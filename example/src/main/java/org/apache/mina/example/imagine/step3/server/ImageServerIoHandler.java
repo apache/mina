@@ -158,7 +158,7 @@ public class ImageServerIoHandler extends IoHandlerAdapter {
      */
     private String generateString(IoSession session, int length) {
         Integer index = (Integer) session.getAttribute(INDEX_KEY);
-        StringBuffer buffer = new StringBuffer(length);
+        StringBuilder buffer = new StringBuilder(length);
         while (buffer.length() < length) {
             buffer.append(characters.charAt(index));
             index++;

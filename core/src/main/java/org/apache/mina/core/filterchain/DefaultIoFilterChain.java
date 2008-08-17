@@ -53,7 +53,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
      * attribute and notifies the future when {@link #fireSessionCreated()}
      * or {@link #fireExceptionCaught(Throwable)} is invoked.
      */
-    public static final AttributeKey SESSION_CREATED_FUTURE = new AttributeKey(DefaultIoFilterChain.class, "connectFuture");
+    public static final AttributeKey SESSION_CREATED_FUTURE = new AttributeKey(
+            DefaultIoFilterChain.class, "connectFuture");
 
     private final AbstractIoSession session;
 
@@ -232,8 +233,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 + oldFilter.getClass().getName());
     }
 
-    public synchronized IoFilter replace(Class<? extends IoFilter> oldFilterType,
-            IoFilter newFilter) {
+    public synchronized IoFilter replace(
+            Class<? extends IoFilter> oldFilterType, IoFilter newFilter) {
         EntryImpl e = head.nextEntry;
         while (e != tail) {
             if (oldFilterType.isAssignableFrom(e.getFilter().getClass())) {
@@ -387,8 +388,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
         callNextSessionIdle(head, session, status);
     }
 
-    private void callNextSessionIdle(
-            Entry entry, IoSession session, IdleStatus status) {
+    private void callNextSessionIdle(Entry entry, IoSession session,
+            IdleStatus status) {
         try {
             entry.getFilter().sessionIdle(entry.getNextFilter(), session,
                     status);
@@ -399,20 +400,19 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
     public void fireMessageReceived(Object message) {
         if (message instanceof IoBuffer) {
-            session.increaseReadBytes(
-                    ((IoBuffer) message).remaining(),
-                    System.currentTimeMillis());
+            session.increaseReadBytes(((IoBuffer) message).remaining(), System
+                    .currentTimeMillis());
         }
 
         Entry head = this.head;
         callNextMessageReceived(head, session, message);
     }
 
-    private void callNextMessageReceived(
-            Entry entry, IoSession session, Object message) {
+    private void callNextMessageReceived(Entry entry, IoSession session,
+            Object message) {
         try {
-            entry.getFilter().messageReceived(
-                    entry.getNextFilter(), session, message);
+            entry.getFilter().messageReceived(entry.getNextFilter(), session,
+                    message);
         } catch (Throwable e) {
             fireExceptionCaught(e);
         }
@@ -430,7 +430,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         Entry head = this.head;
         callNextMessageSent(head, session, request);
     }
-    
+
     private void callNextMessageSent(Entry entry, IoSession session,
             WriteRequest writeRequest) {
         try {
@@ -449,13 +449,17 @@ public class DefaultIoFilterChain implements IoFilterChain {
     private void callNextExceptionCaught(Entry entry, IoSession session,
             Throwable cause) {
         // Notify the related future.
-        ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
+        ConnectFuture future = (ConnectFuture) session
+                .removeAttribute(SESSION_CREATED_FUTURE);
         if (future == null) {
             try {
-                entry.getFilter().exceptionCaught(entry.getNextFilter(), session,
-                        cause);
+                entry.getFilter().exceptionCaught(entry.getNextFilter(),
+                        session, cause);
             } catch (Throwable e) {
-                logger.warn("Unexpected exception from exceptionCaught handler.", e);
+                logger
+                        .warn(
+                                "Unexpected exception from exceptionCaught handler.",
+                                e);
             }
         } else {
             // Please note that this place is not the only place that
@@ -499,14 +503,16 @@ public class DefaultIoFilterChain implements IoFilterChain {
         callPreviousFilterSetTrafficMask(tail, session, trafficMask);
     }
 
-    private void callPreviousFilterSetTrafficMask(Entry entry, IoSession session, TrafficMask trafficMask) {
+    private void callPreviousFilterSetTrafficMask(Entry entry,
+            IoSession session, TrafficMask trafficMask) {
         try {
-            entry.getFilter().filterSetTrafficMask(entry.getNextFilter(), session, trafficMask);
+            entry.getFilter().filterSetTrafficMask(entry.getNextFilter(),
+                    session, trafficMask);
         } catch (Throwable e) {
             fireExceptionCaught(e);
         }
     }
-    
+
     public List<Entry> getAll() {
         List<Entry> list = new ArrayList<Entry>();
         EntryImpl e = head.nextEntry;
@@ -542,7 +548,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("{ ");
 
         boolean empty = true;
@@ -669,7 +675,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             s.setTrafficMaskNow(trafficMask);
             s.getProcessor().updateTrafficMask(s);
         }
-        
+
     }
 
     private static class TailFilter extends IoFilterAdapter {
@@ -680,7 +686,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 session.getHandler().sessionCreated(session);
             } finally {
                 // Notify the related future.
-                ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
+                ConnectFuture future = (ConnectFuture) session
+                        .removeAttribute(SESSION_CREATED_FUTURE);
                 if (future != null) {
                     future.setSession(session);
                 }
@@ -852,7 +859,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 public void filterSetTrafficMask(IoSession session,
                         TrafficMask trafficMask) {
                     Entry nextEntry = EntryImpl.this.prevEntry;
-                    callPreviousFilterSetTrafficMask(nextEntry, session, trafficMask);
+                    callPreviousFilterSetTrafficMask(nextEntry, session,
+                            trafficMask);
                 }
             };
         }

@@ -250,7 +250,7 @@ public class IoHandlerChain implements IoHandlerCommand {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("{ ");
 
         boolean empty = true;

@@ -454,7 +454,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("{ ");
 
         boolean empty = true;

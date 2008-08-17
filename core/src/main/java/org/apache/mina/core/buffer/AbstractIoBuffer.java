@@ -44,8 +44,6 @@ import java.nio.charset.CoderResult;
 import java.util.EnumSet;
 import java.util.Set;
 
-
-
 /**
  * A base implementation of {@link IoBuffer}.  This implementation
  * assumes that {@link IoBuffer#buf()} always returns a correct NIO
@@ -59,10 +57,15 @@ import java.util.Set;
 public abstract class AbstractIoBuffer extends IoBuffer {
 
     private final IoBufferAllocator allocator;
+
     private final boolean derived;
+
     private boolean autoExpand;
+
     private boolean autoShrink;
+
     private boolean recapacityAllowed = true;
+
     private int minimumCapacity;
 
     /**
@@ -74,8 +77,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * Creates a new parent buffer.
      */
-    protected AbstractIoBuffer(
-            IoBufferAllocator allocator, int initialCapacity) {
+    protected AbstractIoBuffer(IoBufferAllocator allocator, int initialCapacity) {
         this.allocator = allocator;
         this.recapacityAllowed = true;
         this.derived = false;
@@ -115,8 +117,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer minimumCapacity(int minimumCapacity) {
         if (minimumCapacity < 0) {
-            throw new IllegalArgumentException(
-                    "minimumCapacity: " + minimumCapacity);
+            throw new IllegalArgumentException("minimumCapacity: "
+                    + minimumCapacity);
         }
         this.minimumCapacity = minimumCapacity;
         return this;
@@ -144,8 +146,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
             //// Reallocate.
             ByteBuffer oldBuf = buf();
-            ByteBuffer newBuf =
-                allocator.allocateNioBuffer(newCapacity, isDirect());
+            ByteBuffer newBuf = allocator.allocateNioBuffer(newCapacity,
+                    isDirect());
             oldBuf.clear();
             newBuf.put(oldBuf);
             buf(newBuf);
@@ -273,8 +275,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
         //// Reallocate.
         ByteBuffer oldBuf = buf();
-        ByteBuffer newBuf =
-            allocator.allocateNioBuffer(newCapacity, isDirect());
+        ByteBuffer newBuf = allocator
+                .allocateNioBuffer(newCapacity, isDirect());
         oldBuf.position(0);
         oldBuf.limit(limit);
         newBuf.put(oldBuf);
@@ -443,7 +445,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             return this;
         }
 
-        if (isAutoShrink() && remaining <= capacity >>> 2 && capacity > minimumCapacity) {
+        if (isAutoShrink() && remaining <= capacity >>> 2
+                && capacity > minimumCapacity) {
             int newCapacity = capacity;
             int minCapacity = Math.max(minimumCapacity, remaining << 1);
             for (;;) {
@@ -466,14 +469,14 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             //// Sanity check.
             if (remaining > newCapacity) {
                 throw new IllegalStateException(
-                        "The amount of the remaining bytes is greater than " +
-                        "the new capacity.");
+                        "The amount of the remaining bytes is greater than "
+                                + "the new capacity.");
             }
 
             //// Reallocate.
             ByteBuffer oldBuf = buf();
-            ByteBuffer newBuf =
-                allocator.allocateNioBuffer(newCapacity, isDirect());
+            ByteBuffer newBuf = allocator.allocateNioBuffer(newCapacity,
+                    isDirect());
             newBuf.put(oldBuf);
             buf(newBuf);
 
@@ -711,9 +714,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         int endIndex = pos + length;
 
         if (capacity() < endIndex) {
-            throw new IndexOutOfBoundsException(
-                    "index + length (" + endIndex + ") is greater " +
-                    "than capacity (" + capacity() + ").");
+            throw new IndexOutOfBoundsException("index + length (" + endIndex
+                    + ") is greater " + "than capacity (" + capacity() + ").");
         }
 
         clear();
@@ -735,9 +737,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         int limit = limit();
         int nextPos = pos + length;
         if (limit < nextPos) {
-            throw new IndexOutOfBoundsException(
-                    "position + length (" + nextPos + ") is greater " +
-                    "than limit (" + limit + ").");
+            throw new IndexOutOfBoundsException("position + length (" + nextPos
+                    + ") is greater " + "than limit (" + limit + ").");
         }
 
         limit(pos + length);
@@ -804,7 +805,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (isDirect()) {
             buf.append("DirectBuffer");
         } else {
@@ -995,7 +996,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 if (n > Integer.MAX_VALUE) {
                     bytes = AbstractIoBuffer.this.remaining();
                 } else {
-                    bytes = Math.min(AbstractIoBuffer.this.remaining(), (int) n);
+                    bytes = Math
+                            .min(AbstractIoBuffer.this.remaining(), (int) n);
                 }
                 AbstractIoBuffer.this.skip(bytes);
                 return bytes;
@@ -1029,7 +1031,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     }
 
     @Override
-    public String getString(CharsetDecoder decoder) throws CharacterCodingException {
+    public String getString(CharsetDecoder decoder)
+            throws CharacterCodingException {
         if (!hasRemaining()) {
             return "";
         }
@@ -1131,447 +1134,449 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public String getString(int fieldSize, CharsetDecoder decoder)
             throws CharacterCodingException {
-                checkFieldSize(fieldSize);
+        checkFieldSize(fieldSize);
 
-                if (fieldSize == 0) {
-                    return "";
+        if (fieldSize == 0) {
+            return "";
+        }
+
+        if (!hasRemaining()) {
+            return "";
+        }
+
+        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
+
+        if (utf16 && (fieldSize & 1) != 0) {
+            throw new IllegalArgumentException("fieldSize is not even.");
+        }
+
+        int oldPos = position();
+        int oldLimit = limit();
+        int end = oldPos + fieldSize;
+
+        if (oldLimit < end) {
+            throw new BufferUnderflowException();
+        }
+
+        int i;
+
+        if (!utf16) {
+            for (i = oldPos; i < end; i++) {
+                if (get(i) == 0) {
+                    break;
                 }
-
-                if (!hasRemaining()) {
-                    return "";
-                }
-
-                boolean utf16 = decoder.charset().name().startsWith("UTF-16");
-
-                if (utf16 && (fieldSize & 1) != 0) {
-                    throw new IllegalArgumentException("fieldSize is not even.");
-                }
-
-                int oldPos = position();
-                int oldLimit = limit();
-                int end = oldPos + fieldSize;
-
-                if (oldLimit < end) {
-                    throw new BufferUnderflowException();
-                }
-
-                int i;
-
-                if (!utf16) {
-                    for (i = oldPos; i < end; i++) {
-                        if (get(i) == 0) {
-                            break;
-                        }
-                    }
-
-                    if (i == end) {
-                        limit(end);
-                    } else {
-                        limit(i);
-                    }
-                } else {
-                    for (i = oldPos; i < end; i += 2) {
-                        if (get(i) == 0 && get(i + 1) == 0) {
-                            break;
-                        }
-                    }
-
-                    if (i == end) {
-                        limit(end);
-                    } else {
-                        limit(i);
-                    }
-                }
-
-                if (!hasRemaining()) {
-                    limit(oldLimit);
-                    position(end);
-                    return "";
-                }
-                decoder.reset();
-
-                int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
-                CharBuffer out = CharBuffer.allocate(expectedLength);
-                for (;;) {
-                    CoderResult cr;
-                    if (hasRemaining()) {
-                        cr = decoder.decode(buf(), out, true);
-                    } else {
-                        cr = decoder.flush(out);
-                    }
-
-                    if (cr.isUnderflow()) {
-                        break;
-                    }
-
-                    if (cr.isOverflow()) {
-                        CharBuffer o = CharBuffer.allocate(out.capacity()
-                                + expectedLength);
-                        out.flip();
-                        o.put(out);
-                        out = o;
-                        continue;
-                    }
-
-                    if (cr.isError()) {
-                        // Revert the buffer back to the previous state.
-                        limit(oldLimit);
-                        position(oldPos);
-                        cr.throwException();
-                    }
-                }
-
-                limit(oldLimit);
-                position(end);
-                return out.flip().toString();
             }
+
+            if (i == end) {
+                limit(end);
+            } else {
+                limit(i);
+            }
+        } else {
+            for (i = oldPos; i < end; i += 2) {
+                if (get(i) == 0 && get(i + 1) == 0) {
+                    break;
+                }
+            }
+
+            if (i == end) {
+                limit(end);
+            } else {
+                limit(i);
+            }
+        }
+
+        if (!hasRemaining()) {
+            limit(oldLimit);
+            position(end);
+            return "";
+        }
+        decoder.reset();
+
+        int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
+        CharBuffer out = CharBuffer.allocate(expectedLength);
+        for (;;) {
+            CoderResult cr;
+            if (hasRemaining()) {
+                cr = decoder.decode(buf(), out, true);
+            } else {
+                cr = decoder.flush(out);
+            }
+
+            if (cr.isUnderflow()) {
+                break;
+            }
+
+            if (cr.isOverflow()) {
+                CharBuffer o = CharBuffer.allocate(out.capacity()
+                        + expectedLength);
+                out.flip();
+                o.put(out);
+                out = o;
+                continue;
+            }
+
+            if (cr.isError()) {
+                // Revert the buffer back to the previous state.
+                limit(oldLimit);
+                position(oldPos);
+                cr.throwException();
+            }
+        }
+
+        limit(oldLimit);
+        position(end);
+        return out.flip().toString();
+    }
 
     @Override
     public IoBuffer putString(CharSequence val, CharsetEncoder encoder)
             throws CharacterCodingException {
-                if (val.length() == 0) {
-                    return this;
-                }
+        if (val.length() == 0) {
+            return this;
+        }
 
-                CharBuffer in = CharBuffer.wrap(val);
-                encoder.reset();
+        CharBuffer in = CharBuffer.wrap(val);
+        encoder.reset();
 
-                int expandedState = 0;
+        int expandedState = 0;
 
-                for (;;) {
-                    CoderResult cr;
-                    if (in.hasRemaining()) {
-                        cr = encoder.encode(in, buf(), true);
-                    } else {
-                        cr = encoder.flush(buf());
-                    }
-
-                    if (cr.isUnderflow()) {
-                        break;
-                    }
-                    if (cr.isOverflow()) {
-                        if (isAutoExpand()) {
-                            switch (expandedState) {
-                            case 0:
-                                autoExpand((int) Math.ceil(in.remaining()
-                                        * encoder.averageBytesPerChar()));
-                                expandedState++;
-                                break;
-                            case 1:
-                                autoExpand((int) Math.ceil(in.remaining()
-                                        * encoder.maxBytesPerChar()));
-                                expandedState++;
-                                break;
-                            default:
-                                throw new RuntimeException("Expanded by "
-                                        + (int) Math.ceil(in.remaining()
-                                                * encoder.maxBytesPerChar())
-                                        + " but that wasn't enough for '" + val + "'");
-                            }
-                            continue;
-                        }
-                    } else {
-                        expandedState = 0;
-                    }
-                    cr.throwException();
-                }
-                return this;
+        for (;;) {
+            CoderResult cr;
+            if (in.hasRemaining()) {
+                cr = encoder.encode(in, buf(), true);
+            } else {
+                cr = encoder.flush(buf());
             }
+
+            if (cr.isUnderflow()) {
+                break;
+            }
+            if (cr.isOverflow()) {
+                if (isAutoExpand()) {
+                    switch (expandedState) {
+                    case 0:
+                        autoExpand((int) Math.ceil(in.remaining()
+                                * encoder.averageBytesPerChar()));
+                        expandedState++;
+                        break;
+                    case 1:
+                        autoExpand((int) Math.ceil(in.remaining()
+                                * encoder.maxBytesPerChar()));
+                        expandedState++;
+                        break;
+                    default:
+                        throw new RuntimeException("Expanded by "
+                                + (int) Math.ceil(in.remaining()
+                                        * encoder.maxBytesPerChar())
+                                + " but that wasn't enough for '" + val + "'");
+                    }
+                    continue;
+                }
+            } else {
+                expandedState = 0;
+            }
+            cr.throwException();
+        }
+        return this;
+    }
 
     @Override
-    public IoBuffer putString(CharSequence val, int fieldSize, CharsetEncoder encoder)
-            throws CharacterCodingException {
-                checkFieldSize(fieldSize);
+    public IoBuffer putString(CharSequence val, int fieldSize,
+            CharsetEncoder encoder) throws CharacterCodingException {
+        checkFieldSize(fieldSize);
 
-                if (fieldSize == 0) {
-                    return this;
-                }
+        if (fieldSize == 0) {
+            return this;
+        }
 
-                autoExpand(fieldSize);
+        autoExpand(fieldSize);
 
-                boolean utf16 = encoder.charset().name().startsWith("UTF-16");
+        boolean utf16 = encoder.charset().name().startsWith("UTF-16");
 
-                if (utf16 && (fieldSize & 1) != 0) {
-                    throw new IllegalArgumentException("fieldSize is not even.");
-                }
+        if (utf16 && (fieldSize & 1) != 0) {
+            throw new IllegalArgumentException("fieldSize is not even.");
+        }
 
-                int oldLimit = limit();
-                int end = position() + fieldSize;
+        int oldLimit = limit();
+        int end = position() + fieldSize;
 
-                if (oldLimit < end) {
-                    throw new BufferOverflowException();
-                }
+        if (oldLimit < end) {
+            throw new BufferOverflowException();
+        }
 
-                if (val.length() == 0) {
-                    if (!utf16) {
-                        put((byte) 0x00);
-                    } else {
-                        put((byte) 0x00);
-                        put((byte) 0x00);
-                    }
-                    position(end);
-                    return this;
-                }
-
-                CharBuffer in = CharBuffer.wrap(val);
-                limit(end);
-                encoder.reset();
-
-                for (;;) {
-                    CoderResult cr;
-                    if (in.hasRemaining()) {
-                        cr = encoder.encode(in, buf(), true);
-                    } else {
-                        cr = encoder.flush(buf());
-                    }
-
-                    if (cr.isUnderflow() || cr.isOverflow()) {
-                        break;
-                    }
-                    cr.throwException();
-                }
-
-                limit(oldLimit);
-
-                if (position() < end) {
-                    if (!utf16) {
-                        put((byte) 0x00);
-                    } else {
-                        put((byte) 0x00);
-                        put((byte) 0x00);
-                    }
-                }
-
-                position(end);
-                return this;
+        if (val.length() == 0) {
+            if (!utf16) {
+                put((byte) 0x00);
+            } else {
+                put((byte) 0x00);
+                put((byte) 0x00);
             }
+            position(end);
+            return this;
+        }
+
+        CharBuffer in = CharBuffer.wrap(val);
+        limit(end);
+        encoder.reset();
+
+        for (;;) {
+            CoderResult cr;
+            if (in.hasRemaining()) {
+                cr = encoder.encode(in, buf(), true);
+            } else {
+                cr = encoder.flush(buf());
+            }
+
+            if (cr.isUnderflow() || cr.isOverflow()) {
+                break;
+            }
+            cr.throwException();
+        }
+
+        limit(oldLimit);
+
+        if (position() < end) {
+            if (!utf16) {
+                put((byte) 0x00);
+            } else {
+                put((byte) 0x00);
+                put((byte) 0x00);
+            }
+        }
+
+        position(end);
+        return this;
+    }
 
     @Override
     public String getPrefixedString(CharsetDecoder decoder)
             throws CharacterCodingException {
-                return getPrefixedString(2, decoder);
-            }
+        return getPrefixedString(2, decoder);
+    }
 
-  /**
-   * Reads a string which has a length field before the actual
-   * encoded string, using the specified <code>decoder</code> and returns it.
-   *
-   * @param prefixLength the length of the length field (1, 2, or 4)
-   * @param decoder the decoder to use for decoding the string
-   * @return the prefixed string
-   * @throws CharacterCodingException when decoding fails
-   * @throws BufferUnderflowException when there is not enough data available
-   */
+    /**
+     * Reads a string which has a length field before the actual
+     * encoded string, using the specified <code>decoder</code> and returns it.
+     *
+     * @param prefixLength the length of the length field (1, 2, or 4)
+     * @param decoder the decoder to use for decoding the string
+     * @return the prefixed string
+     * @throws CharacterCodingException when decoding fails
+     * @throws BufferUnderflowException when there is not enough data available
+     */
     @Override
     public String getPrefixedString(int prefixLength, CharsetDecoder decoder)
             throws CharacterCodingException {
-                if (!prefixedDataAvailable(prefixLength)) {
-                    throw new BufferUnderflowException();
-                }
+        if (!prefixedDataAvailable(prefixLength)) {
+            throw new BufferUnderflowException();
+        }
 
-                int fieldSize = 0;
+        int fieldSize = 0;
 
-                switch (prefixLength) {
-                case 1:
-                    fieldSize = getUnsigned();
-                    break;
-                case 2:
-                    fieldSize = getUnsignedShort();
-                    break;
-                case 4:
-                    fieldSize = getInt();
-                    break;
-                }
+        switch (prefixLength) {
+        case 1:
+            fieldSize = getUnsigned();
+            break;
+        case 2:
+            fieldSize = getUnsignedShort();
+            break;
+        case 4:
+            fieldSize = getInt();
+            break;
+        }
 
-                if (fieldSize == 0) {
-                    return "";
-                }
+        if (fieldSize == 0) {
+            return "";
+        }
 
-                boolean utf16 = decoder.charset().name().startsWith("UTF-16");
+        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
 
-                if (utf16 && (fieldSize & 1) != 0) {
-                    throw new BufferDataException(
-                            "fieldSize is not even for a UTF-16 string.");
-                }
+        if (utf16 && (fieldSize & 1) != 0) {
+            throw new BufferDataException(
+                    "fieldSize is not even for a UTF-16 string.");
+        }
 
-                int oldLimit = limit();
-                int end = position() + fieldSize;
+        int oldLimit = limit();
+        int end = position() + fieldSize;
 
-                if (oldLimit < end) {
-                    throw new BufferUnderflowException();
-                }
+        if (oldLimit < end) {
+            throw new BufferUnderflowException();
+        }
 
-                limit(end);
-                decoder.reset();
+        limit(end);
+        decoder.reset();
 
-                int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
-                CharBuffer out = CharBuffer.allocate(expectedLength);
-                for (;;) {
-                    CoderResult cr;
-                    if (hasRemaining()) {
-                        cr = decoder.decode(buf(), out, true);
-                    } else {
-                        cr = decoder.flush(out);
-                    }
-
-                    if (cr.isUnderflow()) {
-                        break;
-                    }
-
-                    if (cr.isOverflow()) {
-                        CharBuffer o = CharBuffer.allocate(out.capacity()
-                                + expectedLength);
-                        out.flip();
-                        o.put(out);
-                        out = o;
-                        continue;
-                    }
-
-                    cr.throwException();
-                }
-
-                limit(oldLimit);
-                position(end);
-                return out.flip().toString();
+        int expectedLength = (int) (remaining() * decoder.averageCharsPerByte()) + 1;
+        CharBuffer out = CharBuffer.allocate(expectedLength);
+        for (;;) {
+            CoderResult cr;
+            if (hasRemaining()) {
+                cr = decoder.decode(buf(), out, true);
+            } else {
+                cr = decoder.flush(out);
             }
+
+            if (cr.isUnderflow()) {
+                break;
+            }
+
+            if (cr.isOverflow()) {
+                CharBuffer o = CharBuffer.allocate(out.capacity()
+                        + expectedLength);
+                out.flip();
+                o.put(out);
+                out = o;
+                continue;
+            }
+
+            cr.throwException();
+        }
+
+        limit(oldLimit);
+        position(end);
+        return out.flip().toString();
+    }
 
     @Override
     public IoBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
             throws CharacterCodingException {
-                return putPrefixedString(in, 2, 0, encoder);
-            }
+        return putPrefixedString(in, 2, 0, encoder);
+    }
 
     @Override
-    public IoBuffer putPrefixedString(CharSequence in, int prefixLength, CharsetEncoder encoder)
-            throws CharacterCodingException {
-                return putPrefixedString(in, prefixLength, 0, encoder);
-            }
-
-    @Override
-    public IoBuffer putPrefixedString(CharSequence in, int prefixLength, int padding,
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
             CharsetEncoder encoder) throws CharacterCodingException {
-                return putPrefixedString(in, prefixLength, padding, (byte) 0, encoder);
-            }
+        return putPrefixedString(in, prefixLength, 0, encoder);
+    }
 
     @Override
-    public IoBuffer putPrefixedString(CharSequence val, int prefixLength, int padding,
-            byte padValue, CharsetEncoder encoder) throws CharacterCodingException {
-                int maxLength;
-                switch (prefixLength) {
-                case 1:
-                    maxLength = 255;
-                    break;
-                case 2:
-                    maxLength = 65535;
-                    break;
-                case 4:
-                    maxLength = Integer.MAX_VALUE;
-                    break;
-                default:
-                    throw new IllegalArgumentException("prefixLength: " + prefixLength);
-                }
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
+            int padding, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        return putPrefixedString(in, prefixLength, padding, (byte) 0, encoder);
+    }
 
-                if (val.length() > maxLength) {
-                    throw new IllegalArgumentException(
-                            "The specified string is too long.");
-                }
-                if (val.length() == 0) {
-                    switch (prefixLength) {
-                    case 1:
-                        put((byte) 0);
-                        break;
-                    case 2:
-                        putShort((short) 0);
-                        break;
-                    case 4:
-                        putInt(0);
-                        break;
-                    }
-                    return this;
-                }
+    @Override
+    public IoBuffer putPrefixedString(CharSequence val, int prefixLength,
+            int padding, byte padValue, CharsetEncoder encoder)
+            throws CharacterCodingException {
+        int maxLength;
+        switch (prefixLength) {
+        case 1:
+            maxLength = 255;
+            break;
+        case 2:
+            maxLength = 65535;
+            break;
+        case 4:
+            maxLength = Integer.MAX_VALUE;
+            break;
+        default:
+            throw new IllegalArgumentException("prefixLength: " + prefixLength);
+        }
 
-                int padMask;
-                switch (padding) {
-                case 0:
-                case 1:
-                    padMask = 0;
-                    break;
-                case 2:
-                    padMask = 1;
-                    break;
-                case 4:
-                    padMask = 3;
-                    break;
-                default:
-                    throw new IllegalArgumentException("padding: " + padding);
-                }
-
-                CharBuffer in = CharBuffer.wrap(val);
-                skip(prefixLength); // make a room for the length field
-                int oldPos = position();
-                encoder.reset();
-
-                int expandedState = 0;
-
-                for (;;) {
-                    CoderResult cr;
-                    if (in.hasRemaining()) {
-                        cr = encoder.encode(in, buf(), true);
-                    } else {
-                        cr = encoder.flush(buf());
-                    }
-
-                    if (position() - oldPos > maxLength) {
-                        throw new IllegalArgumentException(
-                                "The specified string is too long.");
-                    }
-
-                    if (cr.isUnderflow()) {
-                        break;
-                    }
-                    if (cr.isOverflow()) {
-                        if (isAutoExpand()) {
-                            switch (expandedState) {
-                                case 0:
-                                    autoExpand((int) Math.ceil(in.remaining()
-                                            * encoder.averageBytesPerChar()));
-                                    expandedState++;
-                                    break;
-                                case 1:
-                                    autoExpand((int) Math.ceil(in.remaining()
-                                            * encoder.maxBytesPerChar()));
-                                    expandedState++;
-                                    break;
-                                default:
-                                    throw new RuntimeException("Expanded by "
-                                            + (int) Math.ceil(in.remaining()
-                                                    * encoder.maxBytesPerChar())
-                                            + " but that wasn't enough for '" + val + "'");
-                            }
-                            continue;
-                        }
-                    } else {
-                        expandedState = 0;
-                    }
-                    cr.throwException();
-                }
-
-                // Write the length field
-                fill(padValue, padding - (position() - oldPos & padMask));
-                int length = position() - oldPos;
-                switch (prefixLength) {
-                case 1:
-                    put(oldPos - 1, (byte) length);
-                    break;
-                case 2:
-                    putShort(oldPos - 2, (short) length);
-                    break;
-                case 4:
-                    putInt(oldPos - 4, length);
-                    break;
-                }
-                return this;
+        if (val.length() > maxLength) {
+            throw new IllegalArgumentException(
+                    "The specified string is too long.");
+        }
+        if (val.length() == 0) {
+            switch (prefixLength) {
+            case 1:
+                put((byte) 0);
+                break;
+            case 2:
+                putShort((short) 0);
+                break;
+            case 4:
+                putInt(0);
+                break;
             }
+            return this;
+        }
+
+        int padMask;
+        switch (padding) {
+        case 0:
+        case 1:
+            padMask = 0;
+            break;
+        case 2:
+            padMask = 1;
+            break;
+        case 4:
+            padMask = 3;
+            break;
+        default:
+            throw new IllegalArgumentException("padding: " + padding);
+        }
+
+        CharBuffer in = CharBuffer.wrap(val);
+        skip(prefixLength); // make a room for the length field
+        int oldPos = position();
+        encoder.reset();
+
+        int expandedState = 0;
+
+        for (;;) {
+            CoderResult cr;
+            if (in.hasRemaining()) {
+                cr = encoder.encode(in, buf(), true);
+            } else {
+                cr = encoder.flush(buf());
+            }
+
+            if (position() - oldPos > maxLength) {
+                throw new IllegalArgumentException(
+                        "The specified string is too long.");
+            }
+
+            if (cr.isUnderflow()) {
+                break;
+            }
+            if (cr.isOverflow()) {
+                if (isAutoExpand()) {
+                    switch (expandedState) {
+                    case 0:
+                        autoExpand((int) Math.ceil(in.remaining()
+                                * encoder.averageBytesPerChar()));
+                        expandedState++;
+                        break;
+                    case 1:
+                        autoExpand((int) Math.ceil(in.remaining()
+                                * encoder.maxBytesPerChar()));
+                        expandedState++;
+                        break;
+                    default:
+                        throw new RuntimeException("Expanded by "
+                                + (int) Math.ceil(in.remaining()
+                                        * encoder.maxBytesPerChar())
+                                + " but that wasn't enough for '" + val + "'");
+                    }
+                    continue;
+                }
+            } else {
+                expandedState = 0;
+            }
+            cr.throwException();
+        }
+
+        // Write the length field
+        fill(padValue, padding - (position() - oldPos & padMask));
+        int length = position() - oldPos;
+        switch (prefixLength) {
+        case 1:
+            put(oldPos - 1, (byte) length);
+            break;
+        case 2:
+            putShort(oldPos - 2, (short) length);
+            break;
+        case 4:
+            putInt(oldPos - 4, length);
+            break;
+        }
+        return this;
+    }
 
     @Override
     public Object getObject() throws ClassNotFoundException {
@@ -1579,7 +1584,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     }
 
     @Override
-    public Object getObject(final ClassLoader classLoader) throws ClassNotFoundException {
+    public Object getObject(final ClassLoader classLoader)
+            throws ClassNotFoundException {
         if (!prefixedDataAvailable(4)) {
             throw new BufferUnderflowException();
         }
@@ -1606,8 +1612,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         return super.readClassDescriptor();
                     case 1: // Non-primitive types
                         String className = readUTF();
-                        Class<?> clazz =
-                            Class.forName(className, true, classLoader);
+                        Class<?> clazz = Class.forName(className, true,
+                                classLoader);
                         return ObjectStreamClass.lookup(clazz);
                     default:
                         throw new StreamCorruptedException(
@@ -1616,7 +1622,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 }
 
                 @Override
-                protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                protected Class<?> resolveClass(ObjectStreamClass desc)
+                        throws IOException, ClassNotFoundException {
                     String name = desc.getName();
                     try {
                         return Class.forName(name, false, classLoader);
@@ -1828,7 +1835,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     }
 
     private static final long BYTE_MASK = 0xFFL;
+
     private static final long SHORT_MASK = 0xFFFFL;
+
     private static final long INT_MASK = 0xFFFFFFFFL;
 
     @Override
@@ -1927,7 +1936,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     }
 
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSet(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSet(int index,
+            Class<E> enumClass) {
         return toEnumSet(enumClass, get(index) & BYTE_MASK);
     }
 
@@ -1937,7 +1947,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     }
 
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index,
+            Class<E> enumClass) {
         return toEnumSet(enumClass, getShort(index) & SHORT_MASK);
     }
 
@@ -1947,7 +1958,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     }
 
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index,
+            Class<E> enumClass) {
         return toEnumSet(enumClass, getInt(index) & INT_MASK);
     }
 
@@ -1957,7 +1969,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     }
 
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index,
+            Class<E> enumClass) {
         return toEnumSet(enumClass, getLong(index));
     }
 

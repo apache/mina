@@ -225,7 +225,7 @@ public class IoFilterChainTest extends TestCase {
 
     private String formatResult(String result) {
         result = result.replaceAll("\\s", "");
-        StringBuffer buf = new StringBuffer(result.length() * 4 / 3);
+        StringBuilder buf = new StringBuilder(result.length() * 4 / 3);
         for (int i = 0; i < result.length(); i++) {
             buf.append(result.charAt(i));
             if (i % 3 == 2) {

@@ -38,7 +38,7 @@ public class ChainedIoHandlerTest extends TestCase {
 
     public void testChainedCommand() throws Exception {
         IoHandlerChain chain = new IoHandlerChain();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         chain.addLast("A", new TestCommand(buf, 'A'));
         chain.addLast("B", new TestCommand(buf, 'B'));
         chain.addLast("C", new TestCommand(buf, 'C'));
@@ -49,11 +49,11 @@ public class ChainedIoHandlerTest extends TestCase {
     }
 
     private class TestCommand implements IoHandlerCommand {
-        private final StringBuffer buf;
+        private final StringBuilder buf;
 
         private final char ch;
 
-        private TestCommand(StringBuffer buf, char ch) {
+        private TestCommand(StringBuilder buf, char ch) {
             this.buf = buf;
             this.ch = ch;
         }
