@@ -25,12 +25,14 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 
 import junit.framework.TestCase;
 
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMResponses;
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMUtilities;
 import org.apache.mina.proxy.utils.ByteUtilities;
+import org.apache.mina.proxy.utils.MD4Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,12 @@ public class NTLMTest extends TestCase {
     private final static Logger logger = LoggerFactory
             .getLogger(NTLMTest.class);
 
+    static {
+        if (Security.getProvider("MINA") == null) {
+            Security.addProvider(new MD4Provider());
+        }
+    }
+    
     /**
      * Tests bytes manipulations.
      */
