@@ -20,7 +20,9 @@ package org.apache.mina.integration.xbean;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.xbean.spring.context.FileSystemXmlApplicationContext;
@@ -28,6 +30,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.net.URL;
 
 
@@ -52,17 +55,42 @@ public class SpringXBeanTest
         
         // test default without any properties
         NioDatagramAcceptor acceptor0 = ( NioDatagramAcceptor ) factory.getBean( "datagramAcceptor0" );
-        assertNotNull( acceptor0 );
+        assertNotNull( "acceptor0 should not be null", acceptor0 );
+        assertTrue( 
+            "Default constructor for NioDatagramAcceptor should have true value for closeOnDeactivation property", 
+            acceptor0.isCloseOnDeactivation() );
         
         // test setting the port and IP for the acceptor
         NioDatagramAcceptor acceptor1 = ( NioDatagramAcceptor ) factory.getBean( "datagramAcceptor1" );
-        assertNotNull( acceptor1 );
+        assertNotNull( "acceptor1 should not be null", acceptor1 );
         assertEquals( "192.168.0.1", acceptor1.getDefaultLocalAddress().getAddress().getHostAddress() );
         assertEquals( 110, acceptor1.getDefaultLocalAddress().getPort() );
         
-        // test creating with executor
+        // test creating with executor and some primitive properties
         NioDatagramAcceptor acceptor2 = ( NioDatagramAcceptor ) factory.getBean( "datagramAcceptor2" );
         assertNotNull( acceptor2 );
+        assertFalse( acceptor2.isCloseOnDeactivation() );
+        assertFalse( 
+            "NioDatagramAcceptor should have false value for closeOnDeactivation property", 
+            acceptor2.isCloseOnDeactivation() );
+        
+        // test creating with multiple addresses
+        NioDatagramAcceptor acceptor3 = ( NioDatagramAcceptor ) factory.getBean( "datagramAcceptor3" );
+        assertNotNull( acceptor3 );
+        assertEquals( 3, acceptor3.getDefaultLocalAddresses().size() );
+
+        InetSocketAddress address1 = ( InetSocketAddress ) acceptor3.getDefaultLocalAddresses().get( 0 );
+        assertEquals( "192.168.0.1", address1.getAddress().getHostAddress() );
+        assertEquals( 10001, address1.getPort() );
+        
+        InetSocketAddress address2 = ( InetSocketAddress ) acceptor3.getDefaultLocalAddresses().get( 1 );
+        assertEquals( "192.168.0.2", address2.getAddress().getHostAddress() );
+        assertEquals( 10002, address2.getPort() );
+
+        InetSocketAddress address3 = ( InetSocketAddress ) acceptor3.getDefaultLocalAddresses().get( 2 );
+        assertEquals( "192.168.0.3", address3.getAddress().getHostAddress() );
+        assertEquals( 10003, address3.getPort() );
+        
         
         // test with multiple default addresses 
 //        NioDatagramAcceptor acceptor3 = ( NioDatagramAcceptor ) factory.getBean( "datagramAcceptor3" );

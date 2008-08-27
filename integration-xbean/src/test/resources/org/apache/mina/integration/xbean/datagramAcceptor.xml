@@ -27,9 +27,15 @@
   
   <nioDatagramAcceptor id="datagramAcceptor1" defaultLocalAddress="192.168.0.1:110" />
   
-  <nioDatagramAcceptor id="datagramAcceptor2" executor="#threadPoolExecutor" />
+  <nioDatagramAcceptor id="datagramAcceptor2" executor="#threadPoolExecutor" closeOnDeactivation="false" />
 
-  <nioDatagramAcceptor id="datagramAcceptor3"/>
+  <nioDatagramAcceptor id="datagramAcceptor3">
+    <defaultLocalAddresses>
+      <socketAddress>192.168.0.1:10001</socketAddress>
+      <socketAddress>192.168.0.2:10002</socketAddress>
+      <socketAddress>192.168.0.3:10003</socketAddress>
+    </defaultLocalAddresses>
+  </nioDatagramAcceptor>
 
   <nioDatagramAcceptor id="datagramAcceptor4" />
   
