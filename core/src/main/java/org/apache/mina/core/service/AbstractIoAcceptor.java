@@ -40,6 +40,7 @@ import org.apache.mina.core.session.IoSessionConfig;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * @org.apache.xbean.XBean
  */
 public abstract class AbstractIoAcceptor 
         extends AbstractIoService implements IoAcceptor {
@@ -128,6 +129,7 @@ public abstract class AbstractIoAcceptor
 
     /**
      * {@inheritDoc}
+     * @org.apache.xbean.Property nestedType="java.net.SocketAddress"
      */
     public final void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
@@ -168,6 +170,7 @@ public abstract class AbstractIoAcceptor
 
     /**
      * {@inheritDoc}
+     * @org.apache.xbean.Property nestedType="java.net.SocketAddress"
      */
     public final void setDefaultLocalAddresses(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses) {
         if (otherLocalAddresses == null) {

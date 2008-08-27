@@ -53,6 +53,7 @@ import org.apache.mina.util.ExceptionMonitor;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * @org.apache.xbean.XBean
  */
 public abstract class AbstractPollingConnectionlessIoAcceptor<T extends AbstractIoSession, H>
         extends AbstractIoAcceptor {
