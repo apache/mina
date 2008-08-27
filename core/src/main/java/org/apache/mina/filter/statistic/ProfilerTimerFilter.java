@@ -49,6 +49,7 @@ import org.apache.mina.util.CopyOnWriteMap;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * @org.apache.xbean.XBean
  */
 public class ProfilerTimerFilter extends IoFilterAdapter {
     

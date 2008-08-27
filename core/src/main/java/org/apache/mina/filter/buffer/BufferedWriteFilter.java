@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * @since MINA 2.0.0-M2
+ * @org.apache.xbean.XBean
  */
 public final class BufferedWriteFilter extends IoFilterAdapter {
     private final Logger logger = LoggerFactory

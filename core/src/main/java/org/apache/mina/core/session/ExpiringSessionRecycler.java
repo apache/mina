@@ -33,6 +33,7 @@ import org.apache.mina.util.ExpiringMap;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * @org.apache.xbean.XBean
  */
 public class ExpiringSessionRecycler implements IoSessionRecycler {
     private ExpiringMap<Object, IoSession> sessionMap;

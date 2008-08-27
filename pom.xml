@@ -161,6 +161,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.xbean</groupId>
+        <artifactId>xbean-spring</artifactId>
+        <version>3.4.3</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring</artifactId>
         <version>2.5.5</version>
@@ -314,6 +320,7 @@
     <module>filter-codec-netty</module>
     <module>statemachine</module>
     <module>integration-beans</module>
+    <module>integration-xbean</module>
     <module>integration-ognl</module>
     <module>integration-jmx</module>
     <module>example</module>

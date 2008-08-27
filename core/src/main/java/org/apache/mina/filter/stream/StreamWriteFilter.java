@@ -51,6 +51,7 @@ import org.apache.mina.core.write.WriteRequest;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * @org.apache.xbean.XBean
  */
 public class StreamWriteFilter extends AbstractStreamWriteFilter<InputStream> {
 

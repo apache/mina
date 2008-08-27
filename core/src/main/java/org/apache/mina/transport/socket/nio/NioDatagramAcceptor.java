@@ -42,6 +42,7 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * @org.apache.xbean.XBean
  */
 public final class NioDatagramAcceptor
         extends AbstractPollingConnectionlessIoAcceptor<NioSession, DatagramChannel>

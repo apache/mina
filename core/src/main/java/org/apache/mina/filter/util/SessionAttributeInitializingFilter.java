@@ -37,6 +37,7 @@ import org.apache.mina.core.session.IoSession;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * @org.apache.xbean.XBean
  */
 public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     private final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();

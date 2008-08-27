@@ -111,6 +111,7 @@ import org.apache.mina.core.write.WriteRequest;
  * 
  * @see OrderedThreadPoolExecutor
  * @see UnorderedThreadPoolExecutor
+ * @org.apache.xbean.XBean
  */
 public class ExecutorFilter extends IoFilterAdapter {
 

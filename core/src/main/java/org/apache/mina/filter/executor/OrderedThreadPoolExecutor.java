@@ -48,6 +48,7 @@ import org.apache.mina.util.CircularQueue;
 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
+ * @org.apache.xbean.XBean
  */
 public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
