@@ -36,7 +36,7 @@ import org.apache.mina.proxy.session.ProxyIoSession;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
- * ProxyTelnetTest.java - Tests a classical text communication through a proxy.
+ * ProxyTelnetTestClient.java - Tests a classical text communication through a proxy.
  * Changing the params and request type will allow to test the multiple options
  * (http or socks proxying, various authentications methods, ...).
  * 
@@ -44,7 +44,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
-public class ProxyTelnetTest {
+public class ProxyTelnetTestClient {
     
     /**
      * The user login used to authenticate with the proxy.
@@ -75,7 +75,7 @@ public class ProxyTelnetTest {
      * 
      * @throws Exception
      */
-    public ProxyTelnetTest() throws Exception {
+    public ProxyTelnetTestClient() throws Exception {
         // Create proxy connector.
         NioSocketConnector targetConnector = new NioSocketConnector(Runtime
                 .getRuntime().availableProcessors() + 1);
@@ -131,6 +131,6 @@ public class ProxyTelnetTest {
      * {@inheritDoc}
      */
     public static void main(String[] args) throws Exception {
-        new ProxyTelnetTest();
+        new ProxyTelnetTestClient();
     }
 }
