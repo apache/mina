@@ -56,16 +56,27 @@ public class DefaultIoFilterChain implements IoFilterChain {
     public static final AttributeKey SESSION_CREATED_FUTURE = new AttributeKey(
             DefaultIoFilterChain.class, "connectFuture");
 
+    /** The associated session */
     private final AbstractIoSession session;
 
     private final Map<String, Entry> name2entry = new HashMap<String, Entry>();
 
+    /** The chain head */
     private final EntryImpl head;
 
+    /** The chain tail */
     private final EntryImpl tail;
 
+    /** The logger for this class */
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    
+    /**
+     * Create a new default chain, associated with a session. It will only contain a 
+     * HeadFilter and a TailFilter.
+     * 
+     * @param session The session associated with the created filter chain
+     */
     public DefaultIoFilterChain(AbstractIoSession session) {
         if (session == null) {
             throw new NullPointerException("session");
