@@ -49,28 +49,28 @@ public class IoFilterAdapter implements IoFilter {
      * {@inheritDoc}
      */
     public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+        NextFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
     public void onPostAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+        NextFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
     public void onPreRemove(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+        NextFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
     public void onPostRemove(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+        NextFilter nextFilter) throws Exception {
     }
 
     /**

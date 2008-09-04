@@ -34,6 +34,7 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.util.NoopFilter;
 
 /**
  * Tests {@link DefaultIoFilterChain}.
@@ -117,10 +118,10 @@ public class IoFilterChainTest extends TestCase {
     }
 
     public void testGet() throws Exception {
-        IoFilter filterA = new IoFilterAdapter();
-        IoFilter filterB = new IoFilterAdapter();
-        IoFilter filterC = new IoFilterAdapter();
-        IoFilter filterD = new IoFilterAdapter();
+        IoFilter filterA = new NoopFilter();
+        IoFilter filterB = new NoopFilter();
+        IoFilter filterC = new NoopFilter();
+        IoFilter filterD = new NoopFilter();
 
         chain.addFirst("A", filterA);
         chain.addLast("B", filterB);

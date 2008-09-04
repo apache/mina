@@ -26,6 +26,7 @@ import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterChain.Entry;
+import org.apache.mina.filter.util.NoopFilter;
 
 /**
  * Tests {@link DefaultIoFilterChainBuilder}.
@@ -49,14 +50,14 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
     public void testAdd() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
-        builder.addFirst("A", new IoFilterAdapter());
-        builder.addLast("B", new IoFilterAdapter());
-        builder.addFirst("C", new IoFilterAdapter());
-        builder.addLast("D", new IoFilterAdapter());
-        builder.addBefore("B", "E", new IoFilterAdapter());
-        builder.addBefore("C", "F", new IoFilterAdapter());
-        builder.addAfter("B", "G", new IoFilterAdapter());
-        builder.addAfter("D", "H", new IoFilterAdapter());
+        builder.addFirst("A", new NoopFilter());
+        builder.addLast("B", new NoopFilter());
+        builder.addFirst("C", new NoopFilter());
+        builder.addLast("D", new NoopFilter());
+        builder.addBefore("B", "E", new NoopFilter());
+        builder.addBefore("C", "F", new NoopFilter());
+        builder.addAfter("B", "G", new NoopFilter());
+        builder.addAfter("D", "H", new NoopFilter());
 
         String actual = "";
         for (Entry e : builder.getAll()) {
@@ -69,10 +70,10 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
     public void testGet() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
-        IoFilter filterA = new IoFilterAdapter();
-        IoFilter filterB = new IoFilterAdapter();
-        IoFilter filterC = new IoFilterAdapter();
-        IoFilter filterD = new IoFilterAdapter();
+        IoFilter filterA = new NoopFilter();
+        IoFilter filterB = new NoopFilter();
+        IoFilter filterC = new NoopFilter();
+        IoFilter filterD = new NoopFilter();
 
         builder.addFirst("A", filterA);
         builder.addLast("B", filterB);
@@ -88,11 +89,11 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
     public void testRemove() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
-        builder.addLast("A", new IoFilterAdapter());
-        builder.addLast("B", new IoFilterAdapter());
-        builder.addLast("C", new IoFilterAdapter());
-        builder.addLast("D", new IoFilterAdapter());
-        builder.addLast("E", new IoFilterAdapter());
+        builder.addLast("A", new NoopFilter());
+        builder.addLast("B", new NoopFilter());
+        builder.addLast("C", new NoopFilter());
+        builder.addLast("D", new NoopFilter());
+        builder.addLast("E", new NoopFilter());
 
         builder.remove("A");
         builder.remove("E");
@@ -106,11 +107,11 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
     public void testClear() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
-        builder.addLast("A", new IoFilterAdapter());
-        builder.addLast("B", new IoFilterAdapter());
-        builder.addLast("C", new IoFilterAdapter());
-        builder.addLast("D", new IoFilterAdapter());
-        builder.addLast("E", new IoFilterAdapter());
+        builder.addLast("A", new NoopFilter());
+        builder.addLast("B", new NoopFilter());
+        builder.addLast("C", new NoopFilter());
+        builder.addLast("D", new NoopFilter());
+        builder.addLast("E", new NoopFilter());
 
         builder.clear();
 
