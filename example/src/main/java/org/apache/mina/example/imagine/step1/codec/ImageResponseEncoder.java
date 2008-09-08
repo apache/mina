@@ -44,7 +44,6 @@ public class ImageResponseEncoder extends ProtocolEncoderAdapter {
         byte[] bytes2 = getBytes(imageResponse.getImage2());
         int capacity = bytes1.length + bytes2.length + 8;
         IoBuffer buffer = IoBuffer.allocate(capacity, false);
-        buffer.setAutoExpand(true);
         buffer.putInt(bytes1.length);
         buffer.put(bytes1);
         buffer.putInt(bytes2.length);
