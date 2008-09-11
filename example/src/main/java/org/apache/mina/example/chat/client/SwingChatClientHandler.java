@@ -19,14 +19,10 @@
  */
 package org.apache.mina.example.chat.client;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.chat.ChatCommand;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.logging.LoggingFilter;
 
 /**
  * {@link IoHandler} implementation of the client side of the simple chat protocol.
@@ -50,21 +46,10 @@ public class SwingChatClientHandler extends IoHandlerAdapter {
         void error(String message);
     }
 
-    private static final IoFilter LOGGING_FILTER = new LoggingFilter();
-
-    private static final IoFilter CODEC_FILTER = new ProtocolCodecFilter(
-            new TextLineCodecFactory());
-
     private final Callback callback;
 
     public SwingChatClientHandler(Callback callback) {
         this.callback = callback;
-    }
-
-    @Override
-    public void sessionCreated(IoSession session) throws Exception {
-        session.getFilterChain().addLast("codec", CODEC_FILTER);
-        session.getFilterChain().addLast("logger", LOGGING_FILTER);
     }
 
     @Override
