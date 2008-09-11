@@ -35,13 +35,6 @@ import org.apache.mina.core.write.WriteRequestWrapper;
  *
  */
 public abstract class WriteRequestFilter extends IoFilterAdapter {
-
-    @Override
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) throws Exception {
-        nextFilter.exceptionCaught(session, cause);
-    }
-
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception {
