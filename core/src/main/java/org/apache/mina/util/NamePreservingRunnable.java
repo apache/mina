@@ -31,14 +31,28 @@ import org.slf4j.LoggerFactory;
 public class NamePreservingRunnable implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(NamePreservingRunnable.class);
 
+    /** The runnable name */
     private final String newName;
+    
+    /** The runnable task */
     private final Runnable runnable;
 
+    /**
+     * Creates a new instance of NamePreservingRunnable.
+     *
+     * @param runnable The underlying runnable
+     * @param newName The runnable's name
+     */
     public NamePreservingRunnable(Runnable runnable, String newName) {
         this.runnable = runnable;
         this.newName = newName;
     }
 
+    /**
+     * Run the runnable after having renamed the current thread's name 
+     * to the new name. When the runnable has completed, set back the 
+     * current thread name back to its origin. 
+     */
     public void run() {
         Thread currentThread = Thread.currentThread();
         String oldName = currentThread.getName();
@@ -61,10 +75,9 @@ public class NamePreservingRunnable implements Runnable {
     private void setName(Thread thread, String name) {
         try {
             thread.setName(name);
-        } catch (Exception e) {
-            // Probably SecurityException.
+        } catch (SecurityException se) {
             if (logger.isWarnEnabled()) {
-                logger.warn("Failed to set the thread name.", e);
+                logger.warn("Failed to set the thread name.", se);
             }
         }
     }
