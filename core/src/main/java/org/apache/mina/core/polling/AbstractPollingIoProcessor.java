@@ -72,6 +72,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     private final String threadName;
     private final Executor executor;
 
+    /** A Session queue containing the newly created sessions */
     private final Queue<T> newSessions = new ConcurrentLinkedQueue<T>();
     private final Queue<T> removingSessions = new ConcurrentLinkedQueue<T>();
     private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
@@ -316,6 +317,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             throw new IllegalStateException("Already disposed.");
         }
 
+        // Adds the session to the newSession queue and starts the worker
         newSessions.add(session);
         startupWorker();
     }
