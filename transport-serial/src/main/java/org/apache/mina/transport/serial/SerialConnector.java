@@ -159,6 +159,7 @@ public final class SerialConnector extends AbstractIoConnector {
         }
 
         serialPort.setInputBufferSize(config.getInputBufferSize());
+        serialPort.setOutputBufferSize(config.getOutputBufferSize());
 
         if (config.getReceiveThreshold() >= 0) {
             serialPort.enableReceiveThreshold(config.getReceiveThreshold());

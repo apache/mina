@@ -28,16 +28,24 @@ import org.apache.mina.core.session.IoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 529576 $, $Date: 2007-04-17 14:25:07 +0200 (mar., 17 avr. 2007) $
  */
-class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements SerialSessionConfig {
+class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
+        SerialSessionConfig {
 
     private int receiveThreshold = -1;
+
     private int inputBufferSize = 8;
+
+    private int outputBufferSize = 8;
+
     private boolean lowLatency = false;
 
     public DefaultSerialSessionConfig() {
         // All default properties were configured above.
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doSetAll(IoSessionConfig config) {
         if (config instanceof SerialSessionConfig) {
@@ -47,27 +55,68 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements Seri
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getInputBufferSize() {
         return inputBufferSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isLowLatency() {
         return lowLatency;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setInputBufferSize(int bufferSize) {
         inputBufferSize = bufferSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setLowLatency(boolean lowLatency) {
         this.lowLatency = lowLatency;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getReceiveThreshold() {
         return receiveThreshold;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setReceiveThreshold(int bytes) {
         receiveThreshold = bytes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getOutputBufferSize() {
+        return outputBufferSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setOutputBufferSize(int bufferSize) {
+        outputBufferSize = bufferSize;
+
     }
 }

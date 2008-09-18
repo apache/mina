@@ -29,6 +29,10 @@ import org.apache.mina.core.session.IoSession;
  */
 public interface SerialSession extends IoSession {
     SerialSessionConfig getConfig();
+
     SerialAddress getRemoteAddress();
+
     SerialAddress getLocalAddress();
-    SerialAddress getServiceAddress();}
+
+    SerialAddress getServiceAddress();
+}
