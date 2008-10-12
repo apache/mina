@@ -47,6 +47,11 @@ import org.apache.tomcat.jni.Status;
  * @version $Rev$, $Date$
  */
 public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Long> implements SocketAcceptor {
+    /** 
+     * This constant is deduced from the APR code. It is used when the timeout
+     * has expired while doing a poll() operation.
+     */ 
+    private static final int APR_TIMEUP_ERROR = -120001;
 
     private static final int POLLSET_SIZE = 1024;
 
@@ -213,7 +218,10 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     protected boolean select() throws Exception {
         int rv = Poll.poll(pollset, Integer.MAX_VALUE, polledSockets, false);
         if (rv <= 0) {
-            if (rv != -120001) {
+            // We have had an error. It can simply be that we have reached
+            // the timeout (very unlikely, as we have set it to MAX_INTEGER)
+            if (rv != APR_TIMEUP_ERROR) {
+                // It's not a timeout being exceeded. Throw the error
                 throwException(rv);
             }
 
