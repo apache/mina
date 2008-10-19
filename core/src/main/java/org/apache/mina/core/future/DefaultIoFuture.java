@@ -126,22 +126,12 @@ public class DefaultIoFuture implements IoFuture {
      * {@inheritDoc}
      */
     public IoFuture awaitUninterruptibly() {
-        synchronized (lock) {
-            while (!ready) {
-                waiters++;
-                try {
-                    lock.wait(DEAD_LOCK_CHECK_INTERVAL);
-                } catch (InterruptedException ie) {
-                    // Do nothing : this catch is just mandatory by contract
-                } finally {
-                    waiters--;
-                    if (!ready) {
-                        checkDeadLock();
-                    }
-                }
-            }
+        try {
+            await0(Long.MAX_VALUE, false);
+        } catch ( InterruptedException ie) {
+            // Do nothing : this catch is just mandatory by contract
         }
-
+        
         return this;
     }
 
@@ -163,14 +153,26 @@ public class DefaultIoFuture implements IoFuture {
         }
     }
 
+    /**
+     * Wait for the Future to be ready. If the requested delay is 0 or 
+     * negative, this method immediately returns the value of the 
+     * 'ready' flag. 
+     * Every 5 second, the wait will be suspended to be able to check if 
+     * there is a deadlock or not.
+     * 
+     * @param timeoutMillis The delay we will wait for the Future to be ready
+     * @param interruptable Tells if the wait can be interrupted or not
+     * @return <code>true</code> if the Future is ready
+     * @throws InterruptedException If the thread has been interrupted
+     * when it's not allowed.
+     */
     private boolean await0(long timeoutMillis, boolean interruptable) throws InterruptedException {
-        long startTime = timeoutMillis <= 0 ? 0 : System.currentTimeMillis();
-        long waitTime = timeoutMillis;
+        long endTime = System.currentTimeMillis() + timeoutMillis;
 
         synchronized (lock) {
             if (ready) {
                 return ready;
-            } else if (waitTime <= 0) {
+            } else if (timeoutMillis <= 0) {
                 return ready;
             }
 
@@ -178,7 +180,7 @@ public class DefaultIoFuture implements IoFuture {
             try {
                 for (;;) {
                     try {
-                        lock.wait(Math.min(waitTime, DEAD_LOCK_CHECK_INTERVAL));
+                        lock.wait(Math.min(timeoutMillis, DEAD_LOCK_CHECK_INTERVAL));
                     } catch (InterruptedException e) {
                         if (interruptable) {
                             throw e;
@@ -188,9 +190,7 @@ public class DefaultIoFuture implements IoFuture {
                     if (ready) {
                         return true;
                     } else {
-                        waitTime = timeoutMillis
-                                - (System.currentTimeMillis() - startTime);
-                        if (waitTime <= 0) {
+                        if (endTime > System.currentTimeMillis()) {
                             return ready;
                         }
                     }
