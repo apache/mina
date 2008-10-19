@@ -82,9 +82,11 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     private final ServiceOperationFuture disposalFuture = new ServiceOperationFuture();
 
+    /** A flag set when the acceptor has been created and initialized */
     private volatile boolean selectable;
 
-    private Worker worker;
+    /** The thread responsible of accepting incoming requests */ 
+    private Acceptor acceptor;
 
     /**
      * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
@@ -144,7 +146,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     /**
      * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
-     * session configuration and an {@link Executor} for handling I/O events. If
+     * session configuration and an {@link Executor} for handling I/O events. If a
      * null {@link Executor} is provided, a default one will be created using
      * {@link Executors#newCachedThreadPool()}.
      * 
@@ -165,7 +167,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     /**
      * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
-     * session configuration and an {@link Executor} for handling I/O events. If
+     * session configuration and an {@link Executor} for handling I/O events. If a
      * null {@link Executor} is provided, a default one will be created using
      * {@link Executors#newCachedThreadPool()}.
      * 
@@ -176,9 +178,11 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      * @param executor
      *            the {@link Executor} used for handling asynchronous execution of I/O
      *            events. Can be <code>null</code>.
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
-     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
-     * @param createdProcessor tagging the processor as automatically created, so it will be automatically disposed 
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of 
+     * this transport, triggering events to the bound {@link IoHandler} and processing 
+     * the chains of {@link IoFilter}
+     * @param createdProcessor tagging the processor as automatically created, so it 
+     * will be automatically disposed 
      */
     private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
             Executor executor, IoProcessor<T> processor,
@@ -193,7 +197,11 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         this.createdProcessor = createdProcessor;
 
         try {
+            // Initialize the selector
             init();
+            
+            // The selector is now ready, we can switch the
+            // flag to true so that incoming connection can be accepted
             selectable = true;
         } catch (RuntimeException e) {
             throw e;
@@ -284,7 +292,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     protected IoFuture dispose0() throws Exception {
         unbind();
         if (!disposalFuture.isDone()) {
-            startupWorker();
+            startupAcceptor();
             wakeup();
         }
         return disposalFuture;
@@ -303,9 +311,9 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         // to handle
         registerQueue.add(request);
 
-        // creates an instance of a Worker and has the local
+        // creates the Acceptor instance and has the local
         // executor kick it off.
-        startupWorker();
+        startupAcceptor();
         wakeup();
         request.awaitUninterruptibly();
 
@@ -326,23 +334,25 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     /**
      * This method is called by the doBind() and doUnbind()
-     * methods.  If the worker object is not null, presumably
-     * the acceptor is starting up, then the worker object will
-     * be created and kicked off by the executor.  If the worker
-     * object is not null, probably already created and this class
+     * methods.  If the acceptor is null, the acceptor object will
+     * be created and kicked off by the executor.  If the acceptor
+     * object is null, probably already created and this class
      * is now working, then nothing will happen and the method
      * will just return.
      */
-    private void startupWorker() {
+    private void startupAcceptor() {
+        // If the acceptor is not ready, clear the queues
+        // TODO : they should already be clean : do we have to do that ?
         if (!selectable) {
             registerQueue.clear();
             cancelQueue.clear();
         }
 
+        // start the acceptor if not already started
         synchronized (lock) {
-            if (worker == null) {
-                worker = new Worker();
-                executeWorker(worker);
+            if (acceptor == null) {
+                acceptor = new Acceptor();
+                executeWorker(acceptor);
             }
         }
     }
@@ -357,7 +367,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 localAddresses);
 
         cancelQueue.add(future);
-        startupWorker();
+        startupAcceptor();
         wakeup();
 
         future.awaitUninterruptibly();
@@ -367,10 +377,12 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     }
 
     /**
-     * This class is called by the startupWorker() method and is
+     * This class is called by the startupAcceptor() method and is
      * placed into a NamePreservingRunnable class.
+     * It's a thread accepting incoming connections from clients.
+     * The loop is stopped when all the bound handlers are unbound.
      */
-    private class Worker implements Runnable {
+    private class Acceptor implements Runnable {
         public void run() {
             int nHandles = 0;
 
@@ -395,7 +407,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                         synchronized (lock) {
                             if (registerQueue.isEmpty()
                                     && cancelQueue.isEmpty()) {
-                                worker = null;
+                                acceptor = null;
                                 break;
                             }
                         }

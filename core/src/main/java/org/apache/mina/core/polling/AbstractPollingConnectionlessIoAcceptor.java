@@ -75,7 +75,10 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     private final ServiceOperationFuture disposalFuture =
         new ServiceOperationFuture();
     private volatile boolean selectable;
-    private Worker worker;
+    
+    /** The thread responsible of accepting incoming requests */ 
+    private Acceptor acceptor;
+
     private long lastIdleCheckTime;
 
     /**
@@ -302,9 +305,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
 
         synchronized (lock) {
-            if (worker == null) {
-                worker = new Worker();
-                executeWorker(worker);
+            if (acceptor == null) {
+                acceptor = new Acceptor();
+                executeWorker(acceptor);
             }
         }
     }
@@ -318,7 +321,12 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    private class Worker implements Runnable {
+    /**
+     * This private class is used to accept incoming connection from 
+     * clients. It's an infinite loop, which can be stopped when all
+     * the registered handles have been removed (unbound). 
+     */
+    private class Acceptor implements Runnable {
         public void run() {
             int nHandles = 0;
             lastIdleCheckTime = System.currentTimeMillis();
@@ -342,7 +350,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     if (nHandles == 0) {
                         synchronized (lock) {
                             if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
-                                worker = null;
+                                acceptor = null;
                                 break;
                             }
                         }

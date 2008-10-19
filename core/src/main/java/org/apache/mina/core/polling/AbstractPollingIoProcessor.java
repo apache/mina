@@ -78,7 +78,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
     private final Queue<T> trafficControllingSessions = new ConcurrentLinkedQueue<T>();
 
-    private Worker worker;
+    /** The processor thread : it handles the incoming messages */
+    private Processor processor;
+    
     private long lastIdleCheckTime;
 
     private final Object disposalLock = new Object();
@@ -374,9 +376,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private void startupWorker() {
         synchronized (lock) {
-            if (worker == null) {
-                worker = new Worker();
-                executor.execute(new NamePreservingRunnable(worker, threadName));
+            if (processor == null) {
+                processor = new Processor();
+                executor.execute(new NamePreservingRunnable(processor, threadName));
             }
         }
         wakeup();
@@ -843,7 +845,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     
-    private class Worker implements Runnable {
+    private class Processor implements Runnable {
         public void run() {
             int nSessions = 0;
             lastIdleCheckTime = System.currentTimeMillis();
@@ -867,7 +869,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     if (nSessions == 0) {
                         synchronized (lock) {
                             if (newSessions.isEmpty() && isSelectorEmpty()) {
-                                worker = null;
+                                processor = null;
                                 break;
                             }
                         }

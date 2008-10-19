@@ -73,7 +73,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     private final ServiceOperationFuture disposalFuture =
         new ServiceOperationFuture();
     private volatile boolean selectable;
-    private Worker worker;
+    
+    /** The connector thread */
+    private Connector connector;
 
     /**
      * Constructor for {@link AbstractPollingIoConnector}. You need to provide a default
@@ -356,9 +358,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         }
 
         synchronized (lock) {
-            if (worker == null) {
-                worker = new Worker();
-                executeWorker(worker);
+            if (connector == null) {
+                connector = new Connector();
+                executeWorker(connector);
             }
         }
     }
@@ -451,7 +453,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         }
     }
 
-    private class Worker implements Runnable {
+    private class Connector implements Runnable {
 
         public void run() {
             int nHandles = 0;
@@ -475,7 +477,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     if (nHandles == 0) {
                         synchronized (lock) {
                             if (connectQueue.isEmpty()) {
-                                worker = null;
+                                connector = null;
                                 break;
                             }
                         }
