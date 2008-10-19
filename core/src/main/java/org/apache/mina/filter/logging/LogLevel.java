@@ -19,141 +19,63 @@
  */
 package org.apache.mina.filter.logging;
 
-import org.slf4j.Logger;
-
 /**
  * Defines a logging level.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * 
- * @see LoggingFilter
+ * @see NoopFilter
  */
 public enum LogLevel {
 
     /**
-     * {@link LogLevel} which will not log any information
-     */
-    NONE(new LogLevelLogger() {
-        public void log(Logger logger, String message, Object arg) {
-            // Do nothing.
-        }
-
-        public void log(Logger logger, String message, Object[] args) {
-            // Do nothing.
-        }
-
-        public void log(Logger logger, String message, Throwable cause) {
-            // Do nothing.
-        }
-    }),
-
-    /**
      * {@link LogLevel} which logs messages on the TRACE level.
      */
-    TRACE(new LogLevelLogger() {
-        public void log(Logger logger, String message, Object arg) {
-            logger.trace(message, arg);
-        }
-
-        public void log(Logger logger, String message, Object[] args) {
-            logger.trace(message, args);
-        }
-
-        public void log(Logger logger, String message, Throwable cause) {
-            logger.trace(message, cause);
-        }
-    }),
-
+	TRACE(5),
+	
     /**
      * {@link LogLevel} which logs messages on the DEBUG level.
      */
-    DEBUG(new LogLevelLogger() {
-        public void log(Logger logger, String message, Object arg) {
-            logger.debug(message, arg);
-        }
-
-        public void log(Logger logger, String message, Object[] args) {
-            logger.debug(message, args);
-        }
-
-        public void log(Logger logger, String message, Throwable cause) {
-            logger.debug(message, cause);
-        }
-    }),
-
+	DEBUG(4),
+	
     /**
      * {@link LogLevel} which logs messages on the INFO level.
      */
-    INFO(new LogLevelLogger() {
-        public void log(Logger logger, String message, Object arg) {
-            logger.info(message, arg);
-        }
-
-        public void log(Logger logger, String message, Object[] args) {
-            logger.info(message, args);
-        }
-
-        public void log(Logger logger, String message, Throwable cause) {
-            logger.info(message, cause);
-        }
-    }),
-
+	INFO(3),
+	
     /**
      * {@link LogLevel} which logs messages on the WARN level.
      */
-    WARN(new LogLevelLogger() {
-        public void log(Logger logger, String message, Object arg) {
-            logger.warn(message, arg);
-        }
-
-        public void log(Logger logger, String message, Object[] args) {
-            logger.warn(message, args);
-        }
-
-        public void log(Logger logger, String message, Throwable cause) {
-            logger.warn(message, cause);
-        }
-    }),
-
+	WARN(2),
+	
     /**
      * {@link LogLevel} which logs messages on the ERROR level.
      */
-    ERROR(new LogLevelLogger() {
-        public void log(Logger logger, String message, Object arg) {
-            logger.error(message, arg);
-        }
+	ERROR(1),
+	
+    /**
+     * {@link LogLevel} which will not log any information
+     */
+	NONE(0);
 
-        public void log(Logger logger, String message, Object[] args) {
-            logger.error(message, args);
-        }
-
-        public void log(Logger logger, String message, Throwable cause) {
-            logger.error(message, cause);
-        }
-    });
-
-    private final LogLevelLogger logger;
-
-    private LogLevel(LogLevelLogger logger) {
-        this.logger = logger;
-    }
-
-    void log(Logger logger, String format, Object arg) {
-        this.logger.log(logger, format, arg);
-    }
-
-    void log(Logger logger, String format, Object[] args) {
-        this.logger.log(logger, format, args);
-    }
-
-    void log(Logger logger, String message, Throwable cause) {
-        this.logger.log(logger, message, cause);
-    }
-
-    private interface LogLevelLogger {
-        void log(Logger logger, String message, Object arg);
-        void log(Logger logger, String message, Object[] args);
-        void log(Logger logger, String message, Throwable cause);
-    }
+	/** The internal numeric value associated with the log level */
+	private int level;
+	
+	/**
+	 * Create a new instance of a LogLevel.
+	 * 
+	 * @param level The log level
+	 */
+	private LogLevel(int level) {
+		this.level = level;
+	}
+	
+	
+	/**
+	 * @return The numeric value associated with the log level 
+	 */
+	public int getLevel() {
+		return level;
+	}
 }

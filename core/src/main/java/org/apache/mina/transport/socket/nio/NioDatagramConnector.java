@@ -178,8 +178,8 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected boolean select(int timeout) throws Exception {
-        return false;
+    protected int select(int timeout) throws Exception {
+        return 0;
     }
 
     @Override

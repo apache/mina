@@ -170,8 +170,8 @@ public final class NioDatagramAcceptor
     }
 
     @Override
-    protected boolean select(int timeout) throws Exception {
-        return selector.select(timeout) > 0;
+    protected int select(int timeout) throws Exception {
+        return selector.select(timeout);
     }
 
     @Override

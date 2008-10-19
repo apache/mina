@@ -234,10 +234,10 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     /**
      * Check for acceptable connections, interrupt when at least a server is ready for accepting.
      * All the ready server socket descriptors need to be returned by {@link #selectedHandles()}
-     * @return true if one server socket have got incoming client
+     * @return The number of sockets having got incoming client
      * @throws Exception any exception thrown by the underlying systems calls
      */
-    protected abstract boolean select() throws Exception;
+    protected abstract int select() throws Exception;
 
     /**
      * Interrupt the {@link #select()} method. Used when the poll set need to be modified.
@@ -389,14 +389,14 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             while (selectable) {
                 try {
                     // Detect if we have some keys ready to be processed
-                    boolean selected = select();
+                    int selected = select();
 
                     // this actually sets the selector to OP_ACCEPT,
                     // and binds to the port in which this class will
                     // listen on
                     nHandles += registerHandles();
 
-                    if (selected) {
+                    if (selected > 0) {
                         processHandles(selectedHandles());
                     }
 

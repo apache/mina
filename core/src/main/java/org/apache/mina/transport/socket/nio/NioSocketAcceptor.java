@@ -20,6 +20,7 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -49,7 +50,12 @@ public final class NioSocketAcceptor
         extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel>
         implements SocketAcceptor {
 
+    /** 
+     * Define the number of socket that can wait to be accepted. Default
+     * to 50 (as in the SocketServer default).
+     */
     private int backlog = 50;
+
     private boolean reuseAddress = false;
 
     private volatile Selector selector;
@@ -203,6 +209,11 @@ public final class NioSocketAcceptor
             ServerSocketChannel handle) throws Exception {
 
         SelectionKey key = handle.keyFor(selector);
+        
+        if (!key.isValid()) {
+            return null;
+        }
+
         if (!key.isAcceptable()) {
             return null;
         }
@@ -222,25 +233,26 @@ public final class NioSocketAcceptor
     @Override
     protected ServerSocketChannel open(SocketAddress localAddress)
             throws Exception {
-        ServerSocketChannel c = ServerSocketChannel.open();
+        ServerSocketChannel channel = ServerSocketChannel.open();
         boolean success = false;
         try {
-            c.configureBlocking(false);
+            channel.configureBlocking(false);
             // Configure the server socket,
-            c.socket().setReuseAddress(isReuseAddress());
+            ServerSocket socket = channel.socket();
+            socket.setReuseAddress(isReuseAddress());
             // XXX: Do we need to provide this property? (I think we need to remove it.)
-            c.socket().setReceiveBufferSize(
-                    getSessionConfig().getReceiveBufferSize());
+            socket.setReceiveBufferSize(getSessionConfig().getReceiveBufferSize());
             // and bind.
-            c.socket().bind(localAddress, getBacklog());
-            c.register(selector, SelectionKey.OP_ACCEPT);
+            socket.bind(localAddress, getBacklog());
+            // Register the channel within the selector for ACCEPT event
+            channel.register(selector, SelectionKey.OP_ACCEPT);
             success = true;
         } finally {
             if (!success) {
-                close(c);
+                close(channel);
             }
         }
-        return c;
+        return channel;
     }
 
     /**
@@ -261,13 +273,13 @@ public final class NioSocketAcceptor
       * this selector's wakeup method is invoked, or the current thread 
       * is interrupted, whichever comes first.
       * 
-      * @return <code>true</code> if one key has its ready-operation set updated
+      * @return The number of keys having their ready-operation set updated
       * @throws IOException If an I/O error occurs
       * @throws ClosedSelectorException If this selector is closed 
       */
     @Override
-    protected boolean select() throws Exception {
-        return selector.select() > 0;
+    protected int select() throws Exception {
+        return selector.select();
     }
 
     /**
@@ -298,34 +310,54 @@ public final class NioSocketAcceptor
         selector.wakeup();
     }
 
+    /**
+     * Defines an iterator for the selected-key Set returned by the 
+     * selector.selectedKeys(). It replaces the SelectionKey operator.
+     */
     private static class ServerSocketChannelIterator implements Iterator<ServerSocketChannel> {
+        /** The selected-key iterator */
+        private final Iterator<SelectionKey> iterator;
 
-        private final Iterator<SelectionKey> i;
-
+        /**
+         * Build a SocketChannel iterator which will return a SocketChannel instead of
+         * a SelectionKey.
+         * 
+         * @param selectedKeys The selector selected-key set 
+         */
         private ServerSocketChannelIterator(Collection<SelectionKey> selectedKeys) {
-            i = selectedKeys.iterator();
+            iterator = selectedKeys.iterator();
         }
 
         /**
-         * {@inheritDoc}
+         * Tells if there are more SockectChannel left in the iterator
+         * @return <code>true</code> if there is at least one more 
+         * SockectChannel object to read
          */
         public boolean hasNext() {
-            return i.hasNext();
+            return iterator.hasNext();
         }
 
         /**
-         * {@inheritDoc}
+         * Get the next SocketChannel in the operator we have built from
+         * the selected-key et for this selector.
+         * 
+         * @return The next SocketChannel in the iterator
          */
         public ServerSocketChannel next() {
-            SelectionKey key = i.next();
-            return (ServerSocketChannel) key.channel();
+            SelectionKey key = iterator.next();
+            
+            if ( key.isValid() && key.isAcceptable() ) {
+                return (ServerSocketChannel) key.channel();
+            } else {
+                return null;
+            }
         }
 
         /**
-         * {@inheritDoc}
+         * Remove the current SocketChannel from the iterator 
          */
         public void remove() {
-            i.remove();
+            iterator.remove();
         }
     }
 }

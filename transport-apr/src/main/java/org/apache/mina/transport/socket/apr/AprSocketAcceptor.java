@@ -215,7 +215,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     }
 
     @Override
-    protected boolean select() throws Exception {
+    protected int select() throws Exception {
         int rv = Poll.poll(pollset, Integer.MAX_VALUE, polledSockets, false);
         if (rv <= 0) {
             // We have had an error. It can simply be that we have reached
@@ -234,7 +234,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
                 throwException(rv);
             }
 
-            return false;
+            return 0;
         } else {
             rv <<= 1;
             if (!polledHandles.isEmpty()) {
@@ -256,7 +256,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
                     polledHandles.add(socket);
                 }
             }
-            return !polledHandles.isEmpty();
+            return polledHandles.size();
         }
     }
 

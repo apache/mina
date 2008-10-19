@@ -19,9 +19,7 @@
  */
 package org.apache.mina.filter.statistic;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,10 +29,9 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.util.CopyOnWriteMap;
 
 /**
- * This class will measure, the time it takes for a
+ * This class will measure the time it takes for a
  * method in the {@link IoFilterAdapter} class to execute.  The basic
  * premise of the logic in this class is to get the current time
  * at the beginning of the method, call method on nextFilter, and
@@ -46,16 +43,60 @@ import org.apache.mina.util.CopyOnWriteMap;
  *         TimeUnit.MILLISECOND, IoEventType.MESSAGE_RECEIVED);
  * chain.addFirst("Profiler", profiler);
  * </pre>
+ * 
+ * The profiled {@link IoEventType} are :
+ * <ul>
+ * <li>IoEventType.MESSAGE_RECEIVED</li>
+ * <li>IoEventType.MESSAGE_SENT</li>
+ * <li>IoEventType.SESSION_CREATED</li>
+ * <li>IoEventType.SESSION_OPENED</li>
+ * <li>IoEventType.SESSION_IDLE</li>
+ * <li>IoEventType.SESSION_CLOSED</li>
+ * </ul>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class ProfilerTimerFilter extends IoFilterAdapter {
+    /** TRhe selected time unit */
+    private volatile TimeUnit timeUnit;
     
-    private volatile EnumSet<IoEventType> eventsToProfile;
-    private volatile ProfilerTimerUnit timeUnit;
-    private final Map<IoEventType, TimerWorker> timerManager;
+    /** A TimerWorker for the MessageReceived events */
+    private TimerWorker messageReceivedTimerWorker;
+    
+    /** A flag to tell the filter that the MessageReceived must be profiled */
+    private boolean profileMessageReceived = false;
+
+    /** A TimerWorker for the MessageSent events */
+    private TimerWorker messageSentTimerWorker;
+
+    /** A flag to tell the filter that the MessageSent must be profiled */
+    private boolean profileMessageSent = false;
+
+    /** A TimerWorker for the SessionCreated events */
+    private TimerWorker sessionCreatedTimerWorker;
+
+    /** A flag to tell the filter that the SessionCreated must be profiled */
+    private boolean profileSessionCreated = false;
+
+    /** A TimerWorker for the SessionOpened events */
+    private TimerWorker sessionOpenedTimerWorker;
+
+    /** A flag to tell the filter that the SessionOpened must be profiled */
+    private boolean profileSessionOpened = false;
+
+    /** A TimerWorker for the SessionIdle events */
+    private TimerWorker sessionIdleTimerWorker;
+
+    /** A flag to tell the filter that the SessionIdle must be profiled */
+    private boolean profileSessionIdle = false;
+
+    /** A TimerWorker for the SessionClosed events */
+    private TimerWorker sessionClosedTimerWorker;
+
+    /** A flag to tell the filter that the SessionClosed must be profiled */
+    private boolean profileSessionClosed = false;
 
     /**
      * Creates a new instance of ProfilerFilter.  This is the
@@ -65,19 +106,20 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      */
     public ProfilerTimerFilter() {
         this(
-                TimeUnit.MILLISECONDS, EnumSet.of(IoEventType.MESSAGE_RECEIVED,
-                                IoEventType.MESSAGE_SENT));
+                TimeUnit.MILLISECONDS, 
+                IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT);
     }
     
     /**
      * Creates a new instance of ProfilerFilter.  This is the
      * default constructor and will print out timings for
-     * messageReceived and messageSent and the time increment
-     * will be in milliseconds.
+     * messageReceived and messageSent.
+     * 
+     * @param timeUnit the time increment to set
      */
-    public ProfilerTimerFilter(TimeUnit unit) {
+    public ProfilerTimerFilter(TimeUnit timeUnit) {
         this(
-                unit, 
+        		timeUnit, 
                 IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT);
     }
     
@@ -90,201 +132,352 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      *         TimeUnit.MILLISECONDS,
      *         IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT);
      * </pre>
-     * @param unit
-     *  Used to determine the level of precision you need in your timing.
-     * @param firstEventType an event type to profile
-     * @param otherEventTypes event types to profile
+     * 
+     * Note : you can add as many {@link IoEventType} as you want. The method accepts
+     * a variable number of arguments.
+     * 
+     * @param timeUnit Used to determine the level of precision you need in your timing.
+     * @param eventTypes A list of {@link IoEventType} representation of the methods to profile
      */
-    public ProfilerTimerFilter(TimeUnit unit, IoEventType firstEventType, IoEventType... otherEventTypes) {
-        this(unit, EnumSet.of(firstEventType, otherEventTypes));
+    public ProfilerTimerFilter(TimeUnit timeUnit, IoEventType... eventTypes) {
+        this.timeUnit = timeUnit;
+
+        setProfilers(eventTypes);
     }
-
-
+    
     /**
-     * Creates a new instance of ProfilerFilter.  An example
-     * of this call would be:
-     *
-     * <pre>
-     * new ProfilerTimerFilter(
-     *         TimeUnit.MILLISECONDS,
-     *         EnumSet.of(IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT));
-     * </pre>
-     * @param unit
-     *  Used to determine the level of precision you need in your timing.
-     * @param eventTypes
-     *  A set of {@link IoEventType} representation of the methods to profile
+     * Create the profilers for a list of {@link IoEventType}.
+     * 
+     * @param eventTypes the list of {@link IoEventType} to profile
      */
-    public ProfilerTimerFilter(TimeUnit unit, EnumSet<IoEventType> eventTypes) {
-        setTimeUnit(unit);
-        setEventsToProfile(eventTypes);
+    private void setProfilers(IoEventType... eventTypes) {
+        for (IoEventType type : eventTypes) {
+        	switch (type) {
+	        	case MESSAGE_RECEIVED :
+	        		messageReceivedTimerWorker = new TimerWorker();
+	        		profileMessageReceived = true;
+	        		break;
 
-        timerManager = new CopyOnWriteMap<IoEventType, TimerWorker>();
-        for (IoEventType type : eventsToProfile) {
-            timerManager.put(type, new TimerWorker());
+	        	case MESSAGE_SENT :
+	        		messageSentTimerWorker = new TimerWorker();
+	        		profileMessageSent = true;
+	        		break;
+
+	        	case SESSION_CREATED :
+	        		sessionCreatedTimerWorker = new TimerWorker();
+	        		profileSessionCreated = true;
+	        		break;
+	        		
+	        	case SESSION_OPENED :
+	        		sessionOpenedTimerWorker = new TimerWorker();
+	        		profileSessionOpened = true;
+	        		break;
+	        		
+	        	case SESSION_IDLE :
+	        		sessionIdleTimerWorker = new TimerWorker();
+	        		profileSessionIdle = true;
+	        		break;
+	        		
+	        	case SESSION_CLOSED :
+	        		sessionClosedTimerWorker = new TimerWorker();
+	        		profileSessionClosed = true;
+	        		break;
+        	}
         }
     }
 
     /**
      * Sets the {@link TimeUnit} being used.
      *
-     * @param unit the new {@link TimeUnit} to be used.
+     * @param timeUnit the new {@link TimeUnit} to be used.
      */
-    public void setTimeUnit(TimeUnit unit) {
-        if (unit == TimeUnit.MILLISECONDS) {
-            this.timeUnit = ProfilerTimerUnit.MILLISECONDS;
-        } else if (unit == TimeUnit.NANOSECONDS) {
-            this.timeUnit = ProfilerTimerUnit.NANOSECONDS;
-        } else if (unit == TimeUnit.SECONDS) {
-            this.timeUnit = ProfilerTimerUnit.SECONDS;
-        } else {
-            throw new IllegalArgumentException(
-                    "Invalid Time specified: " + unit + " (expected: " +
-                    TimeUnit.MILLISECONDS + ", " +
-                    TimeUnit.NANOSECONDS + " or " +
-                    TimeUnit.SECONDS + ')');
-        }
+    public void setTimeUnit(TimeUnit timeUnit) {
+    	this.timeUnit = timeUnit;
     }
 
     /**
-     * Add an {@link IoEventType} to profile
+     * Set the {@link IoEventType} to be profiled
      *
-     * @param type
-     *  The {@link IoEventType} to profile
+     * @param type The {@link IoEventType} to profile
      */
-    public void addEventToProfile(IoEventType type) {
-        if (!timerManager.containsKey(type)) {
-            timerManager.put(type, new TimerWorker());
-        }
+    public void profile(IoEventType type) {
+    	switch (type) {
+    		case MESSAGE_RECEIVED :
+	    		profileMessageReceived = true;
+	    		
+	    		if (messageReceivedTimerWorker == null) {
+	    			messageReceivedTimerWorker = new TimerWorker();
+	    		}
+    	    	
+    	    	return;
+    			
+    		case MESSAGE_SENT :
+	    		profileMessageSent = true;
+	    		
+	    		if (messageSentTimerWorker == null) {
+	    			messageSentTimerWorker = new TimerWorker();
+	    		}
+    	    	
+    	    	return;
+    	    	
+    		case SESSION_CREATED :
+				profileSessionCreated = true;
+	    		
+	    		if (sessionCreatedTimerWorker == null) {
+	    			sessionCreatedTimerWorker = new TimerWorker();
+	    		}
+    	    	
+    		case SESSION_OPENED :
+				profileSessionOpened = true;
+	    		
+	    		if (sessionOpenedTimerWorker == null) {
+	    			sessionOpenedTimerWorker = new TimerWorker();
+	    		}
+    	    	
+    		case SESSION_IDLE :
+				profileSessionIdle = true;
+	    		
+	    		if (sessionIdleTimerWorker == null) {
+	    			sessionIdleTimerWorker = new TimerWorker();
+	    		}
+    	    	
+    		case SESSION_CLOSED :
+				profileSessionClosed = true;
+	    		
+	    		if (sessionClosedTimerWorker == null) {
+	    			sessionClosedTimerWorker = new TimerWorker();
+	    		}
+    	}
     }
 
     /**
-     * Remove an {@link IoEventType} to profile
+     * Stop profiling an {@link IoEventType}
      *
-     * @param type
-     *  The {@link IoEventType} to profile
+     * @param type The {@link IoEventType} to stop profiling
      */
-    public void removeEventToProfile(IoEventType type) {
-        timerManager.remove(type);
+    public void stopProfile(IoEventType type) {
+    	switch (type) {
+			case MESSAGE_RECEIVED :
+	    		profileMessageReceived = false;
+		    	return;
+				
+			case MESSAGE_SENT :
+				profileMessageSent = false;
+		    	return;
+		    	
+			case SESSION_CREATED :
+				profileSessionCreated = false;
+				return;
+
+			case SESSION_OPENED :
+				profileSessionOpened = false;
+				return;
+
+			case SESSION_IDLE :
+				profileSessionIdle = false;
+				return;
+
+			case SESSION_CLOSED :
+				profileSessionClosed = false;
+				return;
+    	}
     }
 
     /**
-     * Return the bitmask that is being used to display
-     * timing information for this filter.
+     * Return the set of {@link IoEventType} which are profiled.
      *
-     * @return
-     *  An int representing the methods that will be logged
+     * @return a Set containing all the profiled {@link IoEventType} 
      */
     public Set<IoEventType> getEventsToProfile() {
-        return Collections.unmodifiableSet(eventsToProfile);
+    	Set<IoEventType> set = new HashSet<IoEventType>();
+    	
+    	if ( profileMessageReceived ) {
+    		set.add(IoEventType.MESSAGE_RECEIVED);
+    	}
+    	
+    	if ( profileMessageSent) {
+    		set.add(IoEventType.MESSAGE_SENT);
+    	}
+    	
+    	if ( profileSessionCreated ) {
+    		set.add(IoEventType.SESSION_CREATED);
+    	}
+    	
+    	if ( profileSessionOpened ) {
+    		set.add(IoEventType.SESSION_OPENED);
+    	}
+    	
+    	if ( profileSessionIdle ) {
+    		set.add(IoEventType.SESSION_IDLE);
+    	}
+    	
+    	if ( profileSessionClosed ) {
+    		set.add(IoEventType.SESSION_CLOSED);
+    	}
+    	
+        return set;
     }
 
     /**
-     * Set the bitmask in order to tell this filter which
-     * methods to print out timing information
+     * Set the profilers for a list of {@link IoEventType}
+     * 
+     * @param eventTypes the list of {@link IoEventType} to profile
      */
-    public void setEventsToProfile(IoEventType firstEventType, IoEventType... otherEventTypes) {
-        this.setEventsToProfile(EnumSet.of(firstEventType, otherEventTypes));
+    public void setEventsToProfile(IoEventType... eventTypes) {
+        setProfilers(eventTypes);
     }
 
     /**
-     * Set the bitmask in order to tell this filter which
-     * methods to print out timing information
-     *
-     * @param eventTypes
-     *  An int representing the new methods that should be logged
+     * Profile a MessageReceived event. This method will gather the following
+     * informations :
+     * - the method duration
+     * - the shortest execution time
+     * - the slowest execution time
+     * - the average execution time
+     * - the global number of calls
+     * 
+     * @param nextFilter The filter to call next
+     * @param session The associated session
+     * @param message the received message
      */
-    public void setEventsToProfile(Set<IoEventType> eventTypes) {
-        if (eventTypes == null) {
-            throw new NullPointerException("eventTypes");
-        }
-        if (eventTypes.isEmpty()) {
-            throw new IllegalArgumentException("eventTypes is empty.");
-        }
-
-        EnumSet<IoEventType> newEventsToProfile = EnumSet.noneOf(IoEventType.class);
-        for (IoEventType e: eventTypes) {
-            newEventsToProfile.add(e);
-        }
-        
-        this.eventsToProfile = newEventsToProfile;
-    }
-
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws Exception {
-        long start = timeUnit.timeNow();
-        nextFilter.messageReceived(session, message);
-        long end = timeUnit.timeNow();
-
-        if (getEventsToProfile().contains(IoEventType.MESSAGE_RECEIVED)) {
-            timerManager.get(IoEventType.MESSAGE_RECEIVED).addNewReading(
-                    end - start);
-        }
+    	if (profileMessageReceived) {
+	        long start = timeNow();
+	        nextFilter.messageReceived(session, message);
+	        long end = timeNow();
+	        messageReceivedTimerWorker.addNewDuration(end - start);
+    	} else {
+	        nextFilter.messageReceived(session, message);
+    	}
     }
 
+    /**
+     * Profile a MessageSent event. This method will gather the following
+     * informations :
+     * - the method duration
+     * - the shortest execution time
+     * - the slowest execution time
+     * - the average execution time
+     * - the global number of calls
+     * 
+     * @param nextFilter The filter to call next
+     * @param session The associated session
+     * @param writeRequest the sent message
+     */
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception {
-        long start = timeUnit.timeNow();
-        nextFilter.messageSent(session, writeRequest);
-        long end = timeUnit.timeNow();
-
-        if (getEventsToProfile().contains(IoEventType.MESSAGE_SENT)) {
-            timerManager.get(IoEventType.MESSAGE_SENT).addNewReading(
-                    end - start);
-        }
+    	if (profileMessageSent) {
+	        long start = timeNow();
+	        nextFilter.messageSent(session, writeRequest);
+	        long end = timeNow();
+	        messageSentTimerWorker.addNewDuration(end - start);
+    	} else {
+	        nextFilter.messageSent(session, writeRequest);
+    	}
     }
 
-    @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        long start = timeUnit.timeNow();
-        nextFilter.sessionClosed(session);
-        long end = timeUnit.timeNow();
-
-        if (getEventsToProfile().contains(IoEventType.SESSION_CLOSED)) {
-            timerManager.get(IoEventType.SESSION_CLOSED).addNewReading(
-                    end - start);
-        }
-    }
-
+    /**
+     * Profile a SessionCreated event. This method will gather the following
+     * informations :
+     * - the method duration
+     * - the shortest execution time
+     * - the slowest execution time
+     * - the average execution time
+     * - the global number of calls
+     * 
+     * @param nextFilter The filter to call next
+     * @param session The associated session
+     */
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session)
             throws Exception {
-        long start = timeUnit.timeNow();
-        nextFilter.sessionCreated(session);
-        long end = timeUnit.timeNow();
-
-        if (getEventsToProfile().contains(IoEventType.SESSION_CREATED)) {
-            timerManager.get(IoEventType.SESSION_CREATED).addNewReading(
-                    end - start);
-        }
+    	if (profileSessionCreated) {
+	        long start = timeNow();
+	        nextFilter.sessionCreated(session);
+	        long end = timeNow();
+	        sessionCreatedTimerWorker.addNewDuration(end - start);
+    	} else {
+            nextFilter.sessionCreated(session);
+    	}
     }
 
-    @Override
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) throws Exception {
-        long start = timeUnit.timeNow();
-        nextFilter.sessionIdle(session, status);
-        long end = timeUnit.timeNow();
-
-        if (getEventsToProfile().contains(IoEventType.SESSION_IDLE)) {
-            timerManager.get(IoEventType.SESSION_IDLE).addNewReading(
-                    end - start);
-        }
-    }
-
+    /**
+     * Profile a SessionOpened event. This method will gather the following
+     * informations :
+     * - the method duration
+     * - the shortest execution time
+     * - the slowest execution time
+     * - the average execution time
+     * - the global number of calls
+     * 
+     * @param nextFilter The filter to call next
+     * @param session The associated session
+     */
     @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session)
             throws Exception {
-        long start = timeUnit.timeNow();
-        nextFilter.sessionOpened(session);
-        long end = timeUnit.timeNow();
+    	if (profileSessionOpened) {
+	        long start = timeNow();
+	        nextFilter.sessionOpened(session);
+	        long end = timeNow();
+	        sessionOpenedTimerWorker.addNewDuration(end - start);
+    	} else {
+            nextFilter.sessionOpened(session);
+    	}
+    }
 
-        if (getEventsToProfile().contains(IoEventType.SESSION_OPENED)) {
-            timerManager.get(IoEventType.SESSION_OPENED).addNewReading(
-                    end - start);
-        }
+    /**
+     * Profile a SessionIdle event. This method will gather the following
+     * informations :
+     * - the method duration
+     * - the shortest execution time
+     * - the slowest execution time
+     * - the average execution time
+     * - the global number of calls
+     * 
+     * @param nextFilter The filter to call next
+     * @param session The associated session
+     * @param status The session's status
+     */
+    @Override
+    public void sessionIdle(NextFilter nextFilter, IoSession session,
+            IdleStatus status) throws Exception {
+    	if (profileSessionIdle) {
+	        long start = timeNow();
+	        nextFilter.sessionIdle(session, status);
+	        long end = timeNow();
+	        sessionIdleTimerWorker.addNewDuration(end - start);
+    	} else {
+            nextFilter.sessionIdle(session, status);
+    	}
+    }
+
+    /**
+     * Profile a SessionClosed event. This method will gather the following
+     * informations :
+     * - the method duration
+     * - the shortest execution time
+     * - the slowest execution time
+     * - the average execution time
+     * - the global number of calls
+     * 
+     * @param nextFilter The filter to call next
+     * @param session The associated session
+     */
+    @Override
+    public void sessionClosed(NextFilter nextFilter, IoSession session)
+            throws Exception {
+    	if (profileSessionClosed) {
+	        long start = timeNow();
+	        nextFilter.sessionClosed(session);
+	        long end = timeNow();
+	        sessionClosedTimerWorker.addNewDuration(end - start);
+    	} else {
+            nextFilter.sessionClosed(session);
+    	}
     }
 
     /**
@@ -296,12 +489,52 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      *  The average time it took to execute the method represented by the {@link IoEventType}
      */
     public double getAverageTime(IoEventType type) {
-        if (!timerManager.containsKey(type)) {
-            throw new IllegalArgumentException(
-                    "You are not monitoring this event.  Please add this event first.");
-        }
+    	switch (type) {
+	    	case MESSAGE_RECEIVED :
+	    		if (profileMessageReceived) {
+	    			return messageReceivedTimerWorker.getAverage();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case MESSAGE_SENT :
+	    		if (profileMessageSent) {
+	    			return messageSentTimerWorker.getAverage();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_CREATED :
+	    		if (profileSessionCreated) {
+	    			return sessionCreatedTimerWorker.getAverage();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_OPENED :
+	    		if (profileSessionOpened) {
+	    			return sessionOpenedTimerWorker.getAverage();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_IDLE :
+	    		if (profileSessionIdle) {
+	    			return sessionIdleTimerWorker.getAverage();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_CLOSED :
+	    		if (profileSessionClosed) {
+	    			return sessionClosedTimerWorker.getAverage();
+	    		}
+	    		
+	    		break;
+    	}
 
-        return timerManager.get(type).getAverage();
+    	throw new IllegalArgumentException(
+                "You are not monitoring this event.  Please add this event first.");
     }
 
     /**
@@ -314,12 +547,52 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      *  The total number of method calls for the method represented by the {@link IoEventType}
      */
     public long getTotalCalls(IoEventType type) {
-        if (!timerManager.containsKey(type)) {
-            throw new IllegalArgumentException(
-                    "You are not monitoring this event.  Please add this event first.");
-        }
-
-        return timerManager.get(type).getCalls();
+    	switch (type) {
+	    	case MESSAGE_RECEIVED :
+	    		if (profileMessageReceived) {
+	    			return messageReceivedTimerWorker.getCallsNumber();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case MESSAGE_SENT :
+	    		if (profileMessageSent) {
+	    			return messageSentTimerWorker.getCallsNumber();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_CREATED :
+	    		if (profileSessionCreated) {
+	    			return sessionCreatedTimerWorker.getCallsNumber();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_OPENED :
+	    		if (profileSessionOpened) {
+	    			return sessionOpenedTimerWorker.getCallsNumber();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_IDLE :
+	    		if (profileSessionIdle) {
+	    			return sessionIdleTimerWorker.getCallsNumber();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_CLOSED :
+	    		if (profileSessionClosed) {
+	    			return sessionClosedTimerWorker.getCallsNumber();
+	    		}
+	    		
+	    		break;
+		}
+	
+		throw new IllegalArgumentException(
+	            "You are not monitoring this event.  Please add this event first.");
     }
 
     /**
@@ -332,12 +605,52 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      *  The total time for the method represented by the {@link IoEventType}
      */
     public long getTotalTime(IoEventType type) {
-        if (!timerManager.containsKey(type)) {
-            throw new IllegalArgumentException(
-                    "You are not monitoring this event.  Please add this event first.");
-        }
-
-        return timerManager.get(type).getTotal();
+    	switch (type) {
+	    	case MESSAGE_RECEIVED :
+	    		if (profileMessageReceived) {
+	    			return messageReceivedTimerWorker.getTotal();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case MESSAGE_SENT :
+	    		if (profileMessageSent) {
+	    			return messageSentTimerWorker.getTotal();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_CREATED :
+	    		if (profileSessionCreated) {
+	    			return sessionCreatedTimerWorker.getTotal();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_OPENED :
+	    		if (profileSessionOpened) {
+	    			return sessionOpenedTimerWorker.getTotal();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_IDLE :
+	    		if (profileSessionIdle) {
+	    			return sessionIdleTimerWorker.getTotal();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_CLOSED :
+	    		if (profileSessionClosed) {
+	    			return sessionClosedTimerWorker.getTotal();
+	    		}
+	    		
+	    		break;
+		}
+	
+		throw new IllegalArgumentException(
+	            "You are not monitoring this event.  Please add this event first.");
     }
 
     /**
@@ -350,12 +663,52 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      *  The minimum time this method has executed represented by the {@link IoEventType}
      */
     public long getMinimumTime(IoEventType type) {
-        if (!timerManager.containsKey(type)) {
-            throw new IllegalArgumentException(
-                    "You are not monitoring this event.  Please add this event first.");
-        }
-
-        return timerManager.get(type).getMinimum();
+    	switch (type) {
+	    	case MESSAGE_RECEIVED :
+	    		if (profileMessageReceived) {
+	    			return messageReceivedTimerWorker.getMinimum();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case MESSAGE_SENT :
+	    		if (profileMessageSent) {
+	    			return messageSentTimerWorker.getMinimum();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_CREATED :
+	    		if (profileSessionCreated) {
+	    			return sessionCreatedTimerWorker.getMinimum();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_OPENED :
+	    		if (profileSessionOpened) {
+	    			return sessionOpenedTimerWorker.getMinimum();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_IDLE :
+	    		if (profileSessionIdle) {
+	    			return sessionIdleTimerWorker.getMinimum();
+	    		}
+	    		
+	    		break;
+	    		
+	    	case SESSION_CLOSED :
+	    		if (profileSessionClosed) {
+	    			return sessionClosedTimerWorker.getMinimum();
+	    		}
+	    		
+	    		break;
+		}
+	
+		throw new IllegalArgumentException(
+	            "You are not monitoring this event.  Please add this event first.");
     }
 
     /**
@@ -368,12 +721,52 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      *  The maximum time this method has executed represented by the {@link IoEventType}
      */
     public long getMaximumTime(IoEventType type) {
-        if (!timerManager.containsKey(type)) {
-            throw new IllegalArgumentException(
-                    "You are not monitoring this event.  Please add this event first.");
-        }
-
-        return timerManager.get(type).getMaximum();
+    	switch (type) {
+			case MESSAGE_RECEIVED :
+				if (profileMessageReceived) {
+					return messageReceivedTimerWorker.getMaximum();
+				}
+				
+				break;
+				
+			case MESSAGE_SENT :
+				if (profileMessageSent) {
+					return messageSentTimerWorker.getMaximum();
+				}
+				
+				break;
+				
+			case SESSION_CREATED :
+				if (profileSessionCreated) {
+					return sessionCreatedTimerWorker.getMaximum();
+				}
+				
+				break;
+				
+			case SESSION_OPENED :
+				if (profileSessionOpened) {
+					return sessionOpenedTimerWorker.getMaximum();
+				}
+				
+				break;
+				
+			case SESSION_IDLE :
+				if (profileSessionIdle) {
+					return sessionIdleTimerWorker.getMaximum();
+				}
+				
+				break;
+				
+			case SESSION_CLOSED :
+				if (profileSessionClosed) {
+					return sessionClosedTimerWorker.getMaximum();
+				}
+				
+				break;
+		}
+		
+		throw new IllegalArgumentException(
+		        "You are not monitoring this event.  Please add this event first.");
     }
 
     /**
@@ -382,11 +775,19 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      *
      */
     private class TimerWorker {
-
+    	/** The sum of all operation durations */
         private final AtomicLong total;
-        private final AtomicLong calls;
+        
+        /** The number of calls */
+        private final AtomicLong callsNumber;
+        
+        /** The fastest operation */
         private final AtomicLong minimum;
+        
+        /** The slowest operation */
         private final AtomicLong maximum;
+        
+        /** A lock for synchinized blocks */
         private final Object lock = new Object();
 
         /**
@@ -395,31 +796,31 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
          */
         public TimerWorker() {
             total = new AtomicLong();
-            calls = new AtomicLong();
+            callsNumber = new AtomicLong();
             minimum = new AtomicLong();
             maximum = new AtomicLong();
         }
 
         /**
-         * Add a new reading to this class.  Total is updated
+         * Add a new operation duration to this class.  Total is updated
          * and calls is incremented
          *
-         * @param newReading
-         *  The new reading
+         * @param duration
+         *  The new operation duration
          */
-        public void addNewReading(long newReading) {
-            calls.incrementAndGet();
-            total.addAndGet(newReading);
+        public void addNewDuration(long duration) {
+        	callsNumber.incrementAndGet();
+            total.addAndGet(duration);
 
             synchronized (lock) {
                 // this is not entirely thread-safe, must lock
-                if (newReading < minimum.longValue()) {
-                    minimum.set(newReading);
+                if (duration < minimum.longValue()) {
+                    minimum.set(duration);
                 }
 
                 // this is not entirely thread-safe, must lock
-                if (newReading > maximum.longValue()) {
-                    maximum.set(newReading);
+                if (duration > maximum.longValue()) {
+                    maximum.set(duration);
                 }
             }
         }
@@ -427,106 +828,68 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         /**
          * Gets the average reading for this event
          *
-         * @return
-         *  Gets the average reading for this event
+         * @return the average reading for this event
          */
         public double getAverage() {
-            return total.longValue() / calls.longValue();
+        	synchronized (lock) {
+        		// There are two operations, we need to synchronize the block
+        		return total.longValue() / callsNumber.longValue();
+        	}
         }
 
         /**
-         * Returns the total number of readings
+         * Returns the total number of profiled operations
          *
-         * @return
-         *  total number of readings
+         * @return The total number of profiled operation 
          */
-        public long getCalls() {
-            return calls.longValue();
+        public long getCallsNumber() {
+            return callsNumber.longValue();
         }
 
         /**
          * Returns the total time
          *
-         * @return
-         *  the total time
+         * @return the total time
          */
         public long getTotal() {
             return total.longValue();
         }
 
         /**
-         * Returns the minimum value
+         * Returns the lowest execution time 
          *
-         * @return
-         *  the minimum value
+         * @return the lowest execution time
          */
         public long getMinimum() {
             return minimum.longValue();
         }
 
         /**
-         * Returns the maximum value
+         * Returns the longest execution time
          *
-         * @return
-         *  the maximum value
+         * @return the longest execution time
          */
         public long getMaximum() {
             return maximum.longValue();
         }
     }
 
-    private enum ProfilerTimerUnit {
-        SECONDS {
-            @Override
-            public long timeNow() {
-                return System.currentTimeMillis() / 1000;
-            }
-
-            @Override
-            public String getDescription() {
-                return "seconds";
-            }
-        },
-        MILLISECONDS {
-            @Override
-            public long timeNow() {
-                return System.currentTimeMillis();
-            }
-
-            @Override
-            public String getDescription() {
-                return "milliseconds";
-            }
-        },
-        NANOSECONDS {
-            @Override
-            public long timeNow() {
-                return System.nanoTime();
-            }
-
-            @Override
-            public String getDescription() {
-                return "nanoseconds";
-            }
-        };
-
-        /*
-         * I was looking at possibly using the java.util.concurrent.TimeUnit
-         * and I found this construct for writing enums.  Here is what the
-         * JDK developers say for why these methods below cannot be marked as
-         * abstract, but should act in an abstract way...
-         *
-         *     To maintain full signature compatibility with 1.5, and to improve the
-         *     clarity of the generated javadoc (see 6287639: Abstract methods in
-         *     enum classes should not be listed as abstract), method convert
-         *     etc. are not declared abstract but otherwise act as abstract methods.
-         */
-        public long timeNow() {
-            throw new AbstractMethodError();
-        }
-
-        public String getDescription() {
-            throw new AbstractMethodError();
-        }
+    /**
+     * @return the current time, expressed using the fixed TimeUnit.
+     */
+    private long timeNow() {
+    	switch (timeUnit) {
+	    	case SECONDS :
+	    		return System.currentTimeMillis()/1000;
+	    		
+	    	case MICROSECONDS :
+	    		return System.nanoTime()/1000;
+	    		
+	    	case NANOSECONDS :
+	    		return System.nanoTime();
+	    		
+	    	default :
+	    		return System.currentTimeMillis();
+    	}
     }
 }

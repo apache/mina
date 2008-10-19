@@ -181,10 +181,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     /**
      * poll those sessions for the given timeout
      * @param timeout milliseconds before the call timeout if no event appear
-     * @return true if at least a session is ready for read or for write
+     * @return The number of session ready for read or for write
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract boolean select(int timeout) throws Exception;
+    protected abstract int select(int timeout) throws Exception;
     
     /**
      * Say if the list of {@link IoSession} polled by this {@link IoProcessor} 
@@ -852,12 +852,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
             for (;;) {
                 try {
-                    boolean selected = select(1000);
+                    int selected = select(1000);
 
                     nSessions += add();
                     updateTrafficMask();
 
-                    if (selected) {
+                    if (selected > 0) {
                         process();
                     }
 

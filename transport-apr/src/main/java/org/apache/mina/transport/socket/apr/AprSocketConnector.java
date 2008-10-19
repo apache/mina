@@ -53,6 +53,12 @@ import org.apache.tomcat.jni.Status;
  */
 public final class AprSocketConnector extends AbstractPollingIoConnector<AprSession, Long> implements SocketConnector {
 
+    /** 
+     * This constant is deduced from the APR code. It is used when the timeout
+     * has expired while doing a poll() operation.
+     */ 
+    private static final int APR_TIMEUP_ERROR = -120001;
+
     private static final int POLLSET_SIZE = 1024;
 
     private final Map<Long, ConnectionRequest> requests =
@@ -299,10 +305,10 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      * {@inheritDoc}
      */
     @Override
-    protected boolean select(int timeout) throws Exception {
+    protected int select(int timeout) throws Exception {
         int rv = Poll.poll(pollset, timeout * 1000, polledSockets, false);
         if (rv <= 0) {
-            if (rv != -120001) {
+            if (rv != APR_TIMEUP_ERROR) {
                 throwException(rv);
             }
 
@@ -315,7 +321,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
                 throwException(rv);
             }
 
-            return false;
+            return 0;
         } else {
             rv <<= 1;
             if (!polledHandles.isEmpty()) {
@@ -337,7 +343,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
                     failedHandles.add(socket);
                 }
             }
-            return !polledHandles.isEmpty();
+            return polledHandles.size();
         }
     }
 

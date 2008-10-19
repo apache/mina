@@ -263,10 +263,10 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      * Check for connected sockets, interrupt when at least a connection is processed (connected or
      * failed to connect). All the client socket descriptors processed need to be returned by 
      * {@link #selectedHandles()}
-     * @return true if one server socket have got incoming client
+     * @return The number of socket having received some data
      * @throws Exception any exception thrown by the underlying systems calls
      */
-    protected abstract boolean select(int timeout) throws Exception;
+    protected abstract int select(int timeout) throws Exception;
     
     /**
      * {@link Iterator} for the set of client sockets found connected or 
@@ -462,11 +462,11 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     // the timeout for select shall be smaller of the connect
                     // timeout or 1 second...
                     int timeout = (int)Math.min(getConnectTimeoutMillis(), 1000L);
-                    boolean selected = select(timeout);
+                    int selected = select(timeout);
 
                     nHandles += registerNew();
 
-                    if (selected) {
+                    if (selected > 0) {
                         nHandles -= processSessions(selectedHandles());
                     }
 
