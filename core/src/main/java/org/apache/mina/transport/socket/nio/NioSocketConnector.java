@@ -192,7 +192,7 @@ public final class NioSocketConnector
      * {@inheritDoc}
      */
     @Override
-    protected ConnectionRequest connectionRequest(SocketChannel handle) {
+    protected ConnectionRequest getConnectionRequest(SocketChannel handle) {
         SelectionKey key = handle.keyFor(selector);
         if (key == null) {
             return null;

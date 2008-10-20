@@ -201,7 +201,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      * {@inheritDoc}
      */
     @Override
-    protected ConnectionRequest connectionRequest(Long handle) {
+    protected ConnectionRequest getConnectionRequest(Long handle) {
         return requests.get(handle);
     }
 

@@ -158,7 +158,7 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected ConnectionRequest connectionRequest(DatagramChannel handle) {
+    protected ConnectionRequest getConnectionRequest(DatagramChannel handle) {
         throw new UnsupportedOperationException();
     }
 

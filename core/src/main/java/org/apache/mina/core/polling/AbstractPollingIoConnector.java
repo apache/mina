@@ -294,7 +294,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      * @param handle the socket client handle 
      * @return the connection request if the socket is connecting otherwise <code>null</code>
      */
-    protected abstract ConnectionRequest connectionRequest(H handle);
+    protected abstract ConnectionRequest getConnectionRequest(H handle);
 
     /**
      * {@inheritDoc}
@@ -409,29 +409,35 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         return nHandles;
     }
 
-    @SuppressWarnings("unchecked")
-    private int processSessions(Iterator<H> handlers) {
+    /**
+     * Process the incoming connections, creating a new session for each
+     * valid connection. 
+     */
+    private int processConnections(Iterator<H> handlers) {
         int nHandles = 0;
+        
+        // Loop on each connection request
         while (handlers.hasNext()) {
             H handle = handlers.next();
             handlers.remove();
 
-            ConnectionRequest entry = connectionRequest(handle);
+            ConnectionRequest connectionRequest = getConnectionRequest(handle);
             boolean success = false;
             try {
                 if (finishConnect(handle)) {
                     T session = newSession(processor, handle);
-                    finishSessionInitialization(session, entry, entry.getSessionInitializer());
+                    finishSessionInitialization(session, connectionRequest, connectionRequest.getSessionInitializer());
                     // Forward the remaining process to the IoProcessor.
                     session.getProcessor().add(session);
                     nHandles ++;
                 }
                 success = true;
             } catch (Throwable e) {
-                entry.setException(e);
+                connectionRequest.setException(e);
             } finally {
                 if (!success) {
-                    cancelQueue.offer(entry);
+                    // The connection failed, we have to cancel it.
+                    cancelQueue.offer(connectionRequest);
                 }
             }
         }
@@ -443,12 +449,12 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
         while (handles.hasNext()) {
             H handle = handles.next();
-            ConnectionRequest entry = connectionRequest(handle);
+            ConnectionRequest connectionRequest = getConnectionRequest(handle);
 
-            if (currentTime >= entry.deadline) {
-                entry.setException(
+            if (currentTime >= connectionRequest.deadline) {
+                connectionRequest.setException(
                         new ConnectException("Connection timed out."));
-                cancelQueue.offer(entry);
+                cancelQueue.offer(connectionRequest);
             }
         }
     }
@@ -467,7 +473,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     nHandles += registerNew();
 
                     if (selected > 0) {
-                        nHandles -= processSessions(selectedHandles());
+                        nHandles -= processConnections(selectedHandles());
                     }
 
                     processTimedOutSessions(allHandles());
