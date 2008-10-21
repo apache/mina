@@ -194,7 +194,8 @@ public final class NioSocketConnector
     @Override
     protected ConnectionRequest getConnectionRequest(SocketChannel handle) {
         SelectionKey key = handle.keyFor(selector);
-        if (key == null) {
+        
+        if ((key == null) || (!key.isValid())) { 
             return null;
         }
 
@@ -207,9 +208,11 @@ public final class NioSocketConnector
     @Override
     protected void close(SocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
+        
         if (key != null) {
             key.cancel();
         }
+        
         handle.close();
     }
 
@@ -218,11 +221,13 @@ public final class NioSocketConnector
      */
     @Override
     protected boolean finishConnect(SocketChannel handle) throws Exception {
-        SelectionKey key = handle.keyFor(selector);
         if (handle.finishConnect()) {
+            SelectionKey key = handle.keyFor(selector);
+
             if (key != null) {
                 key.cancel();
             }
+            
             return true;
         }
 

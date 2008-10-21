@@ -451,7 +451,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             H handle = handles.next();
             ConnectionRequest connectionRequest = getConnectionRequest(handle);
 
-            if (currentTime >= connectionRequest.deadline) {
+            if ((connectionRequest != null) && (currentTime >= connectionRequest.deadline)) {
                 connectionRequest.setException(
                         new ConnectException("Connection timed out."));
                 cancelQueue.offer(connectionRequest);

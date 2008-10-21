@@ -121,24 +121,22 @@ public final class NioDatagramAcceptor
     @Override
     protected boolean isReadable(DatagramChannel handle) {
         SelectionKey key = handle.keyFor(selector);
-        if (key == null) {
+
+        if ((key == null) || (!key.isValid())) {
             return false;
         }
-        if (!key.isValid()) {
-            return false;
-        }
+
         return key.isReadable();
     }
 
     @Override
     protected boolean isWritable(DatagramChannel handle) {
         SelectionKey key = handle.keyFor(selector);
-        if (key == null) {
+
+        if ((key == null) || (!key.isValid())) {
             return false;
         }
-        if (!key.isValid()) {
-            return false;
-        }
+
         return key.isWritable();
     }
 
@@ -153,9 +151,11 @@ public final class NioDatagramAcceptor
             IoProcessor<NioSession> processor, DatagramChannel handle,
             SocketAddress remoteAddress) {
         SelectionKey key = handle.keyFor(selector);
-        if (key == null) {
+        
+        if ((key == null) || (!key.isValid())) {
             return null;
         }
+        
         NioDatagramSession newSession = new NioDatagramSession(
                 this, handle, processor, remoteAddress);
         newSession.setSelectionKey(key);
@@ -204,9 +204,11 @@ public final class NioDatagramAcceptor
     @Override
     protected void close(DatagramChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
+
         if (key != null) {
             key.cancel();
         }
+        
         handle.disconnect();
         handle.close();
     }

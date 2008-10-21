@@ -210,11 +210,7 @@ public final class NioSocketAcceptor
 
         SelectionKey key = handle.keyFor(selector);
         
-        if (!key.isValid()) {
-            return null;
-        }
-
-        if (!key.isAcceptable()) {
+        if ((key == null) || (!key.isValid()) || (!key.isAcceptable()) ) {
             return null;
         }
 
@@ -296,9 +292,11 @@ public final class NioSocketAcceptor
     @Override
     protected void close(ServerSocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
+        
         if (key != null) {
             key.cancel();
         }
+        
         handle.close();
     }
 
