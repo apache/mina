@@ -422,6 +422,11 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             handlers.remove();
 
             ConnectionRequest connectionRequest = getConnectionRequest(handle);
+            
+            if ( connectionRequest == null) {
+                continue;
+            }
+            
             boolean success = false;
             try {
                 if (finishConnect(handle)) {
