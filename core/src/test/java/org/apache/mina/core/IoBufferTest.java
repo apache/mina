@@ -32,10 +32,18 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.util.Bar;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.fail;
 
 /**
  * Tests {@link IoBuffer}.
@@ -43,20 +51,21 @@ import org.apache.mina.util.Bar;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoBufferTest extends TestCase {
+public class IoBufferTest {
 
-    public static void main(String[] args) {
+    /* public static void main(String[] args) {
         junit.textui.TestRunner.run(IoBufferTest.class);
+    } */
+
+    @Before
+    public void setUp() throws Exception {
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @After
+    public void tearDown() throws Exception {
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
+    @Test
     public void testAllocate() throws Exception {
         for (int i = 10; i < 1048576 * 2; i = i * 11 / 10) // increase by 10%
         {
@@ -68,6 +77,7 @@ public class IoBufferTest extends TestCase {
         }
     }
 
+    @Test
     public void testAutoExpand() throws Exception {
         IoBuffer buf = IoBuffer.allocate(1);
 
@@ -111,6 +121,7 @@ public class IoBufferTest extends TestCase {
         }
     }
 
+    @Test
     public void testAutoExpandMark() throws Exception {
         IoBuffer buf = IoBuffer.allocate(4).setAutoExpand(true);
 
@@ -130,6 +141,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(3, buf.position());
     }
 
+    @Test
     public void testAutoShrink() throws Exception {
         IoBuffer buf = IoBuffer.allocate(8).setAutoShrink(true);
 
@@ -204,6 +216,7 @@ public class IoBufferTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetString() throws Exception {
         IoBuffer buf = IoBuffer.allocate(16);
         CharsetDecoder decoder;
@@ -317,6 +330,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(4, buf.limit());
     }
 
+    @Test
     public void testGetStringWithFailure() throws Exception {
         String test = "\u30b3\u30e1\u30f3\u30c8\u7de8\u96c6";
         IoBuffer buffer = IoBuffer.wrap(test.getBytes("Shift_JIS"));
@@ -341,6 +355,7 @@ public class IoBufferTest extends TestCase {
         }
     }
 
+    @Test
     public void testPutString() throws Exception {
         CharsetEncoder encoder;
         IoBuffer buf = IoBuffer.allocate(16);
@@ -408,6 +423,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(0, buf.get(1));
     }
 
+    @Test
     public void testGetPrefixedString() throws Exception {
         IoBuffer buf = IoBuffer.allocate(16);
         CharsetEncoder encoder;
@@ -421,6 +437,7 @@ public class IoBufferTest extends TestCase {
         assertEquals("ABC", buf.getPrefixedString(decoder));
     }
 
+    @Test
     public void testPutPrefixedString() throws Exception {
         CharsetEncoder encoder;
         IoBuffer buf = IoBuffer.allocate(16);
@@ -468,6 +485,7 @@ public class IoBufferTest extends TestCase {
         assertEquals('5', buf.get(16));
     }
 
+    @Test
     public void testPutPrefixedStringWithPrefixLength() throws Exception {
         CharsetEncoder encoder = Charset.forName("ISO-8859-1").newEncoder();
         IoBuffer buf = IoBuffer.allocate(16).sweep().setAutoExpand(true);
@@ -494,6 +512,7 @@ public class IoBufferTest extends TestCase {
         assertEquals('A', buf.get(4));
     }
 
+    @Test
     public void testPutPrefixedStringWithPadding() throws Exception {
         CharsetEncoder encoder = Charset.forName("ISO-8859-1").newEncoder();
         IoBuffer buf = IoBuffer.allocate(16).sweep().setAutoExpand(true);
@@ -514,6 +533,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(' ', buf.get(4));
     }
 
+    @Test
     public void testWideUtf8Characters() throws Exception {
         Runnable r = new Runnable() {
             public void run() {
@@ -553,6 +573,7 @@ public class IoBufferTest extends TestCase {
         }
     }
 
+    @Test
     public void testObjectSerialization() throws Exception {
         IoBuffer buf = IoBuffer.allocate(16);
         buf.setAutoExpand(true);
@@ -572,6 +593,7 @@ public class IoBufferTest extends TestCase {
         assertNotSame(o, o2);
     }
 
+    @Test
     public void testInheritedObjectSerialization() throws Exception {
         IoBuffer buf = IoBuffer.allocate(16);
         buf.setAutoExpand(true);
@@ -594,6 +616,7 @@ public class IoBufferTest extends TestCase {
         assertNotSame(expected, actual);
     }
 
+    @Test
     public void testSweepWithZeros() throws Exception {
         IoBuffer buf = IoBuffer.allocate(4);
         buf.putInt(0xdeadbeef);
@@ -608,6 +631,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(0x0, buf.getInt());
     }
 
+    @Test
     public void testSweepNonZeros() throws Exception {
         IoBuffer buf = IoBuffer.allocate(4);
         buf.putInt(0xdeadbeef);
@@ -622,6 +646,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(0x45454545, buf.getInt());
     }
 
+    @Test
     public void testWrapNioBuffer() throws Exception {
         ByteBuffer nioBuf = ByteBuffer.allocate(10);
         nioBuf.position(3);
@@ -633,6 +658,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(10, buf.capacity());
     }
 
+    @Test
     public void testWrapSubArray() throws Exception {
         byte[] array = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
@@ -647,6 +673,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(10, buf.capacity());
     }
 
+    @Test
     public void testDuplicate() throws Exception {
         IoBuffer original;
         IoBuffer duplicate;
@@ -691,6 +718,7 @@ public class IoBufferTest extends TestCase {
         }
     }
 
+    @Test
     public void testSlice() throws Exception {
         IoBuffer original;
         IoBuffer slice;
@@ -708,6 +736,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(127, slice.get(0));
     }
 
+    @Test
     public void testReadOnlyBuffer() throws Exception {
         IoBuffer original;
         IoBuffer duplicate;
@@ -736,6 +765,7 @@ public class IoBufferTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetUnsigned() throws Exception {
         IoBuffer buf = IoBuffer.allocate(16);
         buf.put((byte) 0xA4);
@@ -754,6 +784,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(0xCDB3D0A4L, buf.getUnsignedInt());
     }
 
+    @Test
     public void testIndexOf() throws Exception {
         boolean direct = false;
         for (int i = 0; i < 2; i++, direct = !direct) {
@@ -785,6 +816,7 @@ public class IoBufferTest extends TestCase {
         E1, E2, E3, E4, E5, E6, E7, E8, E9, E10, E11, E12, E13, E14, E15, E16, E17, E18, E19, E20, E21, E22, E23, E24, E25, E26, E27, E28, E29, E30, E31, E32, E33, E34, E35, E36, E37, E38, E39, E40, E41, E42, E43, E44, E45, E46, E77, E48, E49, E50, E51, E52, E53, E54, E55, E56, E57, E58, E59, E60, E61, E62, E63, E64, E65
     }
 
+    @Test
     public void testPutEnumSet() {
         IoBuffer buf = IoBuffer.allocate(8);
 
@@ -872,6 +904,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(Long.MIN_VALUE + 1, buf.getLong());
     }
 
+    @Test
     public void testGetEnumSet() {
         IoBuffer buf = IoBuffer.allocate(8);
 
@@ -976,6 +1009,7 @@ public class IoBufferTest extends TestCase {
                 .getEnumSetLong(TestEnum.class));
     }
 
+    @Test
     public void testBitVectorOverFlow() {
         IoBuffer buf = IoBuffer.allocate(8);
         try {
@@ -1007,6 +1041,7 @@ public class IoBufferTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetPutEnum() {
         IoBuffer buf = IoBuffer.allocate(4);
 
@@ -1025,6 +1060,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(TestEnum.E64, buf.getEnumInt(TestEnum.class));
     }
 
+    @Test
     public void testGetMediumInt() {
         IoBuffer buf = IoBuffer.allocate(3);
 
@@ -1069,6 +1105,7 @@ public class IoBufferTest extends TestCase {
         assertEquals(0x00ff0203, buf.getUnsignedMediumInt(0));
     }
 
+    @Test
     public void testPutMediumInt() {
         IoBuffer buf = IoBuffer.allocate(3);
 
@@ -1091,5 +1128,4 @@ public class IoBufferTest extends TestCase {
 
         buf.flip();
     }
-
 }

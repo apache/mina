@@ -28,8 +28,14 @@ import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IoSession;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 /**
  * Tests {@link IoFuture} implementations.
@@ -37,8 +43,9 @@ import junit.framework.TestCase;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
-public class FutureTest extends TestCase {
+public class FutureTest {
 
+    @Test
     public void testCloseFuture() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
         assertFalse(future.isDone());
@@ -55,6 +62,7 @@ public class FutureTest extends TestCase {
         assertTrue(future.isClosed());
     }
 
+    @Test
     public void testConnectFuture() throws Exception {
         DefaultConnectFuture future = new DefaultConnectFuture();
         assertFalse(future.isDone());
@@ -94,6 +102,7 @@ public class FutureTest extends TestCase {
         }
     }
 
+    @Test
     public void testWriteFuture() throws Exception {
         DefaultWriteFuture future = new DefaultWriteFuture(null);
         assertFalse(future.isDone());
@@ -122,6 +131,7 @@ public class FutureTest extends TestCase {
         assertTrue(future.getException().getClass() == Exception.class);
     }
 
+    @Test
     public void testAddListener() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
         assertFalse(future.isDone());
@@ -146,6 +156,7 @@ public class FutureTest extends TestCase {
         assertSame(future, listener2.notifiedFuture);
     }
 
+    @Test
     public void testLateAddListener() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
         assertFalse(future.isDone());
@@ -166,6 +177,7 @@ public class FutureTest extends TestCase {
         assertSame(future, listener.notifiedFuture);
     }
 
+    @Test
     public void testRemoveListener1() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
         assertFalse(future.isDone());
@@ -191,6 +203,7 @@ public class FutureTest extends TestCase {
         assertSame(future, listener2.notifiedFuture);
     }
 
+    @Test
     public void testRemoveListener2() throws Exception {
         DefaultCloseFuture future = new DefaultCloseFuture(null);
         assertFalse(future.isDone());

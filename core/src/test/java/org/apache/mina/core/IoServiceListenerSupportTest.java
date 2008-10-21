@@ -22,9 +22,6 @@ package org.apache.mina.core;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandler;
@@ -33,6 +30,12 @@ import org.apache.mina.core.service.IoServiceListener;
 import org.apache.mina.core.service.IoServiceListenerSupport;
 import org.apache.mina.core.session.DummySession;
 import org.easymock.EasyMock;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * Tests {@link IoServiceListenerSupport}.
@@ -40,11 +43,12 @@ import org.easymock.EasyMock;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoServiceListenerSupportTest extends TestCase {
+public class IoServiceListenerSupportTest {
     private static final SocketAddress ADDRESS = new InetSocketAddress(8080);
 
     private final IoService mockService = EasyMock.createMock(IoService.class);
 
+    @Test
     public void testServiceLifecycle() throws Exception {
         IoServiceListenerSupport support = new IoServiceListenerSupport(
                 mockService);
@@ -76,6 +80,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         EasyMock.verify(listener);
     }
 
+    @Test
     public void testSessionLifecycle() throws Exception {
         IoServiceListenerSupport support = new IoServiceListenerSupport(
                 mockService);
@@ -103,8 +108,8 @@ public class IoServiceListenerSupportTest extends TestCase {
         EasyMock.verify(listener);
         EasyMock.verify(handler);
 
-        Assert.assertEquals(1, support.getManagedSessions().size());
-        Assert.assertSame(session, support.getManagedSessions().get(session.getId()));
+        assertEquals(1, support.getManagedSessions().size());
+        assertSame(session, support.getManagedSessions().get(session.getId()));
 
         // Test destruction & other side effects
         EasyMock.reset(listener);
@@ -122,11 +127,12 @@ public class IoServiceListenerSupportTest extends TestCase {
 
         EasyMock.verify(listener);
 
-        Assert.assertTrue(session.isClosing());
-        Assert.assertEquals(0, support.getManagedSessions().size());
-        Assert.assertNull(support.getManagedSessions().get(session.getId()));
+        assertTrue(session.isClosing());
+        assertEquals(0, support.getManagedSessions().size());
+        assertNull(support.getManagedSessions().get(session.getId()));
     }
 
+    @Test
     public void testDisconnectOnUnbind() throws Exception {
         IoAcceptor acceptor = EasyMock.createStrictMock(IoAcceptor.class);
 
@@ -196,11 +202,12 @@ public class IoServiceListenerSupportTest extends TestCase {
         EasyMock.verify(acceptor);
         EasyMock.verify(handler);
 
-        Assert.assertTrue(session.isClosing());
-        Assert.assertEquals(0, support.getManagedSessions().size());
-        Assert.assertNull(support.getManagedSessions().get(session.getId()));
+        assertTrue(session.isClosing());
+        assertEquals(0, support.getManagedSessions().size());
+        assertNull(support.getManagedSessions().get(session.getId()));
     }
 
+    @Test
     public void testConnectorActivation() throws Exception {
         IoConnector connector = EasyMock.createStrictMock(IoConnector.class);
 
@@ -246,7 +253,7 @@ public class IoServiceListenerSupportTest extends TestCase {
         EasyMock.verify(listener);
         EasyMock.verify(handler);
 
-        Assert.assertEquals(0, support.getManagedSessions().size());
-        Assert.assertNull(support.getManagedSessions().get(session.getId()));
+        assertEquals(0, support.getManagedSessions().size());
+        assertNull(support.getManagedSessions().get(session.getId()));
     }
 }

@@ -19,9 +19,6 @@
  */
 package org.apache.mina.core;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
@@ -35,6 +32,12 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.util.NoopFilter;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * Tests {@link DefaultIoFilterChain}.
@@ -42,7 +45,7 @@ import org.apache.mina.filter.util.NoopFilter;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class IoFilterChainTest extends TestCase {
+public class IoFilterChainTest {
     private DummySession session;
     private IoFilterChain chain;
     private String result;
@@ -87,7 +90,7 @@ public class IoFilterChainTest extends TestCase {
         }
     };
 
-    @Override
+    @Before
     public void setUp() {
         session = new DummySession();
         session.setHandler(handler);
@@ -95,10 +98,11 @@ public class IoFilterChainTest extends TestCase {
         result = "";
     }
 
-    @Override
+    @After
     public void tearDown() {
     }
 
+    @Test
     public void testAdd() throws Exception {
         chain.addFirst("A", new EventOrderTestFilter('A'));
         chain.addLast("B", new EventOrderTestFilter('A'));
@@ -114,9 +118,10 @@ public class IoFilterChainTest extends TestCase {
             actual += e.getName();
         }
 
-        Assert.assertEquals("FCAEBGDH", actual);
+        assertEquals("FCAEBGDH", actual);
     }
 
+    @Test
     public void testGet() throws Exception {
         IoFilter filterA = new NoopFilter();
         IoFilter filterB = new NoopFilter();
@@ -128,12 +133,13 @@ public class IoFilterChainTest extends TestCase {
         chain.addBefore("B", "C", filterC);
         chain.addAfter("A", "D", filterD);
 
-        Assert.assertSame(filterA, chain.get("A"));
-        Assert.assertSame(filterB, chain.get("B"));
-        Assert.assertSame(filterC, chain.get("C"));
-        Assert.assertSame(filterD, chain.get("D"));
+        assertSame(filterA, chain.get("A"));
+        assertSame(filterB, chain.get("B"));
+        assertSame(filterC, chain.get("C"));
+        assertSame(filterD, chain.get("D"));
     }
 
+    @Test
     public void testRemove() throws Exception {
         chain.addLast("A", new EventOrderTestFilter('A'));
         chain.addLast("B", new EventOrderTestFilter('A'));
@@ -147,9 +153,10 @@ public class IoFilterChainTest extends TestCase {
         chain.remove("B");
         chain.remove("D");
 
-        Assert.assertEquals(0, chain.getAll().size());
+        assertEquals(0, chain.getAll().size());
     }
 
+    @Test
     public void testClear() throws Exception {
         chain.addLast("A", new EventOrderTestFilter('A'));
         chain.addLast("B", new EventOrderTestFilter('A'));
@@ -159,12 +166,13 @@ public class IoFilterChainTest extends TestCase {
 
         chain.clear();
 
-        Assert.assertEquals(0, chain.getAll().size());
+        assertEquals(0, chain.getAll().size());
     }
 
+    @Test
     public void testToString() throws Exception {
         // When the chain is empty
-        Assert.assertEquals("{ empty }", chain.toString());
+        assertEquals("{ empty }", chain.toString());
 
         // When there's one filter
         chain.addLast("A", new IoFilterAdapter() {
@@ -173,7 +181,7 @@ public class IoFilterChainTest extends TestCase {
                 return "B";
             }
         });
-        Assert.assertEquals("{ (A:B) }", chain.toString());
+        assertEquals("{ (A:B) }", chain.toString());
 
         // When there are two
         chain.addLast("C", new IoFilterAdapter() {
@@ -182,13 +190,15 @@ public class IoFilterChainTest extends TestCase {
                 return "D";
             }
         });
-        Assert.assertEquals("{ (A:B), (C:D) }", chain.toString());
+        assertEquals("{ (A:B), (C:D) }", chain.toString());
     }
 
+    @Test
     public void testDefault() {
         run("HS0 HSO HMR HMS HSI HEC HSC");
     }
 
+    @Test
     public void testChained() throws Exception {
         chain.addLast("A", new EventOrderTestFilter('A'));
         chain.addLast("B", new EventOrderTestFilter('B'));
@@ -197,6 +207,7 @@ public class IoFilterChainTest extends TestCase {
                 + "ASC BSC HSC");
     }
 
+    @Test
     public void testAddRemove() throws Exception {
         IoFilter filter = new AddRemoveTestFilter();
 
@@ -221,7 +232,7 @@ public class IoFilterChainTest extends TestCase {
 
         System.out.println("Expected: " + expectedResult);
         System.out.println("Actual:   " + result);
-        Assert.assertEquals(expectedResult, result);
+        assertEquals(expectedResult, result);
     }
 
     private String formatResult(String result) {

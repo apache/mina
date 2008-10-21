@@ -19,14 +19,17 @@
  */
 package org.apache.mina.core;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterChain.Entry;
 import org.apache.mina.filter.util.NoopFilter;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * Tests {@link DefaultIoFilterChainBuilder}.
@@ -34,19 +37,20 @@ import org.apache.mina.filter.util.NoopFilter;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class DefaultIoFilterChainBuilderTest extends TestCase {
-    public static void main(String[] args) {
+public class DefaultIoFilterChainBuilderTest {
+    /*public static void main(String[] args) {
         junit.textui.TestRunner.run(DefaultIoFilterChainBuilderTest.class);
+    }*/
+
+    @Before
+    public void setUp() throws Exception {
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @After
+    public void tearDown() throws Exception {
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-    }
-
+    @Test
     public void testAdd() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
@@ -64,9 +68,10 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
             actual += e.getName();
         }
 
-        Assert.assertEquals("FCAEBGDH", actual);
+        assertEquals("FCAEBGDH", actual);
     }
 
+    @Test
     public void testGet() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
@@ -80,12 +85,13 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
         builder.addBefore("B", "C", filterC);
         builder.addAfter("A", "D", filterD);
 
-        Assert.assertSame(filterA, builder.get("A"));
-        Assert.assertSame(filterB, builder.get("B"));
-        Assert.assertSame(filterC, builder.get("C"));
-        Assert.assertSame(filterD, builder.get("D"));
+        assertSame(filterA, builder.get("A"));
+        assertSame(filterB, builder.get("B"));
+        assertSame(filterC, builder.get("C"));
+        assertSame(filterD, builder.get("D"));
     }
 
+    @Test
     public void testRemove() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
@@ -101,9 +107,10 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
         builder.remove("B");
         builder.remove("D");
 
-        Assert.assertEquals(0, builder.getAll().size());
+        assertEquals(0, builder.getAll().size());
     }
 
+    @Test
     public void testClear() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
@@ -115,14 +122,15 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
 
         builder.clear();
 
-        Assert.assertEquals(0, builder.getAll().size());
+        assertEquals(0, builder.getAll().size());
     }
 
+    @Test
     public void testToString() {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 
         // When the chain is empty
-        Assert.assertEquals("{ empty }", builder.toString());
+        assertEquals("{ empty }", builder.toString());
 
         // When there's one filter
         builder.addLast("A", new IoFilterAdapter() {
@@ -131,7 +139,7 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
                 return "B";
             }
         });
-        Assert.assertEquals("{ (A:B) }", builder.toString());
+        assertEquals("{ (A:B) }", builder.toString());
 
         // When there are two
         builder.addLast("C", new IoFilterAdapter() {
@@ -140,6 +148,6 @@ public class DefaultIoFilterChainBuilderTest extends TestCase {
                 return "D";
             }
         });
-        Assert.assertEquals("{ (A:B), (C:D) }", builder.toString());
+        assertEquals("{ (A:B), (C:D) }", builder.toString());
     }
 }
