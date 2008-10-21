@@ -709,9 +709,14 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         if (length < 0) {
             throw new IllegalArgumentException("length: " + length);
         }
-        int pos = position();
+        
         int limit = limit();
-        int endIndex = pos + length;
+        
+        if (index > limit) {
+            throw new IllegalArgumentException("index: " + index);
+        }
+        
+        int endIndex = index + length;
 
         if (capacity() < endIndex) {
             throw new IndexOutOfBoundsException("index + length (" + endIndex
@@ -723,7 +728,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         limit(endIndex);
 
         IoBuffer slice = slice();
-        position(pos);
+        position(index);
         limit(limit);
         return slice;
     }
