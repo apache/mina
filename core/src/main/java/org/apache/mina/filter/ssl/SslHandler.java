@@ -323,7 +323,7 @@ class SslHandler {
     }
 
     /**
-     * Encrypt provided buffer. Encytpted data reurned by getOutNetBuffer().
+     * Encrypt provided buffer. Encrypted data returned by getOutNetBuffer().
      *
      * @param src data to encrypt
      * @throws SSLException on errors
