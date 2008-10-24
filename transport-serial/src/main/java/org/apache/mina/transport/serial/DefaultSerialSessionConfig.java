@@ -58,7 +58,6 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public int getInputBufferSize() {
         return inputBufferSize;
     }
@@ -66,7 +65,6 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean isLowLatency() {
         return lowLatency;
     }
@@ -74,7 +72,6 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public void setInputBufferSize(int bufferSize) {
         inputBufferSize = bufferSize;
     }
@@ -82,7 +79,6 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public void setLowLatency(boolean lowLatency) {
         this.lowLatency = lowLatency;
     }
@@ -90,7 +86,6 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public int getReceiveThreshold() {
         return receiveThreshold;
     }
@@ -98,7 +93,6 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public void setReceiveThreshold(int bytes) {
         receiveThreshold = bytes;
     }
@@ -106,7 +100,6 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public int getOutputBufferSize() {
         return outputBufferSize;
     }
@@ -114,7 +107,6 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public void setOutputBufferSize(int bufferSize) {
         outputBufferSize = bufferSize;
 
