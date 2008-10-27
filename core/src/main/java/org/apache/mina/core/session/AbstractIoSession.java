@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.DefaultFileRegion;
+import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.DefaultCloseFuture;
 import org.apache.mina.core.future.DefaultReadFuture;
@@ -44,6 +45,7 @@ import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.write.DefaultWriteRequest;
+import org.apache.mina.core.write.WriteException;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteToClosedSessionException;
@@ -363,22 +365,33 @@ public abstract class AbstractIoSession implements IoSession {
             throw new NullPointerException("message");
         }
 
+        // We can't send a message to a connected session if we don't have 
+        // the remote address
         if (!getTransportMetadata().isConnectionless() &&
                 remoteAddress != null) {
             throw new UnsupportedOperationException();
         }
 
+        
+        // If the session has been closed or is closing, we can't either
+        // send a message to the remote side. We generate a future
+        // containing an exception.
         if (isClosing() || !isConnected()) {
             WriteFuture future = new DefaultWriteFuture(this);
             WriteRequest request = new DefaultWriteRequest(message, future, remoteAddress);
-            future.setException(new WriteToClosedSessionException(request));
+            WriteException writeException = new WriteToClosedSessionException(request);
+            future.setException(writeException);
             return future;
         }
 
         FileChannel openedFileChannel = null;
+        
+        // TODO: remove this code as soon as we use InputStream
+        // instead of Object for the message.
         try {
             if (message instanceof IoBuffer
                     && !((IoBuffer) message).hasRemaining()) {
+                // Nothing to write : probably an error in the user code
                 throw new IllegalArgumentException(
                 "message is empty. Forgot to call flip()?");
             } else if (message instanceof FileChannel) {
@@ -394,14 +407,20 @@ public abstract class AbstractIoSession implements IoSession {
             return DefaultWriteFuture.newNotWrittenFuture(this, e);
         }
 
-        WriteFuture future = new DefaultWriteFuture(this);
-        getFilterChain().fireFilterWrite(
-                new DefaultWriteRequest(message, future, remoteAddress));
+        // Now, we can write the message. First, create a future
+        WriteFuture writeFuture = new DefaultWriteFuture(this);
+        WriteRequest writeRequest = new DefaultWriteRequest(message, writeFuture, remoteAddress);
+        
+        // Then, get the chain and inject the WriteRequest into it
+        IoFilterChain filterChain = getFilterChain();
+        filterChain.fireFilterWrite(writeRequest);
 
+        // TODO : This is not our business ! The caller has created a FileChannel,
+        // he has to close it !
         if (openedFileChannel != null) {
             // If we opened a FileChannel, it needs to be closed when the write has completed
             final FileChannel finalChannel = openedFileChannel;
-            future.addListener(new IoFutureListener<WriteFuture>() {
+            writeFuture.addListener(new IoFutureListener<WriteFuture>() {
                 public void operationComplete(WriteFuture future) {
                     try {
                         finalChannel.close();
@@ -412,7 +431,8 @@ public abstract class AbstractIoSession implements IoSession {
             });
         }
 
-        return future;
+        // Return the WriteFuture.
+        return writeFuture;
     }
 
     /**
@@ -642,15 +662,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * Update all statistical properties related with throughput assuming
-     * the specified time is the current time.  By default this method returns
-     * silently without updating the throughput properties if they were
-     * calculated already within last
-     * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
-     * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method
-     * updates the throughput properties immediately.
-
-     * @param currentTime the current time in milliseconds
+     * {@inheritDoc}
      */
     public final void updateThroughput(long currentTime, boolean force) {
         int interval = (int) (currentTime - lastThroughputCalculationTime);
@@ -825,7 +837,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * {@inheritDoc}
      */
     public final WriteRequestQueue getWriteRequestQueue() {
         if (writeRequestQueue == null) {
@@ -853,7 +865,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * {@inheritDoc}
      */
     public final void setCurrentWriteRequest(WriteRequest currentWriteRequest) {
         this.currentWriteRequest = currentWriteRequest;

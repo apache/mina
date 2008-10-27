@@ -33,6 +33,7 @@ import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.core.write.WriteRequestQueue;
 
 /**
  * A handle which represents connection between two end-points regardless of
@@ -96,6 +97,12 @@ public interface IoSession {
      * @return the filter chain that only affects this session.
      */
     IoFilterChain getFilterChain();
+
+    
+    /**
+     * TODO Add method documentation
+     */
+    WriteRequestQueue getWriteRequestQueue();
 
     /**
      * @return the {@link TransportMetadata} that this session runs on.
@@ -371,6 +378,14 @@ public interface IoSession {
     void setTrafficMask(TrafficMask trafficMask);
 
     /**
+     * 
+     * TODO setWriteRequestQueue.
+     *
+     * @param writeRequestQueue
+     */
+    void setCurrentWriteRequest(WriteRequest currentWriteRequest);
+    
+    /**
      * A shortcut method for {@link #setTrafficMask(TrafficMask)} that
      * suspends read operations for this session.
      */
@@ -382,6 +397,19 @@ public interface IoSession {
      */
     void suspendWrite();
 
+    /**
+     * Update all statistical properties related with throughput assuming
+     * the specified time is the current time.  By default this method returns
+     * silently without updating the throughput properties if they were
+     * calculated already within last
+     * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
+     * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method
+     * updates the throughput properties immediately.
+
+     * @param currentTime the current time in milliseconds
+     */
+    void updateThroughput(long currentTime, boolean force);
+    
     /**
      * A shortcut method for {@link #setTrafficMask(TrafficMask)} that
      * resumes read operations for this session.
