@@ -206,22 +206,43 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         }
     }
 
+    /**
+     * An encapsulating iterator around the  {@link Selector#selectedKeys()} 
+     * or the {@link Selector#keys()} iterator;
+     */
     protected static class IoSessionIterator implements Iterator<NioSession> {
-        private final Iterator<SelectionKey> i;
+        private final Iterator<SelectionKey> iterator;
+        
+        /**
+         * Create this iterator as a wrapper on top of the selectionKey
+         * Set.
+         * @param keys
+         */
         private IoSessionIterator(Set<SelectionKey> keys) {
-            i = keys.iterator();
+        	iterator = keys.iterator();
         }
+        
+        /**
+         * {@inheritDoc}
+         */
         public boolean hasNext() {
-            return i.hasNext();
+            return iterator.hasNext();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public NioSession next() {
-            SelectionKey key = i.next();
-            return (NioSession) key.attachment();
+            SelectionKey key = iterator.next();
+            NioSession nioSession =  (NioSession) key.attachment();
+            return nioSession;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void remove() {
-            i.remove();
+        	iterator.remove();
         }
     }
 }
