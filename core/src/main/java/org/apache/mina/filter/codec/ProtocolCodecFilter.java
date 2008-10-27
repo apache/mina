@@ -597,9 +597,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 // Flush only when the buffer has remaining.
                 if (!(encodedMessage instanceof IoBuffer) ||
                         ((IoBuffer) encodedMessage).hasRemaining()) {
-                    nextFilter.filterWrite(
-                            session, new EncodedWriteRequest(
-                                    encodedMessage, null, writeRequest.getDestination()));
+                    SocketAddress destination = writeRequest.getDestination();
+                    WriteRequest writeRequest = new EncodedWriteRequest(
+                        encodedMessage, null, destination); 
+                    nextFilter.filterWrite(session, writeRequest);
                 }
             }
         }
