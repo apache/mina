@@ -389,6 +389,9 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             while (selectable) {
                 try {
                     // Detect if we have some keys ready to be processed
+                    // The select() will be woke up if some new connection
+                    // have occurred, or if the selector has been explicitely
+                    // woke up
                     int selected = select();
 
                     // this actually sets the selector to OP_ACCEPT,
