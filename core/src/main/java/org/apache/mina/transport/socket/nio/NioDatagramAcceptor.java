@@ -170,6 +170,11 @@ public final class NioDatagramAcceptor
     }
 
     @Override
+    protected int select() throws Exception {
+        return selector.select();
+    }
+
+    @Override
     protected int select(int timeout) throws Exception {
         return selector.select(timeout);
     }

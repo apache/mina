@@ -114,6 +114,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     protected abstract void init() throws Exception;
     protected abstract void destroy() throws Exception;
+    protected abstract int select() throws Exception;
     protected abstract int select(int timeout) throws Exception;
     protected abstract void wakeup();
     protected abstract Iterator<H> selectedHandles();
@@ -333,7 +334,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
             while (selectable) {
                 try {
-                    int selected = select(1000);
+                    int selected = select();
 
                     nHandles += registerHandles();
 

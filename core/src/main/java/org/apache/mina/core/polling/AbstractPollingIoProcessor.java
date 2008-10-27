@@ -187,6 +187,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     protected abstract int select(int timeout) throws Exception;
     
     /**
+     * poll those sessions forever
+     * @return The number of session ready for read or for write
+     * @throws Exception if some low level IO error occurs
+     */
+    protected abstract int select() throws Exception;
+    
+    /**
      * Say if the list of {@link IoSession} polled by this {@link IoProcessor} 
      * is empty
      * @return true if at least a session is managed by this {@link IoProcessor}
@@ -340,14 +347,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * {@inheritDoc}
      */
     public final void flush(T session) {
-        // The following optimization has been disabled because it can cause StackOverflowError.
-        //if (Thread.currentThread() == workerThread) {
-        //    // Bypass the queue if called from the worker thread itself
-        //    // (i.e. single thread model).
-        //    flushNow(session, System.currentTimeMillis());
-        //    return;
-        //}
-
         boolean needsWakeup = flushingSessions.isEmpty();
         if (scheduleFlush(session) && needsWakeup) {
             wakeup();
@@ -533,7 +532,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private void process() throws Exception {
         for (Iterator<T> i = selectedSessions(); i.hasNext();) {
-            process(i.next());
+        	T session = i.next();
+            process(session);
             i.remove();
         }
     }

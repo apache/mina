@@ -70,6 +70,11 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
+    protected int select() throws Exception {
+        return selector.select();
+    }
+
+    @Override
     protected boolean isSelectorEmpty() {
         return selector.keys().isEmpty();
     }
