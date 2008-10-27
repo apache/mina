@@ -22,6 +22,7 @@ package org.apache.mina.core.session;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.service.AbstractIoService;
@@ -50,7 +51,8 @@ public class IdleStatusChecker {
 
     public void addSession(AbstractIoSession session) {
         sessions.add(session);
-        session.getCloseFuture().addListener(sessionCloseListener);
+        CloseFuture closeFuture = session.getCloseFuture();
+        closeFuture.addListener(sessionCloseListener);
     }
 
     public void addService(AbstractIoService service) {
@@ -165,53 +167,29 @@ public class IdleStatusChecker {
      * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleSession(IoSession session, long currentTime) {
-        if (session instanceof AbstractIoSession) {
-            AbstractIoSession s = (AbstractIoSession) session;
-            notifyIdleSession1(
-                    s, currentTime,
-                    s.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
-                    IdleStatus.BOTH_IDLE, Math.max(
-                            s.getLastIoTime(),
-                            s.getLastIdleTime(IdleStatus.BOTH_IDLE)));
+        notifyIdleSession0(
+                session, currentTime,
+                session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                IdleStatus.BOTH_IDLE, Math.max(
+                    session.getLastIoTime(),
+                    session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
 
-            notifyIdleSession1(
-                    s, currentTime,
-                    s.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
-                    IdleStatus.READER_IDLE, Math.max(
-                            s.getLastReadTime(),
-                            s.getLastIdleTime(IdleStatus.READER_IDLE)));
+        notifyIdleSession0(
+                session, currentTime,
+                session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                IdleStatus.READER_IDLE, Math.max(
+                    session.getLastReadTime(),
+                    session.getLastIdleTime(IdleStatus.READER_IDLE)));
 
-            notifyIdleSession1(
-                    s, currentTime,
-                    s.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
-                    IdleStatus.WRITER_IDLE, Math.max(
-                            s.getLastWriteTime(),
-                            s.getLastIdleTime(IdleStatus.WRITER_IDLE)));
+        notifyIdleSession0(
+                session, currentTime,
+                session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                IdleStatus.WRITER_IDLE, Math.max(
+                    session.getLastWriteTime(),
+                    session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
 
-            notifyWriteTimeout(s, currentTime);
-            updateThroughput(s, currentTime);
-        } else {
-            notifyIdleSession0(
-                    session, currentTime,
-                    session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
-                    IdleStatus.BOTH_IDLE, Math.max(
-                            session.getLastIoTime(),
-                            session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
-
-            notifyIdleSession0(
-                    session, currentTime,
-                    session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
-                    IdleStatus.READER_IDLE, Math.max(
-                            session.getLastReadTime(),
-                            session.getLastIdleTime(IdleStatus.READER_IDLE)));
-
-            notifyIdleSession0(
-                    session, currentTime,
-                    session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
-                    IdleStatus.WRITER_IDLE, Math.max(
-                            session.getLastWriteTime(),
-                            session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
-        }
+        notifyWriteTimeout(session, currentTime);
+        updateThroughput(session, currentTime);
     }
 
     private static void notifyIdleSession0(
@@ -223,17 +201,8 @@ public class IdleStatusChecker {
         }
     }
 
-    private static void notifyIdleSession1(
-            AbstractIoSession session, long currentTime,
-            long idleTime, IdleStatus status, long lastIoTime) {
-        if (idleTime > 0 && lastIoTime != 0
-                && currentTime - lastIoTime >= idleTime) {
-            session.getFilterChain().fireSessionIdle(status);
-        }
-    }
-
     private static void notifyWriteTimeout(
-            AbstractIoSession session, long currentTime) {
+            IoSession session, long currentTime) {
 
         long writeTimeout = session.getConfig().getWriteTimeoutInMillis();
         if (writeTimeout > 0 &&
@@ -252,7 +221,7 @@ public class IdleStatusChecker {
     }
 
     private static void updateThroughput(
-            AbstractIoSession session, long currentTime) {
+            IoSession session, long currentTime) {
         session.updateThroughput(currentTime, false);
     }
 }
