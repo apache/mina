@@ -42,7 +42,7 @@ public class IdleStatusChecker {
     private final Set<AbstractIoService> services =
         new ConcurrentHashSet<AbstractIoService>();
 
-    private final NotifyingTask notifyingTask = new NotifyingTaskImpl();
+    private final NotifyingTask notifyingTask = new NotifyingTask();
     private final IoFutureListener<IoFuture> sessionCloseListener =
         new SessionCloseListener();
 
@@ -69,16 +69,7 @@ public class IdleStatusChecker {
         return notifyingTask;
     }
 
-    public interface NotifyingTask extends Runnable {
-        /**
-         * Cancels this task.  Once canceled, {@link #run()} method will always return immediately.
-         * To start this task again after calling this method, you have to create a new instance of
-         * {@link IdleStatusChecker} again.
-         */
-        void cancel();
-    }
-
-    private class NotifyingTaskImpl implements NotifyingTask {
+    public class NotifyingTask implements Runnable {
         private volatile boolean cancelled;
         private volatile Thread thread;
 
