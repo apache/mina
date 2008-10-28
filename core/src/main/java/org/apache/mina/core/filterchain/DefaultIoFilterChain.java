@@ -619,45 +619,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     private class HeadFilter extends IoFilterAdapter {
-        @Override
-        public void sessionCreated(NextFilter nextFilter, IoSession session) {
-            nextFilter.sessionCreated(session);
-        }
-
-        @Override
-        public void sessionOpened(NextFilter nextFilter, IoSession session) {
-            nextFilter.sessionOpened(session);
-        }
-
-        @Override
-        public void sessionClosed(NextFilter nextFilter, IoSession session) {
-            nextFilter.sessionClosed(session);
-        }
-
-        @Override
-        public void sessionIdle(NextFilter nextFilter, IoSession session,
-                IdleStatus status) {
-            nextFilter.sessionIdle(session, status);
-        }
-
-        @Override
-        public void exceptionCaught(NextFilter nextFilter, IoSession session,
-                Throwable cause) {
-            nextFilter.exceptionCaught(session, cause);
-        }
-
-        @Override
-        public void messageReceived(NextFilter nextFilter, IoSession session,
-                Object message) {
-            nextFilter.messageReceived(session, message);
-        }
-
-        @Override
-        public void messageSent(NextFilter nextFilter, IoSession session,
-                WriteRequest writeRequest) {
-            nextFilter.messageSent(session, writeRequest);
-        }
-
         @SuppressWarnings("unchecked")
         @Override
         public void filterWrite(NextFilter nextFilter, IoSession session,
@@ -892,6 +853,10 @@ public class DefaultIoFilterChain implements IoFilterChain {
                     callPreviousFilterSetTrafficMask(nextEntry, session,
                             trafficMask);
                 }
+                
+                public String toString() {
+                	return EntryImpl.this.nextEntry.name;
+                }
             };
         }
 
@@ -917,7 +882,35 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
         @Override
         public String toString() {
-            return "(" + getName() + ':' + filter + ')';
+        	StringBuilder sb = new StringBuilder();
+        	
+        	// Add the current filter
+        	sb.append("('").append(getName()).append('\'');
+        	
+        	// Add the previous filter 
+        	sb.append(", prev: '");
+
+        	if (prevEntry != null) {
+                sb.append(prevEntry.name);
+                sb.append(':');
+                sb.append(prevEntry.getFilter().getClass().getSimpleName());
+        	} else {
+            	sb.append("null");
+        	}
+        	
+        	// Add the next filter 
+        	sb.append("', next: '");
+
+        	if (nextEntry != null) {
+                sb.append(nextEntry.name);
+                sb.append(':');
+                sb.append(nextEntry.getFilter().getClass().getSimpleName());
+        	} else {
+            	sb.append("null");
+        	}
+        	
+        	sb.append("')");
+            return sb.toString();
         }
 
         public void addAfter(String name, IoFilter filter) {
