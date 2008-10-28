@@ -152,4 +152,8 @@ public class IoFilterAdapter implements IoFilter {
             TrafficMask trafficMask) throws Exception {
         nextFilter.filterSetTrafficMask(session, trafficMask);
     }
+    
+    public String toString() {
+    	return this.getClass().getSimpleName();
+    }
 }
