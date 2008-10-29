@@ -260,13 +260,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     // Call the decoder with the read bytes
                     decoder.decode(session, in, decoderOut);
                 }
+                
                 // Finish decoding if no exception was thrown.
                 decoderOut.flush();
-                
-                // TODO :
-                // here, we shouldn't break,
-                // we should loop to decode the next portion of the buffer.
-                break;
             } catch (Throwable t) {
                 ProtocolDecoderException pde;
                 if (t instanceof ProtocolDecoderException) {
