@@ -219,9 +219,13 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     /**
      * Forwards the received events into the appropriate {@link MessageHandler}
      * which is registered by {@link #addReceivedMessageHandler(Class, MessageHandler)}.
+     * 
+     * <b>Warning !</b> If you are to overload this method, be aware that you 
+     * _must_ call the messageHandler in your own method, otherwise it won't 
+     * be called.
      */
     @Override
-    public final void messageReceived(IoSession session, Object message)
+    public void messageReceived(IoSession session, Object message)
             throws Exception {
         MessageHandler<Object> handler = findReceivedMessageHandler(message.getClass());
         if (handler != null) {
@@ -233,8 +237,15 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
         }
     }
 
+    /**
+     * Invoked when a message written by IoSession.write(Object) is sent out.
+     * 
+     * <b>Warning !</b> If you are to overload this method, be aware that you 
+     * _must_ call the messageHandler in your own method, otherwise it won't 
+     * be called.
+     */
     @Override
-    public final void messageSent(IoSession session, Object message) throws Exception {
+    public void messageSent(IoSession session, Object message) throws Exception {
         MessageHandler<Object> handler = findSentMessageHandler(message.getClass());
         if (handler != null) {
             handler.handleMessage(session, message);
