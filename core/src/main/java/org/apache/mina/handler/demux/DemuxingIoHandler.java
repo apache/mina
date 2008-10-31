@@ -256,8 +256,17 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
         }
     }
 
+    /**
+     * Invoked when any exception is thrown by user IoHandler implementation 
+     * or by MINA. If cause is an instance of IOException, MINA will close the 
+     * connection automatically.
+     *
+     * <b>Warning !</b> If you are to overload this method, be aware that you 
+     * _must_ call the messageHandler in your own method, otherwise it won't 
+     * be called.
+     */
     @Override
-    public final void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         ExceptionHandler<Throwable> handler = findExceptionHandler(cause.getClass());
         if (handler != null) {
             handler.exceptionCaught(session, cause);
