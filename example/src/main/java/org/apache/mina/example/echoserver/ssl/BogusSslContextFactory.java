@@ -47,7 +47,7 @@ public class BogusSslContextFactory {
         String algorithm = Security
                 .getProperty("ssl.KeyManagerFactory.algorithm");
         if (algorithm == null) {
-            algorithm = "SunX509";
+            algorithm = KeyManagerFactory.getDefaultAlgorithm();
         }
 
         KEY_MANAGER_FACTORY_ALGORITHM = algorithm;
