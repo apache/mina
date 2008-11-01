@@ -45,51 +45,51 @@ OPEN ISSUES:
   </formats>
   
   <moduleSets>
-		<moduleSet>
-			<includeSubModules/>
-			<sources>
-				<outputDirectoryMapping>src/${module.artifactId}</outputDirectoryMapping>
-				<fileSets>
-					<fileSet>
-						<includes>
-						  <!-- copy per-module sources into src/mina-*/ -->
-							<include>src/**</include>
-							<include>pom.xml</include>
-							<include>LICENSE*</include>
-							<include>NOTICE*</include>
-						</includes>
-					</fileSet>
-				</fileSets>
-			</sources>
-			<binaries>
-			  <!-- copy project jars into dist/ -->
-				<outputDirectory>dist</outputDirectory>
-				<includeDependencies>false</includeDependencies>
-				<unpack>false</unpack>
-				<dependencySets>
-					<dependencySet>
-					  <!-- copy project dependencies into lib/ -->
-						<outputDirectory>lib</outputDirectory>
-						<useTransitiveDependencies>true</useTransitiveDependencies>
-						<unpack>false</unpack>
-						<useProjectArtifact>false</useProjectArtifact>
-						<excludes>
-						  <!-- during build, the plugin warns that this exclusion is never
-						       triggered, but the truth is it works just fine and you can't
-						       do without it. -->
-							<exclude>org.apache.mina:*</exclude>
-						</excludes>
-					</dependencySet>
-				</dependencySets>
-			</binaries> 
-		</moduleSet>  	
+    <moduleSet>
+      <includeSubModules/>
+      <sources>
+        <outputDirectoryMapping>src/${module.artifactId}</outputDirectoryMapping>
+        <fileSets>
+          <fileSet>
+            <includes>
+              <!-- copy per-module sources into src/mina-*/ -->
+              <include>src/**</include>
+              <include>pom.xml</include>
+              <include>LICENSE*</include>
+              <include>NOTICE*</include>
+            </includes>
+          </fileSet>
+        </fileSets>
+      </sources>
+      <binaries>
+        <!-- copy project jars into dist/ -->
+        <outputDirectory>dist</outputDirectory>
+        <includeDependencies>false</includeDependencies>
+        <unpack>false</unpack>
+        <dependencySets>
+          <dependencySet>
+            <!-- copy project dependencies into lib/ -->
+            <outputDirectory>lib</outputDirectory>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <unpack>false</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+            <excludes>
+              <!-- during build, the plugin warns that this exclusion is never
+                   triggered, but the truth is it works just fine and you can't
+                   do without it. -->
+              <exclude>org.apache.mina:*</exclude>
+            </excludes>
+          </dependencySet>
+        </dependencySets>
+      </binaries> 
+    </moduleSet>    
   </moduleSets>
   
   <fileSets>
     <fileSet>
-    	<!-- copy the root pom into src/ -->
-    	<outputDirectory>src</outputDirectory>
-    	<filtered>false</filtered>
+      <!-- copy the root pom into src/ -->
+      <outputDirectory>src</outputDirectory>
+      <filtered>false</filtered>
       <includes>
         <include>pom.xml</include>
       </includes>
@@ -97,17 +97,17 @@ OPEN ISSUES:
     
     <fileSet>
       <!-- copy the licenses into / -->
-    	<outputDirectory></outputDirectory>
-    	<filtered>false</filtered>
+      <outputDirectory></outputDirectory>
+      <filtered>false</filtered>
       <includes>
         <include>README*</include>
         <include>LICENSE*</include>
         <include>NOTICE*</include>
       </includes>
     </fileSet>
-  	
+    
     <fileSet>
-    	<!-- copy the javadoc into docs/ -->
+      <!-- copy the javadoc into docs/ -->
       <directory>target/site</directory>
       <outputDirectory>docs</outputDirectory>
       <includes>
