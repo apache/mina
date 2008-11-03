@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.IoSession;
 
 /**
@@ -40,6 +40,11 @@ import org.apache.mina.core.session.IoSession;
  * @org.apache.xbean.XBean
  */
 public class SessionAttributeInitializingFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "sessionAttributeInitializing";
+    }
+    
     private final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 
     /**

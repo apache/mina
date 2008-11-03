@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.util;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;

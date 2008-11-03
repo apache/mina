@@ -20,10 +20,10 @@
 package org.apache.mina.core.session;
 
 import java.net.SocketAddress;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.future.WriteFuture;
@@ -94,10 +94,28 @@ public interface IoSession {
     IoSessionConfig getConfig();
 
     /**
-     * @return the filter chain that only affects this session.
+     * @return the first filter from the Incoming chain 
+     * that only affects this session.
      */
-    IoFilterChain getFilterChain();
+    List<IoFilter> getFilterInChain();
+    
+    /**
+     * Get the first filter in the incoming chain
+     * @return The first filter in the chain
+     */
+    IoFilter getFirstFilterIn();
 
+    /**
+     * @return the first filter from the Outgoing chain 
+     * that only affects this session.
+     */
+    List<IoFilter> getFilterOutChain();
+
+    /**
+     * Get the first filter in the outgoing chain
+     * @return The first filter in the chain
+     */
+    IoFilter getFirstFilterOut();
     
     /**
      * TODO Add method documentation

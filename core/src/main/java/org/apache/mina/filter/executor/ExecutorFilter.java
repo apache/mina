@@ -111,6 +111,11 @@ import org.apache.mina.core.write.WriteRequest;
  * @org.apache.xbean.XBean
  */
 public class ExecutorFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "executor";
+    }
+    
     /** The list of handled events */
     private EnumSet<IoEventType> eventTypes;
     

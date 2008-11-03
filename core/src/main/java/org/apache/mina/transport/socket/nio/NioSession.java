@@ -21,7 +21,10 @@ package org.apache.mina.transport.socket.nio;
 
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SelectionKey;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.AbstractIoSession;
 
 /**

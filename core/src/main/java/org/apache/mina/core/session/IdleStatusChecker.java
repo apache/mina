@@ -197,7 +197,7 @@ public class IdleStatusChecker {
             long idleTime, IdleStatus status, long lastIoTime) {
         if (idleTime > 0 && lastIoTime != 0
                 && currentTime - lastIoTime >= idleTime) {
-            session.getFilterChain().fireSessionIdle(status);
+            session.getFirstFilterIn().sessionIdle(session, status);
         }
     }
 
@@ -213,7 +213,7 @@ public class IdleStatusChecker {
                 session.setCurrentWriteRequest(null);
                 WriteTimeoutException cause = new WriteTimeoutException(request);
                 request.getFuture().setException(cause);
-                session.getFilterChain().fireExceptionCaught(cause);
+                session.getFirstFilterOut().exceptionCaught(session, cause);
                 // WriteException is an IOException, so we close the session.
                 session.close();
             }

@@ -23,12 +23,13 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
-import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
@@ -59,8 +60,6 @@ class NioSocketSession extends NioSession {
     private final SocketSessionConfig config = new SessionConfigImpl();
 
     private final IoProcessor<NioSession> processor;
-
-    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
 
     private final SocketChannel ch;
 
@@ -96,10 +95,6 @@ class NioSocketSession extends NioSession {
     @Override
     public IoProcessor<NioSession> getProcessor() {
         return processor;
-    }
-
-    public IoFilterChain getFilterChain() {
-        return filterChain;
     }
 
     public TransportMetadata getTransportMetadata() {

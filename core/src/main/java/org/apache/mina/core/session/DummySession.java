@@ -77,7 +77,12 @@ public class DummySession extends AbstractIoSession {
         }
     };
 
-    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
+    /** The first filter in the incoming chain */
+    private final IoFilter firstFilterIn;
+
+    /** The first filter in the outgoing chain */
+    private final IoFilter firstFilterOut;
+
     private final IoProcessor<IoSession> processor;
 
     private volatile IoHandler handler = new IoHandlerAdapter();
@@ -142,10 +147,11 @@ public class DummySession extends AbstractIoSession {
                         file.getFileChannel().position(file.getPosition() + file.getRemainingBytes());
                         file.update(file.getRemainingBytes());
                     } catch (IOException e) {
-                        s.getFilterChain().fireExceptionCaught(e);
+                        s.getFilterOutChain().fireExceptionCaught(e);
                     }
                 }
-                getFilterChain().fireMessageSent(req);
+                
+                firstFilterIn.fireMessageSent(req);
             }
 
             public void remove(IoSession session) {
@@ -190,8 +196,18 @@ public class DummySession extends AbstractIoSession {
         this.config = config;
     }
 
-    public IoFilterChain getFilterChain() {
-        return filterChain;
+    /**
+     * {@inheritDoc}
+     */
+    public IoFilter getFilterInChain() {
+        return firstFilterIn;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoFilter getFilterOutChain() {
+        return firstFilterOut;
     }
 
     public IoHandler getHandler() {

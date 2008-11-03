@@ -31,6 +31,11 @@ import org.apache.mina.core.filterchain.IoFilterChain;
  * @version $Rev$, $Date$
  */
 public class IoFilterImpl extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "ioFilter";
+    }
+    
     private final char c;
 
     public IoFilterImpl(char c) {

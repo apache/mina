@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.keepalive;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.AttributeKey;
@@ -139,6 +139,11 @@ import org.apache.mina.core.write.WriteRequest;
  * @org.apache.xbean.XBean
  */
 public class KeepAliveFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "keepAlive";
+    }
+    
 
     private final AttributeKey WAITING_FOR_RESPONSE = new AttributeKey(
             getClass(), "waitingForResponse");

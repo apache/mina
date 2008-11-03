@@ -25,7 +25,7 @@ import org.apache.mina.core.session.TrafficMask;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
- * An adapter class for {@link IoFilter}.  You can extend
+ * An abstract class for {@link IoFilter}.  You can extend
  * this class and selectively override required event filter methods only.  All
  * methods forwards events to the next filter by default.
  *
@@ -33,6 +33,12 @@ import org.apache.mina.core.write.WriteRequest;
  * @version $Rev: 591770 $, $Date: 2007-11-04 13:22:44 +0100 (Sun, 04 Nov 2007) $
  */
 public class IoFilterAdapter implements IoFilter {
+    /** The next filter in the chain */
+    private IoFilter nextFilter;
+    
+    /** The filter's name */
+    protected static String name;
+
     /**
      * {@inheritDoc}
      */
@@ -48,109 +54,126 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
-    public void onPreAdd(IoFilterChain parent, String name,
-        NextFilter nextFilter) throws Exception {
+    public String getName() {
+        return name;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onPostAdd(IoFilterChain parent, String name,
-        NextFilter nextFilter) throws Exception {
+    public IoFilter getNextFilter() {
+        return nextFilter;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoFilter getNextFilterLock() {
+        synchronized(nextFilter) {
+            return nextFilter;
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void onPreAdd(IoFilter parent, String name,
+    		IoFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onPreRemove(IoFilterChain parent, String name,
-        NextFilter nextFilter) throws Exception {
+    public void onPostAdd(IoFilter parent, String name,
+    		IoFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onPostRemove(IoFilterChain parent, String name,
-        NextFilter nextFilter) throws Exception {
+    public void onPreRemove(IoFilter parent, String name,
+    		IoFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        nextFilter.sessionCreated(session);
+    public void onPostRemove(IoFilter parent, String name,
+    		IoFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        nextFilter.sessionOpened(session);
+    public void sessionCreated(IoSession session) {
+    	getNextFilter().sessionCreated(session);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        nextFilter.sessionClosed(session);
+    public void sessionOpened(IoSession session) {
+        getNextFilter().sessionOpened(session);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) throws Exception {
-        nextFilter.sessionIdle(session, status);
+    public void sessionClosed(IoSession session) {
+    	getNextFilter().sessionClosed(session);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) throws Exception {
-        nextFilter.exceptionCaught(session, cause);
+    public void sessionIdle(IoSession session,
+            IdleStatus status) {
+    	getNextFilter().sessionIdle(session, status);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
-        nextFilter.messageReceived(session, message);
+    public void exceptionCaught(IoSession session, Throwable cause) {
+    	getNextFilter().exceptionCaught(session, cause);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
-        nextFilter.messageSent(session, writeRequest);
+    public void messageReceived(IoSession session,
+            Object message) {
+    	getNextFilter().messageReceived(session, message);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
-        nextFilter.filterWrite(session, writeRequest);
+    public void messageSent(IoSession session,
+            WriteRequest writeRequest) {
+    	getNextFilter().messageSent(session, writeRequest);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void filterClose(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        nextFilter.filterClose(session);
+    public void filterWrite(IoSession session, WriteRequest writeRequest) {
+    	getNextFilter().filterWrite(session, writeRequest);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void filterSetTrafficMask(NextFilter nextFilter, IoSession session,
-            TrafficMask trafficMask) throws Exception {
-        nextFilter.filterSetTrafficMask(session, trafficMask);
+    public void filterClose(IoSession session) {
+    	getNextFilter().filterClose(session);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void filterSetTrafficMask(IoSession session,
+            TrafficMask trafficMask) {
+        //getNextFilter().filterSetTrafficMask(session, trafficMask);
     }
     
     public String toString() {

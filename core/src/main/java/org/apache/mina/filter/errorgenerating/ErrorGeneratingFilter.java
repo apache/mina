@@ -23,8 +23,8 @@ package org.apache.mina.filter.errorgenerating;
 import java.util.Random;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
@@ -54,6 +54,11 @@ import org.slf4j.LoggerFactory;
  * @org.apache.xbean.XBean
  */
 public class ErrorGeneratingFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "errorGenerating";
+    }
+    
     private int removeByteProbability = 0;
 
     private int insertByteProbability = 0;

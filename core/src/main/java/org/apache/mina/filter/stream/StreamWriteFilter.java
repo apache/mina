@@ -55,6 +55,12 @@ import org.apache.mina.core.write.WriteRequest;
  */
 public class StreamWriteFilter extends AbstractStreamWriteFilter<InputStream> {
 
+    // Set the filter's name
+    static {
+    	name = "streamWrite";
+    }
+    
+
     @Override
     protected IoBuffer getNextBuffer(InputStream is) throws IOException {
         byte[] bytes = new byte[getWriteBufferSize()];

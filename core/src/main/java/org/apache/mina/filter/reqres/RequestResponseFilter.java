@@ -46,6 +46,11 @@ import org.slf4j.LoggerFactory;
  * @org.apache.xbean.XBean
  */
 public class RequestResponseFilter extends WriteRequestFilter {
+    // Set the filter's name
+    static {
+    	name = "requestResponse";
+    }
+    
 
     private final AttributeKey RESPONSE_INSPECTOR = new AttributeKey(getClass(), "responseInspector");
     private final AttributeKey REQUEST_STORE = new AttributeKey(getClass(), "requestStore");

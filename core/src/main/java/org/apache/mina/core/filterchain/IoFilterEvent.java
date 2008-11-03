@@ -19,12 +19,10 @@
  */
 package org.apache.mina.core.filterchain;
 
-import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoEvent;
 import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.session.TrafficMask;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
@@ -37,9 +35,9 @@ import org.apache.mina.core.write.WriteRequest;
  */
 public class IoFilterEvent extends IoEvent {
 
-    private final NextFilter nextFilter;
+    private final IoFilter nextFilter;
 
-    public IoFilterEvent(NextFilter nextFilter, IoEventType type,
+    public IoFilterEvent(IoFilter nextFilter, IoEventType type,
             IoSession session, Object parameter) {
         super(type, session, parameter);
 
@@ -49,7 +47,7 @@ public class IoFilterEvent extends IoEvent {
         this.nextFilter = nextFilter;
     }
 
-    public NextFilter getNextFilter() {
+    public IoFilter getNextFilter() {
         return nextFilter;
     }
 
@@ -66,7 +64,7 @@ public class IoFilterEvent extends IoEvent {
             getNextFilter().filterWrite(getSession(), (WriteRequest) getParameter());
             break;
         case SET_TRAFFIC_MASK:
-            getNextFilter().filterSetTrafficMask(getSession(), (TrafficMask) getParameter());
+            //getNextFilter().filterSetTrafficMask(getSession(), (TrafficMask) getParameter());
             break;
         case CLOSE:
             getNextFilter().filterClose(getSession());

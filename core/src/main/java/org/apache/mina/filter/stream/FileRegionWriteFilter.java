@@ -59,6 +59,12 @@ import org.apache.mina.core.write.WriteRequest;
 public class FileRegionWriteFilter extends
         AbstractStreamWriteFilter<FileRegion> {
 
+    // Set the filter's name
+    static {
+    	name = "fileRegionWrite";
+    }
+    
+
     @Override
     protected Class<FileRegion> getMessageClass() {
         return FileRegion.class;

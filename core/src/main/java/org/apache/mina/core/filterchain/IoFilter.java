@@ -94,6 +94,37 @@ public interface IoFilter {
      * you don't wrap a filter with {@link ReferenceCountingFilter}.
      */
     void destroy() throws Exception;
+    
+    /**
+     * Returns the next filter in the chain, or null if there is
+     * no more filter (this will be the case when we call this
+     * method on the last protocol Handler.
+     * 
+     * This method is <b>NOT</b> thread safe. If you want to keep
+     * the chain safe when moving or adding some new filter, please
+     * call the #getNextFilterLock() method.
+     *
+     * @return The next filter in the chain
+     */
+    IoFilter getNextFilter();
+    
+    /**
+     * Returns the next filter in the chain, or null if there is
+     * no more filter (this will be the case when we call this
+     * method on the last protocol Handler.
+     * 
+     * This method is thread safe. 
+     *
+     * @return The next filter in the chain
+     */
+    IoFilter getNextFilterLock();
+    
+    /**
+     * Get the Filter's name
+     *
+     * @return The Filter's name
+     */
+    String getName();
 
     /**
      * Invoked before this filter is added to the specified <tt>parent</tt>.
@@ -106,7 +137,7 @@ public interface IoFilter {
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter)
+    void onPreAdd(IoFilter parent, String name, IoFilter nextFilter)
             throws Exception;
 
     /**
@@ -120,7 +151,7 @@ public interface IoFilter {
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter)
+    void onPostAdd(IoFilter parent, String name, IoFilter nextFilter)
             throws Exception;
 
     /**
@@ -134,7 +165,7 @@ public interface IoFilter {
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPreRemove(IoFilterChain parent, String name, NextFilter nextFilter)
+    void onPreRemove(IoFilter parent, String name, IoFilter nextFilter)
             throws Exception;
 
     /**
@@ -148,124 +179,119 @@ public interface IoFilter {
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter)
+    void onPostRemove(IoFilter parent, String name, IoFilter nextFilter)
             throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionCreated(IoSession)} event.
-     */
-    void sessionCreated(NextFilter nextFilter, IoSession session)
+     *
+    void sessionCreated(IoFilter nextFilter, IoSession session)
             throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionOpened(IoSession)} event.
-     */
-    void sessionOpened(NextFilter nextFilter, IoSession session)
+     *
+    void sessionOpened(IoFilter nextFilter, IoSession session)
             throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionClosed(IoSession)} event.
-     */
-    void sessionClosed(NextFilter nextFilter, IoSession session)
+     *
+    void sessionClosed(IoFilter nextFilter, IoSession session)
             throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionIdle(IoSession,IdleStatus)}
      * event.
-     */
-    void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status)
+     *
+    void sessionIdle(IoFilter nextFilter, IoSession session, IdleStatus status)
             throws Exception;
 
     /**
      * Filters {@link IoHandler#exceptionCaught(IoSession,Throwable)}
      * event.
-     */
-    void exceptionCaught(NextFilter nextFilter, IoSession session,
+     *
+    void exceptionCaught(IoFilter nextFilter, IoSession session,
             Throwable cause) throws Exception;
 
     /**
      * Filters {@link IoHandler#messageReceived(IoSession,Object)}
      * event.
-     */
-    void messageReceived(NextFilter nextFilter, IoSession session,
+     *
+    void messageReceived(IoFilter nextFilter, IoSession session,
             Object message) throws Exception;
 
     /**
      * Filters {@link IoHandler#messageSent(IoSession,Object)}
      * event.
-     */
-    void messageSent(NextFilter nextFilter, IoSession session,
+     *
+    void messageSent(IoFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception;
 
     /**
      * Filters {@link IoSession#close()} method invocation.
-     */
-    void filterClose(NextFilter nextFilter, IoSession session) throws Exception;
+     *
+    void filterClose(IoFilter nextFilter, IoSession session) throws Exception;
 
     /**
      * Filters {@link IoSession#write(Object)} method invocation.
-     */
-    void filterWrite(NextFilter nextFilter, IoSession session,
+     *
+    void filterWrite(IoFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws Exception;
     
     /**
      * Filters {@link IoSession#setTrafficMask(TrafficMask)} method invocation.
-     */
+     *
     void filterSetTrafficMask(
-            NextFilter nextFilter, IoSession session, TrafficMask trafficMask) throws Exception;
+            IoFilter nextFilter, IoSession session, TrafficMask trafficMask) throws Exception;
 
     /**
-     * Represents the next {@link IoFilter} in {@link IoFilterChain}.
+     * Forwards <tt>sessionCreated</tt> event to next filter.
      */
-    public interface NextFilter {
-        /**
-         * Forwards <tt>sessionCreated</tt> event to next filter.
-         */
-        void sessionCreated(IoSession session);
+    void sessionCreated(IoSession session);
 
-        /**
-         * Forwards <tt>sessionOpened</tt> event to next filter.
-         */
-        void sessionOpened(IoSession session);
+    /**
+     * Forwards <tt>sessionOpened</tt> event to next filter.
+     */
+    void sessionOpened(IoSession session);
 
-        /**
-         * Forwards <tt>sessionClosed</tt> event to next filter.
-         */
-        void sessionClosed(IoSession session);
+    /**
+     * Forwards <tt>sessionClosed</tt> event to next filter.
+     */
+    void sessionClosed(IoSession session);
 
-        /**
-         * Forwards <tt>sessionIdle</tt> event to next filter.
-         */
-        void sessionIdle(IoSession session, IdleStatus status);
+    /**
+     * Forwards <tt>sessionIdle</tt> event to next filter.
+     */
+    void sessionIdle(IoSession session, IdleStatus status);
 
-        /**
-         * Forwards <tt>exceptionCaught</tt> event to next filter.
-         */
-        void exceptionCaught(IoSession session, Throwable cause);
+    /**
+     * Forwards <tt>exceptionCaught</tt> event to next filter.
+     */
+    void exceptionCaught(IoSession session, Throwable cause);
 
-        /**
-         * Forwards <tt>messageReceived</tt> event to next filter.
-         */
-        void messageReceived(IoSession session, Object message);
+    /**
+     * Forwards <tt>messageReceived</tt> event to next filter.
+     */
+    void messageReceived(IoSession session, Object message);
 
-        /**
-         * Forwards <tt>messageSent</tt> event to next filter.
-         */
-        void messageSent(IoSession session, WriteRequest writeRequest);
+    /**
+     * Forwards <tt>messageSent</tt> event to next filter.
+     */
+    void messageSent(IoSession session, WriteRequest writeRequest);
 
-        /**
-         * Forwards <tt>filterWrite</tt> event to next filter.
-         */
-        void filterWrite(IoSession session, WriteRequest writeRequest);
+    /**
+     * Forwards <tt>filterWrite</tt> event to next filter.
+     */
+    void filterWrite(IoSession session, WriteRequest writeRequest);
 
-        /**
-         * Forwards <tt>filterClose</tt> event to next filter.
-         */
-        void filterClose(IoSession session);
-        
-        /**
-         * Forwards <tt>filterSetTrafficMask</tt> event to next filter.
-         */
-        void filterSetTrafficMask(IoSession session, TrafficMask trafficMask);
-    }
+    /**
+     * Forwards <tt>filterClose</tt> event to next filter.
+     */
+    void filterClose(IoSession session);
+    
+    /**
+     * Forwards <tt>filterSetTrafficMask</tt> event to next filter.
+     */
+    //void filterSetTrafficMask(IoSession session, TrafficMask trafficMask);
 }

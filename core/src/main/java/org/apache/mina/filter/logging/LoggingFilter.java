@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.logging;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
@@ -43,8 +43,13 @@ import org.slf4j.LoggerFactory;
  * @org.apache.xbean.XBean
  */
 public class LoggingFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "logging";
+    }
+    
 	/** The logger name */
-    private final String name;
+    private final String loggerName;
     
     /** The logger */
     private final Logger logger;
@@ -91,21 +96,21 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param name the name used to create the logger. If null, will default to "NoopFilter"
      */
-    public LoggingFilter(String name) {
-        if (name == null) {
-            this.name = LoggingFilter.class.getName();
+    public LoggingFilter(String loggerName) {
+        if (loggerName == null) {
+            this.loggerName = LoggingFilter.class.getName();
         } else {
-        	this.name = name;
+        	this.loggerName = loggerName;
         }
         
-        logger = LoggerFactory.getLogger(name);
+        logger = LoggerFactory.getLogger(loggerName);
     }
 
     /**
      * @return The logger's name
      */
-    public String getName() {
-        return name;
+    public String getLoggerName() {
+        return loggerName;
     }
     
     /**

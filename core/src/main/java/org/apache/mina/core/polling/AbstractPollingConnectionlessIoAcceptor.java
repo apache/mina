@@ -415,7 +415,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             newBuf.put(readBuf);
             newBuf.flip();
 
-            session.getFilterChain().fireMessageReceived(newBuf);
+            session.getFilterInChain().messageReceived(session,newBuf);
         }
     }
 
@@ -435,7 +435,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     scheduleFlush(session);
                 }
             } catch (Exception e) {
-                session.getFilterChain().fireExceptionCaught(e);
+                session.getFilterOutChain().exceptionCaught(session, e);
             }
         }
     }
@@ -466,7 +466,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     // Clear and fire event
                     session.setCurrentWriteRequest(null);
                     buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
+                    session.getFilterOutChain().messageSent(session, req);
                     continue;
                 }
 
@@ -487,7 +487,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     session.setCurrentWriteRequest(null);
                     writtenBytes += localWrittenBytes;
                     buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
+                    session.getFilterOutChain().messageSent(session, req);
                 }
             }
         } finally {

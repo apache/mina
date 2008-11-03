@@ -25,8 +25,6 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
@@ -51,7 +49,6 @@ class NioDatagramSession extends NioSession {
 
     private final IoService service;
     private final DatagramSessionConfig config;
-    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
     private final DatagramChannel ch;
     private final IoHandler handler;
     private final InetSocketAddress localAddress;
@@ -94,10 +91,6 @@ class NioDatagramSession extends NioSession {
 
     public DatagramSessionConfig getConfig() {
         return config;
-    }
-
-    public IoFilterChain getFilterChain() {
-        return filterChain;
     }
 
     @Override

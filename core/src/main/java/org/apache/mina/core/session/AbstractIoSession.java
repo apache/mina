@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.DefaultFileRegion;
-import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.DefaultCloseFuture;
 import org.apache.mina.core.future.DefaultReadFuture;
@@ -136,6 +138,13 @@ public abstract class AbstractIoSession implements IoSession {
 
     private boolean deferDecreaseReadBuffer = true;
 
+    /** The list of IoFilter for the incoming chain */
+    protected final List<IoFilter> incomingChain = new ArrayList<IoFilter>();
+
+    /** The list of IoFilter for the outgoing chain */
+    protected final List<IoFilter> outgoingChain = new ArrayList<IoFilter>();
+
+
     /**
      * TODO Add method documentation
      */
@@ -232,7 +241,7 @@ public abstract class AbstractIoSession implements IoSession {
             }
         }
 
-        getFilterChain().fireFilterClose();
+        getFirstFilterIn().filterClose(this);
         return closeFuture;
     }
 
@@ -360,6 +369,37 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    public List<IoFilter> getFilterInChain() {
+        return incomingChain;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<IoFilter> getFilterOutChain() {
+        return outgoingChain;
+    }
+
+    /**
+     * Get the first filter in the incoming chain
+     * @return The first filter in the chain
+     */
+    public IoFilter getFirstFilterIn() {
+    	return getFilterInChain().get(0);
+    }
+
+    /**
+     * Get the first filter in the incoming chain
+     * @return The first filter in the chain
+     */
+    public IoFilter getFirstFilterOut() {
+    	return getFilterOutChain().get(0);
+    }
+
+    
+    /**
+     * {@inheritDoc}
+     */
     public final WriteFuture write(Object message, SocketAddress remoteAddress) {
         if (message == null) {
             throw new NullPointerException("message");
@@ -412,8 +452,7 @@ public abstract class AbstractIoSession implements IoSession {
         WriteRequest writeRequest = new DefaultWriteRequest(message, writeFuture, remoteAddress);
         
         // Then, get the chain and inject the WriteRequest into it
-        IoFilterChain filterChain = getFilterChain();
-        filterChain.fireFilterWrite(writeRequest);
+        getFirstFilterOut().filterWrite(this, writeRequest);
 
         // TODO : This is not our business ! The caller has created a FileChannel,
         // he has to close it !
@@ -567,7 +606,7 @@ public abstract class AbstractIoSession implements IoSession {
             return;
         }
 
-        getFilterChain().fireFilterSetTrafficMask(trafficMask);
+        //getFirstFilterIn().filterSetTrafficMask(this, trafficMask);
     }
 
     /**

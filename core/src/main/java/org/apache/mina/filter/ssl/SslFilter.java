@@ -85,6 +85,11 @@ import org.apache.mina.core.write.WriteToClosedSessionException;
  * @org.apache.xbean.XBean
  */
 public class SslFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "ssl";
+    }
+    
     /**
      * A session attribute key that stores underlying {@link SSLSession}
      * for each session.

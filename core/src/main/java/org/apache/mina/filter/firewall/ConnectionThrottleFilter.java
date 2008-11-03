@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +39,11 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class ConnectionThrottleFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "connectionThrottle";
+    }
+    
     private static final long DEFAULT_TIME = 1000;
 
     private long allowedInterval;

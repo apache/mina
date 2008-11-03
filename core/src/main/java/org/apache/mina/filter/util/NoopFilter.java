@@ -32,6 +32,11 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
  * @version $Rev: 671827 $, $Date: 2008-06-26 10:49:48 +0200 (Thu, 26 Jun 2008) $
  */
 public class NoopFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "noop";
+    }
+    
     /**
      * Default Constructor.
      */

@@ -62,6 +62,11 @@ import org.apache.mina.core.write.WriteRequest;
  * @version $Rev$, $Date$
  */
 public class WriteRequestFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "writeRequest";
+    }
+    
 
     private final IoEventQueueHandler queueHandler;
 

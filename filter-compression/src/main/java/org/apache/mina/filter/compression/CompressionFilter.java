@@ -57,6 +57,11 @@ import org.apache.mina.filter.util.WriteRequestFilter;
  * @version $Rev$, $Date$
  */
 public class CompressionFilter extends WriteRequestFilter {
+    // Set the filter's name
+    static {
+    	name = "compression";
+    }
+    
     /**
      * Max compression level.  Will give the highest compression ratio, but
      * will also take more cpu time and is the slowest.

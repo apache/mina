@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.DefaultIoFuture;
 import org.apache.mina.core.service.AbstractIoService;
@@ -428,8 +429,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
                 // and call ConnectFuture.setException().
                 scheduleRemove(session);
-                IoFilterChain filterChain = session.getFilterChain(); 
-                filterChain.fireExceptionCaught(e);
+                IoFilter firstFilter = session.getFilterOutChain(); 
+                firstFilter.exceptionCaught(session, e);
                 wakeup();
             } else {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
@@ -584,7 +585,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
 
             if (readBytes > 0) {
-                IoFilterChain filterChain = session.getFilterChain(); 
+                IoFilterChain filterChain = session.getFirstFilter(); 
                 filterChain.fireMessageReceived(buf);
                 buf = null;
 

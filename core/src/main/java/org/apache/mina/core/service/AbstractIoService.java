@@ -31,9 +31,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.IoUtil;
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
-import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
-import org.apache.mina.core.filterchain.IoFilterChainBuilder;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultIoFuture;
 import org.apache.mina.core.future.IoFuture;

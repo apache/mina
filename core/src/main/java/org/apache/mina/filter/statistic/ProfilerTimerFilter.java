@@ -59,7 +59,12 @@ import org.apache.mina.core.write.WriteRequest;
  * @org.apache.xbean.XBean
  */
 public class ProfilerTimerFilter extends IoFilterAdapter {
-    /** TRhe selected time unit */
+    // Set the filter's name
+    static {
+    	name = "profilerTimer";
+    }
+    
+    /** The selected time unit */
     private volatile TimeUnit timeUnit;
     
     /** A TimerWorker for the MessageReceived events */

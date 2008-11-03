@@ -73,6 +73,11 @@ import org.slf4j.MDC;
 
 public class MdcInjectionFilter extends CommonEventFilter {
 
+    // Set the filter's name
+    static {
+    	name = "mdcInjection";
+    }
+    
     public enum MdcKey {
         handlerClass, remoteAddress, localAddress, remoteIp, remotePort, localIp, localPort
     }

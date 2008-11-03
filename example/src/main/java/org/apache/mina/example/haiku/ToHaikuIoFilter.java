@@ -29,6 +29,11 @@ import org.apache.mina.core.session.IoSession;
  * @version $Rev: $, $Date:  $
  */
 public class ToHaikuIoFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "toHaiku";
+    }
+    
 
     @SuppressWarnings( { "unchecked" })
     @Override

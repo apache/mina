@@ -54,6 +54,11 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class ProxyFilter extends IoFilterAdapter {
+    // Set the filter's name
+    static {
+    	name = "proxy";
+    }
+    
     private final static Logger logger = LoggerFactory
             .getLogger(ProxyFilter.class);
 
