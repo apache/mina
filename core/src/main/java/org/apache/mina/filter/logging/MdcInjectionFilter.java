@@ -72,11 +72,8 @@ import org.slf4j.MDC;
  */
 
 public class MdcInjectionFilter extends CommonEventFilter {
-
-    // Set the filter's name
-    static {
-    	name = "mdcInjection";
-    }
+    // Set the filter's default name
+    private static final String DEFAULT_NAME = "mdcInjection";
     
     public enum MdcKey {
         handlerClass, remoteAddress, localAddress, remoteIp, remotePort, localIp, localPort
@@ -103,6 +100,18 @@ public class MdcInjectionFilter extends CommonEventFilter {
      * @see #setProperty(org.apache.mina.core.session.IoSession, String, String)
      */
     public MdcInjectionFilter(EnumSet<MdcKey> keys) {
+        this(DEFAULT_NAME, keys);
+    }
+
+    /**
+     * Use this constructor when you want to specify which keys to add to the MDC.
+     * You could still add custom keys via {@link #setProperty(IoSession, String, String)}
+     * @param keys set of keys that should be added to the MDC
+     *
+     * @see #setProperty(org.apache.mina.core.session.IoSession, String, String)
+     */
+    public MdcInjectionFilter(String name, EnumSet<MdcKey> keys) {
+    	super(name);
         this.mdcKeys = keys.clone();
     }
 
@@ -119,6 +128,11 @@ public class MdcInjectionFilter extends CommonEventFilter {
     }
 
     public MdcInjectionFilter() {
+    	this(DEFAULT_NAME);
+    }
+
+    public MdcInjectionFilter(String name) {
+    	super(name);
         this.mdcKeys = EnumSet.allOf(MdcKey.class);
     }
 

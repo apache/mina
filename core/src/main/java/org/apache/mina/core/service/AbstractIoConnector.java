@@ -219,33 +219,28 @@ public abstract class AbstractIoConnector
 
         if (getHandler() == null) {
             if (getSessionConfig().isUseReadOperation()) {
-                setHandler(new IoHandler() {
+                setHandler(new IoHandlerAdapter() {
                     public void exceptionCaught(IoSession session,
-                            Throwable cause) throws Exception {
+                            Throwable cause){
                     }
 
                     public void messageReceived(IoSession session,
-                            Object message) throws Exception {
+                            Object message) {
                     }
 
-                    public void messageSent(IoSession session, Object message)
-                            throws Exception {
+                    public void messageSent(IoSession session, Object message) {
                     }
 
-                    public void sessionClosed(IoSession session)
-                            throws Exception {
+                    public void sessionClosed(IoSession session) {
                     }
 
-                    public void sessionCreated(IoSession session)
-                            throws Exception {
+                    public void sessionCreated(IoSession session) {
                     }
 
-                    public void sessionIdle(IoSession session, IdleStatus status)
-                            throws Exception {
+                    public void sessionIdle(IoSession session, IdleStatus status) {
                     }
 
-                    public void sessionOpened(IoSession session)
-                            throws Exception {
+                    public void sessionOpened(IoSession session) {
                     }
                 });
             } else {

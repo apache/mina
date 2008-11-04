@@ -20,6 +20,7 @@
 package org.apache.mina.example.chat.client;
 
 import java.net.SocketAddress;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
@@ -64,24 +65,35 @@ public class ChatClientSupport {
         }
 
         try {
-            IoFilter LOGGING_FILTER = new LoggingFilter();
+            IoFilter LOGGING_FILTER = new LoggingFilter("logger", (String)null);
 
-            IoFilter CODEC_FILTER = new ProtocolCodecFilter(
+            IoFilter CODEC_FILTER = new ProtocolCodecFilter("codec",
                     new TextLineCodecFactory());
             
-            connector.getFilterChain().addLast("mdc", new MdcInjectionFilter());
-            connector.getFilterChain().addLast("codec", CODEC_FILTER);
-            connector.getFilterChain().addLast("logger", LOGGING_FILTER);
+            List<IoFilter> chainIn = connector.getFilterChainIn();
+            List<IoFilter> chainOut = connector.getFilterChainOut();
+            
+            chainIn.add(new MdcInjectionFilter("mdc"));
+            chainIn.add(CODEC_FILTER);
+            chainIn.add(LOGGING_FILTER);
+
+            chainOut.add(new MdcInjectionFilter("mdc"));
+            chainOut.add(CODEC_FILTER);
+            chainOut.add(LOGGING_FILTER);
 
             if (useSsl) {
                 SSLContext sslContext = BogusSslContextFactory
                         .getInstance(false);
-                SslFilter sslFilter = new SslFilter(sslContext);
+                SslFilter sslFilter = new SslFilter("sslFilter", sslContext);
                 sslFilter.setUseClientMode(true);
-                connector.getFilterChain().addLast("sslFilter", sslFilter);
+                connector.getFilterChainIn().add(sslFilter);
+                connector.getFilterChainOut().add(sslFilter);
             }
 
+            // Add the handler to the incoming chain
             connector.setHandler(handler);
+            chainIn.add(handler);
+            
             ConnectFuture future1 = connector.connect(address);
             future1.awaitUninterruptibly();
             if (!future1.isConnected()) {

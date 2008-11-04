@@ -430,16 +430,21 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      */
     @Override
     public void sessionCreated(IoSession session) {
-        // Creates the decoder and stores it into the newly created session 
-        ProtocolDecoder decoder = factory.getDecoder(session);
-        session.setAttribute(DECODER, decoder);
-
-        // Creates the encoder and stores it into the newly created session 
-        ProtocolEncoder encoder = factory.getEncoder(session);
-        session.setAttribute(ENCODER, encoder);
-
-        // Call the next filter
-        getNextFilter().sessionCreated(session);
+    	try
+    	{
+	        // Creates the decoder and stores it into the newly created session 
+	        ProtocolDecoder decoder = factory.getDecoder(session);
+	        session.setAttribute(DECODER, decoder);
+	
+	        // Creates the encoder and stores it into the newly created session 
+	        ProtocolEncoder encoder = factory.getEncoder(session);
+	        session.setAttribute(ENCODER, encoder);
+	
+	        // Call the next filter
+	        session.getNextFilterIn(this).sessionCreated(session);
+    	} catch (Exception e) {
+    		// TODO : do nothing atm
+    	}
     }
 
     @Override

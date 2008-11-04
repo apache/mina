@@ -33,9 +33,6 @@ import org.apache.mina.core.write.WriteRequest;
  * @version $Rev: 591770 $, $Date: 2007-11-04 13:22:44 +0100 (Sun, 04 Nov 2007) $
  */
 public class IoFilterAdapter implements IoFilter {
-    /** The next filter in the chain */
-    private IoFilter nextFilter;
-    
     /** The filter's name */
     private String name;
 
@@ -70,15 +67,22 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
-    public IoFilter getNextFilter() {
-        return nextFilter;
+    public IoFilter getNextFilterIn(IoSession session) {
+        return session.getNextFilterIn(this);
     }
     
     /**
      * {@inheritDoc}
      */
-    public IoFilter getNextFilterLock() {
-        synchronized(nextFilter) {
+    public IoFilter getNextFilterOut(IoSession session) {
+        return session.getNextFilterOut(this);
+    }
+    
+    /**
+     * {@inheritDoc}
+     *
+    public IoFilter getNextFilterLock(IoSession session) {
+        synchronized() {
             return nextFilter;
         }
     }
@@ -115,21 +119,21 @@ public class IoFilterAdapter implements IoFilter {
      * {@inheritDoc}
      */
     public void sessionCreated(IoSession session) {
-    	getNextFilter().sessionCreated(session);
+    	getNextFilterIn(session).sessionCreated(session);
     }
 
     /**
      * {@inheritDoc}
      */
     public void sessionOpened(IoSession session) {
-        getNextFilter().sessionOpened(session);
+        getNextFilterIn(session).sessionOpened(session);
     }
 
     /**
      * {@inheritDoc}
      */
     public void sessionClosed(IoSession session) {
-    	getNextFilter().sessionClosed(session);
+    	getNextFilterIn(session).sessionClosed(session);
     }
 
     /**
@@ -137,14 +141,14 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void sessionIdle(IoSession session,
             IdleStatus status) {
-    	getNextFilter().sessionIdle(session, status);
+    	getNextFilterIn(session).sessionIdle(session, status);
     }
 
     /**
      * {@inheritDoc}
      */
     public void exceptionCaught(IoSession session, Throwable cause) {
-    	getNextFilter().exceptionCaught(session, cause);
+    	getNextFilterIn(session).exceptionCaught(session, cause);
     }
 
     /**
@@ -152,7 +156,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void messageReceived(IoSession session,
             Object message) {
-    	getNextFilter().messageReceived(session, message);
+    	getNextFilterIn(session).messageReceived(session, message);
     }
 
     /**
@@ -160,21 +164,21 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void messageSent(IoSession session,
             WriteRequest writeRequest) {
-    	getNextFilter().messageSent(session, writeRequest);
+    	getNextFilterOut(session).messageSent(session, writeRequest);
     }
 
     /**
      * {@inheritDoc}
      */
     public void filterWrite(IoSession session, WriteRequest writeRequest) {
-    	getNextFilter().filterWrite(session, writeRequest);
+    	getNextFilterOut(session).filterWrite(session, writeRequest);
     }
 
     /**
      * {@inheritDoc}
      */
     public void filterClose(IoSession session) {
-    	getNextFilter().filterClose(session);
+    	getNextFilterOut(session).filterClose(session);
     }
 
     /**

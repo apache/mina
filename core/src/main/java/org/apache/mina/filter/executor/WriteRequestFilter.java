@@ -62,10 +62,8 @@ import org.apache.mina.core.write.WriteRequest;
  * @version $Rev$, $Date$
  */
 public class WriteRequestFilter extends IoFilterAdapter {
-    // Set the filter's name
-    static {
-    	name = "writeRequest";
-    }
+    // Set the filter's default name
+    private static final String DEFAULT_NAME = "writeRequest";
     
 
     private final IoEventQueueHandler queueHandler;
@@ -78,9 +76,29 @@ public class WriteRequestFilter extends IoFilterAdapter {
     }
 
     /**
+     * Creates a new instance with a new default {@link IoEventQueueThrottle}.
+     * 
+     * @param name The filter's name 
+     */
+    public WriteRequestFilter(String name) {
+        this(name, new IoEventQueueThrottle());
+    }
+
+    /**
      * Creates a new instance with the specified {@link IoEventQueueHandler}.
      */
     public WriteRequestFilter(IoEventQueueHandler queueHandler) {
+    	this(DEFAULT_NAME, queueHandler);
+    }
+
+    /**
+     * Creates a new instance with the specified {@link IoEventQueueHandler}.
+     * 
+     * @param name The filter's name
+     */
+    public WriteRequestFilter(String name, IoEventQueueHandler queueHandler) {
+    	super(name);
+    	
         if (queueHandler == null) {
             throw new NullPointerException("queueHandler");
         }
@@ -102,7 +120,7 @@ public class WriteRequestFilter extends IoFilterAdapter {
         final IoEvent e = new IoEvent(IoEventType.WRITE, session, writeRequest);
 
         if (queueHandler.accept(this, e)) {
-            getNextFilter().filterWrite(session, writeRequest);
+            session.getNextFilterOut(this).filterWrite(session, writeRequest);
             WriteFuture writeFuture = writeRequest.getFuture();
             if (writeFuture == null) {
                 return;

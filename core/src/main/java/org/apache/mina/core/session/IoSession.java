@@ -130,6 +130,24 @@ public interface IoSession {
     IoFilter getFirstFilterOut();
     
     /**
+     * Get the next filter in the ingoing chain, given a specific name
+     * @param name The current filter
+     * @return the following filter 
+     * @throws ArrayIndexOutOfBoundsException If this was the last filter
+     * in the chain
+     */
+    IoFilter getNextFilterIn(IoFilter filter);
+    
+    /**
+     * Get the next filter in the outgoing chain, given a specific name
+     * @param name The current filter
+     * @return the following filter 
+     * @throws ArrayIndexOutOfBoundsException If this was the last filter
+     * in the chain
+     */
+    IoFilter getNextFilterOut(IoFilter filter);
+    
+    /**
      * TODO Add method documentation
      */
     WriteRequestQueue getWriteRequestQueue();

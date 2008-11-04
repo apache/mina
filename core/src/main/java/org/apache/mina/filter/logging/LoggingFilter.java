@@ -43,10 +43,8 @@ import org.slf4j.LoggerFactory;
  * @org.apache.xbean.XBean
  */
 public class LoggingFilter extends IoFilterAdapter {
-    // Set the filter's name
-    static {
-    	name = "logging";
-    }
+    // Set the filter's default name
+    private static final String DEFAULT_NAME = "logging";
     
 	/** The logger name */
     private final String loggerName;
@@ -79,7 +77,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * Default Constructor.
      */
     public LoggingFilter() {
-        this(LoggingFilter.class.getName());
+        this(DEFAULT_NAME, LoggingFilter.class);
     }
     
     /**
@@ -88,7 +86,16 @@ public class LoggingFilter extends IoFilterAdapter {
      * @param clazz the cass which name will be used to create the logger
      */
     public LoggingFilter(Class<?> clazz) {
-        this(clazz.getName());
+        this(DEFAULT_NAME, clazz);
+    }
+
+    /**
+     * Create a new NoopFilter using a class name
+     * 
+     * @param clazz the cass which name will be used to create the logger
+     */
+    public LoggingFilter(String name, Class<?> clazz) {
+        this(name, clazz.getName());
     }
 
     /**
@@ -96,14 +103,16 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param name the name used to create the logger. If null, will default to "NoopFilter"
      */
-    public LoggingFilter(String loggerName) {
+    public LoggingFilter(String name, String loggerName) {
+    	super(name);
+    	
         if (loggerName == null) {
             this.loggerName = LoggingFilter.class.getName();
         } else {
         	this.loggerName = loggerName;
         }
         
-        logger = LoggerFactory.getLogger(loggerName);
+        logger = LoggerFactory.getLogger(this.loggerName);
     }
 
     /**
@@ -175,43 +184,43 @@ public class LoggingFilter extends IoFilterAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
     	log(exceptionCaughtLevel, "EXCEPTION :", cause);
-        getNextFilter().exceptionCaught(session, cause);
+        session.getNextFilterIn(this).exceptionCaught(session, cause);
     }
 
     @Override
     public void messageReceived(IoSession session, Object message) {
     	log(messageReceivedLevel, "RECEIVED: {}", message );
-    	getNextFilter().messageReceived(session, message);
+    	session.getNextFilterIn(this).messageReceived(session, message);
     }
 
     @Override
     public void messageSent(IoSession session, WriteRequest writeRequest) {
     	log(messageSentLevel, "SENT: {}", writeRequest.getMessage() );
-    	getNextFilter().messageSent(session, writeRequest);
+    	session.getNextFilterOut(this).messageSent(session, writeRequest);
     }
 
     @Override
     public void sessionCreated(IoSession session) {
     	log(sessionCreatedLevel, "CREATED");
-    	getNextFilter().sessionCreated(session);
+    	session.getNextFilterIn(this).sessionCreated(session);
     }
 
     @Override
     public void sessionOpened(IoSession session) {
     	log(sessionOpenedLevel, "OPENED");
-    	getNextFilter().sessionOpened(session);
+    	session.getNextFilterIn(this).sessionOpened(session);
     }
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
     	log(sessionIdleLevel, "IDLE");
-    	getNextFilter().sessionIdle(session, status);
+    	session.getNextFilterIn(this).sessionIdle(session, status);
     }
 
     @Override
     public void sessionClosed(IoSession session) {
     	log(sessionClosedLevel, "CLOSED");
-    	getNextFilter().sessionClosed(session);
+    	session.getNextFilterIn(this).sessionClosed(session);
     }
     
     /**

@@ -420,6 +420,51 @@ public abstract class AbstractIoSession implements IoSession {
     	return getFilterChainOut().get(0);
     }
 
+    /**
+     * Search for filter following the given filter in the incoming
+     * filter chain.
+     * 
+     * @param filter the filter we are looking for the follower
+     * @return The next filter in the chain, or null if none 
+     */
+    public IoFilter getNextFilterIn(IoFilter filter) {
+    	boolean found = false;
+    	
+    	for (IoFilter f:getFilterChainIn()) {
+    		if (found) {
+    			return f;
+    		} else {
+	    		if ( f == filter ) {
+	    			found = true;
+	    		}
+    		}
+    	}
+    	
+    	return null;
+    }
+    
+    /**
+     * Search for filter following the given filter in the incoming
+     * filter chain.
+     * 
+     * @param filter the filter we are looking for the follower
+     * @return The next filter in the chain, or null if none 
+     */
+    public IoFilter getNextFilterOut(IoFilter filter) {
+    	boolean found = false;
+    	
+    	for (IoFilter f:getFilterChainOut()) {
+    		if (found) {
+    			return f;
+    		} else {
+	    		if ( f == filter ) {
+	    			found = true;
+	    		}
+    		}
+    	}
+    	
+    	return null;
+    }
     
     /**
      * {@inheritDoc}

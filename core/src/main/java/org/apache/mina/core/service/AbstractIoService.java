@@ -20,6 +20,7 @@
 package org.apache.mina.core.service;
 
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -243,6 +244,10 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     public final List<IoFilter> getFilterChainIn() {
+    	if (filterChainIn == null) {
+    		filterChainIn = new ArrayList<IoFilter>();
+    	}
+    	
     	return filterChainIn;
     }
 
@@ -250,6 +255,10 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     public final List<IoFilter> getFilterChainOut() {
+    	if (filterChainOut == null) {
+    		filterChainOut = new ArrayList<IoFilter>();
+    	}
+    	
     	return filterChainOut;
     }
 
@@ -373,6 +382,7 @@ public abstract class AbstractIoService implements IoService {
                     "handler cannot be set while the service is active.");
         }
 
+        filterChainIn.add(handler);
         this.handler = handler;
     }
 

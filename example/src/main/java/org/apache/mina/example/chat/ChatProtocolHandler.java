@@ -130,7 +130,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void sessionClosed(IoSession session) throws Exception {
+    public void sessionClosed(IoSession session) {
         String user = (String) session.getAttribute("user");
         users.remove(user);
         sessions.remove(session);

@@ -36,6 +36,7 @@ import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.DefaultIoFuture;
 import org.apache.mina.core.service.AbstractIoService;
+import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IdleStatusChecker;
@@ -420,7 +421,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             ((IoSession)session).setFilterChainIn(chainIn);
             
             List<IoFilter> chainOut = ((IoSession)session). getService().getFilterChainOut();
-            ((IoSession)session).setFilterChainIn(chainOut);
+            ((IoSession)session).setFilterChainOut(chainOut);
             
             // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
             // in AbstractIoFilterChain.fireSessionOpened().

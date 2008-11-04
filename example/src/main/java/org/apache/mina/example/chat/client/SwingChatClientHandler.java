@@ -53,13 +53,12 @@ public class SwingChatClientHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void sessionOpened(IoSession session) throws Exception {
+    public void sessionOpened(IoSession session) {
         callback.connected();
     }
 
     @Override
-    public void messageReceived(IoSession session, Object message)
-            throws Exception {
+    public void messageReceived(IoSession session, Object message) {
         String theMessage = (String) message;
         String[] result = theMessage.split(" ", 3);
         String status = result[1];
@@ -92,7 +91,7 @@ public class SwingChatClientHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void sessionClosed(IoSession session) throws Exception {
+    public void sessionClosed(IoSession session) {
         callback.disconnected();
     }
 

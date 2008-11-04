@@ -96,7 +96,7 @@ public interface IoFilter {
     void destroy() throws Exception;
     
     /**
-     * Returns the next filter in the chain, or null if there is
+     * Returns the next filter in the incoming chain, or null if there is
      * no more filter (this will be the case when we call this
      * method on the last protocol Handler.
      * 
@@ -106,7 +106,21 @@ public interface IoFilter {
      *
      * @return The next filter in the chain
      */
-    IoFilter getNextFilter();
+    IoFilter getNextFilterIn(IoSession session);
+    
+    
+    /**
+     * Returns the next filter in the outgoing chain, or null if there is
+     * no more filter (this will be the case when we call this
+     * method on the last protocol Handler.
+     * 
+     * This method is <b>NOT</b> thread safe. If you want to keep
+     * the chain safe when moving or adding some new filter, please
+     * call the #getNextFilterLock() method.
+     *
+     * @return The next filter in the chain
+     */
+    IoFilter getNextFilterOut(IoSession session);
     
     /**
      * Returns the next filter in the chain, or null if there is
@@ -116,7 +130,7 @@ public interface IoFilter {
      * This method is thread safe. 
      *
      * @return The next filter in the chain
-     */
+     *
     IoFilter getNextFilterLock();
     
     /**

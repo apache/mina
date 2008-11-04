@@ -20,8 +20,9 @@
 package org.apache.mina.example.chat;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
-import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
@@ -45,20 +46,21 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
-        DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+        List<IoFilter> chainIn = acceptor.getFilterChainIn();
+        List<IoFilter> chainOut = acceptor.getFilterChainOut();
 
-        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("mdc", mdcInjectionFilter);
+        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter("mdc");
+        chainIn.add(mdcInjectionFilter);
 
         // Add SSL filter if SSL is enabled.
         if (USE_SSL) {
-            addSSLSupport(chain);
+            addSSLSupport(chainIn, chainOut);
         }
 
-        chain.addLast("codec", new ProtocolCodecFilter(
+        chainIn.add(new ProtocolCodecFilter("codec",
                 new TextLineCodecFactory()));
 
-        addLogger(chain);
+        addLogger(chainIn, chainOut);
 
         // Bind
         acceptor.setHandler(new ChatProtocolHandler());
@@ -67,17 +69,20 @@ public class Main {
         System.out.println("Listening on port " + PORT);
     }
 
-    private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
+    private static void addSSLSupport(List<IoFilter> chainIn, List<IoFilter> chainOut)
             throws Exception {
-        SslFilter sslFilter = new SslFilter(BogusSslContextFactory
+        SslFilter sslFilter = new SslFilter("sslFilter", BogusSslContextFactory
                 .getInstance(true));
-        chain.addLast("sslFilter", sslFilter);
+        chainIn.add(sslFilter);
+        chainOut.add(sslFilter);
         System.out.println("SSL ON");
     }
 
-    private static void addLogger(DefaultIoFilterChainBuilder chain)
+    private static void addLogger(List<IoFilter> chainIn, List<IoFilter> chainOut)
             throws Exception {
-        chain.addLast("logger", new LoggingFilter());
+    	IoFilter loggerFilter = new LoggingFilter("logger", (String)null);
+        chainIn.add(loggerFilter);
+        chainOut.add(loggerFilter);
         System.out.println("Logging ON");
     }
 }
