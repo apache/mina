@@ -40,10 +40,8 @@ import org.apache.mina.core.session.IoSession;
  * @org.apache.xbean.XBean
  */
 public class SessionAttributeInitializingFilter extends IoFilterAdapter {
-    // Set the filter's name
-    static {
-    	name = "sessionAttributeInitializing";
-    }
+    // Set the filter's default name
+    private static final String DEFAULT_NAME = "sessionAttributeInitializing";
     
     private final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 
@@ -53,6 +51,18 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * {@link #setAttribute(String, Object)} and {@link #setAttributes(Map)}.
      */
     public SessionAttributeInitializingFilter() {
+    	super(DEFAULT_NAME);
+    }
+
+    /**
+     * Creates a new instance with a new name. You can set
+     * the additional attributes by calling methods such as
+     * {@link #setAttribute(String, Object)} and {@link #setAttributes(Map)}.
+     * 
+     * @param name the filter's name
+     */
+    public SessionAttributeInitializingFilter(String name) {
+    	super(name);
     }
 
     /**
@@ -62,6 +72,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      */
     public SessionAttributeInitializingFilter(
             Map<String, ? extends Object> attributes) {
+    	super(DEFAULT_NAME);
         setAttributes(attributes);
     }
 
@@ -145,12 +156,11 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * map and forward the event to the next filter.
      */
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionCreated(IoSession session) {
         for (Map.Entry<String, Object> e : attributes.entrySet()) {
             session.setAttribute(e.getKey(), e.getValue());
         }
 
-        nextFilter.sessionCreated(session);
+        getNextFilter().sessionCreated(session);
     }
 }

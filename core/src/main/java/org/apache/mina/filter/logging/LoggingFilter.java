@@ -173,51 +173,45 @@ public class LoggingFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) throws Exception {
+    public void exceptionCaught(IoSession session, Throwable cause) {
     	log(exceptionCaughtLevel, "EXCEPTION :", cause);
-        nextFilter.exceptionCaught(session, cause);
+        getNextFilter().exceptionCaught(session, cause);
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
+    public void messageReceived(IoSession session, Object message) {
     	log(messageReceivedLevel, "RECEIVED: {}", message );
-    	nextFilter.messageReceived(session, message);
+    	getNextFilter().messageReceived(session, message);
     }
 
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    public void messageSent(IoSession session, WriteRequest writeRequest) {
     	log(messageSentLevel, "SENT: {}", writeRequest.getMessage() );
-        nextFilter.messageSent(session, writeRequest);
+    	getNextFilter().messageSent(session, writeRequest);
     }
 
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-    		throws Exception {
+    public void sessionCreated(IoSession session) {
     	log(sessionCreatedLevel, "CREATED");
-        nextFilter.sessionCreated(session);
+    	getNextFilter().sessionCreated(session);
     }
 
     @Override
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
-    throws Exception {
+    public void sessionOpened(IoSession session) {
     	log(sessionOpenedLevel, "OPENED");
-        nextFilter.sessionOpened(session);
+    	getNextFilter().sessionOpened(session);
     }
 
     @Override
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) throws Exception {
+    public void sessionIdle(IoSession session, IdleStatus status) {
     	log(sessionIdleLevel, "IDLE");
-        nextFilter.sessionIdle(session, status);
+    	getNextFilter().sessionIdle(session, status);
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
+    public void sessionClosed(IoSession session) {
     	log(sessionClosedLevel, "CLOSED");
-        nextFilter.sessionClosed(session);
+    	getNextFilter().sessionClosed(session);
     }
     
     /**

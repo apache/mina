@@ -35,36 +35,54 @@ import org.apache.mina.core.write.WriteRequestWrapper;
  *
  */
 public abstract class WriteRequestFilter extends IoFilterAdapter {
+    // Set the filter's default name
+	private static final String DEFAULT_NAME = "writeRequest";
+	
+	/**
+	 * Create a new instance with a default filter name
+	 */
+	public WriteRequestFilter() {
+		super(DEFAULT_NAME);
+	}
+	
+	/**
+	 * Create a new instance with a given filter name
+	 * 
+	 * @param name the filter's name
+	 */
+	public WriteRequestFilter(String name) {
+		super(name);
+	}
+	
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
-        Object filteredMessage = doFilterWrite(nextFilter, session, writeRequest);
+    public void filterWrite( IoSession session, WriteRequest writeRequest) {
+        Object filteredMessage = doFilterWrite(session, writeRequest);
+        
         if (filteredMessage != null && filteredMessage != writeRequest.getMessage()) {
-            nextFilter.filterWrite(
+        	getNextFilter().filterWrite(
                     session, new FilteredWriteRequest(
                             filteredMessage, writeRequest));
         } else {
-            nextFilter.filterWrite(session, writeRequest);
+        	getNextFilter().filterWrite(session, writeRequest);
         }
     }
 
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    public void messageSent(IoSession session, WriteRequest writeRequest) {
         if (writeRequest instanceof FilteredWriteRequest) {
             FilteredWriteRequest req = (FilteredWriteRequest) writeRequest;
             if (req.getParent() == this) {
-                nextFilter.messageSent(session, req.getParentRequest());
+                getNextFilter().messageSent(session, req.getParentRequest());
                 return;
             }
         }
 
-        nextFilter.messageSent(session, writeRequest);
+        getNextFilter().messageSent(session, writeRequest);
     }
 
     protected abstract Object doFilterWrite(
-            NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception;
-
+    		IoSession session, WriteRequest writeRequest);
+ 
     private class FilteredWriteRequest extends WriteRequestWrapper {
         private final Object filteredMessage;
 

@@ -19,7 +19,6 @@
  */
 package org.apache.mina.core.session;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
@@ -66,39 +65,36 @@ public class IoEvent implements Runnable {
     }
 
     public void fire() {
-    	IoFilter firstFilterIn = getSession().getFilterInChain().get(0);
-    	IoFilter firstFilterOut = getSession().getFilterOutChain().get(0);
-    	
         switch (getType()) {
         case MESSAGE_RECEIVED:
-        	firstFilterIn.messageReceived(session, getParameter());
+        	getSession().getFirstFilterIn().messageReceived(session, getParameter());
             break;
         case MESSAGE_SENT:
-        	firstFilterOut.messageSent(session, (WriteRequest) getParameter());
+        	getSession().getFirstFilterOut().messageSent(session, (WriteRequest) getParameter());
             break;
         case WRITE:
-        	firstFilterOut.filterWrite(session, (WriteRequest) getParameter());
+        	getSession().getFirstFilterOut().filterWrite(session, (WriteRequest) getParameter());
             break;
         case SET_TRAFFIC_MASK:
             //getSession().getFilterChain().fireFilterSetTrafficMask((TrafficMask) getParameter());
             break;
         case CLOSE:
-        	firstFilterIn.filterClose(session);
+        	getSession().getFirstFilterIn().filterClose(session);
             break;
         case EXCEPTION_CAUGHT:
-        	firstFilterIn.exceptionCaught(session, (Throwable) getParameter());
+        	getSession().getFirstFilterIn().exceptionCaught(session, (Throwable) getParameter());
             break;
         case SESSION_IDLE:
-        	firstFilterIn.sessionIdle(session, (IdleStatus) getParameter());
+        	getSession().getFirstFilterIn().sessionIdle(session, (IdleStatus) getParameter());
             break;
         case SESSION_OPENED:
-        	firstFilterIn.sessionOpened(session);
+        	getSession().getFirstFilterIn().sessionOpened(session);
             break;
         case SESSION_CREATED:
-        	firstFilterIn.sessionCreated(session);
+        	getSession().getFirstFilterIn().sessionCreated(session);
             break;
         case SESSION_CLOSED:
-        	firstFilterIn.sessionClosed(session);
+        	getSession().getFirstFilterIn().sessionClosed(session);
             break;
         default:
             throw new IllegalArgumentException("Unknown event type: " + getType());

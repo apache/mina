@@ -19,11 +19,10 @@
  */
 package org.apache.mina.core;
 
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
+import java.util.List;
+
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
-import org.apache.mina.core.filterchain.IoFilterChain;
-import org.apache.mina.core.filterchain.IoFilterChain.Entry;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.DummySession;
@@ -47,7 +46,7 @@ import static org.junit.Assert.assertSame;
  */
 public class IoFilterChainTest {
     private DummySession session;
-    private IoFilterChain chain;
+    private List<IoFilter> chain;
     private String result;
 
     private final IoHandler handler = new IoHandlerAdapter() {
@@ -94,7 +93,7 @@ public class IoFilterChainTest {
     public void setUp() {
         session = new DummySession();
         session.setHandler(handler);
-        chain = session.getFilterChain();
+        chain = session.getFilterChainIn();
         result = "";
     }
 
@@ -104,32 +103,28 @@ public class IoFilterChainTest {
 
     @Test
     public void testAdd() throws Exception {
-        chain.addFirst("A", new EventOrderTestFilter('A'));
-        chain.addLast("B", new EventOrderTestFilter('A'));
-        chain.addFirst("C", new EventOrderTestFilter('A'));
-        chain.addLast("D", new EventOrderTestFilter('A'));
-        chain.addBefore("B", "E", new EventOrderTestFilter('A'));
-        chain.addBefore("C", "F", new EventOrderTestFilter('A'));
-        chain.addAfter("B", "G", new EventOrderTestFilter('A'));
-        chain.addAfter("D", "H", new EventOrderTestFilter('A'));
+        chain.add(new EventOrderTestFilter('A'));
+        chain.add(new EventOrderTestFilter('B'));
+        chain.add(0, new EventOrderTestFilter('C'));
+        chain.add(new EventOrderTestFilter('D'));
 
         String actual = "";
-        for (Entry e : chain.getAll()) {
-            actual += e.getName();
+        for (IoFilter filter : chain) {
+            actual += filter.getName();
         }
 
-        assertEquals("FCAEBGDH", actual);
+        assertEquals("CABD", actual);
     }
 
     @Test
     public void testGet() throws Exception {
-        IoFilter filterA = new NoopFilter();
-        IoFilter filterB = new NoopFilter();
-        IoFilter filterC = new NoopFilter();
-        IoFilter filterD = new NoopFilter();
+        IoFilter filterA = new NoopFilter("A");
+        IoFilter filterB = new NoopFilter("B");
+        IoFilter filterC = new NoopFilter("C");
+        IoFilter filterD = new NoopFilter("D");
 
-        chain.addFirst("A", filterA);
-        chain.addLast("B", filterB);
+        chain.add(filterA);
+        chain.add(filterB);
         chain.addBefore("B", "C", filterC);
         chain.addAfter("A", "D", filterD);
 

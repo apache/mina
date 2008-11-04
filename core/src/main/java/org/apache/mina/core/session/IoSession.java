@@ -97,8 +97,14 @@ public interface IoSession {
      * @return the first filter from the Incoming chain 
      * that only affects this session.
      */
-    List<IoFilter> getFilterInChain();
+    List<IoFilter> getFilterChainIn();
     
+    /**
+     * Store a copy of the given incoming chain 
+     * @param chain The chain to copy
+     */
+    void setFilterChainIn(List<IoFilter> chain);
+
     /**
      * Get the first filter in the incoming chain
      * @return The first filter in the chain
@@ -109,7 +115,13 @@ public interface IoSession {
      * @return the first filter from the Outgoing chain 
      * that only affects this session.
      */
-    List<IoFilter> getFilterOutChain();
+    List<IoFilter> getFilterChainOut();
+
+    /**
+     * Store a copy of the given outgoing chain 
+     * @param chain The chain to copy
+     */
+    void setFilterChainOut(List<IoFilter> chain);
 
     /**
      * Get the first filter in the outgoing chain

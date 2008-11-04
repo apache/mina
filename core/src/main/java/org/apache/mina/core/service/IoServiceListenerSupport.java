@@ -32,7 +32,6 @@ import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.ExceptionMonitor;
-import org.apache.mina.core.filterchain.IoFilterChain;
 
 /**
  * A helper which provides addition and removal of {@link IoServiceListener}s and firing
@@ -198,9 +197,8 @@ public class IoServiceListenerSupport {
         }
 
         // Fire session events.
-        IoFilterChain filterChain = session.getFilterChain(); 
-        filterChain.fireSessionCreated();
-        filterChain.fireSessionOpened();
+        session.getFirstFilterIn().sessionCreated(session);
+        session.getFirstFilterIn().sessionOpened(session);
 
         int managedSessionCount = managedSessions.size();
         if (managedSessionCount > largestManagedSessionCount) {
@@ -228,7 +226,7 @@ public class IoServiceListenerSupport {
         }
 
         // Fire session events.
-        session.getFilterChain().fireSessionClosed();
+        session.getFirstFilterIn().sessionClosed(session);
 
         // Fire listener events.
         try {

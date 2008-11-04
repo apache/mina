@@ -54,10 +54,22 @@ import org.apache.mina.core.write.WriteRequest;
  * @org.apache.xbean.XBean
  */
 public class StreamWriteFilter extends AbstractStreamWriteFilter<InputStream> {
+    // Set the filter's default name
+    private static final String DEFAULT_NAME = "streamWrite";
 
-    // Set the filter's name
-    static {
-    	name = "streamWrite";
+    /**
+     * Default Constructor.
+     */
+    public StreamWriteFilter() {
+    	super(DEFAULT_NAME);
+    }
+    
+    /**
+     * Default Constructor.
+     * @param name The filter's name
+     */
+    public StreamWriteFilter(String name) {
+    	super(name);
     }
     
 

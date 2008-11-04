@@ -24,7 +24,6 @@ import java.util.Queue;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
@@ -38,6 +37,9 @@ import org.apache.mina.util.CircularQueue;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
+    // Set the filter's default name
+	private static final String DEFAULT_NAME = "abstractStreamWrite";
+	
     /**
      * The default buffer size this filter uses for writing.
      */
@@ -54,6 +56,21 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
 
 
+    /**
+     * Default Constructor.
+     */
+    protected AbstractStreamWriteFilter() {
+    	super(DEFAULT_NAME);
+    }
+    
+    /**
+     * Default Constructor.
+     * @param name The filter's name
+     */
+    protected AbstractStreamWriteFilter(String name) {
+    	super(name);
+    }
+    
     @Override
     public void onPreAdd(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
@@ -65,8 +82,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     }
 
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-                            WriteRequest writeRequest) throws Exception {
+    public void filterWrite(IoSession session, WriteRequest writeRequest) {
         // If we're already processing a stream we need to queue the WriteRequest.
         if (session.getAttribute(CURRENT_STREAM) != null) {
             Queue<WriteRequest> queue = getWriteRequestQueue(session);
@@ -88,17 +104,17 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
             if (buffer == null) {
                 // End of stream reached.
                 writeRequest.getFuture().setWritten();
-                nextFilter.messageSent(session, writeRequest);
+                getNextFilter().messageSent(session, writeRequest);
             } else {
                 session.setAttribute(CURRENT_STREAM, message);
                 session.setAttribute(CURRENT_WRITE_REQUEST, writeRequest);
 
-                nextFilter.filterWrite(session, new DefaultWriteRequest(
+                getNextFilter().filterWrite(session, new DefaultWriteRequest(
                         buffer));
             }
 
         } else {
-            nextFilter.filterWrite(session, writeRequest);
+        	getNextFilter().filterWrite(session, writeRequest);
         }
     }
     
@@ -115,12 +131,11 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     }
     
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-                            WriteRequest writeRequest) throws Exception {
+    public void messageSent(IoSession session, WriteRequest writeRequest) {
         T stream = getMessageClass().cast(session.getAttribute(CURRENT_STREAM));
 
         if (stream == null) {
-            nextFilter.messageSent(session, writeRequest);
+            getNextFilter().messageSent(session, writeRequest);
         } else {
             IoBuffer buffer = getNextBuffer(stream);
 
@@ -135,15 +150,15 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
                 if (queue != null) {
                     WriteRequest wr = queue.poll();
                     while (wr != null) {
-                        filterWrite(nextFilter, session, wr);
+                        filterWrite(session, wr);
                         wr = queue.poll();
                     }
                 }
 
                 currentWriteRequest.getFuture().setWritten();
-                nextFilter.messageSent(session, currentWriteRequest);
+                getNextFilter().messageSent(session, currentWriteRequest);
             } else {
-                nextFilter.filterWrite(session, new DefaultWriteRequest(
+            	getNextFilter().filterWrite(session, new DefaultWriteRequest(
                         buffer));
             }
         }

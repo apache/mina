@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.IoUtil;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultIoFuture;
 import org.apache.mina.core.future.IoFuture;
@@ -120,10 +121,11 @@ public abstract class AbstractIoService implements IoService {
         }
     };
 
-    /**
-     * Current filter chain builder.
-     */
-    private IoFilterChainBuilder filterChainBuilder = new DefaultIoFilterChainBuilder();
+    /** The incoming filter chain */
+    private List<IoFilter> filterChainIn;
+    
+    /** The outgoing filter chain */
+    private List<IoFilter> filterChainOut;
 
     private IoSessionDataStructureFactory sessionDataStructureFactory = new DefaultIoSessionDataStructureFactory();
 
@@ -212,30 +214,43 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
-    public final IoFilterChainBuilder getFilterChainBuilder() {
-        return filterChainBuilder;
+    public final List<IoFilter> getFilterInChain() {
+        return filterChainIn;
     }
 
     /**
      * {@inheritDoc}
      */
-    public final void setFilterChainBuilder(IoFilterChainBuilder builder) {
-        if (builder == null) {
-            builder = new DefaultIoFilterChainBuilder();
-        }
-        filterChainBuilder = builder;
+    public final List<IoFilter> getFilterOutChain() {
+        return filterChainOut;
     }
 
     /**
      * {@inheritDoc}
      */
-    public final DefaultIoFilterChainBuilder getFilterChain() {
-        if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
-            return (DefaultIoFilterChainBuilder) filterChainBuilder;
-        } else {
-            throw new IllegalStateException(
-                    "Current filter chain builder is not a DefaultIoFilterChainBuilder.");
-        }
+    public final void setFilterChainIn(List<IoFilter> filters) {
+        filterChainIn = filters;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final void setFilterChainOut(List<IoFilter> filters) {
+        filterChainOut = filters;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final List<IoFilter> getFilterChainIn() {
+    	return filterChainIn;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final List<IoFilter> getFilterChainOut() {
+    	return filterChainOut;
     }
 
     /**
@@ -494,7 +509,7 @@ public abstract class AbstractIoService implements IoService {
 
         if (future != null && future instanceof ConnectFuture) {
             // DefaultIoFilterChain will notify the future. (We support ConnectFuture only for now).
-            session.setAttribute(DefaultIoFilterChain.SESSION_CREATED_FUTURE,
+            session.setAttribute(session,
                     future);
         }
 

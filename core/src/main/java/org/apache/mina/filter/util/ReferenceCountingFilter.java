@@ -21,7 +21,6 @@ package org.apache.mina.filter.util;
 
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.TrafficMask;
@@ -36,16 +35,20 @@ import org.apache.mina.core.write.WriteRequest;
  * @org.apache.xbean.XBean
  */
 public class ReferenceCountingFilter extends IoFilterAdapter {
-    // Set the filter's name
-    static {
-    	name = "referenceCounting";
-    }
+    // Set the filter's default name
+    private static final String DEFAULT_NAME = "referenceCounting";
     
     private final IoFilter filter;
 
     private int count = 0;
 
+    public ReferenceCountingFilter(String name, IoFilter filter) {
+    	super(name);
+        this.filter = filter;
+    }
+
     public ReferenceCountingFilter(IoFilter filter) {
+    	super(DEFAULT_NAME);
         this.filter = filter;
     }
 
@@ -79,29 +82,25 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
         }
     }
 
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) throws Exception {
-        filter.exceptionCaught(nextFilter, session, cause);
+    public void exceptionCaught( IoSession session, Throwable cause) {
+        filter.exceptionCaught(session, cause);
     }
 
-    public void filterClose(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        filter.filterClose(nextFilter, session);
+    public void filterClose(IoSession session) {
+        filter.filterClose(session);
     }
 
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
-        filter.filterWrite(nextFilter, session, writeRequest);
+    public void filterWrite(IoSession session, WriteRequest writeRequest) {
+        filter.filterWrite(session, writeRequest);
     }
 
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
-        filter.messageReceived(nextFilter, session, message);
+    public void messageReceived(IoSession session, Object message) {
+        filter.messageReceived(session, message);
     }
 
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
-        filter.messageSent(nextFilter, session, writeRequest);
+    public void messageSent(IoSession session,
+            WriteRequest writeRequest) {
+        filter.messageSent(session, writeRequest);
     }
 
     public void onPostAdd(IoFilterChain parent, String name,
@@ -111,31 +110,26 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
 
     public void onPreRemove(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
-        filter.onPreRemove(parent, name, nextFilter);
+    	getNextFilter().onPreRemove(parent, name, nextFilter);
     }
 
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        filter.sessionClosed(nextFilter, session);
+    public void sessionClosed(IoSession session) {
+        getNextFilter().sessionClosed(session);
     }
 
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        filter.sessionCreated(nextFilter, session);
+    public void sessionCreated(IoSession session) {
+    	getNextFilter().sessionCreated(session);
     }
 
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) throws Exception {
-        filter.sessionIdle(nextFilter, session, status);
+    public void sessionIdle(IoSession session, IdleStatus status) {
+    	getNextFilter().sessionIdle(session, status);
     }
 
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        filter.sessionOpened(nextFilter, session);
+    public void sessionOpened(IoSession session) {
+    	getNextFilter().sessionOpened(session);
     }
 
-    public void filterSetTrafficMask(NextFilter nextFilter, IoSession session,
-            TrafficMask trafficMask) throws Exception {
-        filter.filterSetTrafficMask(nextFilter, session, trafficMask);
+    public void filterSetTrafficMask(IoSession session, TrafficMask trafficMask) {
+    	//getNextFilter().setTrafficMask(session, trafficMask);
     }
 }

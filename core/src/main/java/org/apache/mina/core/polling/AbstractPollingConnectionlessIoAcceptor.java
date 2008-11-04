@@ -33,6 +33,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.IoAcceptor;
@@ -239,7 +240,13 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         finishSessionInitialization(session, null, null);
 
         try {
-            this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
+            // Build the filter chains for this session.
+            List<IoFilter> chainIn = ((IoSession)session). getService().getFilterChainIn();
+            ((IoSession)session).setFilterChainIn(chainIn);
+            
+            List<IoFilter> chainOut = ((IoSession)session). getService().getFilterChainOut();
+            ((IoSession)session).setFilterChainIn(chainOut);
+            
             getListeners().fireSessionCreated(session);
         } catch (Throwable t) {
             ExceptionMonitor.getInstance().exceptionCaught(t);
@@ -415,7 +422,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             newBuf.put(readBuf);
             newBuf.flip();
 
-            session.getFilterInChain().messageReceived(session,newBuf);
+            session.getFirstFilterIn().messageReceived(session,newBuf);
         }
     }
 
@@ -435,7 +442,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     scheduleFlush(session);
                 }
             } catch (Exception e) {
-                session.getFilterOutChain().exceptionCaught(session, e);
+                session.getFirstFilterOut().exceptionCaught(session, e);
             }
         }
     }
@@ -466,7 +473,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     // Clear and fire event
                     session.setCurrentWriteRequest(null);
                     buf.reset();
-                    session.getFilterOutChain().messageSent(session, req);
+                    session.getFirstFilterOut().messageSent(session, req);
                     continue;
                 }
 
@@ -487,7 +494,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     session.setCurrentWriteRequest(null);
                     writtenBytes += localWrittenBytes;
                     buf.reset();
-                    session.getFilterOutChain().messageSent(session, req);
+                    session.getFirstFilterOut().messageSent(session, req);
                 }
             }
         } finally {

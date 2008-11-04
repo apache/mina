@@ -20,13 +20,12 @@
 package org.apache.mina.core.service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.core.IoUtil;
-import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
-import org.apache.mina.core.filterchain.IoFilterChain;
-import org.apache.mina.core.filterchain.IoFilterChainBuilder;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
@@ -109,33 +108,32 @@ public interface IoService {
     IoSessionConfig getSessionConfig();
 
     /**
-     * Returns the {@link IoFilterChainBuilder} which will build the
-     * {@link IoFilterChain} of all {@link IoSession}s which is created
-     * by this service.
-     * The default value is an empty {@link DefaultIoFilterChainBuilder}.
+     * Returns the incoming filter chain stored into the service.
+     * @return the incoming filter chain
      */
-    IoFilterChainBuilder getFilterChainBuilder();
+    List<IoFilter> getFilterChainIn();
 
     /**
-     * Sets the {@link IoFilterChainBuilder} which will build the
-     * {@link IoFilterChain} of all {@link IoSession}s which is created
-     * by this service.
-     * If you specify <tt>null</tt> this property will be set to
-     * an empty {@link DefaultIoFilterChainBuilder}.
+     * Returns the outgoing filter chain stored into the service.
+     * @return the outgoing filter chain
      */
-    void setFilterChainBuilder(IoFilterChainBuilder builder);
+    List<IoFilter> getFilterChainOut();
 
     /**
-     * A shortcut for <tt>( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )</tt>.
-     * Please note that the returned object is not a <b>real</b> {@link IoFilterChain}
-     * but a {@link DefaultIoFilterChainBuilder}.  Modifying the returned builder
-     * won't affect the existing {@link IoSession}s at all, because
-     * {@link IoFilterChainBuilder}s affect only newly created {@link IoSession}s.
-     *
-     * @throws IllegalStateException if the current {@link IoFilterChainBuilder} is
-     *                               not a {@link DefaultIoFilterChainBuilder}
+     * Sets the incoming filter chain. It will be copied for every
+     * new created session.
+     * 
+     * @param builder the new incoming filter chain
      */
-    DefaultIoFilterChainBuilder getFilterChain();
+    void setFilterChainIn(List<IoFilter> builder);
+
+    /**
+     * Sets the outgoing filter chain. It will be copied for every
+     * new created session.
+     * 
+     * @param builder the new outgoing filter chain
+     */
+    void setFilterChainOut(List<IoFilter> builder);
 
     /**
      * Returns a value of whether or not this service is active

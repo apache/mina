@@ -123,7 +123,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
     }
 
     @Override
-    protected void filter(IoFilterEvent event) throws Exception {
+    protected void filter(IoFilterEvent event) {
         // since this method can potentially call into itself
         // we need to check the call depth before clearing the MDC
         int currentCallDepth = callDepth.get();

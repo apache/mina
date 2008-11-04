@@ -561,88 +561,82 @@ public class ExecutorFilter extends IoFilterAdapter {
     }
 
     @Override
-    public final void sessionOpened(NextFilter nextFilter, IoSession session) {
+    public final void sessionOpened(IoSession session) {
         if (eventTypes.contains(IoEventType.SESSION_OPENED)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED,
+            fireEvent(new IoFilterEvent(getNextFilter(), IoEventType.SESSION_OPENED,
                     session, null));
         } else {
-            nextFilter.sessionOpened(session);
+            getNextFilter().sessionOpened(session);
         }
     }
 
     @Override
-    public final void sessionClosed(NextFilter nextFilter, IoSession session) {
+    public final void sessionClosed(IoSession session) {
         if (eventTypes.contains(IoEventType.SESSION_CLOSED)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED,
+            fireEvent(new IoFilterEvent(getNextFilter(), IoEventType.SESSION_CLOSED,
                     session, null));
         } else {
-            nextFilter.sessionClosed(session);
+        	getNextFilter().sessionClosed(session);
         }
     }
 
     @Override
-    public final void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) {
+    public final void sessionIdle(IoSession session, IdleStatus status) {
         if (eventTypes.contains(IoEventType.SESSION_IDLE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE,
+            fireEvent(new IoFilterEvent(getNextFilter(), IoEventType.SESSION_IDLE,
                     session, status));
         } else {
-            nextFilter.sessionIdle(session, status);
+        	getNextFilter().sessionIdle(session, status);
         }
     }
 
     @Override
-    public final void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) {
+    public final void exceptionCaught(IoSession session, Throwable cause) {
         if (eventTypes.contains(IoEventType.EXCEPTION_CAUGHT)) {
-            fireEvent(new IoFilterEvent(nextFilter,
+            fireEvent(new IoFilterEvent(getNextFilter(),
                     IoEventType.EXCEPTION_CAUGHT, session, cause));
         } else {
-            nextFilter.exceptionCaught(session, cause);
+        	getNextFilter().exceptionCaught(session, cause);
         }
     }
 
     @Override
-    public final void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) {
+    public final void messageReceived(IoSession session, Object message) {
         if (eventTypes.contains(IoEventType.MESSAGE_RECEIVED)) {
-            fireEvent(new IoFilterEvent(nextFilter,
+            fireEvent(new IoFilterEvent(getNextFilter(),
                     IoEventType.MESSAGE_RECEIVED, session, message));
         } else {
-            nextFilter.messageReceived(session, message);
+        	getNextFilter().messageReceived(session, message);
         }
     }
 
     @Override
-    public final void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) {
+    public final void messageSent(IoSession session, WriteRequest writeRequest) {
         if (eventTypes.contains(IoEventType.MESSAGE_SENT)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT,
+            fireEvent(new IoFilterEvent(getNextFilter(), IoEventType.MESSAGE_SENT,
                     session, writeRequest));
         } else {
-            nextFilter.messageSent(session, writeRequest);
+        	getNextFilter().messageSent(session, writeRequest);
         }
     }
 
     @Override
-    public final void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) {
+    public final void filterWrite(IoSession session, WriteRequest writeRequest) {
         if (eventTypes.contains(IoEventType.WRITE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.WRITE, session,
+            fireEvent(new IoFilterEvent(getNextFilter(), IoEventType.WRITE, session,
                     writeRequest));
         } else {
-            nextFilter.filterWrite(session, writeRequest);
+        	getNextFilter().filterWrite(session, writeRequest);
         }
     }
 
     @Override
-    public final void filterClose(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public final void filterClose(IoSession session) {
         if (eventTypes.contains(IoEventType.CLOSE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.CLOSE, session,
+            fireEvent(new IoFilterEvent(getNextFilter(), IoEventType.CLOSE, session,
                     null));
         } else {
-            nextFilter.filterClose(session);
+        	getNextFilter().filterClose(session);
         }
     }
 }

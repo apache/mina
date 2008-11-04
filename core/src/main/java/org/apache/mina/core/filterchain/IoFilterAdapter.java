@@ -37,8 +37,17 @@ public class IoFilterAdapter implements IoFilter {
     private IoFilter nextFilter;
     
     /** The filter's name */
-    protected static String name;
+    private String name;
 
+    /**
+     * Creates a new instance of this class, and associate a name
+     * to it.
+     * @param name The filter's name
+     */
+    public  IoFilterAdapter(String name) {
+    	this.name = name;
+    }
+    
     /**
      * {@inheritDoc}
      */

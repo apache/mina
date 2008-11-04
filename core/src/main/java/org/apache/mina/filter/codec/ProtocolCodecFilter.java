@@ -26,7 +26,6 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.AttributeKey;
@@ -49,9 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProtocolCodecFilter extends IoFilterAdapter {
     // Set the filter's name
-    static {
-    	name = "protocolCodec";
-    }
+    private static final String DEFAULT_NAME = "protocolCodec";
     
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
@@ -74,13 +71,25 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      * @param factory The associated factory
      */
     public ProtocolCodecFilter(ProtocolCodecFactory factory) {
+    	this(DEFAULT_NAME, factory);
+    }
+
+    /**
+     * 
+     * Creates a new instance of ProtocolCodecFilter, associating a factory
+     * for the creation of the encoder and decoder.
+     *
+     * @param name the filter's name
+     * @param factory The associated factory
+     */
+    public ProtocolCodecFilter(String name, ProtocolCodecFactory factory) {
+    	super(name);
         if (factory == null) {
             throw new NullPointerException("factory");
         }
         this.factory = factory;
     }
 
-    
     /**
      * Creates a new instance of ProtocolCodecFilter, without any factory.
      * The encoder/decoder factory will be created as an inner class, using
@@ -91,6 +100,20 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      */
     public ProtocolCodecFilter(final ProtocolEncoder encoder,
             final ProtocolDecoder decoder) {
+    	this(DEFAULT_NAME, encoder, decoder);
+    }
+
+    /**
+     * Creates a new instance of ProtocolCodecFilter, without any factory.
+     * The encoder/decoder factory will be created as an inner class, using
+     * the two parameters (encoder and decoder). 
+     * 
+     * @param encoder The class responsible for encoding the message
+     * @param decoder The class responsible for decoding the message
+     */
+    public ProtocolCodecFilter(String name, final ProtocolEncoder encoder,
+            final ProtocolDecoder decoder) {
+    	super(name);
         if (encoder == null) {
             throw new NullPointerException("encoder");
         }
@@ -122,6 +145,22 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public ProtocolCodecFilter(
             final Class<? extends ProtocolEncoder> encoderClass,
             final Class<? extends ProtocolDecoder> decoderClass) {
+    	this(DEFAULT_NAME, encoderClass, decoderClass);
+    }
+
+    /**
+     * Creates a new instance of ProtocolCodecFilter, without any factory.
+     * The encoder/decoder factory will be created as an inner class, using
+     * the two parameters (encoder and decoder), which are class names. Instances
+     * for those classes will be created in this constructor.
+     * 
+     * @param encoder The class responsible for encoding the message
+     * @param decoder The class responsible for decoding the message
+     */
+    public ProtocolCodecFilter(String name,
+            final Class<? extends ProtocolEncoder> encoderClass,
+            final Class<? extends ProtocolDecoder> decoderClass) {
+    	super(name);
         if (encoderClass == null) {
             throw new NullPointerException("encoderClass");
         }
@@ -161,7 +200,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             }
         };
     }
-
     
     /**
      * Get the encoder instance from a given session.
@@ -217,10 +255,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      *    
      */
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
+    public void messageReceived(IoSession session, Object message) {
         if (!(message instanceof IoBuffer)) {
-            nextFilter.messageReceived(session, message);
+        	getNextFilter().messageReceived(session, message);
             return;
         }
 
@@ -235,11 +272,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             ProtocolDecoderException pde = new ProtocolDecoderException(
                 "Cannot decode if the decoder is null. Add the filter in the chain" +
                 "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
+            getNextFilter().exceptionCaught(session, pde);
             return;
         }
         
-        ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
+        ProtocolDecoderOutput decoderOut = getDecoderOut(session, getNextFilter());
         
         if ( decoderOut == null) {
             // The decoderOut must not be null. It's null if
@@ -249,7 +286,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             ProtocolDecoderException pde = new ProtocolDecoderException(
                 "Cannot decode if the decoder is null. Add the filter in the chain" +
                 "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
+            getNextFilter().exceptionCaught(session, pde);
             return;
         }
         
@@ -286,7 +323,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
                 // Fire the exceptionCaught event.
                 decoderOut.flush();
-                nextFilter.exceptionCaught(session, pde);
+                getNextFilter().exceptionCaught(session, pde);
 
                 // Retry only if the type of the caught exception is
                 // recoverable and the buffer position has changed.
@@ -301,30 +338,28 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    public void messageSent(IoSession session, WriteRequest writeRequest) {
         if (writeRequest instanceof EncodedWriteRequest) {
             return;
         }
 
         if (!(writeRequest instanceof MessageWriteRequest)) {
-            nextFilter.messageSent(session, writeRequest);
+            getNextFilter().messageSent(session, writeRequest);
             return;
         }
 
         MessageWriteRequest wrappedRequest = (MessageWriteRequest) writeRequest;
-        nextFilter.messageSent(session, wrappedRequest.getParentRequest());
+        getNextFilter().messageSent(session, wrappedRequest.getParentRequest());
     }
 
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    public void filterWrite(IoSession session, WriteRequest writeRequest) {
         Object message = writeRequest.getMessage();
         
         // Bypass the encoding if the message is contained in a ByteBuffer,
         // as it has already been encoded before
         if (message instanceof IoBuffer || message instanceof FileRegion) {
-            nextFilter.filterWrite(session, writeRequest);
+            getNextFilter().filterWrite(session, writeRequest);
             return;
         }
 
@@ -339,12 +374,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             ProtocolDecoderException pde = new ProtocolDecoderException(
                 "Cannot encode if the encoder is null. Add the filter in the chain" +
                 "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
+            getNextFilter().exceptionCaught(session, pde);
             return;
         }
         
         ProtocolEncoderOutputImpl encoderOut = getEncoderOut(session,
-                nextFilter, writeRequest);
+                getNextFilter(), writeRequest);
 
         if ( encoderOut == null) {
             // The encoder must not be null. It's null if
@@ -354,7 +389,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             ProtocolDecoderException pde = new ProtocolDecoderException(
                 "Cannot encode if the encoder is null. Add the filter in the chain" +
                 "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
+            getNextFilter().exceptionCaught(session, pde);
             return;
         }
         
@@ -366,7 +401,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             encoderOut.flushWithoutFuture();
             
             // Call the next filter
-            nextFilter.filterWrite(session, new MessageWriteRequest(
+            getNextFilter().filterWrite(session, new MessageWriteRequest(
                     writeRequest));
         } catch (Throwable t) {
             ProtocolEncoderException pee;
@@ -394,7 +429,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      * @throws Exception if we can't create instances of the decoder or encoder
      */
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
+    public void sessionCreated(IoSession session) {
         // Creates the decoder and stores it into the newly created session 
         ProtocolDecoder decoder = factory.getDecoder(session);
         session.setAttribute(DECODER, decoder);
@@ -404,12 +439,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         session.setAttribute(ENCODER, encoder);
 
         // Call the next filter
-        nextFilter.sessionCreated(session);
+        getNextFilter().sessionCreated(session);
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionClosed(IoSession session) {
         // Call finishDecode() first when a connection is closed.
         ProtocolDecoder decoder = getDecoder(session);
         
@@ -421,11 +455,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             ProtocolDecoderException pde = new ProtocolDecoderException(
                 "Cannot decode if the decoder is null. Add the filter in the chain" +
                 "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
+            getNextFilter().exceptionCaught(session, pde);
             return;
         }
         
-        ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
+        ProtocolDecoderOutput decoderOut = getDecoderOut(session, getNextFilter());
         
         if ( decoderOut == null) {
             // The decoder must not be null. It's null if
@@ -435,7 +469,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             ProtocolDecoderException pde = new ProtocolDecoderException(
                 "Cannot decode if the decoder is null. Add the filter in the chain" +
                 "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
+            getNextFilter().exceptionCaught(session, pde);
             return;
         }
         
@@ -457,16 +491,16 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             decoderOut.flush();
         }
 
-        nextFilter.sessionClosed(session);
+        getNextFilter().sessionClosed(session);
     }
 
     private ProtocolEncoderOutputImpl getEncoderOut(IoSession session,
-            NextFilter nextFilter, WriteRequest writeRequest) {
+            IoFilter nextFilter, WriteRequest writeRequest) {
         return new ProtocolEncoderOutputImpl(session, nextFilter, writeRequest);
     }
 
     private ProtocolDecoderOutput getDecoderOut(IoSession session,
-            NextFilter nextFilter) {
+            IoFilter nextFilter) {
         ProtocolDecoderOutput out = (ProtocolDecoderOutput) session.getAttribute(DECODER_OUT);
         if (out == null) {
             out = new ProtocolDecoderOutputImpl(session, nextFilter);
@@ -530,10 +564,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     private static class ProtocolDecoderOutputImpl extends
             AbstractProtocolDecoderOutput {
         private final IoSession session;
-        private final NextFilter nextFilter;
+        private final IoFilter nextFilter;
 
         public ProtocolDecoderOutputImpl(
-                IoSession session, NextFilter nextFilter) {
+                IoSession session, IoFilter nextFilter) {
             this.session = session;
             this.nextFilter = nextFilter;
         }
@@ -550,12 +584,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             AbstractProtocolEncoderOutput {
         private final IoSession session;
 
-        private final NextFilter nextFilter;
+        private final IoFilter nextFilter;
 
         private final WriteRequest writeRequest;
 
         public ProtocolEncoderOutputImpl(IoSession session,
-                NextFilter nextFilter, WriteRequest writeRequest) {
+                IoFilter nextFilter, WriteRequest writeRequest) {
             this.session = session;
             this.nextFilter = nextFilter;
             this.writeRequest = writeRequest;

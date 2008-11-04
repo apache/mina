@@ -97,13 +97,12 @@ public class WriteRequestFilter extends IoFilterAdapter {
 
     @Override
     public void filterWrite(
-            NextFilter nextFilter,
-            IoSession session, WriteRequest writeRequest) throws Exception {
+            IoSession session, WriteRequest writeRequest) {
 
         final IoEvent e = new IoEvent(IoEventType.WRITE, session, writeRequest);
 
         if (queueHandler.accept(this, e)) {
-            nextFilter.filterWrite(session, writeRequest);
+            getNextFilter().filterWrite(session, writeRequest);
             WriteFuture writeFuture = writeRequest.getFuture();
             if (writeFuture == null) {
                 return;

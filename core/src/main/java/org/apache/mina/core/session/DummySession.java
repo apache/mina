@@ -26,9 +26,7 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.file.FileRegion;
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.DefaultTransportMetadata;
@@ -76,12 +74,6 @@ public class DummySession extends AbstractIoSession {
         protected void doSetAll(IoSessionConfig config) {
         }
     };
-
-    /** The first filter in the incoming chain */
-    private final IoFilter firstFilterIn;
-
-    /** The first filter in the outgoing chain */
-    private final IoFilter firstFilterOut;
 
     private final IoProcessor<IoSession> processor;
 
@@ -147,11 +139,11 @@ public class DummySession extends AbstractIoSession {
                         file.getFileChannel().position(file.getPosition() + file.getRemainingBytes());
                         file.update(file.getRemainingBytes());
                     } catch (IOException e) {
-                        s.getFilterOutChain().fireExceptionCaught(e);
+                        s.getFirstFilterOut().exceptionCaught(session, e);
                     }
                 }
                 
-                firstFilterIn.fireMessageSent(req);
+                session.getFirstFilterOut().messageSent(session, req);
             }
 
             public void remove(IoSession session) {
@@ -194,20 +186,6 @@ public class DummySession extends AbstractIoSession {
         }
 
         this.config = config;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public IoFilter getFilterInChain() {
-        return firstFilterIn;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public IoFilter getFilterOutChain() {
-        return firstFilterOut;
     }
 
     public IoHandler getHandler() {

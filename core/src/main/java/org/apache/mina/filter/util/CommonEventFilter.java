@@ -34,54 +34,69 @@ import org.apache.mina.core.write.WriteRequest;
  * @version $Rev:$, $Date:$
  */
 public abstract class CommonEventFilter extends IoFilterAdapter {
-
+    // Set the filter's default name
+	private static final String DEFAULT_NAME = "commonEvent";
+	
+	/**
+	 * Create a new instance with a default filter name
+	 */
     public CommonEventFilter() {
+    	super(DEFAULT_NAME);
     }
 
-    protected abstract void filter(IoFilterEvent event) throws Exception;
-
-    @Override
-    public final void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_CREATED, session, null));
+	/**
+	 * Create a new instance with a given filter name
+	 * 
+	 * @param name the filter's name
+	 */
+    public CommonEventFilter(String name) {
+    	super(name);
     }
 
-    @Override
-    public final void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED, session, null));
-    }
+    protected abstract void filter(IoFilterEvent event);
 
     @Override
-    public final void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED, session, null));
-    }
-
-    @Override
-    public final void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE, session, status));
+    public final void sessionCreated(IoSession session) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.SESSION_CREATED, session, null));
     }
 
     @Override
-    public final void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.EXCEPTION_CAUGHT, session, cause));
+    public final void sessionOpened(IoSession session) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.SESSION_OPENED, session, null));
     }
 
     @Override
-    public final void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
+    public final void sessionClosed(IoSession session) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.SESSION_CLOSED, session, null));
     }
 
     @Override
-    public final void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT, session, writeRequest));
+    public final void sessionIdle(IoSession session, IdleStatus status) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.SESSION_IDLE, session, status));
     }
 
     @Override
-    public final void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
+    public final void exceptionCaught(IoSession session, Throwable cause) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.EXCEPTION_CAUGHT, session, cause));
     }
 
     @Override
-    public final void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.CLOSE, session, null));
+    public final void messageReceived(IoSession session, Object message) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.MESSAGE_RECEIVED, session, message));
+    }
+
+    @Override
+    public final void messageSent(IoSession session, WriteRequest writeRequest) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.MESSAGE_SENT, session, writeRequest));
+    }
+
+    @Override
+    public final void filterWrite(IoSession session, WriteRequest writeRequest) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.WRITE, session, writeRequest));
+    }
+
+    @Override
+    public final void filterClose(IoSession session) {
+        filter(new IoFilterEvent(getNextFilter(), IoEventType.CLOSE, session, null));
     }
 }

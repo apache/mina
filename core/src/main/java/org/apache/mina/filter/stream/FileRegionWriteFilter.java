@@ -58,13 +58,24 @@ import org.apache.mina.core.write.WriteRequest;
  */
 public class FileRegionWriteFilter extends
         AbstractStreamWriteFilter<FileRegion> {
+    // Set the filter's default name
+    private static final String DEFAULT_NAME = "fileRegionWrite";
 
-    // Set the filter's name
-    static {
-    	name = "fileRegionWrite";
+    /**
+     * Default Constructor.
+     */
+    public FileRegionWriteFilter() {
+    	super(DEFAULT_NAME);
     }
     
-
+    /**
+     * Default Constructor.
+     * @param name The filter's name
+     */
+    public FileRegionWriteFilter(String name) {
+    	super(name);
+    }
+    
     @Override
     protected Class<FileRegion> getMessageClass() {
         return FileRegion.class;

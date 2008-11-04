@@ -119,21 +119,20 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
+    public void messageReceived(IoSession session, Object message) {
         ResponseInspector responseInspector = (ResponseInspector) session
                 .getAttribute(RESPONSE_INSPECTOR);
         Object requestId = responseInspector.getRequestId(message);
         if (requestId == null) {
             // Not a response message.  Ignore.
-            nextFilter.messageReceived(session, message);
+        	getNextFilter().messageReceived(session, message);
             return;
         }
 
         // Retrieve (or remove) the corresponding request.
         ResponseType type = responseInspector.getResponseType(message);
         if (type == null) {
-            nextFilter.exceptionCaught(session, new IllegalStateException(
+        	getNextFilter().exceptionCaught(session, new IllegalStateException(
                     responseInspector.getClass().getName()
                             + "#getResponseType() may not return null."));
         }
@@ -182,7 +181,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
             // And forward the event.
             Response response = new Response(request, message, type);
             request.signal(response);
-            nextFilter.messageReceived(session, response);
+            getNextFilter().messageReceived(session, response);
         }
     }
 
@@ -232,8 +231,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionClosed(IoSession session) {
         // Copy the unfinished task set to avoid unnecessary lock acquisition.
         // Copying will be cheap because there won't be that many requests queued.
         Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
@@ -258,7 +256,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
         }
 
         // Now tell the main subject.
-        nextFilter.sessionClosed(session);
+        getNextFilter().sessionClosed(session);
     }
 
     @SuppressWarnings("unchecked")

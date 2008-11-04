@@ -139,10 +139,10 @@ public abstract class AbstractIoSession implements IoSession {
     private boolean deferDecreaseReadBuffer = true;
 
     /** The list of IoFilter for the incoming chain */
-    protected final List<IoFilter> incomingChain = new ArrayList<IoFilter>();
+    protected List<IoFilter> incomingChain;
 
     /** The list of IoFilter for the outgoing chain */
-    protected final List<IoFilter> outgoingChain = new ArrayList<IoFilter>();
+    protected List<IoFilter> outgoingChain;
 
 
     /**
@@ -369,15 +369,39 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
-    public List<IoFilter> getFilterInChain() {
+    public List<IoFilter> getFilterChainIn() {
         return incomingChain;
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<IoFilter> getFilterOutChain() {
+    public List<IoFilter> getFilterChainOut() {
         return outgoingChain;
+    }
+
+    /**
+     * Store a copy of the given incoming chain 
+     * @param chain The chain to copy
+     */
+    public void setFilterChainIn(List<IoFilter> chain) {
+    	incomingChain = new ArrayList<IoFilter>(chain.size());
+    	
+    	for (IoFilter filter:chain) {
+    		incomingChain.add(filter);
+    	}
+    }
+
+    /**
+     * Store a copy of the given outgoing chain 
+     * @param chain The chain to copy
+     */
+    public void setFilterChainOut(List<IoFilter> chain) {
+    	outgoingChain = new ArrayList<IoFilter>(chain.size());
+    	
+    	for (IoFilter filter:chain) {
+    		outgoingChain.add(filter);
+    	}
     }
 
     /**
@@ -385,7 +409,7 @@ public abstract class AbstractIoSession implements IoSession {
      * @return The first filter in the chain
      */
     public IoFilter getFirstFilterIn() {
-    	return getFilterInChain().get(0);
+    	return getFilterChainIn().get(0);
     }
 
     /**
@@ -393,7 +417,7 @@ public abstract class AbstractIoSession implements IoSession {
      * @return The first filter in the chain
      */
     public IoFilter getFirstFilterOut() {
-    	return getFilterOutChain().get(0);
+    	return getFilterChainOut().get(0);
     }
 
     
