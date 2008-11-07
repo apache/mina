@@ -19,7 +19,6 @@
  */
 package org.apache.mina.core.filterchain;
 
-import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoEvent;
 import org.apache.mina.core.session.IoEventType;
@@ -36,55 +35,50 @@ import org.apache.mina.core.write.WriteRequest;
  * @version $Rev: 591770 $, $Date: 2007-11-04 13:22:44 +0100 (Sun, 04 Nov 2007) $
  */
 public class IoFilterEvent extends IoEvent {
+	int nextFilterIndex;
 
-    private final NextFilter nextFilter;
-
-    public IoFilterEvent(NextFilter nextFilter, IoEventType type,
+    public IoFilterEvent(int nextFilterIndex, IoEventType type,
             IoSession session, Object parameter) {
         super(type, session, parameter);
 
-        if (nextFilter == null) {
-            throw new NullPointerException("nextFilter");
-        }
-        this.nextFilter = nextFilter;
+        this.nextFilterIndex = nextFilterIndex;
     }
 
-    public NextFilter getNextFilter() {
-        return nextFilter;
+    public IoFilter getNextFilter() {
+        return getSession().getFilter(nextFilterIndex);
     }
 
-    @Override
-    public void fire() {
+    public void fire() throws Exception {
         switch (getType()) {
         case MESSAGE_RECEIVED:
-            getNextFilter().messageReceived(getSession(), getParameter());
+            getNextFilter().messageReceived(nextFilterIndex+1, getSession(), getParameter());
             break;
         case MESSAGE_SENT:
-            getNextFilter().messageSent(getSession(), (WriteRequest) getParameter());
+            getNextFilter().messageSent(nextFilterIndex+1, getSession(), (WriteRequest) getParameter());
             break;
         case WRITE:
-            getNextFilter().filterWrite(getSession(), (WriteRequest) getParameter());
+            getNextFilter().filterWrite(nextFilterIndex+1, getSession(), (WriteRequest) getParameter());
             break;
         case SET_TRAFFIC_MASK:
-            getNextFilter().filterSetTrafficMask(getSession(), (TrafficMask) getParameter());
+            getNextFilter().filterSetTrafficMask(nextFilterIndex+1, getSession(), (TrafficMask) getParameter());
             break;
         case CLOSE:
-            getNextFilter().filterClose(getSession());
+            getNextFilter().filterClose(nextFilterIndex+1, getSession());
             break;
         case EXCEPTION_CAUGHT:
-            getNextFilter().exceptionCaught(getSession(), (Throwable) getParameter());
+            getNextFilter().exceptionCaught(nextFilterIndex+1, getSession(), (Throwable) getParameter());
             break;
         case SESSION_IDLE:
-            getNextFilter().sessionIdle(getSession(), (IdleStatus) getParameter());
+            getNextFilter().sessionIdle(nextFilterIndex+1, getSession(), (IdleStatus) getParameter());
             break;
         case SESSION_OPENED:
-            getNextFilter().sessionOpened(getSession());
+            getNextFilter().sessionOpened(nextFilterIndex+1, getSession());
             break;
         case SESSION_CREATED:
-            getNextFilter().sessionCreated(getSession());
+            getNextFilter().sessionCreated(nextFilterIndex+1, getSession());
             break;
         case SESSION_CLOSED:
-            getNextFilter().sessionClosed(getSession());
+            getNextFilter().sessionClosed(nextFilterIndex+1, getSession());
             break;
         default:
             throw new IllegalArgumentException("Unknown event type: " + getType());

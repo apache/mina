@@ -69,16 +69,16 @@ public class ChatClientSupport {
             IoFilter CODEC_FILTER = new ProtocolCodecFilter(
                     new TextLineCodecFactory());
             
-            connector.getFilterChain().addLast("mdc", new MdcInjectionFilter());
-            connector.getFilterChain().addLast("codec", CODEC_FILTER);
-            connector.getFilterChain().addLast("logger", LOGGING_FILTER);
+            connector.getFilterChain().add(new MdcInjectionFilter());
+            connector.getFilterChain().add(CODEC_FILTER);
+            connector.getFilterChain().add(LOGGING_FILTER);
 
             if (useSsl) {
                 SSLContext sslContext = BogusSslContextFactory
                         .getInstance(false);
                 SslFilter sslFilter = new SslFilter(sslContext);
                 sslFilter.setUseClientMode(true);
-                connector.getFilterChain().addLast("sslFilter", sslFilter);
+                connector.getFilterChain().add(sslFilter);
             }
 
             connector.setHandler(handler);

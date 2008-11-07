@@ -21,7 +21,10 @@ package org.apache.mina.transport.socket.nio;
 
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SelectionKey;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.AbstractIoSession;
 
 /**
@@ -31,6 +34,27 @@ import org.apache.mina.core.session.AbstractIoSession;
  * @version $Rev$, $Date$
  */
 public abstract class NioSession extends AbstractIoSession {
+    private final List<IoFilter> filterChain = new CopyOnWriteArrayList<IoFilter>();
+
+    public List<IoFilter> getFilterChain() {
+        return filterChain;
+    }
+
+    public void setFilterChain(List<IoFilter> filters) {
+    	if (filters == null) {
+    		return;
+    	}
+    	
+		filterChain.addAll(filters);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoFilter getFilter(int index) {
+        return filterChain.get(index);
+    }
+
     abstract ByteChannel getChannel();
     abstract SelectionKey getSelectionKey();
     abstract void setSelectionKey(SelectionKey key);

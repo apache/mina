@@ -21,14 +21,13 @@ package org.apache.mina.core.session;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.file.FileRegion;
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.DefaultTransportMetadata;
@@ -77,7 +76,7 @@ public class DummySession extends AbstractIoSession {
         }
     };
 
-    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
+    private final List<IoFilter> filterChain = new ArrayList<IoFilter>();
     private final IoProcessor<IoSession> processor;
 
     private volatile IoHandler handler = new IoHandlerAdapter();
@@ -132,7 +131,7 @@ public class DummySession extends AbstractIoSession {
             public void add(IoSession session) {
             }
 
-            public void flush(IoSession session) {
+            public void flush(IoSession session) throws Exception {
                 DummySession s = (DummySession) session;
                 WriteRequest req = s.getWriteRequestQueue().poll(session);
                 Object m = req.getMessage();
@@ -142,10 +141,10 @@ public class DummySession extends AbstractIoSession {
                         file.getFileChannel().position(file.getPosition() + file.getRemainingBytes());
                         file.update(file.getRemainingBytes());
                     } catch (IOException e) {
-                        s.getFilterChain().fireExceptionCaught(e);
+                        s.getFilter(0).exceptionCaught(0, session, e);
                     }
                 }
-                getFilterChain().fireMessageSent(req);
+                getFilter(0).messageSent(0, session, req);
             }
 
             public void remove(IoSession session) {
@@ -190,8 +189,12 @@ public class DummySession extends AbstractIoSession {
         this.config = config;
     }
 
-    public IoFilterChain getFilterChain() {
+    public List<IoFilter> getFilterChain() {
         return filterChain;
+    }
+
+    public IoFilter getFilter(int index) {
+        return filterChain.get(index);
     }
 
     public IoHandler getHandler() {

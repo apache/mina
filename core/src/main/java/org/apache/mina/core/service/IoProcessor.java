@@ -66,7 +66,7 @@ public interface IoProcessor<T extends IoSession> {
      * Flushes the internal write request queue of the specified
      * {@code session}.
      */
-    void flush(T session);
+    void flush(T session) throws Exception ;
 
     /**
      * Controls the traffic of the specified {@code session} as specified
@@ -80,5 +80,5 @@ public interface IoProcessor<T extends IoSession> {
      * associated with the {@code session} and releases any other related
      * resources.
      */
-    void remove(T session);
+    void remove(T session) throws Exception;
 }

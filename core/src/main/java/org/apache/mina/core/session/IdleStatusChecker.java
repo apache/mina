@@ -90,6 +90,8 @@ public class IdleStatusChecker {
                         // will exit the loop if interrupted from interrupt()
                     }
                 }
+            } catch (Exception e) {
+            	thread = null;
             } finally {
                 thread = null;
             }
@@ -103,7 +105,7 @@ public class IdleStatusChecker {
             }
         }
 
-        private void notifyServices(long currentTime) {
+        private void notifyServices(long currentTime) throws Exception {
             Iterator<AbstractIoService> it = services.iterator();
             while (it.hasNext()) {
                 AbstractIoService service = it.next();
@@ -113,7 +115,7 @@ public class IdleStatusChecker {
             }
         }
 
-        private void notifySessions(long currentTime) {
+        private void notifySessions(long currentTime) throws Exception {
             Iterator<AbstractIoSession> it = sessions.iterator();
             while (it.hasNext()) {
                 AbstractIoSession session = it.next();
@@ -136,7 +138,8 @@ public class IdleStatusChecker {
      *
      * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
-    public static void notifyIdleness(Iterator<? extends IoSession> sessions, long currentTime) {
+    public static void notifyIdleness(Iterator<? extends IoSession> sessions, 
+    		long currentTime) throws Exception {
         IoSession s = null;
         while (sessions.hasNext()) {
             s = sessions.next();
@@ -144,11 +147,13 @@ public class IdleStatusChecker {
         }
     }
 
-    public static void notifyIdleness(IoService service, long currentTime) {
+    public static void notifyIdleness(IoService service, long currentTime) 
+    	throws Exception {
         notifyIdleness(service, currentTime, true);
     }
 
-    private static void notifyIdleness(IoService service, long currentTime, boolean includeSessions) {
+    private static void notifyIdleness(IoService service, long currentTime, 
+    		boolean includeSessions) throws Exception {
         if (!(service instanceof AbstractIoService)) {
             return;
         }
@@ -166,7 +171,8 @@ public class IdleStatusChecker {
      *
      * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
-    public static void notifyIdleSession(IoSession session, long currentTime) {
+    public static void notifyIdleSession(IoSession session, long currentTime) 
+    	throws Exception {
         notifyIdleSession0(
                 session, currentTime,
                 session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
@@ -194,15 +200,15 @@ public class IdleStatusChecker {
 
     private static void notifyIdleSession0(
             IoSession session, long currentTime,
-            long idleTime, IdleStatus status, long lastIoTime) {
+            long idleTime, IdleStatus status, long lastIoTime) throws Exception {
         if (idleTime > 0 && lastIoTime != 0
                 && currentTime - lastIoTime >= idleTime) {
-            session.getFilterChain().fireSessionIdle(status);
+            session.getFilter(0).sessionIdle(0, session, status);
         }
     }
 
     private static void notifyWriteTimeout(
-            IoSession session, long currentTime) {
+            IoSession session, long currentTime) throws Exception {
 
         long writeTimeout = session.getConfig().getWriteTimeoutInMillis();
         if (writeTimeout > 0 &&
@@ -213,7 +219,7 @@ public class IdleStatusChecker {
                 session.setCurrentWriteRequest(null);
                 WriteTimeoutException cause = new WriteTimeoutException(request);
                 request.getFuture().setException(cause);
-                session.getFilterChain().fireExceptionCaught(cause);
+                session.getFilter(0).exceptionCaught(0, session, cause);
                 // WriteException is an IOException, so we close the session.
                 session.close();
             }

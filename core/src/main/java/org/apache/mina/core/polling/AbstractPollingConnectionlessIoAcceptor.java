@@ -239,7 +239,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         finishSessionInitialization(session, null, null);
 
         try {
-            this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
+            session.getService().setFilterChainBuilder(
+                    session.getFilterChain());
             getListeners().fireSessionCreated(session);
         } catch (Throwable t) {
             ExceptionMonitor.getInstance().exceptionCaught(t);
@@ -277,7 +278,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             }
         }
 
-        public void remove(T session) {
+        public void remove(T session) throws Exception {
             getSessionRecycler().remove(session);
             getListeners().fireSessionDestroyed(session);
         }
@@ -415,11 +416,11 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             newBuf.put(readBuf);
             newBuf.flip();
 
-            session.getFilterChain().fireMessageReceived(newBuf);
+            session.getFilter(0).messageReceived(0, session, newBuf);
         }
     }
 
-    private void flushSessions(long currentTime) {
+    private void flushSessions(long currentTime) throws Exception {
         for (; ;) {
             T session = flushingSessions.poll();
             if (session == null) {
@@ -435,7 +436,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     scheduleFlush(session);
                 }
             } catch (Exception e) {
-                session.getFilterChain().fireExceptionCaught(e);
+                session.getFilter(0).exceptionCaught(0, session, e);
             }
         }
     }
@@ -466,7 +467,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     // Clear and fire event
                     session.setCurrentWriteRequest(null);
                     buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
+                    session.getFilter(0).messageSent(0, session, req);
                     continue;
                 }
 
@@ -487,7 +488,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     session.setCurrentWriteRequest(null);
                     writtenBytes += localWrittenBytes;
                     buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
+                    session.getFilter(0).messageSent(0, session, req);
                 }
             }
         } finally {
@@ -567,7 +568,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         return nHandles;
     }
 
-    private void notifyIdleSessions(long currentTime) {
+    private void notifyIdleSessions(long currentTime) throws Exception {
         // process idle sessions
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;

@@ -20,10 +20,10 @@
 package org.apache.mina.core.session;
 
 import java.net.SocketAddress;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.future.WriteFuture;
@@ -96,7 +96,16 @@ public interface IoSession {
     /**
      * @return the filter chain that only affects this session.
      */
-    IoFilterChain getFilterChain();
+    List<IoFilter> getFilterChain();
+
+    
+    /**
+     * @return the filter at a given position into the chain
+     * that only affects this session.
+     * 
+     * @param index the position in the chain
+     */
+    IoFilter getFilter(int index);
 
     
     /**
@@ -172,7 +181,7 @@ public interface IoSession {
      * This operation is asynchronous.  Wait for the returned {@link CloseFuture}
      * if you want to wait for the session actually closed.
      */
-    CloseFuture closeOnFlush();
+    CloseFuture closeOnFlush() throws Exception;
 
     /**
      * Closes this session immediately or after all queued write requests
@@ -184,7 +193,7 @@ public interface IoSession {
      *                    {@code false} to close this session after all queued
      *                    write requests are flushed (i.e. {@link #closeOnFlush()}).
      */
-    CloseFuture close(boolean immediately);
+    CloseFuture close(boolean immediately) throws Exception;
 
     /**
      * Returns an attachment of this session.

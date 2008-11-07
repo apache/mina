@@ -61,44 +61,44 @@ public class IoEvent implements Runnable {
     }
     
     public void run() {
-        fire();
-    }
-
-    public void fire() {
-        switch (getType()) {
-        case MESSAGE_RECEIVED:
-            getSession().getFilterChain().fireMessageReceived(getParameter());
-            break;
-        case MESSAGE_SENT:
-            getSession().getFilterChain().fireMessageSent((WriteRequest) getParameter());
-            break;
-        case WRITE:
-            getSession().getFilterChain().fireFilterWrite((WriteRequest) getParameter());
-            break;
-        case SET_TRAFFIC_MASK:
-            getSession().getFilterChain().fireFilterSetTrafficMask((TrafficMask) getParameter());
-            break;
-        case CLOSE:
-            getSession().getFilterChain().fireFilterClose();
-            break;
-        case EXCEPTION_CAUGHT:
-            getSession().getFilterChain().fireExceptionCaught((Throwable) getParameter());
-            break;
-        case SESSION_IDLE:
-            getSession().getFilterChain().fireSessionIdle((IdleStatus) getParameter());
-            break;
-        case SESSION_OPENED:
-            getSession().getFilterChain().fireSessionOpened();
-            break;
-        case SESSION_CREATED:
-            getSession().getFilterChain().fireSessionCreated();
-            break;
-        case SESSION_CLOSED:
-            getSession().getFilterChain().fireSessionClosed();
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown event type: " + getType());
-        }
+    	try {
+            switch (type) {
+            case MESSAGE_RECEIVED:
+            	session.getFilter(0).messageReceived(0, session, getParameter());
+                break;
+            case MESSAGE_SENT:
+            	session.getFilter(0).messageSent(0, session, (WriteRequest) getParameter());
+                break;
+            case WRITE:
+            	session.getFilter(0).filterWrite(0, session, (WriteRequest) getParameter());
+                break;
+            case SET_TRAFFIC_MASK:
+            	session.getFilter(0).filterSetTrafficMask(0, session, (TrafficMask) getParameter());
+                break;
+            case CLOSE:
+            	session.getFilter(0).filterClose(0, session);
+                break;
+            case EXCEPTION_CAUGHT:
+            	session.getFilter(0).exceptionCaught(0, session, (Throwable) getParameter());
+                break;
+            case SESSION_IDLE:
+            	session.getFilter(0).sessionIdle(0, session, (IdleStatus) getParameter());
+                break;
+            case SESSION_OPENED:
+            	session.getFilter(0).sessionOpened(0, session);
+                break;
+            case SESSION_CREATED:
+            	session.getFilter(0).sessionCreated(0, session);
+                break;
+            case SESSION_CLOSED:
+            	session.getFilter(0).sessionClosed(0, session);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown event type: " + getType());
+            }
+    	} catch (Exception e) {
+    		// TODO : handle the exception
+    	}
     }
 
     @Override

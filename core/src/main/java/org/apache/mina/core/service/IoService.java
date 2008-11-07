@@ -20,13 +20,12 @@
 package org.apache.mina.core.service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.core.IoUtil;
-import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
-import org.apache.mina.core.filterchain.IoFilterChain;
-import org.apache.mina.core.filterchain.IoFilterChainBuilder;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
@@ -114,7 +113,9 @@ public interface IoService {
      * by this service.
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
      */
-    IoFilterChainBuilder getFilterChainBuilder();
+    List<IoFilter> getFilterChain();
+    
+    IoFilter getTailFilter();
 
     /**
      * Sets the {@link IoFilterChainBuilder} which will build the
@@ -123,19 +124,7 @@ public interface IoService {
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
      */
-    void setFilterChainBuilder(IoFilterChainBuilder builder);
-
-    /**
-     * A shortcut for <tt>( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )</tt>.
-     * Please note that the returned object is not a <b>real</b> {@link IoFilterChain}
-     * but a {@link DefaultIoFilterChainBuilder}.  Modifying the returned builder
-     * won't affect the existing {@link IoSession}s at all, because
-     * {@link IoFilterChainBuilder}s affect only newly created {@link IoSession}s.
-     *
-     * @throws IllegalStateException if the current {@link IoFilterChainBuilder} is
-     *                               not a {@link DefaultIoFilterChainBuilder}
-     */
-    DefaultIoFilterChainBuilder getFilterChain();
+    void setFilterChainBuilder(List<IoFilter> builder);
 
     /**
      * Returns a value of whether or not this service is active

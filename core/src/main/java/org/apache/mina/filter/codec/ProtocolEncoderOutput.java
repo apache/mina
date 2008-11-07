@@ -61,5 +61,5 @@ public interface ProtocolEncoderOutput {
      *
      * @return <tt>null</tt> if there is nothing to flush at all.
      */
-    WriteFuture flush();
+    WriteFuture flush() throws Exception;
 }

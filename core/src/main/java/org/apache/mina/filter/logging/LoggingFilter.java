@@ -168,51 +168,58 @@ public class LoggingFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
+    public void exceptionCaught(int index, IoSession session,
             Throwable cause) throws Exception {
     	log(exceptionCaughtLevel, "EXCEPTION :", cause);
-        nextFilter.exceptionCaught(session, cause);
+    	IoFilter nextFilter = session.getFilter(index);
+        nextFilter.exceptionCaught(index+1, session, cause);
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
+    public void messageReceived(int index, IoSession session,
             Object message) throws Exception {
     	log(messageReceivedLevel, "RECEIVED: {}", message );
-    	nextFilter.messageReceived(session, message);
+    	IoFilter nextFilter = session.getFilter(index);
+    	nextFilter.messageReceived(index+1, session, message);
     }
 
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
+    public void messageSent(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
     	log(messageSentLevel, "SENT: {}", writeRequest.getMessage() );
-        nextFilter.messageSent(session, writeRequest);
+    	IoFilter nextFilter = session.getFilter(index);
+        nextFilter.messageSent(index+1, session, writeRequest);
     }
 
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
+    public void sessionCreated(int index, IoSession session)
     		throws Exception {
     	log(sessionCreatedLevel, "CREATED");
-        nextFilter.sessionCreated(session);
+    	IoFilter nextFilter = session.getFilter(index);
+        nextFilter.sessionCreated(index+1, session);
     }
 
     @Override
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
+    public void sessionOpened(int index, IoSession session)
     throws Exception {
     	log(sessionOpenedLevel, "OPENED");
-        nextFilter.sessionOpened(session);
+    	IoFilter nextFilter = session.getFilter(index);
+        nextFilter.sessionOpened(index+1, session);
     }
 
     @Override
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
+    public void sessionIdle(int index, IoSession session,
             IdleStatus status) throws Exception {
     	log(sessionIdleLevel, "IDLE");
-        nextFilter.sessionIdle(session, status);
+    	IoFilter nextFilter = session.getFilter(index);
+        nextFilter.sessionIdle(index+1, session, status);
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
+    public void sessionClosed(int index, IoSession session) throws Exception {
     	log(sessionClosedLevel, "CLOSED");
-        nextFilter.sessionClosed(session);
+    	IoFilter nextFilter = session.getFilter(index);
+        nextFilter.sessionClosed(index+1, session);
     }
     
     /**

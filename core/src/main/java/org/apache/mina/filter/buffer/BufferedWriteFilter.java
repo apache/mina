@@ -23,6 +23,7 @@ import java.io.BufferedOutputStream;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.ChainEntry;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.IoSession;
@@ -127,7 +128,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      *                   {@link IoBuffer} instance.
      */
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
+    public void filterWrite(ChainEntry nextEntry, IoSession session,
             WriteRequest writeRequest) throws Exception {
 
         Object data = writeRequest.getMessage();
@@ -163,7 +164,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * @param data the data to buffer
      * @param buf the buffer where data will be temporarily written 
      */
-    private void write(IoSession session, IoBuffer data, IoBuffer buf) {
+    private void write(ChainEntry entry, IoSession session, IoBuffer data, IoBuffer buf) {
         try {
             int len = data.remaining();
             if (len >= buf.capacity()) {
@@ -171,9 +172,9 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
                  * If the request length exceeds the size of the output buffer,
                  * flush the output buffer and then write the data directly.
                  */
-                NextFilter nextFilter = session.getFilterChain().getNextFilter(
+                IoFilter nextFilter = session.getFilterChain().getNextFilter(
                         this);
-                internalFlush(nextFilter, session, buf);
+                internalFlush(entry, session, buf);
                 nextFilter.filterWrite(session, new DefaultWriteRequest(data));
                 return;
             }
@@ -197,7 +198,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * @param buf the data to write
      * @throws Exception if a write operation fails
      */
-    private void internalFlush(NextFilter nextFilter, IoSession session,
+    private void internalFlush(ChainEntry entry, IoSession session,
             IoBuffer buf) throws Exception {
         IoBuffer tmp = null;
         synchronized (buf) {
@@ -206,7 +207,9 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
             buf.clear();
         }
         logger.debug("Flushing buffer: {}", tmp);
-        nextFilter.filterWrite(session, new DefaultWriteRequest(tmp));
+        ChainEntry nextEntry = entry.getNextEntry();
+        IoFilter nextFilter = nextEntry.getFilter();
+        nextFilter.filterWrite(nextEntry, session, new DefaultWriteRequest(tmp));
     }
 
     /**

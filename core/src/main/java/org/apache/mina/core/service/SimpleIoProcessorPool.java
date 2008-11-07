@@ -181,11 +181,11 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
         getProcessor(session).add(session);
     }
 
-    public final void flush(T session) {
+    public final void flush(T session) throws Exception {
         getProcessor(session).flush(session);
     }
 
-    public final void remove(T session) {
+    public final void remove(T session) throws Exception {
         getProcessor(session).remove(session);
     }
 

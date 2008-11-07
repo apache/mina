@@ -41,47 +41,47 @@ public abstract class CommonEventFilter extends IoFilterAdapter {
     protected abstract void filter(IoFilterEvent event) throws Exception;
 
     @Override
-    public final void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_CREATED, session, null));
+    public final void sessionCreated(int index, IoSession session) throws Exception {
+        filter(new IoFilterEvent(index+1, IoEventType.SESSION_CREATED, session, null));
     }
 
     @Override
-    public final void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED, session, null));
+    public final void sessionOpened(int index, IoSession session) throws Exception {
+        filter(new IoFilterEvent(index+1, IoEventType.SESSION_OPENED, session, null));
     }
 
     @Override
-    public final void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED, session, null));
+    public final void sessionClosed(int index, IoSession session) throws Exception {
+        filter(new IoFilterEvent(index+1, IoEventType.SESSION_CLOSED, session, null));
     }
 
     @Override
-    public final void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE, session, status));
+    public final void sessionIdle(int index, IoSession session, IdleStatus status) throws Exception {
+        filter(new IoFilterEvent(index+1, IoEventType.SESSION_IDLE, session, status));
     }
 
     @Override
-    public final void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.EXCEPTION_CAUGHT, session, cause));
+    public final void exceptionCaught(int index, IoSession session, Throwable cause) throws Exception {
+        filter(new IoFilterEvent(index+1, IoEventType.EXCEPTION_CAUGHT, session, cause));
     }
 
     @Override
-    public final void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
+    public final void messageReceived(int index, IoSession session, Object message) throws Exception {
+        filter(new IoFilterEvent(index+1, IoEventType.MESSAGE_RECEIVED, session, message));
     }
 
     @Override
-    public final void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT, session, writeRequest));
+    public final void messageSent(int index, IoSession session, WriteRequest writeRequest) throws Exception {
+        filter(new IoFilterEvent(index+1, IoEventType.MESSAGE_SENT, session, writeRequest));
     }
 
     @Override
-    public final void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
+    public final void filterWrite(int index, IoSession session, WriteRequest writeRequest) throws Exception {
+        filter(new IoFilterEvent(index+1, IoEventType.WRITE, session, writeRequest));
     }
 
     @Override
-    public final void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
-        filter(new IoFilterEvent(nextFilter, IoEventType.CLOSE, session, null));
+    public final void filterClose(int index, IoSession session) throws Exception {
+        filter(new IoFilterEvent(index, IoEventType.CLOSE, session, null));
     }
 }

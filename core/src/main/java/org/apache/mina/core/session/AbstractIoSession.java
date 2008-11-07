@@ -31,8 +31,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.DefaultFileRegion;
-import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.CloseFuture;
+import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultCloseFuture;
 import org.apache.mina.core.future.DefaultReadFuture;
 import org.apache.mina.core.future.DefaultWriteFuture;
@@ -51,6 +52,8 @@ import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.apache.mina.util.CircularQueue;
 import org.apache.mina.util.ExceptionMonitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -60,12 +63,23 @@ import org.apache.mina.util.ExceptionMonitor;
  * @version $Rev$, $Date$
  */
 public abstract class AbstractIoSession implements IoSession {
+    /** The logger for this class */
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final AttributeKey READY_READ_FUTURES_KEY =
         new AttributeKey(AbstractIoSession.class, "readyReadFutures");
     
     private static final AttributeKey WAITING_READ_FUTURES_KEY =
         new AttributeKey(AbstractIoSession.class, "waitingReadFutures");
+
+    /**
+     * A session attribute that stores an {@link IoFuture} related with
+     * the {@link IoSession}.  {@link DefaultIoFilterChain} clears this
+     * attribute and notifies the future when {@link #fireSessionCreated()}
+     * or {@link #fireExceptionCaught(Throwable)} is invoked.
+     */
+    public static final AttributeKey SESSION_CREATED_FUTURE = new AttributeKey(
+    		AbstractIoSession.class, "connectFuture");
 
     private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER =
         new IoFutureListener<CloseFuture>() {
@@ -212,7 +226,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
-    public final CloseFuture close(boolean rightNow) {
+    public final CloseFuture close(boolean rightNow) throws Exception {
         if (rightNow) {
             return close();
         } else {
@@ -220,6 +234,25 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    private void exceptionCaught(Throwable cause) {
+        // Notify the related future.
+        ConnectFuture future = (ConnectFuture)removeAttribute(SESSION_CREATED_FUTURE);
+        
+        if (future == null) {
+	    	try {
+	        	getFilter(0).exceptionCaught(0, this, cause);
+	    	} catch (Throwable t) {
+	            logger.warn(
+	                "Unexpected exception from exceptionCaught handler.", t);
+	    	}
+        } else {
+            // Please note that this place is not the only place that
+            // calls ConnectFuture.setException().
+            close();
+            future.setException(cause);
+    	}
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -232,14 +265,19 @@ public abstract class AbstractIoSession implements IoSession {
             }
         }
 
-        getFilterChain().fireFilterClose();
+        try {
+        	getFilter(0).filterClose(0, this);
+        } catch (Throwable e) {
+        	exceptionCaught(e);
+        }
+        	
         return closeFuture;
     }
 
     /**
      * {@inheritDoc}
      */
-    public final CloseFuture closeOnFlush() {
+    public final CloseFuture closeOnFlush() throws Exception {
         getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);
         return closeFuture;
@@ -412,8 +450,14 @@ public abstract class AbstractIoSession implements IoSession {
         WriteRequest writeRequest = new DefaultWriteRequest(message, writeFuture, remoteAddress);
         
         // Then, get the chain and inject the WriteRequest into it
-        IoFilterChain filterChain = getFilterChain();
-        filterChain.fireFilterWrite(writeRequest);
+        IoFilter filter = getFilter(0);
+        
+        try {
+        	filter.filterWrite(getFilterChain().size(), this, writeRequest);
+        } catch (Throwable t) {
+            writeRequest.getFuture().setException(t);
+            exceptionCaught(t);
+        }
 
         // TODO : This is not our business ! The caller has created a FileChannel,
         // he has to close it !
@@ -567,7 +611,11 @@ public abstract class AbstractIoSession implements IoSession {
             return;
         }
 
-        getFilterChain().fireFilterSetTrafficMask(trafficMask);
+        try {
+        	getFilter(0).filterSetTrafficMask(0, this, trafficMask);
+        } catch (Throwable t) {
+        	exceptionCaught(t);
+        }
     }
 
     /**

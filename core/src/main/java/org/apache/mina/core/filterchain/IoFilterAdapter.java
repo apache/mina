@@ -33,6 +33,9 @@ import org.apache.mina.core.write.WriteRequest;
  * @version $Rev: 591770 $, $Date: 2007-11-04 13:22:44 +0100 (Sun, 04 Nov 2007) $
  */
 public class IoFilterAdapter implements IoFilter {
+	/** The filter's name */
+	private String name;
+	
     /**
      * {@inheritDoc}
      */
@@ -44,113 +47,120 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void destroy() throws Exception {
     }
-
+    
     /**
      * {@inheritDoc}
      */
-    public void onPreAdd(IoFilterChain parent, String name,
-        NextFilter nextFilter) throws Exception {
+    public String getName() {
+    	return name;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onPostAdd(IoFilterChain parent, String name,
-        NextFilter nextFilter) throws Exception {
+    public void onPreAdd(IoSession session, int pos, String name,
+        IoFilter filter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onPreRemove(IoFilterChain parent, String name,
-        NextFilter nextFilter) throws Exception {
+    public void onPostAdd(IoSession session, int pos, String name,
+        IoFilter filter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onPostRemove(IoFilterChain parent, String name,
-        NextFilter nextFilter) throws Exception {
+    public void onPreRemove(IoSession session, int pos, String name,
+        IoFilter filter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
+    public void onPostRemove(IoSession session, int pos, String name,
+        IoFilter filter) throws Exception {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void sessionCreated(int index, IoSession session)
             throws Exception {
-        nextFilter.sessionCreated(session);
+        session.getFilter(index).sessionCreated(index+1, session);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
+    public void sessionOpened(int index, IoSession session)
             throws Exception {
-        nextFilter.sessionOpened(session);
+    	session.getFilter(index).sessionOpened(index+1, session);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
+    public void sessionClosed(int index, IoSession session)
             throws Exception {
-        nextFilter.sessionClosed(session);
+    	session.getFilter(index).sessionClosed(index+1, session);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
+    public void sessionIdle(int index, IoSession session,
             IdleStatus status) throws Exception {
-        nextFilter.sessionIdle(session, status);
+    	session.getFilter(index).sessionIdle(index+1, session, status);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
+    public void exceptionCaught(int index, IoSession session,
             Throwable cause) throws Exception {
-        nextFilter.exceptionCaught(session, cause);
+    	session.getFilter(index).exceptionCaught(index+1, session, cause);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void messageReceived(NextFilter nextFilter, IoSession session,
+    public void messageReceived(int index, IoSession session,
             Object message) throws Exception {
-        nextFilter.messageReceived(session, message);
+    	session.getFilter(index).messageReceived(index+1, session, message);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void messageSent(NextFilter nextFilter, IoSession session,
+    public void messageSent(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
-        nextFilter.messageSent(session, writeRequest);
+    	session.getFilter(index).messageSent(index+1, session, writeRequest);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void filterWrite(NextFilter nextFilter, IoSession session,
+    public void filterWrite(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
-        nextFilter.filterWrite(session, writeRequest);
+    	session.getFilter(index).filterWrite(index+1, session, writeRequest);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void filterClose(NextFilter nextFilter, IoSession session)
+    public void filterClose(int index, IoSession session)
             throws Exception {
-        nextFilter.filterClose(session);
+    	session.getFilter(index).filterClose(index+1, session);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void filterSetTrafficMask(NextFilter nextFilter, IoSession session,
+    public void filterSetTrafficMask(int index, IoSession session,
             TrafficMask trafficMask) throws Exception {
-        nextFilter.filterSetTrafficMask(session, trafficMask);
+    	session.getFilter(index).filterSetTrafficMask(index+1, session, trafficMask);
     }
     
     public String toString() {

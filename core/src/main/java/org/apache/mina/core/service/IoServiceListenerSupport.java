@@ -32,7 +32,6 @@ import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.ExceptionMonitor;
-import org.apache.mina.core.filterchain.IoFilterChain;
 
 /**
  * A helper which provides addition and removal of {@link IoServiceListener}s and firing
@@ -179,7 +178,7 @@ public class IoServiceListenerSupport {
     /**
      * Calls {@link IoServiceListener#sessionCreated(IoSession)} for all registered listeners.
      */
-    public void fireSessionCreated(IoSession session) {
+    public void fireSessionCreated(IoSession session) throws Exception {
         boolean firstSession = false;
         if (session.getService() instanceof IoConnector) {
             synchronized (managedSessions) {
@@ -198,9 +197,8 @@ public class IoServiceListenerSupport {
         }
 
         // Fire session events.
-        IoFilterChain filterChain = session.getFilterChain(); 
-        filterChain.fireSessionCreated();
-        filterChain.fireSessionOpened();
+        session.getFilter(0).sessionCreated(0, session);
+        session.getFilter(0).sessionOpened(0, session);
 
         int managedSessionCount = managedSessions.size();
         if (managedSessionCount > largestManagedSessionCount) {
@@ -221,14 +219,14 @@ public class IoServiceListenerSupport {
     /**
      * Calls {@link IoServiceListener#sessionDestroyed(IoSession)} for all registered listeners.
      */
-    public void fireSessionDestroyed(IoSession session) {
+    public void fireSessionDestroyed(IoSession session) throws Exception {
         // Try to remove the remaining empty session set after removal.
         if (managedSessions.remove(Long.valueOf(session.getId())) == null) {
             return;
         }
 
         // Fire session events.
-        session.getFilterChain().fireSessionClosed();
+        session.getFilter(0).sessionClosed(0, session);
 
         // Fire listener events.
         try {
