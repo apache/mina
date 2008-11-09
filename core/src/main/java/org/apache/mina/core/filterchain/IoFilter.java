@@ -178,7 +178,7 @@ public interface IoFilter {
 
     /**
      * Filters {@link IoHandler#exceptionCaught(IoSession,Throwable)}
-     * event.
+     * event for the chain.
      */
     void exceptionCaught(int index, IoSession session,
             Throwable cause) throws Exception;

@@ -197,8 +197,8 @@ public class IoServiceListenerSupport {
         }
 
         // Fire session events.
-        session.getFilter(0).sessionCreated(0, session);
-        session.getFilter(0).sessionOpened(0, session);
+        session.getFilterInHead().sessionCreated(0, session);
+        session.getFilterInHead().sessionOpened(0, session);
 
         int managedSessionCount = managedSessions.size();
         if (managedSessionCount > largestManagedSessionCount) {
@@ -226,7 +226,7 @@ public class IoServiceListenerSupport {
         }
 
         // Fire session events.
-        session.getFilter(0).sessionClosed(0, session);
+        session.getFilterInHead().sessionClosed(0, session);
 
         // Fire listener events.
         try {

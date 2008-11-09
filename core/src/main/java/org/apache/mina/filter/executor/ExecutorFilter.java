@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.core.filterchain.IoFilterAdapter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.filterchain.IoFilterEvent;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoEventType;
@@ -545,99 +544,100 @@ public class ExecutorFilter extends IoFilterAdapter {
      * @param nextFilter The next filter in the chain
      * 
      * @throws IllegalArgumentException If the filter is already present in the chain
-     */
+     *
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
-        if (parent.contains(this)) {
+    public void onPreAdd(IoSession session, int index, String name,
+            IoFilter nextFilter) throws Exception {
+        if (session.getFilterChain().contains(this)) {
             throw new IllegalArgumentException(
                     "You can't add the same filter instance more than once.  Create another instance and add it.");
         }
     }
+    */
 
     @Override
-    public final void sessionOpened(NextFilter nextFilter, IoSession session) {
+    public final void sessionOpened(int index, IoSession session) throws Exception {
         if (eventTypes.contains(IoEventType.SESSION_OPENED)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED,
+            fireEvent(new IoFilterEvent(index, IoEventType.SESSION_OPENED,
                     session, null));
         } else {
-            nextFilter.sessionOpened(session);
+        	session.getFilterIn(index).sessionOpened(index+1, session);
         }
     }
 
     @Override
-    public final void sessionClosed(NextFilter nextFilter, IoSession session) {
+    public final void sessionClosed(int index, IoSession session) throws Exception {
         if (eventTypes.contains(IoEventType.SESSION_CLOSED)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED,
+            fireEvent(new IoFilterEvent(index, IoEventType.SESSION_CLOSED,
                     session, null));
         } else {
-            nextFilter.sessionClosed(session);
+        	session.getFilterIn(index).sessionClosed(index+1, session);
         }
     }
 
     @Override
-    public final void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) {
+    public final void sessionIdle(int index, IoSession session,
+            IdleStatus status) throws Exception {
         if (eventTypes.contains(IoEventType.SESSION_IDLE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE,
+            fireEvent(new IoFilterEvent(index, IoEventType.SESSION_IDLE,
                     session, status));
         } else {
-            nextFilter.sessionIdle(session, status);
+        	session.getFilterIn(index).sessionIdle(index+1, session, status);
         }
     }
 
     @Override
-    public final void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) {
+    public final void exceptionCaught(int index, IoSession session,
+            Throwable cause) throws Exception {
         if (eventTypes.contains(IoEventType.EXCEPTION_CAUGHT)) {
-            fireEvent(new IoFilterEvent(nextFilter,
+            fireEvent(new IoFilterEvent(index,
                     IoEventType.EXCEPTION_CAUGHT, session, cause));
         } else {
-            nextFilter.exceptionCaught(session, cause);
+        	session.getFilterInHead().exceptionCaught(0, session, cause);
         }
     }
 
     @Override
-    public final void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) {
+    public final void messageReceived(int index, IoSession session,
+            Object message) throws Exception {
         if (eventTypes.contains(IoEventType.MESSAGE_RECEIVED)) {
-            fireEvent(new IoFilterEvent(nextFilter,
+            fireEvent(new IoFilterEvent(index,
                     IoEventType.MESSAGE_RECEIVED, session, message));
         } else {
-            nextFilter.messageReceived(session, message);
+        	session.getFilterIn(index).messageReceived(index+1, session, message);
         }
     }
 
     @Override
-    public final void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) {
+    public final void messageSent(int index, IoSession session,
+            WriteRequest writeRequest) throws Exception {
         if (eventTypes.contains(IoEventType.MESSAGE_SENT)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT,
+            fireEvent(new IoFilterEvent(index, IoEventType.MESSAGE_SENT,
                     session, writeRequest));
         } else {
-            nextFilter.messageSent(session, writeRequest);
+        	session.getFilterIn(index).messageSent(index+1, session, writeRequest);
         }
     }
 
     @Override
-    public final void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) {
+    public final void filterWrite(int index, IoSession session,
+            WriteRequest writeRequest) throws Exception {
         if (eventTypes.contains(IoEventType.WRITE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.WRITE, session,
+            fireEvent(new IoFilterEvent(index, IoEventType.WRITE, session,
                     writeRequest));
         } else {
-            nextFilter.filterWrite(session, writeRequest);
+        	session.getFilterOut(index).filterWrite(index+1, session, writeRequest);
         }
     }
 
     @Override
-    public final void filterClose(NextFilter nextFilter, IoSession session)
+    public final void filterClose(int index, IoSession session)
             throws Exception {
         if (eventTypes.contains(IoEventType.CLOSE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.CLOSE, session,
+            fireEvent(new IoFilterEvent(index, IoEventType.CLOSE, session,
                     null));
         } else {
-            nextFilter.filterClose(session);
+        	session.getFilterIn(index).filterClose(index+1, session);
         }
     }
 }

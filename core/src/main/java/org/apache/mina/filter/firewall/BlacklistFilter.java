@@ -163,65 +163,65 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session) {
+    public void sessionCreated(int index, IoSession session) throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.sessionCreated(session);
+        	session.getFilter(index).sessionCreated(index+1, session);
         } else {
             blockSession(session);
         }
     }
 
     @Override
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
+    public void sessionOpened(int index, IoSession session)
             throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.sessionOpened(session);
+        	session.getFilter(index).sessionOpened(index+1, session);
         } else {
             blockSession(session);
         }
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
+    public void sessionClosed(int index, IoSession session)
             throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.sessionClosed(session);
+        	session.getFilter(index).sessionClosed(index+1, session);
         } else {
             blockSession(session);
         }
     }
 
     @Override
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
+    public void sessionIdle(int index, IoSession session,
             IdleStatus status) throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.sessionIdle(session, status);
+        	session.getFilter(index).sessionIdle(index+1, session, status);
         } else {
             blockSession(session);
         }
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) {
+    public void messageReceived(int index, IoSession session,
+            Object message) throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.messageReceived(session, message);
+        	session.getFilter(index).messageReceived(index+1, session, message);
         } else {
             blockSession(session);
         }
     }
 
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
+    public void messageSent(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
-            nextFilter.messageSent(session, writeRequest);
+        	session.getFilter(index).messageSent(index+1, session, writeRequest);
         } else {
             blockSession(session);
         }

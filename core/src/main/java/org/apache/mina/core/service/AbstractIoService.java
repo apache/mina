@@ -124,9 +124,14 @@ public abstract class AbstractIoService implements IoService {
     };
 
     /**
-     * Current filter chain builder.
+     * Current incoming filter chain builder.
      */
-    private List<IoFilter> filterChain = new ArrayList<IoFilter>();
+    private List<IoFilter> filterChainIn = new ArrayList<IoFilter>();
+    
+    /**
+     * Current outgoing filter chain builder.
+     */
+    private List<IoFilter> filterChainOut = new ArrayList<IoFilter>();
     
     /**
      * The terminal filter instance
@@ -220,8 +225,15 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
-    public final List<IoFilter> getFilterChain() {
-        return filterChain;
+    public final List<IoFilter> getFilterChainIn() {
+        return filterChainIn;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final List<IoFilter> getFilterChainOut() {
+        return filterChainOut;
     }
 
     public final IoFilter getTailFilter() {
@@ -237,7 +249,28 @@ public abstract class AbstractIoService implements IoService {
     	}
     	
     	for (IoFilter filter:filters) {
-    		filterChain.add(filter);
+    		filterChainIn.add(filter);
+    	}
+
+    	for (IoFilter filter:filters) {
+    		filterChainOut.add(0, filter);
+    	}
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final void setFilterChainBuilder(List<IoFilter> filtersIn, List<IoFilter> filtersOut) {
+    	if ((filtersIn == null) || (filtersOut == null)) {
+    		return;
+    	}
+    	
+    	for (IoFilter filter:filtersIn) {
+    		filterChainIn.add(filter);
+    	}
+
+    	for (IoFilter filter:filtersOut) {
+    		filterChainOut.add(filter);
     	}
     }
 

@@ -23,7 +23,6 @@ import java.io.BufferedOutputStream;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.filterchain.ChainEntry;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.IoSession;
@@ -128,7 +127,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      *                   {@link IoBuffer} instance.
      */
     @Override
-    public void filterWrite(ChainEntry nextEntry, IoSession session,
+    public void filterWrite(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
 
         Object data = writeRequest.getMessage();
@@ -147,11 +146,11 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * @param session the session to which a write is requested
      * @param data the data to buffer
      */
-    private void write(IoSession session, IoBuffer data) {
+    private void write(IoSession session, IoBuffer data) throws Exception {
         IoBuffer dest = buffersMap.putIfAbsent(session,
                 new IoBufferLazyInitializer(bufferSize));
 
-        write(session, data, dest);
+        write(0, session, data, dest);
     }
 
     /**
@@ -164,7 +163,8 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * @param data the data to buffer
      * @param buf the buffer where data will be temporarily written 
      */
-    private void write(ChainEntry entry, IoSession session, IoBuffer data, IoBuffer buf) {
+    private void write(int index, IoSession session, IoBuffer data, IoBuffer buf) 
+    	throws Exception{
         try {
             int len = data.remaining();
             if (len >= buf.capacity()) {
@@ -172,21 +172,19 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
                  * If the request length exceeds the size of the output buffer,
                  * flush the output buffer and then write the data directly.
                  */
-                IoFilter nextFilter = session.getFilterChain().getNextFilter(
-                        this);
-                internalFlush(entry, session, buf);
-                nextFilter.filterWrite(session, new DefaultWriteRequest(data));
+                internalFlush(index, session, buf);
+                session.getFilter(index).filterWrite(index+1, session, 
+                		new DefaultWriteRequest(data));
                 return;
             }
             if (len > (buf.limit() - buf.position())) {
-                internalFlush(session.getFilterChain().getNextFilter(this),
-                        session, buf);
+                internalFlush(index, session, buf);
             }
             synchronized (buf) {
                 buf.put(data);
             }
         } catch (Throwable e) {
-            session.getFilterChain().fireExceptionCaught(e);
+        	session.getFilter(index).exceptionCaught(0, session, e);
         }
     }
 
@@ -198,7 +196,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * @param buf the data to write
      * @throws Exception if a write operation fails
      */
-    private void internalFlush(ChainEntry entry, IoSession session,
+    private void internalFlush(int index, IoSession session,
             IoBuffer buf) throws Exception {
         IoBuffer tmp = null;
         synchronized (buf) {
@@ -207,9 +205,8 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
             buf.clear();
         }
         logger.debug("Flushing buffer: {}", tmp);
-        ChainEntry nextEntry = entry.getNextEntry();
-        IoFilter nextFilter = nextEntry.getFilter();
-        nextFilter.filterWrite(nextEntry, session, new DefaultWriteRequest(tmp));
+        session.getFilter(index).filterWrite(index+1, session, 
+        		new DefaultWriteRequest(tmp));
     }
 
     /**
@@ -217,12 +214,11 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * 
      * @param session the session where buffer will be written
      */
-    public void flush(IoSession session) {
+    public void flush(int index, IoSession session) throws Exception {
         try {
-            internalFlush(session.getFilterChain().getNextFilter(this),
-                    session, buffersMap.get(session));
+            internalFlush(index,  session, buffersMap.get(session));
         } catch (Throwable e) {
-            session.getFilterChain().fireExceptionCaught(e);
+        	session.getFilter(index).exceptionCaught(0, session, e);
         }
     }
 
@@ -243,7 +239,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * {@inheritDoc}
      */
     @Override
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
+    public void exceptionCaught(int index, IoSession session,
             Throwable cause) throws Exception {
         free(session);
     }
@@ -252,7 +248,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
      * {@inheritDoc}
      */
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
+    public void sessionClosed(int index, IoSession session)
             throws Exception {
         free(session);
     }

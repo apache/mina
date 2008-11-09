@@ -31,8 +31,8 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterEvent;
-import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoEventType;
@@ -222,9 +222,9 @@ class SslHandler {
         return handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone();
     }
 
-    public void schedulePreHandshakeWriteRequest(NextFilter nextFilter,
+    public void schedulePreHandshakeWriteRequest(int index,
                                                  WriteRequest writeRequest) {
-        preHandshakeEventQueue.add(new IoFilterEvent(nextFilter,
+        preHandshakeEventQueue.add(new IoFilterEvent(index+1,
                 IoEventType.WRITE, session, writeRequest));
     }
 
@@ -237,12 +237,12 @@ class SslHandler {
         }
     }
 
-    public void scheduleFilterWrite(NextFilter nextFilter, WriteRequest writeRequest) {
-        filterWriteEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
+    public void scheduleFilterWrite(int index, WriteRequest writeRequest) {
+        filterWriteEventQueue.add(new IoFilterEvent(index+1, IoEventType.WRITE, session, writeRequest));
     }
 
-    public void scheduleMessageReceived(NextFilter nextFilter, Object message) {
-        messageReceivedEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
+    public void scheduleMessageReceived(int index, Object message) {
+        messageReceivedEventQueue.add(new IoFilterEvent(index+1, IoEventType.MESSAGE_RECEIVED, session, message));
     }
 
     public void flushScheduledEvents() {
@@ -275,7 +275,7 @@ class SslHandler {
      * @param nextFilter Next filter in chain
      * @throws SSLException on errors
      */
-    public void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
+    public void messageReceived(int index, ByteBuffer buf) throws SSLException {
         // append buf to inNetBuffer
         if (inNetBuffer == null) {
             inNetBuffer = IoBuffer.allocate(buf.remaining()).setAutoExpand(true);
@@ -283,9 +283,9 @@ class SslHandler {
 
         inNetBuffer.put(buf);
         if (!handshakeComplete) {
-            handshake(nextFilter);
+            handshake(index+1);
         } else {
-            decrypt(nextFilter);
+            decrypt(index+1);
         }
 
         if (isInboundDone()) {

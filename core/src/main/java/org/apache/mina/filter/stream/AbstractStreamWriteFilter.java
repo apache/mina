@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.util.Queue;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
@@ -55,17 +55,17 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
 
 
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPreAdd(IoSession session, int index, String name,
+            IoFilter nextFilter) throws Exception {
         Class<? extends IoFilterAdapter> clazz = getClass();
-		if (parent.contains(clazz)) {
+		if (session.getFilterChain().contains(clazz)) {
             throw new IllegalStateException(
                     "Only one " + clazz.getName() + " is permitted.");
         }
     }
 
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
+    public void filterWrite(int index, IoSession session,
                             WriteRequest writeRequest) throws Exception {
         // If we're already processing a stream we need to queue the WriteRequest.
         if (session.getAttribute(CURRENT_STREAM) != null) {
@@ -88,17 +88,17 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
             if (buffer == null) {
                 // End of stream reached.
                 writeRequest.getFuture().setWritten();
-                nextFilter.messageSent(session, writeRequest);
+                session.getFilter(index).messageSent(index+1, session, writeRequest);
             } else {
                 session.setAttribute(CURRENT_STREAM, message);
                 session.setAttribute(CURRENT_WRITE_REQUEST, writeRequest);
 
-                nextFilter.filterWrite(session, new DefaultWriteRequest(
-                        buffer));
+                session.getFilter(index).filterWrite(index+1, session, 
+                		new DefaultWriteRequest(buffer));
             }
 
         } else {
-            nextFilter.filterWrite(session, writeRequest);
+        	session.getFilter(index).filterWrite(index+1, session, writeRequest);
         }
     }
     
@@ -115,12 +115,12 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     }
     
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
+    public void messageSent(int index, IoSession session,
                             WriteRequest writeRequest) throws Exception {
         T stream = getMessageClass().cast(session.getAttribute(CURRENT_STREAM));
 
         if (stream == null) {
-            nextFilter.messageSent(session, writeRequest);
+            session.getFilter(index).messageSent(index+1, session, writeRequest);
         } else {
             IoBuffer buffer = getNextBuffer(stream);
 
@@ -135,16 +135,17 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
                 if (queue != null) {
                     WriteRequest wr = queue.poll();
                     while (wr != null) {
-                        filterWrite(nextFilter, session, wr);
+                        filterWrite(index+1, session, wr);
                         wr = queue.poll();
                     }
                 }
 
                 currentWriteRequest.getFuture().setWritten();
-                nextFilter.messageSent(session, currentWriteRequest);
+                session.getFilter(index).messageSent(index+1, session, 
+                		currentWriteRequest);
             } else {
-                nextFilter.filterWrite(session, new DefaultWriteRequest(
-                        buffer));
+            	session.getFilter(index).filterWrite(index+1, session, 
+            			new DefaultWriteRequest(buffer));
             }
         }
     }

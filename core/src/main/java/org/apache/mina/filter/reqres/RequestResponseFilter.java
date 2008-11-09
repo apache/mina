@@ -30,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.core.filterchain.IoFilterChain;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
@@ -86,14 +86,13 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
-        if (parent.contains(this)) {
+    public void onPreAdd(IoSession session, int index, String name,
+            IoFilter nextFilter) throws Exception {
+        if (session.getFilterChain().contains(this)) {
             throw new IllegalArgumentException(
                     "You can't add the same filter instance more than once.  Create another instance and add it.");
         }
 
-        IoSession session = parent.getSession();
         session.setAttribute(RESPONSE_INSPECTOR, responseInspectorFactory
                 .getResponseInspector());
         session.setAttribute(REQUEST_STORE, createRequestStore(session));
@@ -101,10 +100,8 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void onPostRemove(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
-        IoSession session = parent.getSession();
-
+    public void onPostRemove(IoSession session, int index, String name,
+            IoFilter nextFilter) throws Exception {
         destroyUnrespondedRequestStore(getUnrespondedRequestStore(session));
         destroyRequestStore(getRequestStore(session));
 
@@ -114,21 +111,21 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
+    public void messageReceived(int index, IoSession session,
             Object message) throws Exception {
         ResponseInspector responseInspector = (ResponseInspector) session
                 .getAttribute(RESPONSE_INSPECTOR);
         Object requestId = responseInspector.getRequestId(message);
         if (requestId == null) {
             // Not a response message.  Ignore.
-            nextFilter.messageReceived(session, message);
+            session.getFilter(index).messageReceived(index+1, session, message);
             return;
         }
 
         // Retrieve (or remove) the corresponding request.
         ResponseType type = responseInspector.getResponseType(message);
         if (type == null) {
-            nextFilter.exceptionCaught(session, new IllegalStateException(
+            session.getFilter(0).exceptionCaught(0, session, new IllegalStateException(
                     responseInspector.getClass().getName()
                             + "#getResponseType() may not return null."));
         }
@@ -177,13 +174,13 @@ public class RequestResponseFilter extends WriteRequestFilter {
             // And forward the event.
             Response response = new Response(request, message, type);
             request.signal(response);
-            nextFilter.messageReceived(session, response);
+            session.getFilter(index).messageReceived(index+1, session, response);
         }
     }
 
     @Override
     protected Object doFilterWrite(
-            final NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+            int index, IoSession session, WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
         if (!(message instanceof Request)) {
             return null;
@@ -209,8 +206,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
         }
 
         // Schedule a task to be executed on timeout.
-        TimeoutTask timeoutTask = new TimeoutTask(
-                nextFilter, request, session);
+        TimeoutTask timeoutTask = new TimeoutTask(request, session);
         ScheduledFuture<?> timeoutFuture = timeoutScheduler.schedule(
                 timeoutTask, request.getTimeoutMillis(),
                 TimeUnit.MILLISECONDS);
@@ -227,7 +223,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
+    public void sessionClosed(int index, IoSession session)
             throws Exception {
         // Copy the unfinished task set to avoid unnecessary lock acquisition.
         // Copying will be cheap because there won't be that many requests queued.
@@ -253,7 +249,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
         }
 
         // Now tell the main subject.
-        nextFilter.sessionClosed(session);
+        session.getFilter(index).sessionClosed(index+1, session);
     }
 
     @SuppressWarnings("unchecked")
@@ -317,15 +313,12 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     private class TimeoutTask implements Runnable {
-        private final NextFilter filter;
-
         private final Request request;
 
         private final IoSession session;
 
-        private TimeoutTask(NextFilter filter, Request request,
+        private TimeoutTask(Request request,
                 IoSession session) {
-            this.filter = filter;
             this.request = request;
             this.session = session;
         }
@@ -354,7 +347,11 @@ public class RequestResponseFilter extends WriteRequestFilter {
                 // Throw the exception only when it's really timed out.
                 RequestTimeoutException e = new RequestTimeoutException(request);
                 request.signal(e);
-                filter.exceptionCaught(session, e);
+                try {
+                	session.getFilter(0).exceptionCaught(0,session, e);
+                } catch (Throwable t) {
+                	// TODO : handle this exception
+                }
             }
         }
     }

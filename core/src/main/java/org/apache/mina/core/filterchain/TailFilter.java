@@ -44,7 +44,8 @@ public class TailFilter extends IoFilterAdapter {
                 } finally {
                     try {
                         // Remove all filters.
-                        session.getFilterChain().clear();
+                        session.getFilterChainIn().clear();
+                        session.getFilterChainOut().clear();
                     } finally {
                         if (s.getConfig().isUseReadOperation()) {
                             s.offerClosedReadFuture();
@@ -99,16 +100,41 @@ public class TailFilter extends IoFilterAdapter {
         session.getHandler()
                 .messageSent(session, writeRequest.getMessage());
     }
-
-    @Override
+    
     public void filterWrite(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
-        session.getFilter(index).filterWrite(0, session, writeRequest);
+
+        AbstractIoSession s = (AbstractIoSession) session;
+
+        // Maintain counters.
+        if (writeRequest.getMessage() instanceof IoBuffer) {
+            IoBuffer buffer = (IoBuffer) writeRequest.getMessage();
+            // I/O processor implementation will call buffer.reset()
+            // it after the write operation is finished, because
+            // the buffer will be specified with messageSent event.
+            buffer.mark();
+            int remaining = buffer.remaining();
+            if (remaining == 0) {
+                // Zero-sized buffer means the internal message
+                // delimiter.
+                s.increaseScheduledWriteMessages();
+            } else {
+                s.increaseScheduledWriteBytes(remaining);
+            }
+        } else {
+            s.increaseScheduledWriteMessages();
+        }
+
+        s.getWriteRequestQueue().offer(s, writeRequest);
+        if (s.getTrafficMask().isWritable()) {
+            s.getProcessor().flush(s);
+        }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void filterClose(int index, IoSession session)
             throws Exception {
-    	session.getFilter(index).filterClose(0, session);
+        ((AbstractIoSession) session).getProcessor().remove(session);
     }
 }

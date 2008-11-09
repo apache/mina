@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -73,7 +72,7 @@ public class ExecutorFilterRegressionTest extends TestCase {
             Integer objI = new Integer(i);
 
             for (int j = end; j >= 0; j--) {
-                filter.messageReceived(nextFilter, sessions[j], objI);
+                filter.messageReceived(0, sessions[j], objI);
             }
 
             if (nextFilter.throwable != null) {

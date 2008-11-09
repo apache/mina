@@ -415,10 +415,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             init(session);
             registered = true;
 
-            // Build the filter chain of this session.
-            session.getService().setFilterChainBuilder(
-                    session.getFilterChain());
-
             // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
             // in AbstractIoFilterChain.fireSessionOpened().
             ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
@@ -428,7 +424,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
                 // and call ConnectFuture.setException().
                 scheduleRemove(session);
-                IoFilter filter = session.getFilter(0); 
+                IoFilter filter = session.getFilterInHead(); 
                 filter.exceptionCaught(0, session, e);
                 wakeup();
             } else {
@@ -484,7 +480,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             destroy(session);
             return true;
         } catch (Exception e) {
-            IoFilter filter = session.getFilter(0); 
+            IoFilter filter = session.getFilterInHead(); 
             filter.exceptionCaught(0, session, e);
         } finally {
             clearWriteRequestQueue(session);
@@ -510,7 +506,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     buf.reset();
                     failedRequests.add(req);
                 } else {
-                    IoFilter filter = session.getFilter(0); 
+                    IoFilter filter = session.getFilterInHead(); 
                     filter.messageSent(0, session, req);
                 }
             } else {
@@ -531,7 +527,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 r.getFuture().setException(cause);
             }
 
-            IoFilter filter = session.getFilter(0); 
+            IoFilter filter = session.getFilterInHead(); 
             filter.exceptionCaught(0, session, cause);
         }
     }
@@ -585,7 +581,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
 
             if (readBytes > 0) {
-                IoFilter filter = session.getFilter(0); 
+                IoFilter filter = session.getFilterInHead(); 
                 filter.messageReceived(0, session, buf);
                 buf = null;
 
@@ -605,7 +601,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 scheduleRemove(session);
             }
 
-            IoFilter filter = session.getFilter(0); 
+            IoFilter filter = session.getFilterInHead(); 
             filter.exceptionCaught(0, session, e);
         }
     }
@@ -638,7 +634,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     }
                 } catch (Exception e) {
                     scheduleRemove(session);
-                    IoFilter filter = session.getFilter(0); 
+                    IoFilter filter = session.getFilterInHead(); 
                     filter.exceptionCaught(0, session, e);
                 }
                 break;
@@ -739,7 +735,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 }
             } while (writtenBytes < maxWrittenBytes);
         } catch (Exception e) {
-            IoFilter filter = session.getFilter(0); 
+            IoFilter filter = session.getFilterInHead(); 
             filter.exceptionCaught(0, session, e);
             return false;
         }
@@ -806,7 +802,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private void fireMessageSent(T session, WriteRequest req) throws Exception {
         session.setCurrentWriteRequest(null);
-        IoFilter filter = session.getFilter(0); 
+        IoFilter filter = session.getFilterInHead(); 
         filter.messageSent(0, session, req);
     }
 
@@ -844,7 +840,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         try {
             setInterestedInRead(session, (mask & SelectionKey.OP_READ) != 0);
         } catch (Exception e) {
-            IoFilter filter = session.getFilter(0); 
+            IoFilter filter = session.getFilterInHead(); 
             filter.exceptionCaught(0, session, e);
         }
         try {
@@ -853,7 +849,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     !session.getWriteRequestQueue().isEmpty(session) &&
                             (mask & SelectionKey.OP_WRITE) != 0);
         } catch (Exception e) {
-            IoFilter filter = session.getFilter(0); 
+            IoFilter filter = session.getFilterInHead(); 
             filter.exceptionCaught(0, session, e);
         }
     }

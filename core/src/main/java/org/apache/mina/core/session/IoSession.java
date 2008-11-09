@@ -94,19 +94,45 @@ public interface IoSession {
     IoSessionConfig getConfig();
 
     /**
-     * @return the filter chain that only affects this session.
+     * @return the incoming filter chain that only affects this session.
      */
-    List<IoFilter> getFilterChain();
+    List<IoFilter> getFilterChainIn();
+
+    /**
+     * @return the outgoing filter chain that only affects this session.
+     */
+    List<IoFilter> getFilterChainOut();
 
     
     /**
-     * @return the filter at a given position into the chain
+     * @return the filter at a given position into the incoming chain
      * that only affects this session.
      * 
      * @param index the position in the chain
      */
-    IoFilter getFilter(int index);
+    IoFilter getFilterIn(int index);
 
+    /**
+     * @return the filter at a given position into the outgoing chain
+     * that only affects this session.
+     * 
+     * @param index the position in the chain
+     */
+    IoFilter getFilterOut(int index);
+
+    /**
+     * @return the incoming filter head.
+     * 
+     * @param index the first filter in the incoming chain
+     */
+    IoFilter getFilterInHead();
+
+    /**
+     * @return the outgoing filter head.
+     * 
+     * @param index the first filter in the outgoing chain
+     */
+    IoFilter getFilterOutHead();
     
     /**
      * TODO Add method documentation

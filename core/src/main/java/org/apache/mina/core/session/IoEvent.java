@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core.session;
 
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
@@ -61,37 +62,49 @@ public class IoEvent implements Runnable {
     }
     
     public void run() {
+    	IoFilter nextFilter;
+
     	try {
             switch (type) {
             case MESSAGE_RECEIVED:
-            	session.getFilter(0).messageReceived(0, session, getParameter());
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.messageReceived(0, session, getParameter());
                 break;
             case MESSAGE_SENT:
-            	session.getFilter(0).messageSent(0, session, (WriteRequest) getParameter());
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.messageSent(0, session, (WriteRequest) getParameter());
                 break;
             case WRITE:
-            	session.getFilter(0).filterWrite(0, session, (WriteRequest) getParameter());
+            	nextFilter = session. getFilterOutHead();
+            	nextFilter.filterWrite(0, session, (WriteRequest) getParameter());
                 break;
             case SET_TRAFFIC_MASK:
-            	session.getFilter(0).filterSetTrafficMask(0, session, (TrafficMask) getParameter());
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.filterSetTrafficMask(0, session, (TrafficMask) getParameter());
                 break;
             case CLOSE:
-            	session.getFilter(0).filterClose(0, session);
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.filterClose(0, session);
                 break;
             case EXCEPTION_CAUGHT:
-            	session.getFilter(0).exceptionCaught(0, session, (Throwable) getParameter());
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.exceptionCaught(0, session, (Throwable) getParameter());
                 break;
             case SESSION_IDLE:
-            	session.getFilter(0).sessionIdle(0, session, (IdleStatus) getParameter());
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.sessionIdle(0, session, (IdleStatus) getParameter());
                 break;
             case SESSION_OPENED:
-            	session.getFilter(0).sessionOpened(0, session);
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.sessionOpened(0, session);
                 break;
             case SESSION_CREATED:
-            	session.getFilter(0).sessionCreated(0, session);
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.sessionCreated(0, session);
                 break;
             case SESSION_CLOSED:
-            	session.getFilter(0).sessionClosed(0, session);
+            	nextFilter = session. getFilterInHead();
+            	nextFilter.sessionClosed(0, session);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown event type: " + getType());

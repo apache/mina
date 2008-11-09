@@ -77,7 +77,7 @@ public abstract class CommonEventFilter extends IoFilterAdapter {
 
     @Override
     public final void filterWrite(int index, IoSession session, WriteRequest writeRequest) throws Exception {
-        filter(new IoFilterEvent(index+1, IoEventType.WRITE, session, writeRequest));
+        filter(new IoFilterEvent(index, IoEventType.WRITE, session, writeRequest));
     }
 
     @Override

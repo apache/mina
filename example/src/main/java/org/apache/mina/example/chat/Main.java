@@ -46,20 +46,26 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
-        List<IoFilter> chain = acceptor.getFilterChain();
-
-        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.add(mdcInjectionFilter);
+        List<IoFilter> chainIn = acceptor.getFilterChainIn();
+        List<IoFilter> chainOut = acceptor.getFilterChainOut();
+        ProtocolCodecFilter codecFilter = new ProtocolCodecFilter(
+                new TextLineCodecFactory());
 
         // Add SSL filter if SSL is enabled.
         if (USE_SSL) {
-            addSSLSupport(chain);
+            addSSLSupport(chainIn);
         }
 
-        chain.add(new ProtocolCodecFilter(
-                new TextLineCodecFactory()));
+        MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
+        chainIn.add(mdcInjectionFilter);
 
-        addLogger(chain);
+        chainIn.add(codecFilter);
+
+        addLogger(chainIn);
+        
+        addLogger(chainOut);
+        chainOut.add(codecFilter);
+        chainOut.add(mdcInjectionFilter);
 
         // Bind
         acceptor.setHandler(new ChatProtocolHandler());

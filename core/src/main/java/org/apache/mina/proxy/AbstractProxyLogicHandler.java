@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoSession;
@@ -106,7 +105,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
      * @param nextFilter	Downstream filter to receive data.
      * @param data			Data buffer to be written.
      */
-    protected WriteFuture writeData(final NextFilter nextFilter,
+    protected WriteFuture writeData(int index,
             final IoBuffer data) throws UnsupportedEncodingException {
         // write net data
         ProxyHandshakeIoBuffer writeBuffer = new ProxyHandshakeIoBuffer(data);
@@ -114,7 +113,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
         logger.debug("   session write: {}", writeBuffer);
 
         WriteFuture writeFuture = new DefaultWriteFuture(getSession());
-        getProxyFilter().writeData(nextFilter, getSession(),
+        getProxyFilter().writeData(index+1, getSession(),
                 new DefaultWriteRequest(writeBuffer, writeFuture), true);
 
         return writeFuture;

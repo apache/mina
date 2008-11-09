@@ -69,17 +69,22 @@ public class ChatClientSupport {
             IoFilter CODEC_FILTER = new ProtocolCodecFilter(
                     new TextLineCodecFactory());
             
-            connector.getFilterChain().add(new MdcInjectionFilter());
-            connector.getFilterChain().add(CODEC_FILTER);
-            connector.getFilterChain().add(LOGGING_FILTER);
+            connector.getFilterChainIn().add(new MdcInjectionFilter());
+            connector.getFilterChainIn().add(CODEC_FILTER);
+            connector.getFilterChainIn().add(LOGGING_FILTER);
 
             if (useSsl) {
                 SSLContext sslContext = BogusSslContextFactory
                         .getInstance(false);
                 SslFilter sslFilter = new SslFilter(sslContext);
                 sslFilter.setUseClientMode(true);
-                connector.getFilterChain().add(sslFilter);
+                connector.getFilterChainIn().add(sslFilter);
+                connector.getFilterChainOut().add(sslFilter);
             }
+
+            connector.getFilterChainOut().add(LOGGING_FILTER);
+            connector.getFilterChainOut().add(CODEC_FILTER);
+            connector.getFilterChainOut().add(new MdcInjectionFilter());
 
             connector.setHandler(handler);
             ConnectFuture future1 = connector.connect(address);

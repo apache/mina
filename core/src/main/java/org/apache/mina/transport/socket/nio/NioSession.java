@@ -34,25 +34,74 @@ import org.apache.mina.core.session.AbstractIoSession;
  * @version $Rev$, $Date$
  */
 public abstract class NioSession extends AbstractIoSession {
-    private final List<IoFilter> filterChain = new CopyOnWriteArrayList<IoFilter>();
+    private final List<IoFilter> filterChainIn = new CopyOnWriteArrayList<IoFilter>();
+    private final List<IoFilter> filterChainOut = new CopyOnWriteArrayList<IoFilter>();
 
-    public List<IoFilter> getFilterChain() {
-        return filterChain;
-    }
-
+    /**
+     * Stores all the filters from the common chain into the incoming and outgoing 
+     * chains for the current session. The chains are copied.
+     * 
+     * @param filters The chain (it will be used in both direction)
+     */
     public void setFilterChain(List<IoFilter> filters) {
     	if (filters == null) {
     		return;
     	}
     	
-		filterChain.addAll(filters);
+		filterChainIn.addAll(filters);
+		filterChainOut.addAll(filters);
+    }
+
+    /**
+     * Stores all the filters from both chains (incoming and outgoing) into 
+     * the current session. The chains are copied.
+     * 
+     * @param filtersIn The incoming chain
+     * @param filtersOut The outgoing chain
+     */
+    public void setFilterChain(List<IoFilter> filtersIn, List<IoFilter> filtersOut) {
+    	if ((filtersIn == null) || (filtersOut == null)) {
+    		return;
+    	}
+    	
+		filterChainIn.addAll(filtersIn);
+		filterChainOut.addAll(filtersOut);
     }
 
     /**
      * {@inheritDoc}
      */
-    public IoFilter getFilter(int index) {
-        return filterChain.get(index);
+    public IoFilter getFilterIn(int index) {
+        return filterChainIn.get(index);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoFilter getFilterOut(int index) {
+        return filterChainOut.get(index);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<IoFilter> getFilterChainIn() {
+        return filterChainIn;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public List<IoFilter> getFilterChainOut() {
+    	return filterChainOut;
+    }
+    
+    public IoFilter getFilterInHead() {
+    	return filterChainIn.get(0);
+    }
+    
+    public IoFilter getFilterOutHead() {
+    	return filterChainOut.get(0);
     }
 
     abstract ByteChannel getChannel();

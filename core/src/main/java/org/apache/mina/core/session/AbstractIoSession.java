@@ -240,7 +240,8 @@ public abstract class AbstractIoSession implements IoSession {
         
         if (future == null) {
 	    	try {
-	        	getFilter(0).exceptionCaught(0, this, cause);
+	    		IoFilter nextFilter = getFilterInHead();
+	        	nextFilter.exceptionCaught(0, this, cause);
 	    	} catch (Throwable t) {
 	            logger.warn(
 	                "Unexpected exception from exceptionCaught handler.", t);
@@ -266,7 +267,8 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         try {
-        	getFilter(0).filterClose(0, this);
+        	IoFilter nextFilter = getFilterInHead();
+        	nextFilter.filterClose(0, this);
         } catch (Throwable e) {
         	exceptionCaught(e);
         }
@@ -450,10 +452,10 @@ public abstract class AbstractIoSession implements IoSession {
         WriteRequest writeRequest = new DefaultWriteRequest(message, writeFuture, remoteAddress);
         
         // Then, get the chain and inject the WriteRequest into it
-        IoFilter filter = getFilter(0);
+        IoFilter filter = getFilterOutHead();
         
         try {
-        	filter.filterWrite(getFilterChain().size(), this, writeRequest);
+        	filter.filterWrite(0, this, writeRequest);
         } catch (Throwable t) {
             writeRequest.getFuture().setException(t);
             exceptionCaught(t);
@@ -612,7 +614,8 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         try {
-        	getFilter(0).filterSetTrafficMask(0, this, trafficMask);
+        	IoFilter nextFilter = getFilterInHead();
+        	nextFilter.filterSetTrafficMask(0, this, trafficMask);
         } catch (Throwable t) {
         	exceptionCaught(t);
         }

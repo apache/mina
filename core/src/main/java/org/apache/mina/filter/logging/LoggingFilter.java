@@ -171,7 +171,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void exceptionCaught(int index, IoSession session,
             Throwable cause) throws Exception {
     	log(exceptionCaughtLevel, "EXCEPTION :", cause);
-    	IoFilter nextFilter = session.getFilter(index);
+    	IoFilter nextFilter = session.getFilterIn(index);
         nextFilter.exceptionCaught(index+1, session, cause);
     }
 
@@ -179,7 +179,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void messageReceived(int index, IoSession session,
             Object message) throws Exception {
     	log(messageReceivedLevel, "RECEIVED: {}", message );
-    	IoFilter nextFilter = session.getFilter(index);
+    	IoFilter nextFilter = session.getFilterIn(index);
     	nextFilter.messageReceived(index+1, session, message);
     }
 
@@ -187,7 +187,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void messageSent(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
     	log(messageSentLevel, "SENT: {}", writeRequest.getMessage() );
-    	IoFilter nextFilter = session.getFilter(index);
+    	IoFilter nextFilter = session.getFilterIn(index);
         nextFilter.messageSent(index+1, session, writeRequest);
     }
 
@@ -195,7 +195,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void sessionCreated(int index, IoSession session)
     		throws Exception {
     	log(sessionCreatedLevel, "CREATED");
-    	IoFilter nextFilter = session.getFilter(index);
+    	IoFilter nextFilter = session.getFilterIn(index);
         nextFilter.sessionCreated(index+1, session);
     }
 
@@ -203,7 +203,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void sessionOpened(int index, IoSession session)
     throws Exception {
     	log(sessionOpenedLevel, "OPENED");
-    	IoFilter nextFilter = session.getFilter(index);
+    	IoFilter nextFilter = session.getFilterIn(index);
         nextFilter.sessionOpened(index+1, session);
     }
 
@@ -211,14 +211,14 @@ public class LoggingFilter extends IoFilterAdapter {
     public void sessionIdle(int index, IoSession session,
             IdleStatus status) throws Exception {
     	log(sessionIdleLevel, "IDLE");
-    	IoFilter nextFilter = session.getFilter(index);
+    	IoFilter nextFilter = session.getFilterIn(index);
         nextFilter.sessionIdle(index+1, session, status);
     }
 
     @Override
     public void sessionClosed(int index, IoSession session) throws Exception {
     	log(sessionClosedLevel, "CLOSED");
-    	IoFilter nextFilter = session.getFilter(index);
+    	IoFilter nextFilter = session.getFilterIn(index);
         nextFilter.sessionClosed(index+1, session);
     }
     

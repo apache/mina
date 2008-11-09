@@ -119,12 +119,13 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
+    public void sessionCreated(int index, IoSession session)
             throws Exception {
         if (!isConnectionOk(session)) {
             logger.warn("Connections coming in too fast; closing.");
             session.close();
         }
-        nextFilter.sessionCreated(session);
+        
+        session.getFilter(index).sessionCreated(index+1, session);
     }
 }

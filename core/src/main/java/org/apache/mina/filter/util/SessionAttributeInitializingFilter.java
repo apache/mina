@@ -140,12 +140,12 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * map and forward the event to the next filter.
      */
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
+    public void sessionCreated(int index, IoSession session)
             throws Exception {
         for (Map.Entry<String, Object> e : attributes.entrySet()) {
             session.setAttribute(e.getKey(), e.getValue());
         }
 
-        nextFilter.sessionCreated(session);
+        session.getFilterIn(index).sessionCreated(index+1, session);
     }
 }

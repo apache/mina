@@ -113,8 +113,16 @@ public interface IoService {
      * by this service.
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
      */
-    List<IoFilter> getFilterChain();
+    List<IoFilter> getFilterChainIn();
     
+    /**
+     * Returns the {@link IoFilterChainBuilder} which will build the
+     * {@link IoFilterChain} of all {@link IoSession}s which is created
+     * by this service.
+     * The default value is an empty {@link DefaultIoFilterChainBuilder}.
+     */
+    List<IoFilter> getFilterChainOut();
+
     IoFilter getTailFilter();
 
     /**
@@ -124,7 +132,7 @@ public interface IoService {
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
      */
-    void setFilterChainBuilder(List<IoFilter> builder);
+    void setFilterChainBuilder(List<IoFilter> chainIn, List<IoFilter> chainOut);
 
     /**
      * Returns a value of whether or not this service is active

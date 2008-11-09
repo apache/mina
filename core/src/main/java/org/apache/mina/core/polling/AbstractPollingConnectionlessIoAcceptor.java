@@ -240,7 +240,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
         try {
             session.getService().setFilterChainBuilder(
-                    session.getFilterChain());
+                    session.getFilterChainIn(), session.getFilterChainOut());
             getListeners().fireSessionCreated(session);
         } catch (Throwable t) {
             ExceptionMonitor.getInstance().exceptionCaught(t);
@@ -416,7 +416,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             newBuf.put(readBuf);
             newBuf.flip();
 
-            session.getFilter(0).messageReceived(0, session, newBuf);
+            session.getFilterInHead().messageReceived(0, session, newBuf);
         }
     }
 
@@ -436,7 +436,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     scheduleFlush(session);
                 }
             } catch (Exception e) {
-                session.getFilter(0).exceptionCaught(0, session, e);
+            	session.getFilterInHead().exceptionCaught(0, session, e);
             }
         }
     }
@@ -467,7 +467,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     // Clear and fire event
                     session.setCurrentWriteRequest(null);
                     buf.reset();
-                    session.getFilter(0).messageSent(0, session, req);
+                    session.getFilterInHead().messageSent(0, session, req);
                     continue;
                 }
 
@@ -488,7 +488,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                     session.setCurrentWriteRequest(null);
                     writtenBytes += localWrittenBytes;
                     buf.reset();
-                    session.getFilter(0).messageSent(0, session, req);
+                    session.getFilterInHead().messageSent(0, session, req);
                 }
             }
         } finally {

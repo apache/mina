@@ -36,6 +36,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 /**
  * Tests {@link IoServiceListenerSupport}.
@@ -190,7 +191,11 @@ public class IoServiceListenerSupportTest {
                 // the visibility problem of simultaneous EasyMock
                 // state update. (not sure if it fixes the failing test yet.)
                 synchronized (listener) {
-                    support.fireSessionDestroyed(session);
+                	try {
+                		support.fireSessionDestroyed(session);
+                	} catch (Throwable t) {
+                		fail();
+                	}
                 }
             }
         }.start();

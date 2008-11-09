@@ -78,7 +78,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
             .getLogger(ErrorGeneratingFilter.class);
 
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
+    public void filterWrite(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
         if (manipulateWrites) {
             // manipulate bytes
@@ -94,7 +94,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
                 // manipulate PDU
             } else {
                 if (duplicatePduProbability > rng.nextInt()) {
-                    nextFilter.filterWrite(session, writeRequest);
+                	session.getFilter(index).filterWrite(index+1, session, writeRequest);
                 }
                 if (resendPduLasterProbability > rng.nextInt()) {
                     // store it somewhere and trigger a write execution for
@@ -106,11 +106,12 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
                 }
             }
         }
-        nextFilter.filterWrite(session, writeRequest);
+        
+        session.getFilter(index).filterWrite(index+1, session, writeRequest);
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
+    public void messageReceived(int index, IoSession session,
             Object message) throws Exception {
         if (manipulateReads) {
             if (message instanceof IoBuffer) {
@@ -125,7 +126,8 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
                 // manipulate PDU
             }
         }
-        nextFilter.messageReceived(session, message);
+        
+        session.getFilter(index).messageReceived(index+1, session, message);
     }
 
     private IoBuffer insertBytesToNewIoBuffer(IoSession session, IoBuffer buffer) {

@@ -21,7 +21,6 @@ package org.apache.mina.filter.keepalive;
 
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IdleStatus;
@@ -298,9 +297,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
-        if (parent.contains(this)) {
+    public void onPreAdd(IoSession session, int index, String name,
+            IoFilter nextFilter) throws Exception {
+        if (session.getFilterChain().contains(this)) {
             throw new IllegalArgumentException(
                     "You can't add the same filter instance more than once. " +
             "Create another instance and add it.");
@@ -309,26 +308,26 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
     @Override
     public void onPostAdd(
-            IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
-        resetStatus(parent.getSession());
+    		IoSession session, int index, String name, IoFilter nextFilter) throws Exception {
+        resetStatus(session);
     }
 
     @Override
     public void onPostRemove(
-            IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
-        resetStatus(parent.getSession());
+    		IoSession session, int index, String name, IoFilter nextFilter) throws Exception {
+        resetStatus(session);
     }
 
     @Override
     public void messageReceived(
-            NextFilter nextFilter, IoSession session, Object message) throws Exception {
+            int index, IoSession session, Object message) throws Exception {
         try {
             if (messageFactory.isRequest(session, message)) {
                 Object pongMessage =
                     messageFactory.getResponse(session, message);
 
                 if (pongMessage != null) {
-                    nextFilter.filterWrite(
+                	session.getFilter(index).filterWrite(index+1,
                             session, new DefaultWriteRequest(pongMessage));
                 }
             }
@@ -338,28 +337,28 @@ public class KeepAliveFilter extends IoFilterAdapter {
             }
         } finally {
             if (!isKeepAliveMessage(session, message)) {
-                nextFilter.messageReceived(session, message);
+            	session.getFilter(index).messageReceived(index+1, session, message);
             }
         }
     }
 
     @Override
     public void messageSent(
-            NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+    		int index, IoSession session, WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
         if (!isKeepAliveMessage(session, message)) {
-            nextFilter.messageSent(session, writeRequest);
+        	session.getFilter(index).messageSent(index+1, session, writeRequest);
         }
     }
 
     @Override
     public void sessionIdle(
-            NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
+    		int index, IoSession session, IdleStatus status) throws Exception {
         if (status == interestedIdleStatus) {
             if (!session.containsAttribute(WAITING_FOR_RESPONSE)) {
                 Object pingMessage = messageFactory.getRequest(session);
                 if (pingMessage != null) {
-                    nextFilter.filterWrite(
+                	session.getFilter(index).filterWrite(index+1,
                             session,
                             new DefaultWriteRequest(pingMessage));
 
@@ -386,7 +385,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
         }
 
         if (forwardEvent) {
-            nextFilter.sessionIdle(session, status);
+        	session.getFilter(index).sessionIdle(index+1, session, status);
         }
     }
 

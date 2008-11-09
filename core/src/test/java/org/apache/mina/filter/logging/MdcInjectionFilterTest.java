@@ -33,7 +33,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -87,77 +87,77 @@ public class MdcInjectionFilterTest extends TestCase {
     }
 
     public void testSimpleChain() throws IOException, InterruptedException {
-        DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        chain.addFirst("mdc-injector", new MdcInjectionFilter());
-        chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
+        List<IoFilter> chain = new ArrayList<IoFilter>();
+        chain.add(new MdcInjectionFilter());
+        chain.add(new DummyIoFilter());
+        chain.add(new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         test(chain);
     }
 
     public void testExecutorFilterAtTheEnd() throws IOException, InterruptedException {
-        DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
+        List<IoFilter> chain = new ArrayList<IoFilter>();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addFirst("mdc-injector1", mdcInjectionFilter);
-        chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
-        chain.addLast("executor" , new ExecutorFilter());
-        chain.addLast("mdc-injector2", mdcInjectionFilter);
+        chain.add(mdcInjectionFilter);
+        chain.add(new DummyIoFilter());
+        chain.add(new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
+        chain.add(new ExecutorFilter());
+        chain.add(mdcInjectionFilter);
         test(chain);
     }
 
     public void testExecutorFilterAtBeginning() throws IOException, InterruptedException {
-        DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
+        List<IoFilter> chain = new ArrayList<IoFilter>();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , new ExecutorFilter());
-        chain.addLast("mdc-injector", mdcInjectionFilter);
-        chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
+        chain.add(new ExecutorFilter());
+        chain.add(mdcInjectionFilter);
+        chain.add(new DummyIoFilter());
+        chain.add(new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         test(chain);
     }
 
     public void testExecutorFilterBeforeProtocol() throws IOException, InterruptedException {
-        DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
+        List<IoFilter> chain = new ArrayList<IoFilter>();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , new ExecutorFilter());
-        chain.addLast("mdc-injector", mdcInjectionFilter);
-        chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
+        chain.add(new ExecutorFilter());
+        chain.add(mdcInjectionFilter);
+        chain.add(new DummyIoFilter());
+        chain.add(new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         test(chain);
     }
 
     public void testMultipleFilters() throws IOException, InterruptedException {
-        DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
+        List<IoFilter> chain = new ArrayList<IoFilter>();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , new ExecutorFilter());
-        chain.addLast("mdc-injector", mdcInjectionFilter);
-        chain.addLast("profiler", new ProfilerTimerFilter());
-        chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("logger", new LoggingFilter());
-        chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
+        chain.add(new ExecutorFilter());
+        chain.add(mdcInjectionFilter);
+        chain.add(new ProfilerTimerFilter());
+        chain.add(new DummyIoFilter());
+        chain.add(new LoggingFilter());
+        chain.add(new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         test(chain);
     }
 
 
     public void testTwoExecutorFilters() throws IOException, InterruptedException {
-        DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
+        List<IoFilter> chain = new ArrayList<IoFilter>();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor1" , new ExecutorFilter());
-        chain.addLast("mdc-injector1", mdcInjectionFilter);
-        chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
-        chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("executor2" , new ExecutorFilter());
+        chain.add(new ExecutorFilter());
+        chain.add(mdcInjectionFilter);
+        chain.add(new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
+        chain.add(new DummyIoFilter());
+        chain.add(new ExecutorFilter());
         // add the MdcInjectionFilter instance after every ExecutorFilter
         // it's important to use the same MdcInjectionFilter instance
-        chain.addLast("mdc-injector2",  mdcInjectionFilter);
+        chain.add(mdcInjectionFilter);
         test(chain);
     }
 
     public void testOnlyRemoteAddress() throws IOException, InterruptedException {
-        DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        chain.addFirst("mdc-injector", new MdcInjectionFilter(
+        List<IoFilter> chain = new ArrayList<IoFilter>();
+        chain.add(new MdcInjectionFilter(
             MdcInjectionFilter.MdcKey.remoteAddress));
-        chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
+        chain.add(new DummyIoFilter());
+        chain.add(new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         SimpleIoHandler simpleIoHandler = new SimpleIoHandler();
         acceptor.setHandler(simpleIoHandler);
         acceptor.bind(new InetSocketAddress(0));
@@ -191,7 +191,7 @@ public class MdcInjectionFilterTest extends TestCase {
         }
     }
 
-    private void test(DefaultIoFilterChainBuilder chain) throws IOException, InterruptedException {
+    private void test(List<IoFilter> chain) throws IOException, InterruptedException {
         // configure the server
         SimpleIoHandler simpleIoHandler = new SimpleIoHandler();
         acceptor.setHandler(simpleIoHandler);
@@ -381,9 +381,9 @@ public class MdcInjectionFilterTest extends TestCase {
 
     private static class DummyIoFilter extends IoFilterAdapter {
         @Override
-        public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
+        public void sessionOpened(int index, IoSession session) throws Exception {
             logger.info("DummyIoFilter.sessionOpened");
-            nextFilter.sessionOpened(session);
+            session.getFilter(index).sessionOpened(index+1, session);
         }
     }
 
