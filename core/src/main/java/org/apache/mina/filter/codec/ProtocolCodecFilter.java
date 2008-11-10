@@ -217,7 +217,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     @Override
     public void messageReceived(int index, IoSession session,  
     		Object message) throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
     	
         if (!(message instanceof IoBuffer)) {
             nextFilter.messageReceived(index+1, session, message);
@@ -267,7 +267,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 }
                 
                 // Finish decoding if no exception was thrown.
-                decoderOut.flush();
+                decoderOut.flush(index);
             } catch (Throwable t) {
                 ProtocolDecoderException pde;
                 if (t instanceof ProtocolDecoderException) {
@@ -285,7 +285,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 }
 
                 // Fire the exceptionCaught event.
-                decoderOut.flush();
+                decoderOut.flush(index);
                 nextFilter.exceptionCaught(0, session, pde);
 
                 // Retry only if the type of the caught exception is
@@ -303,7 +303,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     @Override
     public void messageSent(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
 
     	if (writeRequest instanceof EncodedWriteRequest) {
             return;
@@ -367,7 +367,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             encoder.encode(session, message, encoderOut);
             
             // Send it directly
-            encoderOut.flushWithoutFuture();
+            encoderOut.flushWithoutFuture(index);
             
             // Call the next filter
             nextFilter.filterWrite(index+1, session, new MessageWriteRequest(
@@ -399,7 +399,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      */
     @Override
     public void sessionCreated(int index, IoSession session) throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
 
     	// Creates the decoder and stores it into the newly created session 
         ProtocolDecoder decoder = factory.getDecoder(session);
@@ -416,7 +416,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     @Override
     public void sessionClosed(int index, IoSession session)
             throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
 
     	// Call finishDecode() first when a connection is closed.
         ProtocolDecoder decoder = getDecoder(session);
@@ -462,7 +462,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             disposeEncoder(session);
             disposeDecoder(session);
             disposeDecoderOut(session);
-            decoderOut.flush();
+            decoderOut.flush(index);
         }
 
         nextFilter.sessionClosed(index+1, session);
@@ -470,7 +470,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
     private ProtocolEncoderOutputImpl getEncoderOut(IoSession session, int index, 
             IoFilter nextFilter, WriteRequest writeRequest) {
-        return new ProtocolEncoderOutputImpl(session, index, nextFilter, writeRequest);
+        return new ProtocolEncoderOutputImpl(session, writeRequest);
     }
 
     private ProtocolDecoderOutput getDecoderOut(IoSession session,
@@ -538,18 +538,17 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     private static class ProtocolDecoderOutputImpl extends
             AbstractProtocolDecoderOutput {
         private final IoSession session;
-        private final IoFilter nextFilter;
 
         public ProtocolDecoderOutputImpl(
                 IoSession session, IoFilter nextFilter) {
             this.session = session;
-            this.nextFilter = nextFilter;
         }
 
-        public void flush() throws Exception {
+        public void flush(int index) throws Exception {
             Queue<Object> messageQueue = getMessageQueue();
             while (!messageQueue.isEmpty()) {
-          		nextFilter.messageReceived(0, session, messageQueue.poll());
+            	IoFilter nextFilter = session.getFilterIn(index+1);
+          		nextFilter.messageReceived(index+1, session, messageQueue.poll());
             }
         }
     }
@@ -558,21 +557,14 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             AbstractProtocolEncoderOutput {
         private final IoSession session;
         
-        private final int index;
-
-        private final IoFilter nextFilter;
-
         private final WriteRequest writeRequest;
 
-        public ProtocolEncoderOutputImpl(IoSession session, int index,
-                IoFilter nextFilter, WriteRequest writeRequest) {
+        public ProtocolEncoderOutputImpl(IoSession session, WriteRequest writeRequest) {
             this.session = session;
-            this.index = index;
-            this.nextFilter = nextFilter;
             this.writeRequest = writeRequest;
         }
 
-        public WriteFuture flush() throws Exception {
+        public WriteFuture flush(int index) throws Exception {
             Queue<Object> bufferQueue = getMessageQueue();
             WriteFuture future = null;
             for (;;) {
@@ -585,7 +577,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 if (!(encodedMessage instanceof IoBuffer) ||
                         ((IoBuffer) encodedMessage).hasRemaining()) {
                     future = new DefaultWriteFuture(session);
-                    nextFilter.filterWrite(0, session, new EncodedWriteRequest(encodedMessage,
+                    IoFilter nextFilter = session.getFilterIn(index+1);
+                    nextFilter.filterWrite(index+1, session, new EncodedWriteRequest(encodedMessage,
                             future, writeRequest.getDestination()));
                 }
             }
@@ -598,7 +591,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             return future;
         }
         
-        public void flushWithoutFuture() throws Exception {
+        public void flushWithoutFuture(int index) throws Exception {
             Queue<Object> bufferQueue = getMessageQueue();
             for (;;) {
                 Object encodedMessage = bufferQueue.poll();
@@ -612,7 +605,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     SocketAddress destination = writeRequest.getDestination();
                     WriteRequest writeRequest = new EncodedWriteRequest(
                         encodedMessage, null, destination); 
-                    nextFilter.filterWrite(index, session, writeRequest);
+                	IoFilter nextFilter = session.getFilterOut(index+1);
+                    nextFilter.filterWrite(index+1, session, writeRequest);
                 }
             }
         }

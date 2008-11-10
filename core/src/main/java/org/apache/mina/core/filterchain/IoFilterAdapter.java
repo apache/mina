@@ -88,7 +88,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void sessionCreated(int index, IoSession session)
             throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
         nextFilter.sessionCreated(index+1, session);
     }
 
@@ -97,7 +97,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void sessionOpened(int index, IoSession session)
             throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
     	nextFilter.sessionOpened(index+1, session);
     }
 
@@ -106,7 +106,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void sessionClosed(int index, IoSession session)
             throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
     	nextFilter.sessionClosed(index+1, session);
     }
 
@@ -115,7 +115,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void sessionIdle(int index, IoSession session,
             IdleStatus status) throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
     	nextFilter.sessionIdle(index+1, session, status);
     }
 
@@ -124,7 +124,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void exceptionCaught(int index, IoSession session,
             Throwable cause) throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
     	nextFilter.exceptionCaught(index+1, session, cause);
     }
 
@@ -133,7 +133,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void messageReceived(int index, IoSession session,
             Object message) throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
     	nextFilter.messageReceived(index+1, session, message);
     }
 
@@ -142,7 +142,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void messageSent(int index, IoSession session,
             WriteRequest writeRequest) throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
     	nextFilter.messageSent(index+1, session, writeRequest);
     }
 
@@ -160,7 +160,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void filterClose(int index, IoSession session)
             throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterOut(index+1);
     	nextFilter.filterClose(index+1, session);
     }
 
@@ -169,7 +169,7 @@ public class IoFilterAdapter implements IoFilter {
      */
     public void filterSetTrafficMask(int index, IoSession session,
             TrafficMask trafficMask) throws Exception {
-    	IoFilter nextFilter = session.getFilterIn(index);
+    	IoFilter nextFilter = session.getFilterIn(index+1);
     	nextFilter.filterSetTrafficMask(index+1, session, trafficMask);
     }
     

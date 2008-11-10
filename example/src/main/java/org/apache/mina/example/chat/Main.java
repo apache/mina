@@ -70,7 +70,7 @@ public class Main {
         // Bind
         acceptor.setHandler(new ChatProtocolHandler());
         acceptor.bind(new InetSocketAddress(PORT));
-
+        
         System.out.println("Listening on port " + PORT);
     }
 

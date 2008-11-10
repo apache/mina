@@ -64,14 +64,14 @@ public class ProtocolCodecSession extends DummySession {
 
     private final AbstractProtocolEncoderOutput encoderOutput =
         new AbstractProtocolEncoderOutput() {
-            public WriteFuture flush() {
+            public WriteFuture flush(int index) {
                 return notWrittenFuture;
             }
     };
 
     private final AbstractProtocolDecoderOutput decoderOutput =
         new AbstractProtocolDecoderOutput() {
-            public void flush() {
+            public void flush(int index) {
             }
     };
 

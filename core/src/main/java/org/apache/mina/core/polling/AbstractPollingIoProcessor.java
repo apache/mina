@@ -37,6 +37,7 @@ import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.DefaultIoFuture;
 import org.apache.mina.core.service.AbstractIoService;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoServiceListenerSupport;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IdleStatusChecker;
 import org.apache.mina.core.session.IoSession;
@@ -417,7 +418,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
             // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
             // in AbstractIoFilterChain.fireSessionOpened().
-            ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
+            IoServiceListenerSupport listeners = ((AbstractIoService) session.getService()).getListeners(); 
+            listeners.fireSessionCreated(session);
             notified = true;
         } catch (Throwable e) {
             if (notified) {
@@ -802,6 +804,14 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private void fireMessageSent(T session, WriteRequest req) throws Exception {
         session.setCurrentWriteRequest(null);
+        session.increaseWrittenMessages(req, System.currentTimeMillis());
+
+        try {
+            req.getFuture().setWritten();
+        } catch (Throwable t) {
+            //fireExceptionCaught(t);
+        }
+
         IoFilter filter = session.getFilterInHead(); 
         filter.messageSent(0, session, req);
     }
@@ -862,7 +872,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
             for (;;) {
                 try {
-                    int selected = select(1000);
+                    int selected = select(60000);
 
                     nSessions += add();
                     updateTrafficMask();

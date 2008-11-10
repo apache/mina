@@ -59,43 +59,43 @@ public class IoFilterEvent extends IoEvent {
         switch (getType()) {
         case MESSAGE_RECEIVED:
         	nextFilter = getNextFilterIn();
-            nextFilter.messageReceived(nextFilterIndex+1, session, getParameter());
+            nextFilter.messageReceived(nextFilterIndex, session, getParameter());
             break;
         case MESSAGE_SENT:
         	nextFilter = getNextFilterIn();
-        	nextFilter.messageSent(nextFilterIndex+1, session, (WriteRequest) getParameter());
+        	nextFilter.messageSent(nextFilterIndex, session, (WriteRequest) getParameter());
             break;
         case WRITE:
         	nextFilter = getNextFilterOut();
-        	nextFilter.filterWrite(nextFilterIndex+1, session, (WriteRequest) getParameter());
+        	nextFilter.filterWrite(nextFilterIndex, session, (WriteRequest) getParameter());
             break;
         case SET_TRAFFIC_MASK:
         	nextFilter = getNextFilterIn();
-        	nextFilter.filterSetTrafficMask(nextFilterIndex+1, session, (TrafficMask) getParameter());
+        	nextFilter.filterSetTrafficMask(nextFilterIndex, session, (TrafficMask) getParameter());
             break;
         case CLOSE:
-        	nextFilter = getNextFilterIn();
-        	nextFilter.filterClose(nextFilterIndex+1, session);
+        	nextFilter = getNextFilterOut();
+        	nextFilter.filterClose(nextFilterIndex, session);
             break;
         case EXCEPTION_CAUGHT:
         	nextFilter = getNextFilterIn();
-        	nextFilter.exceptionCaught(nextFilterIndex+1, session, (Throwable) getParameter());
+        	nextFilter.exceptionCaught(nextFilterIndex, session, (Throwable) getParameter());
             break;
         case SESSION_IDLE:
         	nextFilter = getNextFilterIn();
-        	nextFilter.sessionIdle(nextFilterIndex+1, session, (IdleStatus) getParameter());
+        	nextFilter.sessionIdle(nextFilterIndex, session, (IdleStatus) getParameter());
             break;
         case SESSION_OPENED:
         	nextFilter = getNextFilterIn();
-        	nextFilter.sessionOpened(nextFilterIndex+1, session);
+        	nextFilter.sessionOpened(nextFilterIndex, session);
             break;
         case SESSION_CREATED:
         	nextFilter = getNextFilterIn();
-        	nextFilter.sessionCreated(nextFilterIndex+1, session);
+        	nextFilter.sessionCreated(nextFilterIndex, session);
             break;
         case SESSION_CLOSED:
         	nextFilter = getNextFilterIn();
-        	nextFilter.sessionClosed(nextFilterIndex+1, session);
+        	nextFilter.sessionClosed(nextFilterIndex, session);
             break;
         default:
             throw new IllegalArgumentException("Unknown event type: " + getType());

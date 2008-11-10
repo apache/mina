@@ -267,7 +267,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         try {
-        	IoFilter nextFilter = getFilterInHead();
+        	IoFilter nextFilter = getFilterOutHead();
         	nextFilter.filterClose(0, this);
         } catch (Throwable e) {
         	exceptionCaught(e);

@@ -417,5 +417,28 @@ public abstract class AbstractIoAcceptor
         public final List<SocketAddress> getLocalAddresses() {
             return Collections.unmodifiableList(localAddresses);
         }
+        
+        /**
+         * @see Object#toString()
+         */
+        public String toString() {
+        	StringBuilder sb = new StringBuilder();
+        	
+        	sb.append("AcceptorOperationFuture for : {");
+        	boolean isFirst = true;
+        	
+        	for (SocketAddress socketAddress:localAddresses) {
+        		if (isFirst) {
+        			isFirst = false;
+        		} else {
+        			sb.append(", ");
+        		}
+        		sb.append(socketAddress);
+        	}
+        	
+        	sb.append('}');
+        	
+        	return sb.toString();
+        }
     }
 }

@@ -119,7 +119,7 @@ public class DefaultIoFuture implements IoFuture {
      * {@inheritDoc}
      */
     public boolean await(long timeoutMillis) throws InterruptedException {
-        return await0(timeoutMillis, true);
+        return await(timeoutMillis, true);
     }
 
     /**
@@ -127,7 +127,7 @@ public class DefaultIoFuture implements IoFuture {
      */
     public IoFuture awaitUninterruptibly() {
         try {
-            await0(Long.MAX_VALUE, false);
+            await(Long.MAX_VALUE, false);
         } catch ( InterruptedException ie) {
             // Do nothing : this catch is just mandatory by contract
         }
@@ -147,7 +147,7 @@ public class DefaultIoFuture implements IoFuture {
      */
     public boolean awaitUninterruptibly(long timeoutMillis) {
         try {
-            return await0(timeoutMillis, false);
+            return await(timeoutMillis, false);
         } catch (InterruptedException e) {
             throw new InternalError();
         }
@@ -166,7 +166,7 @@ public class DefaultIoFuture implements IoFuture {
      * @throws InterruptedException If the thread has been interrupted
      * when it's not allowed.
      */
-    private boolean await0(long timeoutMillis, boolean interruptable) throws InterruptedException {
+    private boolean await(long timeoutMillis, boolean interruptable) throws InterruptedException {
         long endTime = System.currentTimeMillis() + timeoutMillis;
 
         synchronized (lock) {

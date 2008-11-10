@@ -41,5 +41,5 @@ public interface ProtocolDecoderOutput {
      * Flushes all messages you wrote via {@link #write(Object)} to
      * the next filter.
      */
-    void flush() throws Exception;
+    void flush(int index) throws Exception;
 }
