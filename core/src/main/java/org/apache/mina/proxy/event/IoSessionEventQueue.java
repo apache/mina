@@ -28,7 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * IoSessionEventQueue.java - Queue that contains filtered session events while handshake isn't done.
+ * IoSessionEventQueue.java - Queue that contains filtered session events 
+ * while handshake isn't done.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -43,23 +44,35 @@ public class IoSessionEventQueue {
     /**
      * Queue of session events which occurred before the proxy handshake had completed.
      */
-    private Queue<IoSessionEvent> sessionEventsQueue = null;
+    private Queue<IoSessionEvent> sessionEventsQueue = new LinkedList<IoSessionEvent>();
 
     public IoSessionEventQueue(ProxyIoSession proxyIoSession) {
         this.proxyIoSession = proxyIoSession;
     }
 
-    private void freeSessionQueue() {
-        logger.debug("Event queue CLEARED");
-
-        // Free queue
-        sessionEventsQueue = null;
+    /**
+     * Discard all events from the queue.
+     */
+    private void discardSessionQueueEvents() {
+        synchronized (sessionEventsQueue) {
+            // Free queue
+            sessionEventsQueue.clear();
+            logger.debug("Event queue CLEARED");
+        }
     }
 
     /**
-     * Event is enqueued only if necessary.
+     * Event is enqueued only if necessary : 
+     * - socks proxies do not need the reconnection feature so events are always 
+     * forwarded for these.
+     * - http proxies events will be enqueued while handshake has not been completed
+     * or until connection was closed.
+     * If connection was prematurely closed previous events are discarded and only the
+     * session closed is delivered.  
+     * 
+     * @param evt the event to enqueue
      */
-    public synchronized void enqueueEventIfNecessary(final IoSessionEvent evt) {
+    public void enqueueEventIfNecessary(final IoSessionEvent evt) {
         logger.debug("??? >> Enqueue {}", evt);
 
         if (proxyIoSession.getRequest() instanceof SocksProxyRequest) {
@@ -74,13 +87,14 @@ public class IoSessionEventQueue {
             if (evt.getType() == IoSessionEventType.CLOSED) {
                 if (proxyIoSession.isAuthenticationFailed()) {
                     proxyIoSession.getConnector().cancelConnectFuture();
-                    freeSessionQueue();
+                    discardSessionQueueEvents();
                     evt.deliverEvent();
                 } else {
-                    freeSessionQueue();
+                    discardSessionQueueEvents();
                 }
             } else if (evt.getType() == IoSessionEventType.OPENED) {
-                // Enqueue event cause it will not reach IoHandler but deliver it to enable session creation.
+                // Enqueue event cause it will not reach IoHandler but deliver it to enable 
+                // session creation.
                 enqueueSessionEvent(evt);
                 evt.deliverEvent();
             } else {
@@ -90,39 +104,30 @@ public class IoSessionEventQueue {
     }
 
     /**
-     * Send any session event which were queued whilst waiting for handshaking to complete.
+     * Send any session event which were queued while waiting for handshaking to complete.
      * 
      * Please note this is an internal method. DO NOT USE it in your code.
      */
-    public synchronized void flushPendingSessionEvents() throws Exception {
-        IoSessionEvent evt;
-
-        logger.debug(" flushPendingSessionEvents()");
-
-        if (sessionEventsQueue == null) {
-            return;
+    public void flushPendingSessionEvents() throws Exception {
+        synchronized (sessionEventsQueue) {
+            IoSessionEvent evt;
+            
+            while ((evt = sessionEventsQueue.poll()) != null) {
+                logger.debug(" Flushing buffered event: {}", evt);    
+                evt.deliverEvent();
+            }
         }
-
-        while ((evt = sessionEventsQueue.poll()) != null) {
-            logger.debug(" Flushing buffered event: {}", evt);
-
-            evt.deliverEvent();
-        }
-
-        // Free queue
-        sessionEventsQueue = null;
     }
 
     /**
      * Enqueue an event to be delivered once handshaking is complete.
+     * 
+     * @param evt the session event to enqueue
      */
     private void enqueueSessionEvent(final IoSessionEvent evt) {
-        if (sessionEventsQueue == null) {
-            sessionEventsQueue = new LinkedList<IoSessionEvent>();
-        }
-
-        logger.debug("Enqueuing event: {}", evt);
-
-        sessionEventsQueue.offer(evt);
+        synchronized (sessionEventsQueue) {
+            logger.debug("Enqueuing event: {}", evt);
+            sessionEventsQueue.offer(evt);
+        }    
     }
 }
