@@ -234,19 +234,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         
-        if ( decoderOut == null) {
-            // The decoderOut must not be null. It's null if
-            // the sessionCreated message has not be called, for
-            // instance if the filter has been added after the 
-            // first session is created.
-            ProtocolDecoderException pde = new ProtocolDecoderException(
-                "Cannot decode if the decoder is null. Add the filter in the chain" +
-                "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
-            return;
-        }
-        
-
         // Loop until we don't have anymore byte in the buffer,
         // or until the decoder throws an unrecoverable exception or 
         // can't decoder a message, because there are not enough 
@@ -401,18 +388,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         // Call finishDecode() first when a connection is closed.
         ProtocolDecoder decoder = getDecoder(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
-        
-        if ( decoderOut == null) {
-            // The decoder must not be null. It's null if
-            // the sessionCreated message has not be called, for
-            // instance if the filter has been added after the 
-            // first session is created.
-            ProtocolDecoderException pde = new ProtocolDecoderException(
-                "Cannot decode if the decoder is null. Add the filter in the chain" +
-                "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
-            return;
-        }
         
         try {
             decoder.finishDecode(session, decoderOut);
