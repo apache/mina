@@ -219,19 +219,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         IoBuffer in = (IoBuffer) message;
         ProtocolDecoder decoder = getDecoder(session);
-        
-        if ( decoder == null) {
-            // The decoder must not be null. It's null if
-            // the sessionCreated message has not be called, for
-            // instance if the filter has been added after the 
-            // first session is created.
-            ProtocolDecoderException pde = new ProtocolDecoderException(
-                "Cannot decode if the decoder is null. Add the filter in the chain" +
-                "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
-            return;
-        }
-        
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         
         // Loop until we don't have anymore byte in the buffer,
@@ -414,16 +401,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         return new ProtocolEncoderOutputImpl(session, nextFilter, writeRequest);
     }
 
-    private ProtocolDecoderOutput getDecoderOut(IoSession session,
-            NextFilter nextFilter) {
-        ProtocolDecoderOutput out = (ProtocolDecoderOutput) session.getAttribute(DECODER_OUT);
-        if (out == null) {
-            out = new ProtocolDecoderOutputImpl();
-            session.setAttribute(DECODER_OUT, out);
-        }
-        return out;
-    }
-
     private static class EncodedWriteRequest extends DefaultWriteRequest {
         private EncodedWriteRequest(Object encodedMessage,
                 WriteFuture future, SocketAddress destination) {
@@ -517,6 +494,23 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
     
     //----------- Helper methods ---------------------------------------------
+    /**
+     * Return a reference to the decoder callback. If it's not already created
+     * and stored into the session, we create a new instance.
+     */
+    private ProtocolDecoderOutput getDecoderOut(IoSession session,
+            NextFilter nextFilter) {
+        ProtocolDecoderOutput out = (ProtocolDecoderOutput) session.getAttribute(DECODER_OUT);
+        
+        if (out == null) {
+            // Create a new instance, and stores it into the session
+            out = new ProtocolDecoderOutputImpl();
+            session.setAttribute(DECODER_OUT, out);
+        }
+        
+        return out;
+    }
+
     /**
      * Initialize the encoder and the decoder, storing them in the 
      * session attributes.
