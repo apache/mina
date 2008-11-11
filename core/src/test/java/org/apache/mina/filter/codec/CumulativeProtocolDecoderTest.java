@@ -23,13 +23,18 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * Tests {@link CumulativeProtocolDecoder}.
@@ -37,18 +42,14 @@ import org.apache.mina.core.session.IoSessionConfig;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class CumulativeProtocolDecoderTest extends TestCase {
+public class CumulativeProtocolDecoderTest {
     private final ProtocolCodecSession session = new ProtocolCodecSession();
 
     private IoBuffer buf;
     private IntegerDecoder decoder;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(CumulativeProtocolDecoderTest.class);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         buf = IoBuffer.allocate(16);
         decoder = new IntegerDecoder();
         session.setTransportMetadata(
@@ -57,18 +58,19 @@ public class CumulativeProtocolDecoderTest extends TestCase {
                         IoSessionConfig.class, IoBuffer.class));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         decoder.dispose(session);
     }
 
+    @Test
     public void testCumulation() throws Exception {
         buf.put((byte) 0);
         buf.flip();
 
         decoder.decode(session, buf, session.getDecoderOutput());
-        Assert.assertEquals(0, session.getDecoderOutputQueue().size());
-        Assert.assertEquals(buf.limit(), buf.position());
+        assertEquals(0, session.getDecoderOutputQueue().size());
+        assertEquals(buf.limit(), buf.position());
 
         buf.clear();
         buf.put((byte) 0);
@@ -77,11 +79,12 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         buf.flip();
 
         decoder.decode(session, buf, session.getDecoderOutput());
-        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
-        Assert.assertEquals(new Integer(1), session.getDecoderOutputQueue().poll());
-        Assert.assertEquals(buf.limit(), buf.position());
+        assertEquals(1, session.getDecoderOutputQueue().size());
+        assertEquals(new Integer(1), session.getDecoderOutputQueue().poll());
+        assertEquals(buf.limit(), buf.position());
     }
 
+    @Test
     public void testRepeatitiveDecode() throws Exception {
         for (int i = 0; i < 4; i++) {
             buf.putInt(i);
@@ -89,25 +92,29 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         buf.flip();
 
         decoder.decode(session, buf, session.getDecoderOutput());
-        Assert.assertEquals(4, session.getDecoderOutputQueue().size());
-        Assert.assertEquals(buf.limit(), buf.position());
+        assertEquals(4, session.getDecoderOutputQueue().size());
+        assertEquals(buf.limit(), buf.position());
 
         List<Object> expected = new ArrayList<Object>();
+        
         for (int i = 0; i < 4; i++) {
             expected.add(new Integer(i));
         }
-        Assert.assertEquals(expected, session.getDecoderOutputQueue());
+        
+        assertEquals(expected, session.getDecoderOutputQueue());
     }
 
+    @Test
     public void testWrongImplementationDetection() throws Exception {
         try {
             new WrongDecoder().decode(session, buf, session.getDecoderOutput());
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
             // OK
         }
     }
     
+    @Test
     public void testBufferDerivation() throws Exception {
         decoder = new DuplicatingIntegerDecoder();
         
@@ -118,9 +125,9 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         buf.flip();
 
         decoder.decode(session, buf, session.getDecoderOutput());
-        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
-        Assert.assertEquals(1, session.getDecoderOutputQueue().poll());
-        Assert.assertEquals(buf.limit(), buf.position());
+        assertEquals(1, session.getDecoderOutputQueue().size());
+        assertEquals(1, session.getDecoderOutputQueue().poll());
+        assertEquals(buf.limit(), buf.position());
 
         // Keep appending to the internal buffer.
         // DuplicatingIntegerDecoder will keep duplicating the internal
@@ -138,9 +145,9 @@ public class CumulativeProtocolDecoderTest extends TestCase {
             buf.position(1);
     
             decoder.decode(session, buf, session.getDecoderOutput());
-            Assert.assertEquals(1, session.getDecoderOutputQueue().size());
-            Assert.assertEquals(i, session.getDecoderOutputQueue().poll());
-            Assert.assertEquals(buf.limit(), buf.position());
+            assertEquals(1, session.getDecoderOutputQueue().size());
+            assertEquals(i, session.getDecoderOutputQueue().poll());
+            assertEquals(buf.limit(), buf.position());
         }
     }
 
@@ -149,7 +156,8 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         @Override
         protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
-            Assert.assertTrue(in.hasRemaining());
+            assertTrue(in.hasRemaining());
+            
             if (in.remaining() < 4) {
                 return false;
             }
@@ -178,12 +186,11 @@ public class CumulativeProtocolDecoderTest extends TestCase {
         protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
             in.duplicate(); // Will disable auto-expansion.
-            Assert.assertFalse(in.isAutoExpand());
+            assertFalse(in.isAutoExpand());
             return super.doDecode(session, in, out);
         }
 
         public void dispose() throws Exception {
         }
     }
-
 }

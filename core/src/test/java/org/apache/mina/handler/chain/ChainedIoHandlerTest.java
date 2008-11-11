@@ -19,11 +19,10 @@
  */
 package org.apache.mina.handler.chain;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IoSession;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  * A test case for {@link ChainedIoHandler}.
@@ -31,11 +30,8 @@ import org.apache.mina.core.session.IoSession;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class ChainedIoHandlerTest extends TestCase {
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(ChainedIoHandlerTest.class);
-    }
-
+public class ChainedIoHandlerTest {
+    @Test
     public void testChainedCommand() throws Exception {
         IoHandlerChain chain = new IoHandlerChain();
         StringBuilder buf = new StringBuilder();
@@ -45,7 +41,7 @@ public class ChainedIoHandlerTest extends TestCase {
 
         new ChainedIoHandler(chain).messageReceived(new DummySession(), null);
 
-        Assert.assertEquals("ABC", buf.toString());
+        assertEquals("ABC", buf.toString());
     }
 
     private class TestCommand implements IoHandlerCommand {

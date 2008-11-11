@@ -27,8 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
@@ -51,6 +49,13 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.statistic.ProfilerTimerFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +65,7 @@ import org.slf4j.LoggerFactory;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class MdcInjectionFilterTest extends TestCase {
+public class MdcInjectionFilterTest {
 
     private static Logger logger = LoggerFactory.getLogger(MdcInjectionFilterTest.class);
     private static final int TIMEOUT = 5000;
@@ -69,9 +74,8 @@ public class MdcInjectionFilterTest extends TestCase {
     private int port;
     private NioSocketAcceptor acceptor;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         // comment out next line if you want to see normal logging
         org.apache.log4j.Logger.getRootLogger().removeAllAppenders();
         org.apache.log4j.Logger.getRootLogger().setLevel(Level.DEBUG);
@@ -80,12 +84,12 @@ public class MdcInjectionFilterTest extends TestCase {
     }
 
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         acceptor.dispose();
-        super.tearDown();
     }
 
+    @Test
     public void testSimpleChain() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         chain.addFirst("mdc-injector", new MdcInjectionFilter());
@@ -94,6 +98,7 @@ public class MdcInjectionFilterTest extends TestCase {
         test(chain);
     }
 
+    @Test
     public void testExecutorFilterAtTheEnd() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
@@ -105,6 +110,7 @@ public class MdcInjectionFilterTest extends TestCase {
         test(chain);
     }
 
+    @Test
     public void testExecutorFilterAtBeginning() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
@@ -115,6 +121,7 @@ public class MdcInjectionFilterTest extends TestCase {
         test(chain);
     }
 
+    @Test
     public void testExecutorFilterBeforeProtocol() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
@@ -125,6 +132,7 @@ public class MdcInjectionFilterTest extends TestCase {
         test(chain);
     }
 
+    @Test
     public void testMultipleFilters() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
@@ -138,6 +146,7 @@ public class MdcInjectionFilterTest extends TestCase {
     }
 
 
+    @Test
     public void testTwoExecutorFilters() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
@@ -152,6 +161,7 @@ public class MdcInjectionFilterTest extends TestCase {
         test(chain);
     }
 
+    @Test
     public void testOnlyRemoteAddress() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         chain.addFirst("mdc-injector", new MdcInjectionFilter(

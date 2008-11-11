@@ -38,10 +38,6 @@ import static org.junit.Assert.assertSame;
  * @version $Rev$, $Date$
  */
 public class DefaultIoFilterChainBuilderTest {
-    /*public static void main(String[] args) {
-        junit.textui.TestRunner.run(DefaultIoFilterChainBuilderTest.class);
-    }*/
-
     @Before
     public void setUp() throws Exception {
     }
