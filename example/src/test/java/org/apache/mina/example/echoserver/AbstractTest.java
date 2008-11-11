@@ -22,6 +22,7 @@ package org.apache.mina.example.echoserver;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.security.GeneralSecurityException;
 
 import junit.framework.TestCase;
 
@@ -68,7 +69,7 @@ public abstract class AbstractTest extends TestCase {
     }
 
     protected static String toString(byte[] buf) {
-        StringBuffer str = new StringBuffer(buf.length * 4);
+        StringBuilder str = new StringBuilder(buf.length * 4);
         for (byte element : buf) {
             str.append(element);
             str.append(' ');
@@ -84,8 +85,6 @@ public abstract class AbstractTest extends TestCase {
     protected void setUp() throws Exception {
         // Disable SSL by default
         useSSL = false;
-        final SslFilter sslFilter = new SslFilter(BogusSslContextFactory
-                .getInstance(true));
 
         boundAddress = null;
         datagramAcceptor = new NioDatagramAcceptor();
@@ -112,28 +111,35 @@ public abstract class AbstractTest extends TestCase {
         datagramBound = false;
 
         address = new InetSocketAddress(port);
-        
+
         try {
             socketAcceptor.setHandler(new EchoProtocolHandler() {
                 @Override
                 public void sessionCreated(IoSession session) {
                     if (useSSL) {
-                        session.getFilterChain().addFirst("SSL", sslFilter);
+                        try {
+                            session.getFilterChain().addFirst(
+                                    "SSL",
+                                    new SslFilter(BogusSslContextFactory
+                                            .getInstance(true)));
+                        } catch (GeneralSecurityException e) {
+                            logger.error("", e);
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
 
                 // This is for TLS re-entrance test
                 @Override
-                public void messageReceived(IoSession session,
-                        Object message) throws Exception {
+                public void messageReceived(IoSession session, Object message)
+                        throws Exception {
                     if (!(message instanceof IoBuffer)) {
                         return;
                     }
 
                     IoBuffer buf = (IoBuffer) message;
                     if (session.getFilterChain().contains("SSL")
-                            && buf.remaining() == 1
-                            && buf.get() == (byte) '.') {
+                            && buf.remaining() == 1 && buf.get() == (byte) '.') {
                         logger.info("TLS Reentrance");
                         ((SslFilter) session.getFilterChain().get("SSL"))
                                 .startSsl(session);
@@ -142,8 +148,7 @@ public abstract class AbstractTest extends TestCase {
                         buf = IoBuffer.allocate(1);
                         buf.put((byte) '.');
                         buf.flip();
-                        session
-                                .setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE);
+                        session.setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE);
                         session.write(buf);
                     } else {
                         super.messageReceived(session, message);
@@ -174,7 +179,7 @@ public abstract class AbstractTest extends TestCase {
         }
 
         boundAddress = address;
-        System.out.println("Using port " + port + " for testing.");
+        logger.info("Using port " + port + " for testing.");
     }
 
     @Override
