@@ -22,6 +22,7 @@ package org.apache.mina.filter.codec;
 import java.util.Queue;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.DummySession;
@@ -71,7 +72,7 @@ public class ProtocolCodecSession extends DummySession {
 
     private final AbstractProtocolDecoderOutput decoderOutput =
         new AbstractProtocolDecoderOutput() {
-            public void flush() {
+            public void flush(NextFilter nextFilter, IoSession session) {
             }
     };
 

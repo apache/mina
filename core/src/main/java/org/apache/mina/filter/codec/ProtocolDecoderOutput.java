@@ -19,6 +19,9 @@
  */
 package org.apache.mina.filter.codec;
 
+import org.apache.mina.core.filterchain.IoFilter.NextFilter;
+import org.apache.mina.core.session.IoSession;
+
 /**
  * Callback for {@link ProtocolDecoder} to generate decoded messages.
  * {@link ProtocolDecoder} must call {@link #write(Object)} for each decoded
@@ -41,5 +44,5 @@ public interface ProtocolDecoderOutput {
      * Flushes all messages you wrote via {@link #write(Object)} to
      * the next filter.
      */
-    void flush();
+    void flush(NextFilter nextFilter, IoSession session);
 }

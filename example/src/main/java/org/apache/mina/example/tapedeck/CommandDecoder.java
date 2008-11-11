@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
@@ -94,7 +95,7 @@ public class CommandDecoder extends TextLineDecoder {
             public void write(Object message) {
                 lines.add((String) message);
             }
-            public void flush() {}
+            public void flush(NextFilter nextFilter, IoSession session) {}
         });
         
         for (String s: lines) {

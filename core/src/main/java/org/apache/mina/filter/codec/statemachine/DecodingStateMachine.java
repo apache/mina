@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter.NextFilter;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.slf4j.Logger;
@@ -53,7 +55,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     private final List<Object> childProducts = new ArrayList<Object>();
 
     private final ProtocolDecoderOutput childOutput = new ProtocolDecoderOutput() {
-        public void flush() {
+        public void flush(NextFilter nextFilter, IoSession session) {
         }
 
         public void write(Object message) {

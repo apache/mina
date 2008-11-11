@@ -185,18 +185,16 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             throw new IllegalArgumentException(
                     "You can't add the same filter instance more than once.  Create another instance and add it.");
         }
+        
+        // Initialize the encoder and decoder
+        initCodec(parent.getSession());
     }
 
     @Override
     public void onPostRemove(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
-        // We just remove the two instances of encoder/decoder to release resources
-        // from the session
-        disposeEncoder(parent.getSession());
-        disposeDecoder(parent.getSession());
-        
-        // We also remove the callback  
-        disposeDecoderOut(parent.getSession());
+        // Clean everything
+        disposeCodec(parent.getSession());
     }
 
     /**
@@ -262,7 +260,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 }
                 
                 // Finish decoding if no exception was thrown.
-                decoderOut.flush();
+                decoderOut.flush(nextFilter, session);
             } catch (Throwable t) {
                 ProtocolDecoderException pde;
                 if (t instanceof ProtocolDecoderException) {
@@ -280,7 +278,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 }
 
                 // Fire the exceptionCaught event.
-                decoderOut.flush();
+                decoderOut.flush(nextFilter, session);
                 nextFilter.exceptionCaught(session, pde);
 
                 // Retry only if the type of the caught exception is
@@ -390,13 +388,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      */
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-        // Creates the decoder and stores it into the newly created session 
-        ProtocolDecoder decoder = factory.getDecoder(session);
-        session.setAttribute(DECODER, decoder);
-
-        // Creates the encoder and stores it into the newly created session 
-        ProtocolEncoder encoder = factory.getEncoder(session);
-        session.setAttribute(ENCODER, encoder);
+        // Initialized the encoder and decoder
+        initCodec(session);
 
         // Call the next filter
         nextFilter.sessionCreated(session);
@@ -407,19 +400,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             throws Exception {
         // Call finishDecode() first when a connection is closed.
         ProtocolDecoder decoder = getDecoder(session);
-        
-        if ( decoder == null) {
-            // The decoder must not be null. It's null if
-            // the sessionCreated message has not be called, for
-            // instance if the filter has been added after the 
-            // first session is created.
-            ProtocolDecoderException pde = new ProtocolDecoderException(
-                "Cannot decode if the decoder is null. Add the filter in the chain" +
-                "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
-            return;
-        }
-        
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         
         if ( decoderOut == null) {
@@ -445,13 +425,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             }
             throw pde;
         } finally {
-            // Dispose all.
-            disposeEncoder(session);
-            disposeDecoder(session);
-            disposeDecoderOut(session);
-            decoderOut.flush();
+            // Dispose everything
+            disposeCodec(session);
+            decoderOut.flush(nextFilter, session);
         }
 
+        // Call the next filter
         nextFilter.sessionClosed(session);
     }
 
@@ -464,44 +443,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             NextFilter nextFilter) {
         ProtocolDecoderOutput out = (ProtocolDecoderOutput) session.getAttribute(DECODER_OUT);
         if (out == null) {
-            out = new ProtocolDecoderOutputImpl(session, nextFilter);
+            out = new ProtocolDecoderOutputImpl();
             session.setAttribute(DECODER_OUT, out);
         }
         return out;
-    }
-
-    private void disposeEncoder(IoSession session) {
-        ProtocolEncoder encoder = (ProtocolEncoder) session
-                .removeAttribute(ENCODER);
-        if (encoder == null) {
-            return;
-        }
-
-        try {
-            encoder.dispose(session);
-        } catch (Throwable t) {
-            logger.warn(
-                    "Failed to dispose: " + encoder.getClass().getName() + " (" + encoder + ')');
-        }
-    }
-
-    private void disposeDecoder(IoSession session) {
-        ProtocolDecoder decoder = (ProtocolDecoder) session
-                .removeAttribute(DECODER);
-        if (decoder == null) {
-            return;
-        }
-
-        try {
-            decoder.dispose(session);
-        } catch (Throwable t) {
-            logger.warn(
-                    "Falied to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
-        }
-    }
-
-    private void disposeDecoderOut(IoSession session) {
-        session.removeAttribute(DECODER_OUT);
     }
 
     private static class EncodedWriteRequest extends DefaultWriteRequest {
@@ -524,16 +469,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
     private static class ProtocolDecoderOutputImpl extends
             AbstractProtocolDecoderOutput {
-        private final IoSession session;
-        private final NextFilter nextFilter;
-
-        public ProtocolDecoderOutputImpl(
-                IoSession session, NextFilter nextFilter) {
-            this.session = session;
-            this.nextFilter = nextFilter;
+        public ProtocolDecoderOutputImpl() {
         }
 
-        public void flush() {
+        public void flush(NextFilter nextFilter, IoSession session) {
             Queue<Object> messageQueue = getMessageQueue();
             while (!messageQueue.isEmpty()) {
                 nextFilter.messageReceived(session, messageQueue.poll());
@@ -600,5 +539,81 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 }
             }
         }
+    }
+    
+    //----------- Helper methods ---------------------------------------------
+    /**
+     * Initialize the encoder and the decoder, storing them in the 
+     * session attributes.
+     */
+    private void initCodec(IoSession session) throws Exception {
+        // Creates the decoder and stores it into the newly created session 
+        ProtocolDecoder decoder = factory.getDecoder(session);
+        session.setAttribute(DECODER, decoder);
+
+        // Creates the encoder and stores it into the newly created session 
+        ProtocolEncoder encoder = factory.getEncoder(session);
+        session.setAttribute(ENCODER, encoder);
+    }
+    
+    /**
+     * Dispose the encoder, decoder, and the callback for the decoded
+     * messages.
+     */
+    private void disposeCodec(IoSession session) {
+        // We just remove the two instances of encoder/decoder to release resources
+        // from the session
+        disposeEncoder(session);
+        disposeDecoder(session);
+        
+        // We also remove the callback  
+        disposeDecoderOut(session);
+    }
+    
+    /**
+     * dispose the encoder, removing its instance from the
+     * session's attributes, and calling the associated
+     * dispose method.
+     */
+    private void disposeEncoder(IoSession session) {
+        ProtocolEncoder encoder = (ProtocolEncoder) session
+                .removeAttribute(ENCODER);
+        if (encoder == null) {
+            return;
+        }
+
+        try {
+            encoder.dispose(session);
+        } catch (Throwable t) {
+            logger.warn(
+                    "Failed to dispose: " + encoder.getClass().getName() + " (" + encoder + ')');
+        }
+    }
+
+    /**
+     * dispose the decoder, removing its instance from the
+     * session's attributes, and calling the associated
+     * dispose method.
+     */
+    private void disposeDecoder(IoSession session) {
+        ProtocolDecoder decoder = (ProtocolDecoder) session
+                .removeAttribute(DECODER);
+        if (decoder == null) {
+            return;
+        }
+
+        try {
+            decoder.dispose(session);
+        } catch (Throwable t) {
+            logger.warn(
+                    "Falied to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
+        }
+    }
+
+    /**
+     * Remove the decoder callback from the session's attributes.
+     */
+    private void disposeDecoderOut(IoSession session) {
+        session.removeAttribute(DECODER_OUT);
     }
 }
