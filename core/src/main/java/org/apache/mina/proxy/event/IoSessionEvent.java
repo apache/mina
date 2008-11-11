@@ -36,14 +36,35 @@ public class IoSessionEvent {
     private final static Logger logger = LoggerFactory
             .getLogger(IoSessionEvent.class);
 
+    /**
+     * The next filter in the chain.
+     */
     private final NextFilter nextFilter;
 
+    /**
+     * The session.
+     */
     private final IoSession session;
 
+    /**
+     * The event type.
+     */
     private final IoSessionEventType type;
 
-    private IdleStatus status = null;
+    /**
+     * The idle status if type value is {@link IoSessionEventType#IDLE},
+     * null otherwise.
+     */
+    private IdleStatus status;
 
+    /**
+     * Creates an instance of this class when event type differs from 
+     * {@link IoSessionEventType#IDLE}.
+     * 
+     * @param nextFilter the next filter
+     * @param session the session
+     * @param type the event type
+     */
     public IoSessionEvent(final NextFilter nextFilter, final IoSession session,
             final IoSessionEventType type) {
         this.nextFilter = nextFilter;
@@ -51,11 +72,38 @@ public class IoSessionEvent {
         this.type = type;
     }
 
+    /**
+     * Creates an instance of this class when event type is 
+     * {@link IoSessionEventType#IDLE}.
+     * 
+     * @param nextFilter the next filter
+     * @param session the session
+     * @param status the idle status
+     */
+    public IoSessionEvent(final NextFilter nextFilter, final IoSession session,
+            final IdleStatus status) {
+        this(nextFilter, session, IoSessionEventType.IDLE);
+        this.status = status;
+    }
+    
+    /**
+     * Delivers this event to the next filter.
+     */
     public void deliverEvent() {
         logger.debug("Delivering event {}", this);
         deliverEvent(this.nextFilter, this.session, this.type, this.status);
     }
 
+    /**
+     * Static method which effectively delivers the specified event to the next filter
+     * <code>nextFilter</code> on the <code>session</code>.
+     * 
+     * @param nextFilter the next filter
+     * @param session the session on which the event occured
+     * @param type the event type
+     * @param status the idle status should only be non null only if the event type is 
+     * {@link IoSessionEventType#IDLE} 
+     */
     private static void deliverEvent(final NextFilter nextFilter,
             final IoSession session, final IoSessionEventType type,
             final IdleStatus status) {
@@ -75,6 +123,9 @@ public class IoSessionEvent {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(IoSessionEvent.class
@@ -87,22 +138,38 @@ public class IoSessionEvent {
         return sb.toString();
     }
 
+    /**
+     * Returns the idle status of the event.
+     * 
+     * @return the idle status of the event
+     */
     public IdleStatus getStatus() {
         return status;
     }
 
-    public void setStatus(IdleStatus status) {
-        this.status = status;
-    }
-
+    /**
+     * Returns the next filter to which the event should be sent.
+     * 
+     * @return the next filter
+     */
     public NextFilter getNextFilter() {
         return nextFilter;
     }
 
+    /**
+     * Returns the session on which the event occured.
+     * 
+     * @return the session
+     */
     public IoSession getSession() {
         return session;
     }
 
+    /**
+     * Returns the event type that occured.
+     * 
+     * @return the event type
+     */
     public IoSessionEventType getType() {
         return type;
     }

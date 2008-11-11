@@ -39,6 +39,9 @@ public class IoSessionEventQueue {
     private final static Logger logger = LoggerFactory
             .getLogger(IoSessionEventQueue.class);
 
+    /**
+     * The proxy session object.
+     */
     private ProxyIoSession proxyIoSession;
 
     /**

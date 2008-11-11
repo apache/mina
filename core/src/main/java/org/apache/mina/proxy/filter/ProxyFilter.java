@@ -30,6 +30,7 @@ import org.apache.mina.proxy.ProxyAuthException;
 import org.apache.mina.proxy.ProxyConnector;
 import org.apache.mina.proxy.ProxyLogicHandler;
 import org.apache.mina.proxy.event.IoSessionEvent;
+import org.apache.mina.proxy.event.IoSessionEventQueue;
 import org.apache.mina.proxy.event.IoSessionEventType;
 import org.apache.mina.proxy.handlers.ProxyRequest;
 import org.apache.mina.proxy.handlers.http.HttpSmartProxyHandler;
@@ -64,8 +65,14 @@ public class ProxyFilter extends IoFilterAdapter {
     }
 
     /**
-     * Called before the filter is added into the filter chain, creates the {@link ProxyLogicHandler} instance
-     * which will handle this session.
+     * Called before the filter is added into the filter chain.
+     * Checks if chain already holds an {@link ProxyFilter} instance. 
+     * 
+     * @param chain the filter chain
+     * @param name the name assigned to this filter
+     * @param nextFilter the next filter
+     * @throws IllegalStateException if chain already contains an instance of 
+     * {@link ProxyFilter}
      */
     @Override
     public void onPreAdd(final IoFilterChain chain, final String name,
@@ -77,7 +84,12 @@ public class ProxyFilter extends IoFilterAdapter {
     }
 
     /**
-     * Called when the filter is removed from the filter chain - cleans up the {@link ProxyIoSession} instance.
+     * Called when the filter is removed from the filter chain.
+     * Cleans the {@link ProxyIoSession} instance from the session.
+     * 
+     * @param chain the filter chain
+     * @param name the name assigned to this filter
+     * @param nextFilter the next filter
      */
     @Override
     public void onPreRemove(final IoFilterChain chain, final String name,
@@ -86,6 +98,15 @@ public class ProxyFilter extends IoFilterAdapter {
         session.removeAttribute(ProxyIoSession.PROXY_SESSION);
     }
 
+    /**
+     * Called when an exception occurs in the chain. A flag is set in the
+     * {@link ProxyIoSession} session's instance to signal that handshake
+     * failed.  
+     * 
+     * @param chain the filter chain
+     * @param name the name assigned to this filter
+     * @param nextFilter the next filter
+     */
     @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) throws Exception {
@@ -97,6 +118,9 @@ public class ProxyFilter extends IoFilterAdapter {
 
     /**
      * Get the {@link ProxyLogicHandler} for a given session.
+     * 
+     * @param session the session object
+     * @return the handler which will handle handshaking with the proxy
      */
     private ProxyLogicHandler getProxyHandler(final IoSession session) {
         ProxyLogicHandler handler = ((ProxyIoSession) session
@@ -106,6 +130,7 @@ public class ProxyFilter extends IoFilterAdapter {
             throw new IllegalStateException();
         }
 
+        // Sanity check
         if (handler.getProxyIoSession().getProxyFilter() != this) {
             throw new IllegalArgumentException("Not managed by this filter.");
         }
@@ -114,8 +139,12 @@ public class ProxyFilter extends IoFilterAdapter {
     }
 
     /**
-     * Receives data from the remote host, passes to the handler if a handshake is in progress, otherwise
-     * passes on transparently.
+     * Receives data from the remote host, passes to the handler if a handshake is in progress, 
+     * otherwise passes on transparently.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param session the session object
+     * @param message the object holding the received data
      */
     @Override
     public void messageReceived(final NextFilter nextFilter,
@@ -158,7 +187,12 @@ public class ProxyFilter extends IoFilterAdapter {
     }
 
     /**
-     * Filters outgoing writes, queueing them up if necessary whilst a handshake is ongoing.
+     * Filters outgoing writes, queueing them up if necessary while a handshake 
+     * is ongoing.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param session the session object
+     * @param writeRequest the data to write
      */
     @Override
     public void filterWrite(final NextFilter nextFilter,
@@ -167,7 +201,13 @@ public class ProxyFilter extends IoFilterAdapter {
     }
 
     /**
-     * Actually write data. Queues the data up unless it relates to the handshake or the handshake is done.
+     * Actually write data. Queues the data up unless it relates to the handshake or the 
+     * handshake is done.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param session the session object
+     * @param writeRequest the data to write
+     * @param isHandshakeData true if writeRequest is written by the proxy classes.
      */
     public void writeData(final NextFilter nextFilter, final IoSession session,
             final WriteRequest writeRequest, final boolean isHandshakeData) {
@@ -178,23 +218,18 @@ public class ProxyFilter extends IoFilterAdapter {
                 // Handshake is done - write data as normal
                 nextFilter.filterWrite(session, writeRequest);
             } else if (isHandshakeData) {
-                IoBuffer buf = (IoBuffer) writeRequest.getMessage();
-
-                // Writing handshake data - write
-                logger.debug("   handshake data: {}", buf);
-
+                logger.debug("   handshake data: {}", writeRequest.getMessage());
+                
+                // Writing handshake data
                 nextFilter.filterWrite(session, writeRequest);
             } else {
                 // Writing non-handshake data before the handshake finished
                 if (!session.isConnected()) {
                     // Not even connected - ignore
-                    logger
-                            .debug(" Write request on closed session. Request ignored.");
+                    logger.debug(" Write request on closed session. Request ignored.");
                 } else {
                     // Queue the data to be sent as soon as the handshake completes
-                    logger
-                            .debug(" Handshaking is not complete yet. Buffering write request.");
-
+                    logger.debug(" Handshaking is not complete yet. Buffering write request.");
                     handler.enqueueWriteRequest(nextFilter, writeRequest);
                 }
             }
@@ -202,7 +237,12 @@ public class ProxyFilter extends IoFilterAdapter {
     }
 
     /**
-     * Filter handshake-related messages from reaching the messageSent callbacks of downstream filters.
+     * Filter handshake related messages from reaching the messageSent callbacks of 
+     * downstream filters.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param session the session object
+     * @param writeRequest the data written
      */
     @Override
     public void messageSent(final NextFilter nextFilter,
@@ -217,6 +257,20 @@ public class ProxyFilter extends IoFilterAdapter {
         nextFilter.messageSent(session, writeRequest);
     }
 
+    /**
+     * Called when the session is created. Will create the handler able to handle
+     * the {@link ProxyIoSession#getRequest()} request stored in the session. Event
+     * is stored in an {@link IoSessionEventQueue} for later delivery to the next filter
+     * in the chain when the handshake would have succeed. This will prevent the rest of 
+     * the filter chain from being affected by this filter internals. 
+     * 
+     * Please note that this event can occur multiple times because of some http 
+     * proxies not handling keep-alive connections thus needing multiple sessions 
+     * during the handshake.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param session the session object
+     */
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session)
             throws Exception {
@@ -229,6 +283,8 @@ public class ProxyFilter extends IoFilterAdapter {
         // Create a HTTP proxy handler and start handshake.		
         ProxyLogicHandler handler = proxyIoSession.getHandler();
 
+        // This test prevents from loosing handler conversationnal state when
+        // reconnection occurs during an http handshake.
         if (handler == null) {
             ProxyRequest request = proxyIoSession.getRequest();
 
@@ -252,6 +308,14 @@ public class ProxyFilter extends IoFilterAdapter {
                         IoSessionEventType.CREATED));
     }
 
+    /**
+     * Event is stored in an {@link IoSessionEventQueue} for later delivery to the next filter
+     * in the chain when the handshake would have succeed. This will prevent the rest of 
+     * the filter chain from being affected by this filter internals.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param session the session object
+     */
     @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session)
             throws Exception {
@@ -262,17 +326,31 @@ public class ProxyFilter extends IoFilterAdapter {
                         IoSessionEventType.OPENED));
     }
 
+    /**
+     * Event is stored in an {@link IoSessionEventQueue} for later delivery to the next filter
+     * in the chain when the handshake would have succeed. This will prevent the rest of 
+     * the filter chain from being affected by this filter internals.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param session the session object
+     */    
     @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session,
             IdleStatus status) throws Exception {
         ProxyIoSession proxyIoSession = (ProxyIoSession) session
                 .getAttribute(ProxyIoSession.PROXY_SESSION);
-        IoSessionEvent evt = new IoSessionEvent(nextFilter, session,
-                IoSessionEventType.IDLE);
-        evt.setStatus(status);
-        proxyIoSession.getEventQueue().enqueueEventIfNecessary(evt);
+        proxyIoSession.getEventQueue().enqueueEventIfNecessary(
+                new IoSessionEvent(nextFilter, session, status));
     }
 
+    /**
+     * Event is stored in an {@link IoSessionEventQueue} for later delivery to the next filter
+     * in the chain when the handshake would have succeed. This will prevent the rest of 
+     * the filter chain from being affected by this filter internals.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param session the session object
+     */    
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session)
             throws Exception {

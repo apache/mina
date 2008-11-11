@@ -29,17 +29,28 @@ package org.apache.mina.proxy.event;
 public enum IoSessionEventType {
     CREATED(1), OPENED(2), IDLE(3), CLOSED(4);
 
+    /**
+     * The event type id.
+     */
     private final int id;
     
     private IoSessionEventType(int id) {
     	this.id = id;
     }
     
+    /**
+     * Returns the event id.
+     * 
+     * @return the event id
+     */
     public int getId() {
-		return id;
-	}
+	return id;
+    }
 
-	@Override
+    /**
+     * {@inheritDoc} 
+     */
+    @Override
     public String toString() {
         switch (this) {
         case CREATED:
