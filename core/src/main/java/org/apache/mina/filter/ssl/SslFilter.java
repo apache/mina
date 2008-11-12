@@ -49,7 +49,7 @@ import org.apache.mina.core.write.WriteToClosedSessionException;
  * a SSL 'hello' message, so you don't need to call
  * {@link #startSsl(IoSession)} manually unless you are implementing StartTLS
  * (see below).  If you don't want the handshake procedure to start
- * immediately, please specify {@code true} as {@code autoStart} parameter in
+ * immediately, please specify {@code false} as {@code autoStart} parameter in
  * the constructor.
  * <p>
  * This filter uses an {@link SSLEngine} which was introduced in Java 5, so
@@ -119,8 +119,7 @@ public class SslFilter extends IoFilterAdapter {
      * {@link SSLContext#createSSLEngine(String, int)} to be called passing the
      * hostname and port of the {@link InetSocketAddress} to get an
      * {@link SSLEngine} instance. If not set {@link SSLContext#createSSLEngine()}
-     * will be called.
-     * .
+     * will be called.<br/>
      * Using this feature {@link SSLSession} objects may be cached and reused
      * when in client mode.
      *
@@ -147,10 +146,14 @@ public class SslFilter extends IoFilterAdapter {
     private static final AttributeKey NEXT_FILTER = new AttributeKey(SslFilter.class, "nextFilter");
     private static final AttributeKey SSL_HANDLER = new AttributeKey(SslFilter.class, "handler");
 
-    // SSL Context
+    /** The SslContext used */
     private final SSLContext sslContext;
 
+    /** A flag used to tell the filter to start the handshake immediately */
     private final boolean autoStart;
+    
+    /** A flag used to determinate if the handshake should start immediately */
+    private static final boolean START_HANDSHAKE = true;
 
     private boolean client;
 
@@ -164,13 +167,16 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
+     * The handshake will start immediately.
      */
     public SslFilter(SSLContext sslContext) {
-        this(sslContext, true);
+        this(sslContext, START_HANDSHAKE);
     }
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
+     * If the <code>autostart</code> flag is set to <code>true</code>, the
+     * handshake will start immediately.
      */
     public SslFilter(SSLContext sslContext, boolean autoStart) {
         if (sslContext == null) {
@@ -225,7 +231,8 @@ public class SslFilter extends IoFilterAdapter {
      * is sent and any messages written after then is not goinf to get encrypted.
      */
     public boolean isSslStarted(IoSession session) {
-        SslHandler handler = getSslSessionHandler0(session);
+        SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
+        
         if (handler == null) {
             return false;
         }
@@ -558,7 +565,7 @@ public class SslFilter extends IoFilterAdapter {
     @Override
     public void filterClose(final NextFilter nextFilter, final IoSession session)
             throws SSLException {
-        SslHandler handler = getSslSessionHandler0(session);
+        SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
         if (handler == null) {
             // The connection might already have closed, or
             // SSL might have not started yet.
@@ -590,9 +597,11 @@ public class SslFilter extends IoFilterAdapter {
     private void initiateHandshake(NextFilter nextFilter, IoSession session)
             throws SSLException {
         SslHandler handler = getSslSessionHandler(session);
+        
         synchronized (handler) {
             handler.handshake(nextFilter);
         }
+        
         handler.flushScheduledEvents();
     }
 
@@ -647,18 +656,17 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     private SslHandler getSslSessionHandler(IoSession session) {
-        SslHandler handler = getSslSessionHandler0(session);
+        SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
+        
         if (handler == null) {
             throw new IllegalStateException();
         }
+        
         if (handler.getParent() != this) {
             throw new IllegalArgumentException("Not managed by this filter.");
         }
+        
         return handler;
-    }
-
-    private SslHandler getSslSessionHandler0(IoSession session) {
-        return (SslHandler) session.getAttribute(SSL_HANDLER);
     }
 
     /**
