@@ -353,14 +353,14 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
-    public final WriteFuture write(Object message) {
+    public WriteFuture write(Object message) {
         return write(message, null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public final WriteFuture write(Object message, SocketAddress remoteAddress) {
+    public WriteFuture write(Object message, SocketAddress remoteAddress) {
         if (message == null) {
             throw new NullPointerException("message");
         }
