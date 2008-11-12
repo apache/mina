@@ -55,6 +55,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     private final AttributeKey ENCODER = new AttributeKey(getClass(), "encoder");
     private final AttributeKey DECODER = new AttributeKey(getClass(), "decoder");
     private final AttributeKey DECODER_OUT = new AttributeKey(getClass(), "decoderOut");
+    private final AttributeKey ENCODER_OUT = new AttributeKey(getClass(), "encoderOut");
     
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
@@ -166,16 +167,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      */
     public ProtocolEncoder getEncoder(IoSession session) {
         return (ProtocolEncoder) session.getAttribute(ENCODER);
-    }
-
-    /**
-     * Get the decoder instance from a given session.
-     *
-     * @param session The associated session we will get the decoder from
-     * @return The decoder instance
-     */
-    public ProtocolDecoder getDecoder(IoSession session) {
-        return (ProtocolDecoder) session.getAttribute(DECODER);
     }
 
     @Override
@@ -298,39 +289,15 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         // Get the encoder in the session
         ProtocolEncoder encoder = getEncoder(session);
 
-        if ( encoder == null) {
-            // The encoder must not be null. It's null if
-            // the sessionCreated message has not be called, for
-            // instance if the filter has been added after the 
-            // first session is created.
-            ProtocolDecoderException pde = new ProtocolDecoderException(
-                "Cannot encode if the encoder is null. Add the filter in the chain" +
-                "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
-            return;
-        }
-        
-        ProtocolEncoderOutputImpl encoderOut = getEncoderOut(session,
+        ProtocolEncoderOutput encoderOut = getEncoderOut(session,
                 nextFilter, writeRequest);
 
-        if ( encoderOut == null) {
-            // The encoder must not be null. It's null if
-            // the sessionCreated message has not be called, for
-            // instance if the filter has been added after the 
-            // first session is created.
-            ProtocolDecoderException pde = new ProtocolDecoderException(
-                "Cannot encode if the encoder is null. Add the filter in the chain" +
-                "before the first session is created" ); 
-            nextFilter.exceptionCaught(session, pde);
-            return;
-        }
-        
         try {
             // Now we can try to encode the response
             encoder.encode(session, message, encoderOut);
             
             // Send it directly
-            encoderOut.flushWithoutFuture();
+            ((ProtocolEncoderOutputImpl)encoderOut).flushWithoutFuture();
             
             // Call the next filter
             nextFilter.filterWrite(session, new MessageWriteRequest(
@@ -394,11 +361,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         // Call the next filter
         nextFilter.sessionClosed(session);
-    }
-
-    private ProtocolEncoderOutputImpl getEncoderOut(IoSession session,
-            NextFilter nextFilter, WriteRequest writeRequest) {
-        return new ProtocolEncoderOutputImpl(session, nextFilter, writeRequest);
     }
 
     private static class EncodedWriteRequest extends DefaultWriteRequest {
@@ -495,23 +457,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     
     //----------- Helper methods ---------------------------------------------
     /**
-     * Return a reference to the decoder callback. If it's not already created
-     * and stored into the session, we create a new instance.
-     */
-    private ProtocolDecoderOutput getDecoderOut(IoSession session,
-            NextFilter nextFilter) {
-        ProtocolDecoderOutput out = (ProtocolDecoderOutput) session.getAttribute(DECODER_OUT);
-        
-        if (out == null) {
-            // Create a new instance, and stores it into the session
-            out = new ProtocolDecoderOutputImpl();
-            session.setAttribute(DECODER_OUT, out);
-        }
-        
-        return out;
-    }
-
-    /**
      * Initialize the encoder and the decoder, storing them in the 
      * session attributes.
      */
@@ -560,6 +505,16 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
 
     /**
+     * Get the decoder instance from a given session.
+     *
+     * @param session The associated session we will get the decoder from
+     * @return The decoder instance
+     */
+    private ProtocolDecoder getDecoder(IoSession session) {
+        return (ProtocolDecoder) session.getAttribute(DECODER);
+    }
+
+    /**
      * dispose the decoder, removing its instance from the
      * session's attributes, and calling the associated
      * dispose method.
@@ -577,6 +532,36 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             logger.warn(
                     "Falied to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
         }
+    }
+
+    /**
+     * Return a reference to the decoder callback. If it's not already created
+     * and stored into the session, we create a new instance.
+     */
+    private ProtocolDecoderOutput getDecoderOut(IoSession session,
+            NextFilter nextFilter) {
+        ProtocolDecoderOutput out = (ProtocolDecoderOutput) session.getAttribute(DECODER_OUT);
+        
+        if (out == null) {
+            // Create a new instance, and stores it into the session
+            out = new ProtocolDecoderOutputImpl();
+            session.setAttribute(DECODER_OUT, out);
+        }
+        
+        return out;
+    }
+
+    private ProtocolEncoderOutput getEncoderOut(IoSession session,
+        NextFilter nextFilter, WriteRequest writeRequest) {
+        ProtocolEncoderOutput out = (ProtocolEncoderOutput) session.getAttribute(ENCODER_OUT);
+        
+        if (out == null) {
+            // Create a new instance, and stores it into the session
+            out = new ProtocolEncoderOutputImpl(session, nextFilter, writeRequest);
+            session.setAttribute(ENCODER_OUT, out);
+        }
+        
+        return out;
     }
 
     /**
