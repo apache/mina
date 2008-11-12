@@ -31,8 +31,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -40,6 +38,11 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * TODO Add documentation
@@ -47,28 +50,28 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class SslFilterTest extends TestCase {
+public class SslFilterTest {
 
     private int port;
     private SocketAcceptor acceptor;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         acceptor = new NioSocketAcceptor();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         acceptor.setCloseOnDeactivation(true);
         acceptor.dispose();
-        super.tearDown();
     }
 
+    @Test
     public void testMessageSentIsCalled() throws Exception {
         testMessageSentIsCalled(false);
     }
 
+    @Test
     public void testMessageSentIsCalled_With_SSL() throws Exception {
         testMessageSentIsCalled(true);
     }
