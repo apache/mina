@@ -39,7 +39,7 @@ import org.apache.mina.util.ExceptionMonitor;
 public class DefaultIoFuture implements IoFuture {
 
     /** A number of seconds to wait between two deadlock controls ( 5 seconds ) */
-    private static final int DEAD_LOCK_CHECK_INTERVAL = 5000;
+    private static final long DEAD_LOCK_CHECK_INTERVAL = 5000L;
 
     private final IoSession session;
     
@@ -180,7 +180,8 @@ public class DefaultIoFuture implements IoFuture {
             try {
                 for (;;) {
                     try {
-                        lock.wait(Math.min(timeoutMillis, DEAD_LOCK_CHECK_INTERVAL));
+                        long timeOut = Math.min(timeoutMillis, DEAD_LOCK_CHECK_INTERVAL);
+                        lock.wait(timeOut);
                     } catch (InterruptedException e) {
                         if (interruptable) {
                             throw e;
@@ -190,7 +191,7 @@ public class DefaultIoFuture implements IoFuture {
                     if (ready) {
                         return true;
                     } else {
-                        if (endTime > System.currentTimeMillis()) {
+                        if (endTime < System.currentTimeMillis()) {
                             return ready;
                         }
                     }
