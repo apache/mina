@@ -38,14 +38,19 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
     private final static Logger logger = LoggerFactory
             .getLogger(Socks4LogicHandler.class);
 
+    /**
+     * {@inheritDoc}
+     */
     public Socks4LogicHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);
     }
 
     /**
-     * Perform any handshaking processing.
+     * Perform the handshake.
+     * 
+     * @param nextFilter the next filter
      */
-    public synchronized void doHandshake(final NextFilter nextFilter) {
+    public void doHandshake(final NextFilter nextFilter) {
         logger.debug(" doHandshake()");
 
         // Send request
@@ -53,9 +58,11 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
     }
 
     /**
-     * Encode a SOCKS4/SOCKS4a request and send it to the proxy server.
+     * Encode a SOCKS4/SOCKS4a request and writes it to the next filter
+     * so it can be sent to the proxy server.
      * 
-     * @param request The request to send.
+     * @param nextFilter the next filter
+     * @param request the request to send.
      */
     protected void writeRequest(final NextFilter nextFilter,
             final SocksProxyRequest request) {
@@ -101,11 +108,14 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
     /**
      * Handle incoming data during the handshake process. Should consume only the
      * handshake data from the buffer, leaving any extra data in place.
+     * 
+     * @param nextFilter the next filter
+     * @param buf the server response data buffer
      */
-    public synchronized void messageReceived(final NextFilter nextFilter,
+    public void messageReceived(final NextFilter nextFilter,
             final IoBuffer buf) {
         try {
-            if (buf.remaining() >= 8) {
+            if (buf.remaining() >= SocksProxyConstants.SOCKS_4_RESPONSE_SIZE) {
                 handleResponse(buf);
             }
         } catch (Exception ex) {
@@ -114,9 +124,13 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
     }
 
     /**
-     * Handle a SOCKS4/SOCKS4a response from the proxy server.
+     * Handle a SOCKS4/SOCKS4a response from the proxy server. Test
+     * the response buffer reply code and call {@link #setHandshakeComplete()}
+     * if access is granted.
      * 
-     * @param response The response.
+     * @param buf the buffer holding the server response data.
+     * @throws exception if server response is malformed or if request is rejected
+     * by the proxy server.
      */
     protected void handleResponse(final IoBuffer buf) throws Exception {
         byte first = buf.get(0);
@@ -127,7 +141,9 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
 
         byte status = buf.get(1);
 
-        buf.position(buf.position() + 8);
+        // Consumes all the response data from the buffer
+        buf.position(buf.position() + SocksProxyConstants.SOCKS_4_RESPONSE_SIZE);
+        
         if (status == SocksProxyConstants.V4_REPLY_REQUEST_GRANTED) {
             setHandshakeComplete();
         } else {
