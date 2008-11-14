@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.session.TrafficMask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +43,8 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
     
     @Override
     public void sessionCreated(IoSession session) throws Exception {
-        session.setTrafficMask(TrafficMask.NONE);
+        session.suspendRead();
+        session.suspendWrite();
     }
 
     @Override
@@ -52,7 +52,7 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         if (session.getAttribute( OTHER_IO_SESSION ) != null) {
             IoSession sess = (IoSession) session.getAttribute(OTHER_IO_SESSION);
             sess.setAttribute(OTHER_IO_SESSION, null);
-            sess.closeOnFlush();
+            sess.close(false);
             session.setAttribute(OTHER_IO_SESSION, null);
         }
     }

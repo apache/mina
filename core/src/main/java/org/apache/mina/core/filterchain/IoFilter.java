@@ -22,7 +22,6 @@ package org.apache.mina.core.filterchain;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.session.TrafficMask;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.util.ReferenceCountingFilter;
 
@@ -209,12 +208,6 @@ public interface IoFilter {
             WriteRequest writeRequest) throws Exception;
     
     /**
-     * Filters {@link IoSession#setTrafficMask(TrafficMask)} method invocation.
-     */
-    void filterSetTrafficMask(
-            NextFilter nextFilter, IoSession session, TrafficMask trafficMask) throws Exception;
-
-    /**
      * Represents the next {@link IoFilter} in {@link IoFilterChain}.
      */
     public interface NextFilter {
@@ -263,9 +256,5 @@ public interface IoFilter {
          */
         void filterClose(IoSession session);
         
-        /**
-         * Forwards <tt>filterSetTrafficMask</tt> event to next filter.
-         */
-        void filterSetTrafficMask(IoSession session, TrafficMask trafficMask);
     }
 }

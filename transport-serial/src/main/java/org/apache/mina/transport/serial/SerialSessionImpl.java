@@ -277,7 +277,7 @@ class SerialSessionImpl extends AbstractIoSession implements
             serviceListeners.fireSessionDestroyed(SerialSessionImpl.this);
         }
 
-        public void updateTrafficMask(SerialSessionImpl session) {
+        public void updateTrafficControl(SerialSessionImpl session) {
             throw new UnsupportedOperationException();
         }
 

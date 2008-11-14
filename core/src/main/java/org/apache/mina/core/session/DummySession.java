@@ -78,7 +78,7 @@ public class DummySession extends AbstractIoSession {
     };
 
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
-    private final IoProcessor<IoSession> processor;
+    private final IoProcessor<AbstractIoSession> processor;
 
     private volatile IoHandler handler = new IoHandlerAdapter();
     private volatile SocketAddress localAddress = ANONYMOUS_ADDRESS;
@@ -128,11 +128,11 @@ public class DummySession extends AbstractIoSession {
 
         service = acceptor;
 
-        processor = new IoProcessor<IoSession>() {
-            public void add(IoSession session) {
+        processor = new IoProcessor<AbstractIoSession>() {
+            public void add(AbstractIoSession session) {
             }
 
-            public void flush(IoSession session) {
+            public void flush(AbstractIoSession session) {
                 DummySession s = (DummySession) session;
                 WriteRequest req = s.getWriteRequestQueue().poll(session);
                 Object m = req.getMessage();
@@ -148,10 +148,10 @@ public class DummySession extends AbstractIoSession {
                 getFilterChain().fireMessageSent(req);
             }
 
-            public void remove(IoSession session) {
+            public void remove(AbstractIoSession session) {
             }
 
-            public void updateTrafficMask(IoSession session) {
+            public void updateTrafficControl(AbstractIoSession session) {
             }
 
             public void dispose() {
@@ -164,6 +164,7 @@ public class DummySession extends AbstractIoSession {
             public boolean isDisposing() {
                 return false;
             }
+
         };
 
         try {
@@ -256,7 +257,7 @@ public class DummySession extends AbstractIoSession {
     }
 
     @Override
-    public final IoProcessor<IoSession> getProcessor() {
+    public final IoProcessor<AbstractIoSession> getProcessor() {
         return processor;
     }
 

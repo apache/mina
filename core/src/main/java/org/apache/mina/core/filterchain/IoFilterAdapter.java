@@ -21,7 +21,6 @@ package org.apache.mina.core.filterchain;
 
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.session.TrafficMask;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
@@ -143,14 +142,6 @@ public class IoFilterAdapter implements IoFilter {
     public void filterClose(NextFilter nextFilter, IoSession session)
             throws Exception {
         nextFilter.filterClose(session);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void filterSetTrafficMask(NextFilter nextFilter, IoSession session,
-            TrafficMask trafficMask) throws Exception {
-        nextFilter.filterSetTrafficMask(session, trafficMask);
     }
     
     public String toString() {

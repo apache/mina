@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.FileChannel;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,6 +49,7 @@ import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteException;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
+import org.apache.mina.core.write.WriteTimeoutException;
 import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.apache.mina.util.CircularQueue;
 import org.apache.mina.util.ExceptionMonitor;
@@ -102,7 +104,10 @@ public abstract class AbstractIoSession implements IoSession {
     private final CloseFuture closeFuture = new DefaultCloseFuture(this);
 
     private volatile boolean closing;
-    private volatile TrafficMask trafficMask = TrafficMask.ALL;
+    
+    // traffic control
+    private boolean readSuspended=false;
+    private boolean writeSuspended=false;
 
     // Status variables
     private final AtomicBoolean scheduledForFlush = new AtomicBoolean();
@@ -220,10 +225,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public final CloseFuture close() {
+    private final CloseFuture close() {
         synchronized (lock) {
             if (isClosing()) {
                 return closeFuture;
@@ -236,10 +238,7 @@ public abstract class AbstractIoSession implements IoSession {
         return closeFuture;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public final CloseFuture closeOnFlush() {
+    private final CloseFuture closeOnFlush() {
         getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);
         return closeFuture;
@@ -548,63 +547,67 @@ public abstract class AbstractIoSession implements IoSession {
             new CloseRequestAwareWriteRequestQueue(writeRequestQueue);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public final TrafficMask getTrafficMask() {
-        return trafficMask;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public final void setTrafficMask(TrafficMask trafficMask) {
-        if (trafficMask == null) {
-            throw new NullPointerException("trafficMask");
-        }
-
-        if (isClosing() || !isConnected()) {
-            return;
-        }
-
-        getFilterChain().fireFilterSetTrafficMask(trafficMask);
-    }
-
-    /**
-     * TODO Add method documentation
-     */
-    public final void setTrafficMaskNow(TrafficMask trafficMask) {
-        this.trafficMask = trafficMask;
-    }
 
     /**
      * {@inheritDoc}
      */
     public final void suspendRead() {
-        setTrafficMask(getTrafficMask().and(TrafficMask.READ.not()));
+        readSuspended = true;
+        if (isClosing() || !isConnected()) {
+            return;
+        }
+        getProcessor().updateTrafficControl(this);
     }
 
     /**
      * {@inheritDoc}
      */
     public final void suspendWrite() {
-        setTrafficMask(getTrafficMask().and(TrafficMask.WRITE.not()));
+        writeSuspended = true;
+        if (isClosing() || !isConnected()) {
+            return;
+        }
+        getProcessor().updateTrafficControl(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public final void resumeRead() {
-        setTrafficMask(getTrafficMask().or(TrafficMask.READ));
+    @SuppressWarnings("unchecked")
+	public final void resumeRead() {
+        readSuspended = false;
+        if (isClosing() || !isConnected()) {
+            return;
+        }
+        getProcessor().updateTrafficControl(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public final void resumeWrite() {
-        setTrafficMask(getTrafficMask().or(TrafficMask.WRITE));
+    @SuppressWarnings("unchecked")
+	public final void resumeWrite() {
+        writeSuspended = false;
+        if (isClosing() || !isConnected()) {
+            return;
+        }
+        getProcessor().updateTrafficControl(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isReadSuspended() {
+    	return readSuspended;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isWriteSuspended() {
+    	return writeSuspended; 
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -1152,6 +1155,81 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
+    /**
+     * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable
+     * sessions in the specified collection.
+     *
+     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
+     */
+    public static void notifyIdleness(Iterator<? extends IoSession> sessions, long currentTime) {
+        IoSession s = null;
+        while (sessions.hasNext()) {
+            s = sessions.next();
+            notifyIdleSession(s, currentTime);
+        }
+    }
+
+    /**
+     * Fires a {@link IoEventType#SESSION_IDLE} event if applicable for the
+     * specified {@code session}.
+     *
+     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
+     */
+    public static void notifyIdleSession(IoSession session, long currentTime) {
+        notifyIdleSession0(
+                session, currentTime,
+                session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                IdleStatus.BOTH_IDLE, Math.max(
+                    session.getLastIoTime(),
+                    session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
+
+        notifyIdleSession0(
+                session, currentTime,
+                session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                IdleStatus.READER_IDLE, Math.max(
+                    session.getLastReadTime(),
+                    session.getLastIdleTime(IdleStatus.READER_IDLE)));
+
+        notifyIdleSession0(
+                session, currentTime,
+                session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                IdleStatus.WRITER_IDLE, Math.max(
+                    session.getLastWriteTime(),
+                    session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
+
+        notifyWriteTimeout(session, currentTime);
+    }
+
+    private static void notifyIdleSession0(
+            IoSession session, long currentTime,
+            long idleTime, IdleStatus status, long lastIoTime) {
+        if (idleTime > 0 && lastIoTime != 0
+                && currentTime - lastIoTime >= idleTime) {
+            session.getFilterChain().fireSessionIdle(status);
+        }
+    }
+
+    private static void notifyWriteTimeout(
+            IoSession session, long currentTime) {
+
+        long writeTimeout = session.getConfig().getWriteTimeoutInMillis();
+        if (writeTimeout > 0 &&
+                currentTime - session.getLastWriteTime() >= writeTimeout &&
+                !session.getWriteRequestQueue().isEmpty(session)) {
+            WriteRequest request = session.getCurrentWriteRequest();
+            if (request != null) {
+                session.setCurrentWriteRequest(null);
+                WriteTimeoutException cause = new WriteTimeoutException(request);
+                request.getFuture().setException(cause);
+                session.getFilterChain().fireExceptionCaught(cause);
+                // WriteException is an IOException, so we close the session.
+                session.close(true);
+            }
+        }
+    }
+
+    
+    
     /**
      * TODO Add method documentation. Name is ridiculously too long.
      */

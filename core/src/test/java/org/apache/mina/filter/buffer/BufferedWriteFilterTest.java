@@ -99,6 +99,6 @@ public class BufferedWriteFilterTest extends TestCase {
         // Flush the final byte
         bFilter.flush(sess);
         
-        sess.close();
+        sess.close(true);
     }
 }

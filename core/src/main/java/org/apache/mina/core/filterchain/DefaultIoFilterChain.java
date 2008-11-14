@@ -33,7 +33,6 @@ import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.session.TrafficMask;
 import org.apache.mina.core.write.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -489,7 +488,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         } else {
             // Please note that this place is not the only place that
             // calls ConnectFuture.setException().
-            session.close();
+            session.close(true);
             future.setException(cause);
         }
     }
@@ -521,23 +520,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.filterClose(nextFilter, session);
-        } catch (Throwable e) {
-            fireExceptionCaught(e);
-        }
-    }
-
-    public void fireFilterSetTrafficMask(TrafficMask trafficMask) {
-        Entry tail = this.tail;
-        callPreviousFilterSetTrafficMask(tail, session, trafficMask);
-    }
-
-    private void callPreviousFilterSetTrafficMask(Entry entry,
-            IoSession session, TrafficMask trafficMask) {
-        try {
-            IoFilter filter = entry.getFilter();
-            NextFilter nextFilter = entry.getNextFilter();
-            filter.filterSetTrafficMask(nextFilter,
-                    session, trafficMask);
         } catch (Throwable e) {
             fireExceptionCaught(e);
         }
@@ -646,7 +628,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             }
 
             s.getWriteRequestQueue().offer(s, writeRequest);
-            if (s.getTrafficMask().isWritable()) {
+            if (!s.isWriteSuspended()) {
                 s.getProcessor().flush(s);
             }
         }
@@ -655,18 +637,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
         @Override
         public void filterClose(NextFilter nextFilter, IoSession session)
                 throws Exception {
-            ((AbstractIoSession) session).getProcessor().remove(session);
+            ((AbstractIoSession) session).getProcessor().remove(((AbstractIoSession) session));
         }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void filterSetTrafficMask(NextFilter nextFilter,
-                IoSession session, TrafficMask trafficMask) throws Exception {
-            AbstractIoSession s = (AbstractIoSession) session;
-            s.setTrafficMaskNow(trafficMask);
-            s.getProcessor().updateTrafficMask(s);
-        }
-
     }
 
     private static class TailFilter extends IoFilterAdapter {
@@ -845,13 +817,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 public void filterClose(IoSession session) {
                     Entry nextEntry = EntryImpl.this.prevEntry;
                     callPreviousFilterClose(nextEntry, session);
-                }
-
-                public void filterSetTrafficMask(IoSession session,
-                        TrafficMask trafficMask) {
-                    Entry nextEntry = EntryImpl.this.prevEntry;
-                    callPreviousFilterSetTrafficMask(nextEntry, session,
-                            trafficMask);
                 }
                 
                 public String toString() {

@@ -426,7 +426,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         @Override
         public void sessionIdle(IoSession session, IdleStatus status)
                 throws Exception {
-            session.close();
+            session.close(true);
         }
 
         @Override
@@ -449,7 +449,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
                 bytesRead++;
             }
             if (bytesRead >= size) {
-                session.close();
+                session.close(true);
             }
         }
     }

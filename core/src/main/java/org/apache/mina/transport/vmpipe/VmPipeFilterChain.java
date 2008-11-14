@@ -87,9 +87,9 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
         Object data = e.getParameter();
 
         if (type == IoEventType.MESSAGE_RECEIVED) {
-            if (sessionOpened && session.getTrafficMask().isReadable() && session.getLock().tryLock()) {
+            if (sessionOpened && (! session.isReadSuspended() ) && session.getLock().tryLock()) {
                 try {
-                    if (!session.getTrafficMask().isReadable()) {
+                    if (session.isReadSuspended()) {
                         session.receivedMessageQueue.add(data);
                     } else {
                         super.fireMessageReceived(data);
@@ -127,8 +127,8 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     }
 
     private static void flushPendingDataQueues(VmPipeSession s) {
-        s.getProcessor().updateTrafficMask(s);
-        s.getRemoteSession().getProcessor().updateTrafficMask(s);
+        s.getProcessor().updateTrafficControl(s);
+        s.getRemoteSession().getProcessor().updateTrafficControl(s);
     }
 
     @Override
@@ -241,7 +241,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 session.getLock().lock();
                 if (!session.getCloseFuture().isClosed()) {
                     session.getServiceListeners().fireSessionDestroyed(session);
-                    session.getRemoteSession().close();
+                    session.getRemoteSession().close(true);
                 }
             } finally {
                 session.getLock().unlock();
@@ -252,8 +252,8 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
             // Unused
         }
 
-        public void updateTrafficMask(VmPipeSession session) {
-            if (session.getTrafficMask().isReadable()) {
+        public void updateTrafficControl(VmPipeSession session) {
+            if ( ! session.isReadSuspended()) {
                 List<Object> data = new ArrayList<Object>();
                 session.receivedMessageQueue.drainTo(data);
                 for (Object aData : data) {
@@ -261,7 +261,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 }
             }
 
-            if (session.getTrafficMask().isWritable()) {
+            if ( ! session.isWriteSuspended()) {
                 flush(session);
             }
         }

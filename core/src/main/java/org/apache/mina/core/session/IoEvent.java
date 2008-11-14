@@ -75,9 +75,6 @@ public class IoEvent implements Runnable {
         case WRITE:
             getSession().getFilterChain().fireFilterWrite((WriteRequest) getParameter());
             break;
-        case SET_TRAFFIC_MASK:
-            getSession().getFilterChain().fireFilterSetTrafficMask((TrafficMask) getParameter());
-            break;
         case CLOSE:
             getSession().getFilterChain().fireFilterClose();
             break;

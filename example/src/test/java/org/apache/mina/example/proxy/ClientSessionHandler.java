@@ -162,6 +162,6 @@ public class ClientSessionHandler extends AbstractProxyIoHandler {
     public void exceptionCaught(IoSession session, Throwable cause) {
         logger.debug("CLIENT - Exception caught");
         cause.printStackTrace();
-        session.close();
+        session.close(true);
     }
 }

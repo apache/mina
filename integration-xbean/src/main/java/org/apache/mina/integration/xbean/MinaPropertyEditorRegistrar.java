@@ -25,11 +25,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.apache.mina.core.session.TrafficMask;
-import org.apache.mina.integration.beans.BooleanEditor;
 import org.apache.mina.integration.beans.InetAddressEditor;
 import org.apache.mina.integration.beans.InetSocketAddressEditor;
-import org.apache.mina.integration.beans.TrafficMaskEditor;
 import org.apache.mina.integration.beans.VmPipeAddressEditor;
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
 import org.springframework.beans.PropertyEditorRegistrar;
@@ -72,7 +69,6 @@ public class MinaPropertyEditorRegistrar implements PropertyEditorRegistrar
         registry.registerCustomEditor( InetAddress.class, new InetAddressEditor() );
         registry.registerCustomEditor( InetSocketAddress.class, new InetSocketAddressEditor() );
         registry.registerCustomEditor( SocketAddress.class, new InetSocketAddressEditor() );
-        registry.registerCustomEditor( TrafficMask.class, new TrafficMaskEditor() );
         registry.registerCustomEditor( VmPipeAddress.class, new VmPipeAddressEditor() );
         // registry.registerCustomEditor( Boolean.class, new BooleanEditor() );
     }

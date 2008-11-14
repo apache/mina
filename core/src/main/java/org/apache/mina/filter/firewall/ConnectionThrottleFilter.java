@@ -123,7 +123,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
             throws Exception {
         if (!isConnectionOk(session)) {
             logger.warn("Connections coming in too fast; closing.");
-            session.close();
+            session.close(true);
         }
         nextFilter.sessionCreated(session);
     }

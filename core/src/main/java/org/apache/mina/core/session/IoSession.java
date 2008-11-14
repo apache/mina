@@ -161,20 +161,6 @@ public interface IoSession {
     WriteFuture write(Object message, SocketAddress destination);
 
     /**
-     * Closes this session immediately.  This operation is asynchronous.
-     * Wait for the returned {@link CloseFuture} if you want to wait for
-     * the session actually closed.
-     */
-    CloseFuture close();
-
-    /**
-     * Closes this session after all queued write requests are flushed.
-     * This operation is asynchronous.  Wait for the returned {@link CloseFuture}
-     * if you want to wait for the session actually closed.
-     */
-    CloseFuture closeOnFlush();
-
-    /**
      * Closes this session immediately or after all queued write requests
      * are flushed.  This operation is asynchronous.  Wait for the returned
      * {@link CloseFuture} if you want to wait for the session actually closed.
@@ -366,18 +352,6 @@ public interface IoSession {
     SocketAddress getServiceAddress();
 
     /**
-     * Returns the current {@link TrafficMask} of this session.
-     */
-    TrafficMask getTrafficMask();
-
-    /**
-     * Sets the {@link TrafficMask} of this session which will result
-     * the parent {@link IoService} to start to control the traffic
-     * of this session immediately.
-     */
-    void setTrafficMask(TrafficMask trafficMask);
-
-    /**
      * 
      * TODO setWriteRequestQueue.
      *
@@ -386,17 +360,37 @@ public interface IoSession {
     void setCurrentWriteRequest(WriteRequest currentWriteRequest);
     
     /**
-     * A shortcut method for {@link #setTrafficMask(TrafficMask)} that
-     * suspends read operations for this session.
+     * Suspends read operations for this session.
      */
     void suspendRead();
 
     /**
-     * A shortcut method for {@link #setTrafficMask(TrafficMask)} that
-     * suspends write operations for this session.
+     * Suspends write operations for this session.
      */
     void suspendWrite();
 
+    /**
+     * Resumes read operations for this session.
+     */
+    void resumeRead();
+
+    /**
+     * Resumes write operations for this session.
+     */
+    void resumeWrite();
+    
+    /**
+     * Is read operation is suspended for this session. 
+     * @return <code>true</code> if suspended
+     */
+    boolean isReadSuspended();
+    
+    /**
+     * Is write operation is suspended for this session.
+     * @return <code>true</code> if suspended
+     */
+    boolean isWriteSuspended();
+    
     /**
      * Update all statistical properties related with throughput assuming
      * the specified time is the current time.  By default this method returns
@@ -410,18 +404,6 @@ public interface IoSession {
      */
     void updateThroughput(long currentTime, boolean force);
     
-    /**
-     * A shortcut method for {@link #setTrafficMask(TrafficMask)} that
-     * resumes read operations for this session.
-     */
-    void resumeRead();
-
-    /**
-     * A shortcut method for {@link #setTrafficMask(TrafficMask)} that
-     * resumes write operations for this session.
-     */
-    void resumeWrite();
-
     /**
      * Returns the total number of bytes which were read from this session.
      */

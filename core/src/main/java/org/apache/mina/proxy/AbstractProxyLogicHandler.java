@@ -200,7 +200,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
             logger.error(message);
         }
 
-        getSession().close();
+        getSession().close(true);
     }
 
     protected void closeSession(final String message) {

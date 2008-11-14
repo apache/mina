@@ -189,8 +189,8 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
         getProcessor(session).remove(session);
     }
 
-    public final void updateTrafficMask(T session) {
-        getProcessor(session).updateTrafficMask(session);
+    public final void updateTrafficControl(T session) {
+        getProcessor(session).updateTrafficControl(session);
     }
     
     public boolean isDisposed() {

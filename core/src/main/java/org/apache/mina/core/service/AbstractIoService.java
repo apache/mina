@@ -41,7 +41,6 @@ import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.DefaultIoSessionDataStructureFactory;
 import org.apache.mina.core.session.IdleStatus;
-import org.apache.mina.core.session.IdleStatusChecker;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionDataStructureFactory;
@@ -105,12 +104,9 @@ public abstract class AbstractIoService implements IoService {
             _stats.setLastWriteTime(s.getActivationTime());
             _stats.setLastThroughputCalculationTime(s.getActivationTime());
 
-            // Start idleness notification.
-            idleStatusChecker.addService(s);
         }
 
         public void serviceDeactivated(IoService service) {
-            idleStatusChecker.removeService((AbstractIoService) service);
         }
 
         public void serviceIdle(IoService service, IdleStatus idleStatus) {
@@ -147,17 +143,11 @@ public abstract class AbstractIoService implements IoService {
 
     private IoFuture disposalFuture;
 
-    private final IdleStatusChecker idleStatusChecker = new IdleStatusChecker();
-
     /**
      * {@inheritDoc}
      */
     private IoServiceStatistics stats = new IoServiceStatistics(this);
     
-    /**
-     * Reference to the object holding all the idle state vars.
-     */    
-    private IoServiceIdleState idleState = new IoServiceIdleState(this);
 
     /**
      * Constructor for {@link AbstractIoService}. You need to provide a default
@@ -208,8 +198,6 @@ public abstract class AbstractIoService implements IoService {
         }
 
         threadName = getClass().getSimpleName() + '-' + id.incrementAndGet();
-
-        executeWorker(idleStatusChecker.getNotifyingTask(), "idleStatusChecker");
     }
 
     /**
@@ -300,8 +288,7 @@ public abstract class AbstractIoService implements IoService {
                 }
             }
         }
-
-        idleStatusChecker.getNotifyingTask().cancel();
+        
         if (disposalFuture != null) {
             disposalFuture.awaitUninterruptibly();
         }
@@ -398,13 +385,6 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
-    public IoServiceIdleState getIdleState() {
-        return idleState;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public IoServiceStatistics getStatistics() {
         return stats;
     }
@@ -442,9 +422,6 @@ public abstract class AbstractIoService implements IoService {
         return listeners;
     }
 
-    protected final IdleStatusChecker getIdleStatusChecker() {
-        return idleStatusChecker;
-    }
 
     protected final void executeWorker(Runnable worker) {
         executeWorker(worker, null);
@@ -561,10 +538,4 @@ public abstract class AbstractIoService implements IoService {
         return stats.getScheduledWriteMessages();
     }
     
-    /**
-     * TODO
-     */    
-    public void notifyIdleness(long currentTime) {
-        idleState.notifyIdleness(currentTime);
-    }
 }

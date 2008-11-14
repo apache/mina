@@ -25,55 +25,75 @@ import java.util.Set;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.IoFutureListener;
-import org.apache.mina.core.service.AbstractIoService;
 import org.apache.mina.core.service.IoService;
-import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.core.write.WriteTimeoutException;
 import org.apache.mina.util.ConcurrentHashSet;
 
 /**
  * Detects idle sessions and fires <tt>sessionIdle</tt> events to them.
+ * To be used for service unable to trigger idle events alone, like VmPipe
+ * or SerialTransport. Polling base transport are advised to trigger idle 
+ * events alone, using the poll/select timeout. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev: 525369 $, $Date: 2007-04-04 05:05:11 +0200 (mer., 04 avr. 2007) $
  */
 public class IdleStatusChecker {
-    private final Set<AbstractIoSession> sessions =
+    
+	// the list of session to check
+	private final Set<AbstractIoSession> sessions =
         new ConcurrentHashSet<AbstractIoSession>();
-    private final Set<AbstractIoService> services =
-        new ConcurrentHashSet<AbstractIoService>();
 
+    /* create a task you can execute in the transport code,
+     * if the transport is like NIO or APR you don't need to call it,
+     * you just need to call the needed static sessions on select()/poll() 
+     * timeout.
+     */ 
     private final NotifyingTask notifyingTask = new NotifyingTask();
+    
     private final IoFutureListener<IoFuture> sessionCloseListener =
         new SessionCloseListener();
 
     public IdleStatusChecker() {}
 
+    /**
+     * Add the session for being checked for idle. 
+     * @param session the session to check
+     */
     public void addSession(AbstractIoSession session) {
         sessions.add(session);
         CloseFuture closeFuture = session.getCloseFuture();
+        
+        // isn't service reponsability to remove the session nicely ?
         closeFuture.addListener(sessionCloseListener);
     }
 
-    public void addService(AbstractIoService service) {
-        services.add(service);
-    }
-
-    public void removeSession(AbstractIoSession session) {
+    /**
+     * remove a session from the list of session being checked.
+     * @param session
+     */
+    private void removeSession(AbstractIoSession session) {
         sessions.remove(session);
     }
 
-    public void removeService(AbstractIoService service) {
-        services.remove(service);
-    }
-
+    /**
+     * get a runnable task able to be scheduled in the {@link IoService} executor.
+     * @return
+     */
     public NotifyingTask getNotifyingTask() {
         return notifyingTask;
     }
 
+    /**
+     * The class to place in the transport executor for checking the sessions idle 
+     */
     public class NotifyingTask implements Runnable {
         private volatile boolean cancelled;
         private volatile Thread thread;
+        
+        // we forbid instantiation of this class outside
+        private NotifyingTask() {
+        	
+        }
 
         public void run() {
             thread = Thread.currentThread();
@@ -81,7 +101,7 @@ public class IdleStatusChecker {
                 while (!cancelled) {
                     // Check idleness with fixed delay (1 second).
                     long currentTime = System.currentTimeMillis();
-                    notifyServices(currentTime);
+
                     notifySessions(currentTime);
 
                     try {
@@ -95,6 +115,9 @@ public class IdleStatusChecker {
             }
         }
 
+        /**
+         * stop execution of the task
+         */
         public void cancel() {
             cancelled = true;
             Thread thread = this.thread;
@@ -103,22 +126,12 @@ public class IdleStatusChecker {
             }
         }
 
-        private void notifyServices(long currentTime) {
-            Iterator<AbstractIoService> it = services.iterator();
-            while (it.hasNext()) {
-                AbstractIoService service = it.next();
-                if (service.isActive()) {
-                    notifyIdleness(service, currentTime, false);
-                }
-            }
-        }
-
         private void notifySessions(long currentTime) {
             Iterator<AbstractIoSession> it = sessions.iterator();
             while (it.hasNext()) {
                 AbstractIoSession session = it.next();
                 if (session.isConnected()) {
-                    notifyIdleSession(session, currentTime);
+                    AbstractIoSession.notifyIdleSession(session, currentTime);
                 }
             }
         }
@@ -128,100 +141,5 @@ public class IdleStatusChecker {
         public void operationComplete(IoFuture future) {
             removeSession((AbstractIoSession) future.getSession());
         }
-    }
-
-    /**
-     * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable
-     * sessions in the specified collection.
-     *
-     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
-     */
-    public static void notifyIdleness(Iterator<? extends IoSession> sessions, long currentTime) {
-        IoSession s = null;
-        while (sessions.hasNext()) {
-            s = sessions.next();
-            notifyIdleSession(s, currentTime);
-        }
-    }
-
-    public static void notifyIdleness(IoService service, long currentTime) {
-        notifyIdleness(service, currentTime, true);
-    }
-
-    private static void notifyIdleness(IoService service, long currentTime, boolean includeSessions) {
-        if (!(service instanceof AbstractIoService)) {
-            return;
-        }
-
-        ((AbstractIoService) service).notifyIdleness(currentTime);
-
-        if (includeSessions) {
-            notifyIdleness(service.getManagedSessions().values().iterator(), currentTime);
-        }
-    }
-
-    /**
-     * Fires a {@link IoEventType#SESSION_IDLE} event if applicable for the
-     * specified {@code session}.
-     *
-     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
-     */
-    public static void notifyIdleSession(IoSession session, long currentTime) {
-        notifyIdleSession0(
-                session, currentTime,
-                session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
-                IdleStatus.BOTH_IDLE, Math.max(
-                    session.getLastIoTime(),
-                    session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
-
-        notifyIdleSession0(
-                session, currentTime,
-                session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
-                IdleStatus.READER_IDLE, Math.max(
-                    session.getLastReadTime(),
-                    session.getLastIdleTime(IdleStatus.READER_IDLE)));
-
-        notifyIdleSession0(
-                session, currentTime,
-                session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
-                IdleStatus.WRITER_IDLE, Math.max(
-                    session.getLastWriteTime(),
-                    session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
-
-        notifyWriteTimeout(session, currentTime);
-        updateThroughput(session, currentTime);
-    }
-
-    private static void notifyIdleSession0(
-            IoSession session, long currentTime,
-            long idleTime, IdleStatus status, long lastIoTime) {
-        if (idleTime > 0 && lastIoTime != 0
-                && currentTime - lastIoTime >= idleTime) {
-            session.getFilterChain().fireSessionIdle(status);
-        }
-    }
-
-    private static void notifyWriteTimeout(
-            IoSession session, long currentTime) {
-
-        long writeTimeout = session.getConfig().getWriteTimeoutInMillis();
-        if (writeTimeout > 0 &&
-                currentTime - session.getLastWriteTime() >= writeTimeout &&
-                !session.getWriteRequestQueue().isEmpty(session)) {
-            WriteRequest request = session.getCurrentWriteRequest();
-            if (request != null) {
-                session.setCurrentWriteRequest(null);
-                WriteTimeoutException cause = new WriteTimeoutException(request);
-                request.getFuture().setException(cause);
-                session.getFilterChain().fireExceptionCaught(cause);
-                // WriteException is an IOException, so we close the session.
-                session.close();
-            }
-        }
-    }
-
-    private static void updateThroughput(
-            IoSession session, long currentTime) {
-        session.updateThroughput(currentTime, false);
     }
 }

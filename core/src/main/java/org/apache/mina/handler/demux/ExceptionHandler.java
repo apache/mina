@@ -46,7 +46,7 @@ public interface ExceptionHandler<E extends Throwable> {
      */
     static ExceptionHandler<Throwable> CLOSE = new ExceptionHandler<Throwable>() {
         public void exceptionCaught(IoSession session, Throwable cause) {
-            session.close();
+            session.close(true);
         }
     };
 

@@ -37,5 +37,4 @@ public enum IoEventType {
     EXCEPTION_CAUGHT,
     WRITE,
     CLOSE,
-    SET_TRAFFIC_MASK,
 }

@@ -41,6 +41,7 @@ import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionInitializer;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.ExceptionMonitor;
 
 /**

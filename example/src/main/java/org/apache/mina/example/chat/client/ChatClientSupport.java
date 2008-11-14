@@ -111,7 +111,7 @@ public class ChatClientSupport {
                 // Wait until the chat ends.
                 session.getCloseFuture().awaitUninterruptibly();
             }
-            session.close();
+            session.close(true);
         }
     }
 

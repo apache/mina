@@ -76,7 +76,7 @@ public abstract class AbstractConnectorTest extends TestCase {
                     "localhost", port));
             future.awaitUninterruptibly();
             buf.append("3");
-            future.getSession().close();
+            future.getSession().close(true);
             // sessionCreated() will fire before the connect future completes
             // but sessionOpened() may not
             Assert.assertTrue(Pattern.matches("12?32?", buf.toString()));
@@ -113,7 +113,7 @@ public abstract class AbstractConnectorTest extends TestCase {
             future.awaitUninterruptibly();
             buf.append("1");
             try {
-                future.getSession().close();
+                future.getSession().close(true);
                 fail();
             } catch (RuntimeIoException e) {
                 // OK.

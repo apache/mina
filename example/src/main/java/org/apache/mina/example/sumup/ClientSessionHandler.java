@@ -73,19 +73,19 @@ public class ClientSessionHandler extends IoHandlerAdapter {
             if (rm.getSequence() == values.length - 1) {
                 // print the sum and disconnect.
                 logger.info("The sum: " + rm.getValue());
-                session.close();
+                session.close(true);
                 finished = true;
             }
         } else {
             // seever returned error code because of overflow, etc.
             logger.warn("Server error, disconnecting...");
-            session.close();
+            session.close(true);
             finished = true;
         }
     }
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        session.close();
+        session.close(true);
     }
 }

@@ -66,7 +66,7 @@ public abstract class AbstractFileRegionTest extends TestCase {
             public void exceptionCaught(IoSession session, Throwable cause)
                     throws Exception {
                 exception[0] = cause;
-                session.close();
+                session.close(true);
             }
             @Override
             public void messageReceived(IoSession session, Object message) throws Exception {
@@ -83,7 +83,7 @@ public abstract class AbstractFileRegionTest extends TestCase {
                 }
                 if (index == FILE_SIZE / 4) {
                     success[0] = true;
-                    session.close();
+                    session.close(true);
                 }
             }
         });
@@ -95,7 +95,7 @@ public abstract class AbstractFileRegionTest extends TestCase {
             public void exceptionCaught(IoSession session, Throwable cause)
                     throws Exception {
                 exception[0] = cause;
-                session.close();
+                session.close(true);
             }
             @Override
             public void sessionClosed(IoSession session) throws Exception {

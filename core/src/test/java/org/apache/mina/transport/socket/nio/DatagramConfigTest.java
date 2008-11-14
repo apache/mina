@@ -83,7 +83,7 @@ public class DatagramConfigTest extends TestCase {
             writeFuture.awaitUninterruptibly();
             Assert.assertTrue(writeFuture.isWritten());
 
-            future.getSession().close();
+            future.getSession().close(true);
 
             for (int i = 0; i < 30; i++) {
                 if (result.length() == 2) {

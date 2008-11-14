@@ -48,7 +48,7 @@ class IoSessionOutputStream extends OutputStream {
         try {
             flush();
         } finally {
-            session.close().awaitUninterruptibly();
+            session.close(true).awaitUninterruptibly();
         }
     }
 

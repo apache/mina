@@ -79,7 +79,7 @@ public interface KeepAliveRequestTimeoutHandler {
             log.warn("Closing the session because a keep-alive response " +
                     "message was not received within {} second(s).",
                     filter.getRequestTimeout());
-            session.close();
+            session.close(true);
         }
     };
 

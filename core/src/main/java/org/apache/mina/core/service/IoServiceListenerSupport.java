@@ -27,12 +27,11 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.IoFutureListener;
-import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.ExceptionMonitor;
-import org.apache.mina.core.filterchain.IoFilterChain;
 
 /**
  * A helper which provides addition and removal of {@link IoServiceListener}s and firing
@@ -134,25 +133,6 @@ public class IoServiceListenerSupport {
             }
         }
     }
-
-    /**
-     * Calls {@link IoServiceListener#serviceIdle(IoService, IdleStatus)}
-     * for all registered listeners.
-     */
-    public void fireServiceIdle(IdleStatus status) {
-        if (!activated.get()) {
-            return;
-        }
-
-        for (IoServiceListener l : listeners) {
-            try {
-                l.serviceIdle(service, status);
-            } catch (Throwable e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-            }
-        }
-    }
-
 
     /**
      * Calls {@link IoServiceListener#serviceDeactivated(IoService)}
@@ -266,7 +246,7 @@ public class IoServiceListenerSupport {
         IoFutureListener<IoFuture> listener = new LockNotifyingListener(lock);
 
         for (IoSession s : managedSessions.values()) {
-            s.close().addListener(listener);
+            s.close(true).addListener(listener);
         }
 
         try {

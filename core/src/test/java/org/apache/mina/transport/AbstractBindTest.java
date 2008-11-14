@@ -226,7 +226,7 @@ public abstract class AbstractBindTest extends TestCase {
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
             cause.printStackTrace();
-            session.close();
+            session.close(true);
         }
 
         @Override

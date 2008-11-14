@@ -44,7 +44,7 @@ public class TimeServerHandler extends IoHandlerAdapter
     {
         String str = message.toString();
         if( str.trim().equalsIgnoreCase("quit") ) {
-            session.close();
+            session.close(true);
             return;
         }
 

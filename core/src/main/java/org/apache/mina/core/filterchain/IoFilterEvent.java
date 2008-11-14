@@ -24,7 +24,6 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoEvent;
 import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.session.TrafficMask;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
@@ -64,9 +63,6 @@ public class IoFilterEvent extends IoEvent {
             break;
         case WRITE:
             getNextFilter().filterWrite(getSession(), (WriteRequest) getParameter());
-            break;
-        case SET_TRAFFIC_MASK:
-            getNextFilter().filterSetTrafficMask(getSession(), (TrafficMask) getParameter());
             break;
         case CLOSE:
             getNextFilter().filterClose(getSession());

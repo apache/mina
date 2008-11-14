@@ -316,7 +316,7 @@ public class MdcInjectionFilterTest {
         public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
             logger.info("sessionIdle");
             sessionIdleLatch.countDown();
-            session.close();
+            session.close(true);
         }
 
         @Override

@@ -49,6 +49,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class SerialConnector extends AbstractIoConnector {
     private final Logger log;
+    
+    private IdleStatusChecker idleChecker;
 
     public SerialConnector() {
         this(null);
@@ -57,6 +59,12 @@ public final class SerialConnector extends AbstractIoConnector {
     public SerialConnector(Executor executor) {
         super(new DefaultSerialSessionConfig(), executor);
         log = LoggerFactory.getLogger(SerialConnector.class);
+        
+        idleChecker = new IdleStatusChecker();
+        // we schedule the idle status checking task in this service exceutor
+        // it will be woke up every seconds
+        executeWorker(idleChecker.getNotifyingTask(), "idleStatusChecker");
+        
     }
 
     @Override
@@ -125,6 +133,8 @@ public final class SerialConnector extends AbstractIoConnector {
 
     @Override
     protected IoFuture dispose0() throws Exception {
+    	// stop the idle checking task
+    	idleChecker.getNotifyingTask().cancel();
         return null;
     }
 
@@ -171,6 +181,6 @@ public final class SerialConnector extends AbstractIoConnector {
     }
 
     IdleStatusChecker getIdleStatusChecker0() {
-        return super.getIdleStatusChecker();
+        return idleChecker;
     }
 }

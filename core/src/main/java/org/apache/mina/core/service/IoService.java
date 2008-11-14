@@ -190,13 +190,6 @@ public interface IoService {
     int getScheduledWriteMessages();
 
     /**
-     * Returns the IoServiceIdleState for this service.
-     * 
-     * @return The idle state object for this service.
-     */
-    IoServiceIdleState getIdleState();
-
-    /**
      * Returns the IoServiceStatistics object for this service.
      * 
      * @return The statistics object for this service.

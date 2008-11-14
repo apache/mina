@@ -315,7 +315,6 @@ public class IoServiceStatistics {
     public final void increaseReadBytes(long increment, long currentTime) {
         readBytes.addAndGet(increment);
         lastReadTime = currentTime;
-        service.getIdleState().resetIdleCountForRead();
     }
 
     /**
@@ -324,7 +323,6 @@ public class IoServiceStatistics {
     public final void increaseReadMessages(long currentTime) {
         readMessages.incrementAndGet();
         lastReadTime = currentTime;
-        service.getIdleState().resetIdleCountForRead();
     }
     
     /**
@@ -333,7 +331,6 @@ public class IoServiceStatistics {
     public final void increaseWrittenBytes(int increment, long currentTime) {
         writtenBytes.addAndGet(increment);
         lastWriteTime = currentTime;
-        service.getIdleState().resetIdleCountForWrite();
     }
 
     /**
@@ -342,7 +339,6 @@ public class IoServiceStatistics {
     public final void increaseWrittenMessages(long currentTime) {
         writtenMessages.incrementAndGet();
         lastWriteTime = currentTime;
-        service.getIdleState().resetIdleCountForWrite();
     }
     
     /**

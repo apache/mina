@@ -39,7 +39,6 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.ExpiringSessionRecycler;
-import org.apache.mina.core.session.IdleStatusChecker;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionRecycler;
@@ -282,7 +281,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             getListeners().fireSessionDestroyed(session);
         }
 
-        public void updateTrafficMask(T session) {
+        public void updateTrafficControl(T session) {
             throw new UnsupportedOperationException();
         }
 
@@ -571,7 +570,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         // process idle sessions
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
-            IdleStatusChecker.notifyIdleness(
+            AbstractIoSession.notifyIdleness(
                     getListeners().getManagedSessions().values().iterator(),
                     currentTime);
         }

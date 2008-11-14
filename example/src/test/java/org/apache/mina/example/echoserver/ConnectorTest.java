@@ -164,7 +164,7 @@ public class ConnectorTest extends AbstractTest {
             testConnector0(session);
         }
 
-        session.close().awaitUninterruptibly();
+        session.close(true).awaitUninterruptibly();
     }
 
     private void testConnector0(IoSession session) throws InterruptedException {

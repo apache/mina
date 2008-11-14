@@ -29,7 +29,6 @@ import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.session.TrafficMask;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
@@ -137,9 +136,6 @@ public class ExecutorFilterRegressionTest extends TestCase {
         }
 
         public void sessionCreated(IoSession session) {
-        }
-
-        public void filterSetTrafficMask(IoSession session, TrafficMask trafficMask) {
         }
     }
 

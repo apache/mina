@@ -167,7 +167,7 @@ public class SslFilterTest {
             sentMessages.add(message.toString());
             System.out.println(message);
             if (sentMessages.size() >= 2) {
-                session.close();
+                session.close(true);
             }
         }
     }

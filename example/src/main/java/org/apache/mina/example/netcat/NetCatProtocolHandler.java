@@ -51,7 +51,7 @@ public class NetCatProtocolHandler extends IoHandlerAdapter {
     public void sessionIdle(IoSession session, IdleStatus status) {
         // Close the connection if reader is idle.
         if (status == IdleStatus.READER_IDLE) {
-            session.close();
+            session.close(true);
         }
     }
 

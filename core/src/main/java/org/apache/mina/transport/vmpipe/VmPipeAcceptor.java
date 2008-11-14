@@ -32,6 +32,7 @@ import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.session.IdleStatusChecker;
 import org.apache.mina.core.session.IoSession;
 
 /**
@@ -42,6 +43,10 @@ import org.apache.mina.core.session.IoSession;
  * @version $Rev$, $Date$
  */
 public final class VmPipeAcceptor extends AbstractIoAcceptor {
+	
+	// object used for checking session idle
+	private IdleStatusChecker idleChecker;
+	
     static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
 
     /**
@@ -56,6 +61,10 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
      */
     public VmPipeAcceptor(Executor executor) {
         super(new DefaultVmPipeSessionConfig(), executor);
+        idleChecker = new IdleStatusChecker();
+        // we schedule the idle status checking task in this service exceutor
+        // it will be woke up every seconds
+        executeWorker(idleChecker.getNotifyingTask(), "idleStatusChecker");
     }
 
     public TransportMetadata getTransportMetadata() {
@@ -86,6 +95,8 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
 
     @Override
     protected IoFuture dispose0() throws Exception {
+    	// stop the idle checking task
+    	idleChecker.getNotifyingTask().cancel();
         unbind();
         return null;
     }

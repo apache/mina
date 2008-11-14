@@ -69,10 +69,11 @@ public interface IoProcessor<T extends IoSession> {
     void flush(T session);
 
     /**
-     * Controls the traffic of the specified {@code session} as specified
-     * in {@link IoSession#getTrafficMask()}.
+     * Controls the traffic of the specified {@code session} depending of the
+     * {@link IoSession#isReadSuspended()} and {@link IoSession#isWriteSuspended()}
+     * flags
      */
-    void updateTrafficMask(T session);
+    void updateTrafficControl(T session);
 
     /**
      * Removes and closes the specified {@code session} from the I/O

@@ -157,7 +157,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
             in.throwException(e);
         } else {
             logger.warn("Unexpected exception.", cause);
-            session.close();
+            session.close(true);
         }
     }
 

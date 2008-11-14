@@ -53,7 +53,7 @@ public class VmPipeEventOrderTest extends TestCase {
             @Override
             public void messageSent(IoSession session, Object message)
                     throws Exception {
-                session.close();
+                session.close(true);
             }
         });
 
@@ -133,7 +133,7 @@ public class VmPipeEventOrderTest extends TestCase {
             @Override
             public void messageSent(IoSession session, Object message)
                     throws Exception {
-                session.close();
+                session.close(true);
             }
         });
 
@@ -194,7 +194,7 @@ public class VmPipeEventOrderTest extends TestCase {
         ConnectFuture connectFuture = vmPipeConnector.connect(vmPipeAddress);
         connectFuture.awaitUninterruptibly();
         connectFuture.getSession().write(IoBuffer.wrap(new byte[1]));
-        connectFuture.getSession().closeOnFlush().awaitUninterruptibly();
+        connectFuture.getSession().close(false).awaitUninterruptibly();
 
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
         vmPipeAcceptor.unbind(vmPipeAddress);

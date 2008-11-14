@@ -62,7 +62,7 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        session.close();
+        session.close(true);
     }
 
     @Override

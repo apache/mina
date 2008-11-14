@@ -20,7 +20,6 @@
 package org.apache.mina.core.polling;
 
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +37,6 @@ import org.apache.mina.core.future.DefaultIoFuture;
 import org.apache.mina.core.service.AbstractIoService;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.AbstractIoSession;
-import org.apache.mina.core.session.IdleStatusChecker;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.write.WriteRequest;
@@ -545,11 +543,11 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private void process(T session) {
 
-        if (isReadable(session) && session.getTrafficMask().isReadable()) {
+        if (isReadable(session) && !session.isReadSuspended()) {
             read(session);
         }
 
-        if (isWritable(session) && session.getTrafficMask().isWritable()) {
+        if (isWritable(session) && !session.isWriteSuspended()) {
             scheduleFlush(session);
         }
     }
@@ -612,7 +610,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         // process idle sessions
         if (currentTime - lastIdleCheckTime >= 1000) {
             lastIdleCheckTime = currentTime;
-            IdleStatusChecker.notifyIdleness(allSessions(), currentTime);
+            AbstractIoSession.notifyIdleness(allSessions(), currentTime);
         }
     }
 
@@ -819,7 +817,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             SessionState state = state(session);
             switch (state) {
             case OPEN:
-                updateTrafficMaskNow(session);
+            	updateTrafficControl(session);
                 break;
             case CLOSED:
                 break;
@@ -835,12 +833,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         }
     }
 
-    private void updateTrafficMaskNow(T session) {
-        // The normal is OP_READ and, if there are write requests in the
-        // session's write queue, set OP_WRITE to trigger flushing.
-        int mask = session.getTrafficMask().getInterestOps();
-        try {
-            setInterestedInRead(session, (mask & SelectionKey.OP_READ) != 0);
+    public void updateTrafficControl(T session) {
+    	try {
+            setInterestedInRead(session, !session.isReadSuspended());
         } catch (Exception e) {
             IoFilterChain filterChain = session.getFilterChain(); 
             filterChain.fireExceptionCaught(e);
@@ -849,14 +844,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             setInterestedInWrite(
                     session,
                     !session.getWriteRequestQueue().isEmpty(session) &&
-                            (mask & SelectionKey.OP_WRITE) != 0);
+                            !session.isWriteSuspended());
         } catch (Exception e) {
             IoFilterChain filterChain = session.getFilterChain(); 
             filterChain.fireExceptionCaught(e);
         }
     }
-
-    
+        
     private class Processor implements Runnable {
         public void run() {
             int nSessions = 0;

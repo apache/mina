@@ -84,8 +84,8 @@ public class DatagramRecyclerTest extends TestCase {
             // Close the client-side connection.
             // This doesn't mean that the acceptor-side connection is also closed.
             // The life cycle of the acceptor-side connection is managed by the recycler.
-            future.getSession().close();
-            future.getSession().getCloseFuture().awaitUninterruptibly();
+            future.getSession().close(true);
+	    future.getSession().getCloseFuture().awaitUninterruptibly();
             Assert.assertTrue(future.getSession().getCloseFuture().isClosed());
 
             // Wait until the acceptor-side connection is closed.
@@ -132,7 +132,7 @@ public class DatagramRecyclerTest extends TestCase {
             while (acceptorHandler.session == null) {
                 Thread.yield();
             }
-            acceptorHandler.session.close();
+            acceptorHandler.session.close(true);
             Assert.assertTrue(
                     acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
             
@@ -158,11 +158,11 @@ public class DatagramRecyclerTest extends TestCase {
             while (acceptorHandler.session == null) {
                 Thread.yield();
             }
-            acceptorHandler.session.close();
+            acceptorHandler.session.close(true);
             Assert.assertTrue(
                     acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
 
-            future.getSession().close().awaitUninterruptibly();
+            future.getSession().close(true).awaitUninterruptibly();
             
             Assert.assertNotSame(oldSession, acceptorHandler.session);
         } finally {

@@ -33,6 +33,7 @@ import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.service.AbstractIoConnector;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.session.IdleStatusChecker;
 import org.apache.mina.core.session.IoSessionInitializer;
 import org.apache.mina.util.ExceptionMonitor;
 
@@ -45,6 +46,9 @@ import org.apache.mina.util.ExceptionMonitor;
  */
 public final class VmPipeConnector extends AbstractIoConnector {
 
+	// object used for checking session idle
+	private IdleStatusChecker idleChecker;
+	
     /**
      * Creates a new instance.
      */
@@ -57,6 +61,10 @@ public final class VmPipeConnector extends AbstractIoConnector {
      */
     public VmPipeConnector(Executor executor) {
         super(new DefaultVmPipeSessionConfig(), executor);
+        idleChecker = new IdleStatusChecker();
+        // we schedule the idle status checking task in this service exceutor
+        // it will be woke up every seconds
+        executeWorker(idleChecker.getNotifyingTask(), "idleStatusChecker");
     }
 
     public TransportMetadata getTransportMetadata() {
@@ -103,7 +111,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
             // The following sentences don't throw any exceptions.
             getListeners().fireSessionCreated(localSession);
-            getIdleStatusChecker().addSession(localSession);
+            idleChecker.addSession(localSession);
         } catch (Throwable t) {
             future.setException(t);
             return future;
@@ -119,10 +127,10 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
             // The following sentences don't throw any exceptions.
             entry.getListeners().fireSessionCreated(remoteSession);
-            getIdleStatusChecker().addSession(remoteSession);
+            idleChecker.addSession(remoteSession);
         } catch (Throwable t) {
             ExceptionMonitor.getInstance().exceptionCaught(t);
-            remoteSession.close();
+            remoteSession.close(true);
         }
 
         // Start chains, and then allow and messages read/written to be processed. This is to ensure that
@@ -135,6 +143,8 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
     @Override
     protected IoFuture dispose0() throws Exception {
+    	// stop the idle checking task
+    	idleChecker.getNotifyingTask().cancel();
         return null;
     }
 

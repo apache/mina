@@ -26,7 +26,7 @@ package org.apache.mina.core.future;
  * <h3>Example</h3>
  * <pre>
  * IoSession session = ...;
- * CloseFuture future = session.close();
+ * CloseFuture future = session.close(true);
  * // Wait until the connection is closed
  * future.awaitUninterruptibly();
  * // Now connection should be closed.

@@ -25,7 +25,6 @@ import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.session.TrafficMask;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
@@ -279,13 +278,6 @@ public interface IoFilterChain {
      * event.
      */
     public void fireFilterClose();
-
-    /**
-     * Fires a {@link IoSession#setTrafficMask(TrafficMask)} event.  Most users don't need to call this method at
-     * all.  Please use this method only when you implement a new transport or fire a virtual
-     * event.
-     */
-    public void fireFilterSetTrafficMask(TrafficMask trafficMask);
 
     /**
      * Represents a name-filter pair that an {@link IoFilterChain} contains.
