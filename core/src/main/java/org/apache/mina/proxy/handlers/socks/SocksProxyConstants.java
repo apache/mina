@@ -28,7 +28,7 @@ package org.apache.mina.proxy.handlers.socks;
  */
 public class SocksProxyConstants {
     /**
-     * SOCKS versions filed values.
+     * SOCKS versions field values.
      */
     public final static byte SOCKS_VERSION_4 = 0x04;
 
@@ -36,12 +36,19 @@ public class SocksProxyConstants {
 
     public final static byte TERMINATOR = 0x00;
 
-    // Invalid IP used in SOCKS 4a protocol to specify that 
-    // client can't resolve the destination host's domain name.
+    /**
+     * The size of a server to client response in a SOCKS4/4a negotiation.
+     */
+    public final static int SOCKS_4_RESPONSE_SIZE = 8;
+    
+    /**
+     * Invalid IP used in SOCKS 4a protocol to specify that the
+     * client can't resolve the destination host's domain name.
+     */
     public final static byte[] FAKE_IP = new byte[] { 0, 0, 0, 10 };
 
     /**
-     * Command code. 
+     * Command codes. 
      */
     public final static byte ESTABLISH_TCPIP_STREAM = 0x01;
 
@@ -50,7 +57,7 @@ public class SocksProxyConstants {
     public final static byte ESTABLISH_UDP_ASSOCIATE = 0x03;
 
     /**
-     * Server reply codes of protocol v4 and v4a.
+     * SOCKS v4/v4a server reply codes.
      */
     public final static byte V4_REPLY_REQUEST_GRANTED = 0x5a;
 
@@ -119,19 +126,23 @@ public class SocksProxyConstants {
 
     public final static byte GSSAPI_MSG_TYPE = 0x01;
 
-    // Kerberos providers 
+    /**
+     * Kerberos providers OID's.
+     */ 
     public final static String KERBEROS_V5_OID = "1.2.840.113554.1.2.2";
 
     public final static String MS_KERBEROS_V5_OID = "1.2.840.48018.1.2.2";
 
-    // Microsoft NTLM security support provider 
+    /**
+     * Microsoft NTLM security support provider.
+     */ 
     public final static String NTLMSSP_OID = "1.3.6.1.4.1.311.2.2.10";
 
     /**
-     * Return the string for the given code.
+     * Return the string associated with the specified reply code.
      * 
-     * @param code the received code
-     * @return
+     * @param code the reply code
+     * @return the reply string
      */
     public final static String getReplyCodeAsString(byte code) {
         switch (code) {
@@ -145,7 +156,7 @@ public class SocksProxyConstants {
         case V4_REPLY_REQUEST_FAILED_ID_NOT_CONFIRMED:
             return "Request failed because client's identd could not confirm the user ID string in the request";
 
-            // v5 codes
+        // v5 codes
         case V5_REPLY_SUCCEEDED:
             return "Request succeeded";
         case V5_REPLY_GENERAL_FAILURE:
@@ -166,7 +177,7 @@ public class SocksProxyConstants {
             return "Request failed: address type not supported";
 
         default:
-            return "Unknown code";
+            return "Unknown reply code";
         }
     }
 }
