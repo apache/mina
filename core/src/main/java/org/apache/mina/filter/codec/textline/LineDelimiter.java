@@ -51,6 +51,11 @@ public class LineDelimiter {
     public static final LineDelimiter AUTO = new LineDelimiter("");
 
     /**
+     * The CRLF line delimiter constant (<tt>"\r\n"</tt>)
+     */
+    public static final LineDelimiter CRLF = new LineDelimiter("\r\n");
+        
+    /**
      * The line delimiter constant of UNIX (<tt>"\n"</tt>)
      */
     public static final LineDelimiter UNIX = new LineDelimiter("\n");
@@ -58,7 +63,7 @@ public class LineDelimiter {
     /**
      * The line delimiter constant of MS Windows/DOS (<tt>"\r\n"</tt>)
      */
-    public static final LineDelimiter WINDOWS = new LineDelimiter("\r\n");
+    public static final LineDelimiter WINDOWS = CRLF;
 
     /**
      * The line delimiter constant of Mac OS (<tt>"\r"</tt>)
