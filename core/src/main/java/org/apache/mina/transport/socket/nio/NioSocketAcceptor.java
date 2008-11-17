@@ -229,12 +229,17 @@ public final class NioSocketAcceptor
     @Override
     protected ServerSocketChannel open(SocketAddress localAddress)
             throws Exception {
+        // Creates the listening ServerSocket
         ServerSocketChannel channel = ServerSocketChannel.open();
+        
         boolean success = false;
+        
         try {
             channel.configureBlocking(false);
+        
             // Configure the server socket,
             ServerSocket socket = channel.socket();
+            
             socket.setReuseAddress(isReuseAddress());
             // XXX: Do we need to provide this property? (I think we need to remove it.)
             socket.setReceiveBufferSize(getSessionConfig().getReceiveBufferSize());
