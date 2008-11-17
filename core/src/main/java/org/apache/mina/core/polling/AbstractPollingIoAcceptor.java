@@ -390,7 +390,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 try {
                     // Detect if we have some keys ready to be processed
                     // The select() will be woke up if some new connection
-                    // have occurred, or if the selector has been explicitely
+                    // have occurred, or if the selector has been explicitly
                     // woke up
                     int selected = select();
 
@@ -400,12 +400,17 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                     nHandles += registerHandles();
 
                     if (selected > 0) {
+                        // We have some connection request, let's process 
+                        // them here. 
                         processHandles(selectedHandles());
                     }
 
                     // check to see if any cancellation request has been made.
                     nHandles -= unregisterHandles();
 
+                    // Now, if the number of registred handles is 0, we can
+                    // quit the loop: we don't have any socket listening
+                    // for incoming connection.
                     if (nHandles == 0) {
                         synchronized (lock) {
                             if (registerQueue.isEmpty()
@@ -426,6 +431,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 }
             }
 
+            // Cleanup all the processors, and shutdown the acceptor.
             if (selectable && isDisposing()) {
                 selectable = false;
                 try {
@@ -487,26 +493,36 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      */
     private int registerHandles() {
         for (;;) {
+            // The register queue contains the list of services to manage
+            // in this acceptor.
             AcceptorOperationFuture future = registerQueue.poll();
+            
             if (future == null) {
                 return 0;
             }
 
+            // We create a temporary map to store the bound handles,
+            // as we may have to remove them all if there is an exception
+            // during the sockets opening.
             Map<SocketAddress, H> newHandles = new HashMap<SocketAddress, H>();
             List<SocketAddress> localAddresses = future.getLocalAddresses();
 
             try {
+                // Process all the addresses
                 for (SocketAddress a : localAddresses) {
                     H handle = open(a);
                     newHandles.put(localAddress(handle), handle);
                 }
 
+                // Everything went ok, we can now update the map storing
+                // all the bound sockets.
                 boundHandles.putAll(newHandles);
 
                 // and notify.
                 future.setDone();
                 return newHandles.size();
             } catch (Exception e) {
+                // We store the exception in the future
                 future.setException(e);
             } finally {
                 // Roll back if failed to bind all addresses.
@@ -518,6 +534,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                             ExceptionMonitor.getInstance().exceptionCaught(e);
                         }
                     }
+                    
+                    // TODO : add some comment : what is the wakeup() waking up ?
                     wakeup();
                 }
             }
