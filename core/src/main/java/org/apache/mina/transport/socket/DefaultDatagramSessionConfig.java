@@ -28,32 +28,11 @@ import java.net.DatagramSocket;
  * @version $Rev: 439913 $, $Date: 2006-09-04 05:12:43 +0200 (mån, 04 sep 2006) $
  */
 public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig {
-
-    private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
-    private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
-    private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
-    private static final boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
     private static boolean DEFAULT_BROADCAST = false;
     private static boolean DEFAULT_REUSE_ADDRESS = false;
     private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
     private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
     private static int DEFAULT_TRAFFIC_CLASS = 0;
-
-    public static boolean isSetReceiveBufferSizeAvailable() {
-        return SET_RECEIVE_BUFFER_SIZE_AVAILABLE;
-    }
-
-    public static boolean isSetSendBufferSizeAvailable() {
-        return SET_SEND_BUFFER_SIZE_AVAILABLE;
-    }
-
-    public static boolean isGetTrafficClassAvailable() {
-        return GET_TRAFFIC_CLASS_AVAILABLE;
-    }
-
-    public static boolean isSetTrafficClassAvailable() {
-        return SET_TRAFFIC_CLASS_AVAILABLE;
-    }
 
     private boolean broadcast = DEFAULT_BROADCAST;
     private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;

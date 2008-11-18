@@ -36,7 +36,6 @@ import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
-import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 
 /**
@@ -227,28 +226,25 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int getTrafficClass() {
-            if (DefaultSocketSessionConfig.isGetTrafficClassAvailable()) {
-                try {
-                    return ch.socket().getTrafficClass();
-                } catch (SocketException e) {
-                    // Throw an exception only when setTrafficClass is also available.
-                    if (DefaultSocketSessionConfig.isSetTrafficClassAvailable()) {
-                        throw new RuntimeIoException(e);
-                    }
-                }
+            try {
+                return ch.socket().getTrafficClass();
+            } catch (SocketException e) {
+                throw new RuntimeIoException(e);
             }
-
-            return 0;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void setTrafficClass(int tc) {
-            if (DefaultSocketSessionConfig.isSetTrafficClassAvailable()) {
-                try {
-                    ch.socket().setTrafficClass(tc);
-                } catch (SocketException e) {
-                    throw new RuntimeIoException(e);
-                }
+            try {
+                ch.socket().setTrafficClass(tc);
+            } catch (SocketException e) {
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -261,12 +257,10 @@ class NioSocketSession extends NioSession {
         }
 
         public void setSendBufferSize(int size) {
-            if (DefaultSocketSessionConfig.isSetSendBufferSizeAvailable()) {
-                try {
-                    ch.socket().setSendBufferSize(size);
-                } catch (SocketException e) {
-                    throw new RuntimeIoException(e);
-                }
+            try {
+                ch.socket().setSendBufferSize(size);
+            } catch (SocketException e) {
+                throw new RuntimeIoException(e);
             }
         }
 
@@ -279,12 +273,10 @@ class NioSocketSession extends NioSession {
         }
 
         public void setReceiveBufferSize(int size) {
-            if (DefaultSocketSessionConfig.isSetReceiveBufferSizeAvailable()) {
-                try {
-                    ch.socket().setReceiveBufferSize(size);
-                } catch (SocketException e) {
-                    throw new RuntimeIoException(e);
-                }
+            try {
+                ch.socket().setReceiveBufferSize(size);
+            } catch (SocketException e) {
+                throw new RuntimeIoException(e);
             }
         }
     }

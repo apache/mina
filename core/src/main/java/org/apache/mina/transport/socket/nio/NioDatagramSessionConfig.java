@@ -19,55 +19,80 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
-import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
 
 /**
- * TODO Add documentation
+ * Define the configuration for a Datagram based session. 
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
-    private final DatagramChannel c;
+    /** The associated channel */
+    private final DatagramChannel channel;
 
-    NioDatagramSessionConfig(DatagramChannel c) {
-        this.c = c;
+    /**
+     * Creates a new instance of NioDatagramSessionConfig, associated
+     * with the given DatagramChannel.
+     *
+     * @param channel The associated DatagramChannel
+     */
+    NioDatagramSessionConfig(DatagramChannel channel) {
+        this.channel = channel;
     }
 
+    /**
+     * Get the Socket receive buffer size for this DatagramChannel.
+     * 
+     * @return the DatagramChannel receive buffer size.
+     * @throws RuntimeIoException if the socket is closed or if we 
+     * had a SocketException
+     * 
+     * @see DatagramSocket#getReceiveBufferSize()
+     */
     public int getReceiveBufferSize() {
         try {
-            return c.socket().getReceiveBufferSize();
+            return channel.socket().getReceiveBufferSize();
         } catch (SocketException e) {
             throw new RuntimeIoException(e);
         }
     }
 
+    /**
+     * Set the Socket receive buffer size for this DatagramChannel. <br>
+     * <br>
+     * Note : The underlying Socket may not accept the new buffer's size.
+     * The user has to check that the new value has been set. 
+     * 
+     * @param receiveBufferSize the DatagramChannel receive buffer size.
+     * @throws RuntimeIoException if the socket is closed or if we 
+     * had a SocketException
+     * 
+     * @see DatagramSocket#setReceiveBufferSize()
+     */
     public void setReceiveBufferSize(int receiveBufferSize) {
-        if (DefaultDatagramSessionConfig.isSetReceiveBufferSizeAvailable()) {
-            try {
-                c.socket().setReceiveBufferSize(receiveBufferSize);
-                // Re-retrieve the effective receive buffer size.
-                
-                // TODO clean this dead code. 
-                // Do we really need to do this ???
-                // Is there any secret reason why we should read the 
-                // receiveBufferSize just after having set it ? I don't think so...
-                // Commented :
-                //c.socket().getReceiveBufferSize();
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
+        try {
+            channel.socket().setReceiveBufferSize(receiveBufferSize);
+        } catch (SocketException e) {
+            throw new RuntimeIoException(e);
         }
     }
 
+    /**
+     * Tells if SO_BROADCAST is enabled.
+     * 
+     * @return <code>true</code> if SO_BROADCAST is enabled
+     * @throws RuntimeIoException If the socket is closed or if we get an
+     * {@link SocketException} 
+     */
     public boolean isBroadcast() {
         try {
-            return c.socket().getBroadcast();
+            return channel.socket().getBroadcast();
         } catch (SocketException e) {
             throw new RuntimeIoException(e);
         }
@@ -75,65 +100,93 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
 
     public void setBroadcast(boolean broadcast) {
         try {
-            c.socket().setBroadcast(broadcast);
+            channel.socket().setBroadcast(broadcast);
         } catch (SocketException e) {
             throw new RuntimeIoException(e);
         }
     }
 
+    /**
+     * 
+     * @throws RuntimeIoException If the socket is closed or if we get an
+     * {@link SocketException} 
+     */
     public int getSendBufferSize() {
         try {
-            return c.socket().getSendBufferSize();
+            return channel.socket().getSendBufferSize();
         } catch (SocketException e) {
             throw new RuntimeIoException(e);
         }
     }
 
+    /**
+     * 
+     * @throws RuntimeIoException If the socket is closed or if we get an
+     * {@link SocketException} 
+     */
     public void setSendBufferSize(int sendBufferSize) {
-        if (DefaultDatagramSessionConfig.isSetSendBufferSizeAvailable()) {
-            try {
-                c.socket().setSendBufferSize(sendBufferSize);
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
+        try {
+            channel.socket().setSendBufferSize(sendBufferSize);
+        } catch (SocketException e) {
+            throw new RuntimeIoException(e);
         }
     }
 
+    /**
+     * Tells if SO_REUSEADDR is enabled.
+     * 
+     * @return <code>true</code> if SO_REUSEADDR is enabled
+     * @throws RuntimeIoException If the socket is closed or if we get an
+     * {@link SocketException} 
+     */
     public boolean isReuseAddress() {
         try {
-            return c.socket().getReuseAddress();
+            return channel.socket().getReuseAddress();
         } catch (SocketException e) {
             throw new RuntimeIoException(e);
         }
     }
 
+    /**
+     * 
+     * @throws RuntimeIoException If the socket is closed or if we get an
+     * {@link SocketException} 
+     */
     public void setReuseAddress(boolean reuseAddress) {
         try {
-            c.socket().setReuseAddress(reuseAddress);
+            channel.socket().setReuseAddress(reuseAddress);
         } catch (SocketException e) {
             throw new RuntimeIoException(e);
         }
     }
 
+    /**
+     * Get the current Traffic Class for this Socket, if any. As this is
+     * not a mandatory feature, the returned value should be considered as 
+     * a hint. 
+     * 
+     * @return The Traffic Class supported by this Socket
+     * @throws RuntimeIoException If the socket is closed or if we get an
+     * {@link SocketException} 
+     */
     public int getTrafficClass() {
-        if (DefaultDatagramSessionConfig.isGetTrafficClassAvailable()) {
-            try {
-                return c.socket().getTrafficClass();
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
-        } else {
-            return 0;
+        try {
+            return channel.socket().getTrafficClass();
+        } catch (SocketException e) {
+            throw new RuntimeIoException(e);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws RuntimeIoException If the socket is closed or if we get an
+     * {@link SocketException} 
+     */
     public void setTrafficClass(int trafficClass) {
-        if (DefaultDatagramSessionConfig.isSetTrafficClassAvailable()) {
-            try {
-                c.socket().setTrafficClass(trafficClass);
-            } catch (SocketException e) {
-                throw new RuntimeIoException(e);
-            }
+        try {
+            channel.socket().setTrafficClass(trafficClass);
+        } catch (SocketException e) {
+            throw new RuntimeIoException(e);
         }
     }
 }

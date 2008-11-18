@@ -28,10 +28,6 @@ import org.apache.mina.core.service.IoService;
  * @version $Rev$, $Date$
  */
 public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
-    private static boolean SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
-    private static boolean SET_SEND_BUFFER_SIZE_AVAILABLE = false;
-    private static boolean GET_TRAFFIC_CLASS_AVAILABLE = false;
-    private static boolean SET_TRAFFIC_CLASS_AVAILABLE = false;
     private static boolean DEFAULT_REUSE_ADDRESS = false;
     private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
     private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
@@ -40,22 +36,6 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     private static boolean DEFAULT_OOB_INLINE = false;
     private static int DEFAULT_SO_LINGER = -1;
     private static boolean DEFAULT_TCP_NO_DELAY = false;
-
-    public static boolean isSetReceiveBufferSizeAvailable() {
-        return SET_RECEIVE_BUFFER_SIZE_AVAILABLE;
-    }
-
-    public static boolean isSetSendBufferSizeAvailable() {
-        return SET_SEND_BUFFER_SIZE_AVAILABLE;
-    }
-
-    public static boolean isGetTrafficClassAvailable() {
-        return GET_TRAFFIC_CLASS_AVAILABLE;
-    }
-
-    public static boolean isSetTrafficClassAvailable() {
-        return SET_TRAFFIC_CLASS_AVAILABLE;
-    }
 
     private IoService parent;
     private boolean defaultReuseAddress;
