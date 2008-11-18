@@ -20,9 +20,6 @@
 package org.apache.mina.transport.socket;
 
 import java.net.DatagramSocket;
-import java.net.SocketException;
-
-import org.apache.mina.util.ExceptionMonitor;
 
 /**
  * A default implementation of {@link DatagramSessionConfig}.
@@ -41,53 +38,6 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
     private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
     private static int DEFAULT_TRAFFIC_CLASS = 0;
-
-    static {
-        initialize();
-    }
-
-    private static void initialize() {
-        DatagramSocket socket = null;
-
-        try {
-            socket = new DatagramSocket();
-            DEFAULT_BROADCAST = socket.getBroadcast();
-            DEFAULT_REUSE_ADDRESS = socket.getReuseAddress();
-            DEFAULT_RECEIVE_BUFFER_SIZE = socket.getReceiveBufferSize();
-            DEFAULT_SEND_BUFFER_SIZE = socket.getSendBufferSize();
-
-            // Check if setReceiveBufferSize is supported.
-            try {
-                socket.setReceiveBufferSize(DEFAULT_RECEIVE_BUFFER_SIZE);
-                SET_RECEIVE_BUFFER_SIZE_AVAILABLE = true;
-            } catch (SocketException e) {
-                SET_RECEIVE_BUFFER_SIZE_AVAILABLE = false;
-            }
-
-            // Check if setSendBufferSize is supported.
-            try {
-                socket.setSendBufferSize(DEFAULT_SEND_BUFFER_SIZE);
-                SET_SEND_BUFFER_SIZE_AVAILABLE = true;
-            } catch (SocketException e) {
-                SET_SEND_BUFFER_SIZE_AVAILABLE = false;
-            }
-
-            // Check if getTrafficClass is supported.
-            try {
-                DEFAULT_TRAFFIC_CLASS = socket.getTrafficClass();
-                GET_TRAFFIC_CLASS_AVAILABLE = true;
-            } catch (SocketException e) {
-                GET_TRAFFIC_CLASS_AVAILABLE = false;
-                DEFAULT_TRAFFIC_CLASS = 0;
-            }
-        } catch (SocketException e) {
-            ExceptionMonitor.getInstance().exceptionCaught(e);
-        } finally {
-            if (socket != null) {
-                socket.close();
-            }
-        }
-    }
 
     public static boolean isSetReceiveBufferSizeAvailable() {
         return SET_RECEIVE_BUFFER_SIZE_AVAILABLE;
