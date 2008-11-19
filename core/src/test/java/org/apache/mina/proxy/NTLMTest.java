@@ -111,7 +111,13 @@ public class NTLMTest extends TestCase {
                 msgType1);
 
         assertEquals("050093080000000f", asHex(osVer));
-        assertEquals("0501280a0000000f", asHex(NTLMUtilities.getOsVersion()));
+        
+        //Microsoft Windows XP [version 5.1.2600]
+        String os = System.getProperty("os.name");
+        if (os != null && os.toUpperCase().contains("WINDOWS") && 
+                "5.1".equals(System.getProperty("os.version"))) {
+            assertEquals("0501280a0000000f", asHex(NTLMUtilities.getOsVersion()));
+        }
     }
 
     /**
