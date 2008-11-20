@@ -41,6 +41,7 @@ public class DefaultIoFuture implements IoFuture {
     /** A number of seconds to wait between two deadlock controls ( 5 seconds ) */
     private static final long DEAD_LOCK_CHECK_INTERVAL = 5000L;
 
+    /** The associated session */
     private final IoSession session;
     
     /** A lock used by the wait() method */
