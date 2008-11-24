@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 /**
@@ -57,10 +56,10 @@ public class ByteBufferTest extends TestCase {
         for (int i = 10; i < 1048576 * 2; i = i * 11 / 10) // increase by 10%
         {
             ByteBuffer buf = ByteBuffer.allocate(i);
-            Assert.assertEquals(0, buf.position());
-            Assert.assertEquals(buf.capacity(), buf.remaining());
-            Assert.assertTrue(buf.capacity() >= i);
-            Assert.assertTrue(buf.capacity() < i * 2);
+            assertEquals(0, buf.position());
+            assertEquals(buf.capacity(), buf.remaining());
+            assertTrue(buf.capacity() >= i);
+            assertTrue(buf.capacity() < i * 2);
         }
     }
 
@@ -68,10 +67,10 @@ public class ByteBufferTest extends TestCase {
         for (int i = 10; i < 1048576 * 2; i = i * 11 / 10) // increase by 10%
         {
             ByteBuffer buf = ByteBuffer.allocate(i);
-            Assert.assertEquals(0, buf.position());
-            Assert.assertEquals(buf.capacity(), buf.remaining());
-            Assert.assertTrue(buf.capacity() >= i);
-            Assert.assertTrue(buf.capacity() < i * 2);
+            assertEquals(0, buf.position());
+            assertEquals(buf.capacity(), buf.remaining());
+            assertTrue(buf.capacity() >= i);
+            assertTrue(buf.capacity() < i * 2);
             buf.release();
         }
     }
@@ -81,7 +80,7 @@ public class ByteBufferTest extends TestCase {
         buf.release();
         try {
             buf.release();
-            Assert.fail("Releasing a buffer twice should fail.");
+            fail("Releasing a buffer twice should fail.");
         } catch (IllegalStateException e) {
 
         }
@@ -98,7 +97,7 @@ public class ByteBufferTest extends TestCase {
         buf.release();
         try {
             buf.release();
-            Assert.fail("Releasing a buffer twice should fail.");
+            fail("Releasing a buffer twice should fail.");
         } catch (IllegalStateException e) {
         }
     }
@@ -109,30 +108,30 @@ public class ByteBufferTest extends TestCase {
         buf.put((byte) 0);
         try {
             buf.put((byte) 0);
-            Assert.fail();
+            fail();
         } catch (BufferOverflowException e) {
             // ignore
         }
 
         buf.setAutoExpand(true);
         buf.put((byte) 0);
-        Assert.assertEquals(2, buf.position());
-        Assert.assertEquals(2, buf.limit());
-        Assert.assertEquals(2, buf.capacity());
+        assertEquals(2, buf.position());
+        assertEquals(2, buf.limit());
+        assertEquals(2, buf.capacity());
 
         buf.setAutoExpand(false);
         try {
             buf.put(3, (byte) 0);
-            Assert.fail();
+            fail();
         } catch (IndexOutOfBoundsException e) {
             // ignore
         }
 
         buf.setAutoExpand(true);
         buf.put(3, (byte) 0);
-        Assert.assertEquals(2, buf.position());
-        Assert.assertEquals(4, buf.limit());
-        Assert.assertEquals(4, buf.capacity());
+        assertEquals(2, buf.position());
+        assertEquals(4, buf.limit());
+        assertEquals(4, buf.capacity());
     }
 
     public void testAutoExpandMark() throws Exception {
@@ -149,9 +148,9 @@ public class ByteBufferTest extends TestCase {
         buf.put((byte) 0);
         buf.put((byte) 0);
 
-        Assert.assertEquals(5, buf.position());
+        assertEquals(5, buf.position());
         buf.reset();
-        Assert.assertEquals(3, buf.position());
+        assertEquals(3, buf.position());
     }
 
     public void testPooledProperty() throws Exception {
@@ -159,10 +158,10 @@ public class ByteBufferTest extends TestCase {
         java.nio.ByteBuffer nioBuf = buf.buf();
         buf.release();
         buf = ByteBuffer.allocate(16);
-        Assert.assertSame(nioBuf, buf.buf());
+        assertSame(nioBuf, buf.buf());
         buf.setPooled(false);
         buf.release();
-        Assert.assertNotSame(nioBuf, ByteBuffer.allocate(16).buf());
+        assertNotSame(nioBuf, ByteBuffer.allocate(16).buf());
     }
 
     public void testGetString() throws Exception {
@@ -174,12 +173,12 @@ public class ByteBufferTest extends TestCase {
         buf.putString("hello", charset.newEncoder());
         buf.put((byte) 0);
         buf.flip();
-        Assert.assertEquals("hello", buf.getString(charset.newDecoder()));
+        assertEquals("hello", buf.getString(charset.newDecoder()));
 
         buf.clear();
         buf.putString("hello", charset.newEncoder());
         buf.flip();
-        Assert.assertEquals("hello", buf.getString(charset.newDecoder()));
+        assertEquals("hello", buf.getString(charset.newDecoder()));
 
         decoder = Charset.forName("ISO-8859-1").newDecoder();
         buf.clear();
@@ -189,21 +188,21 @@ public class ByteBufferTest extends TestCase {
         buf.put((byte) 0);
 
         buf.position(0);
-        Assert.assertEquals("ABC", buf.getString(decoder));
-        Assert.assertEquals(4, buf.position());
+        assertEquals("ABC", buf.getString(decoder));
+        assertEquals(4, buf.position());
 
         buf.position(0);
         buf.limit(1);
-        Assert.assertEquals("A", buf.getString(decoder));
-        Assert.assertEquals(1, buf.position());
+        assertEquals("A", buf.getString(decoder));
+        assertEquals(1, buf.position());
 
         buf.clear();
-        Assert.assertEquals("ABC", buf.getString(10, decoder));
-        Assert.assertEquals(10, buf.position());
+        assertEquals("ABC", buf.getString(10, decoder));
+        assertEquals(10, buf.position());
 
         buf.clear();
-        Assert.assertEquals("A", buf.getString(1, decoder));
-        Assert.assertEquals(1, buf.position());
+        assertEquals("A", buf.getString(1, decoder));
+        assertEquals(1, buf.position());
 
         // Test a trailing garbage
         buf.clear();
@@ -212,8 +211,8 @@ public class ByteBufferTest extends TestCase {
         buf.put((byte) 0);
         buf.put((byte) 'C');
         buf.position(0);
-        Assert.assertEquals("AB", buf.getString(4, decoder));
-        Assert.assertEquals(4, buf.position());
+        assertEquals("AB", buf.getString(4, decoder));
+        assertEquals(4, buf.position());
 
         buf.clear();
         buf.fillAndReset(buf.limit());
@@ -228,31 +227,31 @@ public class ByteBufferTest extends TestCase {
         buf.put((byte) 0);
 
         buf.position(0);
-        Assert.assertEquals("ABC", buf.getString(decoder));
-        Assert.assertEquals(8, buf.position());
+        assertEquals("ABC", buf.getString(decoder));
+        assertEquals(8, buf.position());
 
         buf.position(0);
         buf.limit(2);
-        Assert.assertEquals("A", buf.getString(decoder));
-        Assert.assertEquals(2, buf.position());
+        assertEquals("A", buf.getString(decoder));
+        assertEquals(2, buf.position());
 
         buf.position(0);
         buf.limit(3);
-        Assert.assertEquals("A", buf.getString(decoder));
-        Assert.assertEquals(2, buf.position());
+        assertEquals("A", buf.getString(decoder));
+        assertEquals(2, buf.position());
 
         buf.clear();
-        Assert.assertEquals("ABC", buf.getString(10, decoder));
-        Assert.assertEquals(10, buf.position());
+        assertEquals("ABC", buf.getString(10, decoder));
+        assertEquals(10, buf.position());
 
         buf.clear();
-        Assert.assertEquals("A", buf.getString(2, decoder));
-        Assert.assertEquals(2, buf.position());
+        assertEquals("A", buf.getString(2, decoder));
+        assertEquals(2, buf.position());
 
         buf.clear();
         try {
             buf.getString(1, decoder);
-            Assert.fail();
+            fail();
         } catch (IllegalArgumentException e) {
             // ignore
         }
@@ -260,22 +259,22 @@ public class ByteBufferTest extends TestCase {
         // Test getting strings from an empty buffer.
         buf.clear();
         buf.limit(0);
-        Assert.assertEquals("", buf.getString(decoder));
-        Assert.assertEquals("", buf.getString(2, decoder));
+        assertEquals("", buf.getString(decoder));
+        assertEquals("", buf.getString(2, decoder));
 
         // Test getting strings from non-empty buffer which is filled with 0x00
         buf.clear();
         buf.putInt(0);
         buf.clear();
         buf.limit(4);
-        Assert.assertEquals("", buf.getString(decoder));
-        Assert.assertEquals(2, buf.position());
-        Assert.assertEquals(4, buf.limit());
+        assertEquals("", buf.getString(decoder));
+        assertEquals(2, buf.position());
+        assertEquals(4, buf.limit());
 
         buf.position(0);
-        Assert.assertEquals("", buf.getString(2, decoder));
-        Assert.assertEquals(2, buf.position());
-        Assert.assertEquals(4, buf.limit());
+        assertEquals("", buf.getString(2, decoder));
+        assertEquals(2, buf.position());
+        assertEquals(4, buf.limit());
     }
 
     public void testGetStringWithFailure() throws Exception {
@@ -287,18 +286,18 @@ public class ByteBufferTest extends TestCase {
         int oldPos = buffer.position();
         try {
             buffer.getString(3, Charset.forName("ASCII").newDecoder());
-            Assert.fail();
+            fail();
         } catch (Exception e) {
-            Assert.assertEquals(oldLimit, buffer.limit());
-            Assert.assertEquals(oldPos, buffer.position());
+            assertEquals(oldLimit, buffer.limit());
+            assertEquals(oldPos, buffer.position());
         }
 
         try {
             buffer.getString(Charset.forName("ASCII").newDecoder());
-            Assert.fail();
+            fail();
         } catch (Exception e) {
-            Assert.assertEquals(oldLimit, buffer.limit());
-            Assert.assertEquals(oldPos, buffer.position());
+            assertEquals(oldLimit, buffer.limit());
+            assertEquals(oldPos, buffer.position());
         }
     }
 
@@ -308,65 +307,65 @@ public class ByteBufferTest extends TestCase {
         encoder = Charset.forName("ISO-8859-1").newEncoder();
 
         buf.putString("ABC", encoder);
-        Assert.assertEquals(3, buf.position());
+        assertEquals(3, buf.position());
         buf.clear();
-        Assert.assertEquals('A', buf.get(0));
-        Assert.assertEquals('B', buf.get(1));
-        Assert.assertEquals('C', buf.get(2));
+        assertEquals('A', buf.get(0));
+        assertEquals('B', buf.get(1));
+        assertEquals('C', buf.get(2));
 
         buf.putString("D", 5, encoder);
-        Assert.assertEquals(5, buf.position());
+        assertEquals(5, buf.position());
         buf.clear();
-        Assert.assertEquals('D', buf.get(0));
-        Assert.assertEquals(0, buf.get(1));
+        assertEquals('D', buf.get(0));
+        assertEquals(0, buf.get(1));
 
         buf.putString("EFG", 2, encoder);
-        Assert.assertEquals(2, buf.position());
+        assertEquals(2, buf.position());
         buf.clear();
-        Assert.assertEquals('E', buf.get(0));
-        Assert.assertEquals('F', buf.get(1));
-        Assert.assertEquals('C', buf.get(2)); // C may not be overwritten
+        assertEquals('E', buf.get(0));
+        assertEquals('F', buf.get(1));
+        assertEquals('C', buf.get(2)); // C may not be overwritten
 
         // UTF-16: We specify byte order to omit BOM.
         encoder = Charset.forName("UTF-16BE").newEncoder();
         buf.clear();
 
         buf.putString("ABC", encoder);
-        Assert.assertEquals(6, buf.position());
+        assertEquals(6, buf.position());
         buf.clear();
 
-        Assert.assertEquals(0, buf.get(0));
-        Assert.assertEquals('A', buf.get(1));
-        Assert.assertEquals(0, buf.get(2));
-        Assert.assertEquals('B', buf.get(3));
-        Assert.assertEquals(0, buf.get(4));
-        Assert.assertEquals('C', buf.get(5));
+        assertEquals(0, buf.get(0));
+        assertEquals('A', buf.get(1));
+        assertEquals(0, buf.get(2));
+        assertEquals('B', buf.get(3));
+        assertEquals(0, buf.get(4));
+        assertEquals('C', buf.get(5));
 
         buf.putString("D", 10, encoder);
-        Assert.assertEquals(10, buf.position());
+        assertEquals(10, buf.position());
         buf.clear();
-        Assert.assertEquals(0, buf.get(0));
-        Assert.assertEquals('D', buf.get(1));
-        Assert.assertEquals(0, buf.get(2));
-        Assert.assertEquals(0, buf.get(3));
+        assertEquals(0, buf.get(0));
+        assertEquals('D', buf.get(1));
+        assertEquals(0, buf.get(2));
+        assertEquals(0, buf.get(3));
 
         buf.putString("EFG", 4, encoder);
-        Assert.assertEquals(4, buf.position());
+        assertEquals(4, buf.position());
         buf.clear();
-        Assert.assertEquals(0, buf.get(0));
-        Assert.assertEquals('E', buf.get(1));
-        Assert.assertEquals(0, buf.get(2));
-        Assert.assertEquals('F', buf.get(3));
-        Assert.assertEquals(0, buf.get(4)); // C may not be overwritten
-        Assert.assertEquals('C', buf.get(5)); // C may not be overwritten
+        assertEquals(0, buf.get(0));
+        assertEquals('E', buf.get(1));
+        assertEquals(0, buf.get(2));
+        assertEquals('F', buf.get(3));
+        assertEquals(0, buf.get(4)); // C may not be overwritten
+        assertEquals('C', buf.get(5)); // C may not be overwritten
 
         // Test putting an emptry string
         buf.putString("", encoder);
-        Assert.assertEquals(0, buf.position());
+        assertEquals(0, buf.position());
         buf.putString("", 4, encoder);
-        Assert.assertEquals(4, buf.position());
-        Assert.assertEquals(0, buf.get(0));
-        Assert.assertEquals(0, buf.get(1));
+        assertEquals(4, buf.position());
+        assertEquals(0, buf.get(0));
+        assertEquals(0, buf.get(1));
     }
 
     public void testGetPrefixedString() throws Exception {
@@ -379,7 +378,7 @@ public class ByteBufferTest extends TestCase {
         buf.putShort((short) 3);
         buf.putString("ABCD", encoder);
         buf.clear();
-        Assert.assertEquals("ABC", buf.getPrefixedString(decoder));
+        assertEquals("ABC", buf.getPrefixedString(decoder));
     }
 
     public void testPutPrefixedString() throws Exception {
@@ -390,17 +389,17 @@ public class ByteBufferTest extends TestCase {
 
         // Without autoExpand
         buf.putPrefixedString("ABC", encoder);
-        Assert.assertEquals(5, buf.position());
-        Assert.assertEquals(0, buf.get(0));
-        Assert.assertEquals(3, buf.get(1));
-        Assert.assertEquals('A', buf.get(2));
-        Assert.assertEquals('B', buf.get(3));
-        Assert.assertEquals('C', buf.get(4));
+        assertEquals(5, buf.position());
+        assertEquals(0, buf.get(0));
+        assertEquals(3, buf.get(1));
+        assertEquals('A', buf.get(2));
+        assertEquals('B', buf.get(3));
+        assertEquals('C', buf.get(4));
 
         buf.clear();
         try {
             buf.putPrefixedString("123456789012345", encoder);
-            Assert.fail();
+            fail();
         } catch (BufferOverflowException e) {
             // OK
         }
@@ -409,24 +408,24 @@ public class ByteBufferTest extends TestCase {
         buf.clear();
         buf.setAutoExpand(true);
         buf.putPrefixedString("123456789012345", encoder);
-        Assert.assertEquals(17, buf.position());
-        Assert.assertEquals(0, buf.get(0));
-        Assert.assertEquals(15, buf.get(1));
-        Assert.assertEquals('1', buf.get(2));
-        Assert.assertEquals('2', buf.get(3));
-        Assert.assertEquals('3', buf.get(4));
-        Assert.assertEquals('4', buf.get(5));
-        Assert.assertEquals('5', buf.get(6));
-        Assert.assertEquals('6', buf.get(7));
-        Assert.assertEquals('7', buf.get(8));
-        Assert.assertEquals('8', buf.get(9));
-        Assert.assertEquals('9', buf.get(10));
-        Assert.assertEquals('0', buf.get(11));
-        Assert.assertEquals('1', buf.get(12));
-        Assert.assertEquals('2', buf.get(13));
-        Assert.assertEquals('3', buf.get(14));
-        Assert.assertEquals('4', buf.get(15));
-        Assert.assertEquals('5', buf.get(16));
+        assertEquals(17, buf.position());
+        assertEquals(0, buf.get(0));
+        assertEquals(15, buf.get(1));
+        assertEquals('1', buf.get(2));
+        assertEquals('2', buf.get(3));
+        assertEquals('3', buf.get(4));
+        assertEquals('4', buf.get(5));
+        assertEquals('5', buf.get(6));
+        assertEquals('6', buf.get(7));
+        assertEquals('7', buf.get(8));
+        assertEquals('8', buf.get(9));
+        assertEquals('9', buf.get(10));
+        assertEquals('0', buf.get(11));
+        assertEquals('1', buf.get(12));
+        assertEquals('2', buf.get(13));
+        assertEquals('3', buf.get(14));
+        assertEquals('4', buf.get(15));
+        assertEquals('5', buf.get(16));
     }
 
     public void testPutPrefixedStringWithPrefixLength() throws Exception {
@@ -434,25 +433,25 @@ public class ByteBufferTest extends TestCase {
         ByteBuffer buf = ByteBuffer.allocate(16).sweep().setAutoExpand(true);
 
         buf.putPrefixedString("A", 1, encoder);
-        Assert.assertEquals(2, buf.position());
-        Assert.assertEquals(1, buf.get(0));
-        Assert.assertEquals('A', buf.get(1));
+        assertEquals(2, buf.position());
+        assertEquals(1, buf.get(0));
+        assertEquals('A', buf.get(1));
 
         buf.sweep();
         buf.putPrefixedString("A", 2, encoder);
-        Assert.assertEquals(3, buf.position());
-        Assert.assertEquals(0, buf.get(0));
-        Assert.assertEquals(1, buf.get(1));
-        Assert.assertEquals('A', buf.get(2));
+        assertEquals(3, buf.position());
+        assertEquals(0, buf.get(0));
+        assertEquals(1, buf.get(1));
+        assertEquals('A', buf.get(2));
 
         buf.sweep();
         buf.putPrefixedString("A", 4, encoder);
-        Assert.assertEquals(5, buf.position());
-        Assert.assertEquals(0, buf.get(0));
-        Assert.assertEquals(0, buf.get(1));
-        Assert.assertEquals(0, buf.get(2));
-        Assert.assertEquals(1, buf.get(3));
-        Assert.assertEquals('A', buf.get(4));
+        assertEquals(5, buf.position());
+        assertEquals(0, buf.get(0));
+        assertEquals(0, buf.get(1));
+        assertEquals(0, buf.get(2));
+        assertEquals(1, buf.get(3));
+        assertEquals('A', buf.get(4));
     }
 
     public void testPutPrefixedStringWithPadding() throws Exception {
@@ -460,19 +459,19 @@ public class ByteBufferTest extends TestCase {
         ByteBuffer buf = ByteBuffer.allocate(16).sweep().setAutoExpand(true);
 
         buf.putPrefixedString("A", 1, 2, (byte) 32, encoder);
-        Assert.assertEquals(3, buf.position());
-        Assert.assertEquals(2, buf.get(0));
-        Assert.assertEquals('A', buf.get(1));
-        Assert.assertEquals(' ', buf.get(2));
+        assertEquals(3, buf.position());
+        assertEquals(2, buf.get(0));
+        assertEquals('A', buf.get(1));
+        assertEquals(' ', buf.get(2));
 
         buf.sweep();
         buf.putPrefixedString("A", 1, 4, (byte) 32, encoder);
-        Assert.assertEquals(5, buf.position());
-        Assert.assertEquals(4, buf.get(0));
-        Assert.assertEquals('A', buf.get(1));
-        Assert.assertEquals(' ', buf.get(2));
-        Assert.assertEquals(' ', buf.get(3));
-        Assert.assertEquals(' ', buf.get(4));
+        assertEquals(5, buf.position());
+        assertEquals(4, buf.get(0));
+        assertEquals('A', buf.get(1));
+        assertEquals(' ', buf.get(2));
+        assertEquals(' ', buf.get(3));
+        assertEquals(' ', buf.get(4));
     }
 
     public void testWideUtf8Characters() throws Exception {
@@ -526,38 +525,38 @@ public class ByteBufferTest extends TestCase {
         // Test reading an object.
         buf.clear();
         Object o2 = buf.getObject();
-        Assert.assertEquals(o, o2);
+        assertEquals(o, o2);
 
         // This assertion is just to make sure that deserialization occurred.
-        Assert.assertNotSame(o, o2);
+        assertNotSame(o, o2);
     }
 
     public void testSweepWithZeros() throws Exception {
         ByteBuffer buf = ByteBuffer.allocate(4);
         buf.putInt(0xdeadbeef);
         buf.clear();
-        Assert.assertEquals(0xdeadbeef, buf.getInt());
-        Assert.assertEquals(4, buf.position());
-        Assert.assertEquals(4, buf.limit());
+        assertEquals(0xdeadbeef, buf.getInt());
+        assertEquals(4, buf.position());
+        assertEquals(4, buf.limit());
 
         buf.sweep();
-        Assert.assertEquals(0, buf.position());
-        Assert.assertEquals(4, buf.limit());
-        Assert.assertEquals(0x0, buf.getInt());
+        assertEquals(0, buf.position());
+        assertEquals(4, buf.limit());
+        assertEquals(0x0, buf.getInt());
     }
 
     public void testSweepNonZeros() throws Exception {
         ByteBuffer buf = ByteBuffer.allocate(4);
         buf.putInt(0xdeadbeef);
         buf.clear();
-        Assert.assertEquals(0xdeadbeef, buf.getInt());
-        Assert.assertEquals(4, buf.position());
-        Assert.assertEquals(4, buf.limit());
+        assertEquals(0xdeadbeef, buf.getInt());
+        assertEquals(4, buf.position());
+        assertEquals(4, buf.limit());
 
         buf.sweep((byte) 0x45);
-        Assert.assertEquals(0, buf.position());
-        Assert.assertEquals(4, buf.limit());
-        Assert.assertEquals(0x45454545, buf.getInt());
+        assertEquals(0, buf.position());
+        assertEquals(4, buf.limit());
+        assertEquals(0x45454545, buf.getInt());
     }
 
     public void testWrapNioBuffer() throws Exception {
@@ -566,23 +565,23 @@ public class ByteBufferTest extends TestCase {
         nioBuf.limit(7);
 
         ByteBuffer buf = ByteBuffer.wrap(nioBuf);
-        Assert.assertEquals(3, buf.position());
-        Assert.assertEquals(7, buf.limit());
-        Assert.assertEquals(10, buf.capacity());
+        assertEquals(3, buf.position());
+        assertEquals(7, buf.limit());
+        assertEquals(10, buf.capacity());
     }
 
     public void testWrapSubArray() throws Exception {
         byte[] array = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
         ByteBuffer buf = ByteBuffer.wrap(array, 3, 4);
-        Assert.assertEquals(3, buf.position());
-        Assert.assertEquals(7, buf.limit());
-        Assert.assertEquals(10, buf.capacity());
+        assertEquals(3, buf.position());
+        assertEquals(7, buf.limit());
+        assertEquals(10, buf.capacity());
 
         buf.clear();
-        Assert.assertEquals(0, buf.position());
-        Assert.assertEquals(10, buf.limit());
-        Assert.assertEquals(10, buf.capacity());
+        assertEquals(0, buf.position());
+        assertEquals(10, buf.limit());
+        assertEquals(10, buf.capacity());
     }
 
     public void testPoolExpiration() throws Exception {
@@ -598,14 +597,14 @@ public class ByteBufferTest extends TestCase {
         Thread.sleep(2000);
 
         // Make sure old buffers are flushed.
-        Assert.assertNotSame(buf, ByteBuffer.allocate(16));
+        assertNotSame(buf, ByteBuffer.allocate(16));
 
         // Make sure new buffers are not flushed.
         allocator.setTimeout(10);
         buf = ByteBuffer.allocate(16);
         buf.release();
         Thread.sleep(2000);
-        Assert.assertSame(buf.buf(), ByteBuffer.allocate(16).buf());
+        assertSame(buf.buf(), ByteBuffer.allocate(16).buf());
 
         // Return to the default settings
         allocator.setTimeout(60);
@@ -618,7 +617,7 @@ public class ByteBufferTest extends TestCase {
         // dispose() should fail because the allocator is in use.
         try {
             allocator.dispose();
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
             // OK
         }
@@ -632,7 +631,7 @@ public class ByteBufferTest extends TestCase {
         // Allocation request to the disposed allocator should fail.
         try {
             allocator.allocate(16, true);
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
             // OK
         }
@@ -650,17 +649,17 @@ public class ByteBufferTest extends TestCase {
         original.limit(10);
         duplicate = original.duplicate();
         original.put(4, (byte) 127);
-        Assert.assertEquals(4, duplicate.position());
-        Assert.assertEquals(10, duplicate.limit());
-        Assert.assertEquals(16, duplicate.capacity());
-        Assert.assertNotSame(original.buf(), duplicate.buf());
-        Assert.assertEquals(127, duplicate.get(4));
+        assertEquals(4, duplicate.position());
+        assertEquals(10, duplicate.limit());
+        assertEquals(16, duplicate.capacity());
+        assertNotSame(original.buf(), duplicate.buf());
+        assertEquals(127, duplicate.get(4));
         original.release();
         duplicate.release();
 
         //// Check if pooled correctly.
         original = ByteBuffer.allocate(16);
-        Assert.assertSame(nioBuf, original.buf());
+        assertSame(nioBuf, original.buf());
         original.release();
 
         // Try to release duplicate first.
@@ -671,7 +670,7 @@ public class ByteBufferTest extends TestCase {
 
         //// Check if pooled correctly.
         original = ByteBuffer.allocate(16);
-        Assert.assertSame(nioBuf, original.buf());
+        assertSame(nioBuf, original.buf());
         original.release();
 
         // Test a duplicate of a duplicate.
@@ -683,20 +682,20 @@ public class ByteBufferTest extends TestCase {
         duplicate.release();
         try {
             duplicate.release();
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
             // OK
         }
         try {
             anotherDuplicate.release();
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
             // OK
         }
 
         //// Check if pooled correctly.
         original = ByteBuffer.allocate(16);
-        Assert.assertSame(nioBuf, original.buf());
+        assertSame(nioBuf, original.buf());
         original.release();
 
         // Try to expand.
@@ -706,7 +705,7 @@ public class ByteBufferTest extends TestCase {
             duplicate.setAutoExpand(true);
             duplicate.putString("A very very very very looooooong string",
                     Charset.forName("ISO-8859-1").newEncoder());
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
             // OK
         }
@@ -722,11 +721,11 @@ public class ByteBufferTest extends TestCase {
         original.limit(10);
         slice = original.slice();
         original.put(4, (byte) 127);
-        Assert.assertEquals(0, slice.position());
-        Assert.assertEquals(6, slice.limit());
-        Assert.assertEquals(6, slice.capacity());
-        Assert.assertNotSame(original.buf(), slice.buf());
-        Assert.assertEquals(127, slice.get(0));
+        assertEquals(0, slice.position());
+        assertEquals(6, slice.limit());
+        assertEquals(6, slice.capacity());
+        assertNotSame(original.buf(), slice.buf());
+        assertEquals(127, slice.get(0));
         original.release();
         slice.release();
     }
@@ -741,11 +740,11 @@ public class ByteBufferTest extends TestCase {
         original.limit(10);
         duplicate = original.asReadOnlyBuffer();
         original.put(4, (byte) 127);
-        Assert.assertEquals(4, duplicate.position());
-        Assert.assertEquals(10, duplicate.limit());
-        Assert.assertEquals(16, duplicate.capacity());
-        Assert.assertNotSame(original.buf(), duplicate.buf());
-        Assert.assertEquals(127, duplicate.get(4));
+        assertEquals(4, duplicate.position());
+        assertEquals(10, duplicate.limit());
+        assertEquals(16, duplicate.capacity());
+        assertNotSame(original.buf(), duplicate.buf());
+        assertEquals(127, duplicate.get(4));
         original.release();
         duplicate.release();
 
@@ -755,7 +754,7 @@ public class ByteBufferTest extends TestCase {
             duplicate = original.asReadOnlyBuffer();
             duplicate.putString("A very very very very looooooong string",
                     Charset.forName("ISO-8859-1").newEncoder());
-            Assert.fail();
+            fail();
         } catch (ReadOnlyBufferException e) {
             // OK
         }
@@ -772,10 +771,20 @@ public class ByteBufferTest extends TestCase {
         buf.order(ByteOrder.LITTLE_ENDIAN);
 
         buf.mark();
-        Assert.assertEquals(0xA4, buf.getUnsigned());
+        assertEquals(0xA4, buf.getUnsigned());
         buf.reset();
-        Assert.assertEquals(0xD0A4, buf.getUnsignedShort());
+        assertEquals(0xD0A4, buf.getUnsignedShort());
         buf.reset();
-        Assert.assertEquals(0xCDB3D0A4L, buf.getUnsignedInt());
+        assertEquals(0xCDB3D0A4L, buf.getUnsignedInt());
+    }
+    
+    public void testPooledAllocator() {
+        ByteBuffer.setAllocator(new PooledByteBufferAllocator()); 
+        ByteBuffer buffer1 = ByteBuffer.allocate(100); 
+        buffer1.put((byte)42); 
+        buffer1.release();
+        
+        ByteBuffer buffer2 = ByteBuffer.allocate(100);
+        assertEquals(0, buffer2.get(0));
     }
 }
