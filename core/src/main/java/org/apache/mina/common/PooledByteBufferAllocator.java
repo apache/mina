@@ -178,7 +178,6 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator {
             b.clear();
             for (int i=0,max=b.remaining();i<max;i++)
                 b.put((byte) 0);
-            b.clear();
         }
 
         buf.init();
