@@ -172,6 +172,13 @@ public class PooledByteBufferAllocator implements ByteBufferAllocator {
                     .allocateDirect(MINIMUM_CAPACITY << idx)
                     : java.nio.ByteBuffer.allocate(MINIMUM_CAPACITY << idx);
             buf = new UnexpandableByteBuffer(nioBuf);
+        } else {
+            //Fix for DIRMINA-622
+            java.nio.ByteBuffer b = buf.buf();
+            b.clear();
+            for (int i=0,max=b.remaining();i<max;i++)
+                b.put((byte) 0);
+            b.clear();
         }
 
         buf.init();
