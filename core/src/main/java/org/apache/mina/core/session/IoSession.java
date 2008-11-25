@@ -171,6 +171,14 @@ public interface IoSession {
      *                    write requests are flushed (i.e. {@link #closeOnFlush()}).
      */
     CloseFuture close(boolean immediately);
+    
+    /**
+     * Closes this session after all queued write requests
+     * are flushed. This operation is asynchronous.  Wait for the returned
+     * {@link CloseFuture} if you want to wait for the session actually closed.
+     * @deprecated use {@link IoSession#close(boolean)}
+     */
+    @Deprecated CloseFuture close();
 
     /**
      * Returns an attachment of this session.

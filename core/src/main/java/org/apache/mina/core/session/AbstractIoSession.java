@@ -225,7 +225,10 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    private final CloseFuture close() {
+    /**
+     * {@inheritDoc}
+     */
+    public final CloseFuture close() {
         synchronized (lock) {
             if (isClosing()) {
                 return closeFuture;
