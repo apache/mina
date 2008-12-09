@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>build</artifactId>
-    <version>2.0.0-M4-SNAPSHOT</version>
+    <version>2.0.0-M4</version>
   </parent>
   <artifactId>mina-integration-ognl</artifactId>
   <name>Apache MINA OGNL Integration</name>
