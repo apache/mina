@@ -49,32 +49,35 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
             .getLogger(Socks5LogicHandler.class);
 
     /**
-     * The selected authentication method.
+     * The selected authentication method attribute key.
      */
     private final static String SELECTED_AUTH_METHOD = Socks5LogicHandler.class
             .getName()
             + ".SelectedAuthMethod";
 
     /**
-     * The current step in the handshake.
+     * The current step in the handshake attribute key.
      */
     private final static String HANDSHAKE_STEP = Socks5LogicHandler.class
             .getName()
             + ".HandshakeStep";
 
     /**
-     * The Java GSS-API context.
+     * The Java GSS-API context attribute key.
      */
     private final static String GSS_CONTEXT = Socks5LogicHandler.class
             .getName()
             + ".GSSContext";
 
     /**
-     * Last GSS token received.
+     * Last GSS token received attribute key.
      */
     private final static String GSS_TOKEN = Socks5LogicHandler.class.getName()
             + ".GSSToken";
 
+    /**
+     * {@inheritDoc}
+     */
     public Socks5LogicHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);
         getSession().setAttribute(HANDSHAKE_STEP,
@@ -82,15 +85,14 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
     }
 
     /**
-     * Perform any handshaking processing.
+     * Perform the handshake process.
      */
     public synchronized void doHandshake(final NextFilter nextFilter) {
         logger.debug(" doHandshake()");
 
         // Send request
-        int step = ((Integer) getSession().getAttribute(HANDSHAKE_STEP))
-                .intValue();
-        writeRequest(nextFilter, request, step);
+        writeRequest(nextFilter, request, ((Integer) getSession().getAttribute(
+                HANDSHAKE_STEP)).intValue());
     }
 
     /**
@@ -115,7 +117,8 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
      * 
      * @param request the socks proxy request data
      * @return the encoded buffer
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException if request's hostname charset 
+     * can't be converted to ASCII. 
      */
     private IoBuffer encodeProxyRequestPacket(final SocksProxyRequest request)
             throws UnsupportedEncodingException {
@@ -126,7 +129,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
         InetSocketAddress adr = request.getEndpointAddress();
         byte addressType = 0;
 
-        if (adr != null) {
+        if (adr != null && !adr.isUnresolved()) {
             if (adr.getAddress() instanceof Inet6Address) {
                 len += 16;
                 addressType = SocksProxyConstants.IPV6_ADDRESS_TYPE;
@@ -159,89 +162,33 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
     }
 
     /**
-     * Encode the authentication packet for supported auth methods.
+     * Encode the authentication packet for supported authentication methods.
      * 
      * @param request the socks proxy request data
-     * @return the encoded buffer
+     * @return the encoded buffer, if null then authentication step is over 
+     * and handshake process can jump immediately to the next step without waiting
+     * for a server reply.
      * @throws UnsupportedEncodingException
-     * @throws GSSException 
+     * @throws GSSException when something fails while using GSSAPI
      */
     private IoBuffer encodeAuthenticationPacket(final SocksProxyRequest request)
             throws UnsupportedEncodingException, GSSException {
         byte method = ((Byte) getSession().getAttribute(
                 Socks5LogicHandler.SELECTED_AUTH_METHOD)).byteValue();
 
-        if (method == SocksProxyConstants.NO_AUTH) {
+        switch (method) {
+        case SocksProxyConstants.NO_AUTH:
+            // In this case authentication is immediately considered as successfull
+            // Next writeRequest() call will send the proxy request
             getSession().setAttribute(HANDSHAKE_STEP,
                     SocksProxyConstants.SOCKS5_REQUEST_STEP);
+            break;
 
-        } else if (method == SocksProxyConstants.GSSAPI_AUTH) {
-            GSSContext ctx = (GSSContext) getSession()
-                    .getAttribute(GSS_CONTEXT);
-            if (ctx == null) {
-                GSSManager manager = GSSManager.getInstance();
-                GSSName serverName = manager.createName(request
-                        .getServiceKerberosName(), null);
-                Oid krb5OID = new Oid(SocksProxyConstants.KERBEROS_V5_OID);
+        case SocksProxyConstants.GSSAPI_AUTH:
+            return encodeGSSAPIAuthenticationPacket(request);
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Available mechs:");
-                    for (Oid o : manager.getMechs()) {
-                        if (o.equals(krb5OID)) {
-                            logger.debug("Found Kerberos V OID available");
-                        }
-                        logger.debug("{} with oid = {}", manager
-                                .getNamesForMech(o), o);
-                    }
-                }
-
-                ctx = manager.createContext(serverName, krb5OID, null,
-                        GSSContext.DEFAULT_LIFETIME);
-
-                ctx.requestMutualAuth(true); // Mutual authentication
-                ctx.requestConf(false);
-                ctx.requestInteg(false);
-
-                getSession().setAttribute(GSS_CONTEXT, ctx);
-            }
-
-            byte[] token = (byte[]) getSession().getAttribute(GSS_TOKEN);
-            if (token != null) {
-                logger.debug("  Received Token[{}] = {}", token.length,
-                        ByteUtilities.asHex(token));
-            }
-            IoBuffer buf = null;
-
-            if (!ctx.isEstablished()) {
-                // token is ignored on the first call
-                if (token == null) {
-                    token = new byte[32];
-                }
-
-                token = ctx.initSecContext(token, 0, token.length);
-
-                // Send a token to the server if one was generated by
-                // initSecContext
-                if (token != null) {
-                    logger.debug("  Sending Token[{}] = {}", token.length,
-                            ByteUtilities.asHex(token));
-
-                    getSession().setAttribute(GSS_TOKEN, token);
-                    buf = IoBuffer.allocate(4 + token.length);
-                    buf
-                            .put(new byte[] {
-                                    SocksProxyConstants.GSSAPI_AUTH_SUBNEGOTIATION_VERSION,
-                                    SocksProxyConstants.GSSAPI_MSG_TYPE });
-
-                    buf.put(ByteUtilities.intToNetworkByteOrder(token.length,
-                            new byte[2], 0, 2));
-                    buf.put(token);
-                }
-            }
-
-            return buf;
-
-        } else if (method == SocksProxyConstants.BASIC_AUTH) {
+        case SocksProxyConstants.BASIC_AUTH:
+            // The basic auth scheme packet is sent
             byte[] user = request.getUserName().getBytes("ASCII");
             byte[] pwd = request.getPassword().getBytes("ASCII");
             IoBuffer buf = IoBuffer.allocate(3 + user.length + pwd.length);
@@ -259,7 +206,85 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
     }
 
     /**
-     * Encode a SOCKS5 request and send it to the proxy server.
+     * Encode the authentication packet for supported authentication methods.
+     * 
+     * @param request the socks proxy request data
+     * @return the encoded buffer
+     * @throws GSSException when something fails while using GSSAPI
+     */
+    private IoBuffer encodeGSSAPIAuthenticationPacket(
+            final SocksProxyRequest request) throws GSSException {
+        GSSContext ctx = (GSSContext) getSession().getAttribute(GSS_CONTEXT);
+        if (ctx == null) {
+            GSSManager manager = GSSManager.getInstance();
+            GSSName serverName = manager.createName(request
+                    .getServiceKerberosName(), null);
+            Oid krb5OID = new Oid(SocksProxyConstants.KERBEROS_V5_OID);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Available mechs:");
+                for (Oid o : manager.getMechs()) {
+                    if (o.equals(krb5OID)) {
+                        logger.debug("Found Kerberos V OID available");
+                    }
+                    logger.debug("{} with oid = {}",
+                            manager.getNamesForMech(o), o);
+                }
+            }
+
+            ctx = manager.createContext(serverName, krb5OID, null,
+                    GSSContext.DEFAULT_LIFETIME);
+
+            ctx.requestMutualAuth(true); // Mutual authentication
+            ctx.requestConf(false);
+            ctx.requestInteg(false);
+
+            getSession().setAttribute(GSS_CONTEXT, ctx);
+        }
+
+        byte[] token = (byte[]) getSession().getAttribute(GSS_TOKEN);
+        if (token != null) {
+            logger.debug("  Received Token[{}] = {}", token.length,
+                    ByteUtilities.asHex(token));
+        }
+        IoBuffer buf = null;
+
+        if (!ctx.isEstablished()) {
+            // token is ignored on the first call
+            if (token == null) {
+                token = new byte[32];
+            }
+
+            token = ctx.initSecContext(token, 0, token.length);
+
+            // Send a token to the server if one was generated by
+            // initSecContext
+            if (token != null) {
+                logger.debug("  Sending Token[{}] = {}", token.length,
+                        ByteUtilities.asHex(token));
+
+                getSession().setAttribute(GSS_TOKEN, token);
+                buf = IoBuffer.allocate(4 + token.length);
+                buf.put(new byte[] {
+                        SocksProxyConstants.GSSAPI_AUTH_SUBNEGOTIATION_VERSION,
+                        SocksProxyConstants.GSSAPI_MSG_TYPE });
+
+                buf.put(ByteUtilities.intToNetworkByteOrder(token.length,
+                        new byte[2], 0, 2));
+                buf.put(token);
+            }
+        }
+
+        return buf;
+    }
+
+    /**
+     * Encode a SOCKS5 request and writes it to the next filter
+     * so it can be sent to the proxy server.
+     * 
+     * @param nextFilter the next filter
+     * @param request the request to send.
+     * @param step the current step in the handshake process
      */
     private void writeRequest(final NextFilter nextFilter,
             final SocksProxyRequest request, int step) {
@@ -269,7 +294,9 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
             if (step == SocksProxyConstants.SOCKS5_GREETING_STEP) {
                 buf = encodeInitialGreetingPacket(request);
             } else if (step == SocksProxyConstants.SOCKS5_AUTH_STEP) {
+                // This step can happen multiple times like in GSSAPI auth for instance
                 buf = encodeAuthenticationPacket(request);
+                // If buf is null then go to the next step
                 if (buf == null) {
                     step = SocksProxyConstants.SOCKS5_REQUEST_STEP;
                 }
@@ -426,6 +453,9 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
         doHandshake(nextFilter);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void closeSession(String message) {
         GSSContext ctx = (GSSContext) getSession().getAttribute(GSS_CONTEXT);
