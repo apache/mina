@@ -217,7 +217,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param level The LogLevel to set
      */
-    public void setExceptionCaughtLoglevel(LogLevel level) {
+    public void setExceptionCaughtLogLevel(LogLevel level) {
         exceptionCaughtLevel = level;
     }
     
@@ -235,7 +235,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param level The LogLevel to set
      */
-    public void setMessageReceivedLoglevel(LogLevel level) {
+    public void setMessageReceivedLogLevel(LogLevel level) {
         messageReceivedLevel = level;
     }
     
