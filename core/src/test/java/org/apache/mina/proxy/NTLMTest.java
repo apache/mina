@@ -116,7 +116,9 @@ public class NTLMTest extends TestCase {
         String os = System.getProperty("os.name");
         if (os != null && os.toUpperCase().contains("WINDOWS") && 
                 "5.1".equals(System.getProperty("os.version"))) {
-            assertEquals("0501280a0000000f", asHex(NTLMUtilities.getOsVersion()));
+            String hex = asHex(NTLMUtilities.getOsVersion());
+        	assertEquals("0501", hex.substring(0, 4));
+        	assertEquals(16, hex.length());
         }
     }
 
