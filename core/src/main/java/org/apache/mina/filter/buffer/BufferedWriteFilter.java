@@ -243,6 +243,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     public void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) throws Exception {
         free(session);
+        nextFilter.exceptionCaught(session, cause);
     }
 
     /**
@@ -252,5 +253,6 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     public void sessionClosed(NextFilter nextFilter, IoSession session)
             throws Exception {
         free(session);
+        nextFilter.sessionClosed(session);
     }
 }
