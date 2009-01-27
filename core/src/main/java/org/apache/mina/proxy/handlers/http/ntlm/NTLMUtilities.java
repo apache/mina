@@ -95,7 +95,7 @@ public class NTLMUtilities implements NTLMConstants {
                 String line;
                 while ((line = reader.readLine()) != null && "".equals(line))
                     ;
-                int pos = line.indexOf("version");
+                int pos = line.toLowerCase().indexOf("version");
 
                 if (pos == -1) {
                     throw new NullPointerException();
