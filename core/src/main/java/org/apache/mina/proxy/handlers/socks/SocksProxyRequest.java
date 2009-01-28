@@ -32,22 +32,48 @@ import org.apache.mina.proxy.handlers.ProxyRequest;
  */
 public class SocksProxyRequest extends ProxyRequest {
 
+    /**
+     * The SOCKS protocol version.
+     */
     private byte protocolVersion;
 
+    /**
+     * The command code.
+     */
     private byte commandCode;
 
+    /**
+     * The user name used when authenticating to the proxy server. 
+     */
     private String userName;
 
+    /**
+     * The user's password used when authenticating to the proxy server.
+     */
     private String password;
 
+    /**
+     * The SOCKS server host name.
+     */
     private String host;
 
+    /**
+     * The SOCKS server port.
+     */
     private int port;
 
+    /**
+     * The Kerberos service name used in GSSAPI authentication mode.
+     */
     private String serviceKerberosName;
 
     /**
-     * Constructor used when making a SOCKS4/SOCKS5 request.
+     * Constructor used when building a SOCKS4 request.
+     * 
+     * @param protocolVersion the protocol version
+     * @param commandCode the command code
+     * @param endpointAddress the endpoint address
+     * @param userName the user name
      */
     public SocksProxyRequest(byte protocolVersion, byte commandCode,
             InetSocketAddress endpointAddress, String userName) {
@@ -58,7 +84,12 @@ public class SocksProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Constructor used when making a SOCKS4a request.
+     * Constructor used when building a SOCKS4a request.
+     * 
+     * @param commandCode the command code
+     * @param host the server host name
+     * @param port the server port
+     * @param userName the user name
      */
     public SocksProxyRequest(byte commandCode, String host, int port,
             String userName) {
@@ -69,6 +100,13 @@ public class SocksProxyRequest extends ProxyRequest {
         this.port = port;
     }
 
+    /**
+     * Return the endpoint address resulting from the {@link #getEndpointAddress()}. 
+     * If not set, it will return the {@link SocksProxyConstants#FAKE_IP} constant 
+     * value which will be ignored in a SOCKS v4 request.
+     *   
+     * @return the endpoint address
+     */
     public byte[] getIpAddress() {
         if (getEndpointAddress() == null)
             return SocksProxyConstants.FAKE_IP;
@@ -76,6 +114,11 @@ public class SocksProxyRequest extends ProxyRequest {
             return getEndpointAddress().getAddress().getAddress();
     }
 
+    /**
+     * Return the server port as a byte array.
+     * 
+     * @return the server port
+     */
     public byte[] getPort() {
         byte[] port = new byte[2];
         int p = (int) (getEndpointAddress() == null ? this.port
@@ -85,18 +128,38 @@ public class SocksProxyRequest extends ProxyRequest {
         return port;
     }
 
+    /**
+     * Return the command code.
+     * 
+     * @return the command code
+     */
     public byte getCommandCode() {
         return commandCode;
     }
 
+    /**
+     * Return the protocol version.
+     * 
+     * @return the protocol version
+     */
     public byte getProtocolVersion() {
         return protocolVersion;
     }
 
+    /**
+     * Return the user name.
+     * 
+     * @return the user name
+     */
     public String getUserName() {
         return userName;
     }
 
+    /**
+     * Return the server host name.
+     * 
+     * @return the server host name
+     */
     public synchronized final String getHost() {
         if (host == null) {
             if (getEndpointAddress() != null) {
@@ -107,18 +170,38 @@ public class SocksProxyRequest extends ProxyRequest {
         return host;
     }
 
+    /**
+     * Return the user password.
+     * 
+     * @return the user password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Set the user password
+     * 
+     * @param password the user password value
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * Return the Kerberos service name.
+     * 
+     * @return the Kerberos service name
+     */
     public String getServiceKerberosName() {
         return serviceKerberosName;
     }
 
+    /**
+     * Set the Kerberos service name.
+     * 
+     * @param serviceKerberosName the Kerberos service name
+     */
     public void setServiceKerberosName(String serviceKerberosName) {
         this.serviceKerberosName = serviceKerberosName;
     }

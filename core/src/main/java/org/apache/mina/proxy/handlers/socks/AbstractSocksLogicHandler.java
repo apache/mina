@@ -23,7 +23,8 @@ import org.apache.mina.proxy.AbstractProxyLogicHandler;
 import org.apache.mina.proxy.session.ProxyIoSession;
 
 /**
- * AbstractSocksLogicHandler.java - Base class for SOCKS {@link AbstractProxyLogicHandler} implementations.
+ * AbstractSocksLogicHandler.java - Base class for SOCKS {@link AbstractProxyLogicHandler} 
+ * implementations.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -33,12 +34,14 @@ public abstract class AbstractSocksLogicHandler extends
         AbstractProxyLogicHandler {
 
     /**
-     * The request we will ask to the proxy.
+     * The request sent to the proxy.
      */
     protected final SocksProxyRequest request;
 
     /**
      * Creates a new {@link AbstractSocksLogicHandler}.
+     * 
+     * @param proxyIoSession the proxy session object
      */
     public AbstractSocksLogicHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);
