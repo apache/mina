@@ -135,20 +135,28 @@ public class DummySession extends AbstractIoSession {
             public void flush(AbstractIoSession session) {
                 DummySession s = (DummySession) session;
                 WriteRequest req = s.getWriteRequestQueue().poll(session);
-                Object m = req.getMessage();
-                if (m instanceof FileRegion) {
-                    FileRegion file = (FileRegion) m;
-                    try {
-                        file.getFileChannel().position(file.getPosition() + file.getRemainingBytes());
-                        file.update(file.getRemainingBytes());
-                    } catch (IOException e) {
-                        s.getFilterChain().fireExceptionCaught(e);
+                
+                // Chek that the request is not null. If the session has been closed,
+                // we may not have any pending requests.
+                if (req != null) {
+                    Object m = req.getMessage();
+                    if (m instanceof FileRegion) {
+                        FileRegion file = (FileRegion) m;
+                        try {
+                            file.getFileChannel().position(file.getPosition() + file.getRemainingBytes());
+                            file.update(file.getRemainingBytes());
+                        } catch (IOException e) {
+                            s.getFilterChain().fireExceptionCaught(e);
+                        }
                     }
+                    getFilterChain().fireMessageSent(req);
                 }
-                getFilterChain().fireMessageSent(req);
             }
 
             public void remove(AbstractIoSession session) {
+                if (!session.getCloseFuture().isClosed()) {
+                    session.getFilterChain().fireSessionClosed();
+                }
             }
 
             public void updateTrafficControl(AbstractIoSession session) {
