@@ -186,6 +186,51 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
+    public void testUnbindResume() throws Exception {
+        bind(true);
+        IoConnector connector = newConnector();
+        IoSession session = null;
+        connector.setHandler(new IoHandlerAdapter());
+        
+        ConnectFuture future = connector.connect(createSocketAddress(port));
+        future.awaitUninterruptibly();
+        session = future.getSession();
+        Assert.assertTrue(session.isConnected());
+        Assert.assertTrue(session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
+
+        // Wait for the server side session to be created.
+        Thread.sleep(500);
+
+        Collection<IoSession> managedSession = acceptor.getManagedSessions().values();
+        Assert.assertEquals(1, managedSession.size());
+
+        acceptor.unbind();
+
+        // Wait for the client side sessions to close.
+        Thread.sleep(500);
+
+        Assert.assertEquals(0, managedSession.size());
+        for (IoSession element : managedSession) {
+            Assert.assertFalse(element.isConnected());
+        }
+        
+        // Rebind
+        bind(true);
+        
+        // Check again the connection
+        future = connector.connect(createSocketAddress(port));
+        future.awaitUninterruptibly();
+        session = future.getSession();
+        Assert.assertTrue(session.isConnected());
+        Assert.assertTrue(session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
+
+        // Wait for the server side session to be created.
+        Thread.sleep(500);
+
+        managedSession = acceptor.getManagedSessions().values();
+        Assert.assertEquals(1, managedSession.size());
+    }
+
     public void _testRegressively() throws IOException {
         setReuseAddress(true);
 
