@@ -145,19 +145,21 @@ import org.apache.mina.core.session.IoSession;
  * @version $Rev$, $Date$
  */
 public abstract class IoBuffer implements Comparable<IoBuffer> {
+    /** The allocator used to create new buffers */
     private static IoBufferAllocator allocator = new SimpleBufferAllocator();
 
+    /** An immutable allocated empty direct buffer */
     private static final IoBuffer EMPTY_DIRECT_BUFFER = allocator.allocate(0,
             true);
 
+    /** An immutable allocated empty heap buffer */
     private static final IoBuffer EMPTY_HEAP_BUFFER = allocator.allocate(0,
             false);
 
+    /** A flag indicating which type of buffer we are using : heap or direct */
     private static boolean useDirectBuffer = false;
 
-    /**
-     * An immutable empty buffer.
-     */
+    /** An immutable empty buffer. */
     public static final IoBuffer EMPTY_BUFFER = wrap(new byte[0]);
 
     /**

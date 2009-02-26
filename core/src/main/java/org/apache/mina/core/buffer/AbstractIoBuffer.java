@@ -55,9 +55,6 @@ import java.util.Set;
  * @see IoBufferAllocator
  */
 public abstract class AbstractIoBuffer extends IoBuffer {
-    /** The allocator used to creat new buffers */
-    private final IoBufferAllocator allocator;
-
     /** Tells if a buffer has been created from an existing buffer */
     private final boolean derived;
 
@@ -95,7 +92,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * @param initialCapacity The initial buffer capacity when created
      */
     protected AbstractIoBuffer(IoBufferAllocator allocator, int initialCapacity) {
-        this.allocator = allocator;
+        setAllocator(allocator);
         this.recapacityAllowed = true;
         this.derived = false;
         this.minimumCapacity = initialCapacity;
@@ -108,7 +105,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * @param parent The buffer we get the properties from
      */
     protected AbstractIoBuffer(AbstractIoBuffer parent) {
-        this.allocator = parent.allocator;
+        setAllocator(parent.getAllocator());
         this.recapacityAllowed = false;
         this.derived = true;
         this.minimumCapacity = parent.minimumCapacity;
@@ -186,7 +183,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
             //// Reallocate.
             ByteBuffer oldBuf = buf();
-            ByteBuffer newBuf = allocator.allocateNioBuffer(newCapacity,
+            ByteBuffer newBuf = getAllocator().allocateNioBuffer(newCapacity,
                     isDirect());
             oldBuf.clear();
             newBuf.put(oldBuf);
@@ -339,7 +336,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
         //// Reallocate.
         ByteBuffer oldBuf = buf();
-        ByteBuffer newBuf = allocator
+        ByteBuffer newBuf = getAllocator()
                 .allocateNioBuffer(newCapacity, isDirect());
         oldBuf.position(0);
         oldBuf.limit(limit);
@@ -611,7 +608,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
             //// Reallocate.
             ByteBuffer oldBuf = buf();
-            ByteBuffer newBuf = allocator.allocateNioBuffer(newCapacity,
+            ByteBuffer newBuf = getAllocator().allocateNioBuffer(newCapacity,
                     isDirect());
             newBuf.put(oldBuf);
             buf(newBuf);
