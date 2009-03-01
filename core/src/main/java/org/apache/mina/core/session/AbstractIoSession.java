@@ -29,6 +29,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.DefaultFileRegion;
@@ -98,6 +99,12 @@ public abstract class AbstractIoSession implements IoSession {
     // The Session creation's time */
     private final long creationTime;
 
+    /** An id generator guaranteed to generate unique IDs for the session */
+    private static AtomicLong idGenerator = new AtomicLong(0);
+    
+    /** The session ID */
+    private long sessionId;
+    
     /**
      * A future that will be set 'closed' when the connection is closed.
      */
@@ -157,16 +164,19 @@ public abstract class AbstractIoSession implements IoSession {
         
         // TODO add documentation
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
+        
+        // Set a new ID for this session
+        sessionId = idGenerator.incrementAndGet();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * TODO this method implementation is totally wrong. It has to
-     * be rewritten.
+     * We use an AtomicLong to guarantee that the session ID are
+     * unique.
      */
     public final long getId() {
-        return hashCode() & 0xFFFFFFFFL;
+        return sessionId;
     }
 
     /**
