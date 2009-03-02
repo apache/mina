@@ -107,6 +107,11 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
                 return false;
             for (int i = 0; i < last; i++) {
                 boolean found = false;
+
+                // The Content-Length header is compared with
+                // a case-sensitive value. This portion of the
+                // code won't work if the client send a header
+                // with a different case.
                 for (int j = 0; j < CONTENT_LENGTH.length; j++) {
                     if (in.get(i + j) != CONTENT_LENGTH[j]) {
                         found = false;
