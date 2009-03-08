@@ -123,10 +123,19 @@ public final class NioDatagramConnector
     protected DatagramChannel newHandle(SocketAddress localAddress)
             throws Exception {
         DatagramChannel ch = DatagramChannel.open();
-        if (localAddress != null) {
-            ch.socket().bind(localAddress);
+
+        try {
+            if (localAddress != null) {
+                ch.socket().bind(localAddress);
+            }
+            
+            return ch;
+        } catch (Exception e) {
+            // If we got an exception while binding the datagram,
+            // we have to close it otherwise we will loose an handle
+            ch.close();
+            throw e;
         }
-        return ch;
     }
 
     @Override
