@@ -48,7 +48,7 @@ public class MD4Test extends TestCase {
         if (Security.getProvider(MD4Provider.PROVIDER_NAME) == null) {
             System.out.print("Adding MINA provider...");
             Security.addProvider(new MD4Provider());
-            System.out.println(" [Ok]");
+            //System.out.println(" [Ok]");
         }
     }
 
@@ -103,6 +103,6 @@ public class MD4Test extends TestCase {
         String result = asHex(md4.digest(testVector.getBytes()));
         System.out.print(result);
         assertEquals(expected, result);
-        System.out.println(" ... Ok");
+        //System.out.println(" ... Ok");
     }
 }

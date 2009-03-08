@@ -241,9 +241,9 @@ public abstract class AbstractBindTest extends TestCase {
         for (int i = 0; i < 1048576; i++) {
             acceptor.bind();
             acceptor.unbind();
-            if (i % 100 == 0) {
-                System.out.println(i + " (" + new Date() + ")");
-            }
+            //if (i % 100 == 0) {
+                //System.out.println(i + " (" + new Date() + ")");
+            //}
         }
         bind(false);
     }
@@ -270,7 +270,7 @@ public abstract class AbstractBindTest extends TestCase {
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
-            cause.printStackTrace();
+            //cause.printStackTrace();
             session.close(true);
         }
 

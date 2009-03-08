@@ -184,7 +184,7 @@ public class IoServiceListenerSupportTest {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
                 // This synchronization block is a workaround for
                 // the visibility problem of simultaneous EasyMock

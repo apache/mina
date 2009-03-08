@@ -126,7 +126,7 @@ public class ClientSessionHandler extends AbstractProxyIoHandler {
             // position and the limit is written to the file
             wChannel.write(buf.buf());
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -161,7 +161,7 @@ public class ClientSessionHandler extends AbstractProxyIoHandler {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
         logger.debug("CLIENT - Exception caught");
-        cause.printStackTrace();
+        //cause.printStackTrace();
         session.close(true);
     }
 }

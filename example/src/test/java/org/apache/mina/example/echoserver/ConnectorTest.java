@@ -92,10 +92,10 @@ public class ConnectorTest extends AbstractTest {
     private void testConnector(IoConnector connector) throws Exception {
         connector.setHandler(handler);
 
-        System.out.println("* Without localAddress");
+        //System.out.println("* Without localAddress");
         testConnector(connector, false);
 
-        System.out.println("* With localAddress");
+        //System.out.println("* With localAddress");
         testConnector(connector, true);
     }
 

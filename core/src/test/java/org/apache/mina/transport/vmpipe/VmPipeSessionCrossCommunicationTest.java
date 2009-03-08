@@ -51,7 +51,7 @@ public class VmPipeSessionCrossCommunicationTest extends TestCase {
         acceptor.setHandler(new IoHandlerAdapter() {
             @Override
             public void messageReceived(IoSession session, Object message) throws Exception {
-                System.out.println(Thread.currentThread().getName() + ": " + message);
+                //System.out.println(Thread.currentThread().getName() + ": " + message);
 
                 if ("start".equals(message)) {
                     session.write("open new");
@@ -69,10 +69,10 @@ public class VmPipeSessionCrossCommunicationTest extends TestCase {
         connector.setHandler(new IoHandlerAdapter() {
             @Override
             public void messageReceived(IoSession session, Object message) throws Exception {
-                System.out.println(Thread.currentThread().getName() + ": " + message);
+                //System.out.println(Thread.currentThread().getName() + ": " + message);
 
                 if ("open new".equals(message)) {
-                    System.out.println("opening c2 from " + Thread.currentThread().getName());
+                    //System.out.println("opening c2 from " + Thread.currentThread().getName());
 
                     IoConnector c2 = new VmPipeConnector();
                     c2.setHandler(new IoHandlerAdapter() {
@@ -83,7 +83,7 @@ public class VmPipeSessionCrossCommunicationTest extends TestCase {
 
                         @Override
                         public void messageReceived(IoSession session, Object message) throws Exception {
-                            System.out.println(Thread.currentThread().getName() + ": " + message);
+                            //System.out.println(Thread.currentThread().getName() + ": " + message);
 
                             if ("tell me something on c1 now".equals(message)) {
                                 latch.countDown();

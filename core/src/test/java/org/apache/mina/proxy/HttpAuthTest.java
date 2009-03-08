@@ -81,7 +81,7 @@ public class HttpAuthTest extends TestCase {
             assertEquals("6629fae49393a05397450978507c4ef1", response);
             writeResponse(map, response);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -113,6 +113,6 @@ public class HttpAuthTest extends TestCase {
             }
         }
 
-        System.out.println("Proxy-Authorization: " + sb.toString());
+        //System.out.println("Proxy-Authorization: " + sb.toString());
     }
 }

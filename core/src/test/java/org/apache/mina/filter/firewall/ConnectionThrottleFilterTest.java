@@ -65,7 +65,7 @@ public class ConnectionThrottleFilterTest extends TestCase
         }
         catch ( InterruptedException e )
         {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         boolean result = filter.isConnectionOk( sessionOne );

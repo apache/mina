@@ -191,7 +191,7 @@ public class Socks5GSSAPITestServer {
                 // and finally block will close session 			    
                 Thread.sleep(500);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                //ex.printStackTrace();
             } finally {
                 context.dispose();
                 socket.close();

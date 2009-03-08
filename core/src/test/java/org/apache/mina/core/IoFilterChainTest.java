@@ -75,7 +75,7 @@ public class IoFilterChainTest {
         public void exceptionCaught(IoSession session, Throwable cause) {
             result += "HEC";
             if (cause.getClass() != Exception.class) {
-                cause.printStackTrace(System.out);
+                //cause.printStackTrace(System.out);
             }
         }
 
@@ -230,8 +230,8 @@ public class IoFilterChainTest {
         result = formatResult(result);
         expectedResult = formatResult(expectedResult);
 
-        System.out.println("Expected: " + expectedResult);
-        System.out.println("Actual:   " + result);
+        //System.out.println("Expected: " + expectedResult);
+        //System.out.println("Actual:   " + result);
         assertEquals(expectedResult, result);
     }
 

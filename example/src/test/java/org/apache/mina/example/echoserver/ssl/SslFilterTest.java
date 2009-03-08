@@ -91,7 +91,7 @@ public class SslFilterTest {
         acceptor.setHandler(handler);
         acceptor.bind(new InetSocketAddress(0));
         port = acceptor.getLocalAddress().getPort();
-        System.out.println("MINA server started.");
+        //System.out.println("MINA server started.");
 
         Socket socket = getClientSocket(useSSL);
         int bytesSent = 0;
@@ -123,7 +123,7 @@ public class SslFilterTest {
             Thread.sleep(100);
         }
 
-        System.out.println("handler: " + handler.sentMessages);
+        //System.out.println("handler: " + handler.sentMessages);
         assertEquals("handler should have sent 2 messages:", 2,
                 handler.sentMessages.size());
         assertTrue(handler.sentMessages.contains("test-1"));
@@ -152,7 +152,7 @@ public class SslFilterTest {
         @Override
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
-            cause.printStackTrace();
+            //cause.printStackTrace();
         }
 
         @Override
@@ -165,7 +165,7 @@ public class SslFilterTest {
         public void messageSent(IoSession session, Object message)
                 throws Exception {
             sentMessages.add(message.toString());
-            System.out.println(message);
+            //System.out.println(message);
             if (sentMessages.size() >= 2) {
                 session.close(true);
             }

@@ -87,7 +87,7 @@ public class TelnetSessionHandler extends AbstractProxyIoHandler {
      */
     @Override
     public void messageReceived(IoSession session, Object message) {
-        System.out.println((String) message);
+        //System.out.println((String) message);
     }
 
     /**
@@ -104,7 +104,7 @@ public class TelnetSessionHandler extends AbstractProxyIoHandler {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
         logger.debug("CLIENT - Exception caught");
-        cause.printStackTrace();
+        //cause.printStackTrace();
         session.close(true);
     }
 }

@@ -105,14 +105,14 @@ public class KeepAliveFilterTest extends TestCase {
             @Override
             public void exceptionCaught(IoSession session, Throwable cause)
                     throws Exception {
-                cause.printStackTrace();
+                //cause.printStackTrace();
                 gotException.set(true);
             }
 
             @Override
             public void sessionIdle(IoSession session, IdleStatus status)
                     throws Exception {
-                System.out.println("client idle:" + status);
+                //System.out.println("client idle:" + status);
             }
         });
 
