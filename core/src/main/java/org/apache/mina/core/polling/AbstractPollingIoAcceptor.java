@@ -478,12 +478,15 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                 H handle = handles.next();
                 handles.remove();
 
+                // Associates a new created connection to a processor,
+                // and get back a session
                 T session = accept(processor, handle);
+                
                 if (session == null) {
                     break;
                 }
 
-                finishSessionInitialization(session, null, null);
+                initSession(session, null, null);
 
                 // add the session to the SocketIoProcessor
                 session.getProcessor().add(session);

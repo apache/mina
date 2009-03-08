@@ -99,7 +99,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
         VmPipeSession localSession = new VmPipeSession(this,
                 getListeners(), actualLocalAddress, getHandler(), entry);
 
-        finishSessionInitialization(localSession, future, sessionInitializer);
+        initSession(localSession, future, sessionInitializer);
 
         // and reclaim the local address when the connection is closed.
         localSession.getCloseFuture().addListener(LOCAL_ADDRESS_RECLAIMER);

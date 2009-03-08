@@ -252,7 +252,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             session = newSession;
         }
 
-        finishSessionInitialization(session, null, null);
+        initSession(session, null, null);
 
         try {
             this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());

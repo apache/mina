@@ -553,11 +553,13 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Create a new close aware write queue, based on the given write queue.
+     * 
+     * @param writeRequestQueue The write request queue
      */
     public final void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
         this.writeRequestQueue =
-            new CloseRequestAwareWriteRequestQueue(writeRequestQueue);
+            new CloseAwareWriteQueue(writeRequestQueue);
     }
 
 
@@ -1244,38 +1246,61 @@ public abstract class AbstractIoSession implements IoSession {
     
     
     /**
-     * TODO Add method documentation. Name is ridiculously too long.
+     * A queue which handles the CLOSE request.
+     * 
+     * TODO : Check that when closing a session, all the pending
+     * requests are correctly sent.
      */
-    private class CloseRequestAwareWriteRequestQueue implements WriteRequestQueue {
+    private class CloseAwareWriteQueue implements WriteRequestQueue {
 
         private final WriteRequestQueue q;
 
-        public CloseRequestAwareWriteRequestQueue(WriteRequestQueue q) {
+        /**
+         * {@inheritDoc}
+         */
+        public CloseAwareWriteQueue(WriteRequestQueue q) {
             this.q = q;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public synchronized WriteRequest poll(IoSession session) {
             WriteRequest answer = q.poll(session);
+            
             if (answer == CLOSE_REQUEST) {
                 AbstractIoSession.this.close();
                 dispose(session);
                 answer = null;
             }
+            
             return answer;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void offer(IoSession session, WriteRequest e) {
             q.offer(session, e);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean isEmpty(IoSession session) {
             return q.isEmpty(session);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void clear(IoSession session) {
             q.clear(session);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void dispose(IoSession session) {
             q.dispose(session);
         }

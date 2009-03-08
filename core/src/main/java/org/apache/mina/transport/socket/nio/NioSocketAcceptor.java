@@ -216,6 +216,7 @@ public final class NioSocketAcceptor
 
         // accept the connection from the client
         SocketChannel ch = handle.accept();
+        
         if (ch == null) {
             return null;
         }

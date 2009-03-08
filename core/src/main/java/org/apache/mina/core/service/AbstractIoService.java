@@ -437,12 +437,13 @@ public abstract class AbstractIoService implements IoService {
 
     // TODO Figure out make it work without causing a compiler error / warning.
     @SuppressWarnings("unchecked")
-    protected final void finishSessionInitialization(IoSession session,
+    protected final void initSession(IoSession session,
             IoFuture future, IoSessionInitializer sessionInitializer) {
         // Update lastIoTime if needed.
         if (stats.getLastReadTime() == 0) {
             ((IoServiceStatistics)stats).setLastReadTime(getActivationTime());
         }
+        
         if (stats.getLastWriteTime() == 0) {
             ((IoServiceStatistics)stats).setLastWriteTime(getActivationTime());
         }
@@ -472,7 +473,7 @@ public abstract class AbstractIoService implements IoService {
                     "Failed to initialize a writeRequestQueue.", e);
         }
 
-        if (future != null && future instanceof ConnectFuture) {
+        if ((future != null) && (future instanceof ConnectFuture)) {
             // DefaultIoFilterChain will notify the future. (We support ConnectFuture only for now).
             session.setAttribute(DefaultIoFilterChain.SESSION_CREATED_FUTURE,
                     future);

@@ -159,24 +159,39 @@ public class DefaultIoSessionDataStructureFactory implements
     }
     
     private static class DefaultWriteRequestQueue implements WriteRequestQueue {
-
+        /** A queue to store incoming write requests */
         private final Queue<WriteRequest> q = new CircularQueue<WriteRequest>(16);
         
+        /**
+         * {@inheritDoc}
+         */
         public void dispose(IoSession session) {
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public void clear(IoSession session) {
             q.clear();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public synchronized boolean isEmpty(IoSession session) {
             return q.isEmpty();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public synchronized void offer(IoSession session, WriteRequest writeRequest) {
             q.offer(writeRequest);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public synchronized WriteRequest poll(IoSession session) {
             return q.poll();
         }
