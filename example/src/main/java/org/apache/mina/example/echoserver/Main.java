@@ -42,6 +42,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         SocketAcceptor acceptor = new NioSocketAcceptor();
+        acceptor.setReuseAddress( true );
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
         
         // Add SSL filter if SSL is enabled.

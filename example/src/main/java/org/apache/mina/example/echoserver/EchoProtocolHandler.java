@@ -68,6 +68,7 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
+        logger.info( "Received : " + message );
         // Write the received data back to remote peer
         session.write(((IoBuffer) message).duplicate());
     }
