@@ -235,16 +235,21 @@ public final class NioSocketAcceptor
         boolean success = false;
         
         try {
+            // This is a non blocking socket channel
             channel.configureBlocking(false);
         
             // Configure the server socket,
             ServerSocket socket = channel.socket();
             
+            // Set the reuseAddress flag accordingly with the setting
             socket.setReuseAddress(isReuseAddress());
+            
             // XXX: Do we need to provide this property? (I think we need to remove it.)
             socket.setReceiveBufferSize(getSessionConfig().getReceiveBufferSize());
+            
             // and bind.
             socket.bind(localAddress, getBacklog());
+            
             // Register the channel within the selector for ACCEPT event
             channel.register(selector, SelectionKey.OP_ACCEPT);
             success = true;

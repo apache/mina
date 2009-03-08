@@ -302,8 +302,10 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      * {@inheritDoc}
      */
     @Override
-    protected final Set<SocketAddress> bind0(
+    protected final Set<SocketAddress> bindInternal(
             List<? extends SocketAddress> localAddresses) throws Exception {
+        // Create a bind request as a Future operation. When the selector
+        // have handled the registration, it will signal this future.
         AcceptorOperationFuture request = new AcceptorOperationFuture(
                 localAddresses);
 
@@ -314,7 +316,13 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         // creates the Acceptor instance and has the local
         // executor kick it off.
         startupAcceptor();
+        
+        // As we just started the acceptor, we have to unblock the select()
+        // in order to process the bind request we just have added to the 
+        // registerQueue.
         wakeup();
+        
+        // Now, we wait until this request is completed.
         request.awaitUninterruptibly();
 
         if (request.getException() != null) {
@@ -325,6 +333,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         // setLocalAddresses() shouldn't be called from the worker thread
         // because of deadlock.
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
+        
         for (H handle : boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
         }
@@ -395,7 +404,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                     int selected = select();
 
                     // this actually sets the selector to OP_ACCEPT,
-                    // and binds to the port in which this class will
+                    // and binds to the port on which this class will
                     // listen on
                     nHandles += registerHandles();
 

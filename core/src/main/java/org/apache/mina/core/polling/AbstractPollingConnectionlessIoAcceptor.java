@@ -144,7 +144,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
      * {@inheritDoc}
      */
     @Override
-    protected final Set<SocketAddress> bind0(
+    protected final Set<SocketAddress> bindInternal(
             List<? extends SocketAddress> localAddresses) throws Exception {
         AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
 

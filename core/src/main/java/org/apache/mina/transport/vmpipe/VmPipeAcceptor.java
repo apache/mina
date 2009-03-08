@@ -102,7 +102,7 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     }
 
     @Override
-    protected Set<SocketAddress> bind0(List<? extends SocketAddress> localAddresses) throws IOException {
+    protected Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses) throws IOException {
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
 
         synchronized (boundHandlers) {

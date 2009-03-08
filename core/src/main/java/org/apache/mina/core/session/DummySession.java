@@ -100,7 +100,7 @@ public class DummySession extends AbstractIoSession {
                 }) {
 
             @Override
-            protected Set<SocketAddress> bind0(List<? extends SocketAddress> localAddresses) throws Exception {
+            protected Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses) throws Exception {
                 throw new UnsupportedOperationException();
             }
 

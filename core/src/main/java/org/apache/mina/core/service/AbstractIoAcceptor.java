@@ -212,33 +212,19 @@ public abstract class AbstractIoAcceptor
     /**
      * {@inheritDoc}
      */
-    public final void bind(SocketAddress localAddress) throws IOException {
-        if (localAddress == null) {
-            throw new NullPointerException("localAddress");
+    public final void bind(SocketAddress... addresses) throws IOException {
+        if ((addresses == null) || (addresses.length == 0)) {
+            bind(getDefaultLocalAddresses());
         }
         
-        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(1);
-        localAddresses.add(localAddress);
-        bind(localAddresses);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public final void bind(
-            SocketAddress firstLocalAddress,
-            SocketAddress... otherLocalAddresses) throws IOException {
-        if (firstLocalAddress == null) {
-            throw new NullPointerException("firstLocalAddress");
+        if (addresses.length == 1) {
+            List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(addresses.length);
+            for (SocketAddress address:addresses) {
+                localAddresses.add(address);
+            }
+            
+            bind(localAddresses);
         }
-        if (otherLocalAddresses == null) {
-            throw new NullPointerException("otherLocalAddresses");
-        }
-        
-        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>();
-        localAddresses.add(firstLocalAddress);
-        Collections.addAll(localAddresses, otherLocalAddresses);
-        bind(localAddresses);
     }
 
     /**
@@ -248,15 +234,18 @@ public abstract class AbstractIoAcceptor
         if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");
         }
+        
         if (localAddresses == null) {
             throw new NullPointerException("localAddresses");
         }
         
         List<SocketAddress> localAddressesCopy = new ArrayList<SocketAddress>();
+        
         for (SocketAddress a: localAddresses) {
             checkAddressType(a);
             localAddressesCopy.add(a);
         }
+        
         if (localAddressesCopy.isEmpty()) {
             throw new IllegalArgumentException("localAddresses is empty.");
         }
@@ -272,7 +261,7 @@ public abstract class AbstractIoAcceptor
             }
             
             try {
-                boundAddresses.addAll(bind0(localAddressesCopy));
+                boundAddresses.addAll(bindInternal(localAddressesCopy));
             } catch (IOException e) {
                 throw e;
             } catch (RuntimeException e) {
@@ -375,10 +364,10 @@ public abstract class AbstractIoAcceptor
     }
 
     /**
-     * Implement this method to perform the actual bind operation.
+     * Starts the acceptor, and register the given addresses
      * @return the {@link Set} of the local addresses which is bound actually
      */
-    protected abstract Set<SocketAddress> bind0(
+    protected abstract Set<SocketAddress> bindInternal(
             List<? extends SocketAddress> localAddresses) throws Exception;
 
     /**
@@ -416,6 +405,30 @@ public abstract class AbstractIoAcceptor
         
         public final List<SocketAddress> getLocalAddresses() {
             return Collections.unmodifiableList(localAddresses);
+        }
+        
+        /**
+         * @see Object#toString()
+         */
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append( "Acceptor operation : " );
+            
+            if (localAddresses != null) {
+                boolean isFirst = true;
+                
+                for (SocketAddress address:localAddresses) {
+                    if (isFirst) {
+                        isFirst = false;
+                    } else {
+                        sb.append(", ");
+                    }
+                    
+                    sb.append(address);
+                }
+            }
+            return sb.toString(); 
         }
     }
 }
