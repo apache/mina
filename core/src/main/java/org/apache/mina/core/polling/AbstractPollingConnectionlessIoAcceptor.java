@@ -134,7 +134,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected IoFuture dispose0() throws Exception {
         unbind();
         if (!disposalFuture.isDone()) {
-            startupWorker();
+            startupAcceptor();
             wakeup();
         }
         return disposalFuture;
@@ -146,22 +146,39 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     @Override
     protected final Set<SocketAddress> bindInternal(
             List<? extends SocketAddress> localAddresses) throws Exception {
+        // Create a bind request as a Future operation. When the selector
+        // have handled the registration, it will signal this future.
         AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
 
+        // adds the Registration request to the queue for the Workers
+        // to handle
         registerQueue.add(request);
-        startupWorker();
+
+        // creates the Acceptor instance and has the local
+        // executor kick it off.
+        startupAcceptor();
+        
+        // As we just started the acceptor, we have to unblock the select()
+        // in order to process the bind request we just have added to the 
+        // registerQueue.
         wakeup();
 
+        // Now, we wait until this request is completed.
         request.awaitUninterruptibly();
 
         if (request.getException() != null) {
             throw request.getException();
         }
 
+        // Update the local addresses.
+        // setLocalAddresses() shouldn't be called from the worker thread
+        // because of deadlock.
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
-        for (H handle: boundHandles.values()) {
+
+        for (H handle:boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
         }
+        
         return newLocalAddresses;
     }
 
@@ -174,7 +191,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
 
         cancelQueue.add(request);
-        startupWorker();
+        startupAcceptor();
         wakeup();
 
         request.awaitUninterruptibly();
@@ -297,7 +314,10 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    private void startupWorker() {
+    /**
+     * Starts the inner Acceptor thread.
+     */
+    private void startupAcceptor() {
         if (!selectable) {
             registerQueue.clear();
             cancelQueue.clear();

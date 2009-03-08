@@ -334,7 +334,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         // because of deadlock.
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
         
-        for (H handle : boundHandles.values()) {
+        for (H handle:boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
         }
 
