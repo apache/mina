@@ -130,7 +130,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     }
 
  	@Override
-    protected int select(int timeout) throws Exception {
+    protected int select(long timeout) throws Exception {
         int rv = Poll.poll(pollset, 1000 * timeout, polledSockets, false);
         if (rv <= 0) {
             if (rv != -120001) {

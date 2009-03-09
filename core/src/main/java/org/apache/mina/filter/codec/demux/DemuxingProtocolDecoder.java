@@ -125,15 +125,18 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
     protected boolean doDecode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         State state = getState(session);
+        
         if (state.currentDecoder == null) {
             MessageDecoder[] decoders = state.decoders;
             int undecodables = 0;
+        
             for (int i = decoders.length - 1; i >= 0; i--) {
                 MessageDecoder decoder = decoders[i];
                 int limit = in.limit();
                 int pos = in.position();
 
                 MessageDecoderResult result;
+                
                 try {
                     result = decoder.decodable(session, in);
                 } finally {
@@ -209,13 +212,16 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
     
     private State getState(IoSession session) throws Exception {
         State state = (State) session.getAttribute(STATE);
+        
         if (state == null) {
             state = new State();
             State oldState = (State) session.setAttributeIfAbsent(STATE, state);
+            
             if (oldState != null) {
                 state = oldState;
             }
         }
+        
         return state;
     }
     

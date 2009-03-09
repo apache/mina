@@ -62,6 +62,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * It improves memory utilization and write throughput significantly.
      */
     private static final int WRITE_SPIN_COUNT = 256;
+    
+    /** A timeout used for the select, as we need to get out to deal with idle sessions */
+    private static final long SELECT_TIMEOUT = 1000L;
 
     /** A map containing the last Thread ID for each class */
     private static final Map<Class<?>, AtomicInteger> threadIds = 
@@ -183,7 +186,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * @return The number of session ready for read or for write
      * @throws Exception if some low level IO error occurs
      */
-    protected abstract int select(int timeout) throws Exception;
+    protected abstract int select(long timeout) throws Exception;
     
     /**
      * poll those sessions forever
@@ -623,7 +626,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private void notifyIdleSessions(long currentTime) throws Exception {
         // process idle sessions
-        if (currentTime - lastIdleCheckTime >= 1000) {
+        if (currentTime - lastIdleCheckTime >= SELECT_TIMEOUT) {
             lastIdleCheckTime = currentTime;
             AbstractIoSession.notifyIdleness(allSessions(), currentTime);
         }
@@ -874,8 +877,11 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
             for (;;) {
                 try {
-                    // TODO: Why do we use a timeout here ??? 
-                    int selected = select(1000);
+                    // This select has a timeout so that we can manage
+                    // dile session when we get out of the select every
+                    // second. (note : this is a hack to avoid creating
+                    // a dedicated thread).
+                    int selected = select(SELECT_TIMEOUT);
 
                     nSessions += handleNewSessions();
                     updateTrafficMask();
