@@ -181,7 +181,7 @@ class SerialSessionImpl extends AbstractIoSession implements
 
             int writtenBytes = buf.remaining();
             try {
-                outputStream.write(buf.array());
+            	outputStream.write(buf.array(), buf.position(), writtenBytes);
                 buf.position(buf.position() + writtenBytes);
                 req.getFuture().setWritten();
             } catch (IOException e) {
