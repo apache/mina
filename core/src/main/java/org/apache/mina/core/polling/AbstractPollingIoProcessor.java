@@ -162,7 +162,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         synchronized (disposalLock) {
             if (!disposing) {
                 disposing = true;
-                startupWorker();
+                startupProcessor();
             }
         }
 
@@ -219,7 +219,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     protected abstract Iterator<T> selectedSessions();
     
     /**
-     * Get the sate of a session (preparing, open, closed)
+     * Get the state of a session (preparing, open, closed)
      * @param session the {@link IoSession} to inspect
      * @return the state of the session
      */
@@ -327,7 +327,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
         // Adds the session to the newSession queue and starts the worker
         newSessions.add(session);
-        startupWorker();
+        startupProcessor();
     }
 
     /**
@@ -335,7 +335,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      */
     public final void remove(T session) {
         scheduleRemove(session);
-        startupWorker();
+        startupProcessor();
     }
 
     private void scheduleRemove(T session) {
@@ -372,17 +372,28 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         trafficControllingSessions.add(session);
     }
 
-    private void startupWorker() {
+    /**
+     * Starts the inner Processor, asking the executor to pick a thread in its
+     * pool. The Runnable will be renamed 
+     */
+    private void startupProcessor() {
         synchronized (lock) {
             if (processor == null) {
                 processor = new Processor();
                 executor.execute(new NamePreservingRunnable(processor, threadName));
             }
         }
+        
+        // Just stop the select() and start it again, so that the processor
+        // can be activated immediately. 
         wakeup();
     }
 
-    private int add() {
+    /**
+     * Handle newly created sessions
+     * @return The number of new sessions
+     */
+    private int handleNewSessions() {
         int addedSessions = 0;
         
         // Loop on the new sessions blocking queue, to count
@@ -391,13 +402,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             T session = newSessions.poll();
 
             if (session == null) {
-                // We don't have anymore new sessions
+                // We don't have new sessions
                 break;
             }
 
 
             if (addNow(session)) {
-                // The new session has been added to the 
+                // A new session has been created 
                 addedSessions ++;
             }
         }
@@ -541,12 +552,16 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         }
     }
 
+    /**
+     * Deal with session ready for the read or write operations, or both.
+     */
     private void process(T session) {
-
+        // Process Reads
         if (isReadable(session) && !session.isReadSuspended()) {
             read(session);
         }
 
+        // Process writes
         if (isWritable(session) && !session.isWriteSuspended()) {
             scheduleFlush(session);
         }
@@ -624,6 +639,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         for (; ;) {
             session.setScheduledForFlush(false);
             SessionState state = state(session);
+            
             switch (state) {
             case OPEN:
                 try {
@@ -858,11 +874,14 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
             for (;;) {
                 try {
+                    // TODO: Why do we use a timeout here ??? 
                     int selected = select(1000);
 
-                    nSessions += add();
+                    nSessions += handleNewSessions();
                     updateTrafficMask();
 
+                    // Now, if we have had some incoming or outgoing events,
+                    // deal with them
                     if (selected > 0) {
                         process();
                     }
