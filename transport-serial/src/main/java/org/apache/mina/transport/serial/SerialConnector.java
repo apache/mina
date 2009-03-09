@@ -98,7 +98,7 @@ public final class SerialConnector extends AbstractIoConnector {
                         ConnectFuture future = new DefaultConnectFuture();
                         SerialSessionImpl session = new SerialSessionImpl(
                                 this, getListeners(), portAddress, serialPort);
-                        finishSessionInitialization(session, future, sessionInitializer);
+                        initSession(session, future, sessionInitializer);
                         session.start();
                         return future;
                     } catch (PortInUseException e) {
