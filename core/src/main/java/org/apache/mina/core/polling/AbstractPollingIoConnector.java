@@ -558,10 +558,12 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
         @Override
         public void cancel() {
-            super.cancel();
-            cancelQueue.add(this);
-            startupWorker();
-            wakeup();
+            if ( !isDone() ) {
+                super.cancel();
+                cancelQueue.add(this);
+                startupWorker();
+                wakeup();
+            }
         }
     }
 }
