@@ -84,9 +84,10 @@ public class IoBufferTest {
         buf.put((byte) 0);
         try {
             buf.put((byte) 0);
-            fail();
+            fail("Buffer can't auto expand, with autoExpand property set at false");
         } catch (BufferOverflowException e) {
-            // ignore
+            // Expected Exception as auto expand property is false
+            assertTrue(true);
         }
 
         buf.setAutoExpand(true);
@@ -98,9 +99,10 @@ public class IoBufferTest {
         buf.setAutoExpand(false);
         try {
             buf.put(3, (byte) 0);
-            fail();
+            fail("Buffer can't auto expand, with autoExpand property set at false");
         } catch (IndexOutOfBoundsException e) {
-            // ignore
+            // Expected Exception as auto expand property is false
+            assertTrue(true);
         }
 
         buf.setAutoExpand(true);
@@ -306,7 +308,8 @@ public class IoBufferTest {
             buf.getString(1, decoder);
             fail();
         } catch (IllegalArgumentException e) {
-            // ignore
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
 
         // Test getting strings from an empty buffer.
@@ -458,7 +461,8 @@ public class IoBufferTest {
             buf.putPrefixedString("123456789012345", encoder);
             fail();
         } catch (BufferOverflowException e) {
-            // OK
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
 
         // With autoExpand
@@ -705,16 +709,18 @@ public class IoBufferTest {
 
         try {
             original.setAutoExpand(true);
-            fail();
+            fail("Derived buffers and their parent can't be expanded");
         } catch (IllegalStateException e) {
-            // OK
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
 
         try {
             duplicate.setAutoExpand(true);
-            fail();
+            fail("Derived buffers and their parent can't be expanded");
         } catch (IllegalStateException e) {
-            // OK
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
     }
 
@@ -759,9 +765,10 @@ public class IoBufferTest {
             duplicate = original.asReadOnlyBuffer();
             duplicate.putString("A very very very very looooooong string",
                     Charset.forName("ISO-8859-1").newEncoder());
-            fail();
+            fail("ReadOnly buffer's can't be expanded");
         } catch (ReadOnlyBufferException e) {
-            // OK
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
     }
 
@@ -1016,28 +1023,32 @@ public class IoBufferTest {
             buf.putEnumSet(EnumSet.of(TestEnum.E9));
             fail("Should have thrown IllegalArgumentException");
         } catch (IllegalArgumentException e) {
-            // pass
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
 
         try {
             buf.putEnumSetShort(EnumSet.of(TestEnum.E17));
             fail("Should have thrown IllegalArgumentException");
         } catch (IllegalArgumentException e) {
-            // pass
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
 
         try {
             buf.putEnumSetInt(EnumSet.of(TestEnum.E33));
             fail("Should have thrown IllegalArgumentException");
         } catch (IllegalArgumentException e) {
-            // pass
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
 
         try {
             buf.putEnumSetLong(EnumSet.of(TooBigEnum.E65));
             fail("Should have thrown IllegalArgumentException");
         } catch (IllegalArgumentException e) {
-            // pass
+            // Expected an Exception, signifies test success
+            assertTrue(true);
         }
     }
 
