@@ -22,9 +22,7 @@ package org.apache.mina.transport;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Collection;
-import java.util.Date;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -117,13 +115,13 @@ public abstract class AbstractBindTest extends TestCase {
         acceptor.setHandler(new IoHandlerAdapter());
         acceptor.setDefaultLocalAddress(null);
         acceptor.bind();
-        Assert.assertNotNull(acceptor.getLocalAddress());
+        assertNotNull(acceptor.getLocalAddress());
         acceptor.unbind(acceptor.getLocalAddress());
-        Assert.assertNull(acceptor.getLocalAddress());
+        assertNull(acceptor.getLocalAddress());
         acceptor.setDefaultLocalAddress(createSocketAddress(0));
         acceptor.bind();
-        Assert.assertNotNull(acceptor.getLocalAddress());
-        Assert.assertTrue(getPort(acceptor.getLocalAddress()) != 0);
+        assertNotNull(acceptor.getLocalAddress());
+        assertTrue(getPort(acceptor.getLocalAddress()) != 0);
         acceptor.unbind(acceptor.getLocalAddress());
     }
 
@@ -132,8 +130,10 @@ public abstract class AbstractBindTest extends TestCase {
 
         try {
             acceptor.bind();
-            Assert.fail("Exception is not thrown");
+            fail("Exception is not thrown");
         } catch (Exception e) {
+            // Signifies a successfull test case execution
+            assertTrue(true);
         }
     }
 
@@ -165,24 +165,24 @@ public abstract class AbstractBindTest extends TestCase {
             ConnectFuture future = connector.connect(createSocketAddress(port));
             future.awaitUninterruptibly();
             sessions[i] = future.getSession();
-            Assert.assertTrue(sessions[i].isConnected());
-            Assert.assertTrue(sessions[i].write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
+            assertTrue(sessions[i].isConnected());
+            assertTrue(sessions[i].write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
         }
 
         // Wait for the server side sessions to be created.
         Thread.sleep(500);
 
         Collection<IoSession> managedSessions = acceptor.getManagedSessions().values();
-        Assert.assertEquals(5, managedSessions.size());
+        assertEquals(5, managedSessions.size());
 
         acceptor.unbind();
 
         // Wait for the client side sessions to close.
         Thread.sleep(500);
 
-        Assert.assertEquals(0, managedSessions.size());
+        assertEquals(0, managedSessions.size());
         for (IoSession element : managedSessions) {
-            Assert.assertFalse(element.isConnected());
+            assertFalse(element.isConnected());
         }
     }
 
@@ -195,23 +195,23 @@ public abstract class AbstractBindTest extends TestCase {
         ConnectFuture future = connector.connect(createSocketAddress(port));
         future.awaitUninterruptibly();
         session = future.getSession();
-        Assert.assertTrue(session.isConnected());
-        Assert.assertTrue(session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
+        assertTrue(session.isConnected());
+        assertTrue(session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
 
         // Wait for the server side session to be created.
         Thread.sleep(500);
 
         Collection<IoSession> managedSession = acceptor.getManagedSessions().values();
-        Assert.assertEquals(1, managedSession.size());
+        assertEquals(1, managedSession.size());
 
         acceptor.unbind();
 
         // Wait for the client side sessions to close.
         Thread.sleep(500);
 
-        Assert.assertEquals(0, managedSession.size());
+        assertEquals(0, managedSession.size());
         for (IoSession element : managedSession) {
-            Assert.assertFalse(element.isConnected());
+            assertFalse(element.isConnected());
         }
         
         // Rebind
@@ -221,14 +221,14 @@ public abstract class AbstractBindTest extends TestCase {
         future = connector.connect(createSocketAddress(port));
         future.awaitUninterruptibly();
         session = future.getSession();
-        Assert.assertTrue(session.isConnected());
-        Assert.assertTrue(session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
+        assertTrue(session.isConnected());
+        assertTrue(session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten());
 
         // Wait for the server side session to be created.
         Thread.sleep(500);
 
         managedSession = acceptor.getManagedSessions().values();
-        Assert.assertEquals(1, managedSession.size());
+        assertEquals(1, managedSession.size());
     }
 
     public void _testRegressively() throws IOException {
