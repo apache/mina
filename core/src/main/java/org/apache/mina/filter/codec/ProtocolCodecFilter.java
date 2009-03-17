@@ -326,15 +326,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      * method
      * @param session The newly created session
      * @throws Exception if we can't create instances of the decoder or encoder
-     */
+     *
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-        // Initialized the encoder and decoder
-        initCodec(session);
-
         // Call the next filter
         nextFilter.sessionCreated(session);
-    }
+    }*/
 
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session)
