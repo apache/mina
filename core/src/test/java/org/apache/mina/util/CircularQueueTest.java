@@ -19,13 +19,12 @@
  */
 package org.apache.mina.util;
 
-import java.util.Iterator;
-
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import java.util.Iterator;
+
 /**
- * Tests {@link Queue}
+ * Tests {@link org.apache.mina.util.CircularQueue}
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -55,7 +54,7 @@ public class CircularQueueTest extends TestCase {
                 q.offer(new Integer(++pushCount));
             }
 
-            Assert.assertTrue(q.capacity() > oldCapacity);
+            assertTrue(q.capacity() > oldCapacity);
             testRotation0(q);
         }
     }
@@ -63,7 +62,7 @@ public class CircularQueueTest extends TestCase {
     private void testRotation0(CircularQueue<Integer> q) {
         for (int i = 0; i < q.capacity() * 7 / 4; i++) {
             q.offer(new Integer(++pushCount));
-            Assert.assertEquals(++popCount, q.poll().intValue());
+            assertEquals(++popCount, q.poll().intValue());
         }
     }
 
@@ -79,21 +78,22 @@ public class CircularQueueTest extends TestCase {
         q.add(7, new Integer(300));
 
         Iterator<Integer> i = q.iterator();
-        Assert.assertEquals(8, q.size());
-        Assert.assertEquals(new Integer(100), i.next());
-        Assert.assertEquals(new Integer(0), i.next());
-        Assert.assertEquals(new Integer(1), i.next());
-        Assert.assertEquals(new Integer(200), i.next());
-        Assert.assertEquals(new Integer(2), i.next());
-        Assert.assertEquals(new Integer(3), i.next());
-        Assert.assertEquals(new Integer(4), i.next());
-        Assert.assertEquals(new Integer(300), i.next());
+        assertEquals(8, q.size());
+        assertEquals(new Integer(100), i.next());
+        assertEquals(new Integer(0), i.next());
+        assertEquals(new Integer(1), i.next());
+        assertEquals(new Integer(200), i.next());
+        assertEquals(new Integer(2), i.next());
+        assertEquals(new Integer(3), i.next());
+        assertEquals(new Integer(4), i.next());
+        assertEquals(new Integer(300), i.next());
 
         try {
             i.next();
-            Assert.fail();
+            fail();
         } catch (Exception e) {
-            // OK
+            // an exception signifies a successfull test case
+            assertTrue(true);            
         }
     }
 
@@ -107,26 +107,27 @@ public class CircularQueueTest extends TestCase {
         q.add(12, new Integer(500)); // addLast
 
         Iterator<Integer> i = q.iterator();
-        Assert.assertEquals(13, q.size());
-        Assert.assertEquals(new Integer(100), i.next());
-        Assert.assertEquals(new Integer(0), i.next());
-        Assert.assertEquals(new Integer(200), i.next());
-        Assert.assertEquals(new Integer(1), i.next());
-        Assert.assertEquals(new Integer(300), i.next());
-        Assert.assertEquals(new Integer(2), i.next());
-        Assert.assertEquals(new Integer(3), i.next());
-        Assert.assertEquals(new Integer(4), i.next());
-        Assert.assertEquals(new Integer(5), i.next());
-        Assert.assertEquals(new Integer(6), i.next());
-        Assert.assertEquals(new Integer(400), i.next());
-        Assert.assertEquals(new Integer(7), i.next());
-        Assert.assertEquals(new Integer(500), i.next());
+        assertEquals(13, q.size());
+        assertEquals(new Integer(100), i.next());
+        assertEquals(new Integer(0), i.next());
+        assertEquals(new Integer(200), i.next());
+        assertEquals(new Integer(1), i.next());
+        assertEquals(new Integer(300), i.next());
+        assertEquals(new Integer(2), i.next());
+        assertEquals(new Integer(3), i.next());
+        assertEquals(new Integer(4), i.next());
+        assertEquals(new Integer(5), i.next());
+        assertEquals(new Integer(6), i.next());
+        assertEquals(new Integer(400), i.next());
+        assertEquals(new Integer(7), i.next());
+        assertEquals(new Integer(500), i.next());
 
         try {
             i.next();
-            Assert.fail();
+            fail();
         } catch (Exception e) {
-            // OK
+            // an exception signifies a successfull test case
+            assertTrue(true);
         }
     }
 
@@ -143,15 +144,16 @@ public class CircularQueueTest extends TestCase {
         q.remove(2);
 
         Iterator<Integer> i = q.iterator();
-        Assert.assertEquals(2, q.size());
-        Assert.assertEquals(new Integer(1), i.next());
-        Assert.assertEquals(new Integer(2), i.next());
+        assertEquals(2, q.size());
+        assertEquals(new Integer(1), i.next());
+        assertEquals(new Integer(2), i.next());
 
         try {
             i.next();
-            Assert.fail();
+            fail();
         } catch (Exception e) {
-            // OK
+            // an exception signifies a successfull test case
+            assertTrue(true);
         }
     }
 
@@ -164,17 +166,18 @@ public class CircularQueueTest extends TestCase {
         q.remove(4); // removeLast
 
         Iterator<Integer> i = q.iterator();
-        Assert.assertEquals(4, q.size());
-        Assert.assertEquals(new Integer(1), i.next());
-        Assert.assertEquals(new Integer(2), i.next());
-        Assert.assertEquals(new Integer(5), i.next());
-        Assert.assertEquals(new Integer(6), i.next());
+        assertEquals(4, q.size());
+        assertEquals(new Integer(1), i.next());
+        assertEquals(new Integer(2), i.next());
+        assertEquals(new Integer(5), i.next());
+        assertEquals(new Integer(6), i.next());
 
         try {
             i.next();
-            Assert.fail();
+            fail();
         } catch (Exception e) {
-            // OK
+            // an exception signifies a successfull test case
+            assertTrue(true);            
         }
     }
     
@@ -184,20 +187,20 @@ public class CircularQueueTest extends TestCase {
             q.offer(i);
         }
         
-        Assert.assertEquals(1024, q.capacity());
+        assertEquals(1024, q.capacity());
         
         for (int i = 0; i < 512; i ++) {
             q.offer(i);
             q.poll();
         }
         
-        Assert.assertEquals(2048, q.capacity());
+        assertEquals(2048, q.capacity());
         
         for (int i = 0; i < 1024; i ++) { 
             q.poll();
         }
         
-        Assert.assertEquals(4, q.capacity());
+        assertEquals(4, q.capacity());
     }
 
     private CircularQueue<Integer> getRotatedQueue() {
