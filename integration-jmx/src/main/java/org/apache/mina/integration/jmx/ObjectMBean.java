@@ -159,9 +159,16 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         } catch (Throwable e) {
             throwMBeanException(e);
         }
+
+        // Check if the attribute exist, if not throw an exception
+        PropertyDescriptor pdesc = propertyDescriptors.get(fqan);
+        if (pdesc == null) {
+            throwMBeanException(new IllegalArgumentException(
+                    "Unknown attribute: " + fqan));
+        }
         
         try {
-            PropertyDescriptor pdesc = propertyDescriptors.get(fqan);
+
             Object parent = getParent(fqan);
             boolean writable = isWritable(source.getClass(), pdesc);
             
