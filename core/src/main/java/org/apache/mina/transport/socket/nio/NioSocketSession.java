@@ -20,6 +20,7 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -124,12 +125,38 @@ class NioSocketSession extends NioSession {
         return handler;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public InetSocketAddress getRemoteAddress() {
-        return (InetSocketAddress) ch.socket().getRemoteSocketAddress();
+        if ( ch == null ) {
+            return null;
+        }
+        
+        Socket socket = ch.socket();
+        
+        if ( socket == null ) {
+            return null;
+        }
+        
+        return (InetSocketAddress) socket.getRemoteSocketAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public InetSocketAddress getLocalAddress() {
-        return (InetSocketAddress) ch.socket().getLocalSocketAddress();
+        if ( ch == null ) {
+            return null;
+        }
+        
+        Socket socket = ch.socket();
+        
+        if ( socket == null ) {
+            return null;
+        }
+        
+        return (InetSocketAddress) socket.getLocalSocketAddress();
     }
 
     @Override
