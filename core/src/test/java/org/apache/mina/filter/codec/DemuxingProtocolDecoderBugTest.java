@@ -44,7 +44,7 @@ import java.nio.charset.Charset;
 public class DemuxingProtocolDecoderBugTest
 {
 
-    private void doTest(IoSession session) throws Exception
+    private static void doTest(IoSession session) throws Exception
     {
         ProtocolDecoderOutput mock = EasyMock.createMock(ProtocolDecoderOutput.class);
         mock.write(Character.valueOf('A'));
@@ -67,7 +67,7 @@ public class DemuxingProtocolDecoderBugTest
         EasyMock.verify(mock);
     }
 
-    private static class CharacterMessageDecoder extends MessageDecoderAdapter
+    public static class CharacterMessageDecoder extends MessageDecoderAdapter
     {
         public MessageDecoderResult decodable(IoSession session, IoBuffer in)
         {
@@ -83,7 +83,7 @@ public class DemuxingProtocolDecoderBugTest
         }
     }
 
-    private static class IntegerMessageDecoder extends MessageDecoderAdapter
+    public static class IntegerMessageDecoder extends MessageDecoderAdapter
     {
         public MessageDecoderResult decodable(IoSession session, IoBuffer in)
         {
