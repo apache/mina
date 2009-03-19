@@ -316,22 +316,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
     }
     
-    /**
-     * Associate a decoder and encoder instances to the newly created session.
-     * <br>
-     * <br>
-     * In order to get the encoder and decoder crea
-     * 
-     * @param nextFilter The next filter to invoke when having processed the current 
-     * method
-     * @param session The newly created session
-     * @throws Exception if we can't create instances of the decoder or encoder
-     *
-    @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-        // Call the next filter
-        nextFilter.sessionCreated(session);
-    }*/
 
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session)
