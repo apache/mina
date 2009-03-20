@@ -56,7 +56,6 @@
       <groupId>${pom.groupId}</groupId>
       <artifactId>mina-core</artifactId>
       <version>${pom.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
