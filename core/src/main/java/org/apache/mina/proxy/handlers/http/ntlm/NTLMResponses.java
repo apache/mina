@@ -31,7 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
  * NTLMResponses.java - Calculates the various Type 3 responses. Needs an MD4, MD5 and DES
  * crypto provider (Please note that default provider doesn't provide MD4).
  * 
- * Copyright © 2003 Eric Glass 
+ * Copyright Â© 2003 Eric Glass 
  * Permission to use, copy, modify, and distribute this document for any purpose and without 
  * any fee is hereby granted, provided that the above copyright notice and this list of 
  * conditions appear in all copies. 
