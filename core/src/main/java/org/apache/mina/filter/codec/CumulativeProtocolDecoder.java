@@ -123,8 +123,10 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     public void decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         if (!session.getTransportMetadata().hasFragmentation()) {
-            while (in.hasRemaining() ) {
-                doDecode(session, in, out);
+            while (in.hasRemaining()) {
+                if (!doDecode(session, in, out)) {
+                    break;
+                }
             }
 
             return;
