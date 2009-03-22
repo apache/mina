@@ -60,6 +60,12 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     private final List<AprSession> polledSessions =
         new CircularQueue<AprSession>(POLLSET_SIZE);
 
+    /**
+     * Create a new instance of {@link AprIoProcessor} with a given Exector for 
+     * handling I/Os events.
+     * 
+     * @param executor the {@link Executor} for handling I/O events
+     */
     public AprIoProcessor(Executor executor) {
         super(executor);
 
@@ -116,6 +122,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void dispose0() {
         Poll.destroy(pollset);
@@ -124,11 +133,17 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         Pool.destroy(pool);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected int select() throws Exception {
     	return select(Integer.MAX_VALUE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
  	@Override
     protected int select(long timeout) throws Exception {
         int rv = Poll.poll(pollset, 1000 * timeout, polledSockets, false);
@@ -186,11 +201,17 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
+ 	/**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isSelectorEmpty() {
         return allSessions.isEmpty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void wakeup() {
         if (toBeWakenUp) {
@@ -204,11 +225,17 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Iterator<AprSession> allSessions() {
         return allSessions.values().iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Iterator<AprSession> selectedSessions() {
         return polledSessions.iterator();
@@ -229,6 +256,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         allSessions.put(s, session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void destroy(AprSession session) throws Exception {
         if (allSessions.remove(session.getDescriptor()) == null) {
@@ -255,6 +285,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SessionState state(AprSession session) {
         long socket = session.getDescriptor();
@@ -267,26 +300,41 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isReadable(AprSession session) {
         return session.isReadable();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isWritable(AprSession session) {
         return session.isWritable();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isInterestedInRead(AprSession session) {
         return session.isInterestedInRead();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isInterestedInWrite(AprSession session) {
         return session.isInterestedInWrite();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void setInterestedInRead(AprSession session, boolean value) throws Exception {
         if (session.isInterestedInRead() == value) {
@@ -309,6 +357,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void setInterestedInWrite(AprSession session, boolean value) throws Exception {
         if (session.isInterestedInWrite() == value) {
@@ -331,6 +382,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected int read(AprSession session, IoBuffer buffer) throws Exception {
         int bytes;
@@ -359,6 +413,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         return bytes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected int write(AprSession session, IoBuffer buf, int length) throws Exception {
         int writtenBytes;
@@ -385,6 +442,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         return writtenBytes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected int transferFile(AprSession session, FileRegion region, int length)
             throws Exception {

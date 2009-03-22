@@ -33,7 +33,10 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.polling.AbstractPollingIoConnector;
+import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
+import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketConnector;
@@ -46,7 +49,7 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 
 /**
- * {@link IoConnector} for ABR based socket transport (TCP/IP).
+ * {@link IoConnector} for APR based socket transport (TCP/IP).
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -76,7 +79,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     private volatile ByteBuffer dummyBuffer;
 
     /**
-     * TODO : document superclass
+     * Create an {@link AprSocketConnector} with default configuration (multiple thread model).
      */
     public AprSocketConnector() {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
@@ -84,7 +87,10 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     }
 
     /**
-     * TODO : document superclass
+     * Constructor for {@link AprSocketConnector} with default configuration, and 
+     * given number of {@link AprIoProcessor} for multithreading I/O operations
+     * @param processorCount the number of processor to create and place in a
+     * {@link SimpleIoProcessorPool} 
      */
     public AprSocketConnector(int processorCount) {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class, processorCount);
@@ -92,7 +98,10 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     }
 
     /**
-     * TODO : document superclass
+     *  Constructor for {@link AprSocketConnector} with default configuration but a
+     *  specific {@link IoProcessor}, useful for sharing the same processor over multiple
+     *  {@link IoService} of the same type.
+     * @param processor the processor to use for managing I/O events
      */
     public AprSocketConnector(IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), processor);
@@ -100,7 +109,11 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     }
 
     /**
-     * TODO : document superclass
+     *  Constructor for {@link AprSocketConnector} with a given {@link Executor} for handling 
+     *  connection events and a given {@link IoProcessor} for handling I/O events, useful for sharing 
+     *  the same processor and executor over multiple {@link IoService} of the same type.
+     * @param executor the executor for connection
+     * @param processor the processor for I/O operations
      */
     public AprSocketConnector(Executor executor, IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), executor, processor);

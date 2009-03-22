@@ -28,11 +28,15 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.polling.AbstractPollingIoAcceptor;
+import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
+import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.util.CircularQueue;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Poll;
@@ -41,7 +45,7 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 
 /**
- * TODO Add documentation
+ * {@link IoAcceptor} for APR based socket transport (TCP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -68,27 +72,53 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     private final List<Long> polledHandles =
         new CircularQueue<Long>(POLLSET_SIZE);
 
+    /**
+     * Constructor for {@link AprSocketAcceptor} using default parameters (multiple thread model).
+     */
     public AprSocketAcceptor() {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * Constructor for {@link AprSocketAcceptor} using default parameters, and 
+     * given number of {@link AprIoProcessor} for multithreading I/O operations.
+     * 
+     * @param processorCount the number of processor to create and place in a
+     * {@link SimpleIoProcessorPool} 
+     */
     public AprSocketAcceptor(int processorCount) {
         super(new DefaultSocketSessionConfig(), AprIoProcessor.class, processorCount);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     *  Constructor for {@link AprSocketAcceptor} with default configuration but a
+      *  specific {@link AprIoProcessor}, useful for sharing the same processor over multiple
+      *  {@link IoService} of the same type.
+      * @param processor the processor to use for managing I/O events
+      */
     public AprSocketAcceptor(IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     *  Constructor for {@link AprSocketAcceptor} with a given {@link Executor} for handling 
+     *  connection events and a given {@link AprIoProcessor} for handling I/O events, useful for 
+     *  sharing the same processor and executor over multiple {@link IoService} of the same type.
+     * @param executor the executor for connection
+     * @param processor the processor for I/O operations
+     */
     public AprSocketAcceptor(Executor executor,
             IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected AprSession accept(IoProcessor<AprSession> processor, Long handle) throws Exception {
         long s = Socket.accept(handle);
@@ -104,6 +134,9 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Long open(SocketAddress localAddress) throws Exception {
         InetSocketAddress la = (InetSocketAddress) localAddress;
@@ -165,6 +198,9 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         return handle;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init() throws Exception {
         // initialize a memory pool for APR functions
@@ -195,6 +231,9 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void destroy() throws Exception {
         if (wakeupSocket > 0) {
@@ -208,12 +247,18 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SocketAddress localAddress(Long handle) throws Exception {
         long la = Address.get(Socket.APR_LOCAL, handle);
         return new InetSocketAddress(Address.getip(la), Address.getInfo(la).port);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected int select() throws Exception {
         int rv = Poll.poll(pollset, Integer.MAX_VALUE, polledSockets, false);
@@ -260,11 +305,17 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Iterator<Long> selectedHandles() {
         return polledHandles.iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void close(Long handle) throws Exception {
         Poll.remove(pollset, handle);
@@ -274,6 +325,9 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void wakeup() {
         if (toBeWakenUp) {
@@ -287,14 +341,23 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int getBacklog() {
         return backlog;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isReuseAddress() {
         return reuseAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setBacklog(int backlog) {
         synchronized (bindLock) {
             if (isActive()) {
@@ -306,16 +369,25 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getDefaultLocalAddress() {
         return (InetSocketAddress) super.getDefaultLocalAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         super.setDefaultLocalAddress(localAddress);
     }
@@ -331,15 +403,26 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return AprSocketSession.METADATA;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
 
+    /**
+     * Convert an APR code into an Exception with the corresponding message
+     * @param code error number
+     * @throws IOException the generated exception
+     */
     private void throwException(int code) throws IOException {
         throw new IOException(
                 org.apache.tomcat.jni.Error.strerror(-code) +
