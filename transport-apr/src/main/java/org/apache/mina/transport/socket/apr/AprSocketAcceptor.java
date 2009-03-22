@@ -36,7 +36,6 @@ import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;
-import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.util.CircularQueue;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Poll;
