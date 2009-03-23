@@ -61,7 +61,7 @@ class AprLibrary {
 
     /**
      * is the APR library was initialized.
-     * @return
+     * @return true if the Library is initialized, false otherwise
      */
     static synchronized boolean isInitialized() {
         return library != null;
