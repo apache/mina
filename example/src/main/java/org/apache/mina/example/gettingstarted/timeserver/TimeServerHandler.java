@@ -26,33 +26,47 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
 /**
- * TODO Add documentation
+ * The Time Server handler : it return the current date when a message is received,
+ * or close the session if the "quit" message is received.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
 public class TimeServerHandler extends IoHandlerAdapter
 {
+    /**
+     * Trap exceptions.
+     */
     @Override
     public void exceptionCaught( IoSession session, Throwable cause ) throws Exception
     {
         cause.printStackTrace();
     }
 
+    /**
+     * If the message is 'quit', we exit by closing the session. Otherwise,
+     * we return the current date.
+     */
     @Override
     public void messageReceived( IoSession session, Object message ) throws Exception
     {
         String str = message.toString();
+        
         if( str.trim().equalsIgnoreCase("quit") ) {
+            // "Quit" ? let's get out ...
             session.close(true);
             return;
         }
 
+        // Send the current date back to the client
         Date date = new Date();
         session.write( date.toString() );
         System.out.println("Message written...");
     }
 
+    /**
+     * On idle, we just write a message on the console
+     */
     @Override
     public void sessionIdle( IoSession session, IdleStatus status ) throws Exception
     {
