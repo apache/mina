@@ -48,7 +48,7 @@ public enum HttpAuthenticationMethods {
      * @return the id
      */
     public int getId() {
-	return id;
+    	return id;
     }
 
     /**
@@ -64,9 +64,7 @@ public enum HttpAuthenticationMethods {
                 return new HttpBasicAuthLogicHandler(proxyIoSession);
     
             case DIGEST:
-                HttpDigestAuthLogicHandler authHandler = new HttpDigestAuthLogicHandler(
-                        proxyIoSession);
-                return authHandler;
+                return new HttpDigestAuthLogicHandler(proxyIoSession);
     
             case NTLM:
                 return new HttpNTLMAuthLogicHandler(proxyIoSession);
