@@ -92,9 +92,12 @@ public class NTLMUtilities implements NTLMConstants {
                 BufferedReader reader = new BufferedReader(
                         new InputStreamReader(pr.getInputStream()));
                 pr.waitFor();
+                
                 String line;
-                while ((line = reader.readLine()) != null && "".equals(line))
-                    ;
+                do {
+                	  line = reader.readLine();
+                } while ((line != null) && (line.length() != 0));
+                
                 int pos = line.toLowerCase().indexOf("version");
 
                 if (pos == -1) {
