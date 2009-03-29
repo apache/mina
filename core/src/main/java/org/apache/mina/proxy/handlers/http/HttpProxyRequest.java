@@ -41,48 +41,126 @@ public class HttpProxyRequest extends ProxyRequest {
     private final static Logger logger = LoggerFactory
             .getLogger(HttpProxyRequest.class);
 
+    /**
+     * The HTTP verb.
+     */
     public final String httpVerb;
 
+    /**
+     * The HTTP URI.
+     */
     public final String httpURI;
 
+    /**
+     * The HTTP protocol version.
+     */
     private String httpVersion;
 
+    /**
+     * The target hostname.
+     */
     private String host;
 
+    /**
+     * The request headers.
+     */
     private Map<String, List<String>> headers;
 
+    /**
+     * The additionnal properties supplied to use with the proxy for 
+     * authentication for example. 
+     */
     private transient Map<String, String> properties;
 
+    /**
+     * Constructor which creates a HTTP/1.0 CONNECT request to the specified 
+     * endpoint.
+     *  
+     * @param endpointAddress the endpoint to connect to
+     */
     public HttpProxyRequest(final InetSocketAddress endpointAddress) {
-        this(HttpProxyConstants.CONNECT, endpointAddress.getHostName() + ":"
-                + endpointAddress.getPort(), HttpProxyConstants.HTTP_1_0, null);
+        this(endpointAddress, HttpProxyConstants.HTTP_1_0, null);
     }
 
+    /**
+     * Constructor which creates a CONNECT request to the specified endpoint
+     * using the provided protocol version.
+     *  
+     * @param endpointAddress the endpoint to connect to
+     * @param httpVersion the HTTP protocol version
+     */    
     public HttpProxyRequest(final InetSocketAddress endpointAddress,
             final String httpVersion) {
-        this(HttpProxyConstants.CONNECT, endpointAddress.getHostName() + ":"
-                + endpointAddress.getPort(), httpVersion, null);
+        this(endpointAddress, httpVersion, null);
     }
 
+    /**
+     * Constructor which creates a CONNECT request to the specified endpoint
+     * using the provided protocol version and setting the requested headers.
+     *  
+     * @param endpointAddress the endpoint to connect to
+     * @param httpVersion the HTTP protocol version
+     * @param headers the additionnal http headers
+     */    
     public HttpProxyRequest(final InetSocketAddress endpointAddress,
             final String httpVersion, final Map<String, List<String>> headers) {
-        this(HttpProxyConstants.CONNECT, endpointAddress.getHostName() + ":"
-                + endpointAddress.getPort(), httpVersion, headers);
+    	this.httpVerb = HttpProxyConstants.CONNECT;
+        if (!endpointAddress.isUnresolved()) {
+        	this.httpURI = endpointAddress.getHostName() + ":"
+            				+ endpointAddress.getPort();
+        } else {
+        	this.httpURI = endpointAddress.getAddress().getHostAddress() + ":"
+							+ endpointAddress.getPort();
+        }
+        
+        this.httpVersion = httpVersion;
+        this.headers = headers;
     }
 
+    /**
+     * Constructor which creates a HTTP/1.0 GET request to the specified 
+     * http URI.
+     *  
+     * @param httpURI the target URI
+     */    
     public HttpProxyRequest(final String httpURI) {
         this(HttpProxyConstants.GET, httpURI, HttpProxyConstants.HTTP_1_0, null);
     }
 
+    /**
+     * Constructor which creates a GET request to the specified http URI
+     * using the provided protocol version
+     *  
+     * @param httpURI the target URI
+     * @param httpVersion the HTTP protocol version
+     */        
     public HttpProxyRequest(final String httpURI, final String httpVersion) {
         this(HttpProxyConstants.GET, httpURI, httpVersion, null);
     }
 
+    /**
+     * Constructor which creates a request using the provided HTTP verb targeted at
+     * the specified http URI using the provided protocol version.
+     * 
+     * @param httpVerb the HTTP verb to use 
+     * @param httpURI the target URI
+     * @param httpVersion the HTTP protocol version
+     */        
     public HttpProxyRequest(final String httpVerb, final String httpURI,
             final String httpVersion) {
         this(httpVerb, httpURI, httpVersion, null);
     }
 
+    /**
+     * Constructor which creates a request using the provided HTTP verb targeted at
+     * the specified http URI using the provided protocol version and setting the 
+     * requested headers.
+     * 
+     * @param httpVerb the HTTP verb to use 
+     * @param httpURI the target URI
+     * @param httpVersion the HTTP protocol version
+     * @param headers the additional http headers
+     */
     public HttpProxyRequest(final String httpVerb, final String httpURI,
             final String httpVersion, final Map<String, List<String>> headers) {
         this.httpVerb = httpVerb;
@@ -92,14 +170,14 @@ public class HttpProxyRequest extends ProxyRequest {
     }
 
     /**
-     * The request verb.
+     * Returns the HTTP request verb.
      */
     public final String getHttpVerb() {
         return httpVerb;
     }
 
     /**
-     * The HTTP version.
+     * Returns the HTTP version.
      */
     public String getHttpVersion() {
         return httpVersion;
@@ -107,6 +185,8 @@ public class HttpProxyRequest extends ProxyRequest {
 
     /**
      * Sets the HTTP version.
+     * 
+     * @param httpVersion the HTTP protocol version
      */
     public void setHttpVersion(String httpVersion) {
         this.httpVersion = httpVersion;
@@ -117,7 +197,8 @@ public class HttpProxyRequest extends ProxyRequest {
      */
     public synchronized final String getHost() {
         if (host == null) {
-            if (getEndpointAddress() != null) {
+            if (getEndpointAddress() != null && 
+            		!getEndpointAddress().isUnresolved()) {
                 host = getEndpointAddress().getHostName();
             }
 
@@ -134,14 +215,14 @@ public class HttpProxyRequest extends ProxyRequest {
     }
 
     /**
-     * The request URI.
+     * Returns the request HTTP URI.
      */
     public final String getHttpURI() {
         return httpURI;
     }
 
     /**
-     * HTTP headers.
+     * Returns the HTTP headers.
      */
     public final Map<String, List<String>> getHeaders() {
         return headers;
@@ -155,14 +236,14 @@ public class HttpProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Get the additional properties.
+     * Returns additional properties for the request.
      */
     public Map<String, String> getProperties() {
         return properties;
     }
 
     /**
-     * Set the additional properties.
+     * Set additional properties for the request.
      */
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
