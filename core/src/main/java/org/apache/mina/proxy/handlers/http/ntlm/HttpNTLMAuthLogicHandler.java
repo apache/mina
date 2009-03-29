@@ -65,11 +65,11 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
                     "request parameter should be a non null HttpProxyRequest instance");
         }
 
-        HttpProxyRequest req = (HttpProxyRequest) request;
-        req.checkRequiredProperty(HttpProxyConstants.USER_PROPERTY);
-        req.checkRequiredProperty(HttpProxyConstants.PWD_PROPERTY);
-        req.checkRequiredProperty(HttpProxyConstants.DOMAIN_PROPERTY);
-        req.checkRequiredProperty(HttpProxyConstants.WORKSTATION_PROPERTY);
+        ((HttpProxyRequest) request).checkRequiredProperties(
+				HttpProxyConstants.USER_PROPERTY,
+				HttpProxyConstants.PWD_PROPERTY,
+				HttpProxyConstants.DOMAIN_PROPERTY,
+				HttpProxyConstants.WORKSTATION_PROPERTY);
     }
 
     /**

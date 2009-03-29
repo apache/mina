@@ -169,18 +169,22 @@ public class HttpProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Check if the property is set otherwise throw a{@link ProxyAuthException}.
+     * Check if the given property(ies) is(are) set. Otherwise throws a 
+     * {@link ProxyAuthException}.
      */
-    public void checkRequiredProperty(String propertyName)
-            throws ProxyAuthException {
-        if (properties.get(propertyName) == null) {
-            StringBuilder sb = new StringBuilder("'");
-            sb.append(propertyName).append(
-                    "' property not provided in the request properties");
-            throw new ProxyAuthException(sb.toString());
+    public void checkRequiredProperties(String... propNames) throws ProxyAuthException {
+		StringBuilder sb = new StringBuilder();
+    	for (String propertyName : propNames) {
+	        if (properties.get(propertyName) == null) {	        	
+	        	sb.append(propertyName).append(' ');
+	        }
+    	}
+        if (sb.length() > 0) {
+        	sb.append("property(ies) missing in request");
+        	throw new ProxyAuthException(sb.toString());
         }
     }
-
+    
     /**
      * Returns the string representation of the HTTP request .
      */
