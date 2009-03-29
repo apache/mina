@@ -22,7 +22,7 @@ package org.apache.mina.proxy.handlers;
 import java.net.InetSocketAddress;
 
 /**
- * ProxyRequest.java - Wrapper class for proxy requests.
+ * ProxyRequest.java - Abstract wrapper class for proxy requests.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -30,26 +30,33 @@ import java.net.InetSocketAddress;
  */
 public abstract class ProxyRequest {
 
+    /**
+     * The address of the request endpoint.
+     */
     private InetSocketAddress endpointAddress = null;
 
+    /**
+     * Implicit constructor.
+     */
     public ProxyRequest() {
     }
 
+    /**
+     * Basic constructor of a {@link ProxyRequest} that only sets the
+     * address of the request endpoint.
+     *  
+     * @param endpointAddress the address of the request endpoint.
+     */
     public ProxyRequest(final InetSocketAddress endpointAddress) {
         this.endpointAddress = endpointAddress;
     }
 
     /**
-     * The request endpoint.
+     * Returns the address of the request endpoint.
+     * 
+     * @return the address of the request endpoint
      */
     public InetSocketAddress getEndpointAddress() {
         return endpointAddress;
-    }
-
-    /**
-     * Sets the request endpoint.
-     */
-    public void setEndpointAddress(InetSocketAddress endpointAddress) {
-        this.endpointAddress = endpointAddress;
     }
 }

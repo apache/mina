@@ -53,6 +53,9 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
      */
     private byte[] challengePacket = null;
 
+    /**
+     * {@inheritDoc}
+     */
     public HttpNTLMAuthLogicHandler(final ProxyIoSession proxyIoSession)
             throws ProxyAuthException {
         super(proxyIoSession);
@@ -69,6 +72,9 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
         req.checkRequiredProperty(HttpProxyConstants.WORKSTATION_PROPERTY);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doHandshake(NextFilter nextFilter) throws ProxyAuthException {
         logger.debug(" doHandshake()");
@@ -150,6 +156,9 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleResponse(final HttpProxyResponse response)
             throws ProxyAuthException {
@@ -158,7 +167,8 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
             step = 1;
 
             if (challengeResponse == null || challengeResponse.length() < 5) {
-                // Nothing to handle at this step. Just need to send a reply type 1 message in doHandshake().
+                // Nothing to handle at this step. 
+                // Just need to send a reply type 1 message in doHandshake().
                 return;
             }
 
@@ -166,7 +176,7 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
         }
 
         if (step == 1) {
-            // Header should be like this
+            // Header should look like :
             // Proxy-Authenticate: NTLM still_some_more_stuff
             String challengeResponse = getNTLMHeader(response);
 

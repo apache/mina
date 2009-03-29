@@ -69,14 +69,14 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
     /**
      * Creates a new {@link AbstractProxyLogicHandler}.
      * 
-     * @param proxyIoSession	 {@link ProxyIoSession} in use.
+     * @param proxyIoSession {@link ProxyIoSession} in use.
      */
     public AbstractProxyLogicHandler(ProxyIoSession proxyIoSession) {
         this.proxyIoSession = proxyIoSession;
     }
 
     /**
-     * Returns the proxyFilter {@link ProxyFilter}.
+     * Returns the proxy filter {@link ProxyFilter}.
      */
     protected ProxyFilter getProxyFilter() {
         return proxyIoSession.getProxyFilter();
@@ -96,15 +96,11 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
         return proxyIoSession;
     }
 
-    public void setProxySession(ProxyIoSession proxyIoSession) {
-        this.proxyIoSession = proxyIoSession;
-    }
-
     /**
-     * Write data to the proxy server.
+     * Writes data to the proxy server.
      * 
-     * @param nextFilter	Downstream filter to receive data.
-     * @param data			Data buffer to be written.
+     * @param nextFilter the next filter
+     * @param data Data buffer to be written.
      */
     protected WriteFuture writeData(final NextFilter nextFilter,
             final IoBuffer data) throws UnsupportedEncodingException {
@@ -131,7 +127,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
     }
 
     /**
-     * Signals that the shake has finished.
+     * Signals that the handshake has finished.
      */
     protected final void setHandshakeComplete() {
         synchronized (this) {
@@ -203,6 +199,11 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
         getSession().close(true);
     }
 
+    /**
+     * Close the session.
+     * 
+     * @param message
+     */
     protected void closeSession(final String message) {
         closeSession(message, null);
     }

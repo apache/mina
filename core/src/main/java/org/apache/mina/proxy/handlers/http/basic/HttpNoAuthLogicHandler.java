@@ -39,11 +39,17 @@ public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
     private final static Logger logger = LoggerFactory
             .getLogger(HttpNoAuthLogicHandler.class);
 
+    /**
+     * {@inheritDoc}
+     */
     public HttpNoAuthLogicHandler(final ProxyIoSession proxyIoSession)
             throws ProxyAuthException {
         super(proxyIoSession);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doHandshake(final NextFilter nextFilter)
             throws ProxyAuthException {
@@ -54,6 +60,9 @@ public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
         step++;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleResponse(final HttpProxyResponse response)
             throws ProxyAuthException {

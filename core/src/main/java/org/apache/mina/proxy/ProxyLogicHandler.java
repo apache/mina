@@ -33,31 +33,45 @@ import org.apache.mina.proxy.session.ProxyIoSession;
  */
 public interface ProxyLogicHandler {
     /**
-     * Returns <code>true</code> if handshaking is complete and
-     * data can be sent through the proxy.
+     * Tests if handshake process is complete.
+     * 
+     * @return <code>true</code> if handshaking is complete and
+     * data can be sent through the proxy, false otherwise.
      */
     public abstract boolean isHandshakeComplete();
 
     /**
      * Handle incoming data during the handshake process. Should consume only the
      * handshake data from the buffer, leaving any extra data in place.
+     * 
+     * @param nextFilter the next filter in the filter chain
+     * @param buf the buffer holding the received data
+     * @throws ProxyAuthException if authentication fails
      */
     public abstract void messageReceived(NextFilter nextFilter, IoBuffer buf)
             throws ProxyAuthException;
 
     /**
      * Called at each step of the handshake procedure.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @throws ProxyAuthException if authentication fails
      */
     public abstract void doHandshake(NextFilter nextFilter)
             throws ProxyAuthException;
 
     /**
      * Returns the {@link ProxyIoSession}.
+     * 
+     * @return the proxy session object
      */
     public abstract ProxyIoSession getProxyIoSession();
 
     /**
      * Enqueue a message to be written once handshaking is complete.
+     * 
+     * @param nextFilter the next filter in filter chain
+     * @param writeRequest the data to be written
      */
     public abstract void enqueueWriteRequest(final NextFilter nextFilter,
             final WriteRequest writeRequest);

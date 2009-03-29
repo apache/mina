@@ -46,6 +46,9 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
     private final static Logger logger = LoggerFactory
             .getLogger(HttpBasicAuthLogicHandler.class);
 
+    /**
+     * {@inheritDoc}
+     */
     public HttpBasicAuthLogicHandler(final ProxyIoSession proxyIoSession)
             throws ProxyAuthException {
         super(proxyIoSession);
@@ -60,6 +63,9 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
         req.checkRequiredProperty(HttpProxyConstants.PWD_PROPERTY);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doHandshake(final NextFilter nextFilter)
             throws ProxyAuthException {
@@ -93,7 +99,11 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
     }
 
     /**
-     * Computes authorization header value.
+     * Computes the authorization header value.
+     * 
+     * @param username the user name
+     * @param password the user password
+     * @return the authorization header value as a string
      */
     public static String createAuthorization(final String username,
             final String password) {
@@ -101,6 +111,9 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
                 .getBytes()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handleResponse(final HttpProxyResponse response)
             throws ProxyAuthException {

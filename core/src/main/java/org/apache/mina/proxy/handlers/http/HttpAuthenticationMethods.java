@@ -43,32 +43,39 @@ public enum HttpAuthenticationMethods {
     	this.id = id;
     }
 
-	public int getId() {
-		return id;
-	}
+    /**
+     * Returns the authentication mechanism id.
+     * @return the id
+     */
+    public int getId() {
+	return id;
+    }
 
-	/**
-     * Creates an {@link AbstractAuthLogicHandler} to handle this authentication mechanism. 
+    /**
+     * Creates an {@link AbstractAuthLogicHandler} to handle the authentication mechanism.
+     * 
+     * @param proxyIoSession the proxy session object
+     * @return a new logic handler 
      */
     public AbstractAuthLogicHandler getNewHandler(ProxyIoSession proxyIoSession)
             throws ProxyAuthException {
         switch (this) {
-        case BASIC:
-            return new HttpBasicAuthLogicHandler(proxyIoSession);
-
-        case DIGEST:
-            HttpDigestAuthLogicHandler authHandler = new HttpDigestAuthLogicHandler(
-                    proxyIoSession);
-            return authHandler;
-
-        case NTLM:
-            return new HttpNTLMAuthLogicHandler(proxyIoSession);
-
-        case NO_AUTH:
-            return new HttpNoAuthLogicHandler(proxyIoSession);
-
-        default:
-            return null;
+            case BASIC:
+                return new HttpBasicAuthLogicHandler(proxyIoSession);
+    
+            case DIGEST:
+                HttpDigestAuthLogicHandler authHandler = new HttpDigestAuthLogicHandler(
+                        proxyIoSession);
+                return authHandler;
+    
+            case NTLM:
+                return new HttpNTLMAuthLogicHandler(proxyIoSession);
+    
+            case NO_AUTH:
+                return new HttpNoAuthLogicHandler(proxyIoSession);
+    
+            default:
+                return null;
         }
     }
 }

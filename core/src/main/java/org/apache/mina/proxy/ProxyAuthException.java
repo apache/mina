@@ -32,10 +32,16 @@ import javax.security.sasl.SaslException;
 public class ProxyAuthException extends SaslException {
     private static final long serialVersionUID = -6511596809517532988L;
 
+    /**
+     * {@inheritDoc}
+     */
     public ProxyAuthException(String message) {
         super(message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ProxyAuthException(String message, Throwable ex) {
         super(message, ex);
     }

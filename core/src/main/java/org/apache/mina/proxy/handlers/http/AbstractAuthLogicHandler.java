@@ -27,7 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * AbstractAuthLogicHandler.java - Abstract class that handles an authentication mechanism logic.
+ * AbstractAuthLogicHandler.java - Abstract class that handles an authentication 
+ * mechanism logic.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -38,7 +39,7 @@ public abstract class AbstractAuthLogicHandler {
             .getLogger(AbstractAuthLogicHandler.class);
 
     /**
-     * The request the proxy has to handle.
+     * The request to be handled by the proxy.
      */
     protected ProxyRequest request;
 
@@ -48,10 +49,16 @@ public abstract class AbstractAuthLogicHandler {
     protected ProxyIoSession proxyIoSession;
 
     /**
-     * The current step in the handshake.
+     * The current handshake step.
      */
     protected int step = 0;
 
+    /**
+     * Instantiates a handler for the given proxy session.
+     * 
+     * @param proxyIoSession the proxy session object
+     * @throws ProxyAuthException
+     */
     protected AbstractAuthLogicHandler(final ProxyIoSession proxyIoSession)
             throws ProxyAuthException {
         this.proxyIoSession = proxyIoSession;
@@ -59,7 +66,10 @@ public abstract class AbstractAuthLogicHandler {
     }
 
     /**
-     * Called on each step of the handshaking process.
+     * Method called at each step of the handshaking process.
+     * 
+     * @param nextFilter the next filter
+     * @throws ProxyAuthException
      */
     public abstract void doHandshake(final NextFilter nextFilter)
             throws ProxyAuthException;
@@ -67,11 +77,19 @@ public abstract class AbstractAuthLogicHandler {
     /**
      * Handles a HTTP response from the proxy server.
      * 
-     * @param response The response.
+     * @param response The HTTP response.
+     * @throws ProxyAuthException
      */
     public abstract void handleResponse(final HttpProxyResponse response)
             throws ProxyAuthException;
 
+    /**
+     * Sends an HTTP request.
+     * 
+     * @param nextFilter the next filter
+     * @param request the request to write
+     * @throws ProxyAuthException
+     */
     protected void writeRequest(final NextFilter nextFilter,
             final HttpProxyRequest request) throws ProxyAuthException {
         logger.debug("  sending HTTP request");

@@ -43,7 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ProxyFilter.java - Proxy {@link IoFilter}. Automatically inserted into the {@link IoFilter} chain by {@link ProxyConnector}.
+ * ProxyFilter.java - Proxy {@link IoFilter}. 
+ * Automatically inserted into the {@link IoFilter} chain by {@link ProxyConnector}.
  * Sends the initial handshake message to the proxy and handles any response
  * to the handshake. Once the handshake has completed and the proxied connection has been
  * established this filter becomes transparent to data flowing through the connection.
