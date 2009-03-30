@@ -47,6 +47,9 @@ OPEN ISSUES:
   <moduleSets>
     <moduleSet>
       <includeSubModules/>
+      <excludes>
+          <exclude>org.apache.mina:mina-legal</exclude>
+      </excludes>
       <sources>
         <outputDirectoryMapping>src/${module.artifactId}</outputDirectoryMapping>
         <fileSets>
