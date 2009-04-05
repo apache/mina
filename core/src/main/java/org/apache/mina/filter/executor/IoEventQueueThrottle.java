@@ -32,10 +32,12 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class IoEventQueueThrottle implements IoEventQueueHandler {
-
+    /** A logger for this class */
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /** The event size estimator instance */
     private final IoEventSizeEstimator eventSizeEstimator;
+    
     private volatile int threshold;
 
     private final Object lock = new Object();

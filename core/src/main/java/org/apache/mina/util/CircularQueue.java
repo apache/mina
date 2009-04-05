@@ -33,12 +33,15 @@ import java.util.Queue;
  * @version $Rev$, $Date$
  */
 public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<E>, Serializable {
-
+    /** The serialVersionUID : mandatory for serializable classes */
     private static final long serialVersionUID = 3993421269224511264L;
 
+    /** Minimal size fo the underlying attay */
     private static final int DEFAULT_CAPACITY = 4;
 
+    /** The initial capacity of the list */
     private final int initialCapacity;
+    
     // XXX: This volatile keyword here is a workaround for SUN Java Compiler bug,
     //      which produces buggy byte code.  I don't event know why adding a volatile
     //      fixes the problem.  Eclipse Java Compiler seems to produce correct byte code.
@@ -64,8 +67,12 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         this.shrinkThreshold = 0;
     }
 
+    /**
+     * The capacity must be a power of 2.
+     */
     private static int normalizeCapacity(int initialCapacity) {
         int actualCapacity = 1;
+        
         while (actualCapacity < initialCapacity) {
             actualCapacity <<= 1;
             if (actualCapacity < 0) {
@@ -116,6 +123,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         if (item == null) {
             throw new NullPointerException("item");
         }
+        
         expandIfNeeded();
         items[last] = item;
         increaseSize();
