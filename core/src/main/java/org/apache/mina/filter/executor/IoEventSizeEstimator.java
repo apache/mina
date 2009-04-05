@@ -29,5 +29,10 @@ import org.apache.mina.core.session.IoEvent;
  * @version $Rev$, $Date$
  */
 public interface IoEventSizeEstimator {
+    /**
+     * Estimate the IoEvent size in numberof bytes
+     * @param event The event we want to estimate the size of
+     * @return The estimated size of this event
+     */
     int estimateSize(IoEvent event);
 }
