@@ -174,8 +174,7 @@ public class ExecutorFilter extends IoFilterAdapter {
      * a maximum of threads in the pool is given. All the event will be handled 
      * by this default executor.
      * 
-     * @param maximumPoolSize The maximum number of thread the default executor can 
-     * use
+     * @param maximumPoolSize The maximum pool size
      */
     public ExecutorFilter(int maximumPoolSize) {
         // Create a new default Executor
@@ -197,9 +196,8 @@ public class ExecutorFilter extends IoFilterAdapter {
      * maximum of threads the pool can contain. All the event will be handled 
      * by this default executor.
      *
-     * @param corePoolSize the base number of threads the pool will contain at startup
-     * @param maximumPoolSize The maximum number of thread the default executor can 
-     * use
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
      */
     public ExecutorFilter(int corePoolSize, int maximumPoolSize) {
         // Create a new default Executor
@@ -218,6 +216,11 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
      */
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, long keepAliveTime, 
             TimeUnit unit) {
@@ -237,6 +240,12 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param queueHandler The queue used to store events
      */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
@@ -258,6 +267,12 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param threadFactory The factory used to create threads
      */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
@@ -279,6 +294,13 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param threadFactory The factory used to create threads
+     * @param queueHandler The queue used to store events
      */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
@@ -294,6 +316,8 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(IoEventType... eventTypes) {
         // Create a new default Executor
@@ -312,6 +336,9 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param maximumPoolSize The maximum pool size
+     * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(int maximumPoolSize, IoEventType... eventTypes) {
         // Create a new default Executor
@@ -330,6 +357,10 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, IoEventType... eventTypes) {
         // Create a new default Executor
@@ -348,9 +379,16 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(
-            int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, IoEventType... eventTypes) {
+            int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, 
+            IoEventType... eventTypes) {
         // Create a new default Executor
         Executor executor = createDefaultExecutor(
             corePoolSize,
@@ -367,6 +405,13 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param queueHandler The queue used to store events
+     * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
@@ -388,6 +433,13 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
+     * 
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param threadFactory The factory used to create threads
+     * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
@@ -410,13 +462,13 @@ public class ExecutorFilter extends IoFilterAdapter {
      * (Convenience constructor) Creates a new instance with a new
      * {@link OrderedThreadPoolExecutor}.
      * 
-     * @param corePoolSize The base number of thread in the pool
-     * @param maximumPoolSize The macimum thread contained in the executor
-     * @param keepAliveTime The KeepAlive timeout, expressed using the time unit
-     * @param unit The time unit
-     * @param threadFactory
-     * @param queueHandler
-     * @param eventTypes The list of events handled by the created executor
+     * @param corePoolSize The initial pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param threadFactory The factory used to create threads
+     * @param queueHandler The queue used to store events
+     * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(
             int corePoolSize, int maximumPoolSize, 
@@ -433,6 +485,8 @@ public class ExecutorFilter extends IoFilterAdapter {
     
     /**
      * Creates a new instance with the specified {@link Executor}.
+     * 
+     * @param executor the user's managed Executor to use in this filter
      */
     public ExecutorFilter(Executor executor) {
         // Initialize the filter
@@ -441,6 +495,9 @@ public class ExecutorFilter extends IoFilterAdapter {
 
     /**
      * Creates a new instance with the specified {@link Executor}.
+     * 
+     * @param executor the user's managed Executor to use in this filter
+     * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(Executor executor, IoEventType... eventTypes) {
         // Initialize the filter
@@ -450,13 +507,13 @@ public class ExecutorFilter extends IoFilterAdapter {
     /**
      * Create an OrderedThreadPool executor.
      *
-     * @param corePoolSize
-     * @param maximumPoolSize
-     * @param keepAliveTime
-     * @param unit
-     * @param threadFactory
-     * @param queueHandler
-     * @return
+     * @param corePoolSize The initial pool sizePoolSize
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param threadFactory The factory used to create threads
+     * @param queueHandler The queue used to store events
+     * @return An instance of the created Executor
      */
     private Executor createDefaultExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime,
         TimeUnit unit, ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
@@ -474,7 +531,7 @@ public class ExecutorFilter extends IoFilterAdapter {
      * @param eventTypes The array of handled events
      */
     private void initEventTypes(IoEventType... eventTypes) {
-        if (eventTypes == null || eventTypes.length == 0) {
+        if ((eventTypes == null) || (eventTypes.length == 0)) {
             eventTypes = DEFAULT_EVENT_SET;
         }
 
@@ -555,87 +612,119 @@ public class ExecutorFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void sessionOpened(NextFilter nextFilter, IoSession session) {
         if (eventTypes.contains(IoEventType.SESSION_OPENED)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED,
-                    session, null));
+            IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED,
+                session, null); 
+            fireEvent(event);
         } else {
             nextFilter.sessionOpened(session);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void sessionClosed(NextFilter nextFilter, IoSession session) {
         if (eventTypes.contains(IoEventType.SESSION_CLOSED)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED,
-                    session, null));
+            IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED,
+                session, null); 
+            fireEvent(event);
         } else {
             nextFilter.sessionClosed(session);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void sessionIdle(NextFilter nextFilter, IoSession session,
             IdleStatus status) {
         if (eventTypes.contains(IoEventType.SESSION_IDLE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE,
-                    session, status));
+            IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE,
+                session, status); 
+            fireEvent(event);
         } else {
             nextFilter.sessionIdle(session, status);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void exceptionCaught(NextFilter nextFilter, IoSession session,
             Throwable cause) {
         if (eventTypes.contains(IoEventType.EXCEPTION_CAUGHT)) {
-            fireEvent(new IoFilterEvent(nextFilter,
-                    IoEventType.EXCEPTION_CAUGHT, session, cause));
+            IoFilterEvent event = new IoFilterEvent(nextFilter,
+                IoEventType.EXCEPTION_CAUGHT, session, cause); 
+            fireEvent(event);
         } else {
             nextFilter.exceptionCaught(session, cause);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) {
         if (eventTypes.contains(IoEventType.MESSAGE_RECEIVED)) {
-            fireEvent(new IoFilterEvent(nextFilter,
-                    IoEventType.MESSAGE_RECEIVED, session, message));
+            IoFilterEvent event = new IoFilterEvent(nextFilter,
+                IoEventType.MESSAGE_RECEIVED, session, message); 
+            fireEvent(event);
         } else {
             nextFilter.messageReceived(session, message);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void messageSent(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) {
         if (eventTypes.contains(IoEventType.MESSAGE_SENT)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT,
-                    session, writeRequest));
+            IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT,
+                session, writeRequest); 
+            fireEvent(event);
         } else {
             nextFilter.messageSent(session, writeRequest);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) {
         if (eventTypes.contains(IoEventType.WRITE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.WRITE, session,
-                    writeRequest));
+            IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.WRITE, session,
+                writeRequest); 
+            fireEvent(event);
         } else {
             nextFilter.filterWrite(session, writeRequest);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void filterClose(NextFilter nextFilter, IoSession session)
             throws Exception {
         if (eventTypes.contains(IoEventType.CLOSE)) {
-            fireEvent(new IoFilterEvent(nextFilter, IoEventType.CLOSE, session,
-                    null));
+            IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.CLOSE, session,
+                null); 
+            fireEvent(event);
         } else {
             nextFilter.filterClose(session);
         }
