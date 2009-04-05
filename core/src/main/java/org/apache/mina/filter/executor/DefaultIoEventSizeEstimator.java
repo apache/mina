@@ -45,9 +45,13 @@ import org.apache.mina.core.write.WriteRequest;
  * @version $Rev$, $Date$
  */
 public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
-
+    /** A map containing the estimated size of each Java objects we know for */ 
     private final ConcurrentMap<Class<?>, Integer> class2size = new ConcurrentHashMap<Class<?>, Integer>();
 
+    /**
+     * Create a new instance of this class, injecting the known size of 
+     * basic java types.
+     */
     public DefaultIoEventSizeEstimator() {
         class2size.put(boolean.class, 4); // Probably an integer.
         class2size.put(byte.class, 1);
@@ -60,10 +64,18 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         class2size.put(void.class, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int estimateSize(IoEvent event) {
         return estimateSize((Object) event) + estimateSize(event.getParameter());
     }
 
+    /**
+     * Estimate the size of an Objecr in number of bytes
+     * @param message The object to estimate
+     * @return The estimated size of the object
+     */
     public int estimateSize(Object message) {
         if (message == null) {
             return 8;
