@@ -19,16 +19,14 @@
  */
 package org.apache.mina.filter.codec;
 
-import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.session.IoSession;
-
 /**
  * A special exception that tells the {@link ProtocolDecoder} can keep
  * decoding even after this exception is thrown.
  * <p>
  * Once {@link ProtocolCodecFilter} catches any other type of exception
  * than {@link RecoverableProtocolDecoderException}, it stops calling
- * the {@link ProtocolDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
+ * the {@link ProtocolDecoder#decode(org.apache.mina.core.session.IoSession,
+ *        org.apache.mina.core.buffer.IoBuffer, ProtocolDecoderOutput)}
  * immediately and fires an <tt>exceptionCaught</tt> event.
  * <p>
  * On the other hand, if {@link RecoverableProtocolDecoderException} is thrown,
