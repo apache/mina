@@ -29,6 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
+import junit.framework.Assert;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
@@ -302,6 +303,8 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
             fail("0 writeBuferSize specified. IllegalArgumentException expected.");
         } catch (IllegalArgumentException iae) {
             // Pass, exception was thrown
+            // Signifies a successful test execution
+            Assert.assertTrue(true);
         }
 
         try {
@@ -309,6 +312,8 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
             fail("Negative writeBuferSize specified. IllegalArgumentException expected.");
         } catch (IllegalArgumentException iae) {
             // Pass, exception was thrown
+            // Signifies a successful test execution
+            Assert.assertTrue(true);
         }
 
         filter.setWriteBufferSize(1);

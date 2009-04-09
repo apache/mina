@@ -99,6 +99,8 @@ public class FutureTest {
             future.getSession();
             fail("IOException should be thrown.");
         } catch (Exception e) {
+            // Signifies a successful test execution
+            assertTrue(true);
         }
     }
 

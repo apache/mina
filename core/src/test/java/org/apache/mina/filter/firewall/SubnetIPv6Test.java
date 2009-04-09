@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import junit.framework.TestCase;
+import junit.framework.Assert;
 
 /**
  * TODO Add documentation
@@ -34,15 +35,19 @@ import junit.framework.TestCase;
  */
 public class SubnetIPv6Test extends TestCase {
 
+    // Test Data
+    private static final String TEST_V6ADDRESS = "1080:0:0:0:8:800:200C:417A";
+
 	public void testIPv6() throws UnknownHostException {
-		InetAddress a = InetAddress.getByName("1080:0:0:0:8:800:200C:417A");
+		InetAddress a = InetAddress.getByName(TEST_V6ADDRESS);
 		
 		assertTrue(a instanceof Inet6Address);
 		try {
 			new Subnet(a, 24);
 			fail("IPv6 not supported");
 		} catch(IllegalArgumentException e) {
-			// OK
+			// signifies a successful test execution
+            Assert.assertTrue(true);
 		}
 	}
 }

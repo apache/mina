@@ -116,7 +116,8 @@ public abstract class AbstractConnectorTest extends TestCase {
                 future.getSession().close(true);
                 fail();
             } catch (RuntimeIoException e) {
-                // OK.
+                // Signifies a successful test execution
+                assertTrue(true);
             }
             Assert.assertEquals("1", buf.toString());
         } finally {

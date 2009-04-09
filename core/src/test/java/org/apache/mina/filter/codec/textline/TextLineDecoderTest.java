@@ -282,7 +282,8 @@ public class TextLineDecoderTest extends TestCase {
             decoder.decode(session, in, out);
             Assert.fail();
         } catch (RecoverableProtocolDecoderException e) {
-            // Success!
+            // signifies a successful test execution
+            Assert.assertTrue(true);
         }
 
         decoder.decode(session, in, out);
@@ -306,7 +307,8 @@ public class TextLineDecoderTest extends TestCase {
             decoder.decode(session, in, out);
             Assert.fail();
         } catch (RecoverableProtocolDecoderException e) {
-            // Success!
+            // signifies a successful test execution
+            Assert.assertTrue(true);
         }
 
         decoder.decode(session, in, out);

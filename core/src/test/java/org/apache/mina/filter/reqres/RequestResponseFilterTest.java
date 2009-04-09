@@ -123,7 +123,8 @@ public class RequestResponseFilterTest extends TestCase {
             req.awaitResponse();
             Assert.fail();
         } catch (NoSuchElementException e) {
-            // OK
+            // Signifies a successful test execution
+            Assert.assertTrue(true);
         }
     }
 
@@ -194,7 +195,8 @@ public class RequestResponseFilterTest extends TestCase {
             req.awaitResponse();
             Assert.fail();
         } catch (RequestTimeoutException e) {
-            // OK
+            // Signifies a successful test execution
+            Assert.assertTrue(true);
         }
     }
 
