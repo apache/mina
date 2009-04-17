@@ -77,11 +77,6 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
             throws ProxyAuthException {
         super(proxyIoSession);
 
-        if (request == null || !(request instanceof HttpProxyRequest)) {
-            throw new IllegalArgumentException(
-                    "request parameter should be a non null HttpProxyRequest instance");
-        }
-
         ((HttpProxyRequest) request).checkRequiredProperties(
 				HttpProxyConstants.USER_PROPERTY,
 				HttpProxyConstants.PWD_PROPERTY);
@@ -102,6 +97,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
             if (step > 0) {
                 logger.debug("  sending DIGEST challenge response");
 
+                // Build a challenge response
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put("username", req.getProperties().get(
                         HttpProxyConstants.USER_PROPERTY));
@@ -177,7 +173,8 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
                             "Digest response computing failed", e);
                 }
 
-                // Prepare the challenge response header and add it to the request we will send
+                // Prepare the challenge response header and add it to the 
+                // request we will send
                 StringBuilder sb = new StringBuilder("Digest ");
                 boolean addSeparator = false;
 
@@ -203,10 +200,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
                         "Proxy-Authorization", sb.toString(), true);
             }
 
-            StringUtilities.addValueToHeader(headers, "Keep-Alive",
-                    HttpProxyConstants.DEFAULT_KEEP_ALIVE_TIME, true);
-            StringUtilities.addValueToHeader(headers, "Proxy-Connection",
-                    "keep-Alive", true);
+            addKeepAliveHeaders(headers);
             req.setHeaders(headers);
 
             writeRequest(nextFilter, req);
@@ -227,7 +221,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
                                 + response.getStatusLine() + ").");
             }
 
-            // Header should be like this
+            // Header should look like this
             // Proxy-Authenticate: Digest still_some_more_stuff
             List<String> values = response.getHeaders().get(
                     "Proxy-Authenticate");

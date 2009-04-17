@@ -32,7 +32,6 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionInitializer;
 import org.apache.mina.proxy.AbstractProxyLogicHandler;
 import org.apache.mina.proxy.ProxyAuthException;
-import org.apache.mina.proxy.ProxyConnector;
 import org.apache.mina.proxy.session.ProxyIoSession;
 import org.apache.mina.proxy.utils.IoBufferDecoder;
 import org.apache.mina.proxy.utils.StringUtilities;
@@ -108,7 +107,7 @@ public abstract class AbstractHttpLogicHandler extends
     /**
      * Creates a new {@link AbstractHttpLogicHandler}.
      * 
-     * @param proxyIoSession	 {@link ProxyIoSession} in use.
+     * @param proxyIoSession the {@link ProxyIoSession} in use.
      * @param request the requested url to negotiate with the proxy.
      */
     public AbstractHttpLogicHandler(final ProxyIoSession proxyIoSession) {
@@ -116,8 +115,11 @@ public abstract class AbstractHttpLogicHandler extends
     }
 
     /**
-     * Handle incoming data during the handshake process. Should consume only the
+     * Handles incoming data during the handshake process. Should consume only the
      * handshake data from the buffer, leaving any extra data in place.
+     * 
+     * @param nextFilter the next filter
+     * @param buf the buffer holding received data
      */
     public synchronized void messageReceived(final NextFilter nextFilter,
             final IoBuffer buf) throws ProxyAuthException {
@@ -295,7 +297,7 @@ public abstract class AbstractHttpLogicHandler extends
     }
 
     /**
-     * Handle a HTTP response from the proxy server.
+     * Handles a HTTP response from the proxy server.
      * 
      * @param response The response.
      */
@@ -305,9 +307,12 @@ public abstract class AbstractHttpLogicHandler extends
     /**
      * Calls{@link #writeRequest0(NextFilter, HttpProxyRequest)} to write the request. 
      * If needed a reconnection to the proxy is done previously.
+     * 
+     * @param nextFilter the next filter
+     * @param request the http request
      */
     public void writeRequest(final NextFilter nextFilter,
-            final HttpProxyRequest request) throws ProxyAuthException {
+            final HttpProxyRequest request) {
         ProxyIoSession proxyIoSession = getProxyIoSession();
 
         if (proxyIoSession.isReconnectionNeeded()) {
@@ -318,7 +323,10 @@ public abstract class AbstractHttpLogicHandler extends
     }
 
     /**
-     * Encode a HTTP request and send it to the proxy server.
+     * Encodes a HTTP request and sends it to the proxy server.
+     * 
+     * @param nextFilter the next filter
+     * @param request the http request
      */
     private void writeRequest0(final NextFilter nextFilter,
             final HttpProxyRequest request) {
@@ -338,32 +346,41 @@ public abstract class AbstractHttpLogicHandler extends
     }
 
     /**
-     * Method to reconnect to proxy when it decides not to maintain the connection during handshake.
-     * @throws ProxyAuthException 
+     * Method to reconnect to the proxy when it decides not to maintain the connection 
+     * during handshake.
+     * 
+     * @param nextFilter the next filter
+     * @param request the http request
      */
     private void reconnect(final NextFilter nextFilter,
-            final HttpProxyRequest request) throws ProxyAuthException {
+            final HttpProxyRequest request) {
         logger.debug("Reconnecting to proxy ...");
 
         final ProxyIoSession proxyIoSession = getProxyIoSession();
-        final ProxyConnector connector = proxyIoSession.getConnector();
 
-        connector.connect(new IoSessionInitializer<ConnectFuture>() {
-            public void initializeSession(final IoSession session,
-                    ConnectFuture future) {
-                logger.debug("Initializing new session: " + session);
-                session.setAttribute(ProxyIoSession.PROXY_SESSION,
-                        proxyIoSession);
-                proxyIoSession.setSession(session);
-                logger.debug("  setting proxyIoSession: " + proxyIoSession);
-                future.addListener(new IoFutureListener<ConnectFuture>() {
-                    public void operationComplete(ConnectFuture future) {
-                        proxyIoSession.setReconnectionNeeded(false);
-                        writeRequest0(nextFilter, request);
-                    }
-                });
-            }
-        });
+        // Fires reconnection
+		proxyIoSession.getConnector().connect(
+				new IoSessionInitializer<ConnectFuture>() {
+					public void initializeSession(final IoSession session,
+							ConnectFuture future) {
+						logger.debug("Initializing new session: {}", session);
+						session.setAttribute(ProxyIoSession.PROXY_SESSION,
+								proxyIoSession);
+						proxyIoSession.setSession(session);
+						logger.debug("  setting up proxyIoSession: {}", proxyIoSession);
+						future
+								.addListener(new IoFutureListener<ConnectFuture>() {
+									public void operationComplete(
+											ConnectFuture future) {
+										// Reconnection is done so we send the
+										// request to the proxy
+										proxyIoSession
+												.setReconnectionNeeded(false);
+										writeRequest0(nextFilter, request);
+									}
+								});
+					}
+				});
     }
 
     /**
@@ -379,8 +396,8 @@ public abstract class AbstractHttpLogicHandler extends
         String[] responseLines = response.split(HttpProxyConstants.CRLF);
 
         // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
-        // BUG FIX : Trimed to prevent failures with some proxies that add extra space chars
-        // like "Microsoft-IIS/5.0" ...
+        // BUG FIX : Trimed to prevent failures with some proxies that add 
+        // extra space chars like "Microsoft-IIS/5.0" ...
         String[] statusLine = responseLines[0].trim().split(" ", 2);
 
         if (statusLine.length < 2) {

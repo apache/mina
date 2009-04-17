@@ -60,11 +60,6 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
             throws ProxyAuthException {
         super(proxyIoSession);
 
-        if (request == null || !(request instanceof HttpProxyRequest)) {
-            throw new IllegalArgumentException(
-                    "request parameter should be a non null HttpProxyRequest instance");
-        }
-
         ((HttpProxyRequest) request).checkRequiredProperties(
 				HttpProxyConstants.USER_PROPERTY,
 				HttpProxyConstants.PWD_PROPERTY,
@@ -80,7 +75,7 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
         logger.debug(" doHandshake()");
 
         if (step > 0 && challengePacket == null) {
-            throw new IllegalStateException("Challenge packet not received");
+            throw new IllegalStateException("NTLM Challenge packet not received");
         } else {
             HttpProxyRequest req = (HttpProxyRequest) request;
             Map<String, List<String>> headers = req.getHeaders() != null ? req
@@ -109,13 +104,13 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
                         serverFlags, null);
 
                 StringUtilities.addValueToHeader(headers,
-                        "Proxy-Authorization", "NTLM "
-                                + new String(Base64
+                        "Proxy-Authorization", 
+                        "NTLM "+ new String(Base64
                                         .encodeBase64(authenticationPacket)),
                         true);
 
             } else {
-                logger.debug("  sending HTTP request");
+                logger.debug("  sending NTLM negotiation packet");
 
                 byte[] negotiationPacket = NTLMUtilities.createType1Message(
                         workstation, domain, null, null);
@@ -123,17 +118,12 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
                         .addValueToHeader(
                                 headers,
                                 "Proxy-Authorization",
-                                "NTLM "
-                                        + new String(
-                                                Base64
-                                                        .encodeBase64(negotiationPacket)),
+                                "NTLM "+ new String(Base64
+                                          .encodeBase64(negotiationPacket)),
                                 true);
             }
 
-            StringUtilities.addValueToHeader(headers, "Keep-Alive",
-                    HttpProxyConstants.DEFAULT_KEEP_ALIVE_TIME, true);
-            StringUtilities.addValueToHeader(headers, "Proxy-Connection",
-                    "keep-Alive", true);
+            addKeepAliveHeaders(headers);
             req.setHeaders(headers);
 
             writeRequest(nextFilter, req);
@@ -143,6 +133,8 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
 
     /**
      * Returns the value of the NTLM Proxy-Authenticate header.
+     * 
+     * @param response the proxy response
      */
     private String getNTLMHeader(final HttpProxyResponse response) {
         List<String> values = response.getHeaders().get("Proxy-Authenticate");

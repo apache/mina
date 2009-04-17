@@ -53,11 +53,6 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
             throws ProxyAuthException {
         super(proxyIoSession);
 
-        if (request == null || !(request instanceof HttpProxyRequest)) {
-            throw new IllegalArgumentException(
-                    "request parameter should be a non null HttpProxyRequest instance");
-        }
-
         ((HttpProxyRequest) request).checkRequiredProperties(
 				HttpProxyConstants.USER_PROPERTY,
 				HttpProxyConstants.PWD_PROPERTY);
@@ -88,10 +83,7 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
         StringUtilities.addValueToHeader(headers, "Proxy-Authorization",
                 "Basic " + createAuthorization(username, password), true);
 
-        StringUtilities.addValueToHeader(headers, "Keep-Alive",
-                HttpProxyConstants.DEFAULT_KEEP_ALIVE_TIME, true);
-        StringUtilities.addValueToHeader(headers, "Proxy-Connection",
-                "keep-Alive", true);
+        addKeepAliveHeaders(headers);
         req.setHeaders(headers);
 
         writeRequest(nextFilter, req);
