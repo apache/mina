@@ -30,6 +30,7 @@ import org.apache.mina.proxy.event.IoSessionEventQueue;
 import org.apache.mina.proxy.filter.ProxyFilter;
 import org.apache.mina.proxy.handlers.ProxyRequest;
 import org.apache.mina.proxy.handlers.http.HttpAuthenticationMethods;
+import org.apache.mina.proxy.handlers.http.HttpSmartProxyHandler;
 
 /**
  * ProxyIoSession.java - Class that contains all informations for the current proxy 
@@ -48,7 +49,8 @@ public class ProxyIoSession {
 
     /**
      * The list contains the authentication methods to use. 
-     * The order in the list is revelant : if first method is available then it will be used etc ...
+     * The order in the list is revelant : if first method is available 
+     * then it will be used etc ...
      */
     private List<HttpAuthenticationMethods> preferedOrder;
 
@@ -73,7 +75,7 @@ public class ProxyIoSession {
     private IoSession session;
 
     /**
-     * The connector.
+     * The proxy connector.
      */
     private ProxyConnector connector;
 
@@ -83,8 +85,9 @@ public class ProxyIoSession {
     private InetSocketAddress proxyAddress = null;
 
     /**
-     * A flag that indicates that proxy closed the connection before handshake is done. So
-     * we need to reconnect to the proxy to continue handshaking process.  
+     * A flag that indicates that the proxy closed the connection before handshake 
+     * is done. So we need to reconnect to the proxy to continue the handshaking 
+     * process.  
      */
     private boolean reconnectionNeeded = false;
 
@@ -96,55 +99,97 @@ public class ProxyIoSession {
     /**
      * The session event queue.
      */
-    private IoSessionEventQueue eventQueue;
+    private IoSessionEventQueue eventQueue = new IoSessionEventQueue(this);
 
     /**
-     * Set to true when an exception has been thrown.
+     * Set to true when an exception has been thrown or if authentication failed.
      */
     private boolean authenticationFailed;
 
-    public IoSessionEventQueue getEventQueue() {
-        return eventQueue;
-    }
-
+    /**
+     * Constructor.
+     * 
+     * @param proxyAddress the IP address of the proxy server
+     * @param request the proxy request
+     */
     public ProxyIoSession(InetSocketAddress proxyAddress, ProxyRequest request) {
         setProxyAddress(proxyAddress);
         setRequest(request);
     }
 
+    /**
+     * Returns the pending event queue.
+     */
+    public IoSessionEventQueue getEventQueue() {
+        return eventQueue;
+    }
+    
+    /**
+     * Returns the list of the prefered order for the authentication methods.
+     * This list is used by the {@link HttpSmartProxyHandler} to determine
+     * which authentication mechanism to use first between those accepted by the
+     * proxy server. This list is only used when connecting to an http proxy.
+     */
     public List<HttpAuthenticationMethods> getPreferedOrder() {
         return preferedOrder;
     }
 
+    /**
+     * Sets the ordered list of prefered authentication mechanisms.
+     * 
+     * @param preferedOrder the ordered list
+     */
     public void setPreferedOrder(List<HttpAuthenticationMethods> preferedOrder) {
         this.preferedOrder = preferedOrder;
     }
 
+    /**
+     * Returns the {@link ProxyLogicHandler} currently in use.
+     */
     public ProxyLogicHandler getHandler() {
         return handler;
     }
 
+    /**
+     * Sets the {@link ProxyLogicHandler} to use.
+     * 
+     * @param handler the {@link ProxyLogicHandler} instance
+     */
     public void setHandler(ProxyLogicHandler handler) {
         this.handler = handler;
     }
 
+    /**
+     * Returns the {@link ProxyFilter}.
+     */
     public ProxyFilter getProxyFilter() {
         return proxyFilter;
     }
 
     /**
-     * Note : Please do not call this method from your code it could result in an
-     * unexpected behaviour.
+     * Sets the {@link ProxyFilter}.
+     * Note : Please do not call this method from your code it could result 
+     * in an unexpected behaviour.
+     * 
+     * @param proxyFilter the filter
      */
     public void setProxyFilter(ProxyFilter proxyFilter) {
         this.proxyFilter = proxyFilter;
     }
 
+    /**
+     * Returns the proxy request.
+     */
     public ProxyRequest getRequest() {
         return request;
     }
 
-    public void setRequest(ProxyRequest request) {
+    /**
+     * Sets the proxy request.
+     * 
+     * @param request the proxy request
+     */
+    private void setRequest(ProxyRequest request) {
         if (request == null) {
             throw new NullPointerException("request cannot be null");
         }
@@ -152,65 +197,95 @@ public class ProxyIoSession {
         this.request = request;
     }
 
+    /**
+     * Returns the current {@link IoSession}.
+     */
     public IoSession getSession() {
         return session;
     }
 
     /**
+     * Sets the {@link IoSession} in use.
      * Note : Please do not call this method from your code it could result in an
      * unexpected behaviour.
+     * 
+     * @param session the current io session
      */
     public void setSession(IoSession session) {
         this.session = session;
-        this.eventQueue = new IoSessionEventQueue(this);
     }
 
+    /**
+     * Returns the proxy connector.
+     */
     public ProxyConnector getConnector() {
         return connector;
     }
 
     /**
+     * Sets the connector reference of this proxy session.
      * Note : Please do not call this method from your code it could result in an
      * unexpected behaviour.
+     * 
+     * @param connector the proxy connector
      */
     public void setConnector(ProxyConnector connector) {
         this.connector = connector;
     }
 
+    /**
+     * Returns the IP address of the proxy server.
+     */
     public InetSocketAddress getProxyAddress() {
         return proxyAddress;
     }
 
-    public void setProxyAddress(InetSocketAddress proxyAddress) {
+    /**
+     * Sets the IP address of the proxy server.
+     * 
+     * @param proxyAddress the IP address of the proxy server
+     */
+    private void setProxyAddress(InetSocketAddress proxyAddress) {
         if (proxyAddress == null) {
-            throw new IllegalArgumentException("proxyAddress cannot be null");
-        }
-
-        if (!(proxyAddress instanceof InetSocketAddress)) {
-            throw new NullPointerException("Unsupported proxyAddress type "
-                    + proxyAddress.getClass().getName());
+            throw new IllegalArgumentException("proxyAddress object cannot be null");
         }
 
         this.proxyAddress = proxyAddress;
     }
 
+    /**
+     * Returns true if the current authentication process is not finished
+     * but the server has closed the connection.
+     */
     public boolean isReconnectionNeeded() {
         return reconnectionNeeded;
     }
 
     /**
+     * Sets the reconnection needed flag. If set to true, it means that an
+     * authentication process is currently running but the proxy server did not
+     * kept the connection alive. So we need to reconnect to the server to complete
+     * the process.
      * Note : Please do not call this method from your code it could result in an
      * unexpected behaviour.
+     * 
+     * @param reconnectionNeeded the value to set the flag to
      */
     public void setReconnectionNeeded(boolean reconnectionNeeded) {
         this.reconnectionNeeded = reconnectionNeeded;
     }
 
+    /**
+     * Returns a charset instance of the in use charset name.
+     */
     public Charset getCharset() {
         return Charset.forName(getCharsetName());
     }
 
-    public synchronized String getCharsetName() {
+    /**
+     * Returns the used charset name or {@link #DEFAULT_ENCODING} if null.
+     */
+    public String getCharsetName() {
         if (charsetName == null) {
             charsetName = DEFAULT_ENCODING;
         }
@@ -218,14 +293,27 @@ public class ProxyIoSession {
         return charsetName;
     }
 
+    /**
+     * Sets the charset to use.
+     * 
+     * @param charsetName the charset name
+     */
     public void setCharsetName(String charsetName) {
         this.charsetName = charsetName;
     }
 
+    /**
+     * Returns true if authentication failed.
+     */
     public boolean isAuthenticationFailed() {
         return authenticationFailed;
     }
 
+    /**
+     * Sets the authentication failed flag.
+     * 
+     * @param authenticationFailed the value to set the flag to
+     */
     public void setAuthenticationFailed(boolean authenticationFailed) {
         this.authenticationFailed = authenticationFailed;
     }
