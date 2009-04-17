@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * HttpSmartProxyHandler.java - HTTP proxy handler that automatically handles forwarding request 
+ * HttpSmartProxyHandler.java - HTTP proxy handler that automatically handles forwarding a request 
  * to the appropriate authentication mechanism logic handler.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
@@ -57,7 +57,9 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
     }
 
     /**
-     * Perform any handshaking processing.
+     * Performs the handshake processing.
+     * 
+     * @param nextFilter the next filter
      */
     public void doHandshake(final NextFilter nextFilter)
             throws ProxyAuthException {
@@ -67,24 +69,23 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
             authHandler.doHandshake(nextFilter);
         } else {
             if (requestSent) {
+            	// Safety check
                 throw new ProxyAuthException(
                         "Authentication request already sent");
             }
 
             logger.debug("  sending HTTP request");
 
-            // Send request
+            // Compute request headers
             HttpProxyRequest req = (HttpProxyRequest) getProxyIoSession()
                     .getRequest();
             Map<String, List<String>> headers = req.getHeaders() != null ? req
                     .getHeaders() : new HashMap<String, List<String>>();
 
-            StringUtilities.addValueToHeader(headers, "Keep-Alive",
-                    HttpProxyConstants.DEFAULT_KEEP_ALIVE_TIME, true);
-            StringUtilities.addValueToHeader(headers, "Proxy-Connection",
-                    "keep-Alive", true);
+            AbstractAuthLogicHandler.addKeepAliveHeaders(headers);
             req.setHeaders(headers);
 
+            // Write request to the proxy
             writeRequest(nextFilter, req);
             requestSent = true;
         }
@@ -94,98 +95,105 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
      * Automatic selection of the authentication algorithm. If <code>preferedOrder</code> is set then
      * algorithms are selected from the list order otherwise the algorithm tries to select the most 
      * secured algorithm available first.
+     * 
+     * @param response the proxy response
      */
     private void autoSelectAuthHandler(final HttpProxyResponse response)
-            throws ProxyAuthException {
-        // Get the Proxy-Authenticate header
-        List<String> values = response.getHeaders().get("Proxy-Authenticate");
+			throws ProxyAuthException {
+		// Get the Proxy-Authenticate header
+		List<String> values = response.getHeaders().get("Proxy-Authenticate");
+		ProxyIoSession proxyIoSession = getProxyIoSession();
 
-        if (values == null || values.size() == 0) {
-            authHandler = HttpAuthenticationMethods.NO_AUTH
-                    .getNewHandler(getProxyIoSession());
+		if (values == null || values.size() == 0) {
+			authHandler = HttpAuthenticationMethods.NO_AUTH
+					.getNewHandler(proxyIoSession);
 
-        } else if (getProxyIoSession().getPreferedOrder() == null) {
-            for (String proxyAuthHeader : values) {
-                proxyAuthHeader = proxyAuthHeader.toLowerCase();
+		} else if (getProxyIoSession().getPreferedOrder() == null) {
+			// No preference order set for auth mechanisms
+			int method = -1;
 
-                try {
-                    // Test which auth mechanism to use. First found is the first used that's why we test
-                    // in a decreasing security quality order.
-                    if (proxyAuthHeader.contains("ntlm")) {
-                        authHandler = HttpAuthenticationMethods.NTLM
-                                .getNewHandler(getProxyIoSession());
-                        break;
-                    } else if (proxyAuthHeader.contains("digest")) {
-                        authHandler = HttpAuthenticationMethods.DIGEST
-                                .getNewHandler(getProxyIoSession());
-                        break;
-                    } else if (proxyAuthHeader.contains("basic")) {
-                        authHandler = HttpAuthenticationMethods.BASIC
-                                .getNewHandler(getProxyIoSession());
-                        break;
-                    }
-                } catch (Exception ex) {
-                    logger.debug("Following exception occured:", ex);
-                }
-            }
+			// Test which auth mechanism to use. First found is the first used
+			// that's why we test in a decreasing security quality order.
+			for (String proxyAuthHeader : values) {
+				proxyAuthHeader = proxyAuthHeader.toLowerCase();
 
-            if (authHandler == null) {
-                authHandler = HttpAuthenticationMethods.NO_AUTH
-                        .getNewHandler(getProxyIoSession());
-            }
+				if (proxyAuthHeader.contains("ntlm")) {
+					method = HttpAuthenticationMethods.NTLM.getId();
+					break;
+				} else if (proxyAuthHeader.contains("digest")
+						&& method != HttpAuthenticationMethods.NTLM.getId()) {
+					method = HttpAuthenticationMethods.DIGEST.getId();
+				} else if (proxyAuthHeader.contains("basic") && method == -1) {
+					method = HttpAuthenticationMethods.BASIC.getId();
+				}
+			}
 
-        } else {
-            for (HttpAuthenticationMethods method : getProxyIoSession()
-                    .getPreferedOrder()) {
-                if (authHandler != null) {
-                    break;
-                }
+			if (method != -1) {
+				try {
+					authHandler = HttpAuthenticationMethods.getNewHandler(
+							method, proxyIoSession);
+				} catch (Exception ex) {
+					logger.debug("Following exception occured:", ex);
+				}
+			}
 
-                if (method == HttpAuthenticationMethods.NO_AUTH) {
-                    authHandler = HttpAuthenticationMethods.NO_AUTH
-                            .getNewHandler(getProxyIoSession());
-                    break;
-                }
+			if (authHandler == null) {
+				authHandler = HttpAuthenticationMethods.NO_AUTH
+						.getNewHandler(proxyIoSession);
+			}
 
-                for (String proxyAuthHeader : values) {
-                    proxyAuthHeader = proxyAuthHeader.toLowerCase();
+		} else {
+			for (HttpAuthenticationMethods method : proxyIoSession
+					.getPreferedOrder()) {
+				if (authHandler != null) {
+					break;
+				}
 
-                    try {
-                        // test which auth mechanism to use
-                        if (proxyAuthHeader.contains("basic")
-                                && method == HttpAuthenticationMethods.BASIC) {
-                            authHandler = HttpAuthenticationMethods.BASIC
-                                    .getNewHandler(getProxyIoSession());
-                            break;
-                        } else if (proxyAuthHeader.contains("digest")
-                                && method == HttpAuthenticationMethods.DIGEST) {
-                            authHandler = HttpAuthenticationMethods.DIGEST
-                                    .getNewHandler(getProxyIoSession());
-                            break;
-                        } else if (proxyAuthHeader.contains("ntlm")
-                                && method == HttpAuthenticationMethods.NTLM) {
-                            authHandler = HttpAuthenticationMethods.NTLM
-                                    .getNewHandler(getProxyIoSession());
-                            break;
-                        }
-                    } catch (Exception ex) {
-                        logger.debug("Following exception occured:", ex);
-                    }
-                }
-            }
+				if (method == HttpAuthenticationMethods.NO_AUTH) {
+					authHandler = HttpAuthenticationMethods.NO_AUTH
+							.getNewHandler(proxyIoSession);
+					break;
+				}
 
-        }
+				for (String proxyAuthHeader : values) {
+					proxyAuthHeader = proxyAuthHeader.toLowerCase();
 
-        if (authHandler == null) {
-            throw new ProxyAuthException(
-                    "Unknown authentication mechanism(s): " + values);
-        }
-    }
+					try {
+						// test which auth mechanism to use
+						if (proxyAuthHeader.contains("basic")
+								&& method == HttpAuthenticationMethods.BASIC) {
+							authHandler = HttpAuthenticationMethods.BASIC
+									.getNewHandler(proxyIoSession);
+							break;
+						} else if (proxyAuthHeader.contains("digest")
+								&& method == HttpAuthenticationMethods.DIGEST) {
+							authHandler = HttpAuthenticationMethods.DIGEST
+									.getNewHandler(proxyIoSession);
+							break;
+						} else if (proxyAuthHeader.contains("ntlm")
+								&& method == HttpAuthenticationMethods.NTLM) {
+							authHandler = HttpAuthenticationMethods.NTLM
+									.getNewHandler(proxyIoSession);
+							break;
+						}
+					} catch (Exception ex) {
+						logger.debug("Following exception occured:", ex);
+					}
+				}
+			}
+
+		}
+
+		if (authHandler == null) {
+			throw new ProxyAuthException(
+					"Unknown authentication mechanism(s): " + values);
+		}
+	}
 
     /**
      * Handle a HTTP response from the proxy server.
      * 
-     * @param response The response.
+     * @param response The proxy response.
      */
     @Override
     public void handleResponse(final HttpProxyResponse response)
@@ -206,8 +214,8 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
             }
             authHandler.handleResponse(response);
         } else {
-            throw new ProxyAuthException("Received error response code ("
-                    + response.getStatusLine() + ").");
+            throw new ProxyAuthException("Error: unexpected response code "
+                    + response.getStatusLine() + " received from proxy.");
         }
     }
 }
