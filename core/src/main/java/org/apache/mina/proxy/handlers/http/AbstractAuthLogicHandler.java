@@ -19,10 +19,14 @@
  */
 package org.apache.mina.proxy.handlers.http;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.proxy.ProxyAuthException;
 import org.apache.mina.proxy.handlers.ProxyRequest;
 import org.apache.mina.proxy.session.ProxyIoSession;
+import org.apache.mina.proxy.utils.StringUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +67,11 @@ public abstract class AbstractAuthLogicHandler {
             throws ProxyAuthException {
         this.proxyIoSession = proxyIoSession;
         this.request = proxyIoSession.getRequest();
+
+        if (this.request == null || !(this.request instanceof HttpProxyRequest)) {
+            throw new IllegalArgumentException(
+                    "request parameter should be a non null HttpProxyRequest instance");
+        }
     }
 
     /**
@@ -97,4 +106,17 @@ public abstract class AbstractAuthLogicHandler {
         ((AbstractHttpLogicHandler) proxyIoSession.getHandler()).writeRequest(
                 nextFilter, request);
     }
+    
+    /**
+     * Try to force proxy connection to be kept alive.
+     * 
+     * @param headers the request headers
+     */
+    public static void addKeepAliveHeaders(Map<String, List<String>> headers) {
+    	StringUtilities.addValueToHeader(headers, "Keep-Alive",
+                HttpProxyConstants.DEFAULT_KEEP_ALIVE_TIME, true);
+        StringUtilities.addValueToHeader(headers, "Proxy-Connection",
+                "keep-Alive", true);
+    }
+    
 }
