@@ -30,21 +30,44 @@ import java.util.Map;
  * @since MINA 2.0.0-M3
  */
 public class HttpProxyResponse {
+	/**
+	 * The HTTP response protocol version.
+	 */
     public final String httpVersion;
 
+    /**
+     * The HTTP response status line.
+     */
     public final String statusLine;
 
+    /**
+     * The HTTP response status code;
+     */
     public final int statusCode;
 
+    /**
+     * The HTTP response headers.
+     */
     public final Map<String, List<String>> headers;
 
+    /**
+     * The HTTP response body.
+     */
     public String body;
 
+    /**
+     * Constructor of an HTTP proxy response.
+     *  
+     * @param httpVersion the protocol version
+     * @param statusLine the response status line
+     * @param headers the response headers
+     */
     protected HttpProxyResponse(final String httpVersion,
             final String statusLine, final Map<String, List<String>> headers) {
         this.httpVersion = httpVersion;
         this.statusLine = statusLine;
 
+        // parses the status code from the status line
         this.statusCode = statusLine.charAt(0) == ' ' ? Integer
                 .parseInt(statusLine.substring(1, 4)) : Integer
                 .parseInt(statusLine.substring(0, 3));
@@ -53,42 +76,42 @@ public class HttpProxyResponse {
     }
 
     /**
-     * The HTTP version.
+     * Returns the HTTP response protocol version.
      */
     public final String getHttpVersion() {
         return httpVersion;
     }
 
     /**
-     * The HTTP status code.
+     * Returns the HTTP response status code.
      */
     public final int getStatusCode() {
         return statusCode;
     }
 
     /**
-     * The HTTP status line.
+     * Returns the HTTP response status line.
      */
     public final String getStatusLine() {
         return statusLine;
     }
 
     /**
-     * The HTTP entity body.
+     * Returns the HTTP response body.
      */
     public String getBody() {
         return body;
     }
 
     /**
-     * Sets the HTTP entity body.
+     * Sets the HTTP response body.
      */
     public void setBody(String body) {
         this.body = body;
     }
 
     /**
-     * HTTP headers.
+     * Returns the HTTP response headers.
      */
     public final Map<String, List<String>> getHeaders() {
         return headers;

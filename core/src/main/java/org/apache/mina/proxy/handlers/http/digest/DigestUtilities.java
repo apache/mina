@@ -54,11 +54,21 @@ public class DigestUtilities {
         }
     }
 
+    /**
+     * The supported qualities of protections.
+     */
     public final static String[] SUPPORTED_QOPS = new String[] { "auth",
             "auth-int" };
 
     /**
      * Computes the response to the DIGEST challenge.
+     * 
+     * @param session the current session
+     * @param map the map holding the directives sent by the proxy
+     * @param method the HTTP verb
+     * @param pwd the password
+     * @param charsetName the name of the charset used for the challenge
+     * @param body the html body to be hashed for integrity calculations
      */
     public static String computeResponseValue(IoSession session,
             HashMap<String, String> map, String method, String pwd,

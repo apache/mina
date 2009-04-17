@@ -29,10 +29,16 @@ import java.io.UnsupportedEncodingException;
  * @since MINA 2.0.0-M3
  */
 public class ByteUtilities {
-    /**
-     * Returns the integer represented by 4 bytes in network byte order.
-     */
-    public static int networkByteOrderToInt(byte[] buf, int start, int count) {
+
+	/**
+     * Returns the integer represented by up to 4 bytes in network byte order.
+     * 
+	 * @param buf the buffer to read the bytes from
+	 * @param start
+	 * @param count
+	 * @return
+	 */
+	public static int networkByteOrderToInt(byte[] buf, int start, int count) {
         if (count > 4) {
             throw new IllegalArgumentException(
                     "Cannot handle more than 4 bytes");
@@ -48,11 +54,31 @@ public class ByteUtilities {
         return result;
     }
 
-    /**
-     * Encodes an integer into 4 bytes in network byte order in the buffer
-     * supplied.
-     */
-    public static byte[] intToNetworkByteOrder(int num, byte[] buf, int start,
+	/**
+     * Encodes an integer into up to 4 bytes in network byte order.
+     * 
+	 * @param num the int to convert to a byte array
+	 * @param count the number of reserved bytes for the write operation
+	 * @return the resulting byte array
+	 */
+	public static byte[] intToNetworkByteOrder(int num, int count) {
+		byte[] buf = new byte[count];
+		intToNetworkByteOrder(num, buf, 0, count);
+		
+		return buf;
+	}
+	
+	/**
+     * Encodes an integer into up to 4 bytes in network byte order in the 
+     * supplied buffer starting at <code>start</code> offset and writing
+     * <code>count</code> bytes.
+     * 
+	 * @param num the int to convert to a byte array
+	 * @param buf the buffer to write the bytes to
+	 * @param start the offset from beginning for the write operation
+	 * @param count the number of reserved bytes for the write operation
+	 */
+	public static void intToNetworkByteOrder(int num, byte[] buf, int start,
             int count) {
         if (count > 4) {
             throw new IllegalArgumentException(
@@ -63,8 +89,6 @@ public class ByteUtilities {
             buf[start + i] = (byte) (num & 0xff);
             num >>>= 8;
         }
-
-        return buf;
     }
 
     /**
@@ -81,6 +105,8 @@ public class ByteUtilities {
      * the given array <code>b</code> at offset <code>offset</code>.
      * 
      * @param v the short to write
+     * @param b the byte array to write to
+     * @param offset the offset at which to start writing in the array
      */
     public final static byte[] writeShort(short v, byte[] b, int offset) {
         b[offset] = (byte) v;
@@ -103,6 +129,8 @@ public class ByteUtilities {
      * the given array <code>b</code> at offset <code>offset</code>.
      * 
      * @param v the int to write
+     * @param b the byte array to write to
+     * @param offset the offset at which to start writing in the array
      */
     public final static byte[] writeInt(int v, byte[] b, int offset) {
         b[offset] = (byte) v;
@@ -113,6 +141,16 @@ public class ByteUtilities {
         return b;
     }
 
+    /**
+     * Invert the endianness of words (4 bytes) in the given byte array 
+     * starting at the given offset and repeating length/4 times.
+     * eg: b0b1b2b3 -> b3b2b1b0 
+     * 
+     * @param b the byte array 
+     * @param offset the offset at which to change word start
+     * @param length the number of bytes on which to operate 
+     * (should be a multiple of 4)
+     */
     public final static void changeWordEndianess(byte[] b, int offset,
             int length) {
         byte tmp;
@@ -127,6 +165,16 @@ public class ByteUtilities {
         }
     }
 
+    /**
+     * Invert two bytes in the given byte array starting at the given 
+     * offset and repeating the inversion length/2 times.
+     * eg: b0b1 -> b1b0
+     * 
+     * @param b the byte array 
+     * @param offset the offset at which to change word start
+     * @param length the number of bytes on which to operate 
+     * (should be a multiple of 2)
+     */
     public final static void changeByteEndianess(byte[] b, int offset,
             int length) {
         byte tmp;
@@ -138,16 +186,41 @@ public class ByteUtilities {
         }
     }
 
+    /**
+     * Converts an OEM string as defined in NTLM protocol (eg ASCII charset)
+     * to a byte array.
+     * 
+     * @param s the string to convert
+     * @return the result byte array
+     * @throws UnsupportedEncodingException if the string is not an OEM string
+     */
     public final static byte[] getOEMStringAsByteArray(String s)
             throws UnsupportedEncodingException {
         return s.getBytes("ASCII");
     }
 
+    /**
+     * Converts an UTF-16LE string as defined in NTLM protocol to a byte array.
+     * 
+     * @param s the string to convert
+     * @return the result byte array
+     * @throws UnsupportedEncodingException if the string is not an UTF-16LE string
+     */    
     public final static byte[] getUTFStringAsByteArray(String s)
             throws UnsupportedEncodingException {
         return s.getBytes("UTF-16LE");
     }
 
+    /**
+     * Encodes the string to a byte array using UTF-16LE or the ASCII charset
+     * in function of the <code>useUnicode</code> argument.
+     * 
+     * @param s the string to encode
+     * @param useUnicode if true then string is encoded to UTF-16LE 
+     * otherwise to ASCII
+     * @return the encoded string as a byte array
+     * @throws UnsupportedEncodingException if encoding fails
+     */
     public final static byte[] encodeString(String s, boolean useUnicode)
             throws UnsupportedEncodingException {
         if (useUnicode) {
@@ -157,10 +230,24 @@ public class ByteUtilities {
         }
     }
 
+    /**
+     * Returns a hexadecimal representation of the given byte array.
+     * 
+     * @param bytes the array to output to an hex string
+     * @return the hex representation as a string
+     */
     public static String asHex(byte[] bytes) {
         return asHex(bytes, null);
     }
 
+    /**
+     * Returns a hexadecimal representation of the given byte array.
+     * 
+     * @param bytes the array to output to an hex string
+     * @param separator the separator to use between each byte in the output
+     * string. If null no char is inserted between each byte value. 
+     * @return the hex representation as a string
+     */
     public static String asHex(byte[] bytes, String separator) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
@@ -179,6 +266,12 @@ public class ByteUtilities {
         return sb.toString();
     }
 
+    /**
+     * Converts a hex string representation to a byte array.
+     * 
+     * @param hex the string holding the hex values
+     * @return the resulting byte array
+     */
     public static byte[] asByteArray(String hex) {
         byte[] bts = new byte[hex.length() / 2];
         for (int i = 0; i < bts.length; i++) {
@@ -189,25 +282,52 @@ public class ByteUtilities {
         return bts;
     }
 
+    /**
+     * Reads an int from 4 bytes of the given array at offset 0.
+     * 
+     * @param b the byte array to read
+     * @param offset the offset at which to start
+     * @return the int value
+     */
     public static final int makeIntFromByte4(byte[] b) {
         return makeIntFromByte4(b, 0);
     }
 
+    /**
+     * Reads an int from 4 bytes of the given array at the given offset.
+     * 
+     * @param b the byte array to read
+     * @param offset the offset at which to start
+     * @return the int value
+     */
     public static final int makeIntFromByte4(byte[] b, int offset) {
         return b[offset] << 24 | (b[offset + 1] & 0xff) << 16
                 | (b[offset + 2] & 0xff) << 8 | (b[offset + 3] & 0xff);
     }
 
+    /**
+     * Reads an int from 2 bytes of the given array at offset 0.
+     * 
+     * @param b the byte array to read
+     * @return the int value     
+     */
     public static final int makeIntFromByte2(byte[] b) {
         return makeIntFromByte2(b, 0);
     }
 
+    /**
+     * Reads an int from 2 bytes of the given array at the given offset.
+     * 
+     * @param b the byte array to read
+     * @param offset the offset at which to start
+     * @return the int value
+     */
     public static final int makeIntFromByte2(byte[] b, int offset) {
         return (b[offset] & 0xff) << 8 | (b[offset + 1] & 0xff);
     }
 
     /**
-     * Return true if the flag <code>testFlag</code> is set in the
+     * Returns true if the flag <code>testFlag</code> is set in the
      * <code>flags</code> flagset.
      * 
      * @param flagset the flagset to test

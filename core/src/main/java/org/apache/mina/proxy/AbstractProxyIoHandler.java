@@ -40,11 +40,15 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
 
     /**
      * Method called only when handshake has completed.
+     * 
+     * @param session the io session
      */
     public abstract void proxySessionOpened(IoSession session) throws Exception;
 
     /**
      * Hooked session opened event.
+     * 
+     * @param session the io session
      */
     @Override
     public final void sessionOpened(IoSession session) throws Exception {

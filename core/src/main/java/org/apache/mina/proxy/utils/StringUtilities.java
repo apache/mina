@@ -38,11 +38,19 @@ import javax.security.sasl.SaslException;
  */
 public class StringUtilities {
 
-    /**
-     * Returns the value of a directive from the map. If mandatory is true and the value is null,
-     * then it throws a {@link AuthenticationException}. 
-     */
-    public static String getDirectiveValue(
+	/**
+     * A directive is a parameter of the digest authentication process.
+     * Returns the value of a directive from the map. If mandatory is true and the 
+     * value is null, then it throws an {@link AuthenticationException}.
+     *  
+	 * @param directivesMap the directive's map 
+	 * @param directive the name of the directive we want to retrieve
+	 * @param mandatory is the directive mandatory
+	 * @return the mandatory value as a String
+	 * @throws AuthenticationException if mandatory is true and if 
+	 * directivesMap.get(directive) == null
+	 */
+	public static String getDirectiveValue(
             HashMap<String, String> directivesMap, String directive,
             boolean mandatory) throws AuthenticationException {
         String value = directivesMap.get(directive);
@@ -58,22 +66,32 @@ public class StringUtilities {
         return value;
     }
 
-    /**
+	/**
      * Copy the directive to the {@link StringBuilder} if not null.
-     */
-    public static String copyDirective(HashMap<String, String> directives,
+     * (A directive is a parameter of the digest authentication process.)
+     * 
+	 * @param directives the directives map
+	 * @param sb the output buffer
+	 * @param directive the directive name to look for
+	 */
+    public static void copyDirective(HashMap<String, String> directives,
             StringBuilder sb, String directive) {
         String directiveValue = directives.get(directive);
         if (directiveValue != null) {
             sb.append(directive).append(" = \"").append(directiveValue).append(
                     "\", ");
         }
-
-        return directiveValue;
     }
 
     /**
-     * Copy the directive to the from src to dst if not null.
+     * Copy the directive from the source map to the destination map, if it's
+     * value isn't null.
+     * (A directive is a parameter of the digest authentication process.)
+     * 
+     * @param src the source map
+     * @param dst the destination map
+     * @param directive the directive name
+     * @return the value of the copied directive
      */
     public static String copyDirective(HashMap<String, String> src,
             HashMap<String, String> dst, String directive) {
@@ -86,8 +104,8 @@ public class StringUtilities {
     }
 
     /**
-     * Parses digest-challenge string, extracting each token
-     * and value(s)
+     * Parses digest-challenge string, extracting each token and value(s). Each token
+     * is a directive.
      *
      * @param buf A non-null digest-challenge string.
      * @throws UnsupportedEncodingException 
@@ -249,6 +267,10 @@ public class StringUtilities {
 
     /**
      * Skip all linear white spaces
+     * 
+     * @param buf the buf which is being scanned for lws
+     * @param start the offset to start at
+     * @return the next position in buf which isn't a lws character
      */
     private static int skipLws(byte[] buf, int start) {
         int i;
@@ -279,6 +301,14 @@ public class StringUtilities {
         }
     }
 
+    /**
+     * Returns the value of the named header. If it has multiple values
+     * then an {@link IllegalArgumentException} is thrown
+     * 
+     * @param headers the http headers map
+     * @param key the key of the header 
+     * @return the value of the http header
+     */
     public static String getSingleValuedHeader(
             Map<String, List<String>> headers, String key) {
         List<String> values = headers.get(key);
@@ -295,6 +325,16 @@ public class StringUtilities {
         }
     }
 
+    /**
+     * Adds an header to the provided map of headers.
+     * 
+     * @param headers the http headers map
+     * @param key the name of the new header to add
+     * @param value the value of the added header
+     * @param singleValued if true and the map already contains one value
+     * then it is replaced by the new value. Otherwise it simply adds a new
+     * value to this multi-valued header.
+     */
     public static void addValueToHeader(Map<String, List<String>> headers,
             String key, String value, boolean singleValued) {
         List<String> values = headers.get(key);

@@ -24,7 +24,8 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.textline.LineDelimiter;
 
 /**
- * IoBufferDecoder.java - Handles an {@link IoBuffer} decoder which supports two methods : 
+ * IoBufferDecoder.java - Handles an {@link IoBuffer} decoder which supports 
+ * two methods : 
  * - dynamic delimiter decoding
  * - fixed length content reading
  * 
@@ -34,17 +35,36 @@ import org.apache.mina.filter.codec.textline.LineDelimiter;
  */
 public class IoBufferDecoder {
 
+	/**
+	 * The class holding the decoding context.
+	 */
     public class DecodingContext {
 
+    	/**
+    	 * The buffered data.
+    	 */
         private IoBuffer decodedBuffer;
 
+        /**
+         * The delimiter in use. Set if delimiter mode is in use.
+         */
         private IoBuffer delimiter;
 
+        /**
+         * The currently matched bytes of the delimiter. 
+         */
+        private int matchCount = 0;
+        
+        /**
+         * Holds the current content length of decoded data if in
+         * content-length mode.
+         */
         private int contentLength = -1;
 
-        private int matchCount = 0;
-
-        public void clean() {
+        /**
+         * Resets the decoding state.
+         */
+        public void reset() {
             contentLength = -1;
             matchCount = 0;
             decodedBuffer = null;
@@ -83,11 +103,16 @@ public class IoBufferDecoder {
         }
     }
 
+    /**
+     * The decoding context.
+     */
     private DecodingContext ctx = new DecodingContext();
 
     /**
      * Creates a new instance that uses specified <tt>delimiter</tt> byte array as a
      * message delimiter.
+     * 
+     * @param delimiter an array of characters which delimits messages
      */
     public IoBufferDecoder(byte[] delimiter) {
         setDelimiter(delimiter, true);
@@ -95,6 +120,8 @@ public class IoBufferDecoder {
 
     /**
      * Creates a new instance that will read messages of <tt>contentLength</tt> bytes.
+     * 
+     * @param contentLength the exact length to read
      */
     public IoBufferDecoder(int contentLength) {
         setContentLength(contentLength, false);
@@ -102,9 +129,12 @@ public class IoBufferDecoder {
 
     /**
      * Sets the the length of the content line to be decoded.
-     * When set, it overrides the dynamic delimiter setting. The default value is <tt>-1</tt>.
-     * Content length method will be used for decoding on the next decodeOnce call. 
-     * Delimiter matching is reset only if <tt>resetMatchCount</tt> is true.
+     * When set, it overrides the dynamic delimiter setting and content length 
+     * method will be used for decoding on the next decodeOnce call.
+     * The default value is <tt>-1</tt>.
+     * 
+     * @param contentLength the content length to match
+     * @param resetMatchCount delimiter matching is reset if true
      */
     public void setContentLength(int contentLength, boolean resetMatchCount) {
         if (contentLength <= 0) {
@@ -124,7 +154,10 @@ public class IoBufferDecoder {
      * delimiter. Delimiter matching is reset only if <tt>resetMatchCount</tt> is true but 
      * decoding will continue from current position.
      * 
-     * NB : Delimiter {@link LineDelimiter#AUTO} is not allowed. 
+     * NB : Delimiter {@link LineDelimiter#AUTO} is not allowed.
+     * 
+     * @param delim the new delimiter as a byte array
+     * @param resetMatchCount delimiter matching is reset if true
      */
     public void setDelimiter(byte[] delim, boolean resetMatchCount) {
         if (delim == null) {
@@ -148,6 +181,8 @@ public class IoBufferDecoder {
      * is set then it tries to retrieve <code>contentLength</code> bytes from the buffer
      * otherwise it will scan the buffer to find the data <code>delimiter</code> and return
      * all the data and the trailing delimiter.
+     * 
+     * @param in the data to decode
      */
     public IoBuffer decodeFully(IoBuffer in) {
         int contentLength = ctx.getContentLength();
@@ -162,6 +197,7 @@ public class IoBufferDecoder {
                         true);
             }
 
+            // If not enough data to complete the decoding
             if (in.remaining() < contentLength) {
                 int readBytes = in.remaining();
                 decodedBuffer.put(in);
@@ -175,7 +211,7 @@ public class IoBufferDecoder {
                 decodedBuffer.put(in);
                 decodedBuffer.flip();
                 in.limit(oldLimit);
-                ctx.clean();
+                ctx.reset();
 
                 return decodedBuffer;
             }
@@ -206,7 +242,7 @@ public class IoBufferDecoder {
                     decodedBuffer.flip();
 
                     in.limit(oldLimit);
-                    ctx.clean();
+                    ctx.reset();
 
                     return decodedBuffer;
                 }

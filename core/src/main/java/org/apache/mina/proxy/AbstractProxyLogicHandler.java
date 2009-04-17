@@ -186,7 +186,10 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
     }
 
     /**
-     * Close the session.
+     * Closes the session.
+     * 
+     * @param message the error message
+     * @param t the exception which caused the session closing
      */
     protected void closeSession(final String message, final Throwable t) {
         if (t != null) {
@@ -200,9 +203,9 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
     }
 
     /**
-     * Close the session.
+     * Closes the session.
      * 
-     * @param message
+     * @param message the error message
      */
     protected void closeSession(final String message) {
         closeSession(message, null);
