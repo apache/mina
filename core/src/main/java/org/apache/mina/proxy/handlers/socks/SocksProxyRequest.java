@@ -101,7 +101,7 @@ public class SocksProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Return the endpoint address resulting from the {@link #getEndpointAddress()}. 
+     * Returns the endpoint address resulting from the {@link #getEndpointAddress()}. 
      * If not set, it will return the {@link SocksProxyConstants#FAKE_IP} constant 
      * value which will be ignored in a SOCKS v4 request.
      *   
@@ -162,7 +162,8 @@ public class SocksProxyRequest extends ProxyRequest {
      */
     public synchronized final String getHost() {
         if (host == null) {
-            if (getEndpointAddress() != null) {
+        	InetSocketAddress adr = getEndpointAddress();
+            if ( adr != null && !adr.isUnresolved()) {
                 host = getEndpointAddress().getHostName();
             }
         }
