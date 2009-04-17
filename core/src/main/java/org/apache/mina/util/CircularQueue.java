@@ -36,7 +36,7 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
     /** The serialVersionUID : mandatory for serializable classes */
     private static final long serialVersionUID = 3993421269224511264L;
 
-    /** Minimal size fo the underlying attay */
+    /** Minimal size of the underlying array */
     private static final int DEFAULT_CAPACITY = 4;
 
     /** The initial capacity of the list */
