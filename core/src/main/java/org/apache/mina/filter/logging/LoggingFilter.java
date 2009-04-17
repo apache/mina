@@ -226,7 +226,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @return The LogLevel for the ExceptionCaught eventType
      */
-    public LogLevel getExceptionCaughtLoglevel() {
+    public LogLevel getExceptionCaughtLogLevel() {
         return exceptionCaughtLevel;
     }
     
@@ -244,7 +244,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @return The LogLevel for the MessageReceived eventType
      */
-    public LogLevel getMessageReceivedLoglevel() {
+    public LogLevel getMessageReceivedLogLevel() {
         return messageReceivedLevel;
     }
     
@@ -253,7 +253,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param level The LogLevel to set
      */
-    public void setMessageSentLoglevel(LogLevel level) {
+    public void setMessageSentLogLevel(LogLevel level) {
         messageSentLevel = level;
     }
     
@@ -262,7 +262,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @return The LogLevel for the MessageSent eventType
      */
-    public LogLevel getMessageSentLoglevel() {
+    public LogLevel getMessageSentLogLevel() {
         return messageSentLevel;
     }
     
@@ -271,7 +271,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param level The LogLevel to set
      */
-    public void setSessionCreatedLoglevel(LogLevel level) {
+    public void setSessionCreatedLogLevel(LogLevel level) {
         sessionCreatedLevel = level;
     }
     
@@ -280,7 +280,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @return The LogLevel for the SessionCreated eventType
      */
-    public LogLevel getSessionCreatedLoglevel() {
+    public LogLevel getSessionCreatedLogLevel() {
         return sessionCreatedLevel;
     }
     
@@ -289,7 +289,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param level The LogLevel to set
      */
-    public void setSessionOpenedLoglevel(LogLevel level) {
+    public void setSessionOpenedLogLevel(LogLevel level) {
         sessionOpenedLevel = level;
     }
     
@@ -298,7 +298,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @return The LogLevel for the SessionOpened eventType
      */
-    public LogLevel getSessionOpenedLoglevel() {
+    public LogLevel getSessionOpenedLogLevel() {
         return sessionOpenedLevel;
     }
     
@@ -307,7 +307,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param level The LogLevel to set
      */
-    public void setSessionIdleLoglevel(LogLevel level) {
+    public void setSessionIdleLogLevel(LogLevel level) {
         sessionIdleLevel = level;
     }
     
@@ -316,7 +316,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @return The LogLevel for the SessionIdle eventType
      */
-    public LogLevel getSessionIdleLoglevel() {
+    public LogLevel getSessionIdleLogLevel() {
         return sessionIdleLevel;
     }
     
@@ -325,7 +325,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @param level The LogLevel to set
      */
-    public void setSessionClosedLoglevel(LogLevel level) {
+    public void setSessionClosedLogLevel(LogLevel level) {
         sessionClosedLevel = level;
     }
 
@@ -334,7 +334,7 @@ public class LoggingFilter extends IoFilterAdapter {
      * 
      * @return The LogLevel for the SessionClosed eventType
      */
-    public LogLevel getSessionClosedLoglevel() {
+    public LogLevel getSessionClosedLogLevel() {
         return sessionClosedLevel;
     }
 }
