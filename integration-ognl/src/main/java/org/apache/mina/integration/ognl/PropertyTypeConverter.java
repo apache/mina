@@ -83,7 +83,6 @@ public class PropertyTypeConverter implements TypeConverter {
         return e2.getValue();
     }
     
-    @SuppressWarnings("unused")
     protected PropertyEditor getPropertyEditor(Class<?> type, String attrName, Class<?> attrType) {
         return PropertyEditorFactory.getInstance(attrType);
     }
