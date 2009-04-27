@@ -35,9 +35,9 @@ public abstract class SingleByteDecodingState implements DecodingState {
             throws Exception {
         if (in.hasRemaining()) {
             return finishDecode(in.get(), out);
-        } else {
-            return this;
         }
+        
+        return this;
     }
     
     /**

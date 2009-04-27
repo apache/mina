@@ -36,5 +36,6 @@ public abstract class MessageDecoderAdapter implements MessageDecoder {
      */
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
+        // Do nothing
     }
 }

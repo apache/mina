@@ -152,7 +152,13 @@ public class CumulativeProtocolDecoderTest {
     }
 
     private static class IntegerDecoder extends CumulativeProtocolDecoder {
-
+        /**
+         * Default constructor
+         */
+        public IntegerDecoder() {
+            super();
+        }
+        
         @Override
         protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
@@ -167,10 +173,18 @@ public class CumulativeProtocolDecoderTest {
         }
 
         public void dispose() throws Exception {
+            // Do nothing
         }
     }
     
     private static class WrongDecoder extends CumulativeProtocolDecoder {
+        /**
+         * Default constructor
+         */
+        public WrongDecoder() {
+            super();
+        }
+        
         @Override
         protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
@@ -178,10 +192,18 @@ public class CumulativeProtocolDecoderTest {
         }
 
         public void dispose() throws Exception {
+            // Do nothing
         }
     }
 
     private static class DuplicatingIntegerDecoder extends IntegerDecoder {
+        /**
+         * Default constructor
+         */
+        public DuplicatingIntegerDecoder() {
+            super();
+        }
+        
         @Override
         protected boolean doDecode(IoSession session, IoBuffer in,
                 ProtocolDecoderOutput out) throws Exception {
@@ -191,6 +213,7 @@ public class CumulativeProtocolDecoderTest {
         }
 
         public void dispose() throws Exception {
+            // Do nothing
         }
     }
 }

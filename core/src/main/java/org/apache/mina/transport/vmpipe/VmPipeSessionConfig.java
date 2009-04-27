@@ -28,4 +28,5 @@ import org.apache.mina.core.session.IoSessionConfig;
  * @version $Rev$, $Date$
  */
 public interface VmPipeSessionConfig extends IoSessionConfig {
+    // Do nothing
 }

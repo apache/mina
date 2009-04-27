@@ -357,9 +357,9 @@ public final class NioSocketAcceptor
             
             if ( key.isValid() && key.isAcceptable() ) {
                 return (ServerSocketChannel) key.channel();
-            } else {
-                return null;
             }
+
+            return null;
         }
 
         /**

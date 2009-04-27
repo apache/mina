@@ -48,6 +48,7 @@ public class AvailablePortFinder {
      * Creates a new instance.
      */
     private AvailablePortFinder() {
+        // Do nothing
     }
 
     /**
@@ -111,6 +112,7 @@ public class AvailablePortFinder {
             ds.setReuseAddress(true);
             return true;
         } catch (IOException e) {
+            // Do nothing
         } finally {
             if (ds != null) {
                 ds.close();
@@ -152,6 +154,7 @@ public class AvailablePortFinder {
                 s = new ServerSocket(i);
                 result.add(new Integer(i));
             } catch (IOException e) {
+                // Do nothing
             } finally {
                 if (s != null) {
                     try {

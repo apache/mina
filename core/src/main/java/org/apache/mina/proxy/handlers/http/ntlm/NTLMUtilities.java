@@ -101,53 +101,55 @@ public class NTLMUtilities implements NTLMConstants {
      */
     public final static byte[] getOsVersion() {
         String os = System.getProperty("os.name");
+        
         if (os == null || !os.toUpperCase().contains("WINDOWS")) {
             return DEFAULT_OS_VERSION;
-        } else {
-            byte[] osVer = new byte[8];
-            try {
-                Process pr = Runtime.getRuntime().exec("cmd /C ver");
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(pr.getInputStream()));
-                pr.waitFor();
-                
-                String line;
-                do {
-                	  line = reader.readLine();
-                } while ((line != null) && (line.length() != 0));
-                
-                reader.close();
-                
-                // The command line should return a response like :
-                // Microsoft Windows XP [version 5.1.2600]
-                int pos = line.toLowerCase().indexOf("version");
-
-                if (pos == -1) {
-                    throw new NullPointerException();
-                }
-
-                pos += 8;
-                line = line.substring(pos, line.indexOf(']'));
-                StringTokenizer tk = new StringTokenizer(line, ".");
-                if (tk.countTokens() != 3) {
-                    throw new NullPointerException();
-                }
-
-                writeOSVersion(Byte.parseByte(tk.nextToken()), Byte
-                        .parseByte(tk.nextToken()), Short.parseShort(tk
-                        .nextToken()), osVer, 0);
-            } catch (Exception ex) {
-                try {
-                    String version = System.getProperty("os.version");
-                    writeOSVersion(Byte.parseByte(version.substring(0, 1)),
-                            Byte.parseByte(version.substring(2, 3)), (short) 0,
-                            osVer, 0);
-                } catch (Exception ex2) {
-                    return DEFAULT_OS_VERSION;
-                }
-            }
-            return osVer;
         }
+        
+        byte[] osVer = new byte[8];
+        try {
+            Process pr = Runtime.getRuntime().exec("cmd /C ver");
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(pr.getInputStream()));
+            pr.waitFor();
+            
+            String line;
+            do {
+            	  line = reader.readLine();
+            } while ((line != null) && (line.length() != 0));
+            
+            reader.close();
+            
+            // The command line should return a response like :
+            // Microsoft Windows XP [version 5.1.2600]
+            int pos = line.toLowerCase().indexOf("version");
+
+            if (pos == -1) {
+                throw new NullPointerException();
+            }
+
+            pos += 8;
+            line = line.substring(pos, line.indexOf(']'));
+            StringTokenizer tk = new StringTokenizer(line, ".");
+            if (tk.countTokens() != 3) {
+                throw new NullPointerException();
+            }
+
+            writeOSVersion(Byte.parseByte(tk.nextToken()), Byte
+                    .parseByte(tk.nextToken()), Short.parseShort(tk
+                    .nextToken()), osVer, 0);
+        } catch (Exception ex) {
+            try {
+                String version = System.getProperty("os.version");
+                writeOSVersion(Byte.parseByte(version.substring(0, 1)),
+                        Byte.parseByte(version.substring(2, 3)), (short) 0,
+                        osVer, 0);
+            } catch (Exception ex2) {
+                return DEFAULT_OS_VERSION;
+            }
+        }
+    
+        return osVer;
     }
 
     /**
@@ -302,9 +304,9 @@ public class NTLMUtilities implements NTLMConstants {
                 : msgFlags;
         if (ByteUtilities.isFlagSet(flags, FLAG_NEGOTIATE_UNICODE)) {
             return new String(targetName, "UTF-16LE");
-        } else {
-            return new String(targetName, "ASCII");
         }
+        
+        return new String(targetName, "ASCII");
     }
 
     /**

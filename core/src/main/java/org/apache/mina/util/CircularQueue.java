@@ -22,7 +22,6 @@ package org.apache.mina.util;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
@@ -32,7 +31,7 @@ import java.util.Queue;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<E>, Serializable {
+public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Serializable {
     /** The serialVersionUID : mandatory for serializable classes */
     private static final long serialVersionUID = 3993421269224511264L;
 
@@ -159,9 +158,9 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
         
         if (last >= first) {
             return last - first;
-        } else {
-            return last - first + capacity();
         }
+
+        return last - first + capacity();
     }
     
     @Override
@@ -231,9 +230,9 @@ public class CircularQueue<E> extends AbstractList<E> implements List<E>, Queue<
             if (newLen < initialCapacity) {
                 if (oldLen == initialCapacity) {
                     return;
-                } else {
-                    newLen = initialCapacity;
                 }
+
+                newLen = initialCapacity;
             }
             
             Object[] tmp = new Object[newLen];

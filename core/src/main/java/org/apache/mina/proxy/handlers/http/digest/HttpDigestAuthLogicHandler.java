@@ -89,123 +89,123 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
         if (step > 0 && directives == null) {
             throw new ProxyAuthException(
                     "Authentication challenge not received");
-        } else {
-            HttpProxyRequest req = (HttpProxyRequest) request;
-            Map<String, List<String>> headers = req.getHeaders() != null ? req
-                    .getHeaders() : new HashMap<String, List<String>>();
+        }
+        
+        HttpProxyRequest req = (HttpProxyRequest) request;
+        Map<String, List<String>> headers = req.getHeaders() != null ? req
+                .getHeaders() : new HashMap<String, List<String>>();
 
-            if (step > 0) {
-                logger.debug("  sending DIGEST challenge response");
+        if (step > 0) {
+            logger.debug("  sending DIGEST challenge response");
 
-                // Build a challenge response
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("username", req.getProperties().get(
-                        HttpProxyConstants.USER_PROPERTY));
-                StringUtilities.copyDirective(directives, map, "realm");
-                StringUtilities.copyDirective(directives, map, "uri");
-                StringUtilities.copyDirective(directives, map, "opaque");
-                StringUtilities.copyDirective(directives, map, "nonce");
-                String algorithm = StringUtilities.copyDirective(directives,
-                        map, "algorithm");
+            // Build a challenge response
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put("username", req.getProperties().get(
+                    HttpProxyConstants.USER_PROPERTY));
+            StringUtilities.copyDirective(directives, map, "realm");
+            StringUtilities.copyDirective(directives, map, "uri");
+            StringUtilities.copyDirective(directives, map, "opaque");
+            StringUtilities.copyDirective(directives, map, "nonce");
+            String algorithm = StringUtilities.copyDirective(directives,
+                    map, "algorithm");
 
-                // Check for a supported algorithm
-                if (algorithm != null && !"md5".equalsIgnoreCase(algorithm)
-                        && !"md5-sess".equalsIgnoreCase(algorithm)) {
-                    throw new ProxyAuthException(
-                            "Unknown algorithm required by server");
-                }
-
-                // Check for a supported qop
-                String qop = directives.get("qop");
-                if (qop != null) {
-                    StringTokenizer st = new StringTokenizer(qop, ",");
-                    String token = null;
-
-                    while (st.hasMoreTokens()) {
-                        String tk = st.nextToken();
-                        if ("auth".equalsIgnoreCase(token)) {
-                            break;
-                        } else {
-                            int pos = Arrays.binarySearch(
-                                    DigestUtilities.SUPPORTED_QOPS, tk);
-                            if (pos > -1) {
-                                token = tk;
-                            }
-                        }
-                    }
-
-                    if (token != null) {
-                        map.put("qop", token);
-
-                        byte[] nonce = new byte[8];
-                        rnd.nextBytes(nonce);
-
-                        try {
-                            String cnonce = new String(Base64
-                                    .encodeBase64(nonce), proxyIoSession
-                                    .getCharsetName());
-                            map.put("cnonce", cnonce);
-                        } catch (UnsupportedEncodingException e) {
-                            throw new ProxyAuthException(
-                                    "Unable to encode cnonce", e);
-                        }
-                    } else {
-                        throw new ProxyAuthException(
-                                "No supported qop option available");
-                    }
-                }
-
-                map.put("nc", "00000001");
-                map.put("uri", req.getHttpURI());
-
-                // Compute the response
-                try {
-                    map.put("response", DigestUtilities
-                            .computeResponseValue(proxyIoSession.getSession(),
-                                    map, req.getHttpVerb().toUpperCase(),
-                                    req.getProperties().get(
-                                            HttpProxyConstants.PWD_PROPERTY),
-                                    proxyIoSession.getCharsetName(), response
-                                            .getBody()));
-
-                } catch (Exception e) {
-                    throw new ProxyAuthException(
-                            "Digest response computing failed", e);
-                }
-
-                // Prepare the challenge response header and add it to the 
-                // request we will send
-                StringBuilder sb = new StringBuilder("Digest ");
-                boolean addSeparator = false;
-
-                for (String key : map.keySet()) {
-
-                    if (addSeparator) {
-                        sb.append(", ");
-                    } else {
-                        addSeparator = true;
-                    }
-
-                    boolean quotedValue = !"qop".equals(key)
-                            && !"nc".equals(key);
-                    sb.append(key);
-                    if (quotedValue) {
-                        sb.append("=\"").append(map.get(key)).append('\"');
-                    } else {
-                        sb.append('=').append(map.get(key));
-                    }
-                }
-
-                StringUtilities.addValueToHeader(headers,
-                        "Proxy-Authorization", sb.toString(), true);
+            // Check for a supported algorithm
+            if (algorithm != null && !"md5".equalsIgnoreCase(algorithm)
+                    && !"md5-sess".equalsIgnoreCase(algorithm)) {
+                throw new ProxyAuthException(
+                        "Unknown algorithm required by server");
             }
 
-            addKeepAliveHeaders(headers);
-            req.setHeaders(headers);
+            // Check for a supported qop
+            String qop = directives.get("qop");
+            if (qop != null) {
+                StringTokenizer st = new StringTokenizer(qop, ",");
+                String token = null;
 
-            writeRequest(nextFilter, req);
-            step++;
+                while (st.hasMoreTokens()) {
+                    String tk = st.nextToken();
+                    if ("auth".equalsIgnoreCase(token)) {
+                        break;
+                    }
+
+                    int pos = Arrays.binarySearch(
+                            DigestUtilities.SUPPORTED_QOPS, tk);
+                    if (pos > -1) {
+                        token = tk;
+                    }
+                }
+
+                if (token != null) {
+                    map.put("qop", token);
+
+                    byte[] nonce = new byte[8];
+                    rnd.nextBytes(nonce);
+
+                    try {
+                        String cnonce = new String(Base64
+                                .encodeBase64(nonce), proxyIoSession
+                                .getCharsetName());
+                        map.put("cnonce", cnonce);
+                    } catch (UnsupportedEncodingException e) {
+                        throw new ProxyAuthException(
+                                "Unable to encode cnonce", e);
+                    }
+                } else {
+                    throw new ProxyAuthException(
+                            "No supported qop option available");
+                }
+            }
+
+            map.put("nc", "00000001");
+            map.put("uri", req.getHttpURI());
+
+            // Compute the response
+            try {
+                map.put("response", DigestUtilities
+                        .computeResponseValue(proxyIoSession.getSession(),
+                                map, req.getHttpVerb().toUpperCase(),
+                                req.getProperties().get(
+                                        HttpProxyConstants.PWD_PROPERTY),
+                                proxyIoSession.getCharsetName(), response
+                                        .getBody()));
+
+            } catch (Exception e) {
+                throw new ProxyAuthException(
+                        "Digest response computing failed", e);
+            }
+
+            // Prepare the challenge response header and add it to the 
+            // request we will send
+            StringBuilder sb = new StringBuilder("Digest ");
+            boolean addSeparator = false;
+
+            for (String key : map.keySet()) {
+
+                if (addSeparator) {
+                    sb.append(", ");
+                } else {
+                    addSeparator = true;
+                }
+
+                boolean quotedValue = !"qop".equals(key)
+                        && !"nc".equals(key);
+                sb.append(key);
+                if (quotedValue) {
+                    sb.append("=\"").append(map.get(key)).append('\"');
+                } else {
+                    sb.append('=').append(map.get(key));
+                }
+            }
+
+            StringUtilities.addValueToHeader(headers,
+                    "Proxy-Authorization", sb.toString(), true);
         }
+
+        addKeepAliveHeaders(headers);
+        req.setHeaders(headers);
+
+        writeRequest(nextFilter, req);
+        step++;
     }
 
     @Override

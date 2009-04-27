@@ -36,7 +36,9 @@ public interface ExceptionHandler<E extends Throwable> {
      * you want to ignore an exception of a specific type silently.
      */
     static ExceptionHandler<Throwable> NOOP = new ExceptionHandler<Throwable>() {
-        public void exceptionCaught(IoSession session, Throwable cause) {}
+        public void exceptionCaught(IoSession session, Throwable cause) {
+            // Do nothing
+        }
     };
 
     /**

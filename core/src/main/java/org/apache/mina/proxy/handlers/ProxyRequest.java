@@ -39,6 +39,7 @@ public abstract class ProxyRequest {
      * Implicit constructor.
      */
     public ProxyRequest() {
+        // Do nothing
     }
 
     /**

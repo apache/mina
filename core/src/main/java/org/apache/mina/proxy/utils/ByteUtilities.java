@@ -48,7 +48,7 @@ public class ByteUtilities {
 
         for (int i = 0; i < count; i++) {
             result <<= 8;
-            result |= ((int) buf[start + i] & 0xff);
+            result |= (buf[start + i] & 0xff);
         }
 
         return result;
@@ -225,9 +225,9 @@ public class ByteUtilities {
             throws UnsupportedEncodingException {
         if (useUnicode) {
             return getUTFStringAsByteArray(s);
-        } else {
-            return getOEMStringAsByteArray(s);
         }
+
+        return getOEMStringAsByteArray(s);
     }
 
     /**

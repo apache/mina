@@ -273,12 +273,12 @@ public class RequestResponseFilterTest extends TestCase {
         assertRequestTimeoutException(req2);
     }
 
-    private static class Message {
+    static class Message {
         private final int id;
 
         private final ResponseType type;
 
-        private Message(int id, ResponseType type) {
+        Message(int id, ResponseType type) {
             this.id = id;
             this.type = type;
         }
@@ -293,7 +293,13 @@ public class RequestResponseFilterTest extends TestCase {
     }
 
     private static class MessageInspector implements ResponseInspector {
-
+        /**
+         * Default constructor
+         */
+        public MessageInspector() {
+            super();
+        }
+        
         public Object getRequestId(Object message) {
             if (!(message instanceof Message)) {
                 return null;
@@ -314,6 +320,13 @@ public class RequestResponseFilterTest extends TestCase {
     private static class WriteRequestMatcher extends AbstractMatcher {
         private WriteRequest lastWriteRequest;
 
+        /**
+         * Default constructor
+         */
+        public WriteRequestMatcher() {
+            super();
+        }
+        
         public WriteRequest getLastWriteRequest() {
             return lastWriteRequest;
         }
@@ -331,7 +344,7 @@ public class RequestResponseFilterTest extends TestCase {
         }
     }
 
-    private static class ExceptionMatcher extends AbstractMatcher {
+    static class ExceptionMatcher extends AbstractMatcher {
         @Override
         protected boolean argumentMatches(Object expected, Object actual) {
             if (actual instanceof RequestTimeoutException

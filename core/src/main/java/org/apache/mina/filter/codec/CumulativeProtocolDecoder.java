@@ -109,6 +109,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      * Creates a new instance.
      */
     protected CumulativeProtocolDecoder() {
+        // Do nothing
     }
 
     /**

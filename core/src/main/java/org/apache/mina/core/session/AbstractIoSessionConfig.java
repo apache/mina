@@ -40,6 +40,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     private int throughputCalculationInterval = 3;
 
     protected AbstractIoSessionConfig() {
+        // Do nothing
     }
 
     /**

@@ -138,6 +138,7 @@ public class Request {
             try {
                 return awaitResponse();
             } catch (InterruptedException e) {
+                // Do nothing
             }
         }
     }

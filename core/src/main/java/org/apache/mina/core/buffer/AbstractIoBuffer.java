@@ -1142,9 +1142,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         byte b3 = get();
         if (ByteOrder.BIG_ENDIAN.equals(order())) {
             return getMediumInt(b1, b2, b3);
-        } else {
-            return getMediumInt(b3, b2, b1);
         }
+
+        return getMediumInt(b3, b2, b1);
     }
 
     /**
@@ -1157,9 +1157,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         int b3 = getUnsigned();
         if (ByteOrder.BIG_ENDIAN.equals(order())) {
             return b1 << 16 | b2 << 8 | b3;
-        } else {
-            return b3 << 16 | b2 << 8 | b1;
         }
+
+        return b3 << 16 | b2 << 8 | b1;
     }
 
     /**
@@ -1172,9 +1172,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         byte b3 = get(index + 2);
         if (ByteOrder.BIG_ENDIAN.equals(order())) {
             return getMediumInt(b1, b2, b3);
-        } else {
-            return getMediumInt(b3, b2, b1);
         }
+
+        return getMediumInt(b3, b2, b1);
     }
 
     /**
@@ -1187,9 +1187,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         int b3 = getUnsigned(index + 2);
         if (ByteOrder.BIG_ENDIAN.equals(order())) {
             return b1 << 16 | b2 << 8 | b3;
-        } else {
-            return b3 << 16 | b2 << 8 | b1;
         }
+
+        return b3 << 16 | b2 << 8 | b1;
     }
 
     /**
@@ -1274,9 +1274,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             public int read() {
                 if (AbstractIoBuffer.this.hasRemaining()) {
                     return AbstractIoBuffer.this.get() & 0xff;
-                } else {
-                    return -1;
                 }
+
+                return -1;
             }
 
             @Override
@@ -1286,9 +1286,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                     int readBytes = Math.min(remaining, len);
                     AbstractIoBuffer.this.get(b, off, readBytes);
                     return readBytes;
-                } else {
-                    return -1;
                 }
+
+                return -1;
             }
 
             @Override
@@ -1383,9 +1383,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                     i++;
                     if (i >= oldLimit) {
                         break;
-                    } else {
-                        continue;
                     }
+
+                    continue;
                 }
 
                 if (wasZero) {

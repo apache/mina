@@ -71,6 +71,7 @@ public class KeyStoreFactory {
             try {
                 is.close();
             } catch (IOException ignored) {
+                // Do nothing
             }
         }
 

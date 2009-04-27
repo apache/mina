@@ -24,7 +24,6 @@ import java.io.InputStream;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.IoHandler;
-import org.apache.mina.core.session.IoSession;
 
 /**
  * An {@link InputStream} that buffers data read from
@@ -54,10 +53,10 @@ class IoSessionInputStream extends InputStream {
     public int available() {
         if (released) {
             return 0;
-        } else {
-            synchronized (mutex) {
-                return buf.remaining();
-            }
+        }
+
+        synchronized (mutex) {
+            return buf.remaining();
         }
     }
 

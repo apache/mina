@@ -234,7 +234,7 @@ public class FutureTest {
     private static class TestThread extends Thread {
         private final IoFuture future;
 
-        private boolean success;
+        boolean success;
 
         public TestThread(IoFuture future) {
             this.future = future;
@@ -247,8 +247,15 @@ public class FutureTest {
     }
 
     private static class TestListener implements IoFutureListener<IoFuture> {
-        private IoFuture notifiedFuture;
+        IoFuture notifiedFuture;
 
+        /**
+         * Default constructor
+         */
+        public TestListener() {
+            super();
+        }
+        
         public void operationComplete(IoFuture future) {
             this.notifiedFuture = future;
         }

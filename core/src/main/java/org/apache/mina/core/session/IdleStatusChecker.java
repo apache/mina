@@ -53,7 +53,9 @@ public class IdleStatusChecker {
     private final IoFutureListener<IoFuture> sessionCloseListener =
         new SessionCloseListener();
 
-    public IdleStatusChecker() {}
+    public IdleStatusChecker() {
+        // Do nothing
+    }
 
     /**
      * Add the session for being checked for idle. 
@@ -91,8 +93,8 @@ public class IdleStatusChecker {
         private volatile Thread thread;
         
         // we forbid instantiation of this class outside
-        private NotifyingTask() {
-        	
+        /** No qualifier */ NotifyingTask() {
+            // Do nothing
         }
 
         public void run() {
@@ -138,6 +140,13 @@ public class IdleStatusChecker {
     }
 
     private class SessionCloseListener implements IoFutureListener<IoFuture> {
+        /**
+         * Default constructor
+         */
+        public SessionCloseListener() {
+            super();
+        }
+        
         public void operationComplete(IoFuture future) {
             removeSession((AbstractIoSession) future.getSession());
         }

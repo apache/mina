@@ -39,16 +39,14 @@ import org.apache.mina.util.byteaccess.ByteArrayList.Node;
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
  */
-public final class CompositeByteArray extends AbstractByteArray
-{
+public final class CompositeByteArray extends AbstractByteArray {
 
     /**
      * Allows for efficient detection of component boundaries when using a cursor.
      *
      * TODO: Is this interface right?
      */
-    public interface CursorListener
-    {
+    public interface CursorListener {
 
         /**
          * Called when the first component in the composite is entered by the cursor.
@@ -72,7 +70,6 @@ public final class CompositeByteArray extends AbstractByteArray
          * Called when the last component in the composite is entered by the cursor.
          */
         public void enteredLastComponent( int componentIndex, ByteArray component );
-
     }
 
     /**
@@ -93,8 +90,7 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * Creates a new instance of CompositeByteArray.
      */
-    public CompositeByteArray()
-    {
+    public CompositeByteArray() {
         this( null );
     }
 
@@ -105,8 +101,7 @@ public final class CompositeByteArray extends AbstractByteArray
      * @param byteArrayFactory
      *  The factory used to create the ByteArray objects
      */
-    public CompositeByteArray( ByteArrayFactory byteArrayFactory )
-    {
+    public CompositeByteArray( ByteArrayFactory byteArrayFactory ) {
         this.byteArrayFactory = byteArrayFactory;
     }
 
@@ -116,16 +111,12 @@ public final class CompositeByteArray extends AbstractByteArray
      * @return
      *  The first ByteArray in the list
      */
-    public ByteArray getFirst()
-    {
-        if ( bas.isEmpty() )
-        {
+    public ByteArray getFirst() {
+        if ( bas.isEmpty() ) {
             return null;
         }
-        else
-        {
-            return bas.getFirst().getByteArray();
-        }
+
+        return bas.getFirst().getByteArray();
     }
 
     /**
@@ -135,8 +126,7 @@ public final class CompositeByteArray extends AbstractByteArray
      * @param ba
      *  The ByteArray to add to the list
      */
-    public void addFirst( ByteArray ba )
-    {
+    public void addFirst( ByteArray ba ) {
         addHook( ba );
         bas.addFirst( ba );
     }
@@ -147,8 +137,7 @@ public final class CompositeByteArray extends AbstractByteArray
      * @return
      *  The first ByteArray in the list
      */
-    public ByteArray removeFirst()
-    {
+    public ByteArray removeFirst() {
         Node node = bas.removeFirst();
         return node == null ? null : node.getByteArray();
     }
@@ -161,10 +150,8 @@ public final class CompositeByteArray extends AbstractByteArray
      *
      * TODO: Document free behaviour more thoroughly.
      */
-    public ByteArray removeTo( int index )
-    {
-        if ( index < first() || index > last() )
-        {
+    public ByteArray removeTo( int index ) {
+        if ( index < first() || index > last() ) {
             throw new IndexOutOfBoundsException();
         }
         // Optimisation when removing exactly one component.
@@ -176,17 +163,15 @@ public final class CompositeByteArray extends AbstractByteArray
         // Removing
         CompositeByteArray prefix = new CompositeByteArray( byteArrayFactory );
         int remaining = index - first();
-        while ( remaining > 0 )
-        {
+        
+        while ( remaining > 0 ) {
             ByteArray component = removeFirst();
-            if ( component.last() <= remaining )
-            {
+            
+            if ( component.last() <= remaining ) {
                 // Remove entire component.
                 prefix.addLast( component );
                 remaining -= component.last();
-            }
-            else
-            {
+            } else {
                 // Remove part of component. Do this by removing entire
                 // component then readding remaining bytes.
                 // TODO: Consider using getIoBuffers(), as would avoid
@@ -207,25 +192,22 @@ public final class CompositeByteArray extends AbstractByteArray
                 // create a new IoBuffer, sharing teh data with 'bb'
                 IoBuffer bb2 = bb.slice();
                 // create a new ByteArray with 'bb1'
-                ByteArray ba1 = new BufferByteArray( bb1 )
-                {
+                ByteArray ba1 = new BufferByteArray( bb1 ) {
                     @Override
-                    public void free()
-                    {
+                    public void free() {
                         // Do not free.  This will get freed 
                     }
                 };
+                
                 // add the new ByteArray to the CompositeByteArray
                 prefix.addLast( ba1 );
                 remaining -= ba1.last();
                 
                 // final for anonymous inner class
                 final ByteArray componentFinal = component; 
-                ByteArray ba2 = new BufferByteArray( bb2 )
-                {
+                ByteArray ba2 = new BufferByteArray( bb2 ) {
                     @Override
-                    public void free()
-                    {
+                    public void free() {
                         componentFinal.free();
                     }
                 };
@@ -244,8 +226,7 @@ public final class CompositeByteArray extends AbstractByteArray
      * @param ba
      *  The ByteArray to add to the end of the list
      */
-    public void addLast( ByteArray ba )
-    {
+    public void addLast( ByteArray ba ) {
         addHook( ba );
         bas.addLast( ba );
     }
@@ -256,8 +237,7 @@ public final class CompositeByteArray extends AbstractByteArray
      * @return
      *  The ByteArray that was removed
      */
-    public ByteArray removeLast()
-    {
+    public ByteArray removeLast() {
         Node node = bas.removeLast();
         return node == null ? null : node.getByteArray();
     }
@@ -266,10 +246,8 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public void free()
-    {
-        while ( !bas.isEmpty() )
-        {
+    public void free() {
+        while ( !bas.isEmpty() ) {
             Node node = bas.getLast();
             node.getByteArray().free();
             bas.removeLast();
@@ -277,16 +255,15 @@ public final class CompositeByteArray extends AbstractByteArray
     }
 
 
-    private void checkBounds( int index, int accessSize )
-    {
+    private void checkBounds( int index, int accessSize ) {
         int lower = index;
         int upper = index + accessSize;
-        if ( lower < first() )
-        {
+        
+        if ( lower < first() ) {
             throw new IndexOutOfBoundsException( "Index " + lower + " less than start " + first() + "." );
         }
-        if ( upper > last() )
-        {
+        
+        if ( upper > last() ) {
             throw new IndexOutOfBoundsException( "Index " + upper + " greater than length " + last() + "." );
         }
     }
@@ -295,26 +272,26 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public Iterable<IoBuffer> getIoBuffers()
-    {
-        if ( bas.isEmpty() )
-        {
+    public Iterable<IoBuffer> getIoBuffers() {
+        if ( bas.isEmpty() ) {
             return Collections.emptyList();
         }
+        
         Collection<IoBuffer> result = new ArrayList<IoBuffer>();
         Node node = bas.getFirst();
-        for ( IoBuffer bb : node.getByteArray().getIoBuffers() )
-        {
+        
+        for ( IoBuffer bb : node.getByteArray().getIoBuffers() ) {
             result.add( bb );
         }
-        while ( node.hasNextNode() )
-        {
+        
+        while ( node.hasNextNode() ) {
             node = node.getNextNode();
-            for ( IoBuffer bb : node.getByteArray().getIoBuffers() )
-            {
+            
+            for ( IoBuffer bb : node.getByteArray().getIoBuffers() ) {
                 result.add( bb );
             }
         }
+        
         return result;
     }
 
@@ -322,39 +299,41 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public IoBuffer getSingleIoBuffer()
-    {
-        if ( byteArrayFactory == null )
-        {
+    public IoBuffer getSingleIoBuffer() {
+        if ( byteArrayFactory == null ) {
             throw new IllegalStateException(
                 "Can't get single buffer from CompositeByteArray unless it has a ByteArrayFactory." );
         }
-        if ( bas.isEmpty() )
-        {
+        
+        if ( bas.isEmpty() ) {
             ByteArray ba = byteArrayFactory.create( 1 );
             return ba.getSingleIoBuffer();
         }
+        
         int actualLength = last() - first();
+        
         {
             Node node = bas.getFirst();
             ByteArray ba = node.getByteArray();
-            if ( ba.last() == actualLength )
-            {
+            
+            if ( ba.last() == actualLength ) {
                 return ba.getSingleIoBuffer();
             }
         }
+        
         // Replace all nodes with a single node.
         ByteArray target = byteArrayFactory.create( actualLength );
         IoBuffer bb = target.getSingleIoBuffer();
         Cursor cursor = cursor();
         cursor.put( bb ); // Copy all existing data into target IoBuffer.
-        while ( !bas.isEmpty() )
-        {
+        
+        while ( !bas.isEmpty() ) {
             Node node = bas.getLast();
             ByteArray component = node.getByteArray();
             bas.removeLast();
             component.free();
         }
+        
         bas.addLast( target );
         return bb;
     }
@@ -363,8 +342,7 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public Cursor cursor()
-    {
+    public Cursor cursor() {
         return new CursorImpl();
     }
 
@@ -372,8 +350,7 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public Cursor cursor( int index )
-    {
+    public Cursor cursor( int index ) {
         return new CursorImpl( index );
     }
 
@@ -385,8 +362,7 @@ public final class CompositeByteArray extends AbstractByteArray
      * @param listener
      *  Returns a new {@link Cursor} instance
      */
-    public Cursor cursor( CursorListener listener )
-    {
+    public Cursor cursor( CursorListener listener ) {
         return new CursorImpl( listener );
     }
 
@@ -399,8 +375,7 @@ public final class CompositeByteArray extends AbstractByteArray
      * @param listener
      *  The listener for the Cursor that is returned
      */
-    public Cursor cursor( int index, CursorListener listener )
-    {
+    public Cursor cursor( int index, CursorListener listener ) {
         return new CursorImpl( index, listener );
     }
 
@@ -408,8 +383,7 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public ByteArray slice( int index, int length )
-    {
+    public ByteArray slice( int index, int length ) {
         return cursor( index ).slice( length );
     }
 
@@ -417,8 +391,7 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public byte get( int index )
-    {
+    public byte get( int index ) {
         return cursor( index ).get();
     }
 
@@ -511,15 +484,12 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public void order( ByteOrder order )
-    {
-        if ( order == null || !order.equals( this.order ) )
-        {
+    public void order( ByteOrder order ) {
+        if ( order == null || !order.equals( this.order ) ) {
             this.order = order;
-            if ( !bas.isEmpty() )
-            {
-                for ( Node node = bas.getFirst(); node.hasNextNode(); node = node.getNextNode() )
-                {
+            
+            if ( !bas.isEmpty() ) {
+                for ( Node node = bas.getFirst(); node.hasNextNode(); node = node.getNextNode() ) {
                     node.getByteArray().order( order );
                 }
             }
@@ -530,8 +500,7 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public short getShort( int index )
-    {
+    public short getShort( int index ) {
         return cursor( index ).getShort();
     }
 
@@ -539,8 +508,7 @@ public final class CompositeByteArray extends AbstractByteArray
     /**
      * @inheritDoc
      */
-    public void putShort( int index, short s )
-    {
+    public void putShort( int index, short s ) {
         cursor( index ).putShort( s );
     }
 

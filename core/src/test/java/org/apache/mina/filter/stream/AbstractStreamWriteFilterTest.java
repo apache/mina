@@ -366,7 +366,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
 
         StreamWriteFilter streamWriteFilter = new StreamWriteFilter();
 
-        private SenderHandler(M message) {
+        SenderHandler(M message) {
             this.message = message;
         }
 
@@ -416,7 +416,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
 
         MessageDigest digest;
 
-        private ReceiverHandler(long size) throws Exception {
+        ReceiverHandler(long size) throws Exception {
             this.size = size;
             digest = MessageDigest.getInstance("MD5");
         }
@@ -464,8 +464,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         return null;
     }
     
-    public static class WriteRequestMatcher implements IArgumentMatcher {
-        
+    private static class WriteRequestMatcher implements IArgumentMatcher {
         private final WriteRequest expected;
         
         public WriteRequestMatcher(WriteRequest expected) {
@@ -490,6 +489,13 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
     private static class DummyWriteFuture implements WriteFuture {
         private boolean written;
 
+        /**
+         * Default constructor
+         */
+        public DummyWriteFuture() {
+            super();
+        }
+        
         public boolean isWritten() {
             return written;
         }
@@ -507,6 +513,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         }
 
         public void join() {
+            // Do nothing
         }
 
         public boolean join(long timeoutInMillis) {

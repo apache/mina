@@ -24,7 +24,6 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.concurrent.Executor;
 
 import org.apache.mina.core.polling.AbstractPollingIoConnector;
 import org.apache.mina.core.service.IoConnector;
@@ -117,6 +116,7 @@ public final class NioDatagramConnector
 
     @Override
     protected void init() throws Exception {
+        // Do nothing
     }
 
     @Override
@@ -173,6 +173,7 @@ public final class NioDatagramConnector
 
     @Override
     protected void destroy() throws Exception {
+        // Do nothing
     }
 
     @Override
@@ -199,5 +200,6 @@ public final class NioDatagramConnector
 
     @Override
     protected void wakeup() {
+        // Do nothing
     }
 }

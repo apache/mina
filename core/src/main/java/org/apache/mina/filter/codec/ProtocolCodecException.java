@@ -34,6 +34,7 @@ public class ProtocolCodecException extends Exception {
      * Constructs a new instance.
      */
     public ProtocolCodecException() {
+        // Do nothing
     }
 
     /**

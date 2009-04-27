@@ -45,7 +45,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
 
     private final Map<String, Long> clients;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(ConnectionThrottleFilter.class);
     /**
      * Default constructor.  Sets the wait time to 1 second
      */
@@ -95,7 +95,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
 
             if (clients.containsKey(addr.getAddress().getHostAddress())) {
 
-                logger.debug("This is not a new client");
+                LOGGER.debug("This is not a new client");
                 Long lastConnTime = clients.get(addr.getAddress()
                         .getHostAddress());
 
@@ -104,15 +104,15 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
                 // if the interval between now and the last connection is
                 // less than the allowed interval, return false
                 if (now - lastConnTime < allowedInterval) {
-                    logger.warn("Session connection interval too short");
+                    LOGGER.warn("Session connection interval too short");
                     return false;
-                } else {
-                    return true;
                 }
-            } else {
-                clients.put(addr.getAddress().getHostAddress(), now);
+                
                 return true;
             }
+
+            clients.put(addr.getAddress().getHostAddress(), now);
+            return true;
         }
 
         return false;
@@ -122,7 +122,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     public void sessionCreated(NextFilter nextFilter, IoSession session)
             throws Exception {
         if (!isConnectionOk(session)) {
-            logger.warn("Connections coming in too fast; closing.");
+            LOGGER.warn("Connections coming in too fast; closing.");
             session.close(true);
         }
         nextFilter.sessionCreated(session);

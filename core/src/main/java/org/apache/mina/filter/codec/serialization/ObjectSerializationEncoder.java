@@ -42,6 +42,7 @@ public class ObjectSerializationEncoder extends ProtocolEncoderAdapter {
      * Creates a new instance.
      */
     public ObjectSerializationEncoder() {
+        // Do nothing
     }
 
     /**

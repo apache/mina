@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M2
  */
 public class BufferedWriteFilterTest extends TestCase {
-    private final Logger logger = LoggerFactory
+    static final Logger LOGGER = LoggerFactory
             .getLogger(BufferedWriteFilterTest.class);
 
     public void testNonExpandableBuffer() throws Exception {
@@ -56,14 +56,14 @@ public class BufferedWriteFilterTest extends TestCase {
             @Override
             public void filterClose(NextFilter nextFilter, IoSession session)
                     throws Exception {
-                logger.debug("Filter closed !");
+                LOGGER.debug("Filter closed !");
                 assertEquals(3, counter);
             }
 
             @Override
             public void filterWrite(NextFilter nextFilter, IoSession session,
                     WriteRequest writeRequest) throws Exception {
-                logger.debug("New buffered message written !");
+                LOGGER.debug("New buffered message written !");
                 counter++;
                 try {
                     IoBuffer buf = (IoBuffer) writeRequest.getMessage();

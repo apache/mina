@@ -222,30 +222,37 @@ public abstract class AbstractIoConnector
                 setHandler(new IoHandler() {
                     public void exceptionCaught(IoSession session,
                             Throwable cause) throws Exception {
+                        // Empty handler
                     }
 
                     public void messageReceived(IoSession session,
                             Object message) throws Exception {
+                        // Empty handler
                     }
 
                     public void messageSent(IoSession session, Object message)
                             throws Exception {
+                        // Empty handler
                     }
 
                     public void sessionClosed(IoSession session)
                             throws Exception {
+                        // Empty handler
                     }
 
                     public void sessionCreated(IoSession session)
                             throws Exception {
+                        // Empty handler
                     }
 
                     public void sessionIdle(IoSession session, IdleStatus status)
                             throws Exception {
+                        // Empty handler
                     }
 
                     public void sessionOpened(IoSession session)
                             throws Exception {
+                        // Empty handler
                     }
                 });
             } else {

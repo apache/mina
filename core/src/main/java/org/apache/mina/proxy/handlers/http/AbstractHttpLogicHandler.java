@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractHttpLogicHandler extends
         AbstractProxyLogicHandler {
-    private final static Logger logger = LoggerFactory
+    private final static Logger LOGGER = LoggerFactory
             .getLogger(AbstractHttpLogicHandler.class);
 
     private final static String DECODER = AbstractHttpLogicHandler.class
@@ -123,7 +123,7 @@ public abstract class AbstractHttpLogicHandler extends
      */
     public synchronized void messageReceived(final NextFilter nextFilter,
             final IoBuffer buf) throws ProxyAuthException {
-        logger.debug(" messageReceived()");
+        LOGGER.debug(" messageReceived()");
 
         IoBufferDecoder decoder = (IoBufferDecoder) getSession().getAttribute(
                 DECODER);
@@ -140,13 +140,13 @@ public abstract class AbstractHttpLogicHandler extends
                     return;
                 }
 
-                // Handle the response								
+                // Handle the response                                
                 String responseHeader = responseData
                         .getString(getProxyIoSession().getCharset()
                                 .newDecoder());
                 entityBodyStartPosition = responseData.position();
 
-                logger.debug("  response header received:\n{}", responseHeader
+                LOGGER.debug("  response header received:\n{}", responseHeader
                         .replace("\r", "\\r").replace("\n", "\\n\n"));
 
                 // Parse the response
@@ -189,7 +189,7 @@ public abstract class AbstractHttpLogicHandler extends
                         .getSingleValuedHeader(parsedResponse.getHeaders(),
                                 "Transfer-Encoding"))) {
                     // Handle Transfer-Encoding: Chunked
-                    logger.debug("Retrieving additional http response chunks");
+                    LOGGER.debug("Retrieving additional http response chunks");
                     hasChunkedData = true;
                     waitingChunkedData = true;
                 }
@@ -250,7 +250,7 @@ public abstract class AbstractHttpLogicHandler extends
                         break;
                     }
 
-                    // add footer to headers					
+                    // add footer to headers                    
                     String footer = tmp.getString(getProxyIoSession()
                             .getCharset().newDecoder());
                     String[] f = footer.split(":\\s?", 2);
@@ -263,7 +263,7 @@ public abstract class AbstractHttpLogicHandler extends
 
             responseData.flip();
 
-            logger.debug("  end of response received:\n{}",
+            LOGGER.debug("  end of response received:\n{}",
                     responseData.getString(getProxyIoSession().getCharset()
                             .newDecoder()));
 
@@ -290,9 +290,9 @@ public abstract class AbstractHttpLogicHandler extends
         } catch (Exception ex) {
             if (ex instanceof ProxyAuthException) {
                 throw ((ProxyAuthException) ex);
-            } else {
-                throw new ProxyAuthException("Handshake failed", ex);
             }
+
+            throw new ProxyAuthException("Handshake failed", ex);
         }
     }
 
@@ -335,7 +335,7 @@ public abstract class AbstractHttpLogicHandler extends
             IoBuffer buf = IoBuffer.wrap(data.getBytes(getProxyIoSession()
                     .getCharsetName()));
 
-            logger.debug("   write:\n{}", data.replace("\r", "\\r").replace(
+            LOGGER.debug("   write:\n{}", data.replace("\r", "\\r").replace(
                     "\n", "\\n\n"));
 
             writeData(nextFilter, buf);
@@ -354,33 +354,33 @@ public abstract class AbstractHttpLogicHandler extends
      */
     private void reconnect(final NextFilter nextFilter,
             final HttpProxyRequest request) {
-        logger.debug("Reconnecting to proxy ...");
+        LOGGER.debug("Reconnecting to proxy ...");
 
         final ProxyIoSession proxyIoSession = getProxyIoSession();
 
         // Fires reconnection
-		proxyIoSession.getConnector().connect(
-				new IoSessionInitializer<ConnectFuture>() {
-					public void initializeSession(final IoSession session,
-							ConnectFuture future) {
-						logger.debug("Initializing new session: {}", session);
-						session.setAttribute(ProxyIoSession.PROXY_SESSION,
-								proxyIoSession);
-						proxyIoSession.setSession(session);
-						logger.debug("  setting up proxyIoSession: {}", proxyIoSession);
-						future
-								.addListener(new IoFutureListener<ConnectFuture>() {
-									public void operationComplete(
-											ConnectFuture future) {
-										// Reconnection is done so we send the
-										// request to the proxy
-										proxyIoSession
-												.setReconnectionNeeded(false);
-										writeRequest0(nextFilter, request);
-									}
-								});
-					}
-				});
+        proxyIoSession.getConnector().connect(
+                new IoSessionInitializer<ConnectFuture>() {
+                    public void initializeSession(final IoSession session,
+                            ConnectFuture future) {
+                        LOGGER.debug("Initializing new session: {}", session);
+                        session.setAttribute(ProxyIoSession.PROXY_SESSION,
+                                proxyIoSession);
+                        proxyIoSession.setSession(session);
+                        LOGGER.debug("  setting up proxyIoSession: {}", proxyIoSession);
+                        future
+                                .addListener(new IoFutureListener<ConnectFuture>() {
+                                    public void operationComplete(
+                                            ConnectFuture future) {
+                                        // Reconnection is done so we send the
+                                        // request to the proxy
+                                        proxyIoSession
+                                                .setReconnectionNeeded(false);
+                                        writeRequest0(nextFilter, request);
+                                    }
+                                });
+                    }
+                });
     }
 
     /**
@@ -390,7 +390,7 @@ public abstract class AbstractHttpLogicHandler extends
      */
     protected HttpProxyResponse decodeResponse(final String response)
             throws Exception {
-        logger.debug("  parseResponse()");
+        LOGGER.debug("  parseResponse()");
 
         // Break response into lines
         String[] responseLines = response.split(HttpProxyConstants.CRLF);

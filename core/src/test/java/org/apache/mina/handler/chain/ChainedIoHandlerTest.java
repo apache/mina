@@ -49,7 +49,7 @@ public class ChainedIoHandlerTest {
 
         private final char ch;
 
-        private TestCommand(StringBuilder buf, char ch) {
+        public TestCommand(StringBuilder buf, char ch) {
             this.buf = buf;
             this.ch = ch;
         }

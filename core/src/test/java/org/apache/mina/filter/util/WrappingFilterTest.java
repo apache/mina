@@ -114,11 +114,17 @@ public class WrappingFilterTest extends TestCase {
 
 
     private static class MyWrappingFilter extends CommonEventFilter {
+        List<IoEventType> eventsBefore = new ArrayList<IoEventType>();
 
-        private List<IoEventType> eventsBefore = new ArrayList<IoEventType>();
+        List<IoEventType> eventsAfter = new ArrayList<IoEventType>();
 
-        private List<IoEventType> eventsAfter = new ArrayList<IoEventType>();
-
+        /**
+         * Default constructor
+         */
+        public MyWrappingFilter() {
+            super();
+        }
+        
         @Override
         protected void filter(IoFilterEvent event) {
             eventsBefore.add(event.getType());

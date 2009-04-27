@@ -96,6 +96,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
                 if (duplicatePduProbability > rng.nextInt()) {
                     nextFilter.filterWrite(session, writeRequest);
                 }
+                
                 if (resendPduLasterProbability > rng.nextInt()) {
                     // store it somewhere and trigger a write execution for
                     // later
@@ -123,6 +124,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
                 }
             } else {
                 // manipulate PDU
+                // TODO
             }
         }
         nextFilter.messageReceived(session, message);

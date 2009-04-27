@@ -48,6 +48,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * {@link #setAttribute(String, Object)} and {@link #setAttributes(Map)}.
      */
     public SessionAttributeInitializingFilter() {
+        // Do nothing
     }
 
     /**
@@ -80,9 +81,9 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     public Object setAttribute(String key, Object value) {
         if (value == null) {
             return removeAttribute(key);
-        } else {
-            return attributes.put(key, value);
         }
+
+        return attributes.put(key, value);
     }
 
     /**

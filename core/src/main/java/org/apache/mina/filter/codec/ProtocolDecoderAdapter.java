@@ -37,6 +37,7 @@ public abstract class ProtocolDecoderAdapter implements ProtocolDecoder {
      */
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
+        // Do nothing
     }
 
     /**
@@ -44,5 +45,6 @@ public abstract class ProtocolDecoderAdapter implements ProtocolDecoder {
      * The default implementation does nothing.
      */
     public void dispose(IoSession session) throws Exception {
+        // Do nothing
     }
 }

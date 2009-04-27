@@ -41,6 +41,7 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     private final DemuxingProtocolDecoder decoder = new DemuxingProtocolDecoder();
 
     public DemuxingProtocolCodecFactory() {
+        // Do nothing
     }
 
     public ProtocolEncoder getEncoder(IoSession session) throws Exception {

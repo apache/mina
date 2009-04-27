@@ -75,19 +75,19 @@ public abstract class CrLfDecodingState implements DecodingState {
                     found = true;
                     finished = true;
                     break;
-                } else {
-                    throw new ProtocolDecoderException(
-                            "Expected LF after CR but was: " + (b & 0xff));
                 }
+                
+                throw new ProtocolDecoderException(
+                        "Expected LF after CR but was: " + (b & 0xff));
             }
         }
 
         if (finished) {
             hasCR = false;
             return finishDecode(found, out);
-        } else {
-            return this;
         }
+        
+        return this;
     }
 
     /**

@@ -38,6 +38,7 @@ public interface IoSessionRecycler {
      */
     static IoSessionRecycler NOOP = new IoSessionRecycler() {
         public void put(IoSession session) {
+            // Do nothing
         }
 
         public IoSession recycle(SocketAddress localAddress,
@@ -46,6 +47,7 @@ public interface IoSessionRecycler {
         }
 
         public void remove(IoSession session) {
+            // Do nothing
         }
     };
 

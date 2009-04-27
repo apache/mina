@@ -79,7 +79,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
     private static final int DEFAULT_SIZE = Runtime.getRuntime().availableProcessors() + 1;
     private static final AttributeKey PROCESSOR = new AttributeKey(SimpleIoProcessorPool.class, "processor");
     
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(SimpleIoProcessorPool.class);
 
     private final IoProcessor<T>[] pool;
     private final AtomicInteger processorDistributor = new AtomicInteger();
@@ -217,7 +217,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
                     try {
                         pool[i].dispose();
                     } catch (Exception e) {
-                        logger.warn(
+                        LOGGER.warn(
                                 "Failed to dispose a " +
                                 pool[i].getClass().getSimpleName() +
                                 " at index " + i + ".", e);

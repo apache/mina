@@ -43,10 +43,10 @@ import org.apache.mina.core.session.IoSession;
  * @version $Rev$, $Date$
  */
 public final class VmPipeAcceptor extends AbstractIoAcceptor {
-	
-	// object used for checking session idle
-	private IdleStatusChecker idleChecker;
-	
+    
+    // object used for checking session idle
+    private IdleStatusChecker idleChecker;
+    
     static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
 
     /**
@@ -95,8 +95,8 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
 
     @Override
     protected IoFuture dispose0() throws Exception {
-    	// stop the idle checking task
-    	idleChecker.getNotifyingTask().cancel();
+        // stop the idle checking task
+        idleChecker.getNotifyingTask().cancel();
         unbind();
         return null;
     }

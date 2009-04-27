@@ -49,6 +49,7 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
      * Creates a new instance.
      */
     public ConsumeToCrLfDecodingState() {
+        // Do nothing
     }
 
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
@@ -98,19 +99,22 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
             }
             in.position(terminatorPos + 1);
             return finishDecode(product, out);
-        } else {
-            in.position(beginPos);
-            if (buffer == null) {
-                buffer = IoBuffer.allocate(in.remaining());
-                buffer.setAutoExpand(true);
-            }
-
-            buffer.put(in);
-            if (lastIsCR) {
-                buffer.position(buffer.position() - 1);
-            }
-            return this;
         }
+        
+        in.position(beginPos);
+        
+        if (buffer == null) {
+            buffer = IoBuffer.allocate(in.remaining());
+            buffer.setAutoExpand(true);
+        }
+
+        buffer.put(in);
+        
+        if (lastIsCR) {
+            buffer.position(buffer.position() - 1);
+        }
+
+        return this;
     }
 
     /**

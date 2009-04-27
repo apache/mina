@@ -60,7 +60,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(ProtocolCodecFilter.class);
 
     /**
      * 
@@ -345,14 +345,14 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
 
     private static class EncodedWriteRequest extends DefaultWriteRequest {
-        private EncodedWriteRequest(Object encodedMessage,
+        public EncodedWriteRequest(Object encodedMessage,
                 WriteFuture future, SocketAddress destination) {
             super(encodedMessage, future, destination);
         }
     }
 
     private static class MessageWriteRequest extends WriteRequestWrapper {
-        private MessageWriteRequest(WriteRequest writeRequest) {
+        public MessageWriteRequest(WriteRequest writeRequest) {
             super(writeRequest);
         }
 
@@ -365,6 +365,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     private static class ProtocolDecoderOutputImpl extends
             AbstractProtocolDecoderOutput {
         public ProtocolDecoderOutputImpl() {
+            // Do nothing
         }
 
         public void flush(NextFilter nextFilter, IoSession session) {
@@ -480,7 +481,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         try {
             encoder.dispose(session);
         } catch (Throwable t) {
-            logger.warn(
+            LOGGER.warn(
                     "Failed to dispose: " + encoder.getClass().getName() + " (" + encoder + ')');
         }
     }
@@ -510,7 +511,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         try {
             decoder.dispose(session);
         } catch (Throwable t) {
-            logger.warn(
+            LOGGER.warn(
                     "Falied to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }

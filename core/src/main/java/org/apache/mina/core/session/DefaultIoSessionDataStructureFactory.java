@@ -53,10 +53,16 @@ public class DefaultIoSessionDataStructureFactory implements
     }
 
     private static class DefaultIoSessionAttributeMap implements IoSessionAttributeMap {
-
         private final Map<Object, Object> attributes =
             Collections.synchronizedMap(new HashMap<Object, Object>(4));
 
+        /**
+         * Default constructor
+         */
+        public DefaultIoSessionAttributeMap() {
+            super();
+        }
+        
         public Object getAttribute(IoSession session, Object key, Object defaultValue) {
             if (key == null) {
                 throw new NullPointerException("key");
@@ -65,9 +71,9 @@ public class DefaultIoSessionDataStructureFactory implements
             Object answer = attributes.get(key);
             if (answer == null) {
                 return defaultValue;
-            } else {
-                return answer;
             }
+            
+            return answer;
         }
 
         public Object setAttribute(IoSession session, Object key, Object value) {
@@ -77,9 +83,9 @@ public class DefaultIoSessionDataStructureFactory implements
 
             if (value == null) {
                 return attributes.remove(key);
-            } else {
-                return attributes.put(key, value);
             }
+            
+            return attributes.put(key, value);
         }
 
         public Object setAttributeIfAbsent(IoSession session, Object key, Object value) {
@@ -138,9 +144,9 @@ public class DefaultIoSessionDataStructureFactory implements
                 if (actualOldValue.equals(oldValue)) {
                     attributes.put(key, newValue);
                     return true;
-                } else {
-                    return false;
                 }
+                
+                return false;
             }
         }
 
@@ -155,17 +161,26 @@ public class DefaultIoSessionDataStructureFactory implements
         }
 
         public void dispose(IoSession session) throws Exception {
+            // Do nothing
         }
     }
     
     private static class DefaultWriteRequestQueue implements WriteRequestQueue {
         /** A queue to store incoming write requests */
         private final Queue<WriteRequest> q = new CircularQueue<WriteRequest>(16);
+
+        /**
+         * Default constructor
+         */
+        public DefaultWriteRequestQueue() {
+            super();
+        }
         
         /**
          * {@inheritDoc}
          */
         public void dispose(IoSession session) {
+            // Do nothing
         }
         
         /**

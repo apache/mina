@@ -108,10 +108,11 @@ public class SocksProxyRequest extends ProxyRequest {
      * @return the endpoint address
      */
     public byte[] getIpAddress() {
-        if (getEndpointAddress() == null)
+        if (getEndpointAddress() == null) {
             return SocksProxyConstants.FAKE_IP;
-        else
-            return getEndpointAddress().getAddress().getAddress();
+        }
+        
+        return getEndpointAddress().getAddress().getAddress();
     }
 
     /**
@@ -121,7 +122,7 @@ public class SocksProxyRequest extends ProxyRequest {
      */
     public byte[] getPort() {
         byte[] port = new byte[2];
-        int p = (int) (getEndpointAddress() == null ? this.port
+        int p = (getEndpointAddress() == null ? this.port
                 : getEndpointAddress().getPort());
         port[1] = (byte) p;
         port[0] = (byte) (p >> 8);

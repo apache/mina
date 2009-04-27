@@ -102,9 +102,9 @@ public class IoEvent implements Runnable {
     public String toString() {
         if (getParameter() == null) {
             return "[" + getSession() + "] " + getType().name();
-        } else {
-            return "[" + getSession() + "] " + getType().name() + ": "
-                    + getParameter();
         }
+        
+        return "[" + getSession() + "] " + getType().name() + ": "
+                    + getParameter();
     }
 }

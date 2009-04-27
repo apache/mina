@@ -129,7 +129,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         return maxCachedBufferSize;
     }
 
-    private Map<Integer, Queue<CachedBuffer>> newPoolMap() {
+    Map<Integer, Queue<CachedBuffer>> newPoolMap() {
         Map<Integer, Queue<CachedBuffer>> poolMap =
             new HashMap<Integer, Queue<CachedBuffer>>();
         int poolSize = maxPoolSize == 0? DEFAULT_MAX_POOL_SIZE : maxPoolSize;
@@ -186,6 +186,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
     }
 
     public void dispose() {
+        // Do nothing
     }
     
     private class CachedBuffer extends AbstractIoBuffer {

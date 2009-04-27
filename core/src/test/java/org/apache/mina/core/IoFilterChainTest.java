@@ -46,34 +46,34 @@ import static org.junit.Assert.assertSame;
  * @version $Rev$, $Date$
  */
 public class IoFilterChainTest {
-    private DummySession session;
+    private DummySession dummySession;
     private IoFilterChain chain;
-    private String result;
+    String testResult;
 
     private final IoHandler handler = new IoHandlerAdapter() {
         @Override
         public void sessionCreated(IoSession session) {
-            result += "HS0";
+            testResult += "HS0";
         }
 
         @Override
         public void sessionOpened(IoSession session) {
-            result += "HSO";
+            testResult += "HSO";
         }
 
         @Override
         public void sessionClosed(IoSession session) {
-            result += "HSC";
+            testResult += "HSC";
         }
 
         @Override
         public void sessionIdle(IoSession session, IdleStatus status) {
-            result += "HSI";
+            testResult += "HSI";
         }
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
-            result += "HEC";
+            testResult += "HEC";
             if (cause.getClass() != Exception.class) {
                 //cause.printStackTrace(System.out);
             }
@@ -81,25 +81,26 @@ public class IoFilterChainTest {
 
         @Override
         public void messageReceived(IoSession session, Object message) {
-            result += "HMR";
+            testResult += "HMR";
         }
 
         @Override
         public void messageSent(IoSession session, Object message) {
-            result += "HMS";
+            testResult += "HMS";
         }
     };
 
     @Before
     public void setUp() {
-        session = new DummySession();
-        session.setHandler(handler);
-        chain = session.getFilterChain();
-        result = "";
+        dummySession = new DummySession();
+        dummySession.setHandler(handler);
+        chain = dummySession.getFilterChain();
+        testResult = "";
     }
 
     @After
     public void tearDown() {
+        // Do nothing
     }
 
     @Test
@@ -212,10 +213,10 @@ public class IoFilterChainTest {
         IoFilter filter = new AddRemoveTestFilter();
 
         chain.addFirst("A", filter);
-        assertEquals("ADDED", result);
+        assertEquals("ADDED", testResult);
 
         chain.remove("A");
-        assertEquals("ADDEDREMOVED", result);
+        assertEquals("ADDEDREMOVED", testResult);
     }
 
     private void run(String expectedResult) {
@@ -227,19 +228,19 @@ public class IoFilterChainTest {
         chain.fireExceptionCaught(new Exception());
         chain.fireSessionClosed();
 
-        result = formatResult(result);
-        expectedResult = formatResult(expectedResult);
+        testResult = formatResult(testResult);
+        String formatedExpectedResult = formatResult(expectedResult); 
 
-        //System.out.println("Expected: " + expectedResult);
-        //System.out.println("Actual:   " + result);
-        assertEquals(expectedResult, result);
+        assertEquals(formatedExpectedResult, testResult);
     }
 
     private String formatResult(String result) {
-        result = result.replaceAll("\\s", "");
-        StringBuilder buf = new StringBuilder(result.length() * 4 / 3);
-        for (int i = 0; i < result.length(); i++) {
-            buf.append(result.charAt(i));
+        String newResult = result.replaceAll("\\s", "");
+        StringBuilder buf = new StringBuilder(newResult.length() * 4 / 3);
+        
+        for (int i = 0; i < newResult.length(); i++) {
+            buf.append(newResult.charAt(i));
+        
             if (i % 3 == 2) {
                 buf.append(' ');
             }
@@ -251,60 +252,60 @@ public class IoFilterChainTest {
     private class EventOrderTestFilter extends IoFilterAdapter {
         private final char id;
 
-        private EventOrderTestFilter(char id) {
+        EventOrderTestFilter(char id) {
             this.id = id;
         }
 
         @Override
         public void sessionCreated(NextFilter nextFilter, IoSession session) {
-            result += id + "S0";
+            testResult += id + "S0";
             nextFilter.sessionCreated(session);
         }
 
         @Override
         public void sessionOpened(NextFilter nextFilter, IoSession session) {
-            result += id + "SO";
+            testResult += id + "SO";
             nextFilter.sessionOpened(session);
         }
 
         @Override
         public void sessionClosed(NextFilter nextFilter, IoSession session) {
-            result += id + "SC";
+            testResult += id + "SC";
             nextFilter.sessionClosed(session);
         }
 
         @Override
         public void sessionIdle(NextFilter nextFilter, IoSession session,
                 IdleStatus status) {
-            result += id + "SI";
+            testResult += id + "SI";
             nextFilter.sessionIdle(session, status);
         }
 
         @Override
         public void exceptionCaught(NextFilter nextFilter, IoSession session,
                 Throwable cause) {
-            result += id + "EC";
+            testResult += id + "EC";
             nextFilter.exceptionCaught(session, cause);
         }
 
         @Override
         public void filterWrite(NextFilter nextFilter, IoSession session,
                 WriteRequest writeRequest) {
-            result += id + "FW";
+            testResult += id + "FW";
             nextFilter.filterWrite(session, writeRequest);
         }
 
         @Override
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) {
-            result += id + "MR";
+            testResult += id + "MR";
             nextFilter.messageReceived(session, message);
         }
 
         @Override
         public void messageSent(NextFilter nextFilter, IoSession session,
                 WriteRequest writeRequest) {
-            result += id + "MS";
+            testResult += id + "MS";
             nextFilter.messageSent(session, writeRequest);
         }
 
@@ -316,16 +317,23 @@ public class IoFilterChainTest {
     }
 
     private class AddRemoveTestFilter extends IoFilterAdapter {
+        /**
+         * Default constructor
+         */
+        public AddRemoveTestFilter() {
+            super();
+        }
+        
         @Override
         public void onPostAdd(IoFilterChain parent, String name,
                 NextFilter nextFilter) {
-            result += "ADDED";
+            testResult += "ADDED";
         }
 
         @Override
         public void onPostRemove(IoFilterChain parent, String name,
                 NextFilter nextFilter) {
-            result += "REMOVED";
+            testResult += "REMOVED";
         }
     }
 }

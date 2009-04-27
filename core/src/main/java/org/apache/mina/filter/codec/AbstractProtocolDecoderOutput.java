@@ -33,6 +33,7 @@ public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOu
     private final Queue<Object> messageQueue = new CircularQueue<Object>();
 
     public AbstractProtocolDecoderOutput() {
+        // Do nothing
     }
 
     public Queue<Object> getMessageQueue() {

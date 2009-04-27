@@ -41,6 +41,7 @@ public class ExecutorFilterRegressionTest extends TestCase {
     private ExecutorFilter filter;
 
     public ExecutorFilterRegressionTest() {
+        // Do nothing
     }
 
     @Override
@@ -89,8 +90,15 @@ public class ExecutorFilterRegressionTest extends TestCase {
     }
 
     private static class EventOrderCounter extends DummySession {
-        private Integer lastCount = null;
+        Integer lastCount = null;
 
+        /**
+         * Default constructor
+         */
+        public EventOrderCounter() {
+            super();
+        }
+        
         public synchronized void setLastCount(Integer newCount) {
             if (lastCount != null) {
                 Assert.assertEquals(lastCount.intValue() + 1, newCount
@@ -102,18 +110,29 @@ public class ExecutorFilterRegressionTest extends TestCase {
     }
 
     private static class EventOrderChecker implements NextFilter {
-        private Throwable throwable;
+        Throwable throwable;
 
+        /**
+         * Default constructor
+         */
+        public EventOrderChecker() {
+            super();
+        }
+        
         public void sessionOpened(IoSession session) {
+            // Do nothing
         }
 
         public void sessionClosed(IoSession session) {
+            // Do nothing
         }
 
         public void sessionIdle(IoSession session, IdleStatus status) {
+            // Do nothing
         }
 
         public void exceptionCaught(IoSession session, Throwable cause) {
+            // Do nothing
         }
 
         public void messageReceived(IoSession session, Object message) {
@@ -127,15 +146,19 @@ public class ExecutorFilterRegressionTest extends TestCase {
         }
 
         public void messageSent(IoSession session, WriteRequest writeRequest) {
+            // Do nothing
         }
 
         public void filterWrite(IoSession session, WriteRequest writeRequest) {
+            // Do nothing
         }
 
         public void filterClose(IoSession session) {
+            // Do nothing
         }
 
         public void sessionCreated(IoSession session) {
+            // Do nothing
         }
     }
 

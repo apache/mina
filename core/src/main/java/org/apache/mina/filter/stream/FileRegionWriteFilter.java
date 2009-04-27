@@ -23,9 +23,6 @@ import java.io.IOException;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
-import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.write.WriteRequest;
 
 /**
  * Filter implementation that converts a {@link FileRegion} to {@link IoBuffer}

@@ -45,12 +45,12 @@ public interface KeepAliveRequestTimeoutHandler {
      * Logs a warning message, but doesn't do anything else.
      */
     static KeepAliveRequestTimeoutHandler LOG = new KeepAliveRequestTimeoutHandler() {
-        private final Logger log =
+        private final Logger LOGGER =
             LoggerFactory.getLogger(KeepAliveFilter.class);
 
         public void keepAliveRequestTimedOut(
                 KeepAliveFilter filter, IoSession session) throws Exception {
-            log.warn("A keep-alive response message was not received within " +
+            LOGGER.warn("A keep-alive response message was not received within " +
                     "{} second(s).", filter.getRequestTimeout());
         }
     };
@@ -71,12 +71,12 @@ public interface KeepAliveRequestTimeoutHandler {
      * Closes the connection after logging.
      */
     static KeepAliveRequestTimeoutHandler CLOSE = new KeepAliveRequestTimeoutHandler() {
-        private final Logger log =
+        private final Logger LOGGER =
             LoggerFactory.getLogger(KeepAliveFilter.class);
 
         public void keepAliveRequestTimedOut(
                 KeepAliveFilter filter, IoSession session) throws Exception {
-            log.warn("Closing the session because a keep-alive response " +
+            LOGGER.warn("Closing the session because a keep-alive response " +
                     "message was not received within {} second(s).",
                     filter.getRequestTimeout());
             session.close(true);

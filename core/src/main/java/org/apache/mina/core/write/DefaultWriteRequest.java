@@ -39,6 +39,7 @@ public class DefaultWriteRequest implements WriteRequest {
         }
 
         public void setWritten() {
+            // Do nothing
         }
 
         public IoSession getSession() {
@@ -46,6 +47,7 @@ public class DefaultWriteRequest implements WriteRequest {
         }
 
         public void join() {
+            // Do nothing
         }
 
         public boolean join(long timeoutInMillis) {
@@ -96,6 +98,7 @@ public class DefaultWriteRequest implements WriteRequest {
         }
 
         public void setException(Throwable cause) {
+            // Do nothing
         }
     };
 
@@ -162,8 +165,8 @@ public class DefaultWriteRequest implements WriteRequest {
     public String toString() {
         if (getDestination() == null) {
             return message.toString();
-        } else {
-            return message.toString() + " => " + getDestination();
         }
+        
+        return message.toString() + " => " + getDestination();
     }
 }

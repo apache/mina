@@ -38,6 +38,7 @@ public class ProtocolDecoderException extends ProtocolCodecException {
      * Constructs a new instance.
      */
     public ProtocolDecoderException() {
+        // Do nothing
     }
 
     /**
@@ -76,9 +77,9 @@ public class ProtocolDecoderException extends ProtocolCodecException {
         if (hexdump != null) {
             return message + (message.length() > 0 ? " " : "") + "(Hexdump: "
                     + hexdump + ')';
-        } else {
-            return message;
         }
+
+        return message;
     }
 
     /**

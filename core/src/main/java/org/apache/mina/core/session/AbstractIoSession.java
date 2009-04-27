@@ -73,13 +73,13 @@ public abstract class AbstractIoSession implements IoSession {
     private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER =
         new IoFutureListener<CloseFuture>() {
             public void operationComplete(CloseFuture future) {
-                AbstractIoSession s = (AbstractIoSession) future.getSession();
-                s.scheduledWriteBytes.set(0);
-                s.scheduledWriteMessages.set(0);
-                s.readBytesThroughput = 0;
-                s.readMessagesThroughput = 0;
-                s.writtenBytesThroughput = 0;
-                s.writtenMessagesThroughput = 0;
+                AbstractIoSession session = (AbstractIoSession) future.getSession();
+                session.scheduledWriteBytes.set(0);
+                session.scheduledWriteMessages.set(0);
+                session.readBytesThroughput = 0;
+                session.readMessagesThroughput = 0;
+                session.writtenBytesThroughput = 0;
+                session.writtenMessagesThroughput = 0;
             }
     };
 
@@ -218,10 +218,10 @@ public abstract class AbstractIoSession implements IoSession {
     public final boolean setScheduledForFlush(boolean flag) {
         if (flag) {
             return scheduledForFlush.compareAndSet(false, true);
-        } else {
-            scheduledForFlush.set(false);
-            return true;
         }
+        
+        scheduledForFlush.set(false);
+        return true;
     }
 
     /**
@@ -230,9 +230,9 @@ public abstract class AbstractIoSession implements IoSession {
     public final CloseFuture close(boolean rightNow) {
         if (rightNow) {
             return close();
-        } else {
-            return closeOnFlush();
         }
+        
+        return closeOnFlush();
     }
 
     /**
@@ -242,9 +242,9 @@ public abstract class AbstractIoSession implements IoSession {
         synchronized (lock) {
             if (isClosing()) {
                 return closeFuture;
-            } else {
-                closing = true;
             }
+            
+            closing = true;
         }
 
         getFilterChain().fireFilterClose();
@@ -1106,9 +1106,9 @@ public abstract class AbstractIoSession implements IoSession {
         IoService service = getService();
         if (service instanceof IoAcceptor) {
             return ((IoAcceptor) service).getLocalAddress();
-        } else {
-            return getRemoteAddress();
         }
+        
+        return getRemoteAddress();
     }
 
     /**
@@ -1137,14 +1137,13 @@ public abstract class AbstractIoSession implements IoSession {
             if (getService() instanceof IoAcceptor) {
                 return "(" + getIdAsString() + ": " + getServiceName() + ", server, " +
                         getRemoteAddress() + " => " + getLocalAddress() + ')';
-            } else {
-                return "(" + getIdAsString() + ": " + getServiceName() + ", client, " +
-                        getLocalAddress() + " => " + getRemoteAddress() + ')';
             }
-        } else {
-            return "Session disconnected ...";
+
+            return "(" + getIdAsString() + ": " + getServiceName() + ", client, " +
+                        getLocalAddress() + " => " + getRemoteAddress() + ')';
         }
         
+        return "Session disconnected ...";
     }
 
     /**
@@ -1170,9 +1169,9 @@ public abstract class AbstractIoSession implements IoSession {
         TransportMetadata tm = getTransportMetadata();
         if (tm == null) {
             return "null";
-        } else {
-            return tm.getProviderName() + ' ' + tm.getName();
         }
+        
+        return tm.getProviderName() + ' ' + tm.getName();
     }
 
     /**

@@ -101,6 +101,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * Creates a new instance with no registered {@link MessageHandler}s.
      */
     public DemuxingIoHandler() {
+        // Do nothing
     }
 
     /**
