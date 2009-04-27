@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class MethodTransition extends AbstractTransition {
-    private static final Logger log = LoggerFactory.getLogger( MethodTransition.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( MethodTransition.class );
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
     
     private final Method method;
@@ -266,8 +266,8 @@ public class MethodTransition extends AbstractTransition {
 
     private void invokeMethod(Object[] arguments) {
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Executing method " + method 
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Executing method " + method 
                         + " with arguments " + Arrays.asList(arguments));
             }
             method.invoke(target, arguments);

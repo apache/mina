@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class StateMachine {
-    private static final Logger log = LoggerFactory.getLogger(StateMachine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StateMachine.class);
     private static final String CALL_STACK = StateMachine.class.getName() + ".callStack";
     private final State startState;
     private final Map<String, State> states;
@@ -135,8 +135,8 @@ public class StateMachine {
                  * This thread is already processing an event. Queue this 
                  * event.
                  */
-                if (log.isDebugEnabled()) {
-                    log.debug("State machine called recursively. Queuing event " + event
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("State machine called recursively. Queuing event " + event
                             + " for later processing.");
                 }
             } else {
@@ -166,22 +166,22 @@ public class StateMachine {
         StateContext context = event.getContext();
 
         for (Transition t : state.getTransitions()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Trying transition " + t);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Trying transition " + t);
             }
 
             try {
                 if (t.execute(event)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Transition " + t + " executed successfully.");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Transition " + t + " executed successfully.");
                     }
                     setCurrentState(context, t.getNextState());
 
                     return;
                 }
             } catch (BreakAndContinueException bace) {
-                if (log.isDebugEnabled()) {
-                    log.debug("BreakAndContinueException thrown in " 
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("BreakAndContinueException thrown in " 
                             + "transition " + t
                             + ". Continuing with next transition.");
                 }
@@ -189,16 +189,16 @@ public class StateMachine {
                 State newState = getState(bage.getStateId());
 
                 if (bage.isNow()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("BreakAndGotoException thrown in " 
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("BreakAndGotoException thrown in " 
                                 + "transition " + t + ". Moving to state "
                                 + newState.getId() + " now.");
                     }
                     setCurrentState(context, newState);
                     handle(newState, event);
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("BreakAndGotoException thrown in " 
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("BreakAndGotoException thrown in " 
                                 + "transition " + t + ". Moving to state "
                                 + newState.getId() + " next.");
                     }
@@ -215,16 +215,16 @@ public class StateMachine {
                 callStack.push(returnTo);
 
                 if (bace.isNow()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("BreakAndCallException thrown in " 
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("BreakAndCallException thrown in " 
                                 + "transition " + t + ". Moving to state "
                                 + newState.getId() + " now.");
                     }
                     setCurrentState(context, newState);
                     handle(newState, event);
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("BreakAndCallException thrown in " 
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("BreakAndCallException thrown in " 
                                 + "transition " + t + ". Moving to state "
                                 + newState.getId() + " next.");
                     }
@@ -236,16 +236,16 @@ public class StateMachine {
                 State newState = callStack.pop();
 
                 if (bare.isNow()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("BreakAndReturnException thrown in " 
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("BreakAndReturnException thrown in " 
                                 + "transition " + t + ". Moving to state "
                                 + newState.getId() + " now.");
                     }
                     setCurrentState(context, newState);
                     handle(newState, event);
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("BreakAndReturnException thrown in " 
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("BreakAndReturnException thrown in " 
                                 + "transition " + t + ". Moving to state "
                                 + newState.getId() + " next.");
                     }
@@ -279,10 +279,10 @@ public class StateMachine {
 
     private void setCurrentState(StateContext context, State newState) {
         if (newState != null) {
-            if (log.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
                 if (newState != context.getCurrentState()) {
-                    log.debug("Leaving state " + context.getCurrentState().getId());
-                    log.debug("Entering state " + newState.getId());
+                    LOGGER.debug("Leaving state " + context.getCurrentState().getId());
+                    LOGGER.debug("Entering state " + newState.getId());
                 }
             }
             context.setCurrentState(newState);
