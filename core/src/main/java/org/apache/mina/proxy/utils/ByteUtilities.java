@@ -30,15 +30,15 @@ import java.io.UnsupportedEncodingException;
  */
 public class ByteUtilities {
 
-	/**
+    /**
      * Returns the integer represented by up to 4 bytes in network byte order.
      * 
-	 * @param buf the buffer to read the bytes from
-	 * @param start
-	 * @param count
-	 * @return
-	 */
-	public static int networkByteOrderToInt(byte[] buf, int start, int count) {
+     * @param buf the buffer to read the bytes from
+     * @param start
+     * @param count
+     * @return
+     */
+    public static int networkByteOrderToInt(byte[] buf, int start, int count) {
         if (count > 4) {
             throw new IllegalArgumentException(
                     "Cannot handle more than 4 bytes");
@@ -54,31 +54,31 @@ public class ByteUtilities {
         return result;
     }
 
-	/**
+    /**
      * Encodes an integer into up to 4 bytes in network byte order.
      * 
-	 * @param num the int to convert to a byte array
-	 * @param count the number of reserved bytes for the write operation
-	 * @return the resulting byte array
-	 */
-	public static byte[] intToNetworkByteOrder(int num, int count) {
-		byte[] buf = new byte[count];
-		intToNetworkByteOrder(num, buf, 0, count);
-		
-		return buf;
-	}
-	
-	/**
+     * @param num the int to convert to a byte array
+     * @param count the number of reserved bytes for the write operation
+     * @return the resulting byte array
+     */
+    public static byte[] intToNetworkByteOrder(int num, int count) {
+        byte[] buf = new byte[count];
+        intToNetworkByteOrder(num, buf, 0, count);
+        
+        return buf;
+    }
+    
+    /**
      * Encodes an integer into up to 4 bytes in network byte order in the 
      * supplied buffer starting at <code>start</code> offset and writing
      * <code>count</code> bytes.
      * 
-	 * @param num the int to convert to a byte array
-	 * @param buf the buffer to write the bytes to
-	 * @param start the offset from beginning for the write operation
-	 * @param count the number of reserved bytes for the write operation
-	 */
-	public static void intToNetworkByteOrder(int num, byte[] buf, int start,
+     * @param num the int to convert to a byte array
+     * @param buf the buffer to write the bytes to
+     * @param start the offset from beginning for the write operation
+     * @param count the number of reserved bytes for the write operation
+     */
+    public static void intToNetworkByteOrder(int num, byte[] buf, int start,
             int count) {
         if (count > 4) {
             throw new IllegalArgumentException(

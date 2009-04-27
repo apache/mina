@@ -53,8 +53,8 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * performs any necessary handshaking with the proxy before allowing data to flow 
  * normally. During the handshake, any outgoing write requests are buffered.
  * 
- * @see		http://www.nabble.com/Meta-Transport%3A-an-idea-on-implementing-reconnection-and-proxy-td12969001.html
- * @see		http://issues.apache.org/jira/browse/DIRMINA-415
+ * @see        http://www.nabble.com/Meta-Transport%3A-an-idea-on-implementing-reconnection-and-proxy-td12969001.html
+ * @see        http://issues.apache.org/jira/browse/DIRMINA-415
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -230,7 +230,7 @@ public class ProxyConnector extends AbstractIoConnector {
 
         // Removes an old ProxyFilter instance from the chain
         if (connector.getFilterChain().contains(className)) {
-        	connector.getFilterChain().remove(className);
+            connector.getFilterChain().remove(className);
         }
 
         // Insert the ProxyFilter as the first filter in the filter chain builder        

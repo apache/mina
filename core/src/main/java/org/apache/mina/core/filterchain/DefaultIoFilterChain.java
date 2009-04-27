@@ -820,7 +820,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 }
                 
                 public String toString() {
-                	return EntryImpl.this.nextEntry.name;
+                    return EntryImpl.this.nextEntry.name;
                 }
             };
         }
@@ -847,34 +847,34 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
         @Override
         public String toString() {
-        	StringBuilder sb = new StringBuilder();
-        	
-        	// Add the current filter
-        	sb.append("('").append(getName()).append('\'');
-        	
-        	// Add the previous filter 
-        	sb.append(", prev: '");
+            StringBuilder sb = new StringBuilder();
+            
+            // Add the current filter
+            sb.append("('").append(getName()).append('\'');
+            
+            // Add the previous filter 
+            sb.append(", prev: '");
 
-        	if (prevEntry != null) {
+            if (prevEntry != null) {
                 sb.append(prevEntry.name);
                 sb.append(':');
                 sb.append(prevEntry.getFilter().getClass().getSimpleName());
-        	} else {
-            	sb.append("null");
-        	}
-        	
-        	// Add the next filter 
-        	sb.append("', next: '");
+            } else {
+                sb.append("null");
+            }
+            
+            // Add the next filter 
+            sb.append("', next: '");
 
-        	if (nextEntry != null) {
+            if (nextEntry != null) {
                 sb.append(nextEntry.name);
                 sb.append(':');
                 sb.append(nextEntry.getFilter().getClass().getSimpleName());
-        	} else {
-            	sb.append("null");
-        	}
-        	
-        	sb.append("')");
+            } else {
+                sb.append("null");
+            }
+            
+            sb.append("')");
             return sb.toString();
         }
 

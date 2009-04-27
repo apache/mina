@@ -145,6 +145,6 @@ public class IoFilterAdapter implements IoFilter {
     }
     
     public String toString() {
-    	return this.getClass().getSimpleName();
+        return this.getClass().getSimpleName();
     }
 }

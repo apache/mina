@@ -75,7 +75,7 @@ public class StreamWriteFilter extends AbstractStreamWriteFilter<InputStream> {
     
     @Override
     protected Class<InputStream> getMessageClass() {
-    	return InputStream.class;
+        return InputStream.class;
     }
 
 }

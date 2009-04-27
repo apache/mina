@@ -46,9 +46,9 @@ import org.apache.mina.util.ExceptionMonitor;
  */
 public final class VmPipeConnector extends AbstractIoConnector {
 
-	// object used for checking session idle
-	private IdleStatusChecker idleChecker;
-	
+    // object used for checking session idle
+    private IdleStatusChecker idleChecker;
+    
     /**
      * Creates a new instance.
      */
@@ -143,8 +143,8 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
     @Override
     protected IoFuture dispose0() throws Exception {
-    	// stop the idle checking task
-    	idleChecker.getNotifyingTask().cancel();
+        // stop the idle checking task
+        idleChecker.getNotifyingTask().cancel();
         return null;
     }
 

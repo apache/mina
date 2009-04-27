@@ -139,8 +139,7 @@ public interface IoService {
     /**
      * Returns a value of whether or not this service is active
      *
-     * @return
-     * 	whether of not the service is active.
+     * @return whether of not the service is active.
      */
     boolean isActive();
 
@@ -148,8 +147,7 @@ public interface IoService {
      * Returns the time when this service was activated.  It returns the last
      * time when this service was activated if the service is not active now.
      *
-     * @return
-     * 	The time by using {@link System#currentTimeMillis()}
+     * @return The time by using {@link System#currentTimeMillis()}
      */
     long getActivationTime();
 
@@ -175,16 +173,14 @@ public interface IoService {
     /**
      * Returns the number of bytes scheduled to be written
      *
-     * @return
-     * 	The number of bytes scheduled to be written
+     * @return The number of bytes scheduled to be written
      */
     int getScheduledWriteBytes();
 
     /**
      * Returns the number of messages scheduled to be written
      *
-     * @return
-     * 	The number of messages scheduled to be written
+     * @return The number of messages scheduled to be written
      */
     int getScheduledWriteMessages();
 

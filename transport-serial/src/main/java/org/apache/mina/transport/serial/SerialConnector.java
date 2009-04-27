@@ -133,8 +133,8 @@ public final class SerialConnector extends AbstractIoConnector {
 
     @Override
     protected IoFuture dispose0() throws Exception {
-    	// stop the idle checking task
-    	idleChecker.getNotifyingTask().cancel();
+        // stop the idle checking task
+        idleChecker.getNotifyingTask().cancel();
         return null;
     }
 

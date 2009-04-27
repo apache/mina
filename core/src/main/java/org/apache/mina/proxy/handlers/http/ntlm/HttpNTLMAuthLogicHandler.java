@@ -61,10 +61,10 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
         super(proxyIoSession);
 
         ((HttpProxyRequest) request).checkRequiredProperties(
-				HttpProxyConstants.USER_PROPERTY,
-				HttpProxyConstants.PWD_PROPERTY,
-				HttpProxyConstants.DOMAIN_PROPERTY,
-				HttpProxyConstants.WORKSTATION_PROPERTY);
+                HttpProxyConstants.USER_PROPERTY,
+                HttpProxyConstants.PWD_PROPERTY,
+                HttpProxyConstants.DOMAIN_PROPERTY,
+                HttpProxyConstants.WORKSTATION_PROPERTY);
     }
 
     /**

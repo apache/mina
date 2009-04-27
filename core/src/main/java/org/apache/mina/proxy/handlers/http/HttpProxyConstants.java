@@ -30,8 +30,8 @@ public class HttpProxyConstants {
 
     /**
      * The HTTP CONNECT verb.
-     */	
-	public final static String CONNECT = "CONNECT";
+     */
+    public final static String CONNECT = "CONNECT";
 
     /**
      * The HTTP GET verb.

@@ -67,7 +67,7 @@ class AprLibrary {
         return library != null;
     }
 
-    // APR memory pool (package wide mother pool)	
+    // APR memory pool (package wide mother pool)
     private final long pool;
 
     /**

@@ -104,13 +104,13 @@ public class HttpProxyRequest extends ProxyRequest {
      */    
     public HttpProxyRequest(final InetSocketAddress endpointAddress,
             final String httpVersion, final Map<String, List<String>> headers) {
-    	this.httpVerb = HttpProxyConstants.CONNECT;
+        this.httpVerb = HttpProxyConstants.CONNECT;
         if (!endpointAddress.isUnresolved()) {
-        	this.httpURI = endpointAddress.getHostName() + ":"
-            				+ endpointAddress.getPort();
+            this.httpURI = endpointAddress.getHostName() + ":"
+                            + endpointAddress.getPort();
         } else {
-        	this.httpURI = endpointAddress.getAddress().getHostAddress() + ":"
-							+ endpointAddress.getPort();
+            this.httpURI = endpointAddress.getAddress().getHostAddress() + ":"
+                            + endpointAddress.getPort();
         }
         
         this.httpVersion = httpVersion;
@@ -198,7 +198,7 @@ public class HttpProxyRequest extends ProxyRequest {
     public synchronized final String getHost() {
         if (host == null) {
             if (getEndpointAddress() != null && 
-            		!getEndpointAddress().isUnresolved()) {
+                    !getEndpointAddress().isUnresolved()) {
                 host = getEndpointAddress().getHostName();
             }
 
@@ -254,15 +254,15 @@ public class HttpProxyRequest extends ProxyRequest {
      * {@link ProxyAuthException}.
      */
     public void checkRequiredProperties(String... propNames) throws ProxyAuthException {
-		StringBuilder sb = new StringBuilder();
-    	for (String propertyName : propNames) {
-	        if (properties.get(propertyName) == null) {	        	
-	        	sb.append(propertyName).append(' ');
-	        }
-    	}
+        StringBuilder sb = new StringBuilder();
+        for (String propertyName : propNames) {
+            if (properties.get(propertyName) == null) {
+                sb.append(propertyName).append(' ');
+            }
+        }
         if (sb.length() > 0) {
-        	sb.append("property(ies) missing in request");
-        	throw new ProxyAuthException(sb.toString());
+            sb.append("property(ies) missing in request");
+            throw new ProxyAuthException(sb.toString());
         }
     }
     

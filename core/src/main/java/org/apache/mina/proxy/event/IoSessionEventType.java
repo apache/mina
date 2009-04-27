@@ -35,7 +35,7 @@ public enum IoSessionEventType {
     private final int id;
     
     private IoSessionEventType(int id) {
-    	this.id = id;
+        this.id = id;
     }
     
     /**
@@ -44,7 +44,7 @@ public enum IoSessionEventType {
      * @return the event id
      */
     public int getId() {
-	return id;
+        return id;
     }
 
     /**

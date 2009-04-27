@@ -115,7 +115,7 @@ public class NTLMUtilities implements NTLMConstants {
             
             String line;
             do {
-            	  line = reader.readLine();
+                  line = reader.readLine();
             } while ((line != null) && (line.length() != 0));
             
             reader.close();
@@ -269,7 +269,7 @@ public class NTLMUtilities implements NTLMConstants {
      * @return a new byte array holding the data pointed by the security buffer 
      */
     public final static byte[] readSecurityBufferTarget(
-    		byte[] msg, int securityBufferOffset) {
+            byte[] msg, int securityBufferOffset) {
         byte[] securityBuffer = new byte[8];
 
         System.arraycopy(msg, securityBufferOffset, securityBuffer, 0, 8);
@@ -355,21 +355,21 @@ public class NTLMUtilities implements NTLMConstants {
             while (infoBlock[pos] != 0) {
                 out.print("---\nType " + infoBlock[pos] + ": ");
                 switch (infoBlock[pos]) {
-	                case 1:
-	                    out.println("Server name");
-	                    break;
-	                case 2:
-	                    out.println("Domain name");
-	                    break;
-	                case 3:
-	                    out.println("Fully qualified DNS hostname");
-	                    break;
-	                case 4:
-	                    out.println("DNS domain name");
-	                    break;
-	                case 5:
-	                    out.println("Parent DNS domain name");
-	                    break;
+                    case 1:
+                        out.println("Server name");
+                        break;
+                    case 2:
+                        out.println("Domain name");
+                        break;
+                    case 3:
+                        out.println("Fully qualified DNS hostname");
+                        break;
+                    case 4:
+                        out.println("DNS domain name");
+                        break;
+                    case 5:
+                        out.println("Parent DNS domain name");
+                        break;
                 }
                 byte[] len = new byte[2];
                 System.arraycopy(infoBlock, pos + 2, len, 0, 2);
@@ -419,8 +419,8 @@ public class NTLMUtilities implements NTLMConstants {
 
         //TOSEE breaks tests
         /*int flags = serverFlags != null ? serverFlags | 
-        		FLAG_NEGOTIATE_WORKSTATION_SUPPLIED | 
-        		FLAG_NEGOTIATE_DOMAIN_SUPPLIED : DEFAULT_FLAGS;*/
+                FLAG_NEGOTIATE_WORKSTATION_SUPPLIED | 
+                FLAG_NEGOTIATE_DOMAIN_SUPPLIED : DEFAULT_FLAGS;*/
         int flags = serverFlags != null ? serverFlags : DEFAULT_FLAGS;
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -475,7 +475,7 @@ public class NTLMUtilities implements NTLMConstants {
                 baos.write(osVersion);
             }
             //else
-            //	baos.write(DEFAULT_OS_VERSION);
+            //    baos.write(DEFAULT_OS_VERSION);
 
             // Order is not mandatory since a pointer is given in the security buffers
             baos.write(targetName);

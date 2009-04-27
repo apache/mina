@@ -76,9 +76,9 @@ public final class NioDatagramConnector
      * @since 2.0.0-M4
      */
     public NioDatagramConnector(Class<? extends IoProcessor<NioSession>> processorClass,
-			int processorCount) {
-		super(new DefaultDatagramSessionConfig(), processorClass, processorCount);
-	}
+            int processorCount) {
+        super(new DefaultDatagramSessionConfig(), processorClass, processorCount);
+    }
 
     /**
      * Constructor for {@link NioDatagramConnector} with default configuration with default configuration which will use a built-in 
@@ -92,11 +92,11 @@ public final class NioDatagramConnector
      * @see org.apache.mina.core.service.SimpleIoProcessorPool#DEFAULT_SIZE
      * @since 2.0.0-M4
      */
-	public NioDatagramConnector(Class<? extends IoProcessor<NioSession>> processorClass) {
-		super(new DefaultDatagramSessionConfig(), processorClass);
-	}
+    public NioDatagramConnector(Class<? extends IoProcessor<NioSession>> processorClass) {
+        super(new DefaultDatagramSessionConfig(), processorClass);
+    }
 
-	public TransportMetadata getTransportMetadata() {
+    public TransportMetadata getTransportMetadata() {
         return NioDatagramSession.METADATA;
     }
     

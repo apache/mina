@@ -123,21 +123,21 @@ public class BlacklistFilter extends IoFilterAdapter {
      * Blocks the specified endpoint.
      */
     public void block(InetAddress address) {
-    	if (address == null) {
-    		throw new NullPointerException("Adress to block can not be null");
-    	}
+        if (address == null) {
+            throw new NullPointerException("Adress to block can not be null");
+        }
 
-    	block(new Subnet(address, 32));
+        block(new Subnet(address, 32));
     }
 
     /**
      * Blocks the specified subnet.
      */
     public void block(Subnet subnet) {
-    	if(subnet == null) {
-    		throw new NullPointerException("Subnet can not be null");
-    	}
-    	
+        if(subnet == null) {
+            throw new NullPointerException("Subnet can not be null");
+        }
+        
         blacklist.add(subnet);
     }
     
@@ -145,11 +145,11 @@ public class BlacklistFilter extends IoFilterAdapter {
      * Unblocks the specified endpoint.
      */
     public void unblock(InetAddress address) {
-    	if (address == null) {
-    		throw new NullPointerException("Adress to unblock can not be null");
-    	}
-    	
-    	unblock(new Subnet(address, 32));
+        if (address == null) {
+            throw new NullPointerException("Adress to unblock can not be null");
+        }
+        
+        unblock(new Subnet(address, 32));
     }
 
     /**
@@ -235,13 +235,13 @@ public class BlacklistFilter extends IoFilterAdapter {
     private boolean isBlocked(IoSession session) {
         SocketAddress remoteAddress = session.getRemoteAddress();
         if (remoteAddress instanceof InetSocketAddress) {
-        	InetAddress address = ((InetSocketAddress) remoteAddress).getAddress(); 
+            InetAddress address = ((InetSocketAddress) remoteAddress).getAddress(); 
             
             // check all subnets
             for(Subnet subnet : blacklist) {
-            	if(subnet.inSubnet(address)) {
-            		return true;
-            	}
+                if(subnet.inSubnet(address)) {
+                    return true;
+                }
             }
         }
 

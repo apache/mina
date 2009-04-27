@@ -163,7 +163,8 @@ public class SocksProxyRequest extends ProxyRequest {
      */
     public synchronized final String getHost() {
         if (host == null) {
-        	InetSocketAddress adr = getEndpointAddress();
+            InetSocketAddress adr = getEndpointAddress();
+            
             if ( adr != null && !adr.isUnresolved()) {
                 host = getEndpointAddress().getHostName();
             }

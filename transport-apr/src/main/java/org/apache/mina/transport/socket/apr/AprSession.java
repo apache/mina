@@ -39,10 +39,10 @@ import org.apache.tomcat.jni.Socket;
  */
 public abstract class AprSession extends AbstractIoSession {
    
-	// good old socket descriptor
-	private long descriptor;
+    // good old socket descriptor
+    private long descriptor;
 
-	// the service handling this session
+    // the service handling this session
     private final IoService service;
     
     // the processor processing this session

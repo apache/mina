@@ -54,8 +54,8 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
         super(proxyIoSession);
 
         ((HttpProxyRequest) request).checkRequiredProperties(
-				HttpProxyConstants.USER_PROPERTY,
-				HttpProxyConstants.PWD_PROPERTY);
+                HttpProxyConstants.USER_PROPERTY,
+                HttpProxyConstants.PWD_PROPERTY);
     }
 
     /**

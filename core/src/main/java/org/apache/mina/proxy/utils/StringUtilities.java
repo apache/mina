@@ -38,19 +38,19 @@ import javax.security.sasl.SaslException;
  */
 public class StringUtilities {
 
-	/**
+    /**
      * A directive is a parameter of the digest authentication process.
      * Returns the value of a directive from the map. If mandatory is true and the 
      * value is null, then it throws an {@link AuthenticationException}.
      *  
-	 * @param directivesMap the directive's map 
-	 * @param directive the name of the directive we want to retrieve
-	 * @param mandatory is the directive mandatory
-	 * @return the mandatory value as a String
-	 * @throws AuthenticationException if mandatory is true and if 
-	 * directivesMap.get(directive) == null
-	 */
-	public static String getDirectiveValue(
+     * @param directivesMap the directive's map 
+     * @param directive the name of the directive we want to retrieve
+     * @param mandatory is the directive mandatory
+     * @return the mandatory value as a String
+     * @throws AuthenticationException if mandatory is true and if 
+     * directivesMap.get(directive) == null
+     */
+    public static String getDirectiveValue(
             HashMap<String, String> directivesMap, String directive,
             boolean mandatory) throws AuthenticationException {
         String value = directivesMap.get(directive);
@@ -66,14 +66,14 @@ public class StringUtilities {
         return value;
     }
 
-	/**
+    /**
      * Copy the directive to the {@link StringBuilder} if not null.
      * (A directive is a parameter of the digest authentication process.)
      * 
-	 * @param directives the directives map
-	 * @param sb the output buffer
-	 * @param directive the directive name to look for
-	 */
+     * @param directives the directives map
+     * @param sb the output buffer
+     * @param directive the directive name to look for
+     */
     public static void copyDirective(HashMap<String, String> directives,
             StringBuilder sb, String directive) {
         String directiveValue = directives.get(directive);
