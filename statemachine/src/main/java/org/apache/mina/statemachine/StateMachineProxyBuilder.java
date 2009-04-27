@@ -182,10 +182,10 @@ public class StateMachineProxyBuilder {
      * @return the proxy object.
      */
     public Object create(Class<?>[] ifaces, StateMachine sm) {
-	ClassLoader cl = defaultCl;
-	if (cl == null) {
-	   cl = Thread.currentThread().getContextClassLoader();
-	}
+        ClassLoader cl = defaultCl;
+        if (cl == null) {
+           cl = Thread.currentThread().getContextClassLoader();
+        }
 
         InvocationHandler handler = new MethodInvocationHandler(sm,
                 contextLookup, interceptor, eventFactory,

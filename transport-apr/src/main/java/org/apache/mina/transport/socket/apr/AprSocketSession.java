@@ -41,8 +41,6 @@ import org.apache.tomcat.jni.Socket;
  * @version $Rev$, $Date$
  */
 class AprSocketSession extends AprSession {
-
-	
     static final TransportMetadata METADATA =
         new DefaultTransportMetadata(
                 "apr", "socket", false, true,
@@ -82,7 +80,7 @@ class AprSocketSession extends AprSession {
      * @author The Apache MINA Project (dev@mina.apache.org)
      */
     private class SessionConfigImpl extends AbstractSocketSessionConfig {
-    	/**
+        /**
          * {@inheritDoc}
          */
         public boolean isKeepAlive() {

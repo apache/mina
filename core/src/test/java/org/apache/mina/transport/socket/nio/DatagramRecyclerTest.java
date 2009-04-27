@@ -86,7 +86,7 @@ public class DatagramRecyclerTest extends TestCase {
             // This doesn't mean that the acceptor-side connection is also closed.
             // The life cycle of the acceptor-side connection is managed by the recycler.
             future.getSession().close(true);
-	    future.getSession().getCloseFuture().awaitUninterruptibly();
+            future.getSession().getCloseFuture().awaitUninterruptibly();
             Assert.assertTrue(future.getSession().getCloseFuture().isClosed());
 
             // Wait until the acceptor-side connection is closed.

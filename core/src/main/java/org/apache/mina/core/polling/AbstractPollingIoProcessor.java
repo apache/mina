@@ -549,7 +549,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private void process() throws Exception {
         for (Iterator<T> i = selectedSessions(); i.hasNext();) {
-        	T session = i.next();
+            T session = i.next();
             process(session);
             i.remove();
         }
@@ -716,9 +716,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                             maxWrittenBytes - writtenBytes,
                             currentTime);
                     if (localWrittenBytes > 0 && ((IoBuffer)message).hasRemaining() ) {
-                    	// the buffer isn't empty, we re-interest it in writing 
-                    	writtenBytes += localWrittenBytes;    	
-                    	setInterestedInWrite(session, true);
+                        // the buffer isn't empty, we re-interest it in writing 
+                        writtenBytes += localWrittenBytes;    
+                        setInterestedInWrite(session, true);
                         return false;
                     }
                 } else if (message instanceof FileRegion) {
@@ -836,7 +836,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             SessionState state = state(session);
             switch (state) {
             case OPEN:
-            	updateTrafficControl(session);
+                updateTrafficControl(session);
                 break;
             case CLOSED:
                 break;
@@ -853,7 +853,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     public void updateTrafficControl(T session) {
-    	try {
+        try {
             setInterestedInRead(session, !session.isReadSuspended());
         } catch (Exception e) {
             IoFilterChain filterChain = session.getFilterChain(); 

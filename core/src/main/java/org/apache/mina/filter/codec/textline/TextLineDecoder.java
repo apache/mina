@@ -205,7 +205,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                     buf.flip();
                     buf.limit(buf.limit() - matchCount);
                     try {
-                    	writeText(session, buf.getString(ctx.getDecoder()), out);
+                        writeText(session, buf.getString(ctx.getDecoder()), out);
                     } finally {
                         buf.clear();
                     }
@@ -263,7 +263,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                         buf.flip();
                         buf.limit(buf.limit() - matchCount);
                         try {
-                        	writeText(session, buf.getString(ctx.getDecoder()), out);
+                            writeText(session, buf.getString(ctx.getDecoder()), out);
                         } finally {
                             buf.clear();
                         }
@@ -301,7 +301,7 @@ public class TextLineDecoder implements ProtocolDecoder {
      * @param out  the upstream {@code ProtocolDecoderOutput}.
      */
     protected void writeText(IoSession session, String text, ProtocolDecoderOutput out) {
-    	out.write(text);
+        out.write(text);
     }
 
     private class Context {

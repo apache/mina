@@ -40,7 +40,7 @@ public enum HttpAuthenticationMethods {
     private final int id;
     
     private HttpAuthenticationMethods(int id) {
-    	this.id = id;
+        this.id = id;
     }
 
     /**
@@ -48,7 +48,7 @@ public enum HttpAuthenticationMethods {
      * @return the id
      */
     public int getId() {
-    	return id;
+        return id;
     }
 
     /**
@@ -58,8 +58,8 @@ public enum HttpAuthenticationMethods {
      * @return a new logic handler 
      */
     public AbstractAuthLogicHandler getNewHandler(ProxyIoSession proxyIoSession)
-    	throws ProxyAuthException {
-    	return getNewHandler(this.id, proxyIoSession);
+        throws ProxyAuthException {
+        return getNewHandler(this.id, proxyIoSession);
     }
 
     /**
@@ -70,21 +70,21 @@ public enum HttpAuthenticationMethods {
      * @return a new logic handler 
      */    
     public static AbstractAuthLogicHandler getNewHandler(
-			int method, ProxyIoSession proxyIoSession)
-			throws ProxyAuthException {
-		
-    	if (method == BASIC.id)
-			return new HttpBasicAuthLogicHandler(proxyIoSession);
-    	else
-		if (method == DIGEST.id)
-			return new HttpDigestAuthLogicHandler(proxyIoSession);
-		else
-		if (method == NTLM.id)
-			return new HttpNTLMAuthLogicHandler(proxyIoSession);
-		else
-		if (method == NO_AUTH.id)
-			return new HttpNoAuthLogicHandler(proxyIoSession);
-		else
-			return null;
-	}
+            int method, ProxyIoSession proxyIoSession)
+            throws ProxyAuthException {
+        
+        if (method == BASIC.id)
+            return new HttpBasicAuthLogicHandler(proxyIoSession);
+        else
+        if (method == DIGEST.id)
+            return new HttpDigestAuthLogicHandler(proxyIoSession);
+        else
+        if (method == NTLM.id)
+            return new HttpNTLMAuthLogicHandler(proxyIoSession);
+        else
+        if (method == NO_AUTH.id)
+            return new HttpNoAuthLogicHandler(proxyIoSession);
+        else
+            return null;
+    }
 }

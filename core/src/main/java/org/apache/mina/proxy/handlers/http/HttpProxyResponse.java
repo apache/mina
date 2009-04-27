@@ -30,9 +30,9 @@ import java.util.Map;
  * @since MINA 2.0.0-M3
  */
 public class HttpProxyResponse {
-	/**
-	 * The HTTP response protocol version.
-	 */
+    /**
+     * The HTTP response protocol version.
+     */
     public final String httpVersion;
 
     /**

@@ -64,7 +64,7 @@ public class IoSessionStateContextLookup extends AbstractStateContextLookup {
      * @param contextFactory the {@link StateContextFactory}.
      */
     public IoSessionStateContextLookup(StateContextFactory contextFactory) {
-	this(contextFactory, DEFAULT_SESSION_ATTRIBUTE_NAME);
+        this(contextFactory, DEFAULT_SESSION_ATTRIBUTE_NAME);
     }
 
     /**
@@ -77,7 +77,7 @@ public class IoSessionStateContextLookup extends AbstractStateContextLookup {
      */
     public IoSessionStateContextLookup(StateContextFactory contextFactory, String sessionAttributeName) {
         super(contextFactory);
-	this.sessionAttributeName = sessionAttributeName;
+        this.sessionAttributeName = sessionAttributeName;
     }
     
     protected StateContext lookup(Object eventArg) {

@@ -57,8 +57,8 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
      * Constructor that takes in a specified wait time.
      *
      * @param allowedInterval
-     * 	The number of milliseconds a client is allowed to wait
-     * 	before making another successful connection
+     *     The number of milliseconds a client is allowed to wait
+     *     before making another successful connection
      *
      */
     public ConnectionThrottleFilter(long allowedInterval) {
@@ -71,8 +71,8 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
      * This value is measured in milliseconds.
      *
      * @param allowedInterval
-     * 	The number of milliseconds a client is allowed to wait
-     * 	before making another successful connection
+     *     The number of milliseconds a client is allowed to wait
+     *     before making another successful connection
      */
     public void setAllowedInterval(long allowedInterval) {
         this.allowedInterval = allowedInterval;
@@ -83,9 +83,9 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
      * to continue
      *
      * @param session
-     * 	The new session that will be verified
+     *     The new session that will be verified
      * @return
-     * 	True if the session meets the criteria, otherwise false
+     *     True if the session meets the criteria, otherwise false
      */
     protected boolean isConnectionOk(IoSession session) {
         SocketAddress remoteAddress = session.getRemoteAddress();

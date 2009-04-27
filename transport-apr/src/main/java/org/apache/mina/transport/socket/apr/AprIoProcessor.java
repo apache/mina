@@ -138,13 +138,13 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
      */
     @Override
     protected int select() throws Exception {
-    	return select(Integer.MAX_VALUE);
+        return select(Integer.MAX_VALUE);
     }
 
     /**
      * {@inheritDoc}
      */
- 	@Override
+     @Override
     protected int select(long timeout) throws Exception {
         int rv = Poll.poll(pollset, 1000 * timeout, polledSockets, false);
         if (rv <= 0) {
@@ -201,7 +201,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
- 	/**
+     /**
      * {@inheritDoc}
      */
     @Override
@@ -274,7 +274,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         } finally {
             ret = Socket.close(session.getDescriptor());
             
-        	// destroying the session because it won't be reused 
+            // destroying the session because it won't be reused 
             // after this point
             Socket.destroy(session.getDescriptor());
             session.setDescriptor(0);

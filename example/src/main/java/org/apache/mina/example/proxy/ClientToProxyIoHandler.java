@@ -63,7 +63,7 @@ public class ClientToProxyIoHandler extends AbstractProxyIoHandler {
                     // Connect failed
                     session.close(true);
                 } finally {
-                	session.resumeRead();
+                    session.resumeRead();
                     session.resumeWrite();
                 }
             }

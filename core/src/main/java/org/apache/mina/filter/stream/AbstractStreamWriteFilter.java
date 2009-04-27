@@ -58,7 +58,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     public void onPreAdd(IoFilterChain parent, String name,
             NextFilter nextFilter) throws Exception {
         Class<? extends IoFilterAdapter> clazz = getClass();
-		if (parent.contains(clazz)) {
+        if (parent.contains(clazz)) {
             throw new IllegalStateException(
                     "Only one " + clazz.getName() + " is permitted.");
         }
@@ -82,7 +82,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
 
         if (getMessageClass().isInstance(message)) {
 
-        	T stream = getMessageClass().cast(message);
+            T stream = getMessageClass().cast(message);
 
             IoBuffer buffer = getNextBuffer(stream);
             if (buffer == null) {

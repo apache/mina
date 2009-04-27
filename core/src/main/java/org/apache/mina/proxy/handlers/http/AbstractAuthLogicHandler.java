@@ -113,7 +113,7 @@ public abstract class AbstractAuthLogicHandler {
      * @param headers the request headers
      */
     public static void addKeepAliveHeaders(Map<String, List<String>> headers) {
-    	StringUtilities.addValueToHeader(headers, "Keep-Alive",
+        StringUtilities.addValueToHeader(headers, "Keep-Alive",
                 HttpProxyConstants.DEFAULT_KEEP_ALIVE_TIME, true);
         StringUtilities.addValueToHeader(headers, "Proxy-Connection",
                 "keep-Alive", true);

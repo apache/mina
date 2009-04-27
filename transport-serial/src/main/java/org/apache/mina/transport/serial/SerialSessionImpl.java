@@ -131,11 +131,11 @@ class SerialSessionImpl extends AbstractIoSession implements
         port.addEventListener(this);
         service.getIdleStatusChecker0().addSession(this);
         try {
-        	getService().getFilterChainBuilder().buildFilterChain(getFilterChain());
-        	serviceListeners.fireSessionCreated(this);
+            getService().getFilterChainBuilder().buildFilterChain(getFilterChain());
+            serviceListeners.fireSessionCreated(this);
         } catch (Throwable e) {
-        	getFilterChain().fireExceptionCaught(e);
-        	processor.remove(this);
+            getFilterChain().fireExceptionCaught(e);
+            processor.remove(this);
         }
     }
 
@@ -181,7 +181,7 @@ class SerialSessionImpl extends AbstractIoSession implements
 
             int writtenBytes = buf.remaining();
             try {
-            	outputStream.write(buf.array(), buf.position(), writtenBytes);
+                outputStream.write(buf.array(), buf.position(), writtenBytes);
                 buf.position(buf.position() + writtenBytes);
                 req.getFuture().setWritten();
             } catch (IOException e) {

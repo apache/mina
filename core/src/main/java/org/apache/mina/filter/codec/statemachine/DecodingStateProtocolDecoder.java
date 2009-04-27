@@ -67,7 +67,7 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
         } else if (this.session != session) {
             throw new IllegalStateException(
                     getClass().getSimpleName() + " is a stateful decoder.  " +
-    		    "You have to create one per session.");
+                "You have to create one per session.");
         }
 
         undecodedBuffers.offer(in);

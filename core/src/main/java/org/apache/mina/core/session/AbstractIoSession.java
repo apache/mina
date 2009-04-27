@@ -589,7 +589,7 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-	public final void resumeRead() {
+    public final void resumeRead() {
         readSuspended = false;
         if (isClosing() || !isConnected()) {
             return;
@@ -601,7 +601,7 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-	public final void resumeWrite() {
+    public final void resumeWrite() {
         writeSuspended = false;
         if (isClosing() || !isConnected()) {
             return;
@@ -613,14 +613,14 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     public boolean isReadSuspended() {
-    	return readSuspended;
+        return readSuspended;
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean isWriteSuspended() {
-    	return writeSuspended; 
+        return writeSuspended; 
     }
     
     /**

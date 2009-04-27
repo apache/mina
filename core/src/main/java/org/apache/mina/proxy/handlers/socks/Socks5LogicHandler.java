@@ -139,15 +139,15 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
             }
         } else {
             host = request.getHost() != null ? 
-            		request.getHost().getBytes("ASCII") : null;
+                    request.getHost().getBytes("ASCII") : null;
 
-        	if (host != null) {
-	            len += 1 + host.length;
-	            addressType = SocksProxyConstants.DOMAIN_NAME_ADDRESS_TYPE;
-	        } else {
-	        	throw new IllegalArgumentException("SocksProxyRequest object " +
-	        			"has no suitable endpoint information");
-	        }
+            if (host != null) {
+                len += 1 + host.length;
+                addressType = SocksProxyConstants.DOMAIN_NAME_ADDRESS_TYPE;
+            } else {
+                throw new IllegalArgumentException("SocksProxyRequest object " +
+                        "has no suitable endpoint information");
+            }
         }
         
         IoBuffer buf = IoBuffer.allocate(len);
@@ -158,9 +158,9 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
         buf.put(addressType);
 
         if (host == null) {
-        	buf.put(request.getIpAddress());
+            buf.put(request.getIpAddress());
         } else {
-        	buf.put((byte) host.length);
+            buf.put((byte) host.length);
             buf.put(host);            
         }
 
@@ -185,29 +185,29 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
                 Socks5LogicHandler.SELECTED_AUTH_METHOD)).byteValue();
 
         switch (method) {
-	        case SocksProxyConstants.NO_AUTH:
-	            // In this case authentication is immediately considered as successfull
-	            // Next writeRequest() call will send the proxy request
-	            getSession().setAttribute(HANDSHAKE_STEP,
-	                    SocksProxyConstants.SOCKS5_REQUEST_STEP);
-	            break;
-	
-	        case SocksProxyConstants.GSSAPI_AUTH:
-	            return encodeGSSAPIAuthenticationPacket(request);
-	
-	        case SocksProxyConstants.BASIC_AUTH:
-	            // The basic auth scheme packet is sent
-	            byte[] user = request.getUserName().getBytes("ASCII");
-	            byte[] pwd = request.getPassword().getBytes("ASCII");
-	            IoBuffer buf = IoBuffer.allocate(3 + user.length + pwd.length);
-	
-	            buf.put(SocksProxyConstants.BASIC_AUTH_SUBNEGOTIATION_VERSION);
-	            buf.put((byte) user.length);
-	            buf.put(user);
-	            buf.put((byte) pwd.length);
-	            buf.put(pwd);
-	
-	            return buf;
+            case SocksProxyConstants.NO_AUTH:
+                // In this case authentication is immediately considered as successfull
+                // Next writeRequest() call will send the proxy request
+                getSession().setAttribute(HANDSHAKE_STEP,
+                        SocksProxyConstants.SOCKS5_REQUEST_STEP);
+                break;
+    
+            case SocksProxyConstants.GSSAPI_AUTH:
+                return encodeGSSAPIAuthenticationPacket(request);
+    
+            case SocksProxyConstants.BASIC_AUTH:
+                // The basic auth scheme packet is sent
+                byte[] user = request.getUserName().getBytes("ASCII");
+                byte[] pwd = request.getPassword().getBytes("ASCII");
+                IoBuffer buf = IoBuffer.allocate(3 + user.length + pwd.length);
+    
+                buf.put(SocksProxyConstants.BASIC_AUTH_SUBNEGOTIATION_VERSION);
+                buf.put((byte) user.length);
+                buf.put(user);
+                buf.put((byte) pwd.length);
+                buf.put(pwd);
+    
+                return buf;
         }
 
         return null;
@@ -224,7 +224,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
             final SocksProxyRequest request) throws GSSException {
         GSSContext ctx = (GSSContext) getSession().getAttribute(GSS_CONTEXT);
         if (ctx == null) {
-        	// first step in the authentication process
+            // first step in the authentication process
             GSSManager manager = GSSManager.getInstance();
             GSSName serverName = manager.createName(request
                     .getServiceKerberosName(), null);
@@ -342,7 +342,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
             }
 
             if ((step == SocksProxyConstants.SOCKS5_GREETING_STEP || 
-            		step == SocksProxyConstants.SOCKS5_AUTH_STEP)
+                    step == SocksProxyConstants.SOCKS5_AUTH_STEP)
                     && buf.remaining() >= 2) {
                 handleResponse(nextFilter, buf, step);
             } else if (step == SocksProxyConstants.SOCKS5_REQUEST_STEP

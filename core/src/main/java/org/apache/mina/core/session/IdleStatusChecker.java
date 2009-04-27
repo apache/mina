@@ -39,8 +39,8 @@ import org.apache.mina.util.ConcurrentHashSet;
  */
 public class IdleStatusChecker {
     
-	// the list of session to check
-	private final Set<AbstractIoSession> sessions =
+    // the list of session to check
+    private final Set<AbstractIoSession> sessions =
         new ConcurrentHashSet<AbstractIoSession>();
 
     /* create a task you can execute in the transport code,

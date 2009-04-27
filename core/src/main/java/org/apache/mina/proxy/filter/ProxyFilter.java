@@ -282,7 +282,7 @@ public class ProxyFilter extends IoFilterAdapter {
         LOGGER.debug("  get proxyIoSession: " + proxyIoSession);
         proxyIoSession.setProxyFilter(this);
 
-        // Create a HTTP proxy handler and start handshake.		
+        // Create a HTTP proxy handler and start handshake.
         ProxyLogicHandler handler = proxyIoSession.getHandler();
 
         // This test prevents from loosing handler conversationnal state when

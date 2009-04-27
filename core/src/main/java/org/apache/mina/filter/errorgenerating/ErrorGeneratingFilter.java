@@ -216,10 +216,10 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         return duplicatePduProbability;
     }
     
-	/**
-	 * not functional ATM
-	 * @param duplicatePduProbability
-	 */
+    /**
+     * not functional ATM
+     * @param duplicatePduProbability
+     */
     public void setDuplicatePduProbability(int duplicatePduProbability) {
         this.duplicatePduProbability = duplicatePduProbability;
     }
@@ -291,10 +291,10 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
     public int getResendPduLasterProbability() {
         return resendPduLasterProbability;
     }
-	/**
-	 * not functional ATM
-	 * @param resendPduLasterProbability
-	 */
+    /**
+     * not functional ATM
+     * @param resendPduLasterProbability
+     */
     public void setResendPduLasterProbability(int resendPduLasterProbability) {
         this.resendPduLasterProbability = resendPduLasterProbability;
     }

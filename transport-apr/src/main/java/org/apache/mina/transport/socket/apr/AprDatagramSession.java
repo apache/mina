@@ -80,7 +80,7 @@ class AprDatagramSession extends AprSession {
      * @author The Apache MINA Project (dev@mina.apache.org)
      */
     private class SessionConfigImpl extends AbstractDatagramSessionConfig {
-    	/**
+        /**
          * {@inheritDoc}
          */
         public boolean isReuseAddress() {
@@ -91,27 +91,27 @@ class AprDatagramSession extends AprSession {
             }
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public void setReuseAddress(boolean on) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_REUSEADDR, on ? 1 : 0);
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public int getTrafficClass() {
             return 0;
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public void setTrafficClass(int tc) {
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public int getSendBufferSize() {
@@ -122,14 +122,14 @@ class AprDatagramSession extends AprSession {
             }
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public void setSendBufferSize(int size) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_SNDBUF, size);
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public int getReceiveBufferSize() {
@@ -140,21 +140,21 @@ class AprDatagramSession extends AprSession {
             }
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public void setReceiveBufferSize(int size) {
             Socket.optSet(getDescriptor(), Socket.APR_SO_RCVBUF, size);
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public boolean isBroadcast() {
             return false;
         }
 
-    	/**
+        /**
          * {@inheritDoc}
          */
         public void setBroadcast(boolean broadcast) {

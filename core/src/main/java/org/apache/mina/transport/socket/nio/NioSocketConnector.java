@@ -103,9 +103,9 @@ public final class NioSocketConnector
      * @since 2.0.0-M4
      */
     public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass,
-			int processorCount) {
-		super(new DefaultSocketSessionConfig(), processorClass, processorCount);
-	}
+            int processorCount) {
+        super(new DefaultSocketSessionConfig(), processorClass, processorCount);
+    }
 
     /**
      * Constructor for {@link NioSocketConnector} with default configuration with default configuration which will use a built-in 
@@ -119,11 +119,11 @@ public final class NioSocketConnector
      * @see org.apache.mina.core.service.SimpleIoProcessorPool#DEFAULT_SIZE
      * @since 2.0.0-M4
      */
-	public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass) {
-		super(new DefaultSocketSessionConfig(), processorClass);
-	}
+    public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass) {
+        super(new DefaultSocketSessionConfig(), processorClass);
+    }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     @Override

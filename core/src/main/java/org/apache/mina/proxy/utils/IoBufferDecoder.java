@@ -35,14 +35,14 @@ import org.apache.mina.filter.codec.textline.LineDelimiter;
  */
 public class IoBufferDecoder {
 
-	/**
-	 * The class holding the decoding context.
-	 */
+    /**
+     * The class holding the decoding context.
+     */
     public class DecodingContext {
 
-    	/**
-    	 * The buffered data.
-    	 */
+        /**
+         * The buffered data.
+         */
         private IoBuffer decodedBuffer;
 
         /**

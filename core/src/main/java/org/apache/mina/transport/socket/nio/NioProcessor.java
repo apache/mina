@@ -224,7 +224,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
          * @param keys
          */
         private IoSessionIterator(Set<SelectionKey> keys) {
-        	iterator = keys.iterator();
+            iterator = keys.iterator();
         }
         
         /**
@@ -247,7 +247,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
          * {@inheritDoc}
          */
         public void remove() {
-        	iterator.remove();
+            iterator.remove();
         }
     }
 }
