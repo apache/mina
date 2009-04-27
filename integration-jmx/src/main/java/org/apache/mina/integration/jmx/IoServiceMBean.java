@@ -74,7 +74,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
                                     getSessionIdAsString(s.getId())));
                     registeredSessions.add(s);
                 } catch (Exception e) {
-                    logger.warn("Failed to register a session as a MBean: " + s, e);
+                    LOGGER.warn("Failed to register a session as a MBean: " + s, e);
                 }
             }
 
@@ -91,7 +91,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
                 try {
                     Ognl.getValue(expr, s);
                 } catch (Exception e) {
-                    logger.warn("Failed to execute '" + command + "' for: " + s, e);
+                    LOGGER.warn("Failed to execute '" + command + "' for: " + s, e);
                 }
             }
             return matches;
