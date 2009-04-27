@@ -44,6 +44,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
      * Creates a new instance.
      */
     public DefaultDatagramSessionConfig() {
+        // Do nothing
     }
 
     /**

@@ -67,10 +67,10 @@ import org.slf4j.LoggerFactory;
  */
 public class MdcInjectionFilterTest {
 
-    private static Logger logger = LoggerFactory.getLogger(MdcInjectionFilterTest.class);
+    static Logger LOGGER = LoggerFactory.getLogger(MdcInjectionFilterTest.class);
     private static final int TIMEOUT = 5000;
 
-    private final MyAppender appender = new MyAppender();
+    final MyAppender appender = new MyAppender();
     private int port;
     private NioSocketAcceptor acceptor;
 
@@ -290,66 +290,78 @@ public class MdcInjectionFilterTest {
     }
 
     private static class SimpleIoHandler extends IoHandlerAdapter {
-
         CountDownLatch sessionIdleLatch = new CountDownLatch(2);
         CountDownLatch sessionClosedLatch = new CountDownLatch(2);
         CountDownLatch messageSentLatch = new CountDownLatch(2);
 
+        /**
+         * Default constructor
+         */
+        public SimpleIoHandler() {
+            super();
+        }
+        
         @Override
         public void sessionCreated(IoSession session) throws Exception {
-            logger.info("sessionCreated");
+            LOGGER.info("sessionCreated");
             session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 1);
         }
 
         @Override
         public void sessionOpened(IoSession session) throws Exception {
-            logger.info("sessionOpened");
+            LOGGER.info("sessionOpened");
         }
 
         @Override
         public void sessionClosed(IoSession session) throws Exception {
-            logger.info("sessionClosed");
+            LOGGER.info("sessionClosed");
             sessionClosedLatch.countDown();
         }
 
         @Override
         public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
-            logger.info("sessionIdle");
+            LOGGER.info("sessionIdle");
             sessionIdleLatch.countDown();
             session.close(true);
         }
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-            logger.info("exceptionCaught", cause);
+            LOGGER.info("exceptionCaught", cause);
         }
 
         @Override
         public void messageReceived(IoSession session, Object message) throws Exception {
-            logger.info("messageReceived-1");
+            LOGGER.info("messageReceived-1");
             // adding a custom property to the context
             String user = "user-" + message;
             MdcInjectionFilter.setProperty(session, "user", user);
-            logger.info("messageReceived-2");
+            LOGGER.info("messageReceived-2");
             session.getService().broadcast(message);
             throw new RuntimeException("just a test, forcing exceptionCaught");
         }
 
         @Override
         public void messageSent(IoSession session, Object message) throws Exception {
-            logger.info("messageSent-1");
+            LOGGER.info("messageSent-1");
             MdcInjectionFilter.removeProperty(session, "user");
-            logger.info("messageSent-2");
+            LOGGER.info("messageSent-2");
             messageSentLatch.countDown();
         }
     }
 
     private static class DummyProtocolCodecFactory implements ProtocolCodecFactory {
-
+        /**
+         * Default constructor
+         */
+        public DummyProtocolCodecFactory() {
+            super();
+        }
+        
         public ProtocolEncoder getEncoder(IoSession session) throws Exception {
             return new ProtocolEncoderAdapter() {
                 public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
-                    logger.info("encode");
+                    LOGGER.info("encode");
                     IoBuffer buffer = IoBuffer.allocate(4).putInt(123).flip();
                     out.write(buffer);
                 }
@@ -361,7 +373,7 @@ public class MdcInjectionFilterTest {
                 public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
                     if (in.remaining() >= 4) {
                         int value = in.getInt();
-                        logger.info("decode");
+                        LOGGER.info("decode");
                         out.write(value);
                     }
                 }
@@ -370,9 +382,15 @@ public class MdcInjectionFilterTest {
     }
 
     private static class MyAppender extends AppenderSkeleton {
-
         List<LoggingEvent> events = Collections.synchronizedList(new ArrayList<LoggingEvent>());
 
+        /**
+         * Default constructor
+         */
+        public MyAppender() {
+            super();
+        }
+        
         @Override
         protected void append(final LoggingEvent loggingEvent) {
             loggingEvent.getMDCCopy();
@@ -386,13 +404,14 @@ public class MdcInjectionFilterTest {
 
         @Override
         public void close() {
+            // Do nothing
         }
     }
 
-    private static class DummyIoFilter extends IoFilterAdapter {
+    static class DummyIoFilter extends IoFilterAdapter {
         @Override
         public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
-            logger.info("DummyIoFilter.sessionOpened");
+            LOGGER.info("DummyIoFilter.sessionOpened");
             nextFilter.sessionOpened(session);
         }
     }

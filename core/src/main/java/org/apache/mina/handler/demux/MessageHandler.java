@@ -37,7 +37,9 @@ public interface MessageHandler<E> {
      * you want to ignore a message of a specific type silently.
      */
     static MessageHandler<Object> NOOP = new MessageHandler<Object>() {
-        public void handleMessage(IoSession session, Object message) {}
+        public void handleMessage(IoSession session, Object message) {
+            // Do nothing
+        }
     };
 
     /**

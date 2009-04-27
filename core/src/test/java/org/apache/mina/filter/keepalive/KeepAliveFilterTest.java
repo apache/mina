@@ -43,9 +43,8 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  */
 public class KeepAliveFilterTest extends TestCase {
     // Constants -----------------------------------------------------
-
-    private static final IoBuffer PING = IoBuffer.wrap(new byte[] { 1 });
-    private static final IoBuffer PONG = IoBuffer.wrap(new byte[] { 2 });
+    static final IoBuffer PING = IoBuffer.wrap(new byte[] { 1 });
+    static final IoBuffer PONG = IoBuffer.wrap(new byte[] { 2 });
     private static final int INTERVAL = 2;
     private static final int TIMEOUT = 1;
 
@@ -112,7 +111,7 @@ public class KeepAliveFilterTest extends TestCase {
             @Override
             public void sessionIdle(IoSession session, IdleStatus status)
                     throws Exception {
-                //System.out.println("client idle:" + status);
+                // Do nothing
             }
         });
 
@@ -129,14 +128,14 @@ public class KeepAliveFilterTest extends TestCase {
         connector.dispose();
     }
 
-    private static boolean checkRequest(IoBuffer message) {
+    static boolean checkRequest(IoBuffer message) {
         IoBuffer buff = message;
         boolean check = buff.get() == 1;
         buff.rewind();
         return check;
     }
 
-    private static boolean checkResponse(IoBuffer message) {
+    static boolean checkResponse(IoBuffer message) {
         IoBuffer buff = message;
         boolean check = buff.get() == 2;
         buff.rewind();
@@ -144,8 +143,14 @@ public class KeepAliveFilterTest extends TestCase {
     }
 
     // Inner classes -------------------------------------------------
-
     private final class ServerFactory implements KeepAliveMessageFactory {
+        /**
+         * Default constructor
+         */
+        public ServerFactory() {
+            super();
+        }
+        
         public Object getRequest(IoSession session) {
             return null;
         }
@@ -170,6 +175,13 @@ public class KeepAliveFilterTest extends TestCase {
     }
 
     private final class ClientFactory implements KeepAliveMessageFactory {
+        /**
+         * Default constructor
+         */
+        public ClientFactory() {
+            super();
+        }
+        
         public Object getRequest(IoSession session) {
             return PING.duplicate();
         }

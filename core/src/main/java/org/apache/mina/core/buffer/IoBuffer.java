@@ -30,7 +30,6 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.nio.ReadOnlyBufferException;
 import java.nio.ShortBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
@@ -298,6 +297,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Creates a new instance.  This is an empty constructor.
      */
     protected IoBuffer() {
+        // Do nothing
     }
 
     /**

@@ -174,5 +174,6 @@ public class IoUtil {
     }
 
     private IoUtil() {
+        // Do nothing
     }
 }

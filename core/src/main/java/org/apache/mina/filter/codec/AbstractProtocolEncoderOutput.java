@@ -37,6 +37,7 @@ public abstract class AbstractProtocolEncoderOutput implements
     private boolean buffersOnly = true;
 
     public AbstractProtocolEncoderOutput() {
+        // Do nothing
     }
 
     public Queue<Object> getMessageQueue() {

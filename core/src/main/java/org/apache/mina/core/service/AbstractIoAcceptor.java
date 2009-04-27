@@ -87,9 +87,9 @@ public abstract class AbstractIoAcceptor
         Set<SocketAddress> localAddresses = getLocalAddresses();
         if (localAddresses.isEmpty()) {
             return null;
-        } else {
-            return localAddresses.iterator().next();
         }
+
+        return localAddresses.iterator().next();
     }
 
     /**
@@ -215,6 +215,7 @@ public abstract class AbstractIoAcceptor
     public final void bind(SocketAddress... addresses) throws IOException {
         if ((addresses == null) || (addresses.length == 0)) {
             bind(getDefaultLocalAddresses());
+            return;
         }
         
         if (addresses.length == 1) {

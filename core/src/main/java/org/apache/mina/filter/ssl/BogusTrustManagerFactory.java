@@ -51,10 +51,12 @@ public class BogusTrustManagerFactory extends TrustManagerFactory {
     private static final X509TrustManager X509 = new X509TrustManager() {
         public void checkClientTrusted(X509Certificate[] x509Certificates,
                 String s) throws CertificateException {
+            // Do nothing
         }
 
         public void checkServerTrusted(X509Certificate[] x509Certificates,
                 String s) throws CertificateException {
+            // Do nothing
         }
 
         public X509Certificate[] getAcceptedIssuers() {

@@ -32,6 +32,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
         implements SocketSessionConfig {
 
     protected AbstractSocketSessionConfig() {
+        // Do nothing
     }
 
     @Override

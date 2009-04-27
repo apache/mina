@@ -67,7 +67,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
     private final EntryImpl tail;
 
     /** The logger for this class */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(DefaultIoFilterChain.class);
 
     
     /**
@@ -480,7 +480,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 filter.exceptionCaught(nextFilter,
                         session, cause);
             } catch (Throwable e) {
-                logger
+                LOGGER
                         .warn(
                                 "Unexpected exception from exceptionCaught handler.",
                                 e);

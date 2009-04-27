@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IoEventQueueThrottle implements IoEventQueueHandler {
     /** A logger for this class */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(IoEventQueueThrottle.class);
 
     /** The event size estimator instance */
     private final IoEventSizeEstimator eventSizeEstimator;
@@ -116,14 +116,14 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
     }
 
     private void logState() {
-        if (logger.isDebugEnabled()) {
-            logger.debug(Thread.currentThread().getName() + " state: " + counter.get() + " / " + getThreshold());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(Thread.currentThread().getName() + " state: " + counter.get() + " / " + getThreshold());
         }
     }
 
     protected void block() {
-        if (logger.isDebugEnabled()) {
-            logger.debug(Thread.currentThread().getName() + " blocked: " + counter.get() + " >= " + threshold);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(Thread.currentThread().getName() + " blocked: " + counter.get() + " >= " + threshold);
         }
 
         synchronized (lock) {
@@ -139,8 +139,8 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
             }
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(Thread.currentThread().getName() + " unblocked: " + counter.get() + " < " + threshold);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(Thread.currentThread().getName() + " unblocked: " + counter.get() + " < " + threshold);
         }
     }
 

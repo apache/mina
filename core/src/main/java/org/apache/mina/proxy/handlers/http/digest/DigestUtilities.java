@@ -80,7 +80,7 @@ public class DigestUtilities {
         boolean isMD5Sess = "md5-sess".equalsIgnoreCase(StringUtilities
                 .getDirectiveValue(map, "algorithm", false));
 
-        if (!!isMD5Sess || session.getAttribute(SESSION_HA1) == null) {
+        if (!isMD5Sess || (session.getAttribute(SESSION_HA1) == null)) {
             // Build A1
             sb = new StringBuilder();
             sb.append(

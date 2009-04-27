@@ -153,6 +153,7 @@ public class TextLineDecoder implements ProtocolDecoder {
 
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
+        // Do nothing
     }
 
     public void dispose(IoSession session) throws Exception {

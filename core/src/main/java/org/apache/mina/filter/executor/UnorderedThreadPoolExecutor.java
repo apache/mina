@@ -357,9 +357,9 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             if (workers.size() < corePoolSize) {
                 addWorker();
                 return true;
-            } else {
-                return false;
             }
+            
+            return false;
         }
     }
 

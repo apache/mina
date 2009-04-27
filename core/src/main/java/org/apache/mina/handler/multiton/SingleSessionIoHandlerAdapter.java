@@ -59,23 +59,30 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler {
     }
 
     public void exceptionCaught(Throwable th) throws Exception {
+        // Do nothing
     }
 
     public void messageReceived(Object message) throws Exception {
+        // Do nothing
     }
 
     public void messageSent(Object message) throws Exception {
+        // Do nothing
     }
 
     public void sessionClosed() throws Exception {
+        // Do nothing
     }
 
     public void sessionCreated() throws Exception {
+        // Do nothing
     }
 
     public void sessionIdle(IdleStatus status) throws Exception {
+        // Do nothing
     }
 
     public void sessionOpened() throws Exception {
+        // Do nothing
     }
 }

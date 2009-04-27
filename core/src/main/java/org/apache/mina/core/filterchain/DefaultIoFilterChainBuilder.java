@@ -62,7 +62,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = 
+        LoggerFactory.getLogger(DefaultIoFilterChainBuilder.class);
     private final List<Entry> entries;
 
     /**
@@ -363,14 +364,14 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     private boolean isOrderedMap(Map map) {
         Class<?> mapType = map.getClass();
         if (LinkedHashMap.class.isAssignableFrom(mapType)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(mapType.getSimpleName() + " is an ordered map.");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(mapType.getSimpleName() + " is an ordered map.");
             }
             return true;
         }
         
-        if (logger.isDebugEnabled()) {
-            logger.debug(mapType.getName() + " is not a " + LinkedHashMap.class.getSimpleName());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(mapType.getName() + " is not a " + LinkedHashMap.class.getSimpleName());
         }
 
         // Detect Jakarta Commons Collections OrderedMap implementations.
@@ -378,8 +379,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         while (type != null) {
             for (Class<?> i: type.getInterfaces()) {
                 if (i.getName().endsWith("OrderedMap")) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(
                                 mapType.getSimpleName() +
                                 " is an ordered map (guessed from that it " +
                                 " implements OrderedMap interface.)");
@@ -390,15 +391,15 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             type = type.getSuperclass();
         }
         
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(
                     mapType.getName() +
                     " doesn't implement OrderedMap interface.");
         }
         
         // Last resort: try to create a new instance and test if it maintains
         // the insertion order.
-        logger.debug(
+        LOGGER.debug(
                 "Last resort; trying to create a new map instance with a " +
                 "default constructor and test if insertion order is " +
                 "maintained.");
@@ -407,8 +408,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         try {
             newMap = (Map) mapType.newInstance();
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
                         "Failed to create a new map instance of '" + 
                         mapType.getName() +"'.", e);
             }
@@ -430,8 +431,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             Iterator<String> it = expectedNames.iterator();
             for (Object key: newMap.keySet()) {
                 if (!it.next().equals(key)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(
                                 "The specified map didn't pass the insertion " +
                                 "order test after " + (i + 1) + " tries.");
                     }
@@ -440,8 +441,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             }
         }
         
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(
                     "The specified map passed the insertion order test.");
         }
         return true;

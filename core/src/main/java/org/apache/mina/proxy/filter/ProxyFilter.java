@@ -56,13 +56,14 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class ProxyFilter extends IoFilterAdapter {
-    private final static Logger logger = LoggerFactory
+    private final static Logger LOGGER = LoggerFactory
             .getLogger(ProxyFilter.class);
 
     /**
      * Create a new {@link ProxyFilter}.
      */
     public ProxyFilter() {
+        // Do nothing
     }
 
     /**
@@ -161,12 +162,12 @@ public class ProxyFilter extends IoFilterAdapter {
                 nextFilter.messageReceived(session, buf);
 
             } else {
-                logger.debug(" Data Read: {} ({})", handler, buf);
+                LOGGER.debug(" Data Read: {} ({})", handler, buf);
 
                 // Keep sending handshake data to the handler until we run out
                 // of data or the handshake is finished
                 while (buf.hasRemaining() && !handler.isHandshakeComplete()) {
-                    logger.debug(" Pre-handshake - passing to handler");
+                    LOGGER.debug(" Pre-handshake - passing to handler");
 
                     int pos = buf.position();
                     handler.messageReceived(nextFilter, buf);
@@ -179,7 +180,7 @@ public class ProxyFilter extends IoFilterAdapter {
 
                 // Pass on any remaining data to the next filter
                 if (buf.hasRemaining()) {
-                    logger.debug(" Passing remaining data to next filter");
+                    LOGGER.debug(" Passing remaining data to next filter");
 
                     nextFilter.messageReceived(session, buf);
                 }
@@ -219,7 +220,7 @@ public class ProxyFilter extends IoFilterAdapter {
                 // Handshake is done - write data as normal
                 nextFilter.filterWrite(session, writeRequest);
             } else if (isHandshakeData) {
-                logger.debug("   handshake data: {}", writeRequest.getMessage());
+                LOGGER.debug("   handshake data: {}", writeRequest.getMessage());
                 
                 // Writing handshake data
                 nextFilter.filterWrite(session, writeRequest);
@@ -227,10 +228,10 @@ public class ProxyFilter extends IoFilterAdapter {
                 // Writing non-handshake data before the handshake finished
                 if (!session.isConnected()) {
                     // Not even connected - ignore
-                    logger.debug(" Write request on closed session. Request ignored.");
+                    LOGGER.debug(" Write request on closed session. Request ignored.");
                 } else {
                     // Queue the data to be sent as soon as the handshake completes
-                    logger.debug(" Handshaking is not complete yet. Buffering write request.");
+                    LOGGER.debug(" Handshaking is not complete yet. Buffering write request.");
                     handler.enqueueWriteRequest(nextFilter, writeRequest);
                 }
             }
@@ -275,10 +276,10 @@ public class ProxyFilter extends IoFilterAdapter {
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session)
             throws Exception {
-        logger.debug("Session created: " + session);
+        LOGGER.debug("Session created: " + session);
         ProxyIoSession proxyIoSession = (ProxyIoSession) session
                 .getAttribute(ProxyIoSession.PROXY_SESSION);
-        logger.debug("  get proxyIoSession: " + proxyIoSession);
+        LOGGER.debug("  get proxyIoSession: " + proxyIoSession);
         proxyIoSession.setProxyFilter(this);
 
         // Create a HTTP proxy handler and start handshake.		

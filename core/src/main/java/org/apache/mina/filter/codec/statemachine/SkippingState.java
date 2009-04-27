@@ -47,9 +47,9 @@ public abstract class SkippingState implements DecodingState {
                 int answer = this.skippedBytes;
                 this.skippedBytes = 0;
                 return finishDecode(answer);
-            } else {
-                skippedBytes++;
             }
+            
+            skippedBytes++;
         }
 
         in.position(limit);

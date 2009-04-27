@@ -33,6 +33,7 @@ public class ProtocolEncoderException extends ProtocolCodecException {
      * Constructs a new instance.
      */
     public ProtocolEncoderException() {
+        // Do nothing
     }
 
     /**

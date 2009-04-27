@@ -58,9 +58,9 @@ public class StringUtilities {
             if (mandatory) {
                 throw new AuthenticationException("\"" + directive
                         + "\" mandatory directive is missing");
-            } else {
-                return "";
             }
+
+            return "";
         }
 
         return value;
@@ -240,9 +240,9 @@ public class StringUtilities {
         if (map.get(key) != null) {
             throw new SaslException("Peer sent more than one " + key
                     + " directive");
-        } else {
-            map.put(key, value);
         }
+
+        map.put(key, value);
     }
 
     /**
@@ -296,9 +296,9 @@ public class StringUtilities {
             throws UnsupportedEncodingException {
         if (str == null) {
             return "";
-        } else {
-            return new String(str.getBytes("UTF8"), "8859_1");
         }
+
+        return new String(str.getBytes("UTF8"), "8859_1");
     }
 
     /**
@@ -315,14 +315,14 @@ public class StringUtilities {
 
         if (values == null) {
             return null;
-        } else {
-            if (values.size() > 1) {
-                throw new IllegalArgumentException("Header with key [\"" + key
-                        + "\"] isn't single valued !");
-            } else {
-                return values.get(0);
-            }
         }
+
+        if (values.size() > 1) {
+            throw new IllegalArgumentException("Header with key [\"" + key
+                    + "\"] isn't single valued !");
+        }
+
+        return values.get(0);
     }
 
     /**

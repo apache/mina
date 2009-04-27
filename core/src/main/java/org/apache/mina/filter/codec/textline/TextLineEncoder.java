@@ -151,5 +151,6 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     }
 
     public void dispose() throws Exception {
+        // Do nothing
     }
 }

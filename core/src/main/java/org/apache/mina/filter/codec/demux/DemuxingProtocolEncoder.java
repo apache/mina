@@ -56,6 +56,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
     public DemuxingProtocolEncoder() {
+        // Do nothing
     }
 
     @SuppressWarnings("unchecked")

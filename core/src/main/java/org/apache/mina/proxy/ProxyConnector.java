@@ -61,7 +61,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @since MINA 2.0.0-M3
  */
 public class ProxyConnector extends AbstractIoConnector {
-    static final TransportMetadata METADATA = new DefaultTransportMetadata(
+    private static final TransportMetadata METADATA = new DefaultTransportMetadata(
             "proxy", "proxyconnector", false, true, InetSocketAddress.class,
             SocketSessionConfig.class, IoBuffer.class, FileRegion.class);
 
@@ -183,9 +183,9 @@ public class ProxyConnector extends AbstractIoConnector {
         if (proxyIoSession.getRequest() instanceof SocksProxyRequest
                 || proxyIoSession.isReconnectionNeeded()) {
             return conFuture;
-        } else {
-            return future;
         }
+
+        return future;
     }
 
     /**

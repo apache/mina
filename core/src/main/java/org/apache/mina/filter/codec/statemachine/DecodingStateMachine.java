@@ -56,6 +56,7 @@ public abstract class DecodingStateMachine implements DecodingState {
 
     private final ProtocolDecoderOutput childOutput = new ProtocolDecoderOutput() {
         public void flush(NextFilter nextFilter, IoSession session) {
+            // Do nothing
         }
 
         public void write(Object message) {

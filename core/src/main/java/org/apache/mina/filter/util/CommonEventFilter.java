@@ -36,6 +36,7 @@ import org.apache.mina.core.write.WriteRequest;
 public abstract class CommonEventFilter extends IoFilterAdapter {
 
     public CommonEventFilter() {
+        // Do nothing
     }
 
     protected abstract void filter(IoFilterEvent event) throws Exception;

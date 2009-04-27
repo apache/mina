@@ -54,7 +54,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
     private final ResponseInspectorFactory responseInspectorFactory;
     private final ScheduledExecutorService timeoutScheduler;
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(RequestResponseFilter.class);
 
     public RequestResponseFilter(final ResponseInspector responseInspector,
             ScheduledExecutorService timeoutScheduler) {
@@ -155,8 +155,8 @@ public class RequestResponseFilter extends WriteRequestFilter {
         if (request == null) {
             // A response message without request. Swallow the event because
             // the response might have arrived too late.
-            if (logger.isWarnEnabled()) {
-                logger.warn("Unknown request ID '" + requestId
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Unknown request ID '" + requestId
                         + "' for the response message. Timed out already?: "
                         + message);
             }
@@ -303,6 +303,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      */
     protected void destroyRequestStore(
             Map<Object, Request> requestStore) {
+        // Do nothing
     }
 
     /**
@@ -314,6 +315,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      */
     protected void destroyUnrespondedRequestStore(
             Set<Request> unrespondedRequestStore) {
+        // Do nothing
     }
 
     private class TimeoutTask implements Runnable {

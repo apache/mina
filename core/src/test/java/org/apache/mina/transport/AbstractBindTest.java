@@ -249,9 +249,16 @@ public abstract class AbstractBindTest extends TestCase {
     }
 
     private static class EchoProtocolHandler extends IoHandlerAdapter {
-        private static final Logger log = LoggerFactory
+        private static final Logger LOG = LoggerFactory
                 .getLogger(EchoProtocolHandler.class);
 
+        /**
+         * Default constructor
+         */
+        public EchoProtocolHandler() {
+            super();
+        }
+        
         @Override
         public void sessionCreated(IoSession session) {
             if (session.getConfig() instanceof SocketSessionConfig) {
@@ -264,7 +271,7 @@ public abstract class AbstractBindTest extends TestCase {
 
         @Override
         public void sessionIdle(IoSession session, IdleStatus status) {
-            log.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE)
+            LOG.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE)
                     + " ***");
         }
 

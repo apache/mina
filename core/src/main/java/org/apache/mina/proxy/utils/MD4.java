@@ -65,6 +65,7 @@ public class MD4 extends MessageDigestSpi {
      * Default constructor.
      */
     public MD4() {
+        // Do nothing
     }
 
     /**

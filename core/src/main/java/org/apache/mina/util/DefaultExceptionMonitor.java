@@ -34,15 +34,15 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class DefaultExceptionMonitor extends ExceptionMonitor {
-    private final Logger log = LoggerFactory
+    private final static Logger LOGGER = LoggerFactory
             .getLogger(DefaultExceptionMonitor.class);
 
     @Override
     public void exceptionCaught(Throwable cause) {
         if (cause instanceof Error) {
             throw (Error) cause;
-        } else {
-            log.warn("Unexpected exception.", cause);
         }
+
+        LOGGER.warn("Unexpected exception.", cause);
     }
 }

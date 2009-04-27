@@ -54,6 +54,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
      * Creates a new instance.
      */
     public DefaultSocketSessionConfig() {
+        // Do nothing
     }
 
     public void init(IoService parent) {

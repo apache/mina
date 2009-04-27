@@ -59,25 +59,25 @@ public abstract class FixedLengthDecodingState implements DecodingState {
                 in.position(in.position() + length);
                 in.limit(limit);
                 return finishDecode(product, out);
-            } else {
-                buffer = IoBuffer.allocate(length);
-                buffer.put(in);
-                return this;
             }
-        } else {
-            if (in.remaining() >= length - buffer.position()) {
-                int limit = in.limit();
-                in.limit(in.position() + length - buffer.position());
-                buffer.put(in);
-                in.limit(limit);
-                IoBuffer product = this.buffer;
-                this.buffer = null;
-                return finishDecode(product.flip(), out);
-            } else {
-                buffer.put(in);
-                return this;
-            }
+
+            buffer = IoBuffer.allocate(length);
+            buffer.put(in);
+            return this;
         }
+
+        if (in.remaining() >= length - buffer.position()) {
+            int limit = in.limit();
+            in.limit(in.position() + length - buffer.position());
+            buffer.put(in);
+            in.limit(limit);
+            IoBuffer product = this.buffer;
+            this.buffer = null;
+            return finishDecode(product.flip(), out);
+        }
+        
+        buffer.put(in);
+        return this;
     }
 
     /**

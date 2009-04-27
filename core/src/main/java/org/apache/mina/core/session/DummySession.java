@@ -74,6 +74,7 @@ public class DummySession extends AbstractIoSession {
     private volatile IoSessionConfig config = new AbstractIoSessionConfig() {
         @Override
         protected void doSetAll(IoSessionConfig config) {
+            // Do nothing
         }
     };
 
@@ -93,10 +94,14 @@ public class DummySession extends AbstractIoSession {
         IoAcceptor acceptor = new AbstractIoAcceptor(
                 new AbstractIoSessionConfig() {
                     @Override
-                    protected void doSetAll(IoSessionConfig config) {}
+                    protected void doSetAll(IoSessionConfig config) {
+                        // Do nothing
+                    }
                 },
                 new Executor() {
-                    public void execute(Runnable command) {}
+                    public void execute(Runnable command) {
+                        // Do nothing
+                    }
                 }) {
 
             @Override
@@ -130,6 +135,7 @@ public class DummySession extends AbstractIoSession {
 
         processor = new IoProcessor<AbstractIoSession>() {
             public void add(AbstractIoSession session) {
+                // Do nothing
             }
 
             public void flush(AbstractIoSession session) {
@@ -160,9 +166,11 @@ public class DummySession extends AbstractIoSession {
             }
 
             public void updateTrafficControl(AbstractIoSession session) {
+                // Do nothing
             }
 
             public void dispose() {
+                // Do nothing
             }
 
             public boolean isDisposed() {

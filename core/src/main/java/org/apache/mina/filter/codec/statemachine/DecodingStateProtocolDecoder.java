@@ -103,5 +103,7 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
-    public void dispose(IoSession session) throws Exception {}
+    public void dispose(IoSession session) throws Exception {
+        // Do nothing
+    }
 }

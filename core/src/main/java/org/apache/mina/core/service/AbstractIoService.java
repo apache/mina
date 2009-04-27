@@ -99,7 +99,7 @@ public abstract class AbstractIoService implements IoService {
         public void serviceActivated(IoService service) {
             // Update lastIoTime.
             AbstractIoService s = (AbstractIoService) service;
-            IoServiceStatistics _stats = (IoServiceStatistics) s.getStatistics();
+            IoServiceStatistics _stats = s.getStatistics();
             _stats.setLastReadTime(s.getActivationTime());
             _stats.setLastWriteTime(s.getActivationTime());
             _stats.setLastThroughputCalculationTime(s.getActivationTime());
@@ -107,15 +107,19 @@ public abstract class AbstractIoService implements IoService {
         }
 
         public void serviceDeactivated(IoService service) {
+            // Empty handler
         }
 
         public void serviceIdle(IoService service, IdleStatus idleStatus) {
+            // Empty handler
         }
 
         public void sessionCreated(IoSession session) {
+            // Empty handler
         }
 
         public void sessionDestroyed(IoSession session) {
+            // Empty handler
         }
     };
 
@@ -223,10 +227,11 @@ public abstract class AbstractIoService implements IoService {
     public final DefaultIoFilterChainBuilder getFilterChain() {
         if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
             return (DefaultIoFilterChainBuilder) filterChainBuilder;
-        } else {
-            throw new IllegalStateException(
-                    "Current filter chain builder is not a DefaultIoFilterChainBuilder.");
         }
+        
+        
+        throw new IllegalStateException(
+                    "Current filter chain builder is not a DefaultIoFilterChainBuilder.");
     }
 
     /**
@@ -441,11 +446,11 @@ public abstract class AbstractIoService implements IoService {
             IoFuture future, IoSessionInitializer sessionInitializer) {
         // Update lastIoTime if needed.
         if (stats.getLastReadTime() == 0) {
-            ((IoServiceStatistics)stats).setLastReadTime(getActivationTime());
+            stats.setLastReadTime(getActivationTime());
         }
         
         if (stats.getLastWriteTime() == 0) {
-            ((IoServiceStatistics)stats).setLastWriteTime(getActivationTime());
+            stats.setLastWriteTime(getActivationTime());
         }
 
         // Every property but attributeMap should be set now.
@@ -494,6 +499,7 @@ public abstract class AbstractIoService implements IoService {
      */
     protected void finishSessionInitialization0(IoSession session,
             IoFuture future) {
+        // Do nothing. Extended class might add some specific code 
     }
 
     protected static class ServiceOperationFuture extends DefaultIoFuture {
@@ -512,9 +518,9 @@ public abstract class AbstractIoService implements IoService {
         public final Exception getException() {
             if (getValue() instanceof Exception) {
                 return (Exception) getValue();
-            } else {
-                return null;
             }
+            
+            return null;
         }
 
         public final void setException(Exception exception) {

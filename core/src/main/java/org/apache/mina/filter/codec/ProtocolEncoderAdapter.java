@@ -34,5 +34,6 @@ public abstract class ProtocolEncoderAdapter implements ProtocolEncoder {
      * The default implementation does nothing.
      */
     public void dispose(IoSession session) throws Exception {
+        // Do nothing
     }
 }

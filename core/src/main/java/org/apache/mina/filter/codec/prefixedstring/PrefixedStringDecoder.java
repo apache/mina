@@ -112,8 +112,8 @@ public class PrefixedStringDecoder extends CumulativeProtocolDecoder {
             String msg = in.getPrefixedString(prefixLength, charset.newDecoder());
             out.write(msg);
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

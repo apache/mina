@@ -301,6 +301,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
                 try {
                     Thread.sleep(expirationIntervalMillis);
                 } catch (InterruptedException e) {
+                    // Do nothing
                 }
             }
         }

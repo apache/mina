@@ -45,9 +45,10 @@ import org.apache.mina.util.AvailablePortFinder;
 public class DatagramConfigTest extends TestCase {
     private IoAcceptor acceptor;
     private IoConnector connector;
-    private String result;
+    String result;
 
     public DatagramConfigTest() {
+        // Do nothing
     }
 
     @Override
@@ -99,7 +100,13 @@ public class DatagramConfigTest extends TestCase {
     }
 
     private class MockFilter extends IoFilterAdapter {
-
+        /**
+         * Default constructor
+         */
+        public MockFilter() {
+            super();
+        }
+        
         @Override
         public void messageReceived(NextFilter nextFilter, IoSession session,
                 Object message) throws Exception {
@@ -110,6 +117,13 @@ public class DatagramConfigTest extends TestCase {
     }
 
     private class MockHandler extends IoHandlerAdapter {
+        /**
+         * Default constructor
+         */
+        public MockHandler() {
+            super();
+        }
+        
         @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {

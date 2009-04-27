@@ -46,6 +46,7 @@ public class RecoverableProtocolDecoderException extends
     private static final long serialVersionUID = -8172624045024880678L;
 
     public RecoverableProtocolDecoderException() {
+        // Do nothing
     }
 
     public RecoverableProtocolDecoderException(String message) {

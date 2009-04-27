@@ -205,16 +205,16 @@ public class IoBufferDecoder {
                 ctx.setContentLength(contentLength - readBytes);
                 return null;
 
-            } else {
-                int newLimit = in.position() + contentLength;
-                in.limit(newLimit);
-                decodedBuffer.put(in);
-                decodedBuffer.flip();
-                in.limit(oldLimit);
-                ctx.reset();
-
-                return decodedBuffer;
             }
+
+            int newLimit = in.position() + contentLength;
+            in.limit(newLimit);
+            decodedBuffer.put(in);
+            decodedBuffer.flip();
+            in.limit(oldLimit);
+            ctx.reset();
+
+            return decodedBuffer;
         }
 
         // Not a fixed length matching so try to find a delimiter match

@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 class SslHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(SslHandler.class);
     private final SslFilter parent;
     private final SSLContext sslContext;
     private final IoSession session;
@@ -168,7 +168,7 @@ class SslHandler {
         try {
             sslEngine.closeInbound();
         } catch (SSLException e) {
-            logger.debug(
+            LOGGER.debug(
                     "Unexpected exception from SSLEngine.closeInbound().", e);
         }
 

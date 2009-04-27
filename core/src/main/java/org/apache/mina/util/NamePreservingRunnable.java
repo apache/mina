@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev: 446581 $, $Date: 2006-09-15 11:36:12Z $,
  */
 public class NamePreservingRunnable implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(NamePreservingRunnable.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(NamePreservingRunnable.class);
 
     /** The runnable name */
     private final String newName;
@@ -76,8 +76,8 @@ public class NamePreservingRunnable implements Runnable {
         try {
             thread.setName(name);
         } catch (SecurityException se) {
-            if (logger.isWarnEnabled()) {
-                logger.warn("Failed to set the thread name.", se);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Failed to set the thread name.", se);
             }
         }
     }

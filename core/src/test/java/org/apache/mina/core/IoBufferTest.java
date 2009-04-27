@@ -53,16 +53,14 @@ import static org.junit.Assert.fail;
  */
 public class IoBufferTest {
 
-    /* public static void main(String[] args) {
-        junit.textui.TestRunner.run(IoBufferTest.class);
-    } */
-
     @Before
     public void setUp() throws Exception {
+        // Do nothing
     }
 
     @After
     public void tearDown() throws Exception {
+        // Do nothing
     }
 
     @Test

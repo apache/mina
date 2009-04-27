@@ -32,6 +32,7 @@ public abstract class AbstractDatagramSessionConfig extends
         AbstractIoSessionConfig implements DatagramSessionConfig {
 
     protected AbstractDatagramSessionConfig() {
+        // Do nothing
     }
 
     @Override

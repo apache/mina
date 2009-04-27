@@ -79,6 +79,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
     public DemuxingProtocolDecoder() {
+        // Do nothing
     }
 
     public void addMessageDecoder(Class<? extends MessageDecoder> decoderClass) {

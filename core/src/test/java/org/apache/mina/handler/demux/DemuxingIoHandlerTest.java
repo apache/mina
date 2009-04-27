@@ -200,38 +200,50 @@ public class DemuxingIoHandlerTest extends TestCase {
      */
 
     public interface I1 {
+        // Do nothing
     }
 
     public interface I2 extends I3 {
+        // Do nothing
     }
 
     public interface I3 {
+        // Do nothing
     }
 
     public interface I4 {
+        // Do nothing
     }
 
     public static class C1 implements I1, I2, I4 {
+        // Do nothing
     }
 
     public interface I5 {
+        // Do nothing
     }
 
     public interface I6 {
+        // Do nothing
     }
 
     public static class C2 extends C1 implements I5, I6 {
+        // Do nothing
     }
 
     public interface I7 extends I8 {
+        // Do nothing
     }
 
     public interface I8 {
+        // Do nothing
     }
 
     public interface I9 extends I3, I4 {
+        // Do nothing
     }
 
     public static class C3 extends C2 implements I7, I9 {
+        // Do nothing
     }
 }

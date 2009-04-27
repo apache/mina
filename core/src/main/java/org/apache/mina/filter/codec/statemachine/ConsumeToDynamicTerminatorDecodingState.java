@@ -77,14 +77,14 @@ public abstract class ConsumeToDynamicTerminatorDecodingState implements
             }
             in.position(terminatorPos + 1);
             return finishDecode(product, out);
-        } else {
-            if (buffer == null) {
-                buffer = IoBuffer.allocate(in.remaining());
-                buffer.setAutoExpand(true);
-            }
-            buffer.put(in);
-            return this;
         }
+        
+        if (buffer == null) {
+            buffer = IoBuffer.allocate(in.remaining());
+            buffer.setAutoExpand(true);
+        }
+        buffer.put(in);
+        return this;
     }
 
     /**

@@ -44,6 +44,7 @@ public class DatagramRecyclerTest extends TestCase {
     private NioDatagramConnector connector;
 
     public DatagramRecyclerTest() {
+        // Do nothing
     }
 
     @Override
@@ -174,6 +175,13 @@ public class DatagramRecyclerTest extends TestCase {
         public volatile IoSession session;
         public final StringBuffer result = new StringBuffer();
 
+        /**
+         * Default constructor
+         */
+        public MockHandler() {
+            super();
+        }
+        
         @Override
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {

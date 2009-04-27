@@ -31,9 +31,11 @@ import org.apache.mina.core.session.IoSessionConfig;
 class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements
         VmPipeSessionConfig {
     DefaultVmPipeSessionConfig() {
+        // Do nothing
     }
 
     @Override
     protected void doSetAll(IoSessionConfig config) {
+        // Do nothing
     }
 }

@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class BlacklistFilter extends IoFilterAdapter {
     private final List<Subnet> blacklist = new CopyOnWriteArrayList<Subnet>();
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(BlacklistFilter.class);
     /**
      * Sets the addresses to be blacklisted.
      *
@@ -228,7 +228,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     private void blockSession(IoSession session) {
-        logger.warn("Remote address in the blacklist; closing.");
+        LOGGER.warn("Remote address in the blacklist; closing.");
         session.close(true);
     }
 

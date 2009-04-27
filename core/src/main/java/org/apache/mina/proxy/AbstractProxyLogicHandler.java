@@ -19,7 +19,6 @@
  */
 package org.apache.mina.proxy;
 
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
 
-    private final static Logger logger = LoggerFactory
+    private final static Logger LOGGER = LoggerFactory
             .getLogger(AbstractProxyLogicHandler.class);
 
     /**
@@ -103,11 +102,11 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
      * @param data Data buffer to be written.
      */
     protected WriteFuture writeData(final NextFilter nextFilter,
-            final IoBuffer data) throws UnsupportedEncodingException {
+            final IoBuffer data) {
         // write net data
         ProxyHandshakeIoBuffer writeBuffer = new ProxyHandshakeIoBuffer(data);
 
-        logger.debug("   session write: {}", writeBuffer);
+        LOGGER.debug("   session write: {}", writeBuffer);
 
         WriteFuture writeFuture = new DefaultWriteFuture(getSession());
         getProxyFilter().writeData(nextFilter, getSession(),
@@ -139,14 +138,14 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
                 .fireConnected(proxyIoSession.getSession())
                 .awaitUninterruptibly();
 
-        logger.debug("  handshake completed");
+        LOGGER.debug("  handshake completed");
 
         // Connected OK
         try {
             proxyIoSession.getEventQueue().flushPendingSessionEvents();
             flushPendingWriteRequests();
         } catch (Exception ex) {
-            logger.error("Unable to flush pending write requests", ex);
+            LOGGER.error("Unable to flush pending write requests", ex);
         }
     }
 
@@ -154,7 +153,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
      * Send any write requests which were queued whilst waiting for handshaking to complete.
      */
     protected synchronized void flushPendingWriteRequests() throws Exception {
-        logger.debug(" flushPendingWriteRequests()");
+        LOGGER.debug(" flushPendingWriteRequests()");
 
         if (writeRequestQueue == null) {
             return;
@@ -162,7 +161,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
 
         Event scheduledWrite;
         while ((scheduledWrite = writeRequestQueue.poll()) != null) {
-            logger.debug(" Flushing buffered write request: {}",
+            LOGGER.debug(" Flushing buffered write request: {}",
                     scheduledWrite.data);
 
             getProxyFilter().filterWrite(scheduledWrite.nextFilter,
@@ -193,10 +192,10 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
      */
     protected void closeSession(final String message, final Throwable t) {
         if (t != null) {
-            logger.error(message, t);
+            LOGGER.error(message, t);
             proxyIoSession.setAuthenticationFailed(true);
         } else {
-            logger.error(message);
+            LOGGER.error(message);
         }
 
         getSession().close(true);

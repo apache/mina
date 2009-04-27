@@ -73,6 +73,7 @@ public class ProtocolCodecSession extends DummySession {
     private final AbstractProtocolDecoderOutput decoderOutput =
         new AbstractProtocolDecoderOutput() {
             public void flush(NextFilter nextFilter, IoSession session) {
+                // Do nothing
             }
     };
 
@@ -80,6 +81,7 @@ public class ProtocolCodecSession extends DummySession {
      * Creates a new instance.
      */
     public ProtocolCodecSession() {
+        // Do nothing
     }
 
     /**

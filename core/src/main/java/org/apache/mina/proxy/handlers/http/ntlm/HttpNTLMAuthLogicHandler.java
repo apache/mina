@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
 
-    private final static Logger logger = LoggerFactory
+    private final static Logger LOGGER = LoggerFactory
             .getLogger(HttpNTLMAuthLogicHandler.class);
 
     /**
@@ -72,36 +72,37 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
      */
     @Override
     public void doHandshake(NextFilter nextFilter) throws ProxyAuthException {
-        logger.debug(" doHandshake()");
+        LOGGER.debug(" doHandshake()");
 
         if (step > 0 && challengePacket == null) {
             throw new IllegalStateException("NTLM Challenge packet not received");
-        } else {
-            HttpProxyRequest req = (HttpProxyRequest) request;
-            Map<String, List<String>> headers = req.getHeaders() != null ? req
-                    .getHeaders() : new HashMap<String, List<String>>();
+        }
+        
+        HttpProxyRequest req = (HttpProxyRequest) request;
+        Map<String, List<String>> headers = req.getHeaders() != null ? req
+                .getHeaders() : new HashMap<String, List<String>>();
 
-            String domain = req.getProperties().get(
-                    HttpProxyConstants.DOMAIN_PROPERTY);
-            String workstation = req.getProperties().get(
-                    HttpProxyConstants.WORKSTATION_PROPERTY);
+        String domain = req.getProperties().get(
+                HttpProxyConstants.DOMAIN_PROPERTY);
+        String workstation = req.getProperties().get(
+                HttpProxyConstants.WORKSTATION_PROPERTY);
 
-            if (step > 0) {
-                logger.debug("  sending NTLM challenge response");
+        if (step > 0) {
+            LOGGER.debug("  sending NTLM challenge response");
 
-                byte[] challenge = NTLMUtilities
-                        .extractChallengeFromType2Message(challengePacket);
-                int serverFlags = NTLMUtilities
-                        .extractFlagsFromType2Message(challengePacket);
+            byte[] challenge = NTLMUtilities
+                    .extractChallengeFromType2Message(challengePacket);
+            int serverFlags = NTLMUtilities
+                    .extractFlagsFromType2Message(challengePacket);
 
-                String username = req.getProperties().get(
-                        HttpProxyConstants.USER_PROPERTY);
-                String password = req.getProperties().get(
-                        HttpProxyConstants.PWD_PROPERTY);
+            String username = req.getProperties().get(
+                    HttpProxyConstants.USER_PROPERTY);
+            String password = req.getProperties().get(
+                    HttpProxyConstants.PWD_PROPERTY);
 
-                byte[] authenticationPacket = NTLMUtilities.createType3Message(
-                        username, password, challenge, domain, workstation,
-                        serverFlags, null);
+            byte[] authenticationPacket = NTLMUtilities.createType3Message(
+                    username, password, challenge, domain, workstation,
+                    serverFlags, null);
 
                 StringUtilities.addValueToHeader(headers,
                         "Proxy-Authorization", 
@@ -110,7 +111,7 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
                         true);
 
             } else {
-                logger.debug("  sending NTLM negotiation packet");
+                LOGGER.debug("  sending NTLM negotiation packet");
 
                 byte[] negotiationPacket = NTLMUtilities.createType1Message(
                         workstation, domain, null, null);
@@ -126,9 +127,8 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
             addKeepAliveHeaders(headers);
             req.setHeaders(headers);
 
-            writeRequest(nextFilter, req);
-            step++;
-        }
+        writeRequest(nextFilter, req);
+        step++;
     }
 
     /**

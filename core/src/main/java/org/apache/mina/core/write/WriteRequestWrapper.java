@@ -70,8 +70,8 @@ public class WriteRequestWrapper implements WriteRequest {
     public String toString() {
         if (getDestination() == null) {
             return getMessage().toString();
-        } else {
-            return getMessage().toString() + " => " + getDestination();
         }
+        
+        return getMessage().toString() + " => " + getDestination();
     }
 }

@@ -40,10 +40,12 @@ import static org.junit.Assert.assertSame;
 public class DefaultIoFilterChainBuilderTest {
     @Before
     public void setUp() throws Exception {
+        // Do nothing
     }
 
     @After
     public void tearDown() throws Exception {
+        // Do nothing
     }
 
     @Test

@@ -197,7 +197,14 @@ public abstract class AbstractTrafficControlTest {
         return session.getAttribute("sent").toString();
     }
 
-    public static class ClientIoHandler extends IoHandlerAdapter {
+    private static class ClientIoHandler extends IoHandlerAdapter {
+        /**
+         * Default constructor
+         */
+        public ClientIoHandler() {
+            super();
+        }
+        
         @Override
         public void sessionCreated(IoSession session) throws Exception {
             super.sessionCreated(session);
@@ -236,6 +243,13 @@ public abstract class AbstractTrafficControlTest {
     }
 
     private static class ServerIoHandler extends IoHandlerAdapter {
+        /**
+         * Default constructor
+         */
+        public ServerIoHandler() {
+            super();
+        }
+        
         @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {

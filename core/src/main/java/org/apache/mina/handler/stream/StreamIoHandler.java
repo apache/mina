@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public abstract class StreamIoHandler extends IoHandlerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(StreamIoHandler.class);
     
     private static final AttributeKey KEY_IN = new AttributeKey(StreamIoHandler.class, "in");
     private static final AttributeKey KEY_OUT = new AttributeKey(StreamIoHandler.class, "out");
@@ -55,6 +55,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
     private int writeTimeout;
 
     protected StreamIoHandler() {
+        // Do nothing
     }
 
     /**
@@ -156,7 +157,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
         if (e != null && in != null) {
             in.throwException(e);
         } else {
-            logger.warn("Unexpected exception.", cause);
+            LOGGER.warn("Unexpected exception.", cause);
             session.close(true);
         }
     }
