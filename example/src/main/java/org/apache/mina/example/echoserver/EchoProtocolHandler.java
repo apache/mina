@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$,
  */
 public class EchoProtocolHandler extends IoHandlerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(EchoProtocolHandler.class);
     
     @Override
     public void sessionCreated(IoSession session) {
@@ -47,17 +47,17 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
-        logger.info("CLOSED");
+        LOGGER.info("CLOSED");
     }
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
-        logger.info("OPENED");
+        LOGGER.info("OPENED");
     }
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
-        logger.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE) + " ***");
+        LOGGER.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE) + " ***");
     }
 
     @Override
@@ -68,7 +68,7 @@ public class EchoProtocolHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
-        logger.info( "Received : " + message );
+        LOGGER.info( "Received : " + message );
         // Write the received data back to remote peer
         session.write(((IoBuffer) message).duplicate());
     }

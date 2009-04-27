@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MemMonClient extends IoHandlerAdapter {
 
-    private Logger log = LoggerFactory.getLogger(MemMonClient.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(MemMonClient.class);
 
     private IoSession session;
 
@@ -52,25 +52,25 @@ public class MemMonClient extends IoHandlerAdapter {
      */
     public MemMonClient() {
 
-        log.debug("UDPClient::UDPClient");
-        log.debug("Created a datagram connector");
+        LOGGER.debug("UDPClient::UDPClient");
+        LOGGER.debug("Created a datagram connector");
         connector = new NioDatagramConnector();
 
-        log.debug("Setting the handler");
+        LOGGER.debug("Setting the handler");
         connector.setHandler(this);
 
-        log.debug("About to connect to the server...");
+        LOGGER.debug("About to connect to the server...");
         ConnectFuture connFuture = connector.connect(new InetSocketAddress(
                 "localhost", MemoryMonitor.PORT));
 
-        log.debug("About to wait.");
+        LOGGER.debug("About to wait.");
         connFuture.awaitUninterruptibly();
 
-        log.debug("Adding a future listener.");
+        LOGGER.debug("Adding a future listener.");
         connFuture.addListener(new IoFutureListener<ConnectFuture>() {
             public void operationComplete(ConnectFuture future) {
                 if (future.isConnected()) {
-                    log.debug("...connected");
+                    LOGGER.debug("...connected");
                     session = future.getSession();
                     try {
                         sendData();
@@ -78,7 +78,7 @@ public class MemMonClient extends IoHandlerAdapter {
                         e.printStackTrace();
                     }
                 } else {
-                    log.error("Not connected...exiting");
+                    LOGGER.error("Not connected...exiting");
                 }
             }
         });
@@ -110,33 +110,33 @@ public class MemMonClient extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {
-        log.debug("Session recv...");
+        LOGGER.debug("Session recv...");
     }
 
     @Override
     public void messageSent(IoSession session, Object message) throws Exception {
-        log.debug("Message sent...");
+        LOGGER.debug("Message sent...");
     }
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
-        log.debug("Session closed...");
+        LOGGER.debug("Session closed...");
     }
 
     @Override
     public void sessionCreated(IoSession session) throws Exception {
-        log.debug("Session created...");
+        LOGGER.debug("Session created...");
     }
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status)
             throws Exception {
-        log.debug("Session idle...");
+        LOGGER.debug("Session idle...");
     }
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
-        log.debug("Session opened...");
+        LOGGER.debug("Session opened...");
     }
 
     public static void main(String[] args) {

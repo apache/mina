@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
 public abstract class AbstractTest extends TestCase {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(AbstractTest.class);
 
     protected boolean useSSL;
 
@@ -58,6 +58,7 @@ public abstract class AbstractTest extends TestCase {
     protected IoAcceptor socketAcceptor;
 
     protected AbstractTest() {
+        // Do nothing
     }
 
     protected static void assertEquals(byte[] expected, byte[] actual) {
@@ -123,7 +124,7 @@ public abstract class AbstractTest extends TestCase {
                                     new SslFilter(BogusSslContextFactory
                                             .getInstance(true)));
                         } catch (GeneralSecurityException e) {
-                            logger.error("", e);
+                            LOGGER.error("", e);
                             throw new RuntimeException(e);
                         }
                     }
@@ -140,7 +141,7 @@ public abstract class AbstractTest extends TestCase {
                     IoBuffer buf = (IoBuffer) message;
                     if (session.getFilterChain().contains("SSL")
                             && buf.remaining() == 1 && buf.get() == (byte) '.') {
-                        logger.info("TLS Reentrance");
+                        LOGGER.info("TLS Reentrance");
                         ((SslFilter) session.getFilterChain().get("SSL"))
                                 .startSsl(session);
 
@@ -179,7 +180,7 @@ public abstract class AbstractTest extends TestCase {
         }
 
         boundAddress = address;
-        logger.info("Using port " + port + " for testing.");
+        LOGGER.info("Using port " + port + " for testing.");
     }
 
     @Override

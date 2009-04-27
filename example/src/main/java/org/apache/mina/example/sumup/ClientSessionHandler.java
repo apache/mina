@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientSessionHandler extends IoHandlerAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(ClientSessionHandler.class);
     
     private final int[] values;
 
@@ -72,13 +72,13 @@ public class ClientSessionHandler extends IoHandlerAdapter {
             // it is time to disconnect.
             if (rm.getSequence() == values.length - 1) {
                 // print the sum and disconnect.
-                logger.info("The sum: " + rm.getValue());
+                LOGGER.info("The sum: " + rm.getValue());
                 session.close(true);
                 finished = true;
             }
         } else {
             // seever returned error code because of overflow, etc.
-            logger.warn("Server error, disconnecting...");
+            LOGGER.warn("Server error, disconnecting...");
             session.close(true);
             finished = true;
         }

@@ -38,7 +38,7 @@ public class ServerSessionHandler extends IoHandlerAdapter {
     
     private static final String SUM_KEY = "sum";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());    
+    private final static Logger LOGGER = LoggerFactory.getLogger(ServerSessionHandler.class);
     
     @Override
     public void sessionOpened(IoSession session) {
@@ -81,7 +81,7 @@ public class ServerSessionHandler extends IoHandlerAdapter {
 
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
-        logger.info("Disconnecting the idle.");
+        LOGGER.info("Disconnecting the idle.");
         // disconnect an idle client
         session.close(true);
     }
