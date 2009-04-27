@@ -134,8 +134,7 @@ public class StateMachineProxyBuilderTest extends TestCase {
             proxy.call3(proxy);
         }
 
-        public void call3(
-                @SuppressWarnings("unused") Reentrant proxy) {
+        public void call3(Reentrant proxy) {
             finished = true;
         }
     }
@@ -188,5 +187,5 @@ public class StateMachineProxyBuilderTest extends TestCase {
         public void error(Event event) {
             messages.add("Error: Cannot " + event.getId() + " at this time");
         }
-    };    
+    }
 }
