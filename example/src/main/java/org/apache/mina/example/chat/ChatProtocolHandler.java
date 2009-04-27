@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$, $Date$
  */
 public class ChatProtocolHandler extends IoHandlerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(ChatProtocolHandler.class);
 
     private final Set<IoSession> sessions = Collections
             .synchronizedSet(new HashSet<IoSession>());
@@ -47,7 +47,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        logger.warn("Unexpected exception.", cause);
+        LOGGER.warn("Unexpected exception.", cause);
         // Close connection when unexpected exception is caught.
         session.close(true);
     }
@@ -110,12 +110,12 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
                 }
                 break;
             default:
-                logger.info("Unhandled command: " + command);
+                LOGGER.info("Unhandled command: " + command);
                 break;
             }
 
         } catch (IllegalArgumentException e) {
-            logger.debug("Illegal argument", e);
+            LOGGER.debug("Illegal argument", e);
         }
     }
 

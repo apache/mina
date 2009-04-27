@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @version $Rev:448075 $, $Date:2006-09-20 05:26:53Z $
  */
 public class ConnectorTest extends AbstractTest {
-    private final static Logger logger = LoggerFactory.getLogger(ConnectorTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ConnectorTest.class);
 
     private static final int TIMEOUT = 10000; // 10 seconds
 
@@ -58,6 +58,7 @@ public class ConnectorTest extends AbstractTest {
     private SslFilter connectorSSLFilter;
 
     public ConnectorTest() {
+        // Do nothing
     }
 
     @Override
@@ -196,7 +197,7 @@ public class ConnectorTest extends AbstractTest {
         //// in SocketIoProcessor if there was a read timeout because
         //// we share readBuf.
         readBuf.flip();
-        logger.info("readBuf: " + readBuf);
+        LOGGER.info("readBuf: " + readBuf);
         Assert.assertEquals(DATA_SIZE * COUNT, readBuf.remaining());
         IoBuffer expectedBuf = IoBuffer.allocate(DATA_SIZE * COUNT);
         for (int i = 0; i < COUNT; i++) {
@@ -248,10 +249,10 @@ public class ConnectorTest extends AbstractTest {
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
-            logger.warn("Unexpected exception.", cause);
+            LOGGER.warn("Unexpected exception.", cause);
             if (cause instanceof WriteException) {
                 WriteException e = (WriteException) cause;
-                logger.warn("Failed write requests: {}", e.getRequests());
+                LOGGER.warn("Failed write requests: {}", e.getRequests());
             }
         }
     }

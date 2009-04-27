@@ -39,7 +39,7 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
     private static final Charset CHARSET = Charset.forName("iso8859-1");
     public static final String OTHER_IO_SESSION = AbstractProxyIoHandler.class.getName()+".OtherIoSession";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger LOGGER = LoggerFactory.getLogger(AbstractProxyIoHandler.class);
     
     @Override
     public void sessionCreated(IoSession session) throws Exception {
@@ -67,6 +67,6 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         wb.flip();
         ((IoSession) session.getAttribute(OTHER_IO_SESSION)).write(wb);
         rb.reset();
-        logger.info(rb.getString(CHARSET.newDecoder()));
+        LOGGER.info(rb.getString(CHARSET.newDecoder()));
     }
 }

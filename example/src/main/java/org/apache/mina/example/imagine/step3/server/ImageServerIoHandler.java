@@ -48,7 +48,7 @@ public class ImageServerIoHandler extends IoHandlerAdapter {
 
     public static final String INDEX_KEY = ImageServerIoHandler.class.getName() + ".INDEX";
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static Logger LOGGER = LoggerFactory.getLogger(ImageServerIoHandler.class);
 
     private MBeanServer mBeanServer;
     
@@ -104,7 +104,7 @@ public class ImageServerIoHandler extends IoHandlerAdapter {
      * @see org.apache.mina.core.service.IoHandlerAdapter#exceptionCaught(org.apache.mina.core.session.IoSession, java.lang.Throwable)
      */
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-        logger.warn(cause.getMessage(), cause);
+        LOGGER.warn(cause.getMessage(), cause);
     }
 
     /**
