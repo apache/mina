@@ -107,6 +107,10 @@ public class NTLMUtilities implements NTLMConstants {
         }
         
         byte[] osVer = new byte[8];
+
+        // Let's enclose the code by a try...catch in order to
+        // manage incorrect strings. In this case, we will generate 
+        // an exception and deal with the special cases.
         try {
             Process pr = Runtime.getRuntime().exec("cmd /C ver");
             BufferedReader reader = new BufferedReader(
@@ -114,25 +118,36 @@ public class NTLMUtilities implements NTLMConstants {
             pr.waitFor();
             
             String line;
+        
+            // We loop as we may have blank lines.
             do {
                   line = reader.readLine();
             } while ((line != null) && (line.length() != 0));
             
             reader.close();
-            
+
+            // If line is null, we must not go any farther
+            if (line == null) {
+                // Throw an exception to jump into the catch() part
+                throw new Exception();
+            }
+
             // The command line should return a response like :
             // Microsoft Windows XP [version 5.1.2600]
             int pos = line.toLowerCase().indexOf("version");
 
             if (pos == -1) {
-                throw new NullPointerException();
+                // Throw an exception to jump into the catch() part
+                throw new Exception();
             }
 
             pos += 8;
             line = line.substring(pos, line.indexOf(']'));
             StringTokenizer tk = new StringTokenizer(line, ".");
+
             if (tk.countTokens() != 3) {
-                throw new NullPointerException();
+                // Throw an exception to jump into the catch() part
+                throw new Exception();
             }
 
             writeOSVersion(Byte.parseByte(tk.nextToken()), Byte
@@ -474,8 +489,6 @@ public class NTLMUtilities implements NTLMConstants {
             if (osVersion != null) {
                 baos.write(osVersion);
             }
-            //else
-            //    baos.write(DEFAULT_OS_VERSION);
 
             // Order is not mandatory since a pointer is given in the security buffers
             baos.write(targetName);
