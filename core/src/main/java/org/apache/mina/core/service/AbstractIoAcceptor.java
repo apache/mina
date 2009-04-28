@@ -212,20 +212,36 @@ public abstract class AbstractIoAcceptor
     /**
      * {@inheritDoc}
      */
-    public final void bind(SocketAddress... addresses) throws IOException {
-        if ((addresses == null) || (addresses.length == 0)) {
+    public final void bind(SocketAddress localAddress) throws IOException {
+        if (localAddress == null) {
+            throw new NullPointerException("localAddress");
+        }
+        
+        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(1);
+        localAddresses.add(localAddress);
+        bind(localAddresses);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public final void bind(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses) throws IOException {
+        if (firstLocalAddress == null) {
             bind(getDefaultLocalAddresses());
             return;
         }
         
-        if (addresses.length == 1) {
-            List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(addresses.length);
-            for (SocketAddress address:addresses) {
+        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(2);
+        localAddresses.add(firstLocalAddress);
+
+        if (otherLocalAddresses != null) {
+            for (SocketAddress address:otherLocalAddresses) {
                 localAddresses.add(address);
             }
-            
-            bind(localAddresses);
         }
+
+        bind(localAddresses);
     }
 
     /**
