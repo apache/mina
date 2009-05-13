@@ -29,7 +29,6 @@ import org.apache.mina.core.session.IoSessionConfig;
  * Provides meta-information that describes an {@link IoService}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface TransportMetadata {
     

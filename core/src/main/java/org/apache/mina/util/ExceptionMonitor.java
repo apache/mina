@@ -31,7 +31,6 @@ package org.apache.mina.util;
  * SLF4J.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  * @see DefaultExceptionMonitor
  */

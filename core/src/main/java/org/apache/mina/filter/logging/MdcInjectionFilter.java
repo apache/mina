@@ -68,7 +68,6 @@ import org.slf4j.MDC;
  * but you should avoid adding multiple instances to the chain.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 566952 $, $Date: 2007-08-17 09:25:04 +0200 (vr, 17 aug 2007) $
  */
 
 public class MdcInjectionFilter extends CommonEventFilter {

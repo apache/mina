@@ -43,7 +43,6 @@ import java.util.Arrays;
  * </p>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class Log4jXmlFormatter extends Formatter {
 

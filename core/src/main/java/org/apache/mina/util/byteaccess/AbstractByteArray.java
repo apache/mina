@@ -26,7 +26,6 @@ package org.apache.mina.util.byteaccess;
  * used internally and should not be used by end users.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 abstract class AbstractByteArray implements ByteArray
 {

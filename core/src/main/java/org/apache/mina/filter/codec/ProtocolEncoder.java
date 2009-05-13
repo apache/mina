@@ -34,7 +34,6 @@ import org.apache.mina.core.session.IoSession;
  * example.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * 
  * @see ProtocolEncoderException
  */

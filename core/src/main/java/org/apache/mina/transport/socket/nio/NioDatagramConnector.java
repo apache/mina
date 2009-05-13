@@ -37,7 +37,6 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * {@link IoConnector} for datagram transport (UDP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class NioDatagramConnector
         extends AbstractPollingIoConnector<NioSession, DatagramChannel>

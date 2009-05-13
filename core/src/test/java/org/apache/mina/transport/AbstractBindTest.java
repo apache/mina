@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
  * Tests {@link IoAcceptor} resource leakage by repeating bind and unbind.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractBindTest extends TestCase {
     protected final IoAcceptor acceptor;

@@ -27,7 +27,6 @@ import org.apache.mina.core.buffer.IoBufferWrapper;
  * related messages which should not be passed upstream of the {@link ProxyFilter}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class ProxyHandshakeIoBuffer extends IoBufferWrapper {

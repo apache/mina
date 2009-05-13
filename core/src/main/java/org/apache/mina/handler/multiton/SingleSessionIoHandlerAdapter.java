@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSession;
  * through the {@link #getSession()} method.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler {
 

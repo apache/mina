@@ -30,7 +30,6 @@ import org.junit.Before;
  * properly clean up itself.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ExpiringMapTest extends TestCase
 {

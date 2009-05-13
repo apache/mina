@@ -27,7 +27,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * <tt>false</tt>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class SkippingState implements DecodingState {
 

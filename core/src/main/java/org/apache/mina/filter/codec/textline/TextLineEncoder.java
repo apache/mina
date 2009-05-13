@@ -34,7 +34,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * which ends with the delimiter.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class TextLineEncoder extends ProtocolEncoderAdapter {
     private final AttributeKey ENCODER = new AttributeKey(getClass(), "encoder");

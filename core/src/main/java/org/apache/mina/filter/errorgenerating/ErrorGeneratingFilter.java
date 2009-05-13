@@ -50,7 +50,6 @@ import org.slf4j.LoggerFactory;
  * egf.setManipulateWrites(true); </code>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 612456 $, $Date: 2008-01-16 14:49:47 +0100 (mer., 16 janv. 2008) $
  * @org.apache.xbean.XBean
  */
 public class ErrorGeneratingFilter extends IoFilterAdapter {

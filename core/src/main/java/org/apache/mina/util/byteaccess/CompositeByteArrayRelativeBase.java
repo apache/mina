@@ -32,7 +32,6 @@ import org.apache.mina.util.byteaccess.CompositeByteArray.CursorListener;
  * <code>CompositeByteArrayRelativeWriter</code>.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 abstract class CompositeByteArrayRelativeBase
 {

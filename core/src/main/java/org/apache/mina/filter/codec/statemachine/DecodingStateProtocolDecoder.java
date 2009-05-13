@@ -36,7 +36,6 @@ import org.apache.mina.util.CircularQueue;
  * </p>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     private final DecodingState state;

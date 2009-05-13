@@ -51,7 +51,6 @@ import java.util.Set;
  * extend this class and implement their own buffer management mechanism.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @see IoBufferAllocator
  */
 public abstract class AbstractIoBuffer extends IoBuffer {

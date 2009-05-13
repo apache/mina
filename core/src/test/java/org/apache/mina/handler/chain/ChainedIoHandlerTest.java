@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
  * A test case for {@link ChainedIoHandler}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ChainedIoHandlerTest {
     @Test

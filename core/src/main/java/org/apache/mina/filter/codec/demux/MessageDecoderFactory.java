@@ -23,7 +23,6 @@ package org.apache.mina.filter.codec.demux;
  * A factory that creates a new instance of {@link MessageDecoder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  * @see DemuxingProtocolDecoder
  */

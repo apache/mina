@@ -30,7 +30,6 @@ import java.util.Set;
  * A {@link Map}-backed {@link Set}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class MapBackedSet<E> extends AbstractSet<E> implements Serializable {
 

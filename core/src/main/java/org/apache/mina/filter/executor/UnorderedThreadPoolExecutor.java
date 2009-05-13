@@ -49,7 +49,6 @@ import org.apache.mina.core.session.IoEvent;
  * {@link OrderedThreadPoolExecutor}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {

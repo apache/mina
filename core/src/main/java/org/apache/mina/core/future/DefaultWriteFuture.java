@@ -26,7 +26,6 @@ import org.apache.mina.core.session.IoSession;
  * A default implementation of {@link WriteFuture}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
 public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**

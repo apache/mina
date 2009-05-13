@@ -57,7 +57,6 @@ import org.slf4j.LoggerFactory;
  * </pre>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 594846 $, $Date: 2007-11-14 13:03:07 +0100 (Wed, 14 Nov 2007) $
  * @org.apache.xbean.XBean
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {

@@ -27,7 +27,6 @@ import org.apache.mina.core.session.IoSessionConfig;
  * An {@link IoSessionConfig} for datagram transport type.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface DatagramSessionConfig extends IoSessionConfig {
     /**

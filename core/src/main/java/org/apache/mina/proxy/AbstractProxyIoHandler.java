@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * AbstractProxyIoHandler.java - {@link IoHandler} that intercepts events until handshake is complete.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {

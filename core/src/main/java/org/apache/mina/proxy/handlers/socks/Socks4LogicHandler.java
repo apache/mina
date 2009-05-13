@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
  * Socks4LogicHandler.java - SOCKS4/SOCKS4a authentication mechanisms logic handler.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class Socks4LogicHandler extends AbstractSocksLogicHandler {

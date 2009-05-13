@@ -99,7 +99,6 @@ import org.apache.mina.core.session.IoSession;
  * {@link TransportMetadata}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
 

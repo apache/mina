@@ -39,7 +39,6 @@ import org.apache.mina.core.session.IoSessionConfig;
  * A base implementation of {@link IoAcceptor}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public abstract class AbstractIoAcceptor 

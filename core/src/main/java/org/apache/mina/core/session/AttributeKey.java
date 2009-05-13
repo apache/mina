@@ -27,7 +27,6 @@ import java.util.Map;
  * fast while being debug-friendly by providing the string representation.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class AttributeKey implements Serializable {
     /** The serial version UID */

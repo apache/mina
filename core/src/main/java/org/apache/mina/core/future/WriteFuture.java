@@ -41,7 +41,6 @@ package org.apache.mina.core.future;
  * </pre>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface WriteFuture extends IoFuture {
     /**

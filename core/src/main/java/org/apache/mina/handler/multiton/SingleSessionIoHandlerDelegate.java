@@ -31,7 +31,6 @@ import org.apache.mina.core.session.IoSession;
  * created session.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SingleSessionIoHandlerDelegate implements IoHandler {
     /**

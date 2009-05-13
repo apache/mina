@@ -27,7 +27,6 @@ import org.apache.mina.core.service.IoConnector;
  * {@link IoConnector} for datagram transport (UDP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface DatagramConnector extends IoConnector {
     InetSocketAddress getDefaultRemoteAddress();

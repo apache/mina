@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
  * which is logged to {@link LogLevel#WARN}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class LoggingFilter extends IoFilterAdapter {

@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
  * Based upon SSLFilter from mina-filter-ssl.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class ProxyFilter extends IoFilterAdapter {

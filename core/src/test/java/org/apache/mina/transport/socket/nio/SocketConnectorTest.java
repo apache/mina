@@ -27,7 +27,6 @@ import org.apache.mina.transport.AbstractConnectorTest;
  * Tests {@link NioSocketConnector}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SocketConnectorTest extends AbstractConnectorTest {
 

@@ -37,7 +37,6 @@ import org.apache.mina.util.CircularQueue;
  * {@link IoSession}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultIoSessionDataStructureFactory implements
         IoSessionDataStructureFactory {

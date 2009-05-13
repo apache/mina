@@ -29,7 +29,6 @@ import java.io.IOException;
  * while {@link IOException} forces disconnection.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class RuntimeIoException extends RuntimeException {
     private static final long serialVersionUID = 9029092241311939548L;

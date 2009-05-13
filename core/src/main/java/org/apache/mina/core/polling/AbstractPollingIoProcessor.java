@@ -52,7 +52,6 @@ import org.apache.mina.util.NamePreservingRunnable;
  * and trigger events when some I/O operation is possible.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
     /**

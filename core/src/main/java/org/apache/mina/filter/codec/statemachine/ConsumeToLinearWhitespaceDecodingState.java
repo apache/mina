@@ -24,7 +24,6 @@ package org.apache.mina.filter.codec.statemachine;
  * (0x09) character is reached. The terminator is skipped.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class ConsumeToLinearWhitespaceDecodingState extends
         ConsumeToDynamicTerminatorDecodingState {

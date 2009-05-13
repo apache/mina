@@ -135,7 +135,6 @@ import org.apache.mina.core.write.WriteRequest;
  * response timeout detection.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class KeepAliveFilter extends IoFilterAdapter {

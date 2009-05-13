@@ -32,7 +32,6 @@ import org.apache.mina.core.session.IoSession;
  * is not common.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SynchronizedProtocolDecoder implements ProtocolDecoder {
     private final ProtocolDecoder decoder;

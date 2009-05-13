@@ -41,7 +41,6 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * {@link IoConnector} for socket transport (TCP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
 public final class NioSocketConnector
         extends AbstractPollingIoConnector<NioSession, SocketChannel>

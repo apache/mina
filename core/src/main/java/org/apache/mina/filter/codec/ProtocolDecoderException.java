@@ -27,7 +27,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * content.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ProtocolDecoderException extends ProtocolCodecException {
     private static final long serialVersionUID = 3545799879533408565L;

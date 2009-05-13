@@ -35,7 +35,6 @@ import junit.framework.TestCase;
  * @see <a href="http://www.ietf.org/rfc/rfc1320.txt">RFC 1320</a>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class MD4Test extends TestCase {

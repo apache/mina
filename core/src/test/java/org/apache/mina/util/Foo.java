@@ -28,7 +28,6 @@ import org.apache.mina.core.IoBufferTest;
  * in {@link IoBufferTest}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class Foo implements Serializable {
 

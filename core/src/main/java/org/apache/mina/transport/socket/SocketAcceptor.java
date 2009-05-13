@@ -29,7 +29,6 @@ import org.apache.mina.core.service.IoAcceptor;
  * handles incoming TCP/IP based socket connections.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface SocketAcceptor extends IoAcceptor {
     InetSocketAddress getLocalAddress();

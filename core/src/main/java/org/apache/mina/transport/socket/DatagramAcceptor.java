@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSessionRecycler;
  * {@link IoAcceptor} for datagram transport (UDP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface DatagramAcceptor extends IoAcceptor {
     InetSocketAddress getLocalAddress();

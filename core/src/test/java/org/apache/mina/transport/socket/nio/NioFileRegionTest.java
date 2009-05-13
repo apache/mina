@@ -27,7 +27,6 @@ import org.apache.mina.transport.AbstractFileRegionTest;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class NioFileRegionTest extends AbstractFileRegionTest{
 

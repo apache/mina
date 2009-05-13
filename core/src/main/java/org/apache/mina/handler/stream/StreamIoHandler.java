@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
  * the process request to other thread or thread pool.</b>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class StreamIoHandler extends IoHandlerAdapter {
     private final static Logger LOGGER = LoggerFactory.getLogger(StreamIoHandler.class);

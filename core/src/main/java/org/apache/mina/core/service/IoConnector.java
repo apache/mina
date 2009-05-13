@@ -42,7 +42,6 @@ import org.apache.mina.core.session.IoSessionInitializer;
  * connection attempts are finished.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoConnector extends IoService {
     /**

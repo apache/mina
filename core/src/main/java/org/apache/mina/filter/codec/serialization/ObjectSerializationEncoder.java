@@ -33,7 +33,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * using {@link IoBuffer#putObject(Object)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ObjectSerializationEncoder extends ProtocolEncoderAdapter {
     private int maxObjectSize = Integer.MAX_VALUE; // 2GB

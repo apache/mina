@@ -27,7 +27,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * {@link DecodingState} which decodes <code>byte</code> values.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class SingleByteDecodingState implements DecodingState {
 

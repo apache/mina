@@ -30,7 +30,6 @@ import org.apache.mina.core.session.IoSession;
  * common.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SynchronizedProtocolEncoder implements ProtocolEncoder {
     private final ProtocolEncoder encoder;

@@ -37,7 +37,6 @@ import org.apache.mina.core.polling.AbstractPollingIoProcessor;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     /** The selector associated with this processor */

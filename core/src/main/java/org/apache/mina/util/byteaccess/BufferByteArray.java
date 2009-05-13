@@ -33,7 +33,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * a <code>SimpleByteArrayFactory</code>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class BufferByteArray extends AbstractByteArray
 {

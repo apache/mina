@@ -23,7 +23,6 @@ package org.apache.mina.filter.codec.demux;
  * Represents results from {@link MessageDecoder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  * @see MessageDecoder
  */

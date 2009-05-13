@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
  * address.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class BlacklistFilter extends IoFilterAdapter {

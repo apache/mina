@@ -29,7 +29,6 @@ import java.util.Queue;
  * Like any other synchronizing wrappers, iteration is not thread-safe.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SynchronizedQueue<E> implements Queue<E>, Serializable {
     

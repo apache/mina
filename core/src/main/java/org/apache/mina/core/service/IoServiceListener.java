@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSession;
  * Listens to events related to an {@link IoService}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoServiceListener extends EventListener {
     /**

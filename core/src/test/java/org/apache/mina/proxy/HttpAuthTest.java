@@ -32,7 +32,6 @@ import org.apache.mina.proxy.handlers.http.digest.DigestUtilities;
  * See <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a> .
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class HttpAuthTest extends TestCase {

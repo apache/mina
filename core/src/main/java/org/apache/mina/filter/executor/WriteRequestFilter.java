@@ -59,7 +59,6 @@ import org.apache.mina.core.write.WriteRequest;
  * from a different thread.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class WriteRequestFilter extends IoFilterAdapter {
 

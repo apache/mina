@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoEvent;
  * {@link OrderedThreadPoolExecutor} and {@link UnorderedThreadPoolExecutor}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoEventQueueHandler extends EventListener {
 

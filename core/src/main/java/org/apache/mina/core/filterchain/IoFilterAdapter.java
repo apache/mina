@@ -29,7 +29,6 @@ import org.apache.mina.core.write.WriteRequest;
  * methods forwards events to the next filter by default.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 591770 $, $Date: 2007-11-04 13:22:44 +0100 (Sun, 04 Nov 2007) $
  */
 public class IoFilterAdapter implements IoFilter {
     /**

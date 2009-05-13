@@ -37,7 +37,6 @@ import java.security.cert.CertificateException;
  * A factory that creates and configures a new {@link KeyStore} instance.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class KeyStoreFactory {
     

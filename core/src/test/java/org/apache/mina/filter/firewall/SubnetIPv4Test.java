@@ -29,7 +29,6 @@ import junit.framework.TestCase;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SubnetIPv4Test extends TestCase {
 

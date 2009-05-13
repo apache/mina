@@ -28,7 +28,6 @@ import org.apache.mina.core.service.IoConnector;
  * {@link IoConnector} for socket transport (TCP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface SocketConnector extends IoConnector {
     

@@ -28,7 +28,6 @@ import org.easymock.EasyMock;
  * Tests {@link org.apache.mina.handler.demux.DemuxingIoHandler}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 @SuppressWarnings("unchecked")
 public class DemuxingIoHandlerTest extends TestCase {

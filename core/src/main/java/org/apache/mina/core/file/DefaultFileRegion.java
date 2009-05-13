@@ -28,7 +28,6 @@ import java.nio.channels.FileChannel;
  * 
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultFileRegion implements FileRegion {
 

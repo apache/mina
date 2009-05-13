@@ -29,7 +29,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * Provides relative read access to a sequence of bytes.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoRelativeReader
 {

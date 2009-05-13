@@ -66,7 +66,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * </ul>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  * @see MessageDecoderFactory
  * @see MessageDecoder

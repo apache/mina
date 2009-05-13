@@ -44,7 +44,6 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * handles incoming TCP/IP based socket connections.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 389042 $, $Date: 2006-03-27 07:49:41Z $
  */
 public final class NioSocketAcceptor
         extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel>

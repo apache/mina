@@ -23,7 +23,6 @@ package org.apache.mina.proxy.handlers.http.ntlm;
  * NTLMConstants.java - All NTLM constants.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public interface NTLMConstants {

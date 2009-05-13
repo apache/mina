@@ -25,7 +25,6 @@ import java.security.Provider;
  * MD4Provider.java - A security provider that only provides a MD4 implementation.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class MD4Provider extends Provider {

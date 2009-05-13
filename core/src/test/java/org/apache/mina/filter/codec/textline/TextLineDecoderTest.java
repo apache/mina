@@ -34,7 +34,6 @@ import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
  * Tests {@link TextLineDecoder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class TextLineDecoderTest extends TestCase {
     public static void main(String[] args) {

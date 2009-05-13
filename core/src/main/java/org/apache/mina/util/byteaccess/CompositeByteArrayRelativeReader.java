@@ -32,7 +32,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * <code>ByteArray</code>s.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelativeBase implements IoRelativeReader
 {

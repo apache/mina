@@ -39,7 +39,6 @@ import org.apache.mina.core.write.WriteRequestQueue;
  * A {@link IoSession} for in-VM transport (VM_PIPE).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class VmPipeSession extends AbstractIoSession {
 

@@ -29,7 +29,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * session has been closed unexpectedly.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class FixedLengthDecodingState implements DecodingState {
 

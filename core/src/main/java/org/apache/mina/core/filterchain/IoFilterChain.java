@@ -33,7 +33,6 @@ import org.apache.mina.core.write.WriteRequest;
  * Every {@link IoSession} has its own {@link IoFilterChain} (1-to-1 relationship).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 593474 $, $Date: 2007-11-09 11:14:12 +0100 (Fri, 09 Nov 2007) $
  */
 public interface IoFilterChain {
     /**
@@ -283,7 +282,6 @@ public interface IoFilterChain {
      * Represents a name-filter pair that an {@link IoFilterChain} contains.
      *
      * @author The Apache MINA Project (dev@mina.apache.org)
-     * @version $Rev: 593474 $, $Date: 2007-11-09 11:14:12 +0100 (Fri, 09 Nov 2007) $
      */
     public interface Entry {
         /**

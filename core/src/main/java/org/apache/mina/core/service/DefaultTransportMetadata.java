@@ -31,7 +31,6 @@ import org.apache.mina.util.IdentityHashSet;
  * A default immutable implementation of {@link TransportMetadata}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultTransportMetadata implements TransportMetadata {
 

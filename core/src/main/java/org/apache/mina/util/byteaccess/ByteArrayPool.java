@@ -33,7 +33,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ByteArrayPool implements ByteArrayFactory
 {

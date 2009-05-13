@@ -43,7 +43,6 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * An {@link IoSession} for socket transport (TCP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class NioSocketSession extends NioSession {
 

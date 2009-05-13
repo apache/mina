@@ -29,7 +29,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * Provides absolute write access to a sequence of bytes.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoAbsoluteWriter
 {

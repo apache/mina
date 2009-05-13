@@ -23,7 +23,6 @@ package org.apache.mina.filter.logging;
  * Defines a logging level.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * 
  * @see NoopFilter
  */

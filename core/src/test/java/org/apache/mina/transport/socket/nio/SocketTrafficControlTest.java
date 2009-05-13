@@ -32,7 +32,6 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
  * type.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Id$
  */
 public class SocketTrafficControlTest extends AbstractTrafficControlTest {
 

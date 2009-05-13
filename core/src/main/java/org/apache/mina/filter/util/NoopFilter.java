@@ -29,7 +29,6 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
  * chain is working properly when adding or removing a filter.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 671827 $, $Date: 2008-06-26 10:49:48 +0200 (Thu, 26 Jun 2008) $
  */
 public class NoopFilter extends IoFilterAdapter {
     /**

@@ -51,6 +51,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -63,7 +64,6 @@ import org.slf4j.LoggerFactory;
  * Tests {@link MdcInjectionFilter} in variuos scenarios.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class MdcInjectionFilterTest {
 
@@ -144,7 +144,6 @@ public class MdcInjectionFilterTest {
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         test(chain);
     }
-
 
     @Test
     public void testTwoExecutorFilters() throws IOException, InterruptedException {

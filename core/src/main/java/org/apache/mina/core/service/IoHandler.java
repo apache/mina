@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSession;
  * Handles all I/O events fired by MINA.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  * @see IoHandlerAdapter
  */

@@ -25,7 +25,6 @@ import java.net.SocketAddress;
  * A {@link SocketAddress} which represents in-VM pipe port number.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class VmPipeAddress extends SocketAddress implements Comparable<VmPipeAddress> {
     private static final long serialVersionUID = 3257844376976830515L;

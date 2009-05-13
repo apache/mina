@@ -41,7 +41,6 @@ import org.apache.mina.util.IdentityHashSet;
  * <tt>super.dispose()</tt>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  * @see MessageEncoderFactory
  * @see MessageEncoder

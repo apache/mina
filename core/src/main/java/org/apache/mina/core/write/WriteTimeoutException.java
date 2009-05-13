@@ -29,7 +29,6 @@ import org.apache.mina.core.session.IoSessionConfig;
  * {@link IoSessionConfig#getWriteTimeout()} seconds.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class WriteTimeoutException extends WriteException {
     private static final long serialVersionUID = 3906931157944579121L;

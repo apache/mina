@@ -25,7 +25,6 @@ package org.apache.mina.filter.codec;
  * data to process.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ProtocolCodecException extends Exception {
     private static final long serialVersionUID = 5939878548186330695L;

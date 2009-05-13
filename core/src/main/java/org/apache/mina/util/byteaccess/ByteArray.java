@@ -30,7 +30,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * through a cursor.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter
 {

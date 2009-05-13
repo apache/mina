@@ -31,7 +31,6 @@ import org.apache.mina.core.write.WriteRequest;
  * wraps the same logic around all 9 IoEvents
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev:$, $Date:$
  */
 public abstract class CommonEventFilter extends IoFilterAdapter {
 

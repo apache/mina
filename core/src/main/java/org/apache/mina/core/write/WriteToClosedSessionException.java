@@ -27,7 +27,6 @@ import java.util.Collection;
  * attempted on a closed session.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class WriteToClosedSessionException extends WriteException {
 

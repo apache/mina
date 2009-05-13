@@ -75,7 +75,6 @@ import org.apache.mina.util.IdentityHashSet;
  * </p>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DemuxingIoHandler extends IoHandlerAdapter {
     

@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSession;
  * of an asynchronous I/O operation : {@link IoFuture}. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoFutureListener<F extends IoFuture> extends EventListener {
     /**

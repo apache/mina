@@ -31,7 +31,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * the serialized form that {@link ObjectSerializationDecoder} can decode.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ObjectSerializationOutputStream extends OutputStream implements
         ObjectOutput {

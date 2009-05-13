@@ -56,7 +56,6 @@ import org.apache.mina.core.session.IoSession;
  * </pre>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ProtocolCodecSession extends DummySession {
 

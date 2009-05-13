@@ -43,7 +43,6 @@ import static org.junit.Assert.assertSame;
  * Tests {@link DefaultIoFilterChain}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoFilterChainTest {
     private DummySession dummySession;

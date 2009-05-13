@@ -32,7 +32,6 @@ import org.apache.mina.core.file.FileRegion;
  * Tests {@link StreamWriteFilter}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class FileRegionWriteFilterTest extends AbstractStreamWriteFilterTest<FileRegion, FileRegionWriteFilter> {
 

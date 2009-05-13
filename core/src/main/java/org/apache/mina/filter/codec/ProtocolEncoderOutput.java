@@ -29,7 +29,6 @@ import org.apache.mina.core.future.WriteFuture;
  * for each encoded message.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface ProtocolEncoderOutput {
     /**

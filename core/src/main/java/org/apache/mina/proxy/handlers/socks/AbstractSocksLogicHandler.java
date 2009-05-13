@@ -27,7 +27,6 @@ import org.apache.mina.proxy.session.ProxyIoSession;
  * implementations.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractSocksLogicHandler extends

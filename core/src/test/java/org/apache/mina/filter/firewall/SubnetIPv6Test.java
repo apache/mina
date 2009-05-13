@@ -31,7 +31,6 @@ import junit.framework.Assert;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SubnetIPv6Test extends TestCase {
 

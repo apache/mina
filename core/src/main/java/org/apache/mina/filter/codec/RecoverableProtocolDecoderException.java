@@ -38,7 +38,6 @@ package org.apache.mina.filter.codec;
  * protocol violation.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class RecoverableProtocolDecoderException extends
         ProtocolDecoderException {

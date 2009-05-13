@@ -25,7 +25,6 @@ package org.apache.mina.core.session;
  * A base implementation of {@link IoSessionConfig}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 662867 $, $Date: 2008-06-03 21:53:20 +0200 (Tue, 03 Jun 2008) $
  */
 public abstract class AbstractIoSessionConfig implements IoSessionConfig {
 

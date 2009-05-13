@@ -36,7 +36,6 @@ import org.apache.mina.core.session.IoSession;
  * <tt>sessionCreated</tt> event.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class SessionAttributeInitializingFilter extends IoFilterAdapter {

@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
  * was not received within a certain timeout.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface KeepAliveRequestTimeoutHandler {
     /**

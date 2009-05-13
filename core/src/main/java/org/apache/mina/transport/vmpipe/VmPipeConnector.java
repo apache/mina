@@ -42,7 +42,6 @@ import org.apache.mina.util.ExceptionMonitor;
  * {@link VmPipeAddress}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class VmPipeConnector extends AbstractIoConnector {
 

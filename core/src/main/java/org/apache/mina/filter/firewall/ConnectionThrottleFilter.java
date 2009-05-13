@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
  * at a rate faster than the specified interval.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ConnectionThrottleFilter extends IoFilterAdapter {
     private static final long DEFAULT_TIME = 1000;

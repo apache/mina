@@ -27,7 +27,6 @@ import org.apache.mina.core.future.WriteFuture;
  * A wrapper for an existing {@link WriteRequest}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class WriteRequestWrapper implements WriteRequest {
 
