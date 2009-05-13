@@ -25,6 +25,8 @@ import org.apache.mina.core.session.IoEvent;
 import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An I/O event or an I/O request that MINA provides for {@link IoFilter}s.
@@ -32,9 +34,10 @@ import org.apache.mina.core.write.WriteRequest;
  * components to store I/O events.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 591770 $, $Date: 2007-11-04 13:22:44 +0100 (Sun, 04 Nov 2007) $
  */
 public class IoFilterEvent extends IoEvent {
+    /** A logger for this class */
+    //static Logger LOGGER = LoggerFactory.getLogger(IoFilterEvent.class);
 
     private final NextFilter nextFilter;
 
@@ -54,36 +57,56 @@ public class IoFilterEvent extends IoEvent {
 
     @Override
     public void fire() {
-        switch (getType()) {
+        IoSession session = getSession();
+        NextFilter nextFilter = getNextFilter();
+        IoEventType type = getType();
+        
+        /*
+        if ( LOGGER.isDebugEnabled()) {
+            LOGGER.debug( "Firing a {} event for session {}",type, session.getId() );
+        }
+        */
+        
+        switch (type) {
         case MESSAGE_RECEIVED:
-            getNextFilter().messageReceived(getSession(), getParameter());
+            Object parameter = getParameter();
+            nextFilter.messageReceived(session, parameter);
             break;
         case MESSAGE_SENT:
-            getNextFilter().messageSent(getSession(), (WriteRequest) getParameter());
+            WriteRequest writeRequest = (WriteRequest)getParameter();
+            nextFilter.messageSent(session, writeRequest);
             break;
         case WRITE:
-            getNextFilter().filterWrite(getSession(), (WriteRequest) getParameter());
+            writeRequest = (WriteRequest)getParameter();
+            nextFilter.filterWrite(session, writeRequest);
             break;
         case CLOSE:
-            getNextFilter().filterClose(getSession());
+            nextFilter.filterClose(session);
             break;
         case EXCEPTION_CAUGHT:
-            getNextFilter().exceptionCaught(getSession(), (Throwable) getParameter());
+            Throwable throwable = (Throwable)getParameter();
+            nextFilter.exceptionCaught(session, throwable);
             break;
         case SESSION_IDLE:
-            getNextFilter().sessionIdle(getSession(), (IdleStatus) getParameter());
+            nextFilter.sessionIdle(session, (IdleStatus) getParameter());
             break;
         case SESSION_OPENED:
-            getNextFilter().sessionOpened(getSession());
+            nextFilter.sessionOpened(session);
             break;
         case SESSION_CREATED:
-            getNextFilter().sessionCreated(getSession());
+            nextFilter.sessionCreated(session);
             break;
         case SESSION_CLOSED:
-            getNextFilter().sessionClosed(getSession());
+            nextFilter.sessionClosed(session);
             break;
         default:
-            throw new IllegalArgumentException("Unknown event type: " + getType());
+            throw new IllegalArgumentException("Unknown event type: " + type);
         }
+        
+        /*
+        if ( LOGGER.isDebugEnabled()) {
+            LOGGER.debug( "Event {} has been fired for session {}", type, session.getId() );
+        }
+        */
     }
 }
