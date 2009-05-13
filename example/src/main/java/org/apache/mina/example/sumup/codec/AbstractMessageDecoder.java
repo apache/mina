@@ -31,7 +31,6 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
  * the decoding of body to a subclass.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractMessageDecoder implements MessageDecoder {
     private final int type;

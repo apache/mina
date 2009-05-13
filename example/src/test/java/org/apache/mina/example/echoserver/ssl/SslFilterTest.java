@@ -48,7 +48,6 @@ import static org.junit.Assert.assertTrue;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SslFilterTest {
 

@@ -25,7 +25,6 @@ import java.awt.image.BufferedImage;
  * response sent by the server when receiving an {@link ImageRequest}
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ImageResponse {
 

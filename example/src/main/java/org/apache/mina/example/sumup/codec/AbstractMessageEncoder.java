@@ -30,7 +30,6 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  * the encoding of body to a subclass.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractMessageEncoder<T extends AbstractMessage> implements MessageEncoder<T> {
     private final int type;

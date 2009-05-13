@@ -23,7 +23,6 @@ package org.apache.mina.example.imagine.step1;
  * represents a client's request for an image
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 
 public class ImageRequest {

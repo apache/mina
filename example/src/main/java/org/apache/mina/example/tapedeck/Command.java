@@ -23,7 +23,6 @@ package org.apache.mina.example.tapedeck;
  * The base class of all {@link Command} types.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class Command {
     public abstract String getName();

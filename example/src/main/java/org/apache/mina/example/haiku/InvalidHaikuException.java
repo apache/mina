@@ -20,7 +20,6 @@ package org.apache.mina.example.haiku;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 public class InvalidHaikuException extends Exception {
     private static final long serialVersionUID = 34877739006797894L;

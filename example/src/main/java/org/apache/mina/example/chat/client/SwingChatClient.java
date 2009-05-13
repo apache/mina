@@ -47,7 +47,6 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * Simple chat client based on Swing & MINA that implements the chat protocol.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SwingChatClient extends JFrame implements Callback {
     private static final long serialVersionUID = 1538675161745436968L;

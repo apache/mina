@@ -28,7 +28,6 @@ import org.apache.mina.example.chat.ChatCommand;
  * {@link IoHandler} implementation of the client side of the simple chat protocol.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SwingChatClientHandler extends IoHandlerAdapter {
 

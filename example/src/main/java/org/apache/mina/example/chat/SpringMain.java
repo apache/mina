@@ -27,7 +27,6 @@ import org.springframework.context.ConfigurableApplicationContext;
  * file to set up MINA and the server handler.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SpringMain {
 

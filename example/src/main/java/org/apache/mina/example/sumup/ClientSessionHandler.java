@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * {@link IoHandler} for SumUp client.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ClientSessionHandler extends IoHandlerAdapter {
 

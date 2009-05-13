@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 public class PhraseUtilitiesTest extends TestCase {
     public void testCountSyllablesInWord() throws Exception {

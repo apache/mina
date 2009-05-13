@@ -32,7 +32,6 @@ import org.easymock.MockControl;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CompressionFilterTest extends TestCase {
     private MockControl mockSession;

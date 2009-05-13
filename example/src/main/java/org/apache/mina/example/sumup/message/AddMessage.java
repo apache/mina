@@ -23,7 +23,6 @@ package org.apache.mina.example.sumup.message;
  * <code>ADD</code> message in SumUp protocol.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class AddMessage extends AbstractMessage {
     private static final long serialVersionUID = -940833727168119141L;

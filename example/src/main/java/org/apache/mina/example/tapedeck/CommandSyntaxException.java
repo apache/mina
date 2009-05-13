@@ -26,7 +26,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
  * a {@link Command} object.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CommandSyntaxException extends ProtocolDecoderException {
     private static final long serialVersionUID = 4903547501059093765L;

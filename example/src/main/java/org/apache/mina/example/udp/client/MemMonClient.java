@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
  * Sends its memory usage to the MemoryMonitor server.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class MemMonClient extends IoHandlerAdapter {
 

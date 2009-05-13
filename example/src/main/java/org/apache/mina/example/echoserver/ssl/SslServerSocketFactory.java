@@ -31,7 +31,6 @@ import javax.net.ServerSocketFactory;
  * If SSL enabled a "bougus" SSL Context is used (suitable for test purposes)
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SslServerSocketFactory extends javax.net.ServerSocketFactory {
     private static boolean sslEnabled = false;

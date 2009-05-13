@@ -23,7 +23,6 @@ package org.apache.mina.example.tapedeck;
  * Represents the <code>pause</code> command.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class PauseCommand extends Command {
     public static final String NAME = "pause";

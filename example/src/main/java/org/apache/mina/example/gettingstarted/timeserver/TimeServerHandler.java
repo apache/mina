@@ -30,7 +30,6 @@ import org.apache.mina.core.session.IoSession;
  * or close the session if the "quit" message is received.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class TimeServerHandler extends IoHandlerAdapter
 {

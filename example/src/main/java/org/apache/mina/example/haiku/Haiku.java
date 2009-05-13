@@ -22,7 +22,6 @@ import java.util.Arrays;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 public class Haiku {
     private final String[] phrases;

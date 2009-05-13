@@ -41,7 +41,6 @@ import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
  * track the memory usage.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class MemoryMonitor {
 

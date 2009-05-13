@@ -28,7 +28,6 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  * A {@link MessageEncoder} that encodes {@link ResultMessage}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ResultMessageEncoder<T extends ResultMessage> extends AbstractMessageEncoder<T> {
     public ResultMessageEncoder() {

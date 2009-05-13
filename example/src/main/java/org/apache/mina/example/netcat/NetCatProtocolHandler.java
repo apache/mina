@@ -30,7 +30,6 @@ import org.apache.mina.core.session.IoSession;
  * {@link IoHandlerAdapter} for convenience.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class NetCatProtocolHandler extends IoHandlerAdapter {
     @Override

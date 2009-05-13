@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 public class HaikuValidatorTest extends TestCase {
     // from http://allrileyedup.blogspot.com/2006/10/dont-hassle-haiku.html -- good friend of proyal@apache.org

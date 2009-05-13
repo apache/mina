@@ -32,7 +32,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
  * clients.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class Main {
     private static final int PORT = 8080;

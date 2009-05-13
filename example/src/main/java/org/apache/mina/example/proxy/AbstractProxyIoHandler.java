@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
  * proxied connections.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
- *
  */
 public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
     private static final Charset CHARSET = Charset.forName("iso8859-1");

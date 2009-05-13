@@ -30,7 +30,6 @@ import org.apache.mina.filter.codec.demux.MessageDecoder;
  * A {@link MessageDecoder} that decodes {@link ResultMessage}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ResultMessageDecoder extends AbstractMessageDecoder {
     private int code;

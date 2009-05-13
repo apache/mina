@@ -54,7 +54,6 @@ import org.apache.mina.filter.util.WriteRequestFilter;
  * compatible compressor/decompressor using the same algorithm.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CompressionFilter extends WriteRequestFilter {
     /**

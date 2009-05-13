@@ -31,7 +31,6 @@ import org.apache.mina.core.session.IoSession;
  * connections and the data the connections send
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class MemoryMonitorHandler extends IoHandlerAdapter {
 

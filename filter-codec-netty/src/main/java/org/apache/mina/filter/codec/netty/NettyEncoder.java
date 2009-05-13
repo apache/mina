@@ -32,7 +32,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * into buffers.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class NettyEncoder implements ProtocolEncoder {
     /**

@@ -27,7 +27,6 @@ import org.apache.mina.core.service.IoService;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SpringMainTest extends TestCase {
 

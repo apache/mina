@@ -20,7 +20,6 @@ package org.apache.mina.example.haiku;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 public class PhraseUtilities {
     static int countSyllablesInPhrase(String phrase) {

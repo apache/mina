@@ -28,7 +28,6 @@ import org.apache.mina.core.buffer.IoBuffer;
 
 /**
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ZlibTest extends TestCase {
     private Zlib deflater = null;

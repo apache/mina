@@ -29,7 +29,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * an encoder for {@link ImageRequest} objects 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 
 public class ImageRequestEncoder implements ProtocolEncoder {

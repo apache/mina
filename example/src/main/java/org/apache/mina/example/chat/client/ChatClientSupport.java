@@ -39,7 +39,6 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * A simple chat client for a given user.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ChatClientSupport {
     private final IoHandler handler;

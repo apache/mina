@@ -37,7 +37,6 @@ import javax.swing.JTextField;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  */
 public class ConnectDialog extends JDialog {

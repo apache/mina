@@ -34,7 +34,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
  * (<b>Entry point</b>) Chat server
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class Main {
     /** Choose your favorite port number. */

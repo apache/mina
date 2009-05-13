@@ -23,7 +23,6 @@ import org.apache.mina.core.session.IoSession;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 
 public class HaikuValidatorIoHandler extends IoHandlerAdapter {

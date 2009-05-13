@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * TelnetSessionHandler.java - Telnet session handler.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class TelnetSessionHandler extends AbstractProxyIoHandler {

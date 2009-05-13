@@ -23,7 +23,6 @@ package org.apache.mina.example.tapedeck;
  * Represents the <code>stop</code> command.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class StopCommand extends Command {
     public static final String NAME = "stop";
