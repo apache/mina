@@ -27,7 +27,6 @@ import org.apache.mina.statemachine.StateMachine;
  * This is for advanced uses only.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface EventArgumentsInterceptor {
 

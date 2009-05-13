@@ -29,7 +29,6 @@ import java.util.List;
  * a {@link List} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class ListEditor extends CollectionEditor {
 

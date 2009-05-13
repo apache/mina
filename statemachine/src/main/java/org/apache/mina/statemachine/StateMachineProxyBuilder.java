@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
  * {@link StateMachine}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class StateMachineProxyBuilder {
     private static final Logger log = LoggerFactory

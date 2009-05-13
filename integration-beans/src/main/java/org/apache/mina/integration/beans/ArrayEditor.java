@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
  * a one-dimensional array and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class ArrayEditor extends AbstractPropertyEditor {
     private final Class<?> componentType;

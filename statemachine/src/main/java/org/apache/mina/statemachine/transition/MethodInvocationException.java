@@ -26,7 +26,6 @@ import java.lang.reflect.Method;
  * or threw an exception.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class MethodInvocationException extends RuntimeException {
     private static final long serialVersionUID = 4288548621384649704L;

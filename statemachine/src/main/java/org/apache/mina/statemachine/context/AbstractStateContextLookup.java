@@ -29,7 +29,6 @@ package org.apache.mina.statemachine.context;
  * event argument using the {@link #store(Object, StateContext)} method.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractStateContextLookup implements StateContextLookup {
     private final StateContextFactory contextFactory;

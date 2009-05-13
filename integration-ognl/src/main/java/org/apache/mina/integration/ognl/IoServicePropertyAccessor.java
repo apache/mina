@@ -27,7 +27,6 @@ import org.apache.mina.core.service.IoService;
  * An OGNL {@link PropertyAccessor} for {@link IoService}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoServicePropertyAccessor extends AbstractPropertyAccessor {
     @Override

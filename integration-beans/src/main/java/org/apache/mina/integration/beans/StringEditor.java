@@ -25,7 +25,6 @@ import java.beans.PropertyEditor;
  * A dummy {@link PropertyEditor} for a {@link String}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class StringEditor extends AbstractPropertyEditor {
     @Override

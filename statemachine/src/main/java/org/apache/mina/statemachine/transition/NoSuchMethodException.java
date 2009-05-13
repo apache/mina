@@ -25,7 +25,6 @@ package org.apache.mina.statemachine.transition;
  * the specifed name can be found. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class NoSuchMethodException extends RuntimeException {
     private static final long serialVersionUID = -8877979996892420479L;

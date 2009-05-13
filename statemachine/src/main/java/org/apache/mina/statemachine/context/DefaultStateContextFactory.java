@@ -24,7 +24,6 @@ package org.apache.mina.statemachine.context;
  * objects.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultStateContextFactory implements StateContextFactory {
 

@@ -32,7 +32,6 @@ import org.apache.mina.statemachine.event.Event;
  * kind of event when in a specific state.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -33,7 +33,6 @@ import org.apache.mina.statemachine.event.Event;
  * to {@link Event#WILDCARD_EVENT_ID}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractTransition implements Transition {
     private final Object eventId;

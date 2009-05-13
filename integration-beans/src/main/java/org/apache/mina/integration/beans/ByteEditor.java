@@ -26,7 +26,6 @@ import java.beans.PropertyEditor;
  * an {@link Byte} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class ByteEditor extends NumberEditor {
     @Override

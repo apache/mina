@@ -28,7 +28,6 @@ import ognl.PropertyAccessor;
  * An abstract OGNL {@link PropertyAccessor} for MINA constructs.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 @SuppressWarnings("unchecked")
 public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {

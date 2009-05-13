@@ -25,7 +25,6 @@ import org.apache.mina.statemachine.event.Event;
  * Lookups a {@link StateContext} from a collection of event arguments.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface StateContextLookup {
     /**

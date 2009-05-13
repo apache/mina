@@ -29,7 +29,6 @@ import org.apache.mina.statemachine.context.StateContext;
  * methods are invoked on the proxy.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface EventFactory
 {

@@ -34,7 +34,6 @@ import org.apache.mina.transport.serial.SerialAddress.StopBits;
  * port name, bauds, data bits, stop bits, parity and flow control respectively.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class SerialAddressEditor extends AbstractPropertyEditor {
     @Override

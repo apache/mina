@@ -31,7 +31,6 @@ import java.util.Set;
  * the specified object or class. 
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class PropertyEditorFactory {
     @SuppressWarnings("unchecked")

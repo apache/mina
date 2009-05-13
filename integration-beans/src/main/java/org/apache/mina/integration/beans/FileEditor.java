@@ -27,7 +27,6 @@ import java.io.File;
  * a {@link File} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class FileEditor extends AbstractPropertyEditor {
 

@@ -99,7 +99,6 @@ import org.slf4j.LoggerFactory;
  * A {@link ModelMBean} wrapper implementation for a POJO.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * 
  * @param <T> the type of the managed object
  */

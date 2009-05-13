@@ -24,7 +24,6 @@ package org.apache.mina.statemachine;
  * machine references a state which doesn't exist.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class NoSuchStateException extends RuntimeException {
     private static final long serialVersionUID = -886869696039996478L;

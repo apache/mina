@@ -45,7 +45,6 @@ import org.apache.mina.statemachine.transition.Transition;
  * </p>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class State {
     private final String id;

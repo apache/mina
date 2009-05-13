@@ -28,7 +28,6 @@ import org.apache.mina.statemachine.event.Event;
  * between states.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface Transition {
     /**

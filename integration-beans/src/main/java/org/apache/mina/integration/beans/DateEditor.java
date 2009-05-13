@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
  * a {@link Date} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class DateEditor extends AbstractPropertyEditor {
     private static final Pattern MILLIS = Pattern.compile("[0-9][0-9]*");

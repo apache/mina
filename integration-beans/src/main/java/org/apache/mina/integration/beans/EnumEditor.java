@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
  * an {@link Enum} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 @SuppressWarnings("unchecked")
 public class EnumEditor extends AbstractPropertyEditor {

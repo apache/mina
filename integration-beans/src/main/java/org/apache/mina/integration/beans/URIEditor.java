@@ -28,7 +28,6 @@ import java.net.URISyntaxException;
  * a {@link URI} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class URIEditor extends AbstractPropertyEditor {
 

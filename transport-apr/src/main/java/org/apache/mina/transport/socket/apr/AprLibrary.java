@@ -33,7 +33,6 @@ import org.apache.tomcat.jni.Pool;
  * root pool {@link AprLibrary#getRootPool()}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class AprLibrary {
 

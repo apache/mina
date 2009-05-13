@@ -38,7 +38,6 @@ import org.apache.tomcat.jni.Socket;
  * It's implementing the usual common features for {@SocketSession}. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class AprSocketSession extends AprSession {
     static final TransportMetadata METADATA =

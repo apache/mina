@@ -35,7 +35,6 @@ import org.apache.tomcat.jni.Socket;
  * An abstract {@link IoSession} serving of base for APR based sessions.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AprSession extends AbstractIoSession {
    

@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * @version $Rev$ $Date$
  * @org.apache.xbean.XBean
  */
 public class StandardThreadPool implements Executor

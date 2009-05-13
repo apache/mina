@@ -29,7 +29,6 @@ import java.util.Set;
  * a {@link Set} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class SetEditor extends CollectionEditor {
 

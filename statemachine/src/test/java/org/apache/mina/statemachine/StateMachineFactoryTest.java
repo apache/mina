@@ -36,7 +36,6 @@ import org.apache.mina.statemachine.transition.MethodTransition;
  * Tests {@link StateMachineFactory}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class StateMachineFactoryTest extends TestCase {
     Method barInA;

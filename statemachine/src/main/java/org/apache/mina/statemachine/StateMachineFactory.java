@@ -46,7 +46,6 @@ import org.apache.mina.statemachine.transition.MethodTransition;
  * 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class StateMachineFactory {
     private final Class<? extends Annotation> transitionAnnotation;

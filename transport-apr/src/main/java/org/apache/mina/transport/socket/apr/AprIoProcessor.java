@@ -41,7 +41,6 @@ import org.apache.tomcat.jni.Status;
  * The class in charge of processing socket level IO events for the {@link AprSocketConnector}
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     private static final int POLLSET_SIZE = 1024;

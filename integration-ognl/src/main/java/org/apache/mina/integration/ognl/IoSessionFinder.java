@@ -30,7 +30,6 @@ import org.apache.mina.core.session.IoSession;
  * Finds {@link IoSession}s that match a boolean OGNL expression.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoSessionFinder {
     
