@@ -32,7 +32,6 @@ import javax.swing.SwingUtilities;
  * Class the represents a client connection using a JPanel
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ClientPanel extends JPanel {
 

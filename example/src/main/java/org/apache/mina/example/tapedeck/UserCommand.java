@@ -23,7 +23,6 @@ package org.apache.mina.example.tapedeck;
  * Represents the <code>user &lt;username&gt;</code> command.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 587133 $, $Date: 2007-10-22 17:54:15 +0200 (Mon, 22 Oct 2007) $
  */
 public class UserCommand extends Command {
     public static final String NAME = "user";

@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSession;
  * a {@link ProtocolCodecFactory} for the tutorial on how to write a protocol codec
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 
 public class ImageCodecFactory implements ProtocolCodecFactory {

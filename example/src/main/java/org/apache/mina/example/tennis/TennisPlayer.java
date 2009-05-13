@@ -27,7 +27,6 @@ import org.apache.mina.core.session.IoSession;
  * A {@link IoHandler} implementation which plays a tennis game.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class TennisPlayer extends IoHandlerAdapter {
     private static int nextId = 0;

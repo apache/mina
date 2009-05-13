@@ -32,7 +32,6 @@ import com.jcraft.jzlib.ZStream;
  * flush method supported is <tt>Z_SYNC_FLUSH</tt> also known as <tt>Z_PARTIAL_FLUSH</tt>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class Zlib {
     /** Try o get the best possible compression */

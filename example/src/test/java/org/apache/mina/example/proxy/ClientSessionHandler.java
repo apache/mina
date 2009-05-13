@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * ClientSessionHandler.java - Client session handler for the mina proxy test class.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class ClientSessionHandler extends AbstractProxyIoHandler {

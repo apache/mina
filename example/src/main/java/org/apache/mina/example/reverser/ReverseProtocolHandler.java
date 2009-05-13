@@ -27,7 +27,6 @@ import org.apache.mina.core.session.IoSession;
  * {@link IoHandler} implementation of reverser server protocol.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class ReverseProtocolHandler extends IoHandlerAdapter {
     @Override

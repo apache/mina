@@ -30,7 +30,6 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * automatically when no data is read for 10 seconds.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class Main {
     public static void main(String[] args) throws Exception {

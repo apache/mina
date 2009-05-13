@@ -25,7 +25,6 @@ import java.awt.image.BufferedImage;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface ImageListener {
     void onImages(BufferedImage image1, BufferedImage image2);

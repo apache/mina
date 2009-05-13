@@ -34,7 +34,6 @@ import java.io.IOException;
  * a decoder for {@link ImageResponse} objects 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 
 public class ImageResponseDecoder extends CumulativeProtocolDecoder {

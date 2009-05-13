@@ -34,7 +34,6 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * (<strong>Entry Point</strong>) Starts SumUp client.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class Client {
     private static final String HOSTNAME = "localhost";

@@ -23,7 +23,6 @@ package org.apache.mina.example.sumup.codec;
  * Provides SumUp protocol constants.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class Constants {
     public static final int TYPE_LEN = 2;

@@ -24,7 +24,6 @@ package org.apache.mina.example.chat;
  * instance given a command string.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ChatCommand {
     public static final int LOGIN = 0;

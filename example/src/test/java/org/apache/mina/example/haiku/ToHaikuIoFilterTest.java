@@ -28,7 +28,6 @@ import org.jmock.MockObjectTestCase;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 public class ToHaikuIoFilterTest extends MockObjectTestCase {
     private IoFilter filter;

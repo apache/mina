@@ -34,7 +34,6 @@ import org.apache.mina.filter.codec.ProtocolCodecFactory;
  * own factory after this factory.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class NettyCodecFactory implements ProtocolCodecFactory {
     private static final NettyEncoder ENCODER = new NettyEncoder();

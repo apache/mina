@@ -20,7 +20,6 @@ package org.apache.mina.example.haiku;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 public class HaikuValidator {
     private static final int[] SYLLABLE_COUNTS = { 5, 7, 5 };

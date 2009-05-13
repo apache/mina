@@ -37,7 +37,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * Netty2 {@link Message}s using specified {@link MessageRecognizer}s.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class NettyDecoder extends ProtocolDecoderAdapter {
     private final MessageRecognizer recognizer;

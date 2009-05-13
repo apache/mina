@@ -23,7 +23,6 @@ package org.apache.mina.example.tapedeck;
  * Represents the <code>quit</code> command.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class QuitCommand extends Command {
     public static final String NAME = "quit";

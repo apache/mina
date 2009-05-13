@@ -24,7 +24,6 @@ package org.apache.mina.example.tennis;
  * 'PONG'.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class TennisBall {
     private final boolean ping;

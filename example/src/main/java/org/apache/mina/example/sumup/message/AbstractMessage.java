@@ -25,7 +25,6 @@ import java.io.Serializable;
  * A base message for SumUp protocol messages.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractMessage implements Serializable {
     private int sequence;

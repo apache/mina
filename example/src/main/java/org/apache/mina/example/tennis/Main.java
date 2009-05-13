@@ -38,7 +38,6 @@ import org.apache.mina.transport.vmpipe.VmPipeConnector;
  * </ol>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class Main {
 

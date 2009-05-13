@@ -31,7 +31,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
  * @author Apache Mina Project (dev@mina.apache.org)
- * @version $Rev: $, $Date:  $
  */
 
 public class HaikuValidationServer {

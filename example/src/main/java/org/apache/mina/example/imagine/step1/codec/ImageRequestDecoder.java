@@ -29,7 +29,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * a decoder for {@link ImageRequest} objects
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 
 public class ImageRequestDecoder extends CumulativeProtocolDecoder {
