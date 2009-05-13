@@ -26,7 +26,6 @@ import java.beans.PropertyEditor;
  * an {@link Float} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class FloatEditor extends NumberEditor {
     @Override

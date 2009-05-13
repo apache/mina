@@ -28,7 +28,6 @@ import java.net.URL;
  * a {@link URL} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class URLEditor extends AbstractPropertyEditor {
 

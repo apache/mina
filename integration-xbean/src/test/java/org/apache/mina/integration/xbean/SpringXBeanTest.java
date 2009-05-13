@@ -35,7 +35,7 @@ import java.net.URL;
 
 
 /**
- * @version $Rev: 596086 $ $Date: 2007-11-18 09:15:50 -0500 (Sun, 18 Nov 2007) $
+ * TODO : Add documentation
  */
 public class SpringXBeanTest
 {

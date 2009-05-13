@@ -24,7 +24,6 @@ package org.apache.mina.statemachine.context;
  * {@link StateContext} instance.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SingletonStateContextLookup implements StateContextLookup {
     private final StateContext context;

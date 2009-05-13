@@ -25,7 +25,6 @@ import org.apache.mina.core.session.IoSession;
  * An {@link IoSession} for serial communication transport.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 529590 $, $Date: 2007-04-17 15:14:17 +0200 (mar., 17 avr. 2007) $
  */
 public interface SerialSession extends IoSession {
     SerialSessionConfig getConfig();

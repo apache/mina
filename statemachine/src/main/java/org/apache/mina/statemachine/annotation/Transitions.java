@@ -28,7 +28,6 @@ import java.lang.annotation.Target;
  * Annotation used to annotate a method with several {@link Transition}s.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

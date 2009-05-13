@@ -24,7 +24,6 @@ package org.apache.mina.statemachine.transition;
  * methods with the specifed name in the target object's class. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class AmbiguousMethodException extends RuntimeException {
 

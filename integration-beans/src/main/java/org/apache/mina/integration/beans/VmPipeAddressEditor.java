@@ -29,7 +29,6 @@ import java.beans.PropertyEditor;
  * number optionally prefixed with a ':'. E.g.: <code>:80</code>, <code>22</code>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  *
  * @see VmPipeAddress
  */

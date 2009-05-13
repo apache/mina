@@ -33,7 +33,6 @@ import org.apache.mina.statemachine.StateMachine;
  * {@link IoFilter} interface.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
  * An imlpementation of {@link SerialSession}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class SerialSessionImpl extends AbstractIoSession implements
         SerialSession, SerialPortEventListener {

@@ -31,7 +31,6 @@ import java.net.UnknownHostException;
  * when converting to a {@link String}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  *
  * @see java.net.InetAddress
  */

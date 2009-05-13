@@ -28,7 +28,6 @@ import java.util.Properties;
  * a {@link Properties} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class PropertiesEditor extends MapEditor {
     

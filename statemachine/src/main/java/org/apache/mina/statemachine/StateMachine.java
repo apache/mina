@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
  * {@link StateMachine} for you.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class StateMachine {
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachine.class);

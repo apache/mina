@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
  * a {@link Character} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class CharacterEditor extends AbstractPropertyEditor {
     private static final Pattern UNICODE = Pattern.compile("\\\\[uU][0-9a-fA-F]+");

@@ -39,7 +39,6 @@ import org.springframework.beans.PropertyEditorRegistry;
  * MINA Integration Beans module.
  *
  * @author <a href="mailto:dev@mina.apache.org">Apache MINA Project</a>
- * @version $Rev$, $Date$
  */
 public class MinaPropertyEditorRegistrar implements PropertyEditorRegistrar
 {

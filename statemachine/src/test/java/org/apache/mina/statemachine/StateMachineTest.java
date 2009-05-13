@@ -33,7 +33,6 @@ import org.apache.mina.statemachine.transition.AbstractTransition;
  * Tests {@link StateMachine}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class StateMachineTest extends TestCase {
 

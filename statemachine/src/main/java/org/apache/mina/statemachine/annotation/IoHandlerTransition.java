@@ -35,7 +35,6 @@ import org.apache.mina.statemachine.event.IoHandlerEvents;
  * interface.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -27,7 +27,6 @@ import junit.framework.TestCase;
  * Tests {@link InetSocketAddressEditor}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class InetSocketAddressEditorTest extends TestCase {
     InetSocketAddressEditor editor;

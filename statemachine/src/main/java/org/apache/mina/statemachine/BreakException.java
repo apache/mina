@@ -26,7 +26,6 @@ package org.apache.mina.statemachine;
  * that exceptions of this type aren't caught and swallowed by your code.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class BreakException extends RuntimeException {
     private static final long serialVersionUID = -1898782004087949199L;

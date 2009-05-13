@@ -25,7 +25,6 @@ import java.beans.PropertyEditor;
  * A dummy {@link PropertyEditor} for <tt>null</tt>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class NullEditor extends AbstractPropertyEditor {
     @Override

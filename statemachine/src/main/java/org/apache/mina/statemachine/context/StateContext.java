@@ -30,7 +30,6 @@ import org.apache.mina.statemachine.StateMachine;
  * data needs to be stored.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface StateContext {
     /**

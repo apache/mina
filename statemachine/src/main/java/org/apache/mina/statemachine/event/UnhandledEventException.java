@@ -23,7 +23,6 @@ package org.apache.mina.statemachine.event;
  * Thrown when an {@link Event} passed to a state machine couldn't be handled.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class UnhandledEventException extends RuntimeException {
     private static final long serialVersionUID = -717373229954175430L;

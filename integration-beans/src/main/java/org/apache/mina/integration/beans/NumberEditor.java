@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
  * a {@link Number} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class NumberEditor extends AbstractPropertyEditor {
     private static final Pattern DECIMAL = Pattern.compile(

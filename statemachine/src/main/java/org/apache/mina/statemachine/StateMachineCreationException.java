@@ -24,7 +24,6 @@ package org.apache.mina.statemachine;
  * could not be constructed for some reason.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 
 public class StateMachineCreationException extends RuntimeException {

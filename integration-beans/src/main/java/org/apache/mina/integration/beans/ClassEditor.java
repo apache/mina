@@ -26,7 +26,6 @@ import java.beans.PropertyEditor;
  * a {@link Character} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class ClassEditor extends AbstractPropertyEditor {
     @Override

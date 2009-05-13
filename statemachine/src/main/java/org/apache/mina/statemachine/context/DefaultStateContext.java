@@ -23,7 +23,6 @@ package org.apache.mina.statemachine.context;
  * Default {@link StateContext} implementation.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultStateContext extends AbstractStateContext {
 }

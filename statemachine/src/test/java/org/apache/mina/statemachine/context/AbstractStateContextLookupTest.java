@@ -32,7 +32,6 @@ import junit.framework.TestCase;
  * Tests {@link AbstractStateContextLookup}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class AbstractStateContextLookupTest extends TestCase {
 

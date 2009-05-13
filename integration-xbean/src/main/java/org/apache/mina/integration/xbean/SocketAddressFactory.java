@@ -30,7 +30,6 @@ import org.apache.mina.integration.beans.InetSocketAddressEditor;
  * socket address classes.
  *
  * @author <a href="mailto:dev@mina.apache.org">Apache MINA Project</a>
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean element="socketAddress" contentProperty="value"
  */
 public class SocketAddressFactory

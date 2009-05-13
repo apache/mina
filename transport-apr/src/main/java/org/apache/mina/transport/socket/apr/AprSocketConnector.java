@@ -52,7 +52,6 @@ import org.apache.tomcat.jni.Status;
  * {@link IoConnector} for APR based socket transport (TCP/IP).
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class AprSocketConnector extends AbstractPollingIoConnector<AprSession, Long> implements SocketConnector {
 

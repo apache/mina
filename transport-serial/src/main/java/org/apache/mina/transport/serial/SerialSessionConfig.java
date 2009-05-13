@@ -26,7 +26,6 @@ import org.apache.mina.core.session.IoSessionConfig;
  * All those parameters are extracted from rxtx.org API for more details :
  * http://www.rxtx.org
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 529576 $, $Date: 2007-04-17 14:25:07 +0200 (mar., 17 avr. 2007) $
  */
 public interface SerialSessionConfig extends IoSessionConfig {
 

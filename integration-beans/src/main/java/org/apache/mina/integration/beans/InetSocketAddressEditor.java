@@ -30,7 +30,6 @@ import java.net.InetSocketAddress;
  * <code>google.com:80</code>, <code>:22</code>, <code>192.168.0.1:110</code>.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  *
  * @see java.net.InetSocketAddress
  */

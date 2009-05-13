@@ -28,7 +28,6 @@ import org.apache.mina.statemachine.context.StateContext;
  * the method arguments. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class Event {
     public static final String WILDCARD_EVENT_ID = "*";

@@ -27,7 +27,6 @@ import org.apache.mina.statemachine.annotation.IoHandlerTransition;
  * annotations.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public enum IoHandlerEvents {
     ANY(Event.WILDCARD_EVENT_ID),

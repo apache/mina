@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
  * a {@link Pattern} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class PatternEditor extends AbstractPropertyEditor {
 

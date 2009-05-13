@@ -39,7 +39,6 @@ import org.apache.mina.integration.beans.PropertyEditorFactory;
  * is chosen.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class PropertyTypeConverter implements TypeConverter {
     

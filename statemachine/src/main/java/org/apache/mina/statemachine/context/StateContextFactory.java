@@ -23,7 +23,6 @@ package org.apache.mina.statemachine.context;
  * Factory which creates {@link StateContext} instances.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface StateContextFactory {
     /**

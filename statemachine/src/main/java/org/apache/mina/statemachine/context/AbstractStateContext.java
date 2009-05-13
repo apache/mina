@@ -30,7 +30,6 @@ import org.apache.mina.statemachine.State;
  * attributes.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractStateContext implements StateContext {
     private State currentState = null;

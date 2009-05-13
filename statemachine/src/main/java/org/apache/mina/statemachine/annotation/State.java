@@ -30,7 +30,6 @@ import java.lang.annotation.Target;
  * as state id. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
  * a {@link Collection} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class MapEditor extends AbstractPropertyEditor {
     static final Pattern ELEMENT = Pattern.compile(

@@ -56,7 +56,6 @@ import org.slf4j.LoggerFactory;
  * </p>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class MethodTransition extends AbstractTransition {
     private static final Logger LOGGER = LoggerFactory.getLogger( MethodTransition.class );

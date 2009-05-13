@@ -37,7 +37,6 @@ import org.apache.tomcat.jni.Socket;
  * It's implementing the usual common features for {@link DatagramSessionConfig}. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class AprDatagramSession extends AprSession {
 

@@ -26,7 +26,6 @@ import java.beans.PropertyEditor;
  * a {@link Short} and vice versa.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Revision$, $Date$
  */
 public class ShortEditor extends NumberEditor {
     @Override
