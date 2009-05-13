@@ -37,7 +37,6 @@ import org.apache.mina.util.byteaccess.ByteArrayList.Node;
  * happen until actual get/put.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class CompositeByteArray extends AbstractByteArray {
 

@@ -69,7 +69,6 @@ import org.slf4j.LoggerFactory;
  * </code></pre>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * 
  * @param <T> the type of the {@link IoSession} to be managed by the specified
  *            {@link IoProcessor}.

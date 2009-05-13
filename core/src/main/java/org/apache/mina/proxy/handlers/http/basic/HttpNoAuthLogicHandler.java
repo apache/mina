@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
  * HttpNoAuthLogicHandler.java - HTTP 'no auth' mechanism logic handler.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {

@@ -35,7 +35,6 @@ import org.apache.mina.core.session.IoSession;
  * {@link IoSession} and {@link IoFuture}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoUtil {
     

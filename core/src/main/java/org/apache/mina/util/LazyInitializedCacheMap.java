@@ -38,7 +38,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * be called by user code for performance reasons.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M2
  */
 public class LazyInitializedCacheMap<K, V> implements Map<K, V> {

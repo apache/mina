@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
  * NTLMTest.java - JUNIT tests of the NTLM authentication mechanism.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class NTLMTest extends TestCase {

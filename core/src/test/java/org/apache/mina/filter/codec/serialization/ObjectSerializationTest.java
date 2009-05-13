@@ -35,7 +35,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * Tests object serialization codec and streams.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ObjectSerializationTest extends TestCase {
     public void testEncoder() throws Exception {

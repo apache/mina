@@ -27,7 +27,6 @@ import org.apache.mina.core.write.WriteRequest;
  * components to store I/O events.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 592965 $, $Date: 2007-11-08 01:15:00 +0100 (Thu, 08 Nov 2007) $
  */
 public class IoEvent implements Runnable {
     private final IoEventType type;

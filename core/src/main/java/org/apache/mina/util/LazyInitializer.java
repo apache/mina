@@ -25,7 +25,6 @@ package org.apache.mina.util;
  * early initializing unnecessary objects.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M2
  */
 public abstract class LazyInitializer<V> {

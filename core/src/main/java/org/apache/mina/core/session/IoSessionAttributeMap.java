@@ -27,7 +27,6 @@ import java.util.Set;
  * the instance of {@link IoSessionAttributeMap}. 
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoSessionAttributeMap {
 

@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Provides usage statistics for an {@link AbstractIoService} instance.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since 2.0.0-M3
  */
 public class IoServiceStatistics {

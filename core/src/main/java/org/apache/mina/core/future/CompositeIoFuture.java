@@ -31,7 +31,6 @@ import org.apache.mina.core.IoUtil;
  * for better performance.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  * @param <E> the type of the child futures.
  */

@@ -57,7 +57,6 @@ import org.apache.mina.util.CircularQueue;
  * performance advantage if {@link IoBuffer#free()} is called properly.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CachedBufferAllocator implements IoBufferAllocator {
 

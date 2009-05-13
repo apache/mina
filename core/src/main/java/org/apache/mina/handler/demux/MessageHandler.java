@@ -29,7 +29,6 @@ import org.apache.mina.core.session.IoSession;
  * or {@link DemuxingIoHandler#addSentMessageHandler(Class, MessageHandler)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface MessageHandler<E> {
     /**

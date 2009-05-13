@@ -26,7 +26,6 @@ import org.apache.mina.core.session.IoSessionConfig;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfig
         implements SocketSessionConfig {

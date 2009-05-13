@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSession;
  * on a <tt>messageReceived</tt> event.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ChainedIoHandler extends IoHandlerAdapter {
     private final IoHandlerChain chain;

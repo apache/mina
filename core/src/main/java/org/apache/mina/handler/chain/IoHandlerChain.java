@@ -31,7 +31,6 @@ import org.apache.mina.core.session.IoSession;
  * A chain of {@link IoHandlerCommand}s.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoHandlerChain implements IoHandlerCommand {
     private static volatile int nextId = 0;
@@ -285,7 +284,6 @@ public class IoHandlerChain implements IoHandlerCommand {
      * Represents a name-command pair that an {@link IoHandlerChain} contains.
      *
      * @author The Apache MINA Project (dev@mina.apache.org)
-     * @version $Rev$, $Date$
      */
     public class Entry {
         private Entry prevEntry;

@@ -41,7 +41,6 @@ import org.apache.mina.util.AvailablePortFinder;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractFileRegionTest extends TestCase {
 

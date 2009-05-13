@@ -49,7 +49,6 @@ import static org.junit.Assert.fail;
  * Tests {@link IoBuffer}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoBufferTest {
 

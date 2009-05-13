@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
  * we'll require outNetBuffer be completely flushed before trying to wrap any more data.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class SslHandler {
 

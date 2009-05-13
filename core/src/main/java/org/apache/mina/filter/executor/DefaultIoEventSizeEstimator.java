@@ -42,7 +42,6 @@ import org.apache.mina.core.write.WriteRequest;
  * All the estimated sizes of classes are cached for performance improvement.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
     /** A map containing the estimated size of each Java objects we know for */ 

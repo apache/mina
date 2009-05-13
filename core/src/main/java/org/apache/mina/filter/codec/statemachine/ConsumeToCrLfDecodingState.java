@@ -27,7 +27,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * has been encountered.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class ConsumeToCrLfDecodingState implements DecodingState {
 

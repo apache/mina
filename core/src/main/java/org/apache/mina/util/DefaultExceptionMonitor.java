@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * monitor.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultExceptionMonitor extends ExceptionMonitor {
     private final static Logger LOGGER = LoggerFactory

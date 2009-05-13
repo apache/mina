@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class Request {
     private final Object id;

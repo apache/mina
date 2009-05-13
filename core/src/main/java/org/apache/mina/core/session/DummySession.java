@@ -51,7 +51,6 @@ import org.apache.mina.core.write.WriteRequest;
  * {@link IoFilterChain} to intercept any I/O events and requests.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DummySession extends AbstractIoSession {
 

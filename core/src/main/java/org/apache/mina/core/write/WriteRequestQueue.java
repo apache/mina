@@ -26,7 +26,6 @@ import org.apache.mina.core.session.IoSession;
  * Stores {@link WriteRequest}s which are queued to an {@link IoSession}.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface WriteRequestQueue {
 

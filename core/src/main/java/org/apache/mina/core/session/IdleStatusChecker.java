@@ -35,7 +35,6 @@ import org.apache.mina.util.ConcurrentHashSet;
  * events alone, using the poll/select timeout. 
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 525369 $, $Date: 2007-04-04 05:05:11 +0200 (mer., 04 avr. 2007) $
  */
 public class IdleStatusChecker {
     

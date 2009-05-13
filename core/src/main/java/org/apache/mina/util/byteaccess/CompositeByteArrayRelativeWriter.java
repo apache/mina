@@ -38,7 +38,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * TODO: Get flushing working.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelativeBase implements IoRelativeWriter
 {

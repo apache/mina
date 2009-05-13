@@ -104,7 +104,6 @@ import org.apache.mina.core.write.WriteRequest;
  * a parameter of the convenience constructors.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * 
  * @see OrderedThreadPoolExecutor
  * @see UnorderedThreadPoolExecutor

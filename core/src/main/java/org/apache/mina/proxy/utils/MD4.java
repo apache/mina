@@ -13,7 +13,6 @@ import java.security.MessageDigestSpi;
  *    Digest Algorithm by R. Rivest.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M3
  */
 public class MD4 extends MessageDigestSpi {

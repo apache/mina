@@ -32,7 +32,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * Tests {@link TextLineEncoder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class TextLineEncoderTest extends TestCase {
     public static void main(String[] args) {

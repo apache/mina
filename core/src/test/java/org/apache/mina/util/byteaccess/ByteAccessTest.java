@@ -38,7 +38,6 @@ import org.easymock.IMocksControl;
  * Tests classes in the <code>byteaccess</code> package.
  * 
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
- * @version $Rev$, $Date$
  */
 public class ByteAccessTest extends TestCase {
 

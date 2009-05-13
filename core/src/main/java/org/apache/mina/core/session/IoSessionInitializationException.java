@@ -24,7 +24,6 @@ package org.apache.mina.core.session;
  * an {@link IoSession} fails.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoSessionInitializationException extends RuntimeException {
     private static final long serialVersionUID = -1205810145763696189L;

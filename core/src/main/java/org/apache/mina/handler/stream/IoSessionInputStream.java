@@ -30,7 +30,6 @@ import org.apache.mina.core.service.IoHandler;
  * {@link IoHandler#messageReceived(IoSession, Object)} events.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class IoSessionInputStream extends InputStream {
     private final Object mutex = new Object();

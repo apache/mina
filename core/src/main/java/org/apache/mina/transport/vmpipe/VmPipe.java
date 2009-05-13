@@ -26,7 +26,6 @@ import org.apache.mina.core.service.IoServiceListenerSupport;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class VmPipe {
     private final VmPipeAcceptor acceptor;

@@ -42,7 +42,6 @@ import org.junit.Test;
  * Tests {@link RequestResponseFilter}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class RequestResponseFilterTest extends TestCase {
 

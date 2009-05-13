@@ -27,7 +27,6 @@ import org.apache.mina.core.session.IoSession;
  * A default implementation of {@link ConnectFuture}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultConnectFuture extends DefaultIoFuture implements
         ConnectFuture {

@@ -30,7 +30,6 @@ import org.apache.mina.core.session.IoSession;
  * The default implementation of {@link WriteRequest}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev:671827 $, $Date:2008-06-26 09:49:48 +0100 (jeu., 26 juin 2008) $
  */
 public class DefaultWriteRequest implements WriteRequest {
     private static final WriteFuture UNUSED_FUTURE = new WriteFuture() {

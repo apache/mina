@@ -28,7 +28,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * order (high bytes come first).
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class ShortIntegerDecodingState implements DecodingState {
     

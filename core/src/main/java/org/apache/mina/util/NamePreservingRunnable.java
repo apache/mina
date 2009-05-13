@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
  * complete (for {@link Runnable}s that change the name of the Thread they use.)
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 446581 $, $Date: 2006-09-15 11:36:12Z $,
  */
 public class NamePreservingRunnable implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(NamePreservingRunnable.class);

@@ -81,7 +81,6 @@ import org.apache.mina.core.write.WriteToClosedSessionException;
  * </pre>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class SslFilter extends IoFilterAdapter {
@@ -674,7 +673,6 @@ public class SslFilter extends IoFilterAdapter {
      * secure or is not secure anymore.
      *
      * @author The Apache MINA Project (dev@mina.apache.org)
-     * @version $Rev$, $Date$
      */
     public static class SslFilterMessage {
         private final String name;

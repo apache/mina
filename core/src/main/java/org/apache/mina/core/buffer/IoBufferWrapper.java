@@ -44,7 +44,6 @@ import java.util.Set;
  * operations selectively.  You can introduce new operations, too.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoBufferWrapper extends IoBuffer {
 

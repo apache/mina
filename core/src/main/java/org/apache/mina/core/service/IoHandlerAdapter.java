@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * methods do nothing by default.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoHandlerAdapter implements IoHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(IoHandlerAdapter.class);

@@ -34,7 +34,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * by {@link ObjectSerializationEncoder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ObjectSerializationInputStream extends InputStream implements
         ObjectInput {

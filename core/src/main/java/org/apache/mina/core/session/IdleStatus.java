@@ -33,7 +33,6 @@ package org.apache.mina.core.session;
  * using {@link IoSessionConfig#setIdleTime(IdleStatus,int)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IdleStatus {
     /**

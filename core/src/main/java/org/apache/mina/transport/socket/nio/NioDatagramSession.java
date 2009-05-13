@@ -39,7 +39,6 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
  * An {@link IoSession} for datagram transport (UDP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 class NioDatagramSession extends NioSession {
 

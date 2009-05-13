@@ -27,7 +27,6 @@ import java.util.Set;
  * An {@link IdentityHashMap}-backed {@link Set}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IdentityHashSet<E> extends MapBackedSet<E> {
 

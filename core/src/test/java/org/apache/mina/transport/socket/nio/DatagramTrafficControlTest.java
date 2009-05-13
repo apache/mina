@@ -32,7 +32,6 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
  * transport type.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Id$
  */
 public class DatagramTrafficControlTest extends AbstractTrafficControlTest {
 

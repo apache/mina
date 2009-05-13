@@ -31,7 +31,6 @@ import org.apache.mina.core.write.WriteRequest;
  * when the filter is not in use.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class ReferenceCountingFilter extends IoFilterAdapter {

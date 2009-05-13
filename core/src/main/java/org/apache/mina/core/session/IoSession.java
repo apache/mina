@@ -65,7 +65,6 @@ import org.apache.mina.core.write.WriteRequestQueue;
  * to the default behavior that is defined in {@link Object}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoSession {
     /**

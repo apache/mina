@@ -42,7 +42,6 @@ import org.apache.mina.core.session.IoSession;
  * {@link #bind()} is invoked, and stop when {@link #unbind()} is invoked.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoAcceptor extends IoService {
     /**

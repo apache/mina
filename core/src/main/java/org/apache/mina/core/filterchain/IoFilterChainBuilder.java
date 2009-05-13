@@ -35,7 +35,6 @@ import org.apache.mina.core.session.IoSession;
  * </pre>
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 576217 $, $Date: 2007-09-17 01:55:27 +0200 (Mon, 17 Sep 2007) $
  */
 public interface IoFilterChainBuilder {
     /**

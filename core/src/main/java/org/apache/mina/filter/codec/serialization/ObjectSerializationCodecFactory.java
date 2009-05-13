@@ -31,7 +31,6 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  * without any specific codec.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ObjectSerializationCodecFactory implements ProtocolCodecFactory {
     private final ObjectSerializationEncoder encoder;

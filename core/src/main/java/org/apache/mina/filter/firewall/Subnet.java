@@ -28,7 +28,6 @@ import java.net.InetAddress;
  * address are supported.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 636538 $, $Date: 2008-03-12 22:19:27 +0000 (Wed, 12 Mar 2008) $
  */
 public class Subnet {
 

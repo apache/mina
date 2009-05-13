@@ -29,7 +29,6 @@ import java.nio.ByteOrder;
  * buffer every time.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class SimpleBufferAllocator implements IoBufferAllocator {
 

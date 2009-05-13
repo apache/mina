@@ -35,7 +35,6 @@ import static org.junit.Assert.assertSame;
  * Tests {@link DefaultIoFilterChainBuilder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class DefaultIoFilterChainBuilderTest {
     @Before

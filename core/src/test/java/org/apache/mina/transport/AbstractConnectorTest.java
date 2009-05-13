@@ -40,7 +40,6 @@ import org.apache.mina.util.AvailablePortFinder;
  * Tests a generic {@link IoConnector}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractConnectorTest extends TestCase {
 

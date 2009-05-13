@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
  * Tests {@link BufferedWriteFilter}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M2
  */
 public class BufferedWriteFilterTest extends TestCase {

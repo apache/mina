@@ -31,7 +31,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * message types to handle.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  * @see DemuxingProtocolEncoder
  * @see MessageEncoderFactory

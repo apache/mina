@@ -25,7 +25,6 @@ package org.apache.mina.core.session;
  * components to store I/O events.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 591770 $, $Date: 2007-11-04 13:22:44 +0100 (Sun, 04 Nov 2007) $
  */
 public enum IoEventType {
     SESSION_CREATED,

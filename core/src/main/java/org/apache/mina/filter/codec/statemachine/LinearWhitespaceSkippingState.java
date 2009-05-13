@@ -23,7 +23,6 @@ package org.apache.mina.filter.codec.statemachine;
  * {@link DecodingState} which skips space (0x20) and tab (0x09) characters.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class LinearWhitespaceSkippingState extends SkippingState {
 

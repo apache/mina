@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
  * TODO Add documentation
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class RequestResponseFilter extends WriteRequestFilter {

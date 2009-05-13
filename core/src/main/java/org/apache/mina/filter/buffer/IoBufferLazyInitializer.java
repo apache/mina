@@ -27,7 +27,6 @@ import org.apache.mina.util.LazyInitializer;
  * {@link IoBuffer} only when needed.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M2
  */
 public class IoBufferLazyInitializer extends LazyInitializer<IoBuffer> {

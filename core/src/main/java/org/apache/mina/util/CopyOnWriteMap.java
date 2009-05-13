@@ -34,7 +34,6 @@ import java.util.Set;
  * class happen quickly and concurrently.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     private volatile Map<K, V> internalMap;

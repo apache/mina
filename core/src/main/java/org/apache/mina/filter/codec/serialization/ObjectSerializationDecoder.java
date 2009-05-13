@@ -33,7 +33,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * objects using {@link IoBuffer#getObject(ClassLoader)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
     private final ClassLoader classLoader;

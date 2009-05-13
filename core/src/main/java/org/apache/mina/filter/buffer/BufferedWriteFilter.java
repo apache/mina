@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
  * as it only handles {@link WriteRequest}'s carrying {@link IoBuffer} objects.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @since MINA 2.0.0-M2
  * @org.apache.xbean.XBean
  */

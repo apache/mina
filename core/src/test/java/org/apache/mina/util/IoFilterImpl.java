@@ -28,7 +28,6 @@ import org.apache.mina.core.filterchain.IoFilterChain;
  * {@link IoFilterChain}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class IoFilterImpl extends IoFilterAdapter {
     private final char c;

@@ -31,8 +31,6 @@ import org.apache.mina.core.session.IoSession;
  * the associated {@link IoSession}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
- *
  */
 class IoSessionOutputStream extends OutputStream {
     private final IoSession session;

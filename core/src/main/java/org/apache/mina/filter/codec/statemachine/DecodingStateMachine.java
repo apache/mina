@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
  * </p>
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class DecodingStateMachine implements DecodingState {
     private final Logger log = LoggerFactory

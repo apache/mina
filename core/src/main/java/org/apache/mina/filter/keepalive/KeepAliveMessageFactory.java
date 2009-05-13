@@ -25,7 +25,6 @@ import org.apache.mina.core.session.IoSession;
  * Provides keep-alive messages to {@link KeepAliveFilter}.
  *  
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface KeepAliveMessageFactory {
     

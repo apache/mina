@@ -33,7 +33,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * should be removed based on the provided time-to-live value.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class ExpiringMap<K, V> implements Map<K, V> {
     

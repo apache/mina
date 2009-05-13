@@ -27,7 +27,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * character is reached. The terminator is skipped.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class ConsumeToDynamicTerminatorDecodingState implements
         DecodingState {

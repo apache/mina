@@ -26,7 +26,6 @@ import java.util.concurrent.BlockingQueue;
  * The configuration of {@link IoSession}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 597940 $, $Date: 2007-11-25 02:00:09 +0100 (Sun, 25 Nov 2007) $
  */
 public interface IoSessionConfig {
 

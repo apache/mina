@@ -28,7 +28,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * closed.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class ConsumeToEndOfSessionDecodingState implements DecodingState {
 

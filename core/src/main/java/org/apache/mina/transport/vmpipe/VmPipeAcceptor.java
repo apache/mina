@@ -40,7 +40,6 @@ import org.apache.mina.core.session.IoSession;
  * {@link VmPipeAddress}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public final class VmPipeAcceptor extends AbstractIoAcceptor {
     

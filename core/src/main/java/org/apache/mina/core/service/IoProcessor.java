@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSession;
  * implementations.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * 
  * @param <T> the type of the {@link IoSession} this processor can handle
  */

@@ -28,7 +28,6 @@ import org.apache.mina.core.session.IoSession;
  * {@link DemuxingIoHandler#addExceptionHandler(Class, ExceptionHandler)}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface ExceptionHandler<E extends Throwable> {
     /**

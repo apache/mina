@@ -27,7 +27,6 @@ import java.util.Iterator;
  * Tests {@link org.apache.mina.util.CircularQueue}
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CircularQueueTest extends TestCase {
     private volatile int pushCount;

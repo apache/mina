@@ -33,7 +33,6 @@ import org.apache.mina.util.MapBackedSet;
  * An exception which is thrown when one or more write operations were failed.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$,
  */
 public class WriteException extends IOException {
 

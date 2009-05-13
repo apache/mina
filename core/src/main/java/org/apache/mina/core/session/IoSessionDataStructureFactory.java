@@ -28,7 +28,6 @@ import org.apache.mina.core.write.WriteRequestQueue;
  * Provides data structures to a newly created session.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoSessionDataStructureFactory {
     /**

@@ -24,7 +24,6 @@ package org.apache.mina.filter.keepalive;
  * message was not received within a certain timeout.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class KeepAliveRequestTimeoutException extends RuntimeException {
 

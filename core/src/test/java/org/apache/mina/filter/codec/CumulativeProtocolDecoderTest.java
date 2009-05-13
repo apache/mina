@@ -40,7 +40,6 @@ import static org.junit.Assert.assertTrue;
  * Tests {@link CumulativeProtocolDecoder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public class CumulativeProtocolDecoderTest {
     private final ProtocolCodecSession session = new ProtocolCodecSession();

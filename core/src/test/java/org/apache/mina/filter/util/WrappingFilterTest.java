@@ -38,7 +38,6 @@ import org.easymock.EasyMock;
  * Tests {@link CommonEventFilter}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 567208 $, $Date: 2007-08-18 04:27:05 +0200 (za, 18 aug 2007) $
  */
 
 public class WrappingFilterTest extends TestCase {

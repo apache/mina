@@ -56,7 +56,6 @@ import org.apache.mina.util.NamePreservingRunnable;
  * events.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class AbstractIoService implements IoService {
     /** 

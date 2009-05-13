@@ -24,7 +24,6 @@ package org.apache.mina.core.buffer;
  * contains is corrupt.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  */
 public class BufferDataException extends RuntimeException {

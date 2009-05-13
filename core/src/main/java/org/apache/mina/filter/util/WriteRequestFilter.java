@@ -31,7 +31,6 @@ import org.apache.mina.core.write.WriteRequestWrapper;
  * an {@link IoFilter} that filters an {@link IoEventType#WRITE} event.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  *
  */
 public abstract class WriteRequestFilter extends IoFilterAdapter {

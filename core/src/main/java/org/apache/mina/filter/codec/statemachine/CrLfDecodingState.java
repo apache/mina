@@ -33,7 +33,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * an error.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class CrLfDecodingState implements DecodingState {
     /**

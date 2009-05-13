@@ -26,7 +26,6 @@ import java.nio.ByteBuffer;
  * interface if you need more advanced memory management scheme.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public interface IoBufferAllocator {
     /**

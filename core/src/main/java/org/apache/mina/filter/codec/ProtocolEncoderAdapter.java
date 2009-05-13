@@ -26,7 +26,6 @@ import org.apache.mina.core.session.IoSession;
  * resources to dispose.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  */
 public abstract class ProtocolEncoderAdapter implements ProtocolEncoder {
     /**

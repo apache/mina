@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
  * of a Java String object using a fixed-length length prefix.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 596187 $, $Date: 2007-11-19 04:41:14 +0100 (ma, 19 nov 2007) $
  */
 public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
 

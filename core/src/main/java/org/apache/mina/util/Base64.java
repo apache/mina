@@ -33,7 +33,6 @@ import java.security.InvalidParameterException;
  *  This class was 
  * @author Apache Software Foundation commons codec (http://commons.apache.org/codec/)
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Id: $
  */
 public class Base64 {
 

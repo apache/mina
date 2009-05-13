@@ -41,7 +41,6 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * {@link IoAcceptor} for datagram transport (UDP/IP).
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public final class NioDatagramAcceptor

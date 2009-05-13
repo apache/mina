@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
  * A {@link ProtocolDecoder} which decodes a String using a fixed-length length prefix.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev: 591182 $, $Date: 2007-11-02 01:59:27 +0100 (vr, 02 nov 2007) $,
  */
 public class PrefixedStringDecoder extends CumulativeProtocolDecoder {
 
