@@ -44,10 +44,11 @@ import org.slf4j.LoggerFactory;
  * {@link ProtocolEncoder}, or {@link ProtocolDecoder}.
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
- * @version $Rev$, $Date$
  * @org.apache.xbean.XBean
  */
 public class ProtocolCodecFilter extends IoFilterAdapter {
+    /** A logger for this class */
+    private final static Logger LOGGER = LoggerFactory.getLogger(ProtocolCodecFilter.class);
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
     private static final IoBuffer EMPTY_BUFFER = IoBuffer.wrap(new byte[0]);
@@ -59,8 +60,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(ProtocolCodecFilter.class);
 
     /**
      * 
@@ -203,6 +202,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws Exception {
+        LOGGER.debug( "Processing a MESSAGE_RECEIVED for session {}", session.getId() );
+        
         if (!(message instanceof IoBuffer)) {
             nextFilter.messageReceived(session, message);
             return;
