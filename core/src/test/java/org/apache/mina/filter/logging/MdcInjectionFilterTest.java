@@ -51,7 +51,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -238,7 +237,7 @@ public class MdcInjectionFilterTest {
                     event.getMDC("handlerClass") );
             }
         }
-        // asert we have received all expected logging events for each client
+        // assert we have received all expected logging events for each client
         for (int i = 0; i < remoteAddressClients.length; i++) {
             SocketAddress remoteAddressClient = remoteAddressClients[i];
             assertEventExists(events, "sessionCreated", remoteAddressClient, null);
