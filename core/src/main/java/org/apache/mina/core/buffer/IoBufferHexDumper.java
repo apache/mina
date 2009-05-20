@@ -81,7 +81,7 @@ class IoBufferHexDumper {
             return "empty";
         }
 
-        StringBuilder out = new StringBuilder(in.remaining() * 3 - 1);
+        StringBuilder out = new StringBuilder(size * 3 + 3);
 
         int mark = in.position();
 
