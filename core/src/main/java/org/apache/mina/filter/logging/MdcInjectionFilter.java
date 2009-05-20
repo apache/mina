@@ -55,7 +55,7 @@ import org.slf4j.MDC;
  * <li>"localPort"</li>
  * </ul>
  *
- * User code can also add properties to the context, via
+ * User code can also add properties to the context, via TODO : Finish the sentence
  *
  * If you only want the MDC to be set for the IoHandler code, it's enough to add
  * one MdcInjectionFilter at the end of the filter chain.
