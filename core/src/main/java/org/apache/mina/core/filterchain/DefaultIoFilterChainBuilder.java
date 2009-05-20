@@ -287,7 +287,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     public synchronized IoFilter replace(String name, IoFilter newFilter) {
         checkBaseName(name);
-        EntryImpl e = (EntryImpl) get(name);
+        EntryImpl e = (EntryImpl)getEntry(name);
         IoFilter oldFilter = e.getFilter();
         e.setFilter(newFilter);
         return oldFilter;
