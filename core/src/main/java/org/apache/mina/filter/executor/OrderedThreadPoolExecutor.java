@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     /** A logger for this class (commented as it breaks MDCFlter tests) */
-    //static Logger LOGGER = LoggerFactory.getLogger(OrderedThreadPoolExecutor.class);
+    static Logger LOGGER = LoggerFactory.getLogger(OrderedThreadPoolExecutor.class);
 
     /** A default value for the initial pool size */
     private static final int DEFAULT_INITIAL_THREAD_POOL_SIZE = 0;
@@ -441,7 +441,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             sb.append(((IoEvent)elem).getType()).append(", ");
         }
         sb.append( "]\n" );
-        //LOGGER.debug( sb.toString() );
+        LOGGER.debug( sb.toString() );
     }
 
     /**
@@ -485,11 +485,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                     offerSession = false;
                 }
 
-                /*
                 if (LOGGER.isDebugEnabled()) {
                     print(tasksQueue, event);
                 }
-                */
             }
         } else {
             offerSession = false;

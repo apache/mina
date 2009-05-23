@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IoFilterEvent extends IoEvent {
     /** A logger for this class */
-    //static Logger LOGGER = LoggerFactory.getLogger(IoFilterEvent.class);
+    static Logger LOGGER = LoggerFactory.getLogger(IoFilterEvent.class);
 
     private final NextFilter nextFilter;
 
@@ -60,13 +60,11 @@ public class IoFilterEvent extends IoEvent {
         IoSession session = getSession();
         NextFilter nextFilter = getNextFilter();
         IoEventType type = getType();
-        
-        /*
+
         if ( LOGGER.isDebugEnabled()) {
             LOGGER.debug( "Firing a {} event for session {}",type, session.getId() );
         }
-        */
-        
+
         switch (type) {
         case MESSAGE_RECEIVED:
             Object parameter = getParameter();
@@ -103,10 +101,8 @@ public class IoFilterEvent extends IoEvent {
             throw new IllegalArgumentException("Unknown event type: " + type);
         }
         
-        /*
         if ( LOGGER.isDebugEnabled()) {
             LOGGER.debug( "Event {} has been fired for session {}", type, session.getId() );
         }
-        */
     }
 }

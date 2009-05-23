@@ -22,9 +22,7 @@ package org.apache.mina.filter.logging;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.AppenderSkeleton;
@@ -221,16 +219,18 @@ public class MdcInjectionFilterTest {
         // make a copy to prevent ConcurrentModificationException
         List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
 
+        Set<String> loggersToCheck = new HashSet<String>();
+        loggersToCheck.add(MdcInjectionFilterTest.class.getName());
+        loggersToCheck.add(ProtocolCodecFilter.class.getName());
+        loggersToCheck.add(LoggingFilter.class.getName());
+
         // verify that all logging events have correct MDC
         for (LoggingEvent event : events) {
-            if (!ExecutorFilter.class.getName().equals(event.getLoggerName())) {
+             
+            if (loggersToCheck.contains(event.getLoggerName())) {
                 Object remoteAddress = event.getMDC("remoteAddress");
-                assertNotNull(
-                    "MDC[remoteAddress] not set for [" + event.getMessage() + "]",
-                    remoteAddress);
-                assertNotNull(
-                    "MDC[remotePort] not set for [" + event.getMessage() + "]",
-                    event.getMDC("remotePort"));
+                assertNotNull("MDC[remoteAddress] not set for [" + event.getMessage() + "]", remoteAddress);
+                assertNotNull("MDC[remotePort] not set for [" + event.getMessage() + "]", event.getMDC("remotePort"));
                 assertEquals(
                     "every event should have MDC[handlerClass]",
                     SimpleIoHandler.class.getName(),
