@@ -71,10 +71,13 @@ public class MdcInjectionFilterTest {
     private int port;
     private NioSocketAcceptor acceptor;
 
+    private Level previousLevelRootLogger;
+
     @Before
     public void setUp() throws Exception {
         // comment out next line if you want to see normal logging
         org.apache.log4j.Logger.getRootLogger().removeAllAppenders();
+        previousLevelRootLogger = org.apache.log4j.Logger.getRootLogger().getLevel();
         org.apache.log4j.Logger.getRootLogger().setLevel(Level.DEBUG);
         org.apache.log4j.Logger.getRootLogger().addAppender(appender);
         acceptor = new NioSocketAcceptor();
@@ -84,6 +87,7 @@ public class MdcInjectionFilterTest {
     @After
     public void tearDown() throws Exception {
         acceptor.dispose();
+        org.apache.log4j.Logger.getRootLogger().setLevel(previousLevelRootLogger);
     }
 
     @Test
