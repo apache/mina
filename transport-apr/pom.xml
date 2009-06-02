@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>mina-parent</artifactId>
-    <version>2.0.0-M6-SNAPSHOT</version>
+    <version>2.0.0-M7-SNAPSHOT</version>
   </parent>
   <artifactId>mina-transport-apr</artifactId>
   <name>Apache MINA APR Transport</name>
@@ -39,6 +39,7 @@
     <dependency>
       <groupId>tomcat</groupId>
       <artifactId>tomcat-apr</artifactId>
+      <version>5.5.23</version>
     </dependency>
   </dependencies>
   
