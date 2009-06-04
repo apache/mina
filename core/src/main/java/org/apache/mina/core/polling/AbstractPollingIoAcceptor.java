@@ -569,6 +569,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             // close the channels
             for (SocketAddress a : future.getLocalAddresses()) {
                 H handle = boundHandles.remove(a);
+                
                 if (handle == null) {
                     continue;
                 }
