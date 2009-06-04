@@ -168,6 +168,10 @@ public class DefaultIoFuture implements IoFuture {
      */
     private boolean await0(long timeoutMillis, boolean interruptable) throws InterruptedException {
         long endTime = System.currentTimeMillis() + timeoutMillis;
+        
+        if (endTime < 0) {
+            endTime = Long.MAX_VALUE;
+        }
 
         synchronized (lock) {
             if (ready) {
@@ -177,6 +181,7 @@ public class DefaultIoFuture implements IoFuture {
             }
 
             waiters++;
+            
             try {
                 for (;;) {
                     try {
@@ -190,10 +195,10 @@ public class DefaultIoFuture implements IoFuture {
 
                     if (ready) {
                         return true;
-                    } else {
-                        if (endTime < System.currentTimeMillis()) {
-                            return ready;
-                        }
+                    }
+                    
+                    if (endTime < System.currentTimeMillis()) {
+                        return ready;
                     }
                 }
             } finally {
