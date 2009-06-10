@@ -33,7 +33,7 @@ import java.util.Set;
  * modify the Map.  Therefore the operations that do not cause a change to this
  * class happen quickly and concurrently.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     private volatile Map<K, V> internalMap;

@@ -59,7 +59,7 @@ import org.apache.mina.util.ExceptionMonitor;
 /**
  * Base implementation of {@link IoSession}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoSession implements IoSession {
 

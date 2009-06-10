@@ -24,7 +24,7 @@ import org.apache.mina.core.session.IoSessionConfig;
 /**
  * An {@link IoSessionConfig} for vmpipe transport type.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface VmPipeSessionConfig extends IoSessionConfig {
     // Do nothing

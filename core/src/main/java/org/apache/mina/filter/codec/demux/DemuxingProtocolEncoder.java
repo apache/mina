@@ -40,7 +40,7 @@ import org.apache.mina.util.IdentityHashSet;
  * Override {@link #dispose(IoSession)} method. Please don't forget to call
  * <tt>super.dispose()</tt>.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see MessageEncoderFactory
  * @see MessageEncoder

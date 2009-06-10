@@ -31,7 +31,7 @@ import java.nio.charset.Charset;
  * A {@link ProtocolEncoder} which encodes a string
  * using a fixed-length length prefix.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PrefixedStringEncoder extends ProtocolEncoderAdapter {
 

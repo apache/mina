@@ -29,7 +29,7 @@ import org.apache.mina.core.session.IoSession;
  * on a per-encoder basis instead of on a per-session basis, which is not
  * common.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SynchronizedProtocolEncoder implements ProtocolEncoder {
     private final ProtocolEncoder encoder;

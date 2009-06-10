@@ -26,7 +26,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * (<b>Entry point</b>) Chat server which uses Spring and the serverContext.xml
  * file to set up MINA and the server handler.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SpringMain {
 

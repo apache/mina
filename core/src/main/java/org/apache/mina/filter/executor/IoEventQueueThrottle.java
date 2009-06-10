@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Throttles incoming or outgoing events.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoEventQueueThrottle implements IoEventQueueHandler {
     /** A logger for this class */

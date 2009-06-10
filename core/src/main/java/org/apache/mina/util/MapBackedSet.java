@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * A {@link Map}-backed {@link Set}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MapBackedSet<E> extends AbstractSet<E> implements Serializable {
 

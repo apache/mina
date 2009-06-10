@@ -36,7 +36,7 @@ import javax.net.ssl.X509TrustManager;
  * Bogus {@link javax.net.ssl.TrustManagerFactory} which creates
  * {@link javax.net.ssl.X509TrustManager} trusting everything.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class BogusTrustManagerFactory extends TrustManagerFactory {
 

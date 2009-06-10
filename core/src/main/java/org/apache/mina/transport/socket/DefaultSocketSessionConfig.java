@@ -24,7 +24,7 @@ import org.apache.mina.core.service.IoService;
 /**
  * A default implementation of {@link SocketSessionConfig}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     private static boolean DEFAULT_REUSE_ADDRESS = false;

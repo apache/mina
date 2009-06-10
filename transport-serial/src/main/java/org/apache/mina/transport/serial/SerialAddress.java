@@ -28,7 +28,7 @@ import java.security.InvalidParameterException;
 /**
  * An address for a serial port communication.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SerialAddress extends SocketAddress {
 

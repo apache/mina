@@ -31,7 +31,7 @@ import java.util.ArrayList;
  *
  * Implementation is heavily based on org.apache.log4j.helpers.Transform
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Transform {
 

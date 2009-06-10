@@ -38,7 +38,7 @@ import org.apache.mina.integration.beans.PropertyEditorFactory;
  * method to have more control over how an appropriate {@link PropertyEditor}
  * is chosen.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PropertyTypeConverter implements TypeConverter {
     

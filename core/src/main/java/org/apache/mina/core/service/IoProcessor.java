@@ -27,7 +27,7 @@ import org.apache.mina.core.session.IoSession;
  * reactor frameworks such as Java NIO once again to simplify transport
  * implementations.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  * @param <T> the type of the {@link IoSession} this processor can handle
  */

@@ -29,7 +29,7 @@ import org.apache.mina.integration.beans.InetSocketAddressEditor;
  * Workaround for dealing with inability to annotate java docs of JDK 
  * socket address classes.
  *
- * @author <a href="mailto:dev@mina.apache.org">Apache MINA Project</a>
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean element="socketAddress" contentProperty="value"
  */
 public class SocketAddressFactory

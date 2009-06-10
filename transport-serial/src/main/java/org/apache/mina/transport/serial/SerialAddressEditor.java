@@ -33,7 +33,7 @@ import org.apache.mina.transport.serial.SerialAddress.StopBits;
  * components separated by colon (e.g. <tt>COM1:9600:7:1:even:rtscts-in</tt>);
  * port name, bauds, data bits, stop bits, parity and flow control respectively.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SerialAddressEditor extends AbstractPropertyEditor {
     @Override

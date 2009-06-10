@@ -30,7 +30,7 @@ import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
- * @author Apache Mina Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 
 public class HaikuValidationServer {

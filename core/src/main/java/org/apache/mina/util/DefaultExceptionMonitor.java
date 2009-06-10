@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * All {@link IoService}s have this implementation as a default exception
  * monitor.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultExceptionMonitor extends ExceptionMonitor {
     private final static Logger LOGGER = LoggerFactory

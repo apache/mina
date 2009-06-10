@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * A {@link PropertyEditor} which converts a {@link String} into
  * a {@link Pattern} and vice versa.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PatternEditor extends AbstractPropertyEditor {
 

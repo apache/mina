@@ -32,7 +32,7 @@ import org.apache.tomcat.jni.Pool;
  * Each memory pool used in the APR transport module needs to be children of the
  * root pool {@link AprLibrary#getRootPool()}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class AprLibrary {
 

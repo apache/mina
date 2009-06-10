@@ -30,7 +30,7 @@ import java.util.Set;
  * A factory that creates a new {@link PropertyEditor} which is appropriate for
  * the specified object or class. 
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class PropertyEditorFactory {
     @SuppressWarnings("unchecked")

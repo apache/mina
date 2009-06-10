@@ -25,7 +25,7 @@ import org.apache.mina.core.session.IoSessionConfig;
  * An {@link IoSessionConfig} for serial transport type.
  * All those parameters are extracted from rxtx.org API for more details :
  * http://www.rxtx.org
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SerialSessionConfig extends IoSessionConfig {
 

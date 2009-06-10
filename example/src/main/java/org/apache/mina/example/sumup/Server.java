@@ -30,7 +30,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 /**
  * (<strong>Entry Point</strong>) Starts SumUp server.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Server {
     private static final int SERVER_PORT = 8080;

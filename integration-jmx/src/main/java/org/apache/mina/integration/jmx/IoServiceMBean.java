@@ -35,7 +35,7 @@ import org.apache.mina.integration.ognl.IoSessionFinder;
 /**
  * A JMX MBean wrapper for an {@link IoSession}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoServiceMBean extends ObjectMBean<IoService> {
 

@@ -28,7 +28,7 @@ import java.util.Queue;
 /**
  * A unbounded circular queue based on array.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Serializable {
     /** The serialVersionUID : mandatory for serializable classes */

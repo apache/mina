@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * execute your stream I/O logic; <b>please note that you must forward
  * the process request to other thread or thread pool.</b>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class StreamIoHandler extends IoHandlerAdapter {
     private final static Logger LOGGER = LoggerFactory.getLogger(StreamIoHandler.class);

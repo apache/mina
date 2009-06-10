@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Tests echo server example.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractTest extends TestCase {
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractTest.class);

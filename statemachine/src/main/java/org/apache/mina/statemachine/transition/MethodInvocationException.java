@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
  * Thrown by {@link MethodTransition} if the target method couldn't be invoked
  * or threw an exception.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MethodInvocationException extends RuntimeException {
     private static final long serialVersionUID = 4288548621384649704L;

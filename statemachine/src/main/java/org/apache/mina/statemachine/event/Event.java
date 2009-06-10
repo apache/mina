@@ -27,7 +27,7 @@ import org.apache.mina.statemachine.context.StateContext;
  * An event has an id and zero or more arguments typically corresponding to
  * the method arguments. 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Event {
     public static final String WILDCARD_EVENT_ID = "*";

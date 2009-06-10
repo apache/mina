@@ -31,7 +31,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
  * (<b>Entry point</b>) Reverser server which reverses all text lines from
  * clients.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Main {
     private static final int PORT = 8080;

@@ -40,7 +40,7 @@ import static org.junit.Assert.assertSame;
 /**
  * Tests {@link IoServiceListenerSupport}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoServiceListenerSupportTest {
     private static final SocketAddress ADDRESS = new InetSocketAddress(8080);

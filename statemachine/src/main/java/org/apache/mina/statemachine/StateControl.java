@@ -39,7 +39,7 @@ import org.apache.mina.statemachine.transition.Transition;
  * state will be popped from the stack and used as the new state.
  * </p>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StateControl {
 

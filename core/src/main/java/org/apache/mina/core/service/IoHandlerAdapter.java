@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * class and selectively override required event handler methods only.  All
  * methods do nothing by default.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoHandlerAdapter implements IoHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(IoHandlerAdapter.class);

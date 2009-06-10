@@ -28,7 +28,7 @@ import java.nio.ByteOrder;
  * A simplistic {@link IoBufferAllocator} which simply allocates a new
  * buffer every time.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SimpleBufferAllocator implements IoBufferAllocator {
 

@@ -36,7 +36,7 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 /**
  * Makes sure if the order of event is correct.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class VmPipeEventOrderTest extends TestCase {
     public void testServerToClient() throws Exception {

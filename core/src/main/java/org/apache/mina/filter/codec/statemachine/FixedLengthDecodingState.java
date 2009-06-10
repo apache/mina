@@ -28,7 +28,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * produce a buffer with less data than the configured length if the associated 
  * session has been closed unexpectedly.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class FixedLengthDecodingState implements DecodingState {
 

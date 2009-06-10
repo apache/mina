@@ -34,7 +34,7 @@ import org.apache.mina.statemachine.event.Event;
 /**
  * The actual state machine implementation for the tape deck server.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class TapeDeckServer {
     @State public static final String ROOT = "Root";

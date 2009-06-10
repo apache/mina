@@ -27,7 +27,7 @@ import org.apache.mina.proxy.session.ProxyIoSession;
 /**
  * ProxyLogicHandler.java - Interface implemented by classes containing proxy type specific logic.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public interface ProxyLogicHandler {

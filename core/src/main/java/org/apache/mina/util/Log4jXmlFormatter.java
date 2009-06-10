@@ -42,7 +42,7 @@ import java.util.Arrays;
  * The implementation is heavily based on org.apache.log4j.xml.XMLLayout
  * </p>
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Log4jXmlFormatter extends Formatter {
 

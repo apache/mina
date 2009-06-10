@@ -36,7 +36,7 @@ import org.apache.mina.util.AvailablePortFinder;
 /**
  * Tests if datagram sessions are recycled properly.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DatagramRecyclerTest extends TestCase {
     private NioDatagramAcceptor acceptor;

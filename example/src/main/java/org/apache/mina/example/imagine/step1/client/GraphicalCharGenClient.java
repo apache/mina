@@ -48,7 +48,7 @@ import org.apache.mina.example.imagine.step1.server.ImageServer;
 /**
  * Swing application that acts as a client of the {@link ImageServer}
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class GraphicalCharGenClient extends JFrame implements ImageListener {
 

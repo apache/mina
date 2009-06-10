@@ -23,7 +23,7 @@ package org.apache.mina.core.buffer;
  * A {@link RuntimeException} which is thrown when the data the {@link IoBuffer}
  * contains is corrupt.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  */
 public class BufferDataException extends RuntimeException {

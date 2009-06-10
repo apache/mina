@@ -22,7 +22,7 @@ package org.apache.mina.core.buffer;
 /**
  * Provides utility methods to dump an {@link IoBuffer} into a hex formatted string.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class IoBufferHexDumper {
 

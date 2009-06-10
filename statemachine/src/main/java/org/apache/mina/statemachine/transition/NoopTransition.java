@@ -25,7 +25,7 @@ import org.apache.mina.statemachine.event.Event;
 /**
  * {@link Transition} implementation which does nothing but change the state.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NoopTransition extends AbstractTransition {
 

@@ -37,7 +37,7 @@ import org.apache.mina.util.ExceptionMonitor;
  * A helper which provides addition and removal of {@link IoServiceListener}s and firing
  * events.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoServiceListenerSupport {
     /**

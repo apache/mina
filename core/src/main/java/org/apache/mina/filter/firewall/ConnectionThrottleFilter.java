@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * A {@link IoFilter} which blocks connections from connecting
  * at a rate faster than the specified interval.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ConnectionThrottleFilter extends IoFilterAdapter {
     private static final long DEFAULT_TIME = 1000;

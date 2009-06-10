@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link IoHandler} implementation of a simple chat server protocol.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ChatProtocolHandler extends IoHandlerAdapter {
     private final static Logger LOGGER = LoggerFactory.getLogger(ChatProtocolHandler.class);

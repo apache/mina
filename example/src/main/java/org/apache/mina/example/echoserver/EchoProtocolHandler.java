@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link IoHandler} implementation for echo server.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class EchoProtocolHandler extends IoHandlerAdapter {
     private final static Logger LOGGER = LoggerFactory.getLogger(EchoProtocolHandler.class);

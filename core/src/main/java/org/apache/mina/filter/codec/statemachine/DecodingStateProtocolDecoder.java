@@ -35,7 +35,7 @@ import org.apache.mina.util.CircularQueue;
  * NOTE: This is a stateful decoder. You should create one instance per session.
  * </p>
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     private final DecodingState state;

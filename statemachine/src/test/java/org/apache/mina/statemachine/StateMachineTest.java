@@ -32,7 +32,7 @@ import org.apache.mina.statemachine.transition.AbstractTransition;
 /**
  * Tests {@link StateMachine}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StateMachineTest extends TestCase {
 

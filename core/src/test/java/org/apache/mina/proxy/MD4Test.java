@@ -34,7 +34,7 @@ import junit.framework.TestCase;
  * MD4Test.java - JUnit testcase that tests the rfc 1320 test suite.
  * @see <a href="http://www.ietf.org/rfc/rfc1320.txt">RFC 1320</a>
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public class MD4Test extends TestCase {

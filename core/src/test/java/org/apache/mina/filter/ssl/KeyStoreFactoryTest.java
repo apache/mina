@@ -30,7 +30,7 @@ import junit.framework.TestCase;
 /**
  * Tests {@link KeyStoreFactory}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class KeyStoreFactoryTest extends TestCase {
     public void testCreateInstanceFromResource() throws Exception {

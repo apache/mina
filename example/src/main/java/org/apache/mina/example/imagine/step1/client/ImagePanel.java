@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 /**
  * JPanel capable of drawing two {@link BufferedImage}'s
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ImagePanel extends JPanel {
 

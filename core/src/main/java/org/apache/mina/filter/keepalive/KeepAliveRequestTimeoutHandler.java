@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Tells {@link KeepAliveFilter} what to do when a keep-alive response message
  * was not received within a certain timeout.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface KeepAliveRequestTimeoutHandler {
     /**

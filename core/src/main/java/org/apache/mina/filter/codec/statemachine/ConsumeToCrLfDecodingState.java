@@ -26,7 +26,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * {@link DecodingState} which consumes all bytes until a <code>CRLF</code> 
  * has been encountered.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class ConsumeToCrLfDecodingState implements DecodingState {
 

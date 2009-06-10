@@ -24,7 +24,7 @@ import org.apache.mina.core.RuntimeIoException;
 /**
  * An {@link RuntimeIoException} which is thrown when a {@link Request} is timed out.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class RequestTimeoutException extends RuntimeException {
     private static final long serialVersionUID = 5546784978950631652L;

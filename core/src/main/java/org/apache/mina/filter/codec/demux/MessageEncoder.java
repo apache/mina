@@ -30,7 +30,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * because it can give you  performance penalty in case you have a lot of
  * message types to handle.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see DemuxingProtocolEncoder
  * @see MessageEncoderFactory

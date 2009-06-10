@@ -27,7 +27,7 @@ import org.apache.mina.core.session.IoSession;
  *
  * @see SingleSessionIoHandler
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SingleSessionIoHandlerFactory {
 

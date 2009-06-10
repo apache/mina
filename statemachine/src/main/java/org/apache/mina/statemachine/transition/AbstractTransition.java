@@ -32,7 +32,7 @@ import org.apache.mina.statemachine.event.Event;
  * {@link Transition} handles. To handle any {@link Event} the id should be set
  * to {@link Event#WILDCARD_EVENT_ID}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractTransition implements Transition {
     private final Object eventId;

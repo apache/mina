@@ -23,7 +23,7 @@ package org.apache.mina.statemachine.context;
  * {@link StateContextFactory} which creates {@link DefaultStateContext}
  * objects.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultStateContextFactory implements StateContextFactory {
 

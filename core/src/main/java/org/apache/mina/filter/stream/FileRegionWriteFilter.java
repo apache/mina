@@ -49,7 +49,7 @@ import org.apache.mina.core.file.FileRegion;
  * {@code WriteFuture}.
  * </p>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class FileRegionWriteFilter extends

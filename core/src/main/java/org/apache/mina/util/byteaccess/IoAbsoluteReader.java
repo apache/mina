@@ -28,7 +28,7 @@ import org.apache.mina.core.buffer.IoBuffer;
 /**
  * Provides absolute read access to a sequence of bytes.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoAbsoluteReader
 {

@@ -32,7 +32,7 @@ package org.apache.mina.core.session;
  * Idle time settings are all disabled by default.  You can enable them
  * using {@link IoSessionConfig#setIdleTime(IdleStatus,int)}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IdleStatus {
     /**

@@ -40,7 +40,7 @@ package org.apache.mina.core.future;
  * }
  * </pre>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface WriteFuture extends IoFuture {
     /**

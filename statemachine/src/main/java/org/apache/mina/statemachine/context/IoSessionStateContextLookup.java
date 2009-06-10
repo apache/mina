@@ -25,7 +25,7 @@ import org.apache.mina.core.session.IoSession;
  * MINA specific {@link StateContextLookup} which uses an {@link IoSession}
  * attribute to store the {@link StateContextLookup}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoSessionStateContextLookup extends AbstractStateContextLookup {
     /**

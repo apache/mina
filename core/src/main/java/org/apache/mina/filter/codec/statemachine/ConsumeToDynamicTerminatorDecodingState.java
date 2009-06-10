@@ -26,7 +26,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * {@link DecodingState} which consumes all bytes until a fixed (ASCII) 
  * character is reached. The terminator is skipped.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class ConsumeToDynamicTerminatorDecodingState implements
         DecodingState {

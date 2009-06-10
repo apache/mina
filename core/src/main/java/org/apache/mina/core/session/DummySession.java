@@ -50,7 +50,7 @@ import org.apache.mina.core.write.WriteRequest;
  * overridden, but you can always add your custom {@link IoFilter} to the
  * {@link IoFilterChain} to intercept any I/O events and requests.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DummySession extends AbstractIoSession {
 

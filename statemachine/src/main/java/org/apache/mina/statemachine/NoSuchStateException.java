@@ -23,7 +23,7 @@ package org.apache.mina.statemachine;
  * Exception thrown by {@link StateMachine} when a transition in the state
  * machine references a state which doesn't exist.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NoSuchStateException extends RuntimeException {
     private static final long serialVersionUID = -886869696039996478L;

@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * <code>static final String</code> fields. The value of the string will be used
  * as state id. 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

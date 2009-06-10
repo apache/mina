@@ -27,7 +27,7 @@ import org.apache.mina.statemachine.context.StateContext;
  * Default {@link EventFactory} implementation. Uses the method's name as
  * event id.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultEventFactory implements EventFactory {
 

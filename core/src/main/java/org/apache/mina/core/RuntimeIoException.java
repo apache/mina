@@ -28,7 +28,7 @@ import java.io.IOException;
  * {@link IOException} in that doesn't trigger force session close,
  * while {@link IOException} forces disconnection.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class RuntimeIoException extends RuntimeException {
     private static final long serialVersionUID = 9029092241311939548L;

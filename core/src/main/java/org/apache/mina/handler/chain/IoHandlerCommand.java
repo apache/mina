@@ -53,7 +53,7 @@ import org.apache.mina.core.session.IoSession;
  * }
  * </pre>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoHandlerCommand {
     /**
@@ -81,7 +81,7 @@ public interface IoHandlerCommand {
      * the {@link IoHandlerChain}.  This interface provides a way to forward
      * the request to the next {@link IoHandlerCommand}.
      *
-     * @author The Apache MINA Project (dev@mina.apache.org)
+     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      */
     public interface NextCommand {
         /**

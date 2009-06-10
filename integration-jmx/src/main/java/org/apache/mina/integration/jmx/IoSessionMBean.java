@@ -32,7 +32,7 @@ import org.apache.mina.core.session.IoSession;
 /**
  * A JMX MBean wrapper for an {@link IoSession}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoSessionMBean extends ObjectMBean<IoSession> {
 

@@ -32,7 +32,7 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  * incoming messages and buffers to appropriate {@link MessageEncoder}s and 
  * {@link MessageDecoder}s.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
 

@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * periodically check this class in order to determine if any objects 
  * should be removed based on the provided time-to-live value.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ExpiringMap<K, V> implements Map<K, V> {
     

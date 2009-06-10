@@ -26,7 +26,7 @@ import java.util.Collection;
  * An exception which is thrown when one or more write requests resulted
  * in no actual write operation.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NothingWrittenException extends WriteException {
 

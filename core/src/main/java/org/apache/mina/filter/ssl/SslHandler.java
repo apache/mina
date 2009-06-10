@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * These buffers handle all of the intermediary data for the SSL connection. To make things easy,
  * we'll require outNetBuffer be completely flushed before trying to wrap any more data.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class SslHandler {
 

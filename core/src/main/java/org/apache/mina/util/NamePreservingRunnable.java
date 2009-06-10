@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * A {@link Runnable} wrapper that preserves the name of the thread after the runnable is
  * complete (for {@link Runnable}s that change the name of the Thread they use.)
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NamePreservingRunnable implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(NamePreservingRunnable.class);

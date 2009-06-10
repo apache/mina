@@ -30,7 +30,7 @@ package org.apache.mina.util;
  * monitor logs all caught exceptions in <tt>WARN</tt> level using
  * SLF4J.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see DefaultExceptionMonitor
  */

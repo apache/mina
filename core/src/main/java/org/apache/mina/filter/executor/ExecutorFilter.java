@@ -103,7 +103,7 @@ import org.apache.mina.core.write.WriteRequest;
  * Please refer to {@link IoEventQueueThrottle}, which is specified as
  * a parameter of the convenience constructors.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  * @see OrderedThreadPoolExecutor
  * @see UnorderedThreadPoolExecutor

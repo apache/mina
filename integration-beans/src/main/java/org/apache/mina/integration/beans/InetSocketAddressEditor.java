@@ -29,7 +29,7 @@ import java.net.InetSocketAddress;
  * is omitted the wildcard address will be used. E.g.:
  * <code>google.com:80</code>, <code>:22</code>, <code>192.168.0.1:110</code>.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see java.net.InetSocketAddress
  */

@@ -30,7 +30,7 @@ import org.apache.mina.core.write.WriteRequest;
  * An {@link IoFilter}s wrapper that keeps track of the number of usages of this filter and will call init/destroy
  * when the filter is not in use.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class ReferenceCountingFilter extends IoFilterAdapter {

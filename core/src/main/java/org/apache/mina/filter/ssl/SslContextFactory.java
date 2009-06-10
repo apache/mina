@@ -49,7 +49,7 @@ import javax.net.ssl.TrustManagerFactory;
  * the creation of the {@link TrustManagerFactory} to be used.
  * </p>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SslContextFactory {
     

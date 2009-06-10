@@ -39,7 +39,7 @@ import org.apache.mina.core.session.IoSession;
  * Binds the specified {@link IoHandler} to the specified
  * {@link VmPipeAddress}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class VmPipeAcceptor extends AbstractIoAcceptor {
     

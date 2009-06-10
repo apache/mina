@@ -34,7 +34,7 @@ import org.apache.mina.util.ConcurrentHashSet;
  * or SerialTransport. Polling base transport are advised to trigger idle 
  * events alone, using the poll/select timeout. 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IdleStatusChecker {
     

@@ -26,7 +26,7 @@ import org.apache.mina.core.filterchain.IoFilter;
 /**
  * An OGNL {@link PropertyAccessor} for {@link IoFilter}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoFilterPropertyAccessor extends AbstractPropertyAccessor {
     @Override

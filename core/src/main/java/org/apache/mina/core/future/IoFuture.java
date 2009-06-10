@@ -28,7 +28,7 @@ import org.apache.mina.core.session.IoSession;
  * {@link IoSession}.
  * Can be listened for completion using a {@link IoFutureListener}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoFuture {
     /**

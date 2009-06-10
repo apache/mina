@@ -23,7 +23,7 @@ package org.apache.mina.core.session;
  * A {@link RuntimeException} that is thrown when the initialization of
  * an {@link IoSession} fails.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoSessionInitializationException extends RuntimeException {
     private static final long serialVersionUID = -1205810145763696189L;

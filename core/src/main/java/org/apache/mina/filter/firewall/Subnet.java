@@ -27,7 +27,7 @@ import java.net.InetAddress;
  * A IP subnet using the CIDR notation. Currently, only IP version 4
  * address are supported.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Subnet {
 

@@ -27,7 +27,7 @@ import org.apache.mina.core.session.IoEvent;
  * Listens and filters all event queue operations occurring in
  * {@link OrderedThreadPoolExecutor} and {@link UnorderedThreadPoolExecutor}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoEventQueueHandler extends EventListener {
 

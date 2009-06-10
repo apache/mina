@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 /**
  * server-side {@link org.apache.mina.core.service.IoHandler}
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 
 public class ImageServerIoHandler extends IoHandlerAdapter {

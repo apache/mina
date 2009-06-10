@@ -34,7 +34,7 @@ import org.apache.mina.statemachine.context.AbstractStateContext;
 /**
  * TODO Add documentation
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class AuthenticationHandler {
     @State public static final String ROOT = "Root";

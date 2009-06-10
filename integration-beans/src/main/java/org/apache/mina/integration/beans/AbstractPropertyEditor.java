@@ -25,7 +25,7 @@ import java.beans.PropertyEditorSupport;
 /**
  * An abstract bi-directional {@link PropertyEditor}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
 

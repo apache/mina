@@ -29,7 +29,7 @@ import java.util.TreeSet;
 /**
  * Finds currently available server ports.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @see <a href="http://www.iana.org/assignments/port-numbers">IANA.org</a>
  */
 public class AvailablePortFinder {

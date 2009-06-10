@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Based upon SSLHandler from mina-filter-ssl.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {

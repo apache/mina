@@ -25,7 +25,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderException;
  * Exception thrown by {@link CommandDecoder} when a line cannot be decoded as 
  * a {@link Command} object.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CommandSyntaxException extends ProtocolDecoderException {
     private static final long serialVersionUID = 4903547501059093765L;

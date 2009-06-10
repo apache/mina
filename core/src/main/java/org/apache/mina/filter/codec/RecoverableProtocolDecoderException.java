@@ -37,7 +37,7 @@ package org.apache.mina.filter.codec;
  * {@link ProtocolDecoder} that can continue decoding even after any
  * protocol violation.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class RecoverableProtocolDecoderException extends
         ProtocolDecoderException {

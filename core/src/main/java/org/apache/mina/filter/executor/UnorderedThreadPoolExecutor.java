@@ -48,7 +48,7 @@ import org.apache.mina.core.session.IoEvent;
  * If you need to maintain the order of events per session, please use
  * {@link OrderedThreadPoolExecutor}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {

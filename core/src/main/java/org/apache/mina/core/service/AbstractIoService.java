@@ -55,7 +55,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  * An instance of IoService contains an Executor which will handle the incoming
  * events.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoService implements IoService {
     /** 

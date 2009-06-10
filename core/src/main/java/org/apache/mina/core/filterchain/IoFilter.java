@@ -72,7 +72,7 @@ import org.apache.mina.filter.util.ReferenceCountingFilter;
  *       the removed filter was the last one.</li>
  * </ol>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see IoFilterAdapter
  */

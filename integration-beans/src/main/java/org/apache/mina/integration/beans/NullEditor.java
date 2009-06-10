@@ -24,7 +24,7 @@ import java.beans.PropertyEditor;
 /**
  * A dummy {@link PropertyEditor} for <tt>null</tt>.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NullEditor extends AbstractPropertyEditor {
     @Override

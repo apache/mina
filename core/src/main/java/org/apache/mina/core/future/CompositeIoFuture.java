@@ -30,7 +30,7 @@ import org.apache.mina.core.IoUtil;
  * In that case, please use {@link IoUtil#await(Iterable)} instead
  * for better performance.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @param <E> the type of the child futures.
  */

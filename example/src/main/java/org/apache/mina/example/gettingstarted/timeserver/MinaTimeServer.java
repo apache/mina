@@ -37,7 +37,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
  * 
  * In order to quit, just send the 'quit' message.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MinaTimeServer {
     /** We will use a port above 1024 to be able to launch the server with a standard user */

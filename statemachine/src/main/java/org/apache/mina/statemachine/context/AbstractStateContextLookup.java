@@ -28,7 +28,7 @@ package org.apache.mina.statemachine.context;
  * If none is found a new {@link StateContext} will be created and stored in the
  * event argument using the {@link #store(Object, StateContext)} method.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractStateContextLookup implements StateContextLookup {
     private final StateContextFactory contextFactory;

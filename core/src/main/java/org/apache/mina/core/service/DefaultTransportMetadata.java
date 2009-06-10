@@ -30,7 +30,7 @@ import org.apache.mina.util.IdentityHashSet;
 /**
  * A default immutable implementation of {@link TransportMetadata}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultTransportMetadata implements TransportMetadata {
 

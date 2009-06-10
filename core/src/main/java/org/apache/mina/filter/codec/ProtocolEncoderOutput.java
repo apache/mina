@@ -28,7 +28,7 @@ import org.apache.mina.core.future.WriteFuture;
  * {@link IoBuffer}s.  {@link ProtocolEncoder} must call {@link #write(Object)}
  * for each encoded message.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface ProtocolEncoderOutput {
     /**

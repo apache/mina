@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * Used to create proxies which will forward all method calls on them to a
  * {@link StateMachine}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StateMachineProxyBuilder {
     private static final Logger log = LoggerFactory

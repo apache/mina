@@ -28,7 +28,7 @@ import org.apache.mina.core.write.WriteRequest;
  * this class and selectively override required event filter methods only.  All
  * methods forwards events to the next filter by default.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoFilterAdapter implements IoFilter {
     /**

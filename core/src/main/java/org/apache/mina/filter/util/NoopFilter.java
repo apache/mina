@@ -28,7 +28,7 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
  * This class is used by tests, when some faked filter is needed to test that the 
  * chain is working properly when adding or removing a filter.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NoopFilter extends IoFilterAdapter {
     /**

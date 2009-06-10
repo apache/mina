@@ -41,7 +41,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
  * Simple example demonstrating how to build a state machine for MINA's 
  * {@link IoHandler} interface.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Main {
     /** Choose your favorite port number. */

@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @org.apache.xbean.XBean
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StandardThreadPool implements Executor
 {

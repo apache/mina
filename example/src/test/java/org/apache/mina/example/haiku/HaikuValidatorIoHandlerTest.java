@@ -24,7 +24,7 @@ import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
 /**
- * @author Apache Mina Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class HaikuValidatorIoHandlerTest extends MockObjectTestCase {
     private IoHandler handler;

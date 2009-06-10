@@ -32,7 +32,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * WARNING: This code has never been run!
  * 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ByteArrayPool implements ByteArrayFactory
 {

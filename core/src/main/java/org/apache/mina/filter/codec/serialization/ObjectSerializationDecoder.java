@@ -32,7 +32,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * A {@link ProtocolDecoder} which deserializes {@link Serializable} Java
  * objects using {@link IoBuffer#getObject(ClassLoader)}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
     private final ClassLoader classLoader;

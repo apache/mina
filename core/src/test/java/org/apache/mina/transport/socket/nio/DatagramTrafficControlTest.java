@@ -31,7 +31,7 @@ import org.apache.mina.transport.AbstractTrafficControlTest;
  * Tests suspending and resuming reads and writes for the datagram
  * transport type.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DatagramTrafficControlTest extends AbstractTrafficControlTest {
 

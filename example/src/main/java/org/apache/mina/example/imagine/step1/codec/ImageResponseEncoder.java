@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * an encoder for {@link ImageResponse} objects 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ImageResponseEncoder extends ProtocolEncoderAdapter {
 

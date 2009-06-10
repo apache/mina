@@ -37,7 +37,7 @@ import org.apache.mina.transport.vmpipe.VmPipeConnector;
  *   <li>Who gets the ball with 0 TTL loses.</li>
  * </ol>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Main {
 

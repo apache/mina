@@ -27,7 +27,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * Represents a state in a decoder state machine used by 
  * {@link DecodingStateMachine}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface DecodingState {
     /**

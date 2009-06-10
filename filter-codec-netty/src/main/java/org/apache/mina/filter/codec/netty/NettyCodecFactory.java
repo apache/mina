@@ -33,7 +33,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFactory;
  * can be used for multiple sessions.  If not, you'll have to create your
  * own factory after this factory.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NettyCodecFactory implements ProtocolCodecFactory {
     private static final NettyEncoder ENCODER = new NettyEncoder();

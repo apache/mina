@@ -31,7 +31,7 @@ import javax.net.ssl.SSLContext;
 /**
  * Factory to create a bogus SSLContext.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class BogusSslContextFactory {
 

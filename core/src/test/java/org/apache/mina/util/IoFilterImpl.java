@@ -27,7 +27,7 @@ import org.apache.mina.core.filterchain.IoFilterChain;
  * Bogus implementation of {@link IoFilter} to test
  * {@link IoFilterChain}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoFilterImpl extends IoFilterAdapter {
     private final char c;

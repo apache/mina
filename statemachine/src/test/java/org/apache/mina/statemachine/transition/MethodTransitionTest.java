@@ -31,7 +31,7 @@ import com.agical.rmock.extension.junit.RMockTestCase;
 /**
  * Tests {@link MethodTransition}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MethodTransitionTest extends RMockTestCase {
     State currentState;

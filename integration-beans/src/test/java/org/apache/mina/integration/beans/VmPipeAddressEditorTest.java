@@ -26,7 +26,7 @@ import org.apache.mina.transport.vmpipe.VmPipeAddress;
 /**
  * Tests {@link VmPipeAddressEditor}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class VmPipeAddressEditorTest extends TestCase {
     VmPipeAddressEditor editor;

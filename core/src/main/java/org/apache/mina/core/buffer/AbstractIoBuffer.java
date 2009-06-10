@@ -50,7 +50,7 @@ import java.util.Set;
  * {@link ByteBuffer} instance.  Most implementations could
  * extend this class and implement their own buffer management mechanism.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @see IoBufferAllocator
  */
 public abstract class AbstractIoBuffer extends IoBuffer {

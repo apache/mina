@@ -31,7 +31,7 @@ import org.apache.mina.example.echoserver.ssl.SslSocketFactory;
 /**
  * Tests echo server example.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class AcceptorTest extends AbstractTest {
     public AcceptorTest() {

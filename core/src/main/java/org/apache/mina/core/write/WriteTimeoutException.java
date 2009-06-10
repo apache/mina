@@ -28,7 +28,7 @@ import org.apache.mina.core.session.IoSessionConfig;
  * An exception which is thrown when write buffer is not flushed for
  * {@link IoSessionConfig#getWriteTimeout()} seconds.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class WriteTimeoutException extends WriteException {
     private static final long serialVersionUID = 3906931157944579121L;

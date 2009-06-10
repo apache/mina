@@ -29,7 +29,7 @@ import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 /**
  * Define the configuration for a Datagram based session. 
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
     /** The associated channel */

@@ -31,7 +31,7 @@ import org.apache.mina.core.session.IoSession;
  * decorator only when you need to synchronize on a per-decoder basis, which
  * is not common.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SynchronizedProtocolDecoder implements ProtocolDecoder {
     private final ProtocolDecoder decoder;

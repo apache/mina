@@ -33,7 +33,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * An {@link ObjectInput} and {@link InputStream} that can read the objects encoded
  * by {@link ObjectSerializationEncoder}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ObjectSerializationInputStream extends InputStream implements
         ObjectInput {

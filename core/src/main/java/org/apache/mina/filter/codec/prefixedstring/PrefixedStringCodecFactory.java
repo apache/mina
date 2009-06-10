@@ -31,7 +31,7 @@ import java.nio.charset.Charset;
  * A {@link ProtocolCodecFactory} that performs encoding and decoding
  * of a Java String object using a fixed-length length prefix.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
 

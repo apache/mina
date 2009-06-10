@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  * pool.dispose();
  * </code></pre>
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  * @param <T> the type of the {@link IoSession} to be managed by the specified
  *            {@link IoProcessor}.

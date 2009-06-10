@@ -26,7 +26,7 @@ import org.apache.mina.statemachine.StateMachine;
  * to the {@link StateMachine} and allows for the arguments to be modified.
  * This is for advanced uses only.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface EventArgumentsInterceptor {
 

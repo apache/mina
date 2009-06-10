@@ -65,7 +65,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  *                                       be reset and the selection process will start over.</li>
  * </ul>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see MessageDecoderFactory
  * @see MessageDecoder

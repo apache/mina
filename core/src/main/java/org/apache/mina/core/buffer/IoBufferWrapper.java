@@ -43,7 +43,7 @@ import java.util.Set;
  * are proxied by default so that you can extend this class and override existing
  * operations selectively.  You can introduce new operations, too.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoBufferWrapper extends IoBuffer {
 

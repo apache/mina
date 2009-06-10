@@ -33,7 +33,7 @@ import org.apache.mina.util.ExceptionMonitor;
  * A default implementation of {@link IoFuture} associated with
  * an {@link IoSession}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultIoFuture implements IoFuture {
 
