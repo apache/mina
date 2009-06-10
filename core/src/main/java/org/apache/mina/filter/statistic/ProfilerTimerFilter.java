@@ -54,7 +54,7 @@ import org.apache.mina.core.write.WriteRequest;
  * <li>IoEventType.SESSION_CLOSED</li>
  * </ul>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class ProfilerTimerFilter extends IoFilterAdapter {

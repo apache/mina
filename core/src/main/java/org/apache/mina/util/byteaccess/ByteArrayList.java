@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
 /**
  * A linked list that stores <code>ByteArray</code>s and maintains several useful invariants.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class ByteArrayList
 {

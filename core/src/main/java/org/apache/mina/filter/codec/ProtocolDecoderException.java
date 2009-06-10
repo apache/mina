@@ -26,7 +26,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * cannot understand or failed to validate the specified {@link IoBuffer}
  * content.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtocolDecoderException extends ProtocolCodecException {
     private static final long serialVersionUID = 3545799879533408565L;

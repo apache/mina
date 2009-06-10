@@ -40,7 +40,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * Changing the params and request type will allow to test the multiple options
  * (http or socks proxying, various authentications methods, ...).
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public class ProxyTelnetTestClient {

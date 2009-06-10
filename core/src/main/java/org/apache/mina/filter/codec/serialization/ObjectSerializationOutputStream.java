@@ -30,7 +30,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * An {@link ObjectOutput} and {@link OutputStream} that can write the objects as
  * the serialized form that {@link ObjectSerializationDecoder} can decode.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ObjectSerializationOutputStream extends OutputStream implements
         ObjectOutput {

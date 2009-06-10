@@ -58,7 +58,7 @@ import org.apache.mina.util.ExceptionMonitor;
  * 
  * @see NioSocketConnector for a example of implementation
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         extends AbstractIoConnector {

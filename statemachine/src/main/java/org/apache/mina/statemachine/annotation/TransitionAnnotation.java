@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  * The annotation used to group transition annotations must be given as 
  * parameter.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)

@@ -26,7 +26,7 @@ import org.apache.mina.core.write.WriteRequest;
  * Most users won't need to use this class.  It is usually used by internal
  * components to store I/O events.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoEvent implements Runnable {
     private final IoEventType type;

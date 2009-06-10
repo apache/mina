@@ -24,7 +24,7 @@ package org.apache.mina.statemachine.transition;
  * Thrown by the constructors in {@link MethodTransition} if no method by 
  * the specifed name can be found. 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NoSuchMethodException extends RuntimeException {
     private static final long serialVersionUID = -8877979996892420479L;

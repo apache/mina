@@ -27,7 +27,7 @@ import org.apache.mina.core.session.IoSession;
  * An {@link IoHandler} which executes an {@link IoHandlerChain}
  * on a <tt>messageReceived</tt> event.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ChainedIoHandler extends IoHandlerAdapter {
     private final IoHandlerChain chain;

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * A {@link IoFilter} which blocks connections from blacklisted remote
  * address.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class BlacklistFilter extends IoFilterAdapter {

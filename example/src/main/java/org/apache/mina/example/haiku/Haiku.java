@@ -21,7 +21,7 @@ package org.apache.mina.example.haiku;
 import java.util.Arrays;
 
 /**
- * @author Apache Mina Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Haiku {
     private final String[] phrases;

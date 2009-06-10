@@ -40,7 +40,7 @@ import static org.junit.Assert.fail;
 /**
  * Tests {@link IoFuture} implementations.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class FutureTest {
 

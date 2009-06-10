@@ -32,7 +32,7 @@ import org.apache.mina.proxy.utils.ByteUtilities;
 /**
  * NTLMUtilities.java - NTLM functions used for authentication and unit testing.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public class NTLMUtilities implements NTLMConstants {

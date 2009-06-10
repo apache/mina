@@ -29,7 +29,7 @@ import com.agical.rmock.extension.junit.RMockTestCase;
 /**
  * Tests {@link State}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StateTest extends RMockTestCase {
     State state;

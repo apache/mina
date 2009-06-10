@@ -34,7 +34,7 @@ import org.apache.mina.statemachine.event.IoFilterEvents;
  * be used when creating {@link StateMachine}s for MINA's {@link IoFilter}
  * interface.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -28,7 +28,7 @@ import java.beans.PropertyEditor;
  * a {@link VmPipeAddress} and vice versa. Valid values specify an integer port
  * number optionally prefixed with a ':'. E.g.: <code>:80</code>, <code>22</code>.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see VmPipeAddress
  */

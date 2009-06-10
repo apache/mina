@@ -38,7 +38,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * Tests {@link KeepAliveFilter} used by the connector with different
  * interested {@link IdleStatus}es.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class KeepAliveFilterTest extends TestCase {
     // Constants -----------------------------------------------------

@@ -22,7 +22,7 @@ package org.apache.mina.example.tapedeck;
 /**
  * Represents the <code>password &lt;password&gt;</code> command.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PasswordCommand extends Command {
     public static final String NAME = "password";

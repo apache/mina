@@ -25,7 +25,7 @@ import org.apache.mina.core.session.IoEvent;
  * Estimates the amount of memory that the specified {@link IoEvent} occupies
  * in the current JVM.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoEventSizeEstimator {
     /**

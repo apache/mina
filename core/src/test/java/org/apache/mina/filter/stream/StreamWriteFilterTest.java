@@ -25,7 +25,7 @@ import java.io.InputStream;
 /**
  * Tests {@link StreamWriteFilter}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StreamWriteFilterTest extends AbstractStreamWriteFilterTest<InputStream, StreamWriteFilter> {
     

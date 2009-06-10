@@ -36,7 +36,7 @@ import org.apache.tomcat.jni.Socket;
  * An {@link IoSession} for APR UDP datagram based session.
  * It's implementing the usual common features for {@link DatagramSessionConfig}. 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class AprDatagramSession extends AprSession {
 
@@ -76,7 +76,7 @@ class AprDatagramSession extends AprSession {
 
     /**
      * The implementation for the {@link org.apache.mina.core.session.IoSessionConfig} related to APR UDP socket.
-     * @author The Apache MINA Project (dev@mina.apache.org)
+     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      */
     private class SessionConfigImpl extends AbstractDatagramSessionConfig {
         /**

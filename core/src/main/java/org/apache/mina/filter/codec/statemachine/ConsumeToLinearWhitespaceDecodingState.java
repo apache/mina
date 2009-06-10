@@ -23,7 +23,7 @@ package org.apache.mina.filter.codec.statemachine;
  * {@link DecodingState} which consumes all bytes until a space (0x20) or tab 
  * (0x09) character is reached. The terminator is skipped.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class ConsumeToLinearWhitespaceDecodingState extends
         ConsumeToDynamicTerminatorDecodingState {

@@ -26,7 +26,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * {@link DecodingState} which skips data until {@link #canSkip(byte)} returns 
  * <tt>false</tt>.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class SkippingState implements DecodingState {
 

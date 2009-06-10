@@ -28,7 +28,7 @@ import org.apache.mina.core.session.IoSessionInitializer;
  * {@link ProxyIoSession} object that contains all the attributes of the target connection 
  * into the {@link IoSession}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public class ProxyIoSessionInitializer<T extends ConnectFuture> implements

@@ -38,7 +38,7 @@ import org.apache.mina.core.write.WriteToClosedSessionException;
 /**
  * TODO Add documentation
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class VmPipeFilterChain extends DefaultIoFilterChain {
 

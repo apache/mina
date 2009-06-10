@@ -36,6 +36,7 @@ import java.net.URL;
 
 /**
  * TODO : Add documentation
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SpringXBeanTest
 {

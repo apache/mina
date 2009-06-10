@@ -28,7 +28,7 @@ import org.apache.mina.transport.AbstractBindTest;
 /**
  * Tests {@link NioSocketAcceptor} resource leakage.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SocketBindTest extends AbstractBindTest {
 

@@ -36,7 +36,7 @@ import java.net.InetSocketAddress;
 /**
  * client for the {@link ImageServer}
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ImageClient extends IoHandlerAdapter {
     public static final int CONNECT_TIMEOUT = 3000;

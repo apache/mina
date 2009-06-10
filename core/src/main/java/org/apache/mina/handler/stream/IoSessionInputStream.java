@@ -29,7 +29,7 @@ import org.apache.mina.core.service.IoHandler;
  * An {@link InputStream} that buffers data read from
  * {@link IoHandler#messageReceived(IoSession, Object)} events.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class IoSessionInputStream extends InputStream {
     private final Object mutex = new Object();

@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * message object and vice versa using {@link ProtocolCodecFactory},
  * {@link ProtocolEncoder}, or {@link ProtocolDecoder}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class ProtocolCodecFilter extends IoFilterAdapter {

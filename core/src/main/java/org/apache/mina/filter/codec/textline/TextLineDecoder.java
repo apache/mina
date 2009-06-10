@@ -35,7 +35,7 @@ import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
 /**
  * A {@link ProtocolDecoder} which decodes a text line into a string.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class TextLineDecoder implements ProtocolDecoder {
     private final AttributeKey CONTEXT = new AttributeKey(getClass(), "context");

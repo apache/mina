@@ -27,7 +27,7 @@ import org.apache.mina.core.service.IoService;
  * A connectionless transport can recycle existing sessions by assigning an
  * {@link IoSessionRecycler} to an {@link IoService}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * TODO More documentation
  */
 public interface IoSessionRecycler {

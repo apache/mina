@@ -53,7 +53,7 @@ import org.apache.mina.filter.util.WriteRequestFilter;
  * It goes without saying that the other end of this stream should also have a
  * compatible compressor/decompressor using the same algorithm.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CompressionFilter extends WriteRequestFilter {
     /**

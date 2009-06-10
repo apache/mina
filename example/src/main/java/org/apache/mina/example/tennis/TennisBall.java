@@ -23,7 +23,7 @@ package org.apache.mina.example.tennis;
  * A tennis ball which has TTL value and state whose value is one of 'PING' and
  * 'PONG'.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class TennisBall {
     private final boolean ping;

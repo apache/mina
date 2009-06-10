@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
  * A {@link PropertyEditor} which converts a {@link String} into
  * a one-dimensional array and vice versa.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ArrayEditor extends AbstractPropertyEditor {
     private final Class<?> componentType;

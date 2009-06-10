@@ -26,7 +26,7 @@ import org.apache.mina.util.CircularQueue;
 /**
  * A {@link ProtocolDecoderOutput} based on queue.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOutput {
     private final Queue<Object> messageQueue = new CircularQueue<Object>();

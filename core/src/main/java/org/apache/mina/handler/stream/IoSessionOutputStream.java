@@ -30,7 +30,7 @@ import org.apache.mina.core.session.IoSession;
  * An {@link OutputStream} that forwards all write operations to
  * the associated {@link IoSession}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class IoSessionOutputStream extends OutputStream {
     private final IoSession session;

@@ -29,7 +29,7 @@ import org.apache.mina.proxy.session.ProxyIoSession;
 /**
  * HttpAuthenticationMethods.java - Enumerates all known http authentication methods.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public enum HttpAuthenticationMethods {

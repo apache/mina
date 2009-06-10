@@ -24,7 +24,7 @@ package org.apache.mina.filter.codec;
  * {@link ProtocolDecoder} cannot understand or failed to validate
  * data to process.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtocolCodecException extends Exception {
     private static final long serialVersionUID = 5939878548186330695L;

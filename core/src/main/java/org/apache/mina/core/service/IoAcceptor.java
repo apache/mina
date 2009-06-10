@@ -41,7 +41,7 @@ import org.apache.mina.core.session.IoSession;
  * Threads accept incoming connections start automatically when
  * {@link #bind()} is invoked, and stop when {@link #unbind()} is invoked.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoAcceptor extends IoService {
     /**

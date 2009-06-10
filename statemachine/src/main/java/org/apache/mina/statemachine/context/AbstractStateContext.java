@@ -29,7 +29,7 @@ import org.apache.mina.statemachine.State;
  * Abstract {@link StateContext} which uses a {@link Map} to store the
  * attributes.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractStateContext implements StateContext {
     private State currentState = null;

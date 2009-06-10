@@ -36,7 +36,7 @@ import org.apache.mina.util.byteaccess.ByteArrayList.Node;
  * TODO: Write about laziness of cursor implementation - how movement doesn't
  * happen until actual get/put.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class CompositeByteArray extends AbstractByteArray {
 

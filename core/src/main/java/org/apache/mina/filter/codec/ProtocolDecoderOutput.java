@@ -27,7 +27,7 @@ import org.apache.mina.core.session.IoSession;
  * {@link ProtocolDecoder} must call {@link #write(Object)} for each decoded
  * messages.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface ProtocolDecoderOutput {
     /**

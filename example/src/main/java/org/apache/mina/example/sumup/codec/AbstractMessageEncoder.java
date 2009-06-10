@@ -29,7 +29,7 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
  * A {@link MessageEncoder} that encodes message header and forwards
  * the encoding of body to a subclass.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractMessageEncoder<T extends AbstractMessage> implements MessageEncoder<T> {
     private final int type;

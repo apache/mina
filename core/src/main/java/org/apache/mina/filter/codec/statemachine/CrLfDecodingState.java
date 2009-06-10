@@ -32,7 +32,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * Note that if we find a CR but do not find a following LF, we raise
  * an error.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class CrLfDecodingState implements DecodingState {
     /**

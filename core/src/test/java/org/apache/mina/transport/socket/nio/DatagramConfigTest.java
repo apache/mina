@@ -39,7 +39,7 @@ import org.apache.mina.util.AvailablePortFinder;
 /**
  * Tests if {@link NioDatagramAcceptor} session is configured properly.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DatagramConfigTest extends TestCase {
     private IoAcceptor acceptor;

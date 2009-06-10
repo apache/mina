@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * A {@link ConcurrentHashMap}-backed {@link Set}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ConcurrentHashSet<E> extends MapBackedSet<E> {
 

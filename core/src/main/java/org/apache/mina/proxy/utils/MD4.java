@@ -12,7 +12,7 @@ import java.security.MessageDigestSpi;
  * @see The <a href="http://www.ietf.org/rfc/rfc1320.txt">MD4</a> Message-
  *    Digest Algorithm by R. Rivest.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public class MD4 extends MessageDigestSpi {

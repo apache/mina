@@ -32,7 +32,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * A {@link ProtocolEncoder} which serializes {@link Serializable} Java objects
  * using {@link IoBuffer#putObject(Object)}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ObjectSerializationEncoder extends ProtocolEncoderAdapter {
     private int maxObjectSize = Integer.MAX_VALUE; // 2GB

@@ -50,7 +50,7 @@ import org.apache.mina.util.ExceptionMonitor;
  * TODO Add documentation
  * {@link IoAcceptor} for datagram transport (UDP/IP).
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public abstract class AbstractPollingConnectionlessIoAcceptor<T extends AbstractIoSession, H>

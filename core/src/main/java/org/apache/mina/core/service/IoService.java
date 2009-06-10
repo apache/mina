@@ -35,7 +35,7 @@ import org.apache.mina.core.session.IoSessionDataStructureFactory;
  * Base interface for all {@link IoAcceptor}s and {@link IoConnector}s
  * that provide I/O service and manage {@link IoSession}s.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoService {
     /**

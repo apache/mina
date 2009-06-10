@@ -47,7 +47,7 @@ import org.apache.mina.core.filterchain.IoFilter;
  * callback.
  * </p>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class StreamWriteFilter extends AbstractStreamWriteFilter<InputStream> {

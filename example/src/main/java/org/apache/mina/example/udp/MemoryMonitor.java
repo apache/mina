@@ -40,7 +40,7 @@ import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
  * The class that will accept and process clients in order to properly
  * track the memory usage.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MemoryMonitor {
 

@@ -34,7 +34,7 @@ import org.apache.mina.core.session.IoSessionInitializer;
 /**
  * A base implementation of {@link IoConnector}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoConnector 
         extends AbstractIoService implements IoConnector {

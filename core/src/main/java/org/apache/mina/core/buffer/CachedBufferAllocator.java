@@ -56,7 +56,7 @@ import org.apache.mina.util.CircularQueue;
  * buffer, allocates buffers whose capacity is power of 2 only and provides
  * performance advantage if {@link IoBuffer#free()} is called properly.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CachedBufferAllocator implements IoBufferAllocator {
 

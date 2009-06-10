@@ -37,7 +37,7 @@ import org.easymock.IMocksControl;
 /**
  * Tests classes in the <code>byteaccess</code> package.
  * 
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ByteAccessTest extends TestCase {
 

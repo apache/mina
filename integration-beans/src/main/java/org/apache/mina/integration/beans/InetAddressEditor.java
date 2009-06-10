@@ -30,7 +30,7 @@ import java.net.UnknownHostException;
  * when converting from a {@link String}, and {@link InetAddress#getHostAddress()}
  * when converting to a {@link String}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see java.net.InetAddress
  */

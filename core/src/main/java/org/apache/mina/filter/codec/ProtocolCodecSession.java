@@ -55,7 +55,7 @@ import org.apache.mina.core.session.IoSession;
  * Object message = session.getProtocolDecoderOutputQueue().poll();
  * </pre>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtocolCodecSession extends DummySession {
 

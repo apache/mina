@@ -29,7 +29,7 @@ import org.apache.mina.core.session.IoSession;
 /**
  * The default implementation of {@link WriteRequest}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultWriteRequest implements WriteRequest {
     private static final WriteFuture UNUSED_FUTURE = new WriteFuture() {

@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * A {@link PropertyEditor} which converts a {@link String} into
  * an {@link Enum} and vice versa.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @SuppressWarnings("unchecked")
 public class EnumEditor extends AbstractPropertyEditor {

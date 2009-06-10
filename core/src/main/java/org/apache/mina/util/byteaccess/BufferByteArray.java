@@ -32,7 +32,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * implementation backed by a heap <code>IoBuffer</code> can be created with
  * a <code>SimpleByteArrayFactory</code>.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class BufferByteArray extends AbstractByteArray
 {

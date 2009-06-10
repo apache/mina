@@ -37,7 +37,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * {@link UnsupportedOperationException} on each method that is not intended to
  * be called by user code for performance reasons.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M2
  */
 public class LazyInitializedCacheMap<K, V> implements Map<K, V> {

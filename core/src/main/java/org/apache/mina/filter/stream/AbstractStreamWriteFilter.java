@@ -34,7 +34,7 @@ import org.apache.mina.util.CircularQueue;
 /**
  * TODO Add documentation
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     /**

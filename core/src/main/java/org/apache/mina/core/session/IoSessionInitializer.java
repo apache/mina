@@ -25,7 +25,7 @@ import org.apache.mina.core.future.IoFuture;
  * Defines a callback for obtaining the {@link IoSession} during
  * session initialization.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoSessionInitializer<T extends IoFuture> {
     void initializeSession(IoSession session, T future);

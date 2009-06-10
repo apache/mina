@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * AbstractHttpLogicHandler.java - Base class for HTTP proxy {@link AbstractProxyLogicHandler} implementations. 
  * Provides HTTP request encoding/response decoding functionality.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractHttpLogicHandler extends

@@ -27,7 +27,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * {@link DecodingState} which decodes <code>int</code> values in big-endian 
  * order (high bytes come first).
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class IntegerDecodingState implements DecodingState {
     

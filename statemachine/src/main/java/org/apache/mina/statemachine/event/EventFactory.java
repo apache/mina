@@ -28,7 +28,7 @@ import org.apache.mina.statemachine.context.StateContext;
  * Used by {@link StateMachineProxyBuilder} to create {@link Event} objects when 
  * methods are invoked on the proxy.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface EventFactory
 {

@@ -27,7 +27,7 @@ import org.apache.mina.core.buffer.IoBuffer;
 /**
  * A {@link ProtocolEncoderOutput} based on queue.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractProtocolEncoderOutput implements
         ProtocolEncoderOutput {

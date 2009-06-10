@@ -51,7 +51,7 @@ import org.apache.mina.util.NamePreservingRunnable;
  * This class is in charge of active polling a set of {@link IoSession}
  * and trigger events when some I/O operation is possible.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
     /**

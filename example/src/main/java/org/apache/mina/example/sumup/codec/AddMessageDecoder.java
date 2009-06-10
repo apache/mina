@@ -29,7 +29,7 @@ import org.apache.mina.filter.codec.demux.MessageDecoder;
 /**
  * A {@link MessageDecoder} that decodes {@link AddMessage}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class AddMessageDecoder extends AbstractMessageDecoder {
 

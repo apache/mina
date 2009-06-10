@@ -24,7 +24,7 @@ package org.apache.mina.util;
  * fully initialized when requested to. It allows to avoid loosing time when 
  * early initializing unnecessary objects.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M2
  */
 public abstract class LazyInitializer<V> {

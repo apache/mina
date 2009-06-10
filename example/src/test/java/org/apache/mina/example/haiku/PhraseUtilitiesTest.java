@@ -21,7 +21,7 @@ package org.apache.mina.example.haiku;
 import junit.framework.TestCase;
 
 /**
- * @author Apache Mina Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PhraseUtilitiesTest extends TestCase {
     public void testCountSyllablesInWord() throws Exception {

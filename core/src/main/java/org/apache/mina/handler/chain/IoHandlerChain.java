@@ -30,7 +30,7 @@ import org.apache.mina.core.session.IoSession;
 /**
  * A chain of {@link IoHandlerCommand}s.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoHandlerChain implements IoHandlerCommand {
     private static volatile int nextId = 0;
@@ -283,7 +283,7 @@ public class IoHandlerChain implements IoHandlerCommand {
     /**
      * Represents a name-command pair that an {@link IoHandlerChain} contains.
      *
-     * @author The Apache MINA Project (dev@mina.apache.org)
+     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      */
     public class Entry {
         private Entry prevEntry;

@@ -25,7 +25,7 @@ package org.apache.mina.core.filterchain;
  * or {@link IoFilter#onPostAdd(IoFilterChain, String, org.apache.mina.core.filterchain.IoFilter.NextFilter)}
  * failed.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoFilterLifeCycleException extends RuntimeException {
     private static final long serialVersionUID = -5542098881633506449L;

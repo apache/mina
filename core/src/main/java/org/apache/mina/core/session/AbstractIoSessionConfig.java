@@ -24,7 +24,7 @@ package org.apache.mina.core.session;
 /**
  * A base implementation of {@link IoSessionConfig}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoSessionConfig implements IoSessionConfig {
 

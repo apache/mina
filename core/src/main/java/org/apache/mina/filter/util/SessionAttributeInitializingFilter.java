@@ -35,7 +35,7 @@ import org.apache.mina.core.session.IoSession;
  * the pre-configured attributes available after this filter executes the
  * <tt>sessionCreated</tt> event.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class SessionAttributeInitializingFilter extends IoFilterAdapter {

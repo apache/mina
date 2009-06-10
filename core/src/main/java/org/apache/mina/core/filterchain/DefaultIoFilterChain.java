@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * all operations for developers who want to implement their own
  * transport layer once used with {@link AbstractIoSession}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultIoFilterChain implements IoFilterChain {
     /**

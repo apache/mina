@@ -67,7 +67,7 @@ import org.slf4j.MDC;
  * Thus it's ok to have one instance of the MdcInjectionFilter and add it multiple times to the chain
  * but you should avoid adding multiple instances to the chain.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 
 public class MdcInjectionFilter extends CommonEventFilter {

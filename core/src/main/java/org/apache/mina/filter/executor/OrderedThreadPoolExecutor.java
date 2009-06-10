@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * If you don't need to maintain the order of events per session, please use
  * {@link UnorderedThreadPoolExecutor}.
 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {

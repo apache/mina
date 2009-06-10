@@ -22,7 +22,7 @@ package org.apache.mina.example.imagine.step1;
 /**
  * represents a client's request for an image
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 
 public class ImageRequest {

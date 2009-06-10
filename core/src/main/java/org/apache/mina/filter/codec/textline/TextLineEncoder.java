@@ -33,7 +33,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * A {@link ProtocolEncoder} which encodes a string into a text line
  * which ends with the delimiter.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class TextLineEncoder extends ProtocolEncoderAdapter {
     private final AttributeKey ENCODER = new AttributeKey(getClass(), "encoder");

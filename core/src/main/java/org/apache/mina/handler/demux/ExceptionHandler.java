@@ -27,7 +27,7 @@ import org.apache.mina.core.session.IoSession;
  * handler with the type of exception you want to get notified using
  * {@link DemuxingIoHandler#addExceptionHandler(Class, ExceptionHandler)}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface ExceptionHandler<E extends Throwable> {
     /**

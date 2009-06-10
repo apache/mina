@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * your states and then let {@link StateMachineFactory} create a 
  * {@link StateMachine} for you.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StateMachine {
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachine.class);

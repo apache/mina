@@ -32,7 +32,7 @@ import org.apache.mina.statemachine.StateMachine;
  * This should be used when creating {@link StateMachine}s for MINA's 
  * {@link IoHandler} interface.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

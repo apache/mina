@@ -32,7 +32,7 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  * a text line data and a Java string object.  This codec is useful especially
  * when you work with a text-based protocols such as SMTP and IMAP.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class TextLineCodecFactory implements ProtocolCodecFactory {
 

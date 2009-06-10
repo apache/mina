@@ -29,7 +29,7 @@ import org.apache.mina.core.session.IoSession;
  * The Time Server handler : it return the current date when a message is received,
  * or close the session if the "quit" message is received.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class TimeServerHandler extends IoHandlerAdapter
 {

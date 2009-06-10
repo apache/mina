@@ -34,7 +34,7 @@ import org.apache.mina.core.session.IoSession;
  * A utility class that provides various convenience methods related with
  * {@link IoSession} and {@link IoFuture}.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoUtil {
     

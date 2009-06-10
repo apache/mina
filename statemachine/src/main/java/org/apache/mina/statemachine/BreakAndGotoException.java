@@ -22,7 +22,7 @@ package org.apache.mina.statemachine;
 /**
  * Exception used internally by {@link StateControl}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class BreakAndGotoException extends BreakException {
     private static final long serialVersionUID = 711671882187950113L;

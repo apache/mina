@@ -22,7 +22,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 
 /**
- * @author Apache Mina Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 
 public class HaikuValidatorIoHandler extends IoHandlerAdapter {

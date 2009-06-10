@@ -34,7 +34,7 @@ import org.apache.mina.filter.codec.textline.TextLineDecoder;
  * MINA {@link ProtocolDecoder} which decodes bytes into {@link Command}
  * objects.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CommandDecoder extends TextLineDecoder {
     

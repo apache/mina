@@ -25,7 +25,7 @@ package org.apache.mina.util.byteaccess;
  * Abstract class that implements {@link ByteArray}.  This class will only be 
  * used internally and should not be used by end users.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 abstract class AbstractByteArray implements ByteArray
 {

@@ -27,7 +27,7 @@ import org.apache.mina.core.session.IoSession;
  * Something interested in being notified when the completion
  * of an asynchronous I/O operation : {@link IoFuture}. 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoFutureListener<F extends IoFuture> extends EventListener {
     /**

@@ -26,7 +26,7 @@ import org.apache.mina.statemachine.annotation.IoFilterTransition;
  * Defines all possible MINA {@link IoFilter} events for use in {@link IoFilterTransition}
  * annotations.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum IoFilterEvents {
     ANY(Event.WILDCARD_EVENT_ID),

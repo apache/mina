@@ -24,7 +24,7 @@ import java.net.InetSocketAddress;
 /**
  * ProxyRequest.java - Abstract wrapper class for proxy requests.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
 public abstract class ProxyRequest {

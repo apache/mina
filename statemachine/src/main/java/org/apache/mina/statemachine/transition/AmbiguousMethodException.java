@@ -23,7 +23,7 @@ package org.apache.mina.statemachine.transition;
  * Thrown by the constructors in {@link MethodTransition} if there are several 
  * methods with the specifed name in the target object's class. 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class AmbiguousMethodException extends RuntimeException {
 

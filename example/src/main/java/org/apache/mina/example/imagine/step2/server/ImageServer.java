@@ -33,7 +33,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 /**
  * entry point for the server used in the tutorial on protocol codecs
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 
 public class ImageServer {

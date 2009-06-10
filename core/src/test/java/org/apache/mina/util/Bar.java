@@ -25,7 +25,7 @@ import org.apache.mina.core.IoBufferTest;
  * The subtype of {@link Foo}.  It is used to test the serialization of inherited object
  * in {@link IoBufferTest}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Bar extends Foo {
 

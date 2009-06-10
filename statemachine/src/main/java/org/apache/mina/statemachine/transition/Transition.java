@@ -27,7 +27,7 @@ import org.apache.mina.statemachine.event.Event;
  * The interface implemented by classes which need to react on transitions
  * between states.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface Transition {
     /**

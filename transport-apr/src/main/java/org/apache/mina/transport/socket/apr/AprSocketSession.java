@@ -37,7 +37,7 @@ import org.apache.tomcat.jni.Socket;
  * An {@link IoSession} for APR TCP socket based session.
  * It's implementing the usual common features for {@SocketSession}. 
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class AprSocketSession extends AprSession {
     static final TransportMetadata METADATA =
@@ -76,7 +76,7 @@ class AprSocketSession extends AprSession {
 
     /**
      * The implementation for the {@link IoSessionConfig} related to APR TCP socket.
-     * @author The Apache MINA Project (dev@mina.apache.org)
+     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      */
     private class SessionConfigImpl extends AbstractSocketSessionConfig {
         /**

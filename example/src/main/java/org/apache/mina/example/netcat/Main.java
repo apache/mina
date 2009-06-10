@@ -29,7 +29,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  * endpoint and prints out received data.  NetCat client disconnects
  * automatically when no data is read for 10 seconds.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Main {
     public static void main(String[] args) throws Exception {

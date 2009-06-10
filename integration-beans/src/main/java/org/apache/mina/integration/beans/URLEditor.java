@@ -27,7 +27,7 @@ import java.net.URL;
  * A {@link PropertyEditor} which converts a {@link String} into
  * a {@link URL} and vice versa.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class URLEditor extends AbstractPropertyEditor {
 

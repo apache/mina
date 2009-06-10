@@ -27,7 +27,7 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
 /**
  * A {@link MessageEncoder} that encodes {@link AddMessage}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class AddMessageEncoder<T extends AddMessage> extends AbstractMessageEncoder<T> {
     public AddMessageEncoder() {

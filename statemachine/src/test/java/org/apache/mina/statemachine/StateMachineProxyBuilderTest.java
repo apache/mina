@@ -31,7 +31,7 @@ import org.apache.mina.statemachine.transition.MethodTransition;
 /**
  * Tests {@link StateMachineProxyBuilder}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StateMachineProxyBuilderTest extends TestCase {
 

@@ -23,7 +23,7 @@ package org.apache.mina.statemachine;
  * Exception thrown by {@link StateMachineFactory} when a {@link StateMachine}
  * could not be constructed for some reason.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 
 public class StateMachineCreationException extends RuntimeException {

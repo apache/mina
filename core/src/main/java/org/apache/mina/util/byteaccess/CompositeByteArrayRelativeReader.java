@@ -31,7 +31,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * automatically freed. This makes it easier to use pooling for underlying
  * <code>ByteArray</code>s.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelativeBase implements IoRelativeReader
 {

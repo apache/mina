@@ -36,7 +36,7 @@ import org.apache.mina.core.session.IoSession;
 /**
  * TODO Add documentation
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class VmPipeSessionCrossCommunicationTest extends TestCase {
     public void testOneSessionTalkingBackAndForthDoesNotDeadlock() throws Exception {

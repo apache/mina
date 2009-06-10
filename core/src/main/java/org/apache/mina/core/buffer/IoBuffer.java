@@ -140,7 +140,7 @@ import org.apache.mina.core.session.IoSession;
  * {@link #setAllocator(IoBufferAllocator)}.
  * </p>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class IoBuffer implements Comparable<IoBuffer> {
     /** The allocator used to create new buffers */

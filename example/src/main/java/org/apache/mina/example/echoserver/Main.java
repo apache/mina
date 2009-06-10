@@ -30,7 +30,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 /**
  * (<b>Entry point</b>) Echo server
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Main {
     /** Choose your favorite port number. */

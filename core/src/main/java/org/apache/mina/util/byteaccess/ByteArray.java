@@ -29,7 +29,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * Represents a sequence of bytes that can be read or written directly or
  * through a cursor.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter
 {

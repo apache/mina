@@ -64,7 +64,7 @@ import org.apache.mina.core.write.WriteRequestQueue;
  * {@link #equals(Object)} and {@link #hashCode()} shall not be overriden
  * to the default behavior that is defined in {@link Object}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoSession {
     /**

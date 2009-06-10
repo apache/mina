@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link IoHandler} for SumUp server.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ServerSessionHandler extends IoHandlerAdapter {
     

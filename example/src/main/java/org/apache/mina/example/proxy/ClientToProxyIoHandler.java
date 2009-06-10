@@ -30,7 +30,7 @@ import org.apache.mina.core.session.IoSession;
 /**
  * Handles the client to proxy part of the proxied connection.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ClientToProxyIoHandler extends AbstractProxyIoHandler {
     private final ServerToProxyIoHandler connectorHandler = new ServerToProxyIoHandler();

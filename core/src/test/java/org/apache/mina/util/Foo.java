@@ -27,7 +27,7 @@ import org.apache.mina.core.IoBufferTest;
  * The parent class of {@link Bar}.  It is used to test the serialization of inherited object
  * in {@link IoBufferTest}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Foo implements Serializable {
 

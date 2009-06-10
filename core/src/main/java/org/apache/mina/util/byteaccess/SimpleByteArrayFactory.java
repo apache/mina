@@ -28,7 +28,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * <code>IoBuffer</code>. The free method on returned
  * <code>ByteArray</code>s is a nop.
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SimpleByteArrayFactory implements ByteArrayFactory
 {

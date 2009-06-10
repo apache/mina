@@ -40,7 +40,8 @@ import java.nio.charset.Charset;
  * Simple Unit Test showing that the DemuxingProtocolDecoder has
  * inconsistent behavior if used with a non fragmented transport.
  * 
- */
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+*/
 public class DemuxingProtocolDecoderBugTest
 {
 

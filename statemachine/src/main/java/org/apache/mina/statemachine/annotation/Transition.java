@@ -31,7 +31,7 @@ import org.apache.mina.statemachine.event.Event;
  * Annotation used on methods to indicate that the method handles a specific
  * kind of event when in a specific state.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

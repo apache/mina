@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Tests {@link MdcInjectionFilter} in variuos scenarios.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MdcInjectionFilterTest {
 

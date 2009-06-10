@@ -38,7 +38,7 @@ import org.springframework.beans.PropertyEditorRegistry;
  * registers by default all the {@link PropertyEditor} implementations in the 
  * MINA Integration Beans module.
  *
- * @author <a href="mailto:dev@mina.apache.org">Apache MINA Project</a>
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MinaPropertyEditorRegistrar implements PropertyEditorRegistrar
 {

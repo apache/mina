@@ -23,7 +23,7 @@ package org.apache.mina.core.session;
 /**
  * An exception that is thrown when the type of the message cannot be determined.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class UnknownMessageTypeException extends RuntimeException {
     private static final long serialVersionUID = 3257290227428047158L;

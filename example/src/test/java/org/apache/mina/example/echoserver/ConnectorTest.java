@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Tests echo server example.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ConnectorTest extends AbstractTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(ConnectorTest.class);

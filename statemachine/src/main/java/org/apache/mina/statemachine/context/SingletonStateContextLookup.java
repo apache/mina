@@ -23,7 +23,7 @@ package org.apache.mina.statemachine.context;
  * {@link StateContextLookup} implementation which always returns the same
  * {@link StateContext} instance.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SingletonStateContextLookup implements StateContextLookup {
     private final StateContext context;

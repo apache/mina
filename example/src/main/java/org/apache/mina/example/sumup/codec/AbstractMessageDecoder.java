@@ -30,7 +30,7 @@ import org.apache.mina.filter.codec.demux.MessageDecoderResult;
  * A {@link MessageDecoder} that decodes message header and forwards
  * the decoding of body to a subclass.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractMessageDecoder implements MessageDecoder {
     private final int type;

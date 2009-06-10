@@ -24,7 +24,7 @@ import java.net.DatagramSocket;
 /**
  * A default implementation of {@link DatagramSessionConfig}.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig {
     private static boolean DEFAULT_BROADCAST = false;

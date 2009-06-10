@@ -31,7 +31,7 @@ import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 
 /**
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CompressionFilterTest extends TestCase {
     private MockControl mockSession;

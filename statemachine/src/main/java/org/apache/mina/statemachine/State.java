@@ -44,7 +44,7 @@ import org.apache.mina.statemachine.transition.Transition;
  * searched and so on.
  * </p>
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class State {
     private final String id;

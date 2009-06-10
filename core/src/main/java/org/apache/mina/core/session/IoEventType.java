@@ -24,7 +24,7 @@ package org.apache.mina.core.session;
  * Most users won't need to use this class.  It is usually used by internal
  * components to store I/O events.
  *
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum IoEventType {
     SESSION_CREATED,
