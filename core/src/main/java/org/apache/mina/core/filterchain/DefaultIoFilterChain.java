@@ -21,7 +21,6 @@ package org.apache.mina.core.filterchain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -68,11 +67,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
     /** The logger for this class */
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultIoFilterChain.class);
 
-    
+
     /**
-     * Create a new default chain, associated with a session. It will only contain a 
+     * Create a new default chain, associated with a session. It will only contain a
      * HeadFilter and a TailFilter.
-     * 
+     *
      * @param session The session associated with the created filter chain
      */
     public DefaultIoFilterChain(AbstractIoSession session) {
@@ -258,12 +257,14 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public synchronized void clear() throws Exception {
-        Iterator<String> it = new ArrayList<String>(name2entry.keySet())
-                .iterator();
-        while (it.hasNext()) {
-            String name = it.next();
-            if (contains(name)) {
-                remove(name);
+        List<IoFilterChain.Entry> l = new ArrayList<IoFilterChain.Entry>(
+                name2entry.values());
+        for (IoFilterChain.Entry entry : l) {
+            try {
+                deregister((EntryImpl) entry);
+            } catch (Exception e) {
+                throw new IoFilterLifeCycleException("clear(): "
+                        + entry.getName() + " in " + getSession(), e);
             }
         }
     }
@@ -590,15 +591,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
         return buf.toString();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            this.clear();
-        } finally {
-            super.finalize();
-        }
-    }
-
     private class HeadFilter extends IoFilterAdapter {
         @SuppressWarnings("unchecked")
         @Override
@@ -817,7 +809,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                     Entry nextEntry = EntryImpl.this.prevEntry;
                     callPreviousFilterClose(nextEntry, session);
                 }
-                
+
                 public String toString() {
                     return EntryImpl.this.nextEntry.name;
                 }
@@ -847,11 +839,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            
+
             // Add the current filter
             sb.append("('").append(getName()).append('\'');
-            
-            // Add the previous filter 
+
+            // Add the previous filter
             sb.append(", prev: '");
 
             if (prevEntry != null) {
@@ -861,8 +853,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
             } else {
                 sb.append("null");
             }
-            
-            // Add the next filter 
+
+            // Add the next filter
             sb.append("', next: '");
 
             if (nextEntry != null) {
@@ -872,7 +864,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             } else {
                 sb.append("null");
             }
-            
+
             sb.append("')");
             return sb.toString();
         }
