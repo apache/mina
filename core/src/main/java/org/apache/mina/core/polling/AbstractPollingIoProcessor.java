@@ -55,7 +55,8 @@ import org.apache.mina.util.NamePreservingRunnable;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> implements IoProcessor<T> {
+public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
+        implements IoProcessor<T> {
     /**
      * The maximum loop count for a write operation until
      * {@link #write(AbstractIoSession, IoBuffer, int)} returns non-zero value.
@@ -63,32 +64,39 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * It improves memory utilization and write throughput significantly.
      */
     private static final int WRITE_SPIN_COUNT = 256;
-    
+
     /** A timeout used for the select, as we need to get out to deal with idle sessions */
     private static final long SELECT_TIMEOUT = 1000L;
 
     /** A map containing the last Thread ID for each class */
-    private static final Map<Class<?>, AtomicInteger> threadIds = 
-        new HashMap<Class<?>, AtomicInteger>();
+    private static final Map<Class<?>, AtomicInteger> threadIds = new HashMap<Class<?>, AtomicInteger>();
 
     private final Object lock = new Object();
+
     private final String threadName;
+
     private final Executor executor;
 
     /** A Session queue containing the newly created sessions */
     private final Queue<T> newSessions = new ConcurrentLinkedQueue<T>();
+
     private final Queue<T> removingSessions = new ConcurrentLinkedQueue<T>();
+
     private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
+
     private final Queue<T> trafficControllingSessions = new ConcurrentLinkedQueue<T>();
 
     /** The processor thread : it handles the incoming messages */
     private Processor processor;
-    
+
     private long lastIdleCheckTime;
 
     private final Object disposalLock = new Object();
+
     private volatile boolean disposing;
+
     private volatile boolean disposed;
+
     private final DefaultIoFuture disposalFuture = new DefaultIoFuture(null);
 
     /**
@@ -117,14 +125,14 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     private String nextThreadName() {
         Class<?> cls = getClass();
         int newThreadId;
-        
+
         // We synchronize this block to avoid a concurrent access to 
         // the actomicInteger (it can be modified by another thread, while
         // being seen as null by another thread)
-        synchronized( threadIds ) {
+        synchronized (threadIds) {
             // Get the current ID associated to this class' name
             AtomicInteger threadId = threadIds.get(cls);
-            
+
             if (threadId == null) {
                 // We never have seen this class before, just create a
                 // new ID starting at 1 for it, and associate this ID
@@ -136,7 +144,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 newThreadId = threadId.incrementAndGet();
             }
         }
-        
+
         // Now we can compute the name for this thread
         return cls.getSimpleName() + '-' + newThreadId;
     }
@@ -154,7 +162,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     public final boolean isDisposed() {
         return disposed;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -188,40 +196,40 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * @throws Exception if some low level IO error occurs
      */
     protected abstract int select(long timeout) throws Exception;
-    
+
     /**
      * poll those sessions forever
      * @return The number of session ready for read or for write
      * @throws Exception if some low level IO error occurs
      */
     protected abstract int select() throws Exception;
-    
+
     /**
      * Say if the list of {@link IoSession} polled by this {@link IoProcessor} 
      * is empty
      * @return true if at least a session is managed by this {@link IoProcessor}
      */
     protected abstract boolean isSelectorEmpty();
-    
+
     /**
      * Interrupt the {@link AbstractPollingIoProcessor#select(int) call.
      */
     protected abstract void wakeup();
-    
+
     /**
      * Get an {@link Iterator} for the list of {@link IoSession} polled by this
      * {@link IoProcessor}   
      * @return {@link Iterator} of {@link IoSession}
      */
     protected abstract Iterator<T> allSessions();
-    
+
     /**
      * Get an {@link Iterator} for the list of {@link IoSession} found selected 
      * by the last call of {@link AbstractPollingIoProcessor#select(int)
      * @return {@link Iterator} of {@link IoSession} read for I/Os operation
      */
     protected abstract Iterator<T> selectedSessions();
-    
+
     /**
      * Get the state of a session (preparing, open, closed)
      * @param session the {@link IoSession} to inspect
@@ -279,14 +287,14 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract void init(T session) throws Exception;
-    
+
     /**
      * Destroy the underlying client socket handle
      * @param session the {@link IoSession}
      * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract void destroy(T session) throws Exception;
-    
+
     /**
      * Reads a sequence of bytes from a {@link IoSession} into the given {@link IoBuffer}. 
      * Is called when the session was found ready for reading.
@@ -307,8 +315,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * @return the number of byte written
      * @throws Exception any exception thrown by the underlying system calls
      */
-    protected abstract int write(T session, IoBuffer buf, int length) throws Exception;
-    
+    protected abstract int write(T session, IoBuffer buf, int length)
+            throws Exception;
+
     /**
      * Write a part of a file to a {@link IoSession}, if the underlying API isn't supporting
      * system calls like sendfile(), you can throw a {@link UnsupportedOperationException} so 
@@ -319,7 +328,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
      * @return the number of written bytes
      * @throws Exception any exception thrown by the underlying system calls
      */
-    protected abstract int transferFile(T session, FileRegion region, int length) throws Exception;
+    protected abstract int transferFile(T session, FileRegion region, int length)
+            throws Exception;
 
     /**
      * {@inheritDoc}
@@ -384,36 +394,36 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         synchronized (lock) {
             if (processor == null) {
                 processor = new Processor();
-                executor.execute(new NamePreservingRunnable(processor, threadName));
+                executor.execute(new NamePreservingRunnable(processor,
+                        threadName));
             }
         }
-        
+
         // Just stop the select() and start it again, so that the processor
         // can be activated immediately. 
         wakeup();
     }
 
     /**
-     * Handle newly created sessions
+     * Loops over the new sessions blocking queue and returns
+     * the number of sessions which are effectively created
+     *
      * @return The number of new sessions
      */
     private int handleNewSessions() {
         int addedSessions = 0;
-        
-        // Loop on the new sessions blocking queue, to count
-        // the number of sessions who has been created
+
         for (;;) {
             T session = newSessions.poll();
 
             if (session == null) {
-                // We don't have new sessions
+                // All new sessions have been handled
                 break;
             }
 
-
             if (addNow(session)) {
                 // A new session has been created 
-                addedSessions ++;
+                addedSessions++;
             }
         }
 
@@ -434,14 +444,15 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
             // DefaultIoFilterChain.CONNECT_FUTURE is cleared inside here
             // in AbstractIoFilterChain.fireSessionOpened().
-            ((AbstractIoService) session.getService()).getListeners().fireSessionCreated(session);
+            ((AbstractIoService) session.getService()).getListeners()
+                    .fireSessionCreated(session);
             notified = true;
         } catch (Throwable e) {
             if (notified) {
                 // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
                 // and call ConnectFuture.setException().
                 scheduleRemove(session);
-                IoFilterChain filterChain = session.getFilterChain(); 
+                IoFilterChain filterChain = session.getFilterChain();
                 filterChain.fireExceptionCaught(e);
                 wakeup();
             } else {
@@ -460,7 +471,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private int remove() {
         int removedSessions = 0;
-        for (; ;) {
+        for (;;) {
             T session = removingSessions.poll();
 
             if (session == null) {
@@ -471,17 +482,20 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             switch (state) {
             case OPEN:
                 if (removeNow(session)) {
-                    removedSessions ++;
+                    removedSessions++;
                 }
                 break;
             case CLOSED:
                 // Skip if channel is already closed
                 break;
             case PREPARING:
-                // Retry later if session is not yet fully initialized.
-                // (In case that Session.close() is called before addSession() is processed)
-                scheduleRemove(session);
-                return removedSessions;
+                // Remove session from the newSessions queue and
+                // remove it
+                newSessions.remove(session);
+                if (removeNow(session)) {
+                    removedSessions++;
+                }
+                break;
             default:
                 throw new IllegalStateException(String.valueOf(state));
             }
@@ -497,11 +511,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             destroy(session);
             return true;
         } catch (Exception e) {
-            IoFilterChain filterChain = session.getFilterChain(); 
+            IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);
         } finally {
             clearWriteRequestQueue(session);
-            ((AbstractIoService) session.getService()).getListeners().fireSessionDestroyed(session);
+            ((AbstractIoService) session.getService()).getListeners()
+                    .fireSessionDestroyed(session);
         }
         return false;
     }
@@ -523,7 +538,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     buf.reset();
                     failedRequests.add(req);
                 } else {
-                    IoFilterChain filterChain = session.getFilterChain(); 
+                    IoFilterChain filterChain = session.getFilterChain();
                     filterChain.fireMessageSent(req);
                 }
             } else {
@@ -538,12 +553,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
         // Create an exception and notify.
         if (!failedRequests.isEmpty()) {
-            WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
-            for (WriteRequest r: failedRequests) {
+            WriteToClosedSessionException cause = new WriteToClosedSessionException(
+                    failedRequests);
+            for (WriteRequest r : failedRequests) {
                 session.decreaseScheduledBytesAndMessages(r);
                 r.getFuture().setException(cause);
             }
-            IoFilterChain filterChain = session.getFilterChain(); 
+            IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(cause);
         }
     }
@@ -575,8 +591,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         IoSessionConfig config = session.getConfig();
         IoBuffer buf = IoBuffer.allocate(config.getReadBufferSize());
 
-        final boolean hasFragmentation =
-            session.getTransportMetadata().hasFragmentation();
+        final boolean hasFragmentation = session.getTransportMetadata()
+                .hasFragmentation();
 
         try {
             int readBytes = 0;
@@ -601,7 +617,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
 
             if (readBytes > 0) {
-                IoFilterChain filterChain = session.getFilterChain(); 
+                IoFilterChain filterChain = session.getFilterChain();
                 filterChain.fireMessageReceived(buf);
                 buf = null;
 
@@ -619,13 +635,14 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         } catch (Throwable e) {
             if (e instanceof IOException) {
                 if (!(e instanceof PortUnreachableException)
-                        || !AbstractDatagramSessionConfig.class.isAssignableFrom(config.getClass())
+                        || !AbstractDatagramSessionConfig.class
+                                .isAssignableFrom(config.getClass())
                         || ((AbstractDatagramSessionConfig) config)
                                 .isCloseOnPortUnreachable())
 
                     scheduleRemove(session);
             }
-            IoFilterChain filterChain = session.getFilterChain(); 
+            IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);
         }
     }
@@ -645,21 +662,22 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         }
 
         T session = flushingSessions.poll(); // the same one with firstSession
-        for (; ;) {
+        for (;;) {
             session.setScheduledForFlush(false);
             SessionState state = state(session);
-            
+
             switch (state) {
             case OPEN:
                 try {
                     boolean flushedAll = flushNow(session, currentTime);
-                    if (flushedAll && !session.getWriteRequestQueue().isEmpty(session) &&
-                        !session.isScheduledForFlush()) {
+                    if (flushedAll
+                            && !session.getWriteRequestQueue().isEmpty(session)
+                            && !session.isScheduledForFlush()) {
                         scheduleFlush(session);
                     }
                 } catch (Exception e) {
                     scheduleRemove(session);
-                    IoFilterChain filterChain = session.getFilterChain(); 
+                    IoFilterChain filterChain = session.getFilterChain();
                     filterChain.fireExceptionCaught(e);
                 }
                 break;
@@ -689,16 +707,17 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             return false;
         }
 
-        final boolean hasFragmentation =
-            session.getTransportMetadata().hasFragmentation();
+        final boolean hasFragmentation = session.getTransportMetadata()
+                .hasFragmentation();
 
-        final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+        final WriteRequestQueue writeRequestQueue = session
+                .getWriteRequestQueue();
 
         // Set limitation for the number of written bytes for read-write
         // fairness.  I used maxReadBufferSize * 3 / 2, which yields best
         // performance in my experience while not breaking fairness much.
-        final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize() +
-                              (session.getConfig().getMaxReadBufferSize() >>> 1);
+        final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize()
+                + (session.getConfig().getMaxReadBufferSize() >>> 1);
         int writtenBytes = 0;
         try {
             // Clear OP_WRITE
@@ -717,32 +736,35 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 int localWrittenBytes = 0;
                 Object message = req.getMessage();
                 if (message instanceof IoBuffer) {
-                    localWrittenBytes = writeBuffer(
-                            session, req, hasFragmentation,
-                            maxWrittenBytes - writtenBytes,
+                    localWrittenBytes = writeBuffer(session, req,
+                            hasFragmentation, maxWrittenBytes - writtenBytes,
                             currentTime);
-                    if (localWrittenBytes > 0 && ((IoBuffer)message).hasRemaining() ) {
+                    if (localWrittenBytes > 0
+                            && ((IoBuffer) message).hasRemaining()) {
                         // the buffer isn't empty, we re-interest it in writing 
-                        writtenBytes += localWrittenBytes;    
+                        writtenBytes += localWrittenBytes;
                         setInterestedInWrite(session, true);
                         return false;
                     }
                 } else if (message instanceof FileRegion) {
-                    localWrittenBytes = writeFile(
-                            session, req, hasFragmentation,
-                            maxWrittenBytes - writtenBytes,
+                    localWrittenBytes = writeFile(session, req,
+                            hasFragmentation, maxWrittenBytes - writtenBytes,
                             currentTime);
 
                     // Fix for Java bug on Linux http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
                     // If there's still data to be written in the FileRegion, return 0 indicating that we need
                     // to pause until writing may resume.
-                    if (localWrittenBytes > 0 && ((FileRegion) message).getRemainingBytes() > 0) {
+                    if (localWrittenBytes > 0
+                            && ((FileRegion) message).getRemainingBytes() > 0) {
                         writtenBytes += localWrittenBytes;
                         setInterestedInWrite(session, true);
                         return false;
                     }
                 } else {
-                    throw new IllegalStateException("Don't know how to handle message of type '" + message.getClass().getName() + "'.  Are you missing a protocol encoder?");
+                    throw new IllegalStateException(
+                            "Don't know how to handle message of type '"
+                                    + message.getClass().getName()
+                                    + "'.  Are you missing a protocol encoder?");
                 }
 
                 if (localWrittenBytes == 0) {
@@ -760,7 +782,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                 }
             } while (writtenBytes < maxWrittenBytes);
         } catch (Exception e) {
-            IoFilterChain filterChain = session.getFilterChain(); 
+            IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);
             return false;
         }
@@ -769,7 +791,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     private int writeBuffer(T session, WriteRequest req,
-            boolean hasFragmentation, int maxLength, long currentTime) throws Exception {
+            boolean hasFragmentation, int maxLength, long currentTime)
+            throws Exception {
         IoBuffer buf = (IoBuffer) req.getMessage();
         int localWrittenBytes = 0;
         if (buf.hasRemaining()) {
@@ -779,7 +802,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             } else {
                 length = buf.remaining();
             }
-            for (int i = WRITE_SPIN_COUNT; i > 0; i --) {
+            for (int i = WRITE_SPIN_COUNT; i > 0; i--) {
                 localWrittenBytes = write(session, buf, length);
                 if (localWrittenBytes != 0) {
                     break;
@@ -789,8 +812,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
         session.increaseWrittenBytes(localWrittenBytes, currentTime);
 
-        if (!buf.hasRemaining() ||
-                !hasFragmentation && localWrittenBytes != 0) {
+        if (!buf.hasRemaining() || !hasFragmentation && localWrittenBytes != 0) {
             // Buffer has been sent, clear the current request.
             buf.reset();
             fireMessageSent(session, req);
@@ -799,7 +821,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     private int writeFile(T session, WriteRequest req,
-            boolean hasFragmentation, int maxLength, long currentTime) throws Exception {
+            boolean hasFragmentation, int maxLength, long currentTime)
+            throws Exception {
         int localWrittenBytes;
         FileRegion region = (FileRegion) req.getMessage();
         if (region.getRemainingBytes() > 0) {
@@ -807,7 +830,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             if (hasFragmentation) {
                 length = (int) Math.min(region.getRemainingBytes(), maxLength);
             } else {
-                length = (int) Math.min(Integer.MAX_VALUE, region.getRemainingBytes());
+                length = (int) Math.min(Integer.MAX_VALUE, region
+                        .getRemainingBytes());
             }
             localWrittenBytes = transferFile(session, region, length);
             region.update(localWrittenBytes);
@@ -817,8 +841,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
         session.increaseWrittenBytes(localWrittenBytes, currentTime);
 
-        if (region.getRemainingBytes() <= 0 ||
-                    !hasFragmentation && localWrittenBytes != 0) {
+        if (region.getRemainingBytes() <= 0 || !hasFragmentation
+                && localWrittenBytes != 0) {
             fireMessageSent(session, req);
         }
 
@@ -827,12 +851,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
 
     private void fireMessageSent(T session, WriteRequest req) {
         session.setCurrentWriteRequest(null);
-        IoFilterChain filterChain = session.getFilterChain(); 
+        IoFilterChain filterChain = session.getFilterChain();
         filterChain.fireMessageSent(req);
     }
 
     private void updateTrafficMask() {
-        for (; ;) {
+        for (;;) {
             T session = trafficControllingSessions.poll();
 
             if (session == null) {
@@ -862,20 +886,19 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
         try {
             setInterestedInRead(session, !session.isReadSuspended());
         } catch (Exception e) {
-            IoFilterChain filterChain = session.getFilterChain(); 
+            IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);
         }
         try {
-            setInterestedInWrite(
-                    session,
-                    !session.getWriteRequestQueue().isEmpty(session) &&
-                            !session.isWriteSuspended());
+            setInterestedInWrite(session, !session.getWriteRequestQueue()
+                    .isEmpty(session)
+                    && !session.isWriteSuspended());
         } catch (Exception e) {
-            IoFilterChain filterChain = session.getFilterChain(); 
+            IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);
         }
     }
-        
+
     private class Processor implements Runnable {
         public void run() {
             int nSessions = 0;
@@ -884,7 +907,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             for (;;) {
                 try {
                     // This select has a timeout so that we can manage
-                    // dile session when we get out of the select every
+                    // idle session when we get out of the select every
                     // second. (note : this is a hack to avoid creating
                     // a dedicated thread).
                     int selected = select(SELECT_TIMEOUT);
@@ -915,7 +938,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
                     // Disconnect all sessions immediately if disposal has been
                     // requested so that we exit this loop eventually.
                     if (isDisposing()) {
-                        for (Iterator<T> i = allSessions(); i.hasNext(); ) {
+                        for (Iterator<T> i = allSessions(); i.hasNext();) {
                             scheduleRemove(i.next());
                         }
                         wakeup();
@@ -946,8 +969,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
     }
 
     protected static enum SessionState {
-        OPEN,
-        CLOSED,
-        PREPARING,
+        OPEN, CLOSED, PREPARING,
     }
 }
