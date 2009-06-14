@@ -20,6 +20,7 @@
 package org.apache.mina.transport.socket;
 
 import java.net.DatagramSocket;
+import java.net.PortUnreachableException;
 
 import org.apache.mina.core.session.IoSessionConfig;
 
@@ -78,4 +79,16 @@ public interface DatagramSessionConfig extends IoSessionConfig {
      * @see DatagramSocket#setTrafficClass(int)
      */
     void setTrafficClass(int trafficClass);
+
+    /**
+     * If method returns true, it means session should be closed when a
+     * {@link PortUnreachableException} occurs.
+     */
+    boolean isCloseOnPortUnreachable();
+
+    /**
+     * Sets if the session should be closed if an {@link PortUnreachableException} 
+     * occurs.
+     */
+    void setCloseOnPortUnreachable(boolean closeOnPortUnreachable);
 }

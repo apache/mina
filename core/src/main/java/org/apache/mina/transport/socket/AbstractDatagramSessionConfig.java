@@ -30,6 +30,10 @@ import org.apache.mina.core.session.IoSessionConfig;
 public abstract class AbstractDatagramSessionConfig extends
         AbstractIoSessionConfig implements DatagramSessionConfig {
 
+    private static final boolean DEFAULT_CLOSE_ON_PORT_UNREACHABLE = true;
+
+    private boolean closeOnPortUnreachable = DEFAULT_CLOSE_ON_PORT_UNREACHABLE;
+    
     protected AbstractDatagramSessionConfig() {
         // Do nothing
     }
@@ -123,5 +127,19 @@ public abstract class AbstractDatagramSessionConfig extends
      */
     protected  boolean isTrafficClassChanged() {
         return true;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isCloseOnPortUnreachable() {
+        return closeOnPortUnreachable;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setCloseOnPortUnreachable(boolean closeOnPortUnreachable) {
+        this.closeOnPortUnreachable = closeOnPortUnreachable;
     }
 }
