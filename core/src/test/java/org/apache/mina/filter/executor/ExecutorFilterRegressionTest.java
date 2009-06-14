@@ -62,7 +62,7 @@ public class ExecutorFilterRegressionTest extends TestCase {
                 new EventOrderCounter(), new EventOrderCounter(),
                 new EventOrderCounter(), new EventOrderCounter(),
                 new EventOrderCounter(), new EventOrderCounter(), };
-        final int loop = 10000000;
+        final int loop = 1000000;
         final int end = sessions.length - 1;
         final ExecutorFilter filter = this.filter;
         ExecutorService executor = (ExecutorService) filter.getExecutor();
