@@ -20,6 +20,7 @@
 package org.apache.mina.core.polling;
 
 import java.io.IOException;
+import java.net.PortUnreachableException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,6 +43,7 @@ import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteToClosedSessionException;
+import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.util.ExceptionMonitor;
 import org.apache.mina.util.NamePreservingRunnable;
 
@@ -616,7 +618,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession> im
             }
         } catch (Throwable e) {
             if (e instanceof IOException) {
-                scheduleRemove(session);
+                if (!(e instanceof PortUnreachableException)
+                        || !AbstractDatagramSessionConfig.class.isAssignableFrom(config.getClass())
+                        || ((AbstractDatagramSessionConfig) config)
+                                .isCloseOnPortUnreachable())
+
+                    scheduleRemove(session);
             }
             IoFilterChain filterChain = session.getFilterChain(); 
             filterChain.fireExceptionCaught(e);
