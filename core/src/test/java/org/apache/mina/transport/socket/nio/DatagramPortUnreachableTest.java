@@ -56,7 +56,7 @@ public class DatagramPortUnreachableTest extends TestCase {
 
         session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten();
         ReadFuture rf = session.read();
-        rf.await(2500);
+        rf.await(5000);
         assertEquals(closeOnPortUnreachable, session.isClosing());
         connector.dispose();
     }
