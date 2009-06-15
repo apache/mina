@@ -31,6 +31,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
+import org.apache.mina.util.AvailablePortFinder;
 
 /**
  * Tests {@link DatagramSessionConfig#setCloseOnPortUnreachable(boolean)}.
@@ -40,7 +41,7 @@ import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 public class DatagramPortUnreachableTest extends TestCase {
 
     private final static InetSocketAddress FAKE_ADDR = new InetSocketAddress(
-            "localhost", 7000);
+            "localhost", AvailablePortFinder.getNextAvailable(1025));
 
     private void runTest(boolean closeOnPortUnreachable) throws Exception {
         IoConnector connector = new NioDatagramConnector();
@@ -56,8 +57,21 @@ public class DatagramPortUnreachableTest extends TestCase {
 
         session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten();
         ReadFuture rf = session.read();
-        rf.await(5000);
-        assertEquals(closeOnPortUnreachable, session.isClosing());
+        
+        boolean done = false;
+        for (int i=0; i<10; i++) {
+            rf.await(1000L);
+            
+            if (session.isClosing()) {
+                assertTrue(closeOnPortUnreachable);
+                done = true;
+            }
+        }
+        
+        if (!done) {
+            assertFalse(closeOnPortUnreachable);
+        }
+
         connector.dispose();
     }
 
