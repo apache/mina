@@ -233,7 +233,6 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         
         return queue;
     }
-
     
     /**
      * @return The associated queue handler. 
@@ -261,7 +260,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             }
 
             // Create a new worker, and add it to the thread pool
-            Worker worker = new Worker( workers.size());
+            Worker worker = new Worker();
             Thread thread = getThreadFactory().newThread(worker);
             
             // As we have added a new thread, it's considered as idle.
@@ -682,31 +681,11 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
     }
 
-    private Queue<Runnable> getTasksQueue(IoSession session) {
-        Queue<Runnable> tasksQueue = (Queue<Runnable>) session.getAttribute(TASKS_QUEUE);
-        
-        if (tasksQueue == null) {
-            tasksQueue = new ConcurrentLinkedQueue<Runnable>();
-            Queue<Runnable> oldTasksQueue = (Queue<Runnable>) session.setAttributeIfAbsent(TASKS_QUEUE, tasksQueue);
-        
-            if (oldTasksQueue != null) {
-                tasksQueue = oldTasksQueue;
-            }
-        }
-        
-        return tasksQueue;
-    }
-
     private class Worker implements Runnable {
 
         private volatile long completedTaskCount;
         private Thread thread;
-        private int id;
         
-        public Worker( int id ) {
-            this.id = id;
-        }
-
         public void run() {
             thread = Thread.currentThread();
 
