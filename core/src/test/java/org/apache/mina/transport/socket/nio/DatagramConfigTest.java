@@ -64,7 +64,7 @@ public class DatagramConfigTest extends TestCase {
     }
 
     public void testAcceptorFilterChain() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(1024);
+        int port = AvailablePortFinder.getNextAvailable(1024 + 1000);
         IoFilter mockFilter = new MockFilter();
         IoHandler mockHandler = new MockHandler();
 
