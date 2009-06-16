@@ -1133,13 +1133,20 @@ public abstract class AbstractIoSession implements IoSession {
     @Override
     public String toString() {
         if (isConnected()||isClosing()) {
-            if (getService() instanceof IoAcceptor) {
-                return "(" + getIdAsString() + ": " + getServiceName() + ", server, " +
-                        getRemoteAddress() + " => " + getLocalAddress() + ')';
+            try {
+                SocketAddress remote = getRemoteAddress();
+                SocketAddress local = getLocalAddress();
+                
+                if (getService() instanceof IoAcceptor) {
+                    return "(" + getIdAsString() + ": " + getServiceName() + ", server, " +
+                            remote + " => " + local + ')';
+                }
+    
+                return "(" + getIdAsString() + ": " + getServiceName() + ", client, " +
+                            local + " => " + remote + ')';
+            } catch (Exception e) {
+                return "Session is disconnecting ...";
             }
-
-            return "(" + getIdAsString() + ": " + getServiceName() + ", client, " +
-                        getLocalAddress() + " => " + getRemoteAddress() + ')';
         }
         
         return "Session disconnected ...";
