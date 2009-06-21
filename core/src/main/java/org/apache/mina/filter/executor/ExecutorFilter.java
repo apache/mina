@@ -137,15 +137,23 @@ public class ExecutorFilter extends IoFilterAdapter {
     private static final boolean NOT_MANAGEABLE_EXECUTOR = false;
     
     /** A list of default EventTypes to be handled by the executor */
-    private static IoEventType[] DEFAULT_EVENT_SET = new IoEventType[] {
-        IoEventType.EXCEPTION_CAUGHT,
-        IoEventType.MESSAGE_RECEIVED, 
-        IoEventType.MESSAGE_SENT,
-        IoEventType.SESSION_CLOSED, 
-        IoEventType.SESSION_IDLE,
-        IoEventType.SESSION_OPENED
-    };
+    private static final IoEventType[] DEFAULT_EVENT_SET;
     
+    /**
+     * Add all {@link IoEventType} except {@link IoEventType.SESSION_CREATED}
+     * as required by {@link #initEventTypes(IoEventType...)}.
+     */
+    static {
+        IoEventType[] all = IoEventType.values();
+        DEFAULT_EVENT_SET = new IoEventType[all.length-1];
+        int i=0;
+        for (IoEventType type : all) {
+            if (type != IoEventType.SESSION_CREATED) {
+                DEFAULT_EVENT_SET[i] = type;
+                i++;
+            }                
+        }
+    }
 
     /**
      * (Convenience constructor) Creates a new instance with a new
