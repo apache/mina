@@ -719,12 +719,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize()
                 + (session.getConfig().getMaxReadBufferSize() >>> 1);
         int writtenBytes = 0;
+        WriteRequest req = null;
         try {
             // Clear OP_WRITE
             setInterestedInWrite(session, false);
             do {
                 // Check for pending writes.
-                WriteRequest req = session.getCurrentWriteRequest();
+                req = session.getCurrentWriteRequest();
                 if (req == null) {
                     req = writeRequestQueue.poll(session);
                     if (req == null) {
@@ -782,6 +783,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                 }
             } while (writtenBytes < maxWrittenBytes);
         } catch (Exception e) {
+        	if (req != null) {
+        		req.getFuture().setException(e);
+        	}
             IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);
             return false;
