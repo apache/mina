@@ -236,21 +236,22 @@ public class IoServiceStatistics {
     }
 
     /**
-     * TODO add documentation
+     * Sets last time at which a read occurred on the service.
      */
     protected final void setLastReadTime(long lastReadTime) {
         this.lastReadTime = lastReadTime;
     }
 
     /**
-     * TODO add documentation
-     */     
+     * Sets last time at which a write occurred on the service.
+     */
     protected final void setLastWriteTime(long lastWriteTime) {
         this.lastWriteTime = lastWriteTime;
     }
     
     /**
-     * TODO add documentation
+     * Resets the throughput counters of the service if none session 
+     * is currently managed. 
      */
     private void resetThroughput() {
         if (service.getManagedSessionCount() == 0) {
@@ -262,7 +263,7 @@ public class IoServiceStatistics {
     }
 
     /**
-     * TODO add documentation
+     * Updates the throughput counters.
      */    
     public void updateThroughput(long currentTime) {
         synchronized (throughputCalculationLock) {
@@ -309,7 +310,8 @@ public class IoServiceStatistics {
     }
     
     /**
-     * TODO add documentation
+     * Increases the count of read bytes by <code>increment</code> and sets 
+     * the last read time to <code>currentTime</code>.
      */ 
     public final void increaseReadBytes(long increment, long currentTime) {
         readBytes.addAndGet(increment);
@@ -317,66 +319,69 @@ public class IoServiceStatistics {
     }
 
     /**
-     * TODO add documentation
-     */     
+     * Increases the count of read messages by 1 and sets the last read time to 
+     * <code>currentTime</code>.
+     */ 
     public final void increaseReadMessages(long currentTime) {
         readMessages.incrementAndGet();
         lastReadTime = currentTime;
     }
     
     /**
-     * TODO add documentation
-     */
+     * Increases the count of written bytes by <code>increment</code> and sets 
+     * the last write time to <code>currentTime</code>.
+     */ 
     public final void increaseWrittenBytes(int increment, long currentTime) {
         writtenBytes.addAndGet(increment);
         lastWriteTime = currentTime;
     }
 
     /**
-     * TODO add documentation
-     */    
+     * Increases the count of written messages by 1 and sets the last write time to 
+     * <code>currentTime</code>.
+     */   
     public final void increaseWrittenMessages(long currentTime) {
         writtenMessages.incrementAndGet();
         lastWriteTime = currentTime;
     }
     
     /**
-     * TODO add documentation
+     * Returns the count of bytes scheduled for write.
      */
     public final int getScheduledWriteBytes() {
         return scheduledWriteBytes.get();
     }
 
     /**
-     * TODO add documentation
-     */    
+     * Increments by <code>increment</code> the count of bytes scheduled for write.
+     */
     public final void increaseScheduledWriteBytes(int increment) {
         scheduledWriteBytes.addAndGet(increment);
     }
 
     /**
-     * TODO add documentation
+     * Returns the count of messages scheduled for write.
      */
     public final int getScheduledWriteMessages() {
         return scheduledWriteMessages.get();
     }
 
     /**
-     * TODO add documentation
+     * Increments by 1 the count of messages scheduled for write.
      */    
     public final void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
     }
 
     /**
-     * TODO add documentation
+     * Decrements by 1 the count of messages scheduled for write.
      */    
     public final void decreaseScheduledWriteMessages() {
         scheduledWriteMessages.decrementAndGet();
     }
 
     /**
-     * TODO add documentation
+     * Sets the time at which throughtput counters where updated.
      */        
     protected void setLastThroughputCalculationTime(
             long lastThroughputCalculationTime) {
