@@ -32,7 +32,11 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * into buffers.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ * 
+ * @deprecated Please note that this package classes won't be supported 
+ * after 2.0.0 and that these were not deleted because of the API freeze
  */
+@Deprecated
 public class NettyEncoder implements ProtocolEncoder {
     /**
      * Creates a new instance.
