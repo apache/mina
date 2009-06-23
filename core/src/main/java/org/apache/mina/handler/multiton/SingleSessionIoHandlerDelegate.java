@@ -30,8 +30,14 @@ import org.apache.mina.core.session.IoSession;
  * is used to create a new {@link SingleSessionIoHandler} for each newly
  * created session.
  *
+ * WARNING : This {@link IoHandler} implementation may be easier to understand and 
+ * thus to use but the user should be aware that creating one handler by session 
+ * will lower scalability if building an high performance server. This should only
+ * be used with very specific needs in mind.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
+@Deprecated
 public class SingleSessionIoHandlerDelegate implements IoHandler {
     /**
      * The key used to store the {@link SingleSessionIoHandler} as a session
