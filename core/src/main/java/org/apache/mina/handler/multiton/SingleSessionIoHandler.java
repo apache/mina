@@ -38,8 +38,12 @@ import org.apache.mina.core.session.IoSession;
  * conversational state as instance variables in this object.
  * </p>
  *
+ * WARNING: This class is badly named as the actual {@link IoHandler} implementor 
+ * is in fact the {@link SingleSessionIoHandlerDelegate}.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
+@Deprecated
 public interface SingleSessionIoHandler {
 
     /**
