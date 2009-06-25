@@ -34,7 +34,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.executor.ExecutorFilter;
 
 /**
- * Makes sure if the order of event is correct.
+ * Makes sure the order of events are correct.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -192,7 +192,7 @@ public class VmPipeEventOrderTest extends TestCase {
         vmPipeConnector.setHandler(new IoHandlerAdapter());
         ConnectFuture connectFuture = vmPipeConnector.connect(vmPipeAddress);
         connectFuture.awaitUninterruptibly();
-        connectFuture.getSession().write(IoBuffer.wrap(new byte[1]));
+        connectFuture.getSession().write(IoBuffer.wrap(new byte[1])).awaitUninterruptibly();
         connectFuture.getSession().close(false).awaitUninterruptibly();
 
         semaphore.tryAcquire(1, TimeUnit.SECONDS);
