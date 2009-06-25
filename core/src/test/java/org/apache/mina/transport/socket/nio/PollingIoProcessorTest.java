@@ -168,7 +168,7 @@ public class PollingIoProcessorTest extends TestCase {
         ConnectFuture future = connector.connect(addr);
         future.awaitUninterruptibly();
         IoSession session = future.getSession();
-        WriteFuture wf = session.write(IoBuffer.allocate(1));
+        WriteFuture wf = session.write(IoBuffer.allocate(1)).awaitUninterruptibly();
         assertNotNull(wf.getException());
 
         connector.dispose();
