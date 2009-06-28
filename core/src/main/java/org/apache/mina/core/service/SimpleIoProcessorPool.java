@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core.service;
 
+import java.lang.reflect.Constructor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -73,44 +74,57 @@ import org.slf4j.LoggerFactory;
  * @param <T> the type of the {@link IoSession} to be managed by the specified
  *            {@link IoProcessor}.
  */
-public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoProcessor<T> {
-    
-    private static final int DEFAULT_SIZE = Runtime.getRuntime().availableProcessors() + 1;
-    private static final AttributeKey PROCESSOR = new AttributeKey(SimpleIoProcessorPool.class, "processor");
-    
-    private final static Logger LOGGER = LoggerFactory.getLogger(SimpleIoProcessorPool.class);
+public class SimpleIoProcessorPool<T extends AbstractIoSession> implements
+        IoProcessor<T> {
+
+    private static final int DEFAULT_SIZE = Runtime.getRuntime()
+            .availableProcessors() + 1;
+
+    private static final AttributeKey PROCESSOR = new AttributeKey(
+            SimpleIoProcessorPool.class, "processor");
+
+    private final static Logger LOGGER = LoggerFactory
+            .getLogger(SimpleIoProcessorPool.class);
 
     private final IoProcessor<T>[] pool;
+
     private final AtomicInteger processorDistributor = new AtomicInteger();
+
     private final Executor executor;
+
     private final boolean createdExecutor;
-    
+
     private final Object disposalLock = new Object();
+
     private volatile boolean disposing;
+
     private volatile boolean disposed;
-    
+
     public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType) {
         this(processorType, null, DEFAULT_SIZE);
     }
-    
-    public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType, int size) {
+
+    public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType,
+            int size) {
         this(processorType, null, size);
     }
 
-    public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType, Executor executor) {
+    public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType,
+            Executor executor) {
         this(processorType, executor, DEFAULT_SIZE);
     }
-    
+
     @SuppressWarnings("unchecked")
-    public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType, Executor executor, int size) {
+    public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType,
+            Executor executor, int size) {
         if (processorType == null) {
             throw new NullPointerException("processorType");
         }
         if (size <= 0) {
-            throw new IllegalArgumentException(
-                    "size: " + size + " (expected: positive integer)");
+            throw new IllegalArgumentException("size: " + size
+                    + " (expected: positive integer)");
         }
-        
+
         if (executor == null) {
             this.executor = executor = Executors.newCachedThreadPool();
             this.createdExecutor = true;
@@ -118,56 +132,72 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
             this.executor = executor;
             this.createdExecutor = false;
         }
-        
+
         pool = new IoProcessor[size];
-        
+
         boolean success = false;
+        Constructor<? extends IoProcessor<T>> processorConstructor = null;
+        boolean usesExecutorArg = true;
+
         try {
-            for (int i = 0; i < pool.length; i ++) {
-                IoProcessor<T> processor = null;
-                
-                // Try to create a new processor with a proper constructor.
+            // We create at least one processor
+            try {
                 try {
-                    try {
-                        processor = processorType.getConstructor(ExecutorService.class).newInstance(executor);
-                    } catch (NoSuchMethodException e) {
-                        // To the next step...
-                    }
-                    
-                    if (processor == null) {
-                        try {
-                            processor = processorType.getConstructor(Executor.class).newInstance(executor);
-                        } catch (NoSuchMethodException e) {
-                            // To the next step...
-                        }
-                    }
-                    
-                    if (processor == null) {
-                        try {
-                            processor = processorType.getConstructor().newInstance();
-                        } catch (NoSuchMethodException e) {
-                            // To the next step...
-                        }
-                    }
-                } catch (RuntimeException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new RuntimeIoException(
-                            "Failed to create a new instance of " + processorType.getName(), e);
+                    processorConstructor = processorType
+                            .getConstructor(ExecutorService.class);
+                    pool[0] = processorConstructor.newInstance(executor);
+                } catch (NoSuchMethodException e) {
+                    // To the next step...
                 }
-                
-                // Raise an exception if no proper constructor is found.
-                if (processor == null) {
-                    throw new IllegalArgumentException(
-                            String.valueOf(processorType) + " must have a public constructor " +
-                            "with one " + ExecutorService.class.getSimpleName() + " parameter, " +
-                            "a public constructor with one " + Executor.class.getSimpleName() + 
-                            " parameter or a public default constructor.");
+
+                try {
+                    processorConstructor = processorType
+                            .getConstructor(Executor.class);
+                    pool[0] = processorConstructor.newInstance(executor);
+                } catch (NoSuchMethodException e) {
+                    // To the next step...
                 }
-                
-                pool[i] = processor;
+
+                try {
+                    processorConstructor = processorType.getConstructor();
+                    usesExecutorArg = false;
+                    pool[0] = processorConstructor.newInstance();
+                } catch (NoSuchMethodException e) {
+                    // To the next step...
+                }
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new RuntimeIoException(
+                        "Failed to create a new instance of "
+                                + processorType.getName(), e);
             }
-            
+
+            if (processorConstructor == null) {
+                // Raise an exception if no proper constructor is found.
+                throw new IllegalArgumentException(String
+                        .valueOf(processorType)
+                        + " must have a public constructor "
+                        + "with one "
+                        + ExecutorService.class.getSimpleName()
+                        + " parameter, "
+                        + "a public constructor with one "
+                        + Executor.class.getSimpleName()
+                        + " parameter or a public default constructor.");
+            }
+
+            // Constructor found now use it for all subsequent instantiations
+            for (int i = 1; i < pool.length; i++) {
+                try {
+                    if (usesExecutorArg) {
+                        pool[i] = processorConstructor.newInstance(executor);
+                    } else {
+                        pool[i] = processorConstructor.newInstance();
+                    }
+                } catch (Exception e) {
+                    // Won't happen because it has been done previously
+                }
+            }
             success = true;
         } finally {
             if (!success) {
@@ -175,7 +205,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
             }
         }
     }
-    
+
     public final void add(T session) {
         getProcessor(session).add(session);
     }
@@ -191,7 +221,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
     public final void updateTrafficControl(T session) {
         getProcessor(session).updateTrafficControl(session);
     }
-    
+
     public boolean isDisposed() {
         return disposed;
     }
@@ -208,7 +238,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
         synchronized (disposalLock) {
             if (!disposing) {
                 disposing = true;
-                for (int i = pool.length - 1; i >= 0; i --) {
+                for (int i = pool.length - 1; i >= 0; i--) {
                     if (pool[i] == null || pool[i].isDisposing()) {
                         continue;
                     }
@@ -216,15 +246,14 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
                     try {
                         pool[i].dispose();
                     } catch (Exception e) {
-                        LOGGER.warn(
-                                "Failed to dispose a " +
-                                pool[i].getClass().getSimpleName() +
-                                " at index " + i + ".", e);
+                        LOGGER.warn("Failed to dispose a "
+                                + pool[i].getClass().getSimpleName()
+                                + " at index " + i + ".", e);
                     } finally {
                         pool[i] = null;
                     }
                 }
-                
+
                 if (createdExecutor) {
                     ((ExecutorService) executor).shutdown();
                 }
@@ -233,30 +262,28 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
 
         disposed = true;
     }
-    
+
     @SuppressWarnings("unchecked")
     private IoProcessor<T> getProcessor(T session) {
         IoProcessor<T> p = (IoProcessor<T>) session.getAttribute(PROCESSOR);
         if (p == null) {
             p = nextProcessor();
-            IoProcessor<T> oldp =
-                (IoProcessor<T>) session.setAttributeIfAbsent(PROCESSOR, p);
+            IoProcessor<T> oldp = (IoProcessor<T>) session
+                    .setAttributeIfAbsent(PROCESSOR, p);
             if (oldp != null) {
                 p = oldp;
             }
         }
-        
+
         return p;
     }
 
     private IoProcessor<T> nextProcessor() {
-        checkDisposal();
-        return pool[Math.abs(processorDistributor.getAndIncrement()) % pool.length];
-    }
-
-    private void checkDisposal() {
         if (disposed) {
-            throw new IllegalStateException("A disposed processor cannot be accessed.");
+            throw new IllegalStateException(
+                    "A disposed processor cannot be accessed.");
         }
+        return pool[Math.abs(processorDistributor.getAndIncrement())
+                % pool.length];
     }
 }
