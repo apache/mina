@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An {@link IoFilter} which translates binary or protocol specific data into
- * message object and vice versa using {@link ProtocolCodecFactory},
+ * message objects and vice versa using {@link ProtocolCodecFactory},
  * {@link ProtocolEncoder}, or {@link ProtocolDecoder}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -48,15 +48,15 @@ import org.slf4j.LoggerFactory;
  */
 public class ProtocolCodecFilter extends IoFilterAdapter {
     /** A logger for this class */
-    private final static Logger LOGGER = LoggerFactory.getLogger(ProtocolCodecFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolCodecFilter.class);
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
     private static final IoBuffer EMPTY_BUFFER = IoBuffer.wrap(new byte[0]);
 
-    private final AttributeKey ENCODER = new AttributeKey(getClass(), "encoder");
-    private final AttributeKey DECODER = new AttributeKey(getClass(), "decoder");
-    private final AttributeKey DECODER_OUT = new AttributeKey(getClass(), "decoderOut");
-    private final AttributeKey ENCODER_OUT = new AttributeKey(getClass(), "encoderOut");
+    private static final AttributeKey ENCODER = new AttributeKey(ProtocolCodecFilter.class, "encoder");
+    private static final AttributeKey DECODER = new AttributeKey(ProtocolCodecFilter.class, "decoder");
+    private static final AttributeKey DECODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "decoderOut");
+    private static final AttributeKey ENCODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "encoderOut");
     
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
@@ -144,7 +144,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     "decoderClass doesn't have a public default constructor.");
         }
 
-        // Create the inner Factory based on the two parameters. We instanciate
+        // Create the inner factory based on the two parameters. We instantiate
         // the encoder and decoder locally.
         this.factory = new ProtocolCodecFactory() {
             public ProtocolEncoder getEncoder(IoSession session) throws Exception {
@@ -280,7 +280,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
         
-        // Bypass the encoding if the message is contained in a ByteBuffer,
+        // Bypass the encoding if the message is contained in a IoBuffer,
         // as it has already been encoded before
         if (message instanceof IoBuffer || message instanceof FileRegion) {
             nextFilter.filterWrite(session, writeRequest);
@@ -468,7 +468,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
     
     /**
-     * dispose the encoder, removing its instance from the
+     * Dispose the encoder, removing its instance from the
      * session's attributes, and calling the associated
      * dispose method.
      */
@@ -498,7 +498,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
 
     /**
-     * dispose the decoder, removing its instance from the
+     * Dispose the decoder, removing its instance from the
      * session's attributes, and calling the associated
      * dispose method.
      */
@@ -513,7 +513,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             decoder.dispose(session);
         } catch (Throwable t) {
             LOGGER.warn(
-                    "Falied to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
+                    "Failed to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }
 
