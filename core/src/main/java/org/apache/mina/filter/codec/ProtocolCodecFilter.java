@@ -266,13 +266,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             return;
         }
 
-        if (!(writeRequest instanceof MessageWriteRequest)) {
-            nextFilter.messageSent(session, writeRequest);
-            return;
+        if (writeRequest instanceof MessageWriteRequest) {
+            MessageWriteRequest wrappedRequest = (MessageWriteRequest) writeRequest;
+            nextFilter.messageSent(session, wrappedRequest.getParentRequest());            
         }
-
-        MessageWriteRequest wrappedRequest = (MessageWriteRequest) writeRequest;
-        nextFilter.messageSent(session, wrappedRequest.getParentRequest());
+        else {
+            nextFilter.messageSent(session, writeRequest);
+        }        
     }
 
     @Override
