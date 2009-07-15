@@ -77,7 +77,7 @@ public class ChatClientSupport {
                         .getInstance(false);
                 SslFilter sslFilter = new SslFilter(sslContext);
                 sslFilter.setUseClientMode(true);
-                connector.getFilterChain().addLast("sslFilter", sslFilter);
+                connector.getFilterChain().addFirst("sslFilter", sslFilter);
             }
 
             connector.setHandler(handler);
