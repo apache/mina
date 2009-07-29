@@ -36,6 +36,7 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.SessionState;
 import org.apache.mina.util.AvailablePortFinder;
 
 /**
@@ -132,9 +133,9 @@ public class PollingIoProcessorTest extends TestCase {
                     }
 
                     @Override
-                    protected org.apache.mina.core.polling.AbstractPollingIoProcessor.SessionState state(
+                    protected SessionState getState(
                             NioSession session) {
-                        return proc.state(session);
+                        return proc.getState(session);
                     }
 
                     @Override
