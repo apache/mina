@@ -136,24 +136,6 @@ public class ExecutorFilter extends IoFilterAdapter {
     private static final boolean MANAGEABLE_EXECUTOR = true;
     private static final boolean NOT_MANAGEABLE_EXECUTOR = false;
     
-    /** A list of default EventTypes to be handled by the executor */
-    private static final IoEventType[] DEFAULT_EVENT_SET;
-    
-    /**
-     * Add all {@link IoEventType} except {@link IoEventType.SESSION_CREATED}
-     * as required by {@link #initEventTypes(IoEventType...)}.
-     */
-    static {
-        IoEventType[] all = IoEventType.values();
-        DEFAULT_EVENT_SET = new IoEventType[all.length-1];
-        int i=0;
-        for (IoEventType type : all) {
-            if (type != IoEventType.SESSION_CREATED) {
-                DEFAULT_EVENT_SET[i] = type;
-                i++;
-            }                
-        }
-    }
 
     /**
      * (Convenience constructor) Creates a new instance with a new
@@ -172,7 +154,7 @@ public class ExecutorFilter extends IoFilterAdapter {
             null);
         
         // Initialize the filter
-        init(executor, MANAGEABLE_EXECUTOR, DEFAULT_EVENT_SET);
+        init(executor, MANAGEABLE_EXECUTOR);
     }
     
     /**
@@ -194,7 +176,7 @@ public class ExecutorFilter extends IoFilterAdapter {
             null);
         
         // Initialize the filter
-        init(executor, MANAGEABLE_EXECUTOR, DEFAULT_EVENT_SET);
+        init(executor, MANAGEABLE_EXECUTOR);
     }
     
     /**
@@ -217,7 +199,7 @@ public class ExecutorFilter extends IoFilterAdapter {
             null);
         
         // Initialize the filter
-        init(executor, MANAGEABLE_EXECUTOR, DEFAULT_EVENT_SET);
+        init(executor, MANAGEABLE_EXECUTOR);
     }
     
     /**
@@ -241,7 +223,7 @@ public class ExecutorFilter extends IoFilterAdapter {
             null);
         
         // Initialize the filter
-        init(executor, MANAGEABLE_EXECUTOR, DEFAULT_EVENT_SET);
+        init(executor, MANAGEABLE_EXECUTOR);
     }
 
     /**
@@ -268,7 +250,7 @@ public class ExecutorFilter extends IoFilterAdapter {
             queueHandler);
         
         // Initialize the filter
-        init(executor, MANAGEABLE_EXECUTOR, DEFAULT_EVENT_SET);
+        init(executor, MANAGEABLE_EXECUTOR);
     }
 
     /**
@@ -295,7 +277,7 @@ public class ExecutorFilter extends IoFilterAdapter {
             null);
         
         // Initialize the filter
-        init(executor, MANAGEABLE_EXECUTOR, DEFAULT_EVENT_SET);
+        init(executor, MANAGEABLE_EXECUTOR);
     }
 
     /**
@@ -317,7 +299,7 @@ public class ExecutorFilter extends IoFilterAdapter {
         Executor executor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, queueHandler);
         
         // Initialize the filter
-        init(executor, MANAGEABLE_EXECUTOR, DEFAULT_EVENT_SET);
+        init(executor, MANAGEABLE_EXECUTOR);
     }
 
     /**
@@ -497,7 +479,7 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     public ExecutorFilter(Executor executor) {
         // Initialize the filter
-        init(executor, NOT_MANAGEABLE_EXECUTOR, DEFAULT_EVENT_SET);
+        init(executor, NOT_MANAGEABLE_EXECUTOR);
     }
 
     /**
@@ -539,17 +521,31 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     private void initEventTypes(IoEventType... eventTypes) {
         if ((eventTypes == null) || (eventTypes.length == 0)) {
-            eventTypes = DEFAULT_EVENT_SET;
+            // Covers the case of a default initialization
+            IoEventType[] all = IoEventType.values();
+            IoEventType[] tmpEventTypes = new IoEventType[all.length-1];
+            int i=0;
+            
+            for (IoEventType type : all) {
+                if (type != IoEventType.SESSION_CREATED) {
+                    tmpEventTypes[i] = type;
+                    i++;
+                }                
+            }
+            this.eventTypes = EnumSet.of(tmpEventTypes[0], tmpEventTypes);
         }
-
-        // Copy the list of handled events in the event set
-        this.eventTypes = EnumSet.of(eventTypes[0], eventTypes);
-        
-        // Check that we don't have the SESSION_CREATED event in the set
-        if (this.eventTypes.contains( IoEventType.SESSION_CREATED )) {
-            this.eventTypes = null;
-            throw new IllegalArgumentException(IoEventType.SESSION_CREATED
-                + " is not allowed.");
+        else
+        {
+            // The constructor was called with a list of Events to be filtered
+            // Copy the list of handled events in the event set
+            this.eventTypes = EnumSet.of(eventTypes[0], eventTypes);
+            
+            // Check that we don't have the SESSION_CREATED event in the set
+            if (this.eventTypes.contains( IoEventType.SESSION_CREATED )) {
+                this.eventTypes = null;
+                throw new IllegalArgumentException(IoEventType.SESSION_CREATED
+                    + " is not allowed.");
+            }
         }
     }
 
@@ -594,21 +590,15 @@ public class ExecutorFilter extends IoFilterAdapter {
 
     /**
      * Fires the specified event through the underlying executor.
+     * 
+     * @param event The filtered event
      */
     protected void fireEvent(IoFilterEvent event) {
-        getExecutor().execute(event);
+        executor.execute(event);
     }
 
     /**
-     * A trigger fired when adding this filter in a chain. As this filter can be
-     * added only once in a chain, if the chain already contains the same filter,
-     * and exception will be thrown.
-     * 
-     * @param parent The chain in which we want to inject this filter
-     * @param name The Fitler's name
-     * @param nextFilter The next filter in the chain
-     * 
-     * @throws IllegalArgumentException If the filter is already present in the chain
+     * {@inheritDoc}
      */
     @Override
     public void onPreAdd(IoFilterChain parent, String name,
