@@ -58,6 +58,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,7 @@ public class MdcInjectionFilterTest {
     }
 
     @Test
+    @Ignore
     public void testExecutorFilterAtTheEnd() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
@@ -152,6 +154,7 @@ public class MdcInjectionFilterTest {
     }
 
     @Test
+    @Ignore
     public void testTwoExecutorFilters() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
