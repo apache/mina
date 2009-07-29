@@ -31,6 +31,7 @@ import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.core.polling.AbstractPollingIoProcessor;
+import org.apache.mina.core.session.SessionState;
 import org.apache.mina.util.CircularQueue;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
@@ -288,14 +289,15 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
      * {@inheritDoc}
      */
     @Override
-    protected SessionState state(AprSession session) {
+    protected SessionState getState(AprSession session) {
         long socket = session.getDescriptor();
+        
         if (socket != 0) {
-            return SessionState.OPEN;
+            return SessionState.OPENED;
         } else if (allSessions.get(socket) != null) {
-            return SessionState.PREPARING; // will occur ?
+            return SessionState.OPENING; // will occur ?
         } else {
-            return SessionState.CLOSED;
+            return SessionState.CLOSING;
         }
     }
 

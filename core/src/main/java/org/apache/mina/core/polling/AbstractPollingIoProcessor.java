@@ -40,6 +40,7 @@ import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
+import org.apache.mina.core.session.SessionState;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteToClosedSessionException;
@@ -80,10 +81,13 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
     /** A Session queue containing the newly created sessions */
     private final Queue<T> newSessions = new ConcurrentLinkedQueue<T>();
 
+    /** A queue used to store the sessions to be removed */
     private final Queue<T> removingSessions = new ConcurrentLinkedQueue<T>();
 
+    /** A queue used to store the sessions to be flushed */
     private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
 
+    /** A queue used to store the sessions which have a trafficControl to be updated */
     private final Queue<T> trafficControllingSessions = new ConcurrentLinkedQueue<T>();
 
     /** The processor thread : it handles the incoming messages */
@@ -235,7 +239,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
      * @param session the {@link IoSession} to inspect
      * @return the state of the session
      */
-    protected abstract SessionState state(T session);
+    protected abstract SessionState getState(T session);
 
     /**
      * Is the session ready for writing
@@ -431,9 +435,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
     }
 
     private boolean addNow(T session) {
-
         boolean registered = false;
         boolean notified = false;
+        
         try {
             init(session);
             registered = true;
@@ -469,39 +473,46 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         return registered;
     }
 
-    private int remove() {
+    private int removeSessions() {
         int removedSessions = 0;
+        
         for (;;) {
             T session = removingSessions.poll();
 
             if (session == null) {
-                break;
+                // No session to remove. Get out.
+                return removedSessions;
             }
 
-            SessionState state = state(session);
+            SessionState state = getState(session);
+            
             switch (state) {
-            case OPEN:
-                if (removeNow(session)) {
-                    removedSessions++;
-                }
-                break;
-            case CLOSED:
-                // Skip if channel is already closed
-                break;
-            case PREPARING:
-                // Remove session from the newSessions queue and
-                // remove it
-                newSessions.remove(session);
-                if (removeNow(session)) {
-                    removedSessions++;
-                }
-                break;
-            default:
-                throw new IllegalStateException(String.valueOf(state));
+                case OPENED:
+                    if (removeNow(session)) {
+                        removedSessions++;
+                    }
+                    
+                    break;
+                    
+                case CLOSING:
+                    // Skip if channel is already closed
+                    break;
+                    
+                case OPENING:
+                    // Remove session from the newSessions queue and
+                    // remove it
+                    newSessions.remove(session);
+                    
+                    if (removeNow(session)) {
+                        removedSessions++;
+                    }
+                    
+                    break;
+                    
+                default:
+                    throw new IllegalStateException(String.valueOf(state));
             }
         }
-
-        return removedSessions;
     }
 
     private boolean removeNow(T session) {
@@ -662,35 +673,40 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         }
 
         T session = flushingSessions.poll(); // the same one with firstSession
+        
         for (;;) {
             session.setScheduledForFlush(false);
-            SessionState state = state(session);
+            SessionState state = getState(session);
 
             switch (state) {
-            case OPEN:
-                try {
-                    boolean flushedAll = flushNow(session, currentTime);
-                    if (flushedAll
-                            && !session.getWriteRequestQueue().isEmpty(session)
-                            && !session.isScheduledForFlush()) {
-                        scheduleFlush(session);
+                case OPENED:
+                    try {
+                        boolean flushedAll = flushNow(session, currentTime);
+                        if (flushedAll
+                                && !session.getWriteRequestQueue().isEmpty(session)
+                                && !session.isScheduledForFlush()) {
+                            scheduleFlush(session);
+                        }
+                    } catch (Exception e) {
+                        scheduleRemove(session);
+                        IoFilterChain filterChain = session.getFilterChain();
+                        filterChain.fireExceptionCaught(e);
                     }
-                } catch (Exception e) {
-                    scheduleRemove(session);
-                    IoFilterChain filterChain = session.getFilterChain();
-                    filterChain.fireExceptionCaught(e);
-                }
-                break;
-            case CLOSED:
-                // Skip if the channel is already closed.
-                break;
-            case PREPARING:
-                // Retry later if session is not yet fully initialized.
-                // (In case that Session.write() is called before addSession() is processed)
-                scheduleFlush(session);
-                return;
-            default:
-                throw new IllegalStateException(String.valueOf(state));
+                    
+                    break;
+                    
+                case CLOSING:
+                    // Skip if the channel is already closed.
+                    break;
+                    
+                case OPENING:
+                    // Retry later if session is not yet fully initialized.
+                    // (In case that Session.write() is called before addSession() is processed)
+                    scheduleFlush(session);
+                    return;
+                    
+                default:
+                    throw new IllegalStateException(String.valueOf(state));
             }
 
             session = flushingSessions.peek();
@@ -867,21 +883,25 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                 break;
             }
 
-            SessionState state = state(session);
+            SessionState state = getState(session);
+            
             switch (state) {
-            case OPEN:
-                updateTrafficControl(session);
-                break;
-            case CLOSED:
-                break;
-            case PREPARING:
-                // Retry later if session is not yet fully initialized.
-                // (In case that Session.suspend??() or session.resume??() is
-                // called before addSession() is processed)
-                scheduleTrafficControl(session);
-                return;
-            default:
-                throw new IllegalStateException(String.valueOf(state));
+                case OPENED:
+                    updateTrafficControl(session);
+                    break;
+                    
+                case CLOSING:
+                    break;
+                    
+                case OPENING:
+                    // Retry later if session is not yet fully initialized.
+                    // (In case that Session.suspend??() or session.resume??() is
+                    // called before addSession() is processed)
+                    scheduleTrafficControl(session);
+                    return;
+                    
+                default:
+                    throw new IllegalStateException(String.valueOf(state));
             }
         }
     }
@@ -927,7 +947,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
 
                     long currentTime = System.currentTimeMillis();
                     flush(currentTime);
-                    nSessions -= remove();
+                    nSessions -= removeSessions();
                     notifyIdleSessions(currentTime);
 
                     if (nSessions == 0) {
@@ -970,9 +990,5 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                 disposalFuture.setValue(true);
             }
         }
-    }
-
-    protected static enum SessionState {
-        OPEN, CLOSED, PREPARING,
     }
 }
