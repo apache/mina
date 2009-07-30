@@ -47,6 +47,8 @@ import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.apache.mina.transport.socket.AbstractDatagramSessionConfig;
 import org.apache.mina.util.ExceptionMonitor;
 import org.apache.mina.util.NamePreservingRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract implementation of {@link IoProcessor} which helps
@@ -58,6 +60,9 @@ import org.apache.mina.util.NamePreservingRunnable;
  */
 public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         implements IoProcessor<T> {
+    /** A logger for this class */
+    private final static Logger LOG = LoggerFactory.getLogger(IoProcessor.class);
+    
     /**
      * The maximum loop count for a write operation until
      * {@link #write(AbstractIoSession, IoBuffer, int)} returns non-zero value.
@@ -258,17 +263,17 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
     /**
      * register a session for writing
      * @param session the session registered
-     * @param interested true for registering, false for removing
+     * @param isInterested true for registering, false for removing
      */
-    protected abstract void setInterestedInWrite(T session, boolean interested)
+    protected abstract void setInterestedInWrite(T session, boolean isInterested)
             throws Exception;
 
     /**
      * register a session for reading
      * @param session the session registered
-     * @param interested true for registering, false for removing
+     * @param isInterested true for registering, false for removing
      */
-    protected abstract void setInterestedInRead(T session, boolean interested)
+    protected abstract void setInterestedInRead(T session, boolean isInterested)
             throws Exception;
 
     /**
@@ -875,12 +880,18 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         filterChain.fireMessageSent(req);
     }
 
+    /**
+     * Update the trafficControl for all the session which has
+     * just been opened. 
+     */
     private void updateTrafficMask() {
-        for (;;) {
+        int queueSize = trafficControllingSessions.size();
+        
+        while (queueSize > 0) {
             T session = trafficControllingSessions.poll();
 
             if (session == null) {
-                break;
+                return;
             }
 
             SessionState state = getState(session);
@@ -897,12 +908,18 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                     // Retry later if session is not yet fully initialized.
                     // (In case that Session.suspend??() or session.resume??() is
                     // called before addSession() is processed)
-                    scheduleTrafficControl(session);
-                    return;
+                    // We just put back the session at the end of the queue.
+                    trafficControllingSessions.add(session);
+                    
+                    break;
                     
                 default:
                     throw new IllegalStateException(String.valueOf(state));
             }
+            
+            // As we have handled one session, decrement the number of 
+            // remaining sessions.
+            queueSize--;
         }
     }
 
@@ -913,10 +930,11 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
             IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);
         }
+        
         try {
-            setInterestedInWrite(session, !session.getWriteRequestQueue()
-                    .isEmpty(session)
-                    && !session.isWriteSuspended());
+            setInterestedInWrite(session, 
+                !session.getWriteRequestQueue().isEmpty(session) && 
+                !session.isWriteSuspended());
         } catch (Exception e) {
             IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);

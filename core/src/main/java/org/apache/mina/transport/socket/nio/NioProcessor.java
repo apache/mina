@@ -156,31 +156,39 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         return key.isValid() && (key.interestOps() & SelectionKey.OP_WRITE) != 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void setInterestedInRead(NioSession session, boolean value) throws Exception {
+    protected void setInterestedInRead(NioSession session, boolean isInterested) throws Exception {
         SelectionKey key = session.getSelectionKey();
         int oldInterestOps = key.interestOps();
-        int newInterestOps;
-        if (value) {
-            newInterestOps = oldInterestOps | SelectionKey.OP_READ;
+        int newInterestOps = oldInterestOps;
+        
+        if (isInterested) {
+            newInterestOps |= SelectionKey.OP_READ;
         } else {
-            newInterestOps = oldInterestOps & ~SelectionKey.OP_READ;
+            newInterestOps &= ~SelectionKey.OP_READ;
         }
+        
         if (oldInterestOps != newInterestOps) {
             key.interestOps(newInterestOps);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void setInterestedInWrite(NioSession session, boolean value) throws Exception {
+    protected void setInterestedInWrite(NioSession session, boolean isInterested) throws Exception {
         SelectionKey key = session.getSelectionKey();
         int oldInterestOps = key.interestOps();
-        int newInterestOps;
+        int newInterestOps = oldInterestOps;
         
-        if (value) {
-            newInterestOps = oldInterestOps | SelectionKey.OP_WRITE;
+        if (isInterested) {
+            newInterestOps |= SelectionKey.OP_WRITE;
         } else {
-            newInterestOps = oldInterestOps & ~SelectionKey.OP_WRITE;
+            newInterestOps &= ~SelectionKey.OP_WRITE;
         }
         
         if (oldInterestOps != newInterestOps) {
