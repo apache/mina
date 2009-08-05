@@ -392,9 +392,11 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         int capacity = buffer.remaining();
         // Using Socket.recv() directly causes memory leak. :-(
         ByteBuffer b = Pool.alloc(bufferPool, capacity);
+        
         try {
             bytes = Socket.recvb(
                     session.getDescriptor(), b, 0, capacity);
+            
             if (bytes > 0) {
                 b.position(0);
                 b.limit(bytes);
@@ -411,6 +413,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         } finally {
             Pool.clear(bufferPool);
         }
+        
         return bytes;
     }
 
