@@ -216,6 +216,7 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public final boolean setScheduledForFlush(boolean flag) {
         if (flag) {
+            // If the current tag is set to false, switch it to true 
             return scheduledForFlush.compareAndSet(false, true);
         }
         
