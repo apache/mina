@@ -89,6 +89,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         return new IoSessionIterator(selector.keys());
     }
 
+    @SuppressWarnings("synthetic-access")
     @Override
     protected Iterator<NioSession> selectedSessions() {
         return new IoSessionIterator(selector.selectedKeys());
@@ -236,13 +237,13 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
      * An encapsulating iterator around the  {@link Selector#selectedKeys()} 
      * or the {@link Selector#keys()} iterator;
      */
-    protected static class IoSessionIterator implements Iterator<NioSession> {
+    protected static class IoSessionIterator<NioSession> implements Iterator<NioSession> {
         private final Iterator<SelectionKey> iterator;
         
         /**
          * Create this iterator as a wrapper on top of the selectionKey
          * Set.
-         * @param keys
+         * @param keys The set of selected sessions
          */
         private IoSessionIterator(Set<SelectionKey> keys) {
             iterator = keys.iterator();
