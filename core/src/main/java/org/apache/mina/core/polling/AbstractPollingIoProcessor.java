@@ -377,6 +377,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
 
     private boolean scheduleFlush(T session) {
         if (session.setScheduledForFlush(true)) {
+            // add the session to the queue
             flushingSessions.add(session);
             return true;
         }
@@ -645,6 +646,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                     }
                 }
             }
+            
             if (ret < 0) {
                 scheduleRemove(session);
             }
@@ -658,6 +660,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
 
                     scheduleRemove(session);
             }
+            
             IoFilterChain filterChain = session.getFilterChain();
             filterChain.fireExceptionCaught(e);
         }
@@ -923,6 +926,9 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void updateTrafficControl(T session) {
         try {
             setInterestedInRead(session, !session.isReadSuspended());
