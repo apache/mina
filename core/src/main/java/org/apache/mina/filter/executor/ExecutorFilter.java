@@ -136,6 +136,15 @@ public class ExecutorFilter extends IoFilterAdapter {
     private static final boolean MANAGEABLE_EXECUTOR = true;
     private static final boolean NOT_MANAGEABLE_EXECUTOR = false;
     
+    /** A list of default EventTypes to be handled by the executor */
+    private static IoEventType[] DEFAULT_EVENT_SET = new IoEventType[] {
+        IoEventType.EXCEPTION_CAUGHT,
+        IoEventType.MESSAGE_RECEIVED, 
+        IoEventType.MESSAGE_SENT,
+        IoEventType.SESSION_CLOSED, 
+        IoEventType.SESSION_IDLE,
+        IoEventType.SESSION_OPENED
+    };
 
     /**
      * (Convenience constructor) Creates a new instance with a new
@@ -521,31 +530,17 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     private void initEventTypes(IoEventType... eventTypes) {
         if ((eventTypes == null) || (eventTypes.length == 0)) {
-            // Covers the case of a default initialization
-            IoEventType[] all = IoEventType.values();
-            IoEventType[] tmpEventTypes = new IoEventType[all.length-1];
-            int i=0;
-            
-            for (IoEventType type : all) {
-                if (type != IoEventType.SESSION_CREATED) {
-                    tmpEventTypes[i] = type;
-                    i++;
-                }                
-            }
-            this.eventTypes = EnumSet.of(tmpEventTypes[0], tmpEventTypes);
+            eventTypes = DEFAULT_EVENT_SET;
         }
-        else
-        {
-            // The constructor was called with a list of Events to be filtered
-            // Copy the list of handled events in the event set
-            this.eventTypes = EnumSet.of(eventTypes[0], eventTypes);
-            
-            // Check that we don't have the SESSION_CREATED event in the set
-            if (this.eventTypes.contains( IoEventType.SESSION_CREATED )) {
-                this.eventTypes = null;
-                throw new IllegalArgumentException(IoEventType.SESSION_CREATED
-                    + " is not allowed.");
-            }
+
+        // Copy the list of handled events in the event set
+        this.eventTypes = EnumSet.of(eventTypes[0], eventTypes);
+        
+        // Check that we don't have the SESSION_CREATED event in the set
+        if (this.eventTypes.contains( IoEventType.SESSION_CREATED )) {
+            this.eventTypes = null;
+            throw new IllegalArgumentException(IoEventType.SESSION_CREATED
+                + " is not allowed.");
         }
     }
 
