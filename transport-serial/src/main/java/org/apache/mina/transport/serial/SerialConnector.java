@@ -67,7 +67,7 @@ public final class SerialConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected ConnectFuture connect0(
+    protected synchronized ConnectFuture connect0(
             SocketAddress remoteAddress, SocketAddress localAddress,
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
 
