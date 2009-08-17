@@ -182,10 +182,22 @@ class SerialSessionImpl extends AbstractIoSession implements
             try {
                 outputStream.write(buf.array(), buf.position(), writtenBytes);
                 buf.position(buf.position() + writtenBytes);
+                
+                // increase written bytes
+                increaseWrittenBytes(writtenBytes, System.currentTimeMillis());
+                
+                // finish the write request
                 req.getFuture().setWritten();
+                setCurrentWriteRequest(null);
+                
+                // fire the message sent event
+                getFilterChain().fireMessageSent(req);
             } catch (IOException e) {
                 this.getFilterChain().fireExceptionCaught(e);
             }
+            
+            buf.reset();
+
         }
     }
 
