@@ -173,7 +173,6 @@ class SerialSessionImpl extends AbstractIoSession implements
             if (buf.remaining() == 0) {
                 setCurrentWriteRequest(null);
                 buf.reset();
-
                 this.getFilterChain().fireMessageSent(req);
                 continue;
             }
@@ -186,17 +185,14 @@ class SerialSessionImpl extends AbstractIoSession implements
                 // increase written bytes
                 increaseWrittenBytes(writtenBytes, System.currentTimeMillis());
                 
-                // finish the write request
-                req.getFuture().setWritten();
                 setCurrentWriteRequest(null);
+                buf.reset();
                 
                 // fire the message sent event
                 getFilterChain().fireMessageSent(req);
             } catch (IOException e) {
                 this.getFilterChain().fireExceptionCaught(e);
             }
-            
-            buf.reset();
 
         }
     }
