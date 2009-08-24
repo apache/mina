@@ -137,9 +137,9 @@ public abstract class AbstractIoSession implements IoSession {
     private double readMessagesThroughput;
     private double writtenMessagesThroughput;
 
-    private int idleCountForBoth;
-    private int idleCountForRead;
-    private int idleCountForWrite;
+    private AtomicInteger idleCountForBoth = new AtomicInteger();
+    private AtomicInteger idleCountForRead = new AtomicInteger();
+    private AtomicInteger idleCountForWrite = new AtomicInteger();
 
     private long lastIdleTimeForBoth;
     private long lastIdleTimeForRead;
@@ -743,8 +743,8 @@ public abstract class AbstractIoSession implements IoSession {
 
         readBytes += increment;
         lastReadTime = currentTime;
-        idleCountForBoth = 0;
-        idleCountForRead = 0;
+        idleCountForBoth.set(0);
+        idleCountForRead.set(0);
 
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).getStatistics().increaseReadBytes(increment, currentTime);
@@ -757,8 +757,8 @@ public abstract class AbstractIoSession implements IoSession {
     public final void increaseReadMessages(long currentTime) {
         readMessages++;
         lastReadTime = currentTime;
-        idleCountForBoth = 0;
-        idleCountForRead = 0;
+        idleCountForBoth.set(0);
+        idleCountForRead.set(0);
 
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).getStatistics().increaseReadMessages(currentTime);
@@ -775,8 +775,8 @@ public abstract class AbstractIoSession implements IoSession {
 
         writtenBytes += increment;
         lastWriteTime = currentTime;
-        idleCountForBoth = 0;
-        idleCountForWrite = 0;
+        idleCountForBoth.set(0);
+        idleCountForWrite.set(0);
 
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).getStatistics().increaseWrittenBytes(increment, currentTime);
@@ -952,15 +952,15 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public final boolean isIdle(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
-            return idleCountForBoth > 0;
+            return idleCountForBoth.get() > 0;
         }
 
         if (status == IdleStatus.READER_IDLE) {
-            return idleCountForRead > 0;
+            return idleCountForRead.get() > 0;
         }
 
         if (status == IdleStatus.WRITER_IDLE) {
-            return idleCountForWrite > 0;
+            return idleCountForWrite.get() > 0;
         }
 
         throw new IllegalArgumentException("Unknown idle status: " + status);
@@ -993,28 +993,28 @@ public abstract class AbstractIoSession implements IoSession {
     public final int getIdleCount(IdleStatus status) {
         if (getConfig().getIdleTime(status) == 0) {
             if (status == IdleStatus.BOTH_IDLE) {
-                idleCountForBoth = 0;
+                idleCountForBoth.set(0);
             }
 
             if (status == IdleStatus.READER_IDLE) {
-                idleCountForRead = 0;
+                idleCountForRead.set(0);
             }
 
             if (status == IdleStatus.WRITER_IDLE) {
-                idleCountForWrite = 0;
+                idleCountForWrite.set(0);
             }
         }
 
         if (status == IdleStatus.BOTH_IDLE) {
-            return idleCountForBoth;
+            return idleCountForBoth.get();
         }
 
         if (status == IdleStatus.READER_IDLE) {
-            return idleCountForRead;
+            return idleCountForRead.get();
         }
 
         if (status == IdleStatus.WRITER_IDLE) {
-            return idleCountForWrite;
+            return idleCountForWrite.get();
         }
 
         throw new IllegalArgumentException("Unknown idle status: " + status);
@@ -1044,13 +1044,13 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public final void increaseIdleCount(IdleStatus status, long currentTime) {
         if (status == IdleStatus.BOTH_IDLE) {
-            idleCountForBoth++;
+            idleCountForBoth.incrementAndGet();
             lastIdleTimeForBoth = currentTime;
         } else if (status == IdleStatus.READER_IDLE) {
-            idleCountForRead++;
+            idleCountForRead.incrementAndGet();
             lastIdleTimeForRead = currentTime;
         } else if (status == IdleStatus.WRITER_IDLE) {
-            idleCountForWrite++;
+            idleCountForWrite.incrementAndGet();
             lastIdleTimeForWrite = currentTime;
         } else {
             throw new IllegalArgumentException("Unknown idle status: " + status);
