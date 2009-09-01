@@ -157,7 +157,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
     }
 
     private void manipulateIoBuffer(IoSession session, IoBuffer buffer) {
-        if (removeByteProbability > rng.nextInt(1000)) {
+        if ((buffer.remaining() > 0) && (removeByteProbability > rng.nextInt(1000))) {
             logger.info(buffer.getHexDump());
             // where to remove bytes ?
             int pos = rng.nextInt(buffer.remaining());
@@ -181,7 +181,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
             logger.info("Removed " + count + " bytes at position " + pos + ".");
             logger.info(buffer.getHexDump());
         }
-        if (changeByteProbability > rng.nextInt(1000)) {
+        if ((buffer.remaining() > 0) && (changeByteProbability > rng.nextInt(1000))) {
             logger.info(buffer.getHexDump());
             // how many byte to change ?
             int count = rng.nextInt(buffer.remaining() - 1) + 1;
