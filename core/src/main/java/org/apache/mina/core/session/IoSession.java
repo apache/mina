@@ -477,7 +477,7 @@ public interface IoSession {
     WriteRequest getCurrentWriteRequest();
 
     /**
-     * @return the session's creation time in nanoseconds
+     * @return the session's creation time in milliseconds
      */
     long getCreationTime();
 
