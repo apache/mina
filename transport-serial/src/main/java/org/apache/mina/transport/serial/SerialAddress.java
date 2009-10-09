@@ -47,7 +47,7 @@ public class SerialAddress extends SocketAddress {
     }
 
     public enum FlowControl {
-        NONE, RTSCTS_IN, RTSCTS_OUT, XONXOFF_IN, XONXOFF_OUT
+        NONE, RTSCTS_IN, RTSCTS_OUT, RTSCTS_IN_OUT,  XONXOFF_IN, XONXOFF_OUT, XONXOFF_IN_OUT
     }
 
     private final String name;
@@ -208,11 +208,15 @@ public class SerialAddress extends SocketAddress {
             return SerialPort.FLOWCONTROL_RTSCTS_IN;
         case RTSCTS_OUT:
             return SerialPort.FLOWCONTROL_RTSCTS_OUT;
+        case RTSCTS_IN_OUT:
+            return SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT;
         case XONXOFF_IN:
             return SerialPort.FLOWCONTROL_XONXOFF_IN;
         case XONXOFF_OUT:
             return SerialPort.FLOWCONTROL_XONXOFF_OUT;
+        case XONXOFF_IN_OUT:
+            return SerialPort.FLOWCONTROL_XONXOFF_IN | SerialPort.FLOWCONTROL_XONXOFF_OUT;
         }
-        throw new InvalidParameterException("broken stopbits");
+        throw new InvalidParameterException("broken flow control");
     }
 }
