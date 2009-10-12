@@ -34,4 +34,26 @@ public interface SerialSession extends IoSession {
     SerialAddress getLocalAddress();
 
     SerialAddress getServiceAddress();
+    
+    /**
+     * Sets or clears the RTS (Request To Send) bit in the UART, if supported by the underlying implementation.
+     * @param rts true for set RTS, false for clearing
+     */
+    void setRTS(boolean rts);
+
+    /**
+     * Gets the state of the RTS (Request To Send) bit in the UART, if supported by the underlying implementation. 
+     */
+    boolean isRTS();
+
+    /**
+     * Sets or clears the DTR (Data Terminal Ready) bit in the UART, if supported by the underlying implementation.
+     * @param dtr true for set DTR, false for clearing
+     */
+    void setDTR(boolean dtr);
+
+    /**
+     * Gets the state of the DTR (Data Terminal Ready) bit in the UART, if supported by the underlying implementation. 
+     */
+    boolean isDTR();
 }

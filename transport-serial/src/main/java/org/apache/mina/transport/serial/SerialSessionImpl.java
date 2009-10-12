@@ -116,6 +116,22 @@ class SerialSessionImpl extends AbstractIoSession implements
         return service;
     }
 
+    public void setDTR(boolean dtr) {
+        port.setDTR(dtr);
+    }
+
+    public boolean isDTR() {
+        return port.isDTR();
+    }
+
+    public void setRTS(boolean rts) {
+        port.setRTS(rts);
+    }
+
+    public boolean isRTS() {
+        return port.isRTS();
+    }
+
     /**
      * start handling streams
      *
