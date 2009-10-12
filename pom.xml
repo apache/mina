@@ -83,7 +83,6 @@
     <module>core</module>
     <module>transport-apr</module>
     <module>filter-compression</module>
-    <module>filter-codec-netty</module>
     <module>statemachine</module>
     <module>integration-beans</module>
     <module>integration-xbean</module>
