@@ -53,10 +53,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
     private static final IoBuffer EMPTY_BUFFER = IoBuffer.wrap(new byte[0]);
 
-    private static final AttributeKey ENCODER = new AttributeKey(ProtocolCodecFilter.class, "encoder");
-    private static final AttributeKey DECODER = new AttributeKey(ProtocolCodecFilter.class, "decoder");
-    private static final AttributeKey DECODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "decoderOut");
-    private static final AttributeKey ENCODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "encoderOut");
+    private final AttributeKey ENCODER = new AttributeKey(ProtocolCodecFilter.class, "encoder");
+    private final AttributeKey DECODER = new AttributeKey(ProtocolCodecFilter.class, "decoder");
+    private final AttributeKey DECODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "decoderOut");
+    private final AttributeKey ENCODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "encoderOut");
     
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
@@ -210,7 +210,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         IoBuffer in = (IoBuffer) message;
-        ProtocolDecoder decoder = getDecoder(session);
+        ProtocolDecoder decoder = getDecoder0(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         
         // Loop until we don't have anymore byte in the buffer,
@@ -288,7 +288,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         // Get the encoder in the session
-        ProtocolEncoder encoder = getEncoder(session);
+        ProtocolEncoder encoder = getEncoder0(session);
 
         ProtocolEncoderOutput encoderOut = getEncoderOut(session,
                 nextFilter, writeRequest);
@@ -322,7 +322,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public void sessionClosed(NextFilter nextFilter, IoSession session)
             throws Exception {
         // Call finishDecode() first when a connection is closed.
-        ProtocolDecoder decoder = getDecoder(session);
+        ProtocolDecoder decoder = getDecoder0(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         
         try {
@@ -488,16 +488,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     }
 
     /**
-     * Get the decoder instance from a given session.
-     *
-     * @param session The associated session we will get the decoder from
-     * @return The decoder instance
-     */
-    private ProtocolDecoder getDecoder(IoSession session) {
-        return (ProtocolDecoder) session.getAttribute(DECODER);
-    }
-
-    /**
      * Dispose the decoder, removing its instance from the
      * session's attributes, and calling the associated
      * dispose method.
@@ -532,6 +522,28 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
         
         return out;
+    }
+
+    private ProtocolEncoder getEncoder0(IoSession session) throws Exception {
+        ProtocolEncoder encoder = (ProtocolEncoder) session
+                .getAttribute(ENCODER);
+        if (encoder == null) {
+            encoder = factory.getEncoder(session);
+            session.setAttribute(ENCODER, encoder);
+        }
+        return encoder;
+    }
+
+    private ProtocolDecoder getDecoder0(IoSession session) throws Exception {
+        ProtocolDecoder decoder = (ProtocolDecoder) session
+                .getAttribute(DECODER);
+        
+        if (decoder == null) {
+            decoder = factory.getDecoder(session);
+            session.setAttribute(DECODER, decoder);
+        }
+        
+        return decoder;
     }
 
     private ProtocolEncoderOutput getEncoderOut(IoSession session,
