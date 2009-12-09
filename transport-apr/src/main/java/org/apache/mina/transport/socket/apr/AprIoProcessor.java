@@ -39,15 +39,15 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 
 /**
- * The class in charge of processing socket level IO events for the {@link AprSocketConnector}
- *
+ * The class in charge of processing socket level IO events for the
+ * {@link AprSocketConnector}
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     private static final int POLLSET_SIZE = 1024;
 
-    private final Map<Long, AprSession> allSessions =
-        new HashMap<Long, AprSession>(POLLSET_SIZE);
+    private final Map<Long, AprSession> allSessions = new HashMap<Long, AprSession>(POLLSET_SIZE);
 
     private final Object wakeupLock = new Object();
     private final long wakeupSocket;
@@ -57,14 +57,14 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     private final long bufferPool; // memory pool
     private final long pollset; // socket poller
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
-    private final List<AprSession> polledSessions =
-        new CircularQueue<AprSession>(POLLSET_SIZE);
+    private final List<AprSession> polledSessions = new CircularQueue<AprSession>(POLLSET_SIZE);
 
     /**
-     * Create a new instance of {@link AprIoProcessor} with a given Exector for 
+     * Create a new instance of {@link AprIoProcessor} with a given Exector for
      * handling I/Os events.
      * 
-     * @param executor the {@link Executor} for handling I/O events
+     * @param executor
+     *            the {@link Executor} for handling I/O events
      */
     public AprIoProcessor(Executor executor) {
         super(executor);
@@ -74,8 +74,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         bufferPool = Pool.create(AprLibrary.getInstance().getRootPool());
 
         try {
-            wakeupSocket = Socket.create(
-                    Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
+            wakeupSocket = Socket.create(Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
         } catch (RuntimeException e) {
             throw e;
         } catch (Error e) {
@@ -87,25 +86,16 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         boolean success = false;
         long newPollset;
         try {
-            newPollset = Poll.create(
-                    POLLSET_SIZE,
-                    pool,
-                    Poll.APR_POLLSET_THREADSAFE,
-                    Long.MAX_VALUE);
+            newPollset = Poll.create(POLLSET_SIZE, pool, Poll.APR_POLLSET_THREADSAFE, Long.MAX_VALUE);
 
             if (newPollset == 0) {
-                newPollset = Poll.create(
-                        62,
-                        pool,
-                        Poll.APR_POLLSET_THREADSAFE,
-                        Long.MAX_VALUE);
+                newPollset = Poll.create(62, pool, Poll.APR_POLLSET_THREADSAFE, Long.MAX_VALUE);
             }
 
             pollset = newPollset;
             if (pollset < 0) {
-                if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
-                    throw new RuntimeIoException(
-                            "Thread-safe pollset is not supported in this platform.");
+                if (Status.APR_STATUS_IS_ENOTIMPL(-(int) pollset)) {
+                    throw new RuntimeIoException("Thread-safe pollset is not supported in this platform.");
                 }
             }
             success = true;
@@ -144,7 +134,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     /**
      * {@inheritDoc}
      */
-     @Override
+    @Override
     protected int select(long timeout) throws Exception {
         int rv = Poll.poll(pollset, 1000 * timeout, polledSockets, false);
         if (rv <= 0) {
@@ -154,15 +144,15 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
 
             rv = Poll.maintain(pollset, polledSockets, true);
             if (rv > 0) {
-                for (int i = 0; i < rv; i ++) {
+                for (int i = 0; i < rv; i++) {
                     long socket = polledSockets[i];
                     AprSession session = allSessions.get(socket);
                     if (session == null) {
                         continue;
                     }
 
-                    int flag = (session.isInterestedInRead()? Poll.APR_POLLIN : 0) |
-                               (session.isInterestedInWrite()? Poll.APR_POLLOUT : 0);
+                    int flag = (session.isInterestedInRead() ? Poll.APR_POLLIN : 0)
+                            | (session.isInterestedInWrite() ? Poll.APR_POLLOUT : 0);
 
                     Poll.add(pollset, socket, flag);
                 }
@@ -176,7 +166,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
             if (!polledSessions.isEmpty()) {
                 polledSessions.clear();
             }
-            for (int i = 0; i < rv; i ++) {
+            for (int i = 0; i < rv; i++) {
                 long flag = polledSockets[i];
                 long socket = polledSockets[++i];
                 if (socket == wakeupSocket) {
@@ -201,7 +191,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
     }
 
-     /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -273,12 +263,12 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
             }
         } finally {
             ret = Socket.close(session.getDescriptor());
-            
-            // destroying the session because it won't be reused 
+
+            // destroying the session because it won't be reused
             // after this point
             Socket.destroy(session.getDescriptor());
             session.setDescriptor(0);
-            
+
             if (ret != Status.APR_SUCCESS) {
                 throwException(ret);
             }
@@ -291,7 +281,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     @Override
     protected SessionState getState(AprSession session) {
         long socket = session.getDescriptor();
-        
+
         if (socket != 0) {
             return SessionState.OPENED;
         } else if (allSessions.get(socket) != null) {
@@ -343,14 +333,15 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
 
         int rv = Poll.remove(pollset, session.getDescriptor());
+
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
         }
 
-        int flags = (isInterested ? Poll.APR_POLLIN : 0)
-                | (session.isInterestedInWrite() ? Poll.APR_POLLOUT : 0);
+        int flags = (isInterested ? Poll.APR_POLLIN : 0) | (session.isInterestedInWrite() ? Poll.APR_POLLOUT : 0);
 
         rv = Poll.add(pollset, session.getDescriptor(), flags);
+
         if (rv == Status.APR_SUCCESS) {
             session.setInterestedInRead(isInterested);
         } else {
@@ -368,14 +359,15 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         }
 
         int rv = Poll.remove(pollset, session.getDescriptor());
+
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
         }
 
-        int flags = (session.isInterestedInRead() ? Poll.APR_POLLIN : 0)
-                | (isInterested ? Poll.APR_POLLOUT : 0);
+        int flags = (session.isInterestedInRead() ? Poll.APR_POLLIN : 0) | (isInterested ? Poll.APR_POLLOUT : 0);
 
         rv = Poll.add(pollset, session.getDescriptor(), flags);
+
         if (rv == Status.APR_SUCCESS) {
             session.setInterestedInWrite(isInterested);
         } else {
@@ -392,11 +384,10 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         int capacity = buffer.remaining();
         // Using Socket.recv() directly causes memory leak. :-(
         ByteBuffer b = Pool.alloc(bufferPool, capacity);
-        
+
         try {
-            bytes = Socket.recvb(
-                    session.getDescriptor(), b, 0, capacity);
-            
+            bytes = Socket.recvb(session.getDescriptor(), b, 0, capacity);
+
             if (bytes > 0) {
                 b.position(0);
                 b.limit(bytes);
@@ -413,7 +404,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         } finally {
             Pool.clear(bufferPool);
         }
-        
+
         return bytes;
     }
 
@@ -424,11 +415,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     protected int write(AprSession session, IoBuffer buf, int length) throws Exception {
         int writtenBytes;
         if (buf.isDirect()) {
-            writtenBytes = Socket.sendb(
-                    session.getDescriptor(), buf.buf(), buf.position(), length);
+            writtenBytes = Socket.sendb(session.getDescriptor(), buf.buf(), buf.position(), length);
         } else {
-            writtenBytes = Socket.send(
-                    session.getDescriptor(), buf.array(), buf.position(), length);
+            writtenBytes = Socket.send(session.getDescriptor(), buf.array(), buf.position(), length);
             if (writtenBytes > 0) {
                 buf.skip(writtenBytes);
             }
@@ -450,14 +439,26 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
      * {@inheritDoc}
      */
     @Override
-    protected int transferFile(AprSession session, FileRegion region, int length)
-            throws Exception {
+    protected int transferFile(AprSession session, FileRegion region, int length) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     private void throwException(int code) throws IOException {
-        throw new IOException(
-                org.apache.tomcat.jni.Error.strerror(-code) +
-                " (code: " + code + ")");
+        throw new IOException(org.apache.tomcat.jni.Error.strerror(-code) + " (code: " + code + ")");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void registerNewSelector() {
+        // Do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected boolean isBrokenConnection() throws IOException {
+        // Here, we assume that this is the case.
+        return true;
     }
 }

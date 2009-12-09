@@ -19,13 +19,14 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
@@ -38,14 +39,17 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.SessionState;
 import org.apache.mina.util.AvailablePortFinder;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Tests non regression on issue DIRMINA-632.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class PollingIoProcessorTest extends TestCase {
-
+public class PollingIoProcessorTest {
+    @Ignore
+    @Test
     public void testExceptionOnWrite() throws Exception {
         final Executor ex = Executors.newFixedThreadPool(1);
 
@@ -133,8 +137,7 @@ public class PollingIoProcessorTest extends TestCase {
                     }
 
                     @Override
-                    protected SessionState getState(
-                            NioSession session) {
+                    protected SessionState getState(NioSession session) {
                         return proc.getState(session);
                     }
 
@@ -156,6 +159,16 @@ public class PollingIoProcessorTest extends TestCase {
                                 "No Route To Host Test");
                     }
 
+                    @Override
+                    protected boolean isBrokenConnection() throws IOException {
+                        return proc.isBrokenConnection();
+                    }
+
+                    @Override
+                    protected void registerNewSelector() throws IOException {
+                        proc.registerNewSelector();
+                    }
+
                 });
         connector.setHandler(new IoHandlerAdapter());
 
@@ -169,7 +182,8 @@ public class PollingIoProcessorTest extends TestCase {
         ConnectFuture future = connector.connect(addr);
         future.awaitUninterruptibly();
         IoSession session = future.getSession();
-        WriteFuture wf = session.write(IoBuffer.allocate(1)).awaitUninterruptibly();
+        WriteFuture wf = session.write(IoBuffer.allocate(1))
+                .awaitUninterruptibly();
         assertNotNull(wf.getException());
 
         connector.dispose();
