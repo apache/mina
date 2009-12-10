@@ -108,7 +108,7 @@ public class SslTest {
 
     private static void connectAndSend() throws Exception {
         Socket parent = new Socket(address, port);
-        Socket socket = factory.createSocket(parent, address.getCanonicalHostName(), 5555, true);
+        Socket socket = factory.createSocket(parent, address.getCanonicalHostName(), port, true);
 
         System.out.println("Client sending: hello");
         socket.getOutputStream().write("hello                      \n".getBytes());
