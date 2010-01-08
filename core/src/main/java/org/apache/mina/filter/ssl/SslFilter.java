@@ -226,8 +226,8 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Returns <tt>true</tt> if and only if the specified <tt>session</tt> is
      * encrypted/decrypted over SSL/TLS currently.  This method will start
-     * to retun <tt>false</tt> after TLS <tt>close_notify</tt> message
-     * is sent and any messages written after then is not goinf to get encrypted.
+     * to return <tt>false</tt> after TLS <tt>close_notify</tt> message
+     * is sent and any messages written after then is not going to get encrypted.
      */
     public boolean isSslStarted(IoSession session) {
         SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
@@ -368,7 +368,7 @@ public class SslFilter extends IoFilterAdapter {
     @Override
     public void onPostAdd(IoFilterChain parent, String name,
             NextFilter nextFilter) throws SSLException {
-        if (autoStart) {
+        if (autoStart == START_HANDSHAKE) {
             initiateHandshake(nextFilter, parent.getSession());
         }
     }
@@ -404,11 +404,13 @@ public class SslFilter extends IoFilterAdapter {
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws SSLException {
         SslHandler handler = getSslSessionHandler(session);
+        
         synchronized (handler) {
             if (!isSslStarted(session) && handler.isInboundDone()) {
                 handler.scheduleMessageReceived(nextFilter, message);
             } else {
                 IoBuffer buf = (IoBuffer) message;
+                
                 try {
                     // forward read encrypted data to SSL handler
                     handler.messageReceived(nextFilter, buf.buf());

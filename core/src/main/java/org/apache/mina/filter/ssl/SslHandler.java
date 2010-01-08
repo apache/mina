@@ -77,7 +77,7 @@ class SslHandler {
     private IoBuffer outNetBuffer;
 
     /**
-     * Applicaton cleartext data to be read by application
+     * Application cleartext data to be read by application
      */
     private IoBuffer appBuffer;
 
@@ -277,15 +277,12 @@ class SslHandler {
     }
 
     /**
-     * Call when data read from net. Will perform inial hanshake or decrypt
-     * provided Buffer. Decrytpted data reurned by getAppBuffer(), if any.
+     * Call when data are read from net. It will perform the initial hanshake or decrypt
+     * the data if SSL has been initialiaed. 
      * 
-     * @param buf
-     *            buffer to decrypt
-     * @param nextFilter
-     *            Next filter in chain
-     * @throws SSLException
-     *             on errors
+     * @param buf buffer to decrypt
+     * @param nextFilter Next filter in chain
+     * @throws SSLException on errors
      */
     public void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
         // append buf to inNetBuffer
@@ -294,10 +291,29 @@ class SslHandler {
         }
 
         inNetBuffer.put(buf);
+        
         if (!handshakeComplete) {
             handshake(nextFilter);
         } else {
-            decrypt(nextFilter);
+            // Prepare the net data for reading.
+            inNetBuffer.flip();
+
+            if (!inNetBuffer.hasRemaining()) {
+                return;
+            }
+
+            SSLEngineResult res = decrypt(!HANDSHAKE_FINISHED);
+
+            // prepare to be written again
+            if (inNetBuffer.hasRemaining()) {
+                inNetBuffer.compact();
+            } else {
+                inNetBuffer = null;
+            }
+
+            checkStatus(res);
+
+            renegotiateIfNeeded(nextFilter, res);
         }
 
         if (isInboundDone()) {
@@ -409,20 +425,6 @@ class SslHandler {
         }
         outNetBuffer.flip();
         return true;
-    }
-
-    /**
-     * Decrypt in net buffer. Result is stored in app buffer.
-     * 
-     * @throws SSLException
-     */
-    private void decrypt(NextFilter nextFilter) throws SSLException {
-
-        if (!handshakeComplete) {
-            throw new IllegalStateException();
-        }
-
-        unwrap(nextFilter);
     }
 
     /**
@@ -569,30 +571,6 @@ class SslHandler {
         return writeFuture;
     }
 
-    private void unwrap(NextFilter nextFilter) throws SSLException {
-        // Prepare the net data for reading.
-        if (inNetBuffer != null) {
-            inNetBuffer.flip();
-        }
-
-        if (inNetBuffer == null || !inNetBuffer.hasRemaining()) {
-            return;
-        }
-
-        SSLEngineResult res = unwrap0(!HANDSHAKE_FINISHED);
-
-        // prepare to be written again
-        if (inNetBuffer.hasRemaining()) {
-            inNetBuffer.compact();
-        } else {
-            inNetBuffer = null;
-        }
-
-        checkStatus(res);
-
-        renegotiateIfNeeded(nextFilter, res);
-    }
-
     private SSLEngineResult.Status unwrapHandshake(NextFilter nextFilter) throws SSLException {
         // Prepare the net data for reading.
         if (inNetBuffer != null) {
@@ -604,7 +582,7 @@ class SslHandler {
             return SSLEngineResult.Status.BUFFER_UNDERFLOW;
         }
 
-        SSLEngineResult res = unwrap0(!HANDSHAKE_FINISHED);
+        SSLEngineResult res = decrypt(!HANDSHAKE_FINISHED);
         handshakeStatus = res.getHandshakeStatus();
 
         checkStatus(res);
@@ -614,7 +592,7 @@ class SslHandler {
         // try to unwrap more
         if (handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED && res.getStatus() == SSLEngineResult.Status.OK
                 && inNetBuffer.hasRemaining()) {
-            res = unwrap0(HANDSHAKE_FINISHED);
+            res = decrypt(HANDSHAKE_FINISHED);
 
             // prepare to be written again
             if (inNetBuffer.hasRemaining()) {
@@ -637,8 +615,9 @@ class SslHandler {
     }
 
     private void renegotiateIfNeeded(NextFilter nextFilter, SSLEngineResult res) throws SSLException {
-        if (res.getStatus() != SSLEngineResult.Status.CLOSED && res.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW
-                && res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) {
+        if ( ( res.getStatus() != SSLEngineResult.Status.CLOSED ) && 
+             ( res.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW ) &&
+             ( res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING ) ) {
             // Renegotiation required.
             handshakeComplete = false;
             handshakeStatus = res.getHandshakeStatus();
@@ -646,7 +625,7 @@ class SslHandler {
         }
     }
 
-    private SSLEngineResult unwrap0(boolean finished) throws SSLException {
+    private SSLEngineResult decrypt(boolean finished) throws SSLException {
         if (appBuffer == null) {
             appBuffer = IoBuffer.allocate(inNetBuffer.remaining());
         } else {
@@ -668,8 +647,22 @@ class SslHandler {
                 appBuffer.limit(appBuffer.capacity());
                 continue;
             }
-        } while (((status == SSLEngineResult.Status.OK) || (status == SSLEngineResult.Status.BUFFER_OVERFLOW))
-                && (((finished || handshakeComplete) && (handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING)) || (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
+        } while (
+                    (
+                        (status == SSLEngineResult.Status.OK) || 
+                        (status == SSLEngineResult.Status.BUFFER_OVERFLOW)
+                    )
+                    &&
+                    (
+                        (
+                            (finished || handshakeComplete) 
+                            && 
+                            (handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING)
+                        ) 
+                        || 
+                        (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)
+                    )
+                );
 
         return res;
     }
