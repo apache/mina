@@ -82,19 +82,31 @@ public class SslTest {
         }
     }
 
+    
+    /**
+     * Starts a Server with the SSL Filter and a simple text line 
+     * protocol codec filter
+     */
     private static void startServer() throws Exception {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
 
         acceptor.setReuseAddress(true);
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
 
+        // Inject the SSL filter
         SslFilter sslFilter = new SslFilter(createSSLContext());
         filters.addLast("sslFilter", sslFilter);
+        
+        // Inject the TestLine codec filter
         filters.addLast("text", new ProtocolCodecFilter(new TextLineCodecFactory()));
+        
         acceptor.setHandler(new TestHandler());
         acceptor.bind(new InetSocketAddress(port));
     }
 
+    /**
+     * Starts a client which will connect twice using SSL
+     */
     private static void startClient() throws Exception {
         address = InetAddress.getByName("localhost");
 
@@ -102,6 +114,7 @@ public class SslTest {
         factory = context.getSocketFactory();
 
         connectAndSend();
+        
         // This one will throw a SocketTimeoutException if DIRMINA-650 is not fixed
         connectAndSend();
     }
