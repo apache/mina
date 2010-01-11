@@ -135,7 +135,7 @@ import org.slf4j.LoggerFactory;
             return;
         }
 
-        LOGGER.debug("Session[{}]: Initializing the SSL Handler", session.getId());
+        LOGGER.debug("{} Initializing the SSL Handler", sslFilter.getSessionInfo(session));
 
         InetSocketAddress peer = (InetSocketAddress) session.getAttribute(SslFilter.PEER_ADDRESS);
 
@@ -185,7 +185,9 @@ import org.slf4j.LoggerFactory;
         firstSSLNegociation = true;
         handshakeComplete = false;
 
-        LOGGER.debug("Session[{}]: SSL Handler Initialization done.", session.getId());
+        if ( LOGGER.isDebugEnabled()) {
+            LOGGER.debug("{} SSL Handler Initialization done.", sslFilter.getSessionInfo(session));
+        }
     }
 
     
@@ -331,9 +333,9 @@ import org.slf4j.LoggerFactory;
     /* no qualifier */ void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
         if ( LOGGER.isDebugEnabled()) {
             if ( !isOutboundDone()) {
-                LOGGER.debug("Session[{}](SSL): Processing the received message", session.getId());
+                LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
             } else {
-                LOGGER.debug("Session[{}]: Processing the received message", session.getId());
+                LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
             }
         }
 
@@ -508,7 +510,10 @@ import org.slf4j.LoggerFactory;
         for (;;) {
             switch (handshakeStatus) {
                 case FINISHED:
-                    LOGGER.debug("Session[{}] : processing the FINISHED state", session.getId());
+                    if ( LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{} processing the FINISHED state", sslFilter.getSessionInfo(session));
+                    }
+                    
                     session.setAttribute(SslFilter.SSL_SESSION, sslEngine.getSession());
                     handshakeComplete = true;
     
@@ -521,21 +526,26 @@ import org.slf4j.LoggerFactory;
                     
                     if ( LOGGER.isDebugEnabled()) {
                         if ( !isOutboundDone()) {
-                            LOGGER.debug("Session[{}] is now secured", session.getId());
+                            LOGGER.debug("{} is now secured", sslFilter.getSessionInfo(session));
                         } else {
-                            LOGGER.debug("Session[{}] is not secured yet", session.getId());
+                            LOGGER.debug("{} is not secured yet", sslFilter.getSessionInfo(session));
                         }
                     }
     
                     return;
     
                 case NEED_TASK:
-                    LOGGER.debug("Session[{}] : processing the NEED_TASK state", session.getId());
+                    if ( LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{} processing the NEED_TASK state", sslFilter.getSessionInfo(session));
+                    }
+                    
                     handshakeStatus = doTasks();
                     break;
     
                 case NEED_UNWRAP:
-                    LOGGER.debug("Session[{}] : processing the NEED_UNWRAP state", session.getId());
+                    if ( LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{} processing the NEED_UNWRAP state", sslFilter.getSessionInfo(session));
+                    }
                     // we need more data read
                     SSLEngineResult.Status status = unwrapHandshake(nextFilter);
     
@@ -548,7 +558,10 @@ import org.slf4j.LoggerFactory;
                     break;
     
                 case NEED_WRAP:
-                    LOGGER.debug("Session[{}] : processing the NEED_WRAP state", session.getId());
+                    if ( LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("{} processing the NEED_WRAP state", sslFilter.getSessionInfo(session));
+                    }
+                    
                     // First make sure that the out buffer is completely empty.
                     // Since we
                     // cannot call wrap with data left on the buffer
