@@ -230,7 +230,12 @@ public class SslFilter extends IoFilterAdapter {
     }
     
     
-    private String getSessionInfo(IoSession session) {
+    /**
+     * An extended toString() method for sessions. If the SSL handshake
+     * is not yet completed, we will print (ssl) in small caps. Once it's
+     * completed, we will use SSL capitalized.
+     */
+    /* no qualifier */ String getSessionInfo(IoSession session) {
         StringBuilder sb = new StringBuilder();
 
         if (session.getService() instanceof IoAcceptor) {
@@ -242,9 +247,11 @@ public class SslFilter extends IoFilterAdapter {
         
         sb.append('[').append(session.getId()).append(']');
 
-        SslHandler handler = getSslSessionHandler(session);
-        
-        if (isSslStarted(session)) {
+        SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
+
+        if (handler == null) {
+            sb.append("(no sslEngine)");
+        } else if (isSslStarted(session)) {
             if ( handler.isHandshakeComplete()) {
                 sb.append("(SSL)");
             } else {
