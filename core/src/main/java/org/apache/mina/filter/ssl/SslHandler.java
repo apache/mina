@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
@@ -52,18 +51,27 @@ import org.slf4j.LoggerFactory;
  * We allocate buffers for use as the outbound and inbound network buffers.
  * These buffers handle all of the intermediary data for the SSL connection. To make things easy,
  * we'll require outNetBuffer be completely flushed before trying to wrap any more data.
+ * <p/>
+ * This class is not to be used by any client, it's closely associated with the SSL Filter.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-class SslHandler {
-
+/** No qualifier*/ class SslHandler {
+    /** A logger for this class */
     private final static Logger LOGGER = LoggerFactory.getLogger(SslHandler.class);
-    private final SslFilter parent;
-    private final SSLContext sslContext;
+    
+    /** The SSL Filter which has created this handler */
+    private final SslFilter sslFilter;
+    
+    /** The current session */
     private final IoSession session;
+    
     private final Queue<IoFilterEvent> preHandshakeEventQueue = new CircularQueue<IoFilterEvent>();
     private final Queue<IoFilterEvent> filterWriteEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
+    
+    /** A queue used to stack all the incoming data until the SSL session is established */
     private final Queue<IoFilterEvent> messageReceivedEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
+    
     private SSLEngine sslEngine;
 
     /**
@@ -87,30 +95,37 @@ class SslHandler {
     private final IoBuffer emptyBuffer = IoBuffer.allocate(0);
 
     private SSLEngineResult.HandshakeStatus handshakeStatus;
-    private boolean initialHandshakeComplete;
+    
+    /** 
+     * A flag set to true when the first SSL handshake has been completed
+     * This is used to avoid sending a notification to the application handler
+     * when we switch to a SECURE or UNSECURE session. 
+     */
+    private boolean firstSSLNegociation;
+    
+    /** A flag set to true when a SSL Handshake has been completed */
     private boolean handshakeComplete;
+    
+    /** A flag used to indicate to the SslFilter that the buffer
+     * it will write is already encrypted (this will be the case
+     * for data being produced during the handshake). */
     private boolean writingEncryptedData;
 
-    /** A flag used when the Handlshake is finished */
-    private static final boolean HANDSHAKE_FINISHED = true;
-
     /**
-     * Constuctor.
+     * Create a new SSL Handler, and initialize it.
      *
-     * @param sslc
+     * @param sslContext
      * @throws SSLException
      */
-    public SslHandler(SslFilter parent, SSLContext sslContext, IoSession session) throws SSLException {
-        this.parent = parent;
+    public SslHandler(SslFilter sslFilter, IoSession session) throws SSLException {
+        this.sslFilter = sslFilter;
         this.session = session;
-        this.sslContext = sslContext;
-        init();
     }
 
     /**
      * Initialize the SSL handshake.
      *
-     * @throws SSLException
+     * @throws SSLException If the underlying SSLEngine handshake initialization failed
      */
     public void init() throws SSLException {
         if (sslEngine != null) {
@@ -118,45 +133,60 @@ class SslHandler {
             return;
         }
 
+        LOGGER.debug("Session[{}]: Initializing the SSL Handler", session.getId());
+
         InetSocketAddress peer = (InetSocketAddress) session.getAttribute(SslFilter.PEER_ADDRESS);
 
         // Create the SSL engine here
         if (peer == null) {
-            sslEngine = sslContext.createSSLEngine();
+            sslEngine = sslFilter.sslContext.createSSLEngine();
         } else {
-            sslEngine = sslContext.createSSLEngine(peer.getHostName(), peer.getPort());
+            sslEngine = sslFilter.sslContext.createSSLEngine(peer.getHostName(), peer.getPort());
         }
 
         // Initialize the engine in client mode if necessary
-        sslEngine.setUseClientMode(parent.isUseClientMode());
+        sslEngine.setUseClientMode(sslFilter.isUseClientMode());
 
         // Initialize the different SslEngine modes
-        if (parent.isWantClientAuth()) {
-            sslEngine.setWantClientAuth(true);
+        if (!sslEngine.getUseClientMode()) {
+            // Those parameters are only valid when in server mode
+            if (sslFilter.isWantClientAuth()) {
+                sslEngine.setWantClientAuth(true);
+            }
+
+            if (sslFilter.isNeedClientAuth()) {
+                sslEngine.setNeedClientAuth(true);
+            }
         }
 
-        if (parent.isNeedClientAuth()) {
-            sslEngine.setNeedClientAuth(true);
+        // Set the cipher suite to use by this SslEngine instance
+        if (sslFilter.getEnabledCipherSuites() != null) {
+            sslEngine.setEnabledCipherSuites(sslFilter.getEnabledCipherSuites());
         }
 
-        if (parent.getEnabledCipherSuites() != null) {
-            sslEngine.setEnabledCipherSuites(parent.getEnabledCipherSuites());
-        }
-
-        if (parent.getEnabledProtocols() != null) {
-            sslEngine.setEnabledProtocols(parent.getEnabledProtocols());
+        // Set the list of enabled protocols
+        if (sslFilter.getEnabledProtocols() != null) {
+            sslEngine.setEnabledProtocols(sslFilter.getEnabledProtocols());
         }
 
         // TODO : we may not need to call this method...
+        // However, if we don't call it here, the tests are failing. Why?
         sslEngine.beginHandshake();
 
         handshakeStatus = sslEngine.getHandshakeStatus();
 
-        handshakeComplete = false;
-        initialHandshakeComplete = false;
+        // Default value
         writingEncryptedData = false;
+        
+        // We haven't yet started a SSL negotiation
+        // set the flags accordingly
+        firstSSLNegociation = true;
+        handshakeComplete = false;
+
+        LOGGER.debug("Session[{}]: SSL Handler Initialization done.", session.getId());
     }
 
+    
     /**
      * Release allocated buffers.
      */
@@ -198,8 +228,11 @@ class SslHandler {
         outNetBuffer = null;
     }
 
-    public SslFilter getParent() {
-        return parent;
+    /**
+     * @return The SSL filter which has created this handler
+     */
+    public SslFilter getSslFilter() {
+        return sslFilter;
     }
 
     public IoSession getSession() {
@@ -207,7 +240,7 @@ class SslHandler {
     }
 
     /**
-     * Check we are writing encrypted data.
+     * Check if we are writing encrypted data.
      */
     public boolean isWritingEncryptedData() {
         return writingEncryptedData;
@@ -243,7 +276,7 @@ class SslHandler {
         IoFilterEvent scheduledWrite;
 
         while ((scheduledWrite = preHandshakeEventQueue.poll()) != null) {
-            parent.filterWrite(scheduledWrite.getNextFilter(), session, (WriteRequest) scheduledWrite.getParameter());
+            sslFilter.filterWrite(scheduledWrite.getNextFilter(), session, (WriteRequest) scheduledWrite.getParameter());
         }
     }
 
@@ -251,6 +284,13 @@ class SslHandler {
         filterWriteEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
     }
 
+    /**
+     * Push the newly received data into a queue, waiting for the SSL session
+     * to be fully established
+     *
+     * @param nextFilter The next filter to call
+     * @param message The incoming data
+     */
     public void scheduleMessageReceived(NextFilter nextFilter, Object message) {
         messageReceivedEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
     }
@@ -261,18 +301,20 @@ class SslHandler {
             return;
         }
 
-        IoFilterEvent e;
+        IoFilterEvent event;
 
         // We need synchronization here inevitably because filterWrite can be
         // called simultaneously and cause 'bad record MAC' integrity error.
         synchronized (this) {
-            while ((e = filterWriteEventQueue.poll()) != null) {
-                e.getNextFilter().filterWrite(session, (WriteRequest) e.getParameter());
+            while ((event = filterWriteEventQueue.poll()) != null) {
+                NextFilter nextFilter = event.getNextFilter();
+                nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
             }
         }
 
-        while ((e = messageReceivedEventQueue.poll()) != null) {
-            e.getNextFilter().messageReceived(session, e.getParameter());
+        while ((event = messageReceivedEventQueue.poll()) != null) {
+            NextFilter nextFilter = event.getNextFilter();
+            nextFilter.messageReceived(session, event.getParameter());
         }
     }
 
@@ -285,6 +327,14 @@ class SslHandler {
      * @throws SSLException on errors
      */
     public void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
+        if ( LOGGER.isDebugEnabled()) {
+            if ( !isOutboundDone()) {
+                LOGGER.debug("Session[{}](SSL): Processing the received message", session.getId());
+            } else {
+                LOGGER.debug("Session[{}]: Processing the received message", session.getId());
+            }
+        }
+
         // append buf to inNetBuffer
         if (inNetBuffer == null) {
             inNetBuffer = IoBuffer.allocate(buf.remaining()).setAutoExpand(true);
@@ -302,7 +352,7 @@ class SslHandler {
                 return;
             }
 
-            SSLEngineResult res = decrypt(!HANDSHAKE_FINISHED);
+            SSLEngineResult res = unwrap();
 
             // prepare to be written again
             if (inNetBuffer.hasRemaining()) {
@@ -455,64 +505,78 @@ class SslHandler {
     public void handshake(NextFilter nextFilter) throws SSLException {
         for (;;) {
             switch (handshakeStatus) {
-            case FINISHED:
-                session.setAttribute(SslFilter.SSL_SESSION, sslEngine.getSession());
-                handshakeComplete = true;
-
-                if (!initialHandshakeComplete && session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
-                    // SESSION_SECURED is fired only when it's the first
-                    // handshake.
-                    // (i.e. renegotiation shouldn't trigger SESSION_SECURED.)
-                    initialHandshakeComplete = true;
-                    scheduleMessageReceived(nextFilter, SslFilter.SESSION_SECURED);
-                }
-
-                return;
-
-            case NEED_TASK:
-                handshakeStatus = doTasks();
-                break;
-
-            case NEED_UNWRAP:
-                // we need more data read
-                SSLEngineResult.Status status = unwrapHandshake(nextFilter);
-
-                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW
-                        && handshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED || isInboundDone()) {
-                    // We need more data or the session is closed
-                    return;
-                }
-
-                break;
-
-            case NEED_WRAP:
-                // First make sure that the out buffer is completely empty.
-                // Since we
-                // cannot call wrap with data left on the buffer
-                if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
-                    return;
-                }
-
-                SSLEngineResult result;
-                createOutNetBuffer(0);
-
-                for (;;) {
-                    result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
-                    if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-                        outNetBuffer.capacity(outNetBuffer.capacity() << 1);
-                        outNetBuffer.limit(outNetBuffer.capacity());
-                    } else {
-                        break;
+                case FINISHED:
+                    LOGGER.debug("Session[{}] : processing the FINISHED state", session.getId());
+                    session.setAttribute(SslFilter.SSL_SESSION, sslEngine.getSession());
+                    handshakeComplete = true;
+    
+                    // Send the SECURE message only if it's the first SSL handshake
+                    if (firstSSLNegociation && session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
+                        // SESSION_SECURED is fired only when it's the first handshake
+                        firstSSLNegociation = false;
+                        scheduleMessageReceived(nextFilter, SslFilter.SESSION_SECURED);
                     }
-                }
-
-                outNetBuffer.flip();
-                handshakeStatus = result.getHandshakeStatus();
-                writeNetBuffer(nextFilter);
-                break;
-
-            default:
-                throw new IllegalStateException("Invalid Handshaking State" + handshakeStatus);
+                    
+                    if ( LOGGER.isDebugEnabled()) {
+                        if ( !isOutboundDone()) {
+                            LOGGER.debug("Session[{}] is now secured", session.getId());
+                        } else {
+                            LOGGER.debug("Session[{}] is not secured yet", session.getId());
+                        }
+                    }
+    
+                    return;
+    
+                case NEED_TASK:
+                    LOGGER.debug("Session[{}] : processing the NEED_TASK state", session.getId());
+                    handshakeStatus = doTasks();
+                    break;
+    
+                case NEED_UNWRAP:
+                    LOGGER.debug("Session[{}] : processing the NEED_UNWRAP state", session.getId());
+                    // we need more data read
+                    SSLEngineResult.Status status = unwrapHandshake(nextFilter);
+    
+                    if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW
+                            && handshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED || isInboundDone()) {
+                        // We need more data or the session is closed
+                        return;
+                    }
+    
+                    break;
+    
+                case NEED_WRAP:
+                    LOGGER.debug("Session[{}] : processing the NEED_WRAP state", session.getId());
+                    // First make sure that the out buffer is completely empty.
+                    // Since we
+                    // cannot call wrap with data left on the buffer
+                    if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
+                        return;
+                    }
+    
+                    SSLEngineResult result;
+                    createOutNetBuffer(0);
+    
+                    for (;;) {
+                        result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
+                        if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
+                            outNetBuffer.capacity(outNetBuffer.capacity() << 1);
+                            outNetBuffer.limit(outNetBuffer.capacity());
+                        } else {
+                            break;
+                        }
+                    }
+    
+                    outNetBuffer.flip();
+                    handshakeStatus = result.getHandshakeStatus();
+                    writeNetBuffer(nextFilter);
+                    break;
+    
+                default:
+                    String msg = "Invalid Handshaking State" + handshakeStatus + 
+                        " while processing the Handshake for session " + session.getId();
+                    LOGGER.error(msg);
+                    throw new IllegalStateException(msg);
             }
         }
     }
@@ -546,7 +610,7 @@ class SslHandler {
         try {
             IoBuffer writeBuffer = fetchOutNetBuffer();
             writeFuture = new DefaultWriteFuture(session);
-            parent.filterWrite(nextFilter, session, new DefaultWriteRequest(writeBuffer, writeFuture));
+            sslFilter.filterWrite(nextFilter, session, new DefaultWriteRequest(writeBuffer, writeFuture));
 
             // loop while more writes required to complete handshake
             while (needToCompleteHandshake()) {
@@ -561,7 +625,7 @@ class SslHandler {
                 IoBuffer outNetBuffer = fetchOutNetBuffer();
                 if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
                     writeFuture = new DefaultWriteFuture(session);
-                    parent.filterWrite(nextFilter, session, new DefaultWriteRequest(outNetBuffer, writeFuture));
+                    sslFilter.filterWrite(nextFilter, session, new DefaultWriteRequest(outNetBuffer, writeFuture));
                 }
             }
         } finally {
@@ -582,17 +646,16 @@ class SslHandler {
             return SSLEngineResult.Status.BUFFER_UNDERFLOW;
         }
 
-        SSLEngineResult res = decrypt(!HANDSHAKE_FINISHED);
+        SSLEngineResult res = unwrap();
         handshakeStatus = res.getHandshakeStatus();
 
         checkStatus(res);
 
         // If handshake finished, no data was produced, and the status is still
-        // ok,
-        // try to unwrap more
+        // ok, try to unwrap more
         if (handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED && res.getStatus() == SSLEngineResult.Status.OK
                 && inNetBuffer.hasRemaining()) {
-            res = decrypt(HANDSHAKE_FINISHED);
+            res = unwrap();
 
             // prepare to be written again
             if (inNetBuffer.hasRemaining()) {
@@ -625,10 +688,16 @@ class SslHandler {
         }
     }
 
-    private SSLEngineResult decrypt(boolean finished) throws SSLException {
+    /**
+     * Decrypt the incoming buffer and move the decrypted data to an
+     * application buffer. 
+     */
+    private SSLEngineResult unwrap() throws SSLException {
+        // We first have to create the application buffer if it does not exist
         if (appBuffer == null) {
             appBuffer = IoBuffer.allocate(inNetBuffer.remaining());
         } else {
+            // We already have one, just add the new data into it
             appBuffer.expand(inNetBuffer.remaining());
         }
 
@@ -638,27 +707,29 @@ class SslHandler {
         HandshakeStatus handshakeStatus = null;
 
         do {
+            // Decode the incoming data
             res = sslEngine.unwrap(inNetBuffer.buf(), appBuffer.buf());
             status = res.getStatus();
+            
+            // We can be processing the Handshake
             handshakeStatus = res.getHandshakeStatus();
 
             if (status == SSLEngineResult.Status.BUFFER_OVERFLOW) {
+                // We have to grow the target buffer, it's too small.
+                // Then we can call the unwrap method again
                 appBuffer.capacity(appBuffer.capacity() << 1);
                 appBuffer.limit(appBuffer.capacity());
                 continue;
             }
         } while (
                     (
-                        (status == SSLEngineResult.Status.OK) || 
+                        (status == SSLEngineResult.Status.OK) 
+                        || 
                         (status == SSLEngineResult.Status.BUFFER_OVERFLOW)
                     )
                     &&
                     (
-                        (
-                            (finished || handshakeComplete) 
-                            && 
-                            (handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING)
-                        ) 
+                        (handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING)
                         || 
                         (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)
                     )
@@ -698,4 +769,23 @@ class SslHandler {
         copy.flip();
         return copy;
     }
+    
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("SSLStatus <");
+        
+        if (handshakeComplete) {
+            sb.append("SSL established");
+        } else {
+            sb.append("Processing Handshake" ).append("; ");
+            sb.append("Status : ").append(handshakeStatus).append("; ");
+        }
+        
+        sb.append(", ");
+        sb.append("HandshakeComplete :" ).append(handshakeComplete).append(", ");
+        sb.append(">");
+        return sb.toString();
+    }
+    
 }
