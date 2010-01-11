@@ -53,6 +53,8 @@ import org.slf4j.LoggerFactory;
  * we'll require outNetBuffer be completely flushed before trying to wrap any more data.
  * <p/>
  * This class is not to be used by any client, it's closely associated with the SSL Filter.
+ * None of its methods are public as they should not be used by any other class but from
+ * the SslFilter class, in the same package
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -117,7 +119,7 @@ import org.slf4j.LoggerFactory;
      * @param sslContext
      * @throws SSLException
      */
-    public SslHandler(SslFilter sslFilter, IoSession session) throws SSLException {
+    /* no qualifier */ SslHandler(SslFilter sslFilter, IoSession session) throws SSLException {
         this.sslFilter = sslFilter;
         this.session = session;
     }
@@ -127,7 +129,7 @@ import org.slf4j.LoggerFactory;
      *
      * @throws SSLException If the underlying SSLEngine handshake initialization failed
      */
-    public void init() throws SSLException {
+    /* no qualifier */ void init() throws SSLException {
         if (sslEngine != null) {
             // We already have a SSL engine created, no need to create a new one
             return;
@@ -190,7 +192,7 @@ import org.slf4j.LoggerFactory;
     /**
      * Release allocated buffers.
      */
-    public void destroy() {
+    /* no qualifier */ void destroy() {
         if (sslEngine == null) {
             return;
         }
@@ -231,48 +233,48 @@ import org.slf4j.LoggerFactory;
     /**
      * @return The SSL filter which has created this handler
      */
-    public SslFilter getSslFilter() {
+    /* no qualifier */ SslFilter getSslFilter() {
         return sslFilter;
     }
 
-    public IoSession getSession() {
+    /* no qualifier */ IoSession getSession() {
         return session;
     }
 
     /**
      * Check if we are writing encrypted data.
      */
-    public boolean isWritingEncryptedData() {
+    /* no qualifier */ boolean isWritingEncryptedData() {
         return writingEncryptedData;
     }
 
     /**
      * Check if handshake is completed.
      */
-    public boolean isHandshakeComplete() {
+    /* no qualifier */ boolean isHandshakeComplete() {
         return handshakeComplete;
     }
 
-    public boolean isInboundDone() {
+    /* no qualifier */ boolean isInboundDone() {
         return sslEngine == null || sslEngine.isInboundDone();
     }
 
-    public boolean isOutboundDone() {
+    /* no qualifier */ boolean isOutboundDone() {
         return sslEngine == null || sslEngine.isOutboundDone();
     }
 
     /**
      * Check if there is any need to complete handshake.
      */
-    public boolean needToCompleteHandshake() {
+    /* no qualifier */ boolean needToCompleteHandshake() {
         return handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone();
     }
 
-    public void schedulePreHandshakeWriteRequest(NextFilter nextFilter, WriteRequest writeRequest) {
+    /* no qualifier */ void schedulePreHandshakeWriteRequest(NextFilter nextFilter, WriteRequest writeRequest) {
         preHandshakeEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
     }
 
-    public void flushPreHandshakeEvents() throws SSLException {
+    /* no qualifier */ void flushPreHandshakeEvents() throws SSLException {
         IoFilterEvent scheduledWrite;
 
         while ((scheduledWrite = preHandshakeEventQueue.poll()) != null) {
@@ -280,7 +282,7 @@ import org.slf4j.LoggerFactory;
         }
     }
 
-    public void scheduleFilterWrite(NextFilter nextFilter, WriteRequest writeRequest) {
+    /* no qualifier */ void scheduleFilterWrite(NextFilter nextFilter, WriteRequest writeRequest) {
         filterWriteEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
     }
 
@@ -291,11 +293,11 @@ import org.slf4j.LoggerFactory;
      * @param nextFilter The next filter to call
      * @param message The incoming data
      */
-    public void scheduleMessageReceived(NextFilter nextFilter, Object message) {
+    /* no qualifier */ void scheduleMessageReceived(NextFilter nextFilter, Object message) {
         messageReceivedEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
     }
 
-    public void flushScheduledEvents() {
+    /* no qualifier */ void flushScheduledEvents() {
         // Fire events only when no lock is hold for this handler.
         if (Thread.holdsLock(this)) {
             return;
@@ -326,7 +328,7 @@ import org.slf4j.LoggerFactory;
      * @param nextFilter Next filter in chain
      * @throws SSLException on errors
      */
-    public void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
+    /* no qualifier */ void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
         if ( LOGGER.isDebugEnabled()) {
             if ( !isOutboundDone()) {
                 LOGGER.debug("Session[{}](SSL): Processing the received message", session.getId());
@@ -380,7 +382,7 @@ import org.slf4j.LoggerFactory;
      * 
      * @return buffer with data
      */
-    public IoBuffer fetchAppBuffer() {
+    /* no qualifier */ IoBuffer fetchAppBuffer() {
         IoBuffer appBuffer = this.appBuffer.flip();
         this.appBuffer = null;
         return appBuffer;
@@ -391,7 +393,7 @@ import org.slf4j.LoggerFactory;
      * 
      * @return buffer with data
      */
-    public IoBuffer fetchOutNetBuffer() {
+    /* no qualifier */ IoBuffer fetchOutNetBuffer() {
         IoBuffer answer = outNetBuffer;
         if (answer == null) {
             return emptyBuffer;
@@ -409,7 +411,7 @@ import org.slf4j.LoggerFactory;
      * @throws SSLException
      *             on errors
      */
-    public void encrypt(ByteBuffer src) throws SSLException {
+    /* no qualifier */ void encrypt(ByteBuffer src) throws SSLException {
         if (!handshakeComplete) {
             throw new IllegalStateException();
         }
@@ -451,7 +453,7 @@ import org.slf4j.LoggerFactory;
      * @throws SSLException
      *             on errors
      */
-    public boolean closeOutbound() throws SSLException {
+    /* no qualifier */ boolean closeOutbound() throws SSLException {
         if (sslEngine == null || sslEngine.isOutboundDone()) {
             return false;
         }
@@ -502,7 +504,7 @@ import org.slf4j.LoggerFactory;
     /**
      * Perform any handshaking processing.
      */
-    public void handshake(NextFilter nextFilter) throws SSLException {
+    /* no qualifier */ void handshake(NextFilter nextFilter) throws SSLException {
         for (;;) {
             switch (handshakeStatus) {
                 case FINISHED:
@@ -593,7 +595,7 @@ import org.slf4j.LoggerFactory;
         }
     }
 
-    public WriteFuture writeNetBuffer(NextFilter nextFilter) throws SSLException {
+    /* no qualifier */ WriteFuture writeNetBuffer(NextFilter nextFilter) throws SSLException {
         // Check if any net data needed to be writen
         if (outNetBuffer == null || !outNetBuffer.hasRemaining()) {
             // no; bail out
@@ -763,7 +765,7 @@ import org.slf4j.LoggerFactory;
      *            the buffer to copy
      * @return the new buffer, ready to read from
      */
-    public static IoBuffer copy(ByteBuffer src) {
+    /* no qualifier */ static IoBuffer copy(ByteBuffer src) {
         IoBuffer copy = IoBuffer.allocate(src.remaining());
         copy.put(src);
         copy.flip();

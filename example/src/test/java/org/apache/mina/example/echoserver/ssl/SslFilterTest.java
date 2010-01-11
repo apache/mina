@@ -19,6 +19,9 @@
  */
 package org.apache.mina.example.echoserver.ssl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
@@ -41,8 +44,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * TODO Add documentation
@@ -164,7 +165,7 @@ public class SslFilterTest {
         public void messageSent(IoSession session, Object message)
                 throws Exception {
             sentMessages.add(message.toString());
-            //System.out.println(message);
+
             if (sentMessages.size() >= 2) {
                 session.close(true);
             }
