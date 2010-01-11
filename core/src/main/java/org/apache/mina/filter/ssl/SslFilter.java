@@ -36,6 +36,7 @@ import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
@@ -226,6 +227,32 @@ public class SslFilter extends IoFilterAdapter {
 
         handler.flushScheduledEvents();
         return started;
+    }
+    
+    
+    private String getSessionInfo(IoSession session) {
+        StringBuilder sb = new StringBuilder();
+
+        if (session.getService() instanceof IoAcceptor) {
+            sb.append("Session Server");
+            
+        } else {
+            sb.append("Session Client");
+        }
+        
+        sb.append('[').append(session.getId()).append(']');
+
+        SslHandler handler = getSslSessionHandler(session);
+        
+        if (isSslStarted(session)) {
+            if ( handler.isHandshakeComplete()) {
+                sb.append("(SSL)");
+            } else {
+                sb.append( "(ssl...)" );
+            }
+        }
+        
+        return sb.toString();
     }
 
     /**
@@ -423,11 +450,7 @@ public class SslFilter extends IoFilterAdapter {
     public void messageReceived(NextFilter nextFilter, IoSession session,
             Object message) throws SSLException {
         if ( LOGGER.isDebugEnabled()) {
-            if ( isSslStarted(session)) {
-                LOGGER.debug("Session[{}](SSL): Message received : {}", session.getId(), message);
-            } else {
-                LOGGER.debug("Session[{}]: Message received : {}", session.getId(), message);
-            }
+            LOGGER.debug("{}: Message received : {}", getSessionInfo(session), message);
         }
         
         SslHandler handler = getSslSessionHandler(session);
@@ -548,11 +571,7 @@ public class SslFilter extends IoFilterAdapter {
     public void filterWrite(NextFilter nextFilter, IoSession session,
             WriteRequest writeRequest) throws SSLException {
         if ( LOGGER.isDebugEnabled()) {
-            if ( isSslStarted(session)) {
-                LOGGER.debug("Session[{}](SSL): Writing Message : {}", session.getId(), writeRequest);
-            } else {
-                LOGGER.debug("Session[{}]: Writing Message : {}", session.getId(), writeRequest);
-            }
+            LOGGER.debug("{}: Writing Message : {}",  getSessionInfo(session), writeRequest);
         }
 
         boolean needsFlush = true;
@@ -635,7 +654,7 @@ public class SslFilter extends IoFilterAdapter {
 
     private void initiateHandshake(NextFilter nextFilter, IoSession session)
             throws SSLException {
-        LOGGER.debug("Session[{}] : Starting the first handshake", session.getId());
+        LOGGER.debug("{} : Starting the first handshake", getSessionInfo(session));
         SslHandler handler = getSslSessionHandler(session);
         
         synchronized (handler) {
@@ -677,13 +696,7 @@ public class SslFilter extends IoFilterAdapter {
     private void handleSslData(NextFilter nextFilter, SslHandler handler)
             throws SSLException {
         if ( LOGGER.isDebugEnabled()) {
-            IoSession session = handler.getSession();
-            
-            if ( isSslStarted(session)) {
-                LOGGER.debug("Session[{}](SSL): Processing the SSL Data ", session.getId());
-            } else {
-                LOGGER.debug("Session[{}]: Processing the SSL Data message", session.getId());
-            }
+            LOGGER.debug("{}: Processing the SSL Data ", getSessionInfo(handler.getSession()));
         }
 
         // Flush any buffered write requests occurred before handshaking.
