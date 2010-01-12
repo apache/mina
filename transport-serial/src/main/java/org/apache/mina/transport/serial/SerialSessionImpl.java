@@ -22,6 +22,7 @@ package org.apache.mina.transport.serial;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+import gnu.io.UnsupportedCommOperationException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -289,6 +290,12 @@ class SerialSessionImpl extends AbstractIoSession implements
             try {
                 outputStream.close();
             } catch (IOException e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            }
+
+            try { // Turn flow control off right before close to avoid deadlock
+                port.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
+            } catch (UnsupportedCommOperationException e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
             }
 
