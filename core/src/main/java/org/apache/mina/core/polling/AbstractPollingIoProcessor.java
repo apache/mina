@@ -426,8 +426,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
      * {@inheritDoc}
      */
     public final void flush(T session) {
-        boolean needsWakeup = flushingSessions.isEmpty();
-        if (scheduleFlush(session) && needsWakeup) {
+        if (scheduleFlush(session)) {
             wakeup();
         }
     }
