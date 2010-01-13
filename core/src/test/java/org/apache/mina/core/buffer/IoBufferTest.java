@@ -20,6 +20,8 @@
 package org.apache.mina.core.buffer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 
@@ -89,6 +91,18 @@ public class IoBufferTest {
         time2 = System.currentTimeMillis();
         System.out.println("Time for performance test 2: " + (time2 - time) + "ms");
     }
+    
+    @Test 
+    public void autoExpand() { 
+        IoBuffer buffer = IoBuffer.allocate(8, false); 
+        buffer.setAutoExpand(true); 
+         
+        assertTrue("Should AutoExpand", buffer.isAutoExpand()); 
+         
+        IoBuffer slice = buffer.slice(); 
+        assertFalse("Should *NOT* AutoExpand", buffer.isAutoExpand()); 
+        assertFalse("Should *NOT* AutoExpand", slice.isAutoExpand()); 
+    } 
 
     /**
      * This class extends the AbstractIoBuffer class to have direct access to
