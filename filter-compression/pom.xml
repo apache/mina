@@ -26,12 +26,15 @@
     <artifactId>mina-parent</artifactId>
     <version>2.0.0-RC2-SNAPSHOT</version>
   </parent>
+
   <artifactId>mina-filter-compression</artifactId>
   <name>Apache MINA Compression Filter</name>
   <packaging>bundle</packaging>  
+
   <properties>
     <exportedPackage>${groupId}.filter.compression</exportedPackage>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>

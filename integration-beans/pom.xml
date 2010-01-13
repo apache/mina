@@ -26,24 +26,20 @@
     <artifactId>mina-parent</artifactId>
     <version>2.0.0-RC2-SNAPSHOT</version>
   </parent>
+
   <artifactId>mina-integration-beans</artifactId>
   <name>Apache MINA JavaBeans Integration</name>
   <packaging>bundle</packaging>  
+
   <properties>
     <exportedPackage>${groupId}.integration.beans</exportedPackage>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>${groupId}</groupId>
-      <artifactId>mina-transport-serial</artifactId>
-      <optional>true</optional>
-    </dependency>
-    -->
   </dependencies>
 </project>
 
