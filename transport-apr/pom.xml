@@ -24,18 +24,22 @@
     <artifactId>mina-parent</artifactId>
     <version>2.0.0-RC2-SNAPSHOT</version>
   </parent>
+
   <artifactId>mina-transport-apr</artifactId>
   <name>Apache MINA APR Transport</name>
   <packaging>bundle</packaging>  
+
   <properties>
     <exportedPackage>${groupId}.transport.socket.apr</exportedPackage>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
       <version>${pom.version}</version>
     </dependency>
+
     <dependency>
       <groupId>tomcat</groupId>
       <artifactId>tomcat-apr</artifactId>

@@ -26,21 +26,26 @@
     <artifactId>mina-parent</artifactId>
     <version>2.0.0-RC2-SNAPSHOT</version>
   </parent>
+
   <artifactId>mina-integration-jmx</artifactId>
   <name>Apache MINA JMX Integration</name>
   <packaging>bundle</packaging>  
+
   <properties>
     <exportedPackage>${groupId}.integration.jmx</exportedPackage>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
     </dependency>
+
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-integration-beans</artifactId>
     </dependency>
+
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-integration-ognl</artifactId>

@@ -26,10 +26,12 @@
     <artifactId>apache</artifactId>
     <version>4</version>
   </parent>
+
   <organization>
     <name>Apache MINA Project</name>
     <url>http://mina.apache.org/</url>
   </organization>
+
   <groupId>org.apache.mina</groupId>
   <version>2.0.0-RC2-SNAPSHOT</version>
   <artifactId>build</artifactId>
@@ -76,6 +78,22 @@
     </license>
   </licenses>
 
+  <!-- Define the version for each of the used jar and maven plugins -->
+  <properties>
+    <version.assembly.plugin>2.2-beta-5</version.assembly.plugin>
+    <version.clean.plugin>2.3</version.clean.plugin>
+    <version.compiler.plugin>2.1</version.compiler.plugin>
+    <version.deploy.plugin>2.5</version.deploy.plugin>
+    <version.jar.plugin>2.3</version.jar.plugin>
+    <version.javadoc.plugin>2.6.1</version.javadoc.plugin>
+    <version.jxr.plugin>2.1</version.jxr.plugin>
+    <version.rat.maven.plugin>1.0-alpha-3</version.rat.maven.plugin>
+    <version.release.plugin>2.0-beta-9</version.release.plugin>
+    <version.remote.resources.plugin>1.1</version.remote.resources.plugin>
+    <version.site.plugin>2.1</version.site.plugin>
+    <version.source.plugin>2.1.1</version.source.plugin>
+    <version.surefire.plugin>2.4.3</version.surefire.plugin>
+  </properties>
 
   <modules>
     <module>legal</module>
@@ -113,7 +131,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
+        <version>${version.compiler.plugin}</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <source>1.5</source>
@@ -126,7 +144,7 @@
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.3</version>
+        <version>${version.surefire.plugin}</version>
         <configuration>
           <excludes>
             <exclude>**/Abstract*</exclude>
@@ -138,7 +156,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.0.4</version>
+        <version>${version.source.plugin}</version>
         <executions>
           <execution>
             <id>attach-source</id>
@@ -151,7 +169,7 @@
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-3</version>
+        <version>${version.assembly.plugin}</version>
         <configuration>
           <descriptors>
             <descriptor>release.xml</descriptor>
@@ -164,7 +182,7 @@
 
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.0-beta-7</version>
+        <version>${version.release.plugin}</version>
         <configuration>
           <tagBase>
             https://svn.apache.org/repos/asf/mina/tags
@@ -193,7 +211,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.4</version>
+        <version>${version.javadoc.plugin}</version>
         <inherited>false</inherited>
         <configuration>
           <aggregate>true</aggregate>
@@ -217,7 +235,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.1</version>
+        <version>${version.jxr.plugin}</version>
         <inherited>false</inherited>
         <configuration>
           <aggregate>true</aggregate>
@@ -227,10 +245,11 @@
           <docTitle>Apache MINA ${project.version} Cross Reference</docTitle>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>rat-maven-plugin</artifactId>
-        <version>1.0-alpha-3</version>
+        <version>${version.rat.maven.plugin}</version>
         <configuration>
           <excludes>
             <exclude>**/target/**/*</exclude>
