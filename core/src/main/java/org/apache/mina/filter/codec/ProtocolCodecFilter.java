@@ -292,7 +292,15 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         ProtocolEncoderOutput encoderOut = getEncoderOut(session,
                 nextFilter, writeRequest);
-
+        
+        if (encoder == null) {
+            throw new ProtocolEncoderException("The encoder is null for the session " + session);
+        }
+        
+        if (encoderOut == null) {
+            throw new ProtocolEncoderException("The encoderOut is null for the session " + session);
+        }
+        
         try {
             // Now we can try to encode the response
             encoder.encode(session, message, encoderOut);
