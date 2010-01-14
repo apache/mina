@@ -60,71 +60,76 @@ public abstract class AbstractFileRegionTest {
         final boolean[] success = {false};
         final Throwable[] exception = {null};
         
-        int port = AvailablePortFinder.getNextAvailable(1025);
+        int port = AvailablePortFinder.getNextAvailable(4025);
         IoAcceptor acceptor = createAcceptor();
-        
-        acceptor.setHandler(new IoHandlerAdapter() {
-            private int index = 0;
-            @Override
-            public void exceptionCaught(IoSession session, Throwable cause)
-                    throws Exception {
-                exception[0] = cause;
-                session.close(true);
-            }
-            @Override
-            public void messageReceived(IoSession session, Object message) throws Exception {
-                IoBuffer buffer = (IoBuffer) message;
-                while (buffer.hasRemaining()) {
-                    int x = buffer.getInt();
-                    if (x != index) {
-                        throw new Exception(String.format("Integer at %d was %d but should have been %d", index, x, index));
-                    }
-                    index++;
-                }
-                if (index > FILE_SIZE / 4) {
-                    throw new Exception("Read too much data");
-                }
-                if (index == FILE_SIZE / 4) {
-                    success[0] = true;
+        IoConnector connector = createConnector();
+
+        try {
+            acceptor.setHandler(new IoHandlerAdapter() {
+                private int index = 0;
+                @Override
+                public void exceptionCaught(IoSession session, Throwable cause)
+                        throws Exception {
+                    exception[0] = cause;
                     session.close(true);
                 }
+                @Override
+                public void messageReceived(IoSession session, Object message) throws Exception {
+                    IoBuffer buffer = (IoBuffer) message;
+                    while (buffer.hasRemaining()) {
+                        int x = buffer.getInt();
+                        if (x != index) {
+                            throw new Exception(String.format("Integer at %d was %d but should have been %d", index, x, index));
+                        }
+                        index++;
+                    }
+                    if (index > FILE_SIZE / 4) {
+                        throw new Exception("Read too much data");
+                    }
+                    if (index == FILE_SIZE / 4) {
+                        success[0] = true;
+                        session.close(true);
+                    }
+                }
+            });
+            
+            acceptor.bind(new InetSocketAddress(port));
+            
+            connector.setHandler(new IoHandlerAdapter() {
+                @Override
+                public void exceptionCaught(IoSession session, Throwable cause)
+                        throws Exception {
+                    exception[0] = cause;
+                    session.close(true);
+                }
+                @Override
+                public void sessionClosed(IoSession session) throws Exception {
+                    latch.countDown();
+                }
+            });
+            
+            ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
+            future.awaitUninterruptibly();
+            
+            IoSession session = future.getSession();
+            session.write(file);
+            
+            latch.await();
+            
+            if (exception[0] != null) {
+                throw exception[0];
             }
-        });
-        
-        acceptor.bind(new InetSocketAddress(port));
-        
-        IoConnector connector = createConnector();
-        connector.setHandler(new IoHandlerAdapter() {
-            @Override
-            public void exceptionCaught(IoSession session, Throwable cause)
-                    throws Exception {
-                exception[0] = cause;
-                session.close(true);
+            assertTrue("Did not complete file transfer successfully", success[0]);
+            
+            assertEquals("Written messages should be 1 (we wrote one file)", 1, session.getWrittenMessages());
+            assertEquals("Written bytes should match file size", FILE_SIZE, session.getWrittenBytes());
+        } finally {
+            try {
+                connector.dispose();
+            } finally {
+                acceptor.dispose();
             }
-            @Override
-            public void sessionClosed(IoSession session) throws Exception {
-                latch.countDown();
-            }
-        });
-        
-        ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
-        future.awaitUninterruptibly();
-        
-        IoSession session = future.getSession();
-        session.write(file);
-        
-        latch.await();
-        
-        if (exception[0] != null) {
-            throw exception[0];
         }
-        assertTrue("Did not complete file transfer successfully", success[0]);
-        
-        assertEquals("Written messages should be 1 (we wrote one file)", 1, session.getWrittenMessages());
-        assertEquals("Written bytes should match file size", FILE_SIZE, session.getWrittenBytes());
-        
-        connector.dispose();
-        acceptor.dispose();
     }
     
     private File createLargeFile() throws IOException {

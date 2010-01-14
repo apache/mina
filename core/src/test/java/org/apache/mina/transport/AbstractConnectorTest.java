@@ -85,7 +85,7 @@ public abstract class AbstractConnectorTest extends TestCase {
     }
 
     public void testConnectFutureFailureTiming() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(3025);
+        int port = AvailablePortFinder.getNextAvailable(1025);
         final StringBuffer buf = new StringBuffer();
 
         IoConnector connector = createConnector();
@@ -135,34 +135,43 @@ public abstract class AbstractConnectorTest extends TestCase {
         final CountDownLatch latch = new CountDownLatch(2);
         final ConnectFuture[] callbackFuture = new ConnectFuture[1];
         
-        int port = AvailablePortFinder.getNextAvailable(4025);
+        int port = AvailablePortFinder.getNextAvailable(3025);
         IoAcceptor acceptor = createAcceptor();
-        acceptor.setHandler(new IoHandlerAdapter());
-        InetSocketAddress address = new InetSocketAddress(port);
-        acceptor.bind(address);
-
         IoConnector connector = createConnector();
-        connector.setHandler(new IoHandlerAdapter() {
-           @Override
-            public void sessionCreated(IoSession session) throws Exception {
-                   assertions[sessionCreatedInvoked] = true;
-                   assertions[sessionCreatedInvokedBeforeCallback] = !assertions[callbackInvoked];
-                   latch.countDown();
-            } 
-        });
+
+        try {
+            acceptor.setHandler(new IoHandlerAdapter());
+            InetSocketAddress address = new InetSocketAddress(port);
+            acceptor.bind(address);
+    
+            connector.setHandler(new IoHandlerAdapter() {
+               @Override
+                public void sessionCreated(IoSession session) throws Exception {
+                       assertions[sessionCreatedInvoked] = true;
+                       assertions[sessionCreatedInvokedBeforeCallback] = !assertions[callbackInvoked];
+                       latch.countDown();
+                } 
+            });
         
-        ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port), new IoSessionInitializer<ConnectFuture>() {
-            public void initializeSession(IoSession session, ConnectFuture future) {
-                assertions[callbackInvoked] = true;
-                callbackFuture[0] = future;
-                latch.countDown();
+            ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port), new IoSessionInitializer<ConnectFuture>() {
+                public void initializeSession(IoSession session, ConnectFuture future) {
+                    assertions[callbackInvoked] = true;
+                    callbackFuture[0] = future;
+                    latch.countDown();
+                }
+            });
+            
+            assertTrue("Timed out waiting for callback and IoHandler.sessionCreated to be invoked", latch.await(5, TimeUnit.SECONDS));
+            assertTrue("Callback was not invoked", assertions[callbackInvoked]);
+            assertTrue("IoHandler.sessionCreated was not invoked", assertions[sessionCreatedInvoked]);
+            assertFalse("IoHandler.sessionCreated was invoked before session callback", assertions[sessionCreatedInvokedBeforeCallback]);
+            assertSame("Callback future should have been same future as returned by connect", future, callbackFuture[0]);
+        } finally {
+            try {
+                connector.dispose();
+            } finally {
+                acceptor.dispose();
             }
-        });
-        
-        assertTrue("Timed out waiting for callback and IoHandler.sessionCreated to be invoked", latch.await(5, TimeUnit.SECONDS));
-        assertTrue("Callback was not invoked", assertions[callbackInvoked]);
-        assertTrue("IoHandler.sessionCreated was not invoked", assertions[sessionCreatedInvoked]);
-        assertFalse("IoHandler.sessionCreated was invoked before session callback", assertions[sessionCreatedInvokedBeforeCallback]);
-        assertSame("Callback future should have been same future as returned by connect", future, callbackFuture[0]);
+        }
     }
 }
