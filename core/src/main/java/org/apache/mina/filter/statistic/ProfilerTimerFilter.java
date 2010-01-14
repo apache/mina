@@ -226,12 +226,16 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                     sessionCreatedTimerWorker = new TimerWorker();
                 }
                 
+                return;
+                
             case SESSION_OPENED :
                 profileSessionOpened = true;
                 
                 if (sessionOpenedTimerWorker == null) {
                     sessionOpenedTimerWorker = new TimerWorker();
                 }
+                
+                return;
                 
             case SESSION_IDLE :
                 profileSessionIdle = true;
@@ -240,12 +244,16 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                     sessionIdleTimerWorker = new TimerWorker();
                 }
                 
+                return;
+                
             case SESSION_CLOSED :
                 profileSessionClosed = true;
                 
                 if (sessionClosedTimerWorker == null) {
                     sessionClosedTimerWorker = new TimerWorker();
                 }
+                
+                return;
         }
     }
 
