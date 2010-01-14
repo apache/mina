@@ -90,6 +90,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         if (maxPoolSize < 0) {
             throw new IllegalArgumentException("maxPoolSize: " + maxPoolSize);
         }
+        
         if (maxCachedBufferSize < 0) {
             throw new IllegalArgumentException("maxCachedBufferSize: " + maxCachedBufferSize);
         }
@@ -103,6 +104,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
                 return newPoolMap();
             }
         };
+        
         this.directBuffers = new ThreadLocal<Map<Integer, Queue<CachedBuffer>>>() {
             @Override
             protected Map<Integer, Queue<CachedBuffer>> initialValue() {
@@ -132,18 +134,22 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         Map<Integer, Queue<CachedBuffer>> poolMap =
             new HashMap<Integer, Queue<CachedBuffer>>();
         int poolSize = maxPoolSize == 0? DEFAULT_MAX_POOL_SIZE : maxPoolSize;
+        
         for (int i = 0; i < 31; i ++) {
             poolMap.put(1 << i, new CircularQueue<CachedBuffer>(poolSize));
         }
+        
         poolMap.put(0, new CircularQueue<CachedBuffer>(poolSize));
         poolMap.put(Integer.MAX_VALUE, new CircularQueue<CachedBuffer>(poolSize));
+        
         return poolMap;
     }
 
     public IoBuffer allocate(int requestedCapacity, boolean direct) {
         int actualCapacity = IoBuffer.normalizeCapacity(requestedCapacity);
         IoBuffer buf ;
-        if (maxCachedBufferSize != 0 && actualCapacity > maxCachedBufferSize) {
+        
+        if ((maxCachedBufferSize != 0) && (actualCapacity > maxCachedBufferSize)) {
             if (direct) {
                 buf = wrap(ByteBuffer.allocateDirect(actualCapacity));
             } else {
@@ -151,6 +157,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             }
         } else {
             Queue<CachedBuffer> pool;
+            
             if (direct) {
                 pool = directBuffers.get().get(actualCapacity);
             } else {
@@ -159,6 +166,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             
             // Recycle if possible.
             buf = pool.poll();
+            
             if (buf != null) {
                 buf.clear();
                 buf.setAutoExpand(false);
@@ -257,14 +265,17 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         }
         
         private void free(ByteBuffer oldBuf) {
-            if (oldBuf == null || oldBuf.capacity() > maxCachedBufferSize ||
-                oldBuf.isReadOnly() || isDerived() ||
-                Thread.currentThread() != ownerThread) {
+            if ((oldBuf == null) || 
+                ((maxCachedBufferSize != 0 ) && (oldBuf.capacity() > maxCachedBufferSize)) ||
+                oldBuf.isReadOnly() || 
+                isDerived() ||
+                (Thread.currentThread() != ownerThread)) {
                 return;
             }
 
             // Add to the cache.
             Queue<CachedBuffer> pool;
+            
             if (oldBuf.isDirect()) {
                 pool = directBuffers.get().get(oldBuf.capacity());
             } else {
@@ -276,7 +287,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
             }
 
             // Restrict the size of the pool to prevent OOM.
-            if (maxPoolSize == 0 || pool.size() < maxPoolSize) {
+            if ((maxPoolSize == 0) || (pool.size() < maxPoolSize)) {
                 pool.offer(new CachedBuffer(oldBuf));
             }
         }
