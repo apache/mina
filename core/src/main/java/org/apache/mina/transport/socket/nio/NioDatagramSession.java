@@ -68,6 +68,7 @@ class NioDatagramSession extends NioSession {
         this.service = service;
         this.ch = ch;
         this.config = new NioDatagramSessionConfig(ch);
+        this.config.setAll(service.getSessionConfig());
         this.handler = service.getHandler();
         this.processor = processor;
         this.remoteAddress = (InetSocketAddress) remoteAddress;
