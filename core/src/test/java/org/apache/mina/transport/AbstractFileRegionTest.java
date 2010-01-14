@@ -19,6 +19,9 @@
  */
 package org.apache.mina.transport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,8 +30,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.CountDownLatch;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoAcceptor;
@@ -36,19 +37,21 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.AvailablePortFinder;
+import org.junit.Test;
 
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractFileRegionTest extends TestCase {
+public abstract class AbstractFileRegionTest {
 
     private static final int FILE_SIZE = 1 * 1024 * 1024; // 1MB file
     
     protected abstract IoAcceptor createAcceptor();
     protected abstract IoConnector createConnector();
 
+    @Test
     public void testSendLargeFile() throws Throwable {
         File file = createLargeFile();
         assertEquals("Test file not as big as specified", FILE_SIZE, file.length());
@@ -59,6 +62,7 @@ public abstract class AbstractFileRegionTest extends TestCase {
         
         int port = AvailablePortFinder.getNextAvailable(1025);
         IoAcceptor acceptor = createAcceptor();
+        
         acceptor.setHandler(new IoHandlerAdapter() {
             private int index = 0;
             @Override
@@ -86,6 +90,7 @@ public abstract class AbstractFileRegionTest extends TestCase {
                 }
             }
         });
+        
         acceptor.bind(new InetSocketAddress(port));
         
         IoConnector connector = createConnector();
@@ -101,6 +106,7 @@ public abstract class AbstractFileRegionTest extends TestCase {
                 latch.countDown();
             }
         });
+        
         ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
         future.awaitUninterruptibly();
         
@@ -130,6 +136,7 @@ public abstract class AbstractFileRegionTest extends TestCase {
         channel.close();
         return largeFile;
     }
+    
     private ByteBuffer createBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(FILE_SIZE);
         for (int i = 0; i < FILE_SIZE / 4; i++) {
@@ -138,5 +145,4 @@ public abstract class AbstractFileRegionTest extends TestCase {
         buffer.flip();
         return buffer;
     }
-    
 }
