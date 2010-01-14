@@ -58,11 +58,14 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     public void init(IoService parent) {
         this.parent = parent;
+        
         if (parent instanceof SocketAcceptor) {
             defaultReuseAddress = true;
+            defaultReceiveBufferSize = receiveBufferSize;
         } else {
             defaultReuseAddress = DEFAULT_REUSE_ADDRESS;
         }
+        
         reuseAddress = defaultReuseAddress;
     }
 
@@ -89,7 +92,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
         // not bound yet to avoid a unnecessary system call
         // when the acceptor is activated and new sessions are
         // created.
-        if (!parent.isActive() && parent instanceof SocketAcceptor) {
+        if ((parent != null) && !parent.isActive() && parent instanceof SocketAcceptor) {
             defaultReceiveBufferSize = receiveBufferSize;
         }
     }
