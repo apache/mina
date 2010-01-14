@@ -36,6 +36,7 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.util.AvailablePortFinder;
 import org.junit.Test;
 
@@ -60,7 +61,7 @@ public abstract class AbstractFileRegionTest {
         final boolean[] success = {false};
         final Throwable[] exception = {null};
         
-        int port = AvailablePortFinder.getNextAvailable(4025);
+        int port = AvailablePortFinder.getNextAvailable(1025);
         IoAcceptor acceptor = createAcceptor();
         IoConnector connector = createConnector();
 
@@ -92,6 +93,8 @@ public abstract class AbstractFileRegionTest {
                     }
                 }
             });
+            
+            ((NioSocketAcceptor)acceptor).setReuseAddress(true);
             
             acceptor.bind(new InetSocketAddress(port));
             

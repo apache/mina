@@ -32,7 +32,9 @@ public class NioFileRegionTest extends AbstractFileRegionTest{
 
     @Override
     protected IoAcceptor createAcceptor() {
-        return new NioSocketAcceptor();
+        NioSocketAcceptor acceptor = new NioSocketAcceptor();
+        acceptor.setReuseAddress(true);
+        return acceptor;
     }
 
     @Override
