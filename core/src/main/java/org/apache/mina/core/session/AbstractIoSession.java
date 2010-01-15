@@ -1264,21 +1264,21 @@ public abstract class AbstractIoSession implements IoSession {
      */
     private class CloseAwareWriteQueue implements WriteRequestQueue {
 
-        private final WriteRequestQueue q;
+        private final WriteRequestQueue queue;
 
         /**
          * {@inheritDoc}
          */
-        public CloseAwareWriteQueue(WriteRequestQueue q) {
-            this.q = q;
+        public CloseAwareWriteQueue(WriteRequestQueue queue) {
+            this.queue = queue;
         }
 
         /**
          * {@inheritDoc}
          */
         public synchronized WriteRequest poll(IoSession session) {
-            WriteRequest answer = q.poll(session);
-            
+            WriteRequest answer = queue.poll(session);
+
             if (answer == CLOSE_REQUEST) {
                 AbstractIoSession.this.close();
                 dispose(session);
@@ -1292,28 +1292,28 @@ public abstract class AbstractIoSession implements IoSession {
          * {@inheritDoc}
          */
         public void offer(IoSession session, WriteRequest e) {
-            q.offer(session, e);
+            queue.offer(session, e);
         }
 
         /**
          * {@inheritDoc}
          */
         public boolean isEmpty(IoSession session) {
-            return q.isEmpty(session);
+            return queue.isEmpty(session);
         }
 
         /**
          * {@inheritDoc}
          */
         public void clear(IoSession session) {
-            q.clear(session);
+            queue.clear(session);
         }
 
         /**
          * {@inheritDoc}
          */
         public void dispose(IoSession session) {
-            q.dispose(session);
+            queue.dispose(session);
         }
     }
 }

@@ -162,10 +162,24 @@ public class DefaultWriteRequest implements WriteRequest {
 
     @Override
     public String toString() {
-        if (getDestination() == null) {
-            return message.toString();
-        }
+        StringBuilder sb = new StringBuilder();
         
-        return message.toString() + " => " + getDestination();
+        sb.append("WriteRequest: ");
+
+        // Special case for the CLOSE_REQUEST writerequest : it just
+        // carries a native Object instance
+        if (message.getClass().getName().equals(Object.class.getName()) ) {
+            sb.append("CLOSE_REQUEST");
+        } else {
+            if (getDestination() == null) {
+                sb.append(message);
+            } else {
+                sb.append(message);
+                sb.append(" => ");
+                sb.append(getDestination());
+            }
+        }
+
+        return sb.toString();
     }
 }
