@@ -67,10 +67,6 @@ public class WriteRequestWrapper implements WriteRequest {
 
     @Override
     public String toString() {
-        if (getDestination() == null) {
-            return getMessage().toString();
-        }
-        
-        return getMessage().toString() + " => " + getDestination();
+        return parentRequest.toString();
     }
 }
