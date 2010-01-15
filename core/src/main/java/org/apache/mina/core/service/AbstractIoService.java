@@ -276,17 +276,19 @@ public abstract class AbstractIoService implements IoService {
             return;
         }
 
-        IoFuture disposalFuture;
+        IoFuture dispFuture;
         synchronized (disposalLock) {
-            disposalFuture = this.disposalFuture;
+            dispFuture = this.disposalFuture;
+            
             if (!disposing) {
                 disposing = true;
+            
                 try {
-                    this.disposalFuture = disposalFuture = dispose0();
+                    this.disposalFuture = dispFuture = dispose0();
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 } finally {
-                    if (disposalFuture == null) {
+                    if (dispFuture == null) {
                         disposed = true;
                     }
                 }
@@ -300,6 +302,7 @@ public abstract class AbstractIoService implements IoService {
         if (createdExecutor) {
             ExecutorService e = (ExecutorService) executor;
             e.shutdown();
+            
             while (!e.isTerminated()) {
                 try {
                     e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
