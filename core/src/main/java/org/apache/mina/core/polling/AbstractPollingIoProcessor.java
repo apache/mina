@@ -517,7 +517,6 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
      */
     private boolean addNow(T session) {
         boolean registered = false;
-        boolean notified = false;
 
         try {
             init(session);
@@ -532,26 +531,15 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
             // Propagate the SESSION_CREATED event up to the chain
             IoServiceListenerSupport listeners = ((AbstractIoService) session.getService()).getListeners();
             listeners.fireSessionCreated(session);
-            
-            notified = true;
         } catch (Throwable e) {
-            if (notified) {
-                // Clear the DefaultIoFilterChain.CONNECT_FUTURE attribute
-                // and call ConnectFuture.setException().
-                scheduleRemove(session);
-                IoFilterChain filterChain = session.getFilterChain();
-                filterChain.fireExceptionCaught(e);
-                wakeup();
-            } else {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-                
-                try {
-                    destroy(session);
-                } catch (Exception e1) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e1);
-                } finally {
-                    registered = false;
-                }
+            ExceptionMonitor.getInstance().exceptionCaught(e);
+            
+            try {
+                destroy(session);
+            } catch (Exception e1) {
+                ExceptionMonitor.getInstance().exceptionCaught(e1);
+            } finally {
+                registered = false;
             }
         }
         
