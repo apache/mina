@@ -141,10 +141,9 @@ public final class VmPipeConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected IoFuture dispose0() throws Exception {
+    protected void dispose0() throws Exception {
         // stop the idle checking task
         idleChecker.getNotifyingTask().cancel();
-        return null;
     }
 
     private static final Set<VmPipeAddress> TAKEN_LOCAL_ADDRESSES = new HashSet<VmPipeAddress>();

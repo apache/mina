@@ -93,11 +93,10 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     }
 
     @Override
-    protected IoFuture dispose0() throws Exception {
+    protected void dispose0() throws Exception {
         // stop the idle checking task
         idleChecker.getNotifyingTask().cancel();
         unbind();
-        return null;
     }
 
     @Override
