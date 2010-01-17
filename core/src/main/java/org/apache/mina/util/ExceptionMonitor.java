@@ -55,11 +55,14 @@ public abstract class ExceptionMonitor {
         if (monitor == null) {
             monitor = new DefaultExceptionMonitor();
         }
+        
         instance = monitor;
     }
 
     /**
      * Invoked when there are any uncaught exceptions.
+     * 
+     * @param cause The caught exception
      */
     public abstract void exceptionCaught(Throwable cause);
 }
