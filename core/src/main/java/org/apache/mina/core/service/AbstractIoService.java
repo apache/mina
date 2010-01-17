@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.IoUtil;
@@ -143,8 +142,6 @@ public abstract class AbstractIoService implements IoService {
     private volatile boolean disposing;
 
     private volatile boolean disposed;
-
-    private IoFuture disposalFuture;
 
     /**
      * {@inheritDoc}
@@ -276,40 +273,21 @@ public abstract class AbstractIoService implements IoService {
             return;
         }
 
-        IoFuture dispFuture;
         synchronized (disposalLock) {
-            dispFuture = this.disposalFuture;
-            
             if (!disposing) {
                 disposing = true;
             
                 try {
-                    this.disposalFuture = dispFuture = dispose0();
+                    dispose0();
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
-                } finally {
-                    if (dispFuture == null) {
-                        disposed = true;
-                    }
                 }
             }
         }
         
-        if (disposalFuture != null) {
-            disposalFuture.awaitUninterruptibly();
-        }
-
         if (createdExecutor) {
             ExecutorService e = (ExecutorService) executor;
-            e.shutdown();
-            
-            while (!e.isTerminated()) {
-                try {
-                    e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                } catch (InterruptedException e1) {
-                    // Ignore; it should end shortly.
-                }
-            }
+            e.shutdownNow();
         }
 
         disposed = true;
@@ -319,7 +297,7 @@ public abstract class AbstractIoService implements IoService {
      * Implement this method to release any acquired resources.  This method
      * is invoked only once by {@link #dispose()}.
      */
-    protected abstract IoFuture dispose0() throws Exception;
+    protected abstract void dispose0() throws Exception;
 
     /**
      * {@inheritDoc}

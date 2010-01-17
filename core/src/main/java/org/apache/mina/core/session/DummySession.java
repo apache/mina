@@ -29,7 +29,6 @@ import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterChain;
-import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoAcceptor;
@@ -122,8 +121,7 @@ public class DummySession extends AbstractIoSession {
             }
 
             @Override
-            protected IoFuture dispose0() throws Exception {
-                return null;
+            protected void dispose0() throws Exception {
             }
         };
 

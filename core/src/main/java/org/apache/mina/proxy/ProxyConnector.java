@@ -28,7 +28,6 @@ import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultConnectFuture;
-import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoConnector;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoHandler;
@@ -240,11 +239,10 @@ public class ProxyConnector extends AbstractIoConnector {
      * {@inheritDoc}
      */
     @Override
-    protected IoFuture dispose0() throws Exception {
+    protected void dispose0() throws Exception {
         if (connector != null) {
             connector.dispose();
         }
-        return null;
     }
 
     /**

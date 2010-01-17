@@ -194,7 +194,7 @@ public abstract class AbstractIoConnector
     public final ConnectFuture connect(SocketAddress remoteAddress,
             SocketAddress localAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         if (isDisposing()) {
-            throw new IllegalStateException("Already disposed.");
+            throw new IllegalStateException("The connector has been disposed.");
         }
 
         if (remoteAddress == null) {

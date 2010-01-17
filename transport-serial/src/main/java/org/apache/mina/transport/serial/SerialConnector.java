@@ -30,14 +30,13 @@ import java.util.Enumeration;
 import java.util.TooManyListenersException;
 import java.util.concurrent.Executor;
 
-import org.apache.mina.core.service.AbstractIoConnector;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultConnectFuture;
-import org.apache.mina.core.session.IdleStatusChecker;
+import org.apache.mina.core.service.AbstractIoConnector;
 import org.apache.mina.core.service.IoConnector;
-import org.apache.mina.core.future.IoFuture;
-import org.apache.mina.core.session.IoSessionInitializer;
 import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.session.IdleStatusChecker;
+import org.apache.mina.core.session.IoSessionInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,10 +130,9 @@ public final class SerialConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected IoFuture dispose0() throws Exception {
+    protected void dispose0() throws Exception {
         // stop the idle checking task
         idleChecker.getNotifyingTask().cancel();
-        return null;
     }
 
     public TransportMetadata getTransportMetadata() {

@@ -31,7 +31,6 @@ import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultConnectFuture;
-import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoConnector;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandler;
@@ -299,12 +298,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      * {@inheritDoc}
      */
     @Override
-    protected final IoFuture dispose0() throws Exception {
-        if (!disposalFuture.isDone()) {
-            startupWorker();
-            wakeup();
-        }
-        return disposalFuture;
+    protected final void dispose0() throws Exception {
+        startupWorker();
+        wakeup();
     }
 
     /**

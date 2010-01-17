@@ -33,7 +33,6 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoProcessor;
@@ -135,15 +134,10 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
      * {@inheritDoc}
      */
     @Override
-    protected IoFuture dispose0() throws Exception {
+    protected void dispose0() throws Exception {
         unbind();
-        
-        if (!disposalFuture.isDone()) {
-            startupAcceptor();
-            wakeup();
-        }
-        
-        return disposalFuture;
+        startupAcceptor();
+        wakeup();
     }
 
     /**
