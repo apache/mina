@@ -33,6 +33,7 @@ import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.core.polling.AbstractPollingIoProcessor;
 import org.apache.mina.core.session.SessionState;
 import org.apache.mina.util.CircularQueue;
+import org.apache.tomcat.jni.File;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.Socket;
@@ -440,7 +441,26 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
      */
     @Override
     protected int transferFile(AprSession session, FileRegion region, int length) throws Exception {
-        throw new UnsupportedOperationException();
+        if (!region.hasFilename()) {
+            throw new UnsupportedOperationException();
+        }
+
+        long fd = File.open(region.getFilename(),
+                            File.APR_FOPEN_READ
+                                | File.APR_FOPEN_SENDFILE_ENABLED
+                                | File.APR_FOPEN_BINARY,
+                            0,
+                            Socket.pool(session.getDescriptor()));
+        long numWritten = Socket.sendfilen(session.getDescriptor(), fd, region.getPosition(), length, 0);
+        File.close(fd);
+
+        if (numWritten < 0) {
+            if (numWritten == -Status.EAGAIN) {
+                return 0;
+            }
+            throw new IOException(org.apache.tomcat.jni.Error.strerror((int) -numWritten) + " (code: " + numWritten + ")");
+        }
+        return (int) numWritten;
     }
 
     private void throwException(int code) throws IOException {

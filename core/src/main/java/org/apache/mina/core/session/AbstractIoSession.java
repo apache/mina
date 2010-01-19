@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.DefaultFileRegion;
+import org.apache.mina.core.file.FilenameFileRegion;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.DefaultCloseFuture;
@@ -412,7 +413,7 @@ public abstract class AbstractIoSession implements IoSession {
             } else if (message instanceof File) {
                 File file = (File) message;
                 openedFileChannel = new FileInputStream(file).getChannel();
-                message = new DefaultFileRegion(openedFileChannel, 0, openedFileChannel.size());
+                message = new FilenameFileRegion(file, openedFileChannel, 0, openedFileChannel.size());
             }
         } catch (IOException e) {
             ExceptionMonitor.getInstance().exceptionCaught(e);
