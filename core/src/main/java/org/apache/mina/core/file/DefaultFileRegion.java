@@ -78,4 +78,12 @@ public class DefaultFileRegion implements FileRegion {
         remainingBytes -= value;
     }
 
+	public String getFilename() {
+		return null;
+	}
+
+	public boolean hasFilename() {
+		return false;
+	}
+
 }
