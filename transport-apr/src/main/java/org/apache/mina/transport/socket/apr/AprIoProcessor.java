@@ -441,7 +441,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
      */
     @Override
     protected int transferFile(AprSession session, FileRegion region, int length) throws Exception {
-        if (!region.hasFilename()) {
+        if (region.getFilename() == null) {
             throw new UnsupportedOperationException();
         }
 
