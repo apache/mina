@@ -48,10 +48,6 @@ public class FilenameFileRegion extends DefaultFileRegion {
         this.file = file;
     }
 
-    public boolean hasFilename() {
-    	return true;
-    }
-    
     public String getFilename() {
     	return file.getAbsolutePath();
     }

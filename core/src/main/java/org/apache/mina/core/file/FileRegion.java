@@ -69,13 +69,6 @@ public interface FileRegion {
     long getWrittenBytes();
 
     /**
-     * Indicates if the FileRegion has the filename for the underlying FileChannel.
-     * 
-     * @return  true if getFilename() will return a valid filename
-     */
-    boolean hasFilename();
-    
-    /**
      * Provides an absolute filename for the underlying FileChannel.
      * 
      * @return  the absolute filename, or <tt>null</tt> if the FileRegion
