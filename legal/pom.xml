@@ -24,7 +24,6 @@
         <version>2.0.0-RC2-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.apache.mina</groupId>
     <artifactId>mina-legal</artifactId>
     <name>Apache MINA Legal</name>
     <url>http://mina.apache.org</url>
@@ -38,8 +37,8 @@
         <dependency>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
-            <version>1.0</version>
             <optional>true</optional>
+            <version>${version.jdom}</version>
         </dependency>
 
         <dependency>
@@ -52,35 +51,35 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>2.2.1</version>
+            <version>${version.maven.plugin.api}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>2.2.1</version>
+            <version>${version.maven.model}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-project</artifactId>
-            <version>2.2.1</version>
+            <version>${version.maven.project}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>1.1</version>
+            <version>${version.shade.plugin}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>pmd</groupId>
             <artifactId>pmd</artifactId>
-            <version>4.2</version>
+            <version>${version.pmd}</version>
         </dependency>
     </dependencies>
 </project>

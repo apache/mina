@@ -39,11 +39,13 @@
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
+      <version>${version}</version>
     </dependency>
 
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-integration-beans</artifactId>
+      <version>${version}</version>
     </dependency>
 
     <dependency>

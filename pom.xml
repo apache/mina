@@ -47,9 +47,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/tags/build-2.0.0-RC1-SNAPSHOT</connection>
-    <url>http://svn.apache.org/viewvc/directory/mina/tags/build-2.0.0-RC1-SNAPSHOT</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/build-2.0.0-RC1-SNAPSHOT</developerConnection>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/tags/build-2.0.0-RC2-SNAPSHOT</connection>
+    <url>http://svn.apache.org/viewvc/directory/mina/tags/build-2.0.0-RC2-SNAPSHOT</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/build-2.0.0-RC2-SNAPSHOT</developerConnection>
   </scm>
 
   <distributionManagement>
@@ -80,6 +80,7 @@
 
   <!-- Define the version for each of the used jar and maven plugins -->
   <properties>
+    <!-- Plugins -->
     <version.assembly.plugin>2.2-beta-5</version.assembly.plugin>
     <version.clean.plugin>2.3</version.clean.plugin>
     <version.compiler.plugin>2.1</version.compiler.plugin>
@@ -92,7 +93,32 @@
     <version.remote.resources.plugin>1.1</version.remote.resources.plugin>
     <version.site.plugin>2.1</version.site.plugin>
     <version.source.plugin>2.1.1</version.source.plugin>
+    <version.shade.plugin>1.3</version.shade.plugin>
     <version.surefire.plugin>2.4.3</version.surefire.plugin>
+
+    <version.maven.plugin.api>2.2.1</version.maven.plugin.api>
+    <version.maven.project>2.2.1</version.maven.project>
+    <version.maven.model>2.2.1</version.maven.model>
+
+    <!-- Jars -->
+    <version.springframework>2.5.6</version.springframework>
+    <version.ognl>2.7.3</version.ognl>
+    <version.easymock>2.5.2</version.easymock>
+    <version.easymockclassextension>2.5.2</version.easymockclassextension>
+    <version.tomcat.apr>5.5.23</version.tomcat.apr>
+    <version.jzlib>1.0.7</version.jzlib>
+    <version.slf4j.api>1.5.10</version.slf4j.api>
+    <version.slf4j.log4j12>1.5.10</version.slf4j.log4j12>
+    <version.slf4j.jcl.over.slf4j>1.5.10</version.slf4j.jcl.over.slf4j>
+    <version.log4j>1.2.14</version.log4j>
+    <version.rmock>2.0.2</version.rmock>
+    <version.junit>4.7</version.junit>
+    <version.jdom>1.0</version.jdom>
+    <version.pmd>4.2.5</version.pmd>
+    <version.jboss.javassist>3.7.ga</version.jboss.javassist>
+    <version.xbean.spring>3.6</version.xbean.spring>
+    <!--version.></version.>
+    <version.></version.-->
   </properties>
 
   <modules>

@@ -32,16 +32,19 @@
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
+      <version>${version}</version>
     </dependency>
 
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-integration-jmx</artifactId>
+      <version>${version}</version>
     </dependency>
 
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-statemachine</artifactId>
+      <version>${version}</version>
     </dependency>
 
     <dependency>

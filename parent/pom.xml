@@ -17,270 +17,288 @@
   under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.apache.mina</groupId>
-        <artifactId>build</artifactId>
-        <version>2.0.0-RC2-SNAPSHOT</version>
-    </parent>
-
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
     <groupId>org.apache.mina</groupId>
-    <artifactId>mina-parent</artifactId>
-    <name>Apache MINA Parent POM</name>
-    <url>http://mina.apache.org</url>
-    <packaging>pom</packaging>
+    <artifactId>build</artifactId>
+    <version>2.0.0-RC2-SNAPSHOT</version>
+  </parent>
 
-    <properties>
-        <symbolicName>${exportedPackage}</symbolicName>
-    </properties>
+  <groupId>org.apache.mina</groupId>
+  <artifactId>mina-parent</artifactId>
+  <name>Apache MINA Parent POM</name>
+  <url>http://mina.apache.org</url>
+  <packaging>pom</packaging>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- Submodules -->
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>mina-core</artifactId>
-                <version>${pom.version}</version>
-            </dependency>
+  <properties>
+    <symbolicName>${exportedPackage}</symbolicName>
+  </properties>
 
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>mina-transport-apr</artifactId>
-                <version>${pom.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>mina-filter-compression</artifactId>
-                <version>${pom.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>mina-integration-beans</artifactId>
-                <version>${pom.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>mina-integration-ognl</artifactId>
-                <version>${pom.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>mina-integration-jmx</artifactId>
-                <version>${pom.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>${groupId}</groupId>
-                <artifactId>mina-statemachine</artifactId>
-                <version>${pom.version}</version>
-            </dependency>
-
-            <!-- Transport -->
-            <dependency>
-                <groupId>tomcat</groupId>
-                <artifactId>tomcat-apr</artifactId>
-                <version>5.5.23</version>
-            </dependency>
-
-            <!-- Filter -->
-            <dependency>
-                <groupId>com.jcraft</groupId>
-                <artifactId>jzlib</artifactId>
-                <version>1.0.7</version>
-            </dependency>
-
-            <!-- Integration -->
-
-            <dependency>
-                <groupId>org.apache.xbean</groupId>
-                <artifactId>xbean-spring</artifactId>
-                <version>3.4.3</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring</artifactId>
-                <version>2.5.5</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>ognl</groupId>
-                <artifactId>ognl</artifactId>
-                <version>2.7.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>jboss</groupId>
-                <artifactId>javassist</artifactId>
-                <version>3.7.ga</version>
-            </dependency>
-
-            <!-- State Machine -->
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.4</version>
-            </dependency>
-
-            <!-- Logging -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.5.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>1.5.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.5.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.14</version>
-            </dependency>
-
-            <!-- Testing -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.4</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymock</artifactId>
-                <version>2.3</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymockclassextension</artifactId>
-                <version>2.3</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.agical.rmock</groupId>
-                <artifactId>rmock</artifactId>
-                <version>2.0.0</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
+  <dependencyManagement>
     <dependencies>
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>compile</scope>
-        </dependency>
+      <!-- Submodules -->
+      <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>mina-core</artifactId>
+        <version>${version}</version>
+      </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>mina-transport-apr</artifactId>
+        <version>${version}</version>
+      </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>mina-filter-compression</artifactId>
+        <version>${version}</version>
+      </dependency>
 
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>mina-integration-beans</artifactId>
+        <version>${version}</version>
+      </dependency>
 
-        <!-- Testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>mina-integration-ognl</artifactId>
+        <version>${version}</version>
+      </dependency>
 
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>mina-integration-jmx</artifactId>
+        <version>${version}</version>
+      </dependency>
 
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>mina-statemachine</artifactId>
+        <version>${version}</version>
+      </dependency>
 
-        <dependency>
-            <groupId>com.agical.rmock</groupId>
-            <artifactId>rmock</artifactId>
-            <scope>test</scope>
-        </dependency>
+      <!-- Transport -->
+      <dependency>
+        <groupId>tomcat</groupId>
+        <artifactId>tomcat-apr</artifactId>
+        <version>${version.tomcat.apr}</version>
+      </dependency>
+
+      <!-- Filter -->
+      <dependency>
+        <groupId>com.jcraft</groupId>
+        <artifactId>jzlib</artifactId>
+        <version>${version.jzlib}</version>
+      </dependency>
+
+      <!-- Integration -->
+
+      <dependency>
+        <groupId>org.apache.xbean</groupId>
+        <artifactId>xbean-spring</artifactId>
+        <version>${version.xbean.spring}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring</artifactId>
+        <version>${version.springframework}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>ognl</groupId>
+        <artifactId>ognl</artifactId>
+        <version>${version.ognl}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jboss</groupId>
+        <artifactId>javassist</artifactId>
+        <version>${version.jboss.javassist}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jdom</groupId>
+        <artifactId>jdom</artifactId>
+        <version>${version.jdom}</version>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>pmd</groupId>
+        <artifactId>pmd</artifactId>
+        <version>${version.pmd}</version>
+      </dependency>
+
+      <!-- State Machine -->
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.4</version>
+      </dependency>
+
+      <!-- Logging -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${version.slf4j.api}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${version.slf4j.jcl.over.slf4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${version.slf4j.log4j12}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
+      <!-- Testing -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>${version.easymock}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymockclassextension</artifactId>
+        <version>${version.easymockclassextension}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.agical.rmock</groupId>
+        <artifactId>rmock</artifactId>
+        <version>${version.rmock}</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
+  </dependencyManagement>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>1.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.mina</groupId>
-                        <artifactId>mina-legal</artifactId>
-                        <version>${pom.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <configuration>
-                            <resourceBundles>
-                                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
-                            </resourceBundles>
-                            <supplementalModels>
-                                <supplementalModel>notices.xml</supplementalModel>
-                            </supplementalModels>
-                            <properties>
-                                <projectName>Apache MINA</projectName>
-                                <addLicense>true</addLicense>
-                                <addArtifact>true</addArtifact>
-                            </properties>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+  <dependencies>
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>pmd</groupId>
+      <artifactId>pmd</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.agical.rmock</groupId>
+      <artifactId>rmock</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <version>1.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.mina</groupId>
+            <artifactId>mina-legal</artifactId>
+            <version>${version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process</goal>
+            </goals>
+            <configuration>
+              <resourceBundles>
+                <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+              </resourceBundles>
+              <supplementalModels>
+                <supplementalModel>notices.xml</supplementalModel>
+              </supplementalModels>
+              <properties>
+                <projectName>Apache MINA</projectName>
+                <addLicense>true</addLicense>
+                <addArtifact>true</addArtifact>
+              </properties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
