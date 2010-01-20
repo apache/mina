@@ -37,7 +37,7 @@
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${pom.version}</version>
+      <version>${version}</version>
     </dependency>
 
     <dependency>
@@ -46,6 +46,5 @@
       <version>5.5.23</version>
     </dependency>
   </dependencies>
-  
 </project>
 
