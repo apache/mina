@@ -18,12 +18,14 @@
  */
 package org.apache.mina.example.haiku;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class HaikuValidatorTest extends TestCase {
+public class HaikuValidatorTest {
     // from http://allrileyedup.blogspot.com/2006/10/dont-hassle-haiku.html -- good friend of proyal@apache.org
     private static final String[] HAIKUS = {
             "This class is boring.\n" + "Will David ever shut up?\n"
@@ -61,13 +63,12 @@ public class HaikuValidatorTest extends TestCase {
 
     private HaikuValidator validator;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         validator = new HaikuValidator();
     }
 
+    @Test
     public void testValidateHaikus() throws Exception {
         for (String s : HAIKUS) {
             String[] lines = s.split("\n");

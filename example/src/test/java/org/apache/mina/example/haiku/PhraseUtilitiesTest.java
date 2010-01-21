@@ -18,12 +18,15 @@
  */
 package org.apache.mina.example.haiku;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class PhraseUtilitiesTest extends TestCase {
+public class PhraseUtilitiesTest {
+    @Test
     public void testCountSyllablesInWord() throws Exception {
         assertSyllableCount(1, "one");
         assertSyllableCount(1, "I");

@@ -19,9 +19,11 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.net.InetSocketAddress;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.Assert;
+import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
@@ -87,7 +89,7 @@ public class DatagramRecyclerTest {
             // The life cycle of the acceptor-side connection is managed by the recycler.
             future.getSession().close(true);
             future.getSession().getCloseFuture().awaitUninterruptibly();
-            Assert.assertTrue(future.getSession().getCloseFuture().isClosed());
+            assertTrue(future.getSession().getCloseFuture().isClosed());
 
             // Wait until the acceptor-side connection is closed.
             while (acceptorHandler.session == null) {
@@ -96,13 +98,13 @@ public class DatagramRecyclerTest {
             acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000);
 
             // Is it closed?
-            Assert.assertTrue(acceptorHandler.session.getCloseFuture()
+            assertTrue(acceptorHandler.session.getCloseFuture()
                     .isClosed());
 
             Thread.sleep(1000);
 
-            Assert.assertEquals("CROPSECL", connectorHandler.result.toString());
-            Assert.assertEquals("CROPRECL", acceptorHandler.result.toString());
+            assertEquals("CROPSECL", connectorHandler.result.toString());
+            assertEquals("CROPRECL", acceptorHandler.result.toString());
         } finally {
             acceptor.unbind();
         }
@@ -135,7 +137,7 @@ public class DatagramRecyclerTest {
                 Thread.yield();
             }
             acceptorHandler.session.close(true);
-            Assert.assertTrue(
+            assertTrue(
                     acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
             
             IoSession oldSession = acceptorHandler.session;
@@ -154,19 +156,19 @@ public class DatagramRecyclerTest {
             // Write whatever to trigger the acceptor again.
             WriteFuture wf = future.getSession().write(
                     IoBuffer.allocate(1)).awaitUninterruptibly();
-            Assert.assertTrue(wf.isWritten());
+            assertTrue(wf.isWritten());
             
             // Make sure the connection is closed before recycler closes it.
             while (acceptorHandler.session == null) {
                 Thread.yield();
             }
             acceptorHandler.session.close(true);
-            Assert.assertTrue(
+            assertTrue(
                     acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
 
             future.getSession().close(true).awaitUninterruptibly();
             
-            Assert.assertNotSame(oldSession, acceptorHandler.session);
+            assertNotSame(oldSession, acceptorHandler.session);
         } finally {
             acceptor.unbind();
         }
