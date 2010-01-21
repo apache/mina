@@ -20,6 +20,7 @@
 package org.apache.mina.proxy;
 
 import static org.apache.mina.proxy.utils.ByteUtilities.asHex;
+import static org.junit.Assert.assertEquals;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -27,12 +28,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMResponses;
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMUtilities;
 import org.apache.mina.proxy.utils.ByteUtilities;
 import org.apache.mina.proxy.utils.MD4Provider;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
-public class NTLMTest extends TestCase {
+public class NTLMTest {
     private final static Logger logger = LoggerFactory
             .getLogger(NTLMTest.class);
 
@@ -55,6 +55,7 @@ public class NTLMTest extends TestCase {
     /**
      * Tests bytes manipulations.
      */
+    @Test
     public void testEncoding() throws UnsupportedEncodingException {
         assertEquals("d204", asHex(ByteUtilities.writeShort((short) 1234)));
         assertEquals("d2040000", asHex(ByteUtilities.writeInt(1234)));
@@ -70,6 +71,7 @@ public class NTLMTest extends TestCase {
     /**
      * Tests conversions to and from network byte order.
      */
+    @Test
     public void testMethods() {
         byte[] buf = new byte[4];
         ByteUtilities.intToNetworkByteOrder(1234, buf, 0, 4);
@@ -80,6 +82,7 @@ public class NTLMTest extends TestCase {
     /**
      * Tests security buffers.
      */
+    @Test
     public void testSecurityBuffer() {
         byte[] secBuf = new byte[8];
         NTLMUtilities.writeSecurityBuffer((short) 1234, (short) 1234, 4321,
@@ -90,6 +93,7 @@ public class NTLMTest extends TestCase {
     /**
      * Tests creating a type 1 message.
      */
+    @Test
     public void testType1Message() {
         int customFlags = NTLMUtilities.FLAG_NEGOTIATE_UNICODE
                 | NTLMUtilities.FLAG_NEGOTIATE_OEM
@@ -125,6 +129,7 @@ public class NTLMTest extends TestCase {
      * Tests creating a type 3 message.
      * WARNING: Will silently fail if no MD4 digest provider is available.
      */
+    @Test
     public void testType3Message() throws Exception {
         try {
             MessageDigest.getInstance("MD4");
@@ -191,6 +196,7 @@ public class NTLMTest extends TestCase {
     /**
      * Tests flags manipulations.
      */
+    @Test
     public void testFlags() {
         int flags = NTLMUtilities.FLAG_NEGOTIATE_UNICODE
                 | NTLMUtilities.FLAG_REQUEST_SERVER_AUTH_REALM
@@ -220,6 +226,7 @@ public class NTLMTest extends TestCase {
      * Tests response computing.
      * WARNING: Will silently fail if no MD4 digest provider is available.
      */
+    @Test
     public void testResponses() throws Exception {
         try {
             MessageDigest.getInstance("MD4");

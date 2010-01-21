@@ -19,14 +19,20 @@
  */
 package org.apache.mina.example.echoserver;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Arrays;
 
 import org.apache.mina.example.echoserver.ssl.SslServerSocketFactory;
 import org.apache.mina.example.echoserver.ssl.SslSocketFactory;
+import org.junit.Test;
 
 /**
  * Tests echo server example.
@@ -37,10 +43,12 @@ public class AcceptorTest extends AbstractTest {
     public AcceptorTest() {
     }
 
+    @Test
     public void testTCP() throws Exception {
         testTCP0(new Socket("127.0.0.1", port));
     }
 
+    @Test
     public void testTCPWithSSL() throws Exception {
         // Add an SSL filter
         useSSL = true;
@@ -78,7 +86,7 @@ public class AcceptorTest extends AbstractTest {
                 readBytes += nBytes;
             }
 
-            assertEquals(writeBuf, readBuf);
+            assertTrue(Arrays.equals( writeBuf, readBuf));
         }
 
         client.setSoTimeout(500);
@@ -109,7 +117,7 @@ public class AcceptorTest extends AbstractTest {
 
             client.receive(rp);
             assertEquals(writeBuf.length, rp.getLength());
-            assertEquals(writeBuf, readBuf);
+            assertTrue(Arrays.equals(writeBuf, readBuf));
         }
 
         try {
@@ -125,9 +133,5 @@ public class AcceptorTest extends AbstractTest {
         for (int j = writeBuf.length - 1; j >= 0; j--) {
             writeBuf[j] = (byte) (j + i);
         }
-    }
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(AcceptorTest.class);
     }
 }

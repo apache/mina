@@ -19,13 +19,17 @@
  */
 package org.apache.mina.transport;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
@@ -35,17 +39,19 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionInitializer;
 import org.apache.mina.util.AvailablePortFinder;
+import org.junit.Test;
 
 /**
  * Tests a generic {@link IoConnector}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractConnectorTest extends TestCase {
+public abstract class AbstractConnectorTest {
 
     protected abstract IoAcceptor createAcceptor();
     protected abstract IoConnector createConnector();
 
+    @Test
     public void testConnectFutureSuccessTiming() throws Exception {
         int port = AvailablePortFinder.getNextAvailable(1025);
         IoAcceptor acceptor = createAcceptor();
@@ -84,6 +90,7 @@ public abstract class AbstractConnectorTest extends TestCase {
         }
     }
 
+    @Test
     public void testConnectFutureFailureTiming() throws Exception {
         int port = AvailablePortFinder.getNextAvailable(1025);
         final StringBuffer buf = new StringBuffer();
@@ -127,6 +134,7 @@ public abstract class AbstractConnectorTest extends TestCase {
     /**
      * Test to make sure the SessionCallback gets invoked before IoHandler.sessionCreated.
      */
+    @Test
     public void testSessionCallbackInvocation() throws Exception {
         final int callbackInvoked = 0;
         final int sessionCreatedInvoked = 1;

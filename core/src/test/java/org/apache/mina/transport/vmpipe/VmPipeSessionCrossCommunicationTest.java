@@ -18,6 +18,8 @@
  */
 package org.apache.mina.transport.vmpipe;
 
+import static org.junit.Assert.fail;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -25,20 +27,20 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.junit.Test;
 
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class VmPipeSessionCrossCommunicationTest extends TestCase {
+public class VmPipeSessionCrossCommunicationTest {
+    @Test
     public void testOneSessionTalkingBackAndForthDoesNotDeadlock() throws Exception {
         final VmPipeAddress address = new VmPipeAddress(1);
         final IoConnector connector = new VmPipeConnector();

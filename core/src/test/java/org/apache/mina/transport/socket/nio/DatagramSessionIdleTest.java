@@ -19,20 +19,22 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.net.InetSocketAddress;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
+import java.net.InetSocketAddress;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+import org.junit.Test;
 
 /**
  * Test for DIRMINA-732
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DatagramSessionIdleTest extends TestCase {
+public class DatagramSessionIdleTest {
 
     private boolean readerIdleReceived;
 
@@ -63,6 +65,7 @@ public class DatagramSessionIdleTest extends TestCase {
         }
     }
 
+    @Test
     public void testSessionIdle() throws Exception {
         final int READER_IDLE_TIME = 3;//seconds
         final int WRITER_IDLE_TIME = READER_IDLE_TIME + 2;//seconds

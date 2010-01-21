@@ -19,10 +19,10 @@
  */
 package org.apache.mina.handler.demux;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.core.session.IoSession;
 import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests {@link org.apache.mina.handler.demux.DemuxingIoHandler}.
@@ -30,7 +30,7 @@ import org.easymock.EasyMock;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @SuppressWarnings("unchecked")
-public class DemuxingIoHandlerTest extends TestCase {
+public class DemuxingIoHandlerTest {
     MessageHandler handler1;
 
     MessageHandler handler2;
@@ -41,10 +41,8 @@ public class DemuxingIoHandlerTest extends TestCase {
 
     Object[] msg;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         /*
          * Create the messages.
          */
@@ -69,6 +67,7 @@ public class DemuxingIoHandlerTest extends TestCase {
         session = EasyMock.createMock( IoSession.class);
     }
 
+    @Test
     public void testFindHandlerByClass() throws Exception {
         /*
          * Record expectations.
@@ -126,6 +125,7 @@ public class DemuxingIoHandlerTest extends TestCase {
         EasyMock.verify(handler3);
     }
 
+    @Test
     public void testFindHandlerByInterface() throws Exception {
         /*
          * Record expectations.

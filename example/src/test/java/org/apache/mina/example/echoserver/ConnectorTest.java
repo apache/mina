@@ -19,9 +19,11 @@
  */
 package org.apache.mina.example.echoserver;
 
-import java.net.InetSocketAddress;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import junit.framework.Assert;
+import java.net.InetSocketAddress;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
@@ -36,6 +38,8 @@ import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
+import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +64,8 @@ public class ConnectorTest extends AbstractTest {
         // Do nothing
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         handler = new EchoConnectorHandler();
         connectorSSLFilter = new SslFilter(BogusSslContextFactory
@@ -69,11 +73,13 @@ public class ConnectorTest extends AbstractTest {
         connectorSSLFilter.setUseClientMode(true); // set client mode
     }
 
+    @Test
     public void testTCP() throws Exception {
         IoConnector connector = new NioSocketConnector();
         testConnector(connector);
     }
 
+    @Test
     public void testTCPWithSSL() throws Exception {
         useSSL = true;
         // Create a connector
@@ -84,6 +90,7 @@ public class ConnectorTest extends AbstractTest {
         testConnector(connector);
     }
 
+    @Test
     public void testUDP() throws Exception {
         IoConnector connector = new NioDatagramConnector();
         testConnector(connector);
@@ -125,7 +132,7 @@ public class ConnectorTest extends AbstractTest {
             }
 
             if (session == null) {
-                Assert.fail("Failed to find out an appropriate local address.");
+                fail("Failed to find out an appropriate local address.");
             }
         }
 
@@ -156,11 +163,11 @@ public class ConnectorTest extends AbstractTest {
             waitForResponse(handler, 1);
 
             handler.readBuf.flip();
-            Assert.assertEquals(1, handler.readBuf.remaining());
-            Assert.assertEquals((byte) '.', handler.readBuf.get());
+            assertEquals(1, handler.readBuf.remaining());
+            assertEquals((byte) '.', handler.readBuf.get());
 
             // Now start TLS connection
-            Assert.assertTrue(connectorSSLFilter.startSsl(session));
+            assertTrue(connectorSSLFilter.startSsl(session));
             testConnector0(session);
         }
 
@@ -197,15 +204,17 @@ public class ConnectorTest extends AbstractTest {
         //// we share readBuf.
         readBuf.flip();
         LOGGER.info("readBuf: " + readBuf);
-        Assert.assertEquals(DATA_SIZE * COUNT, readBuf.remaining());
+        assertEquals(DATA_SIZE * COUNT, readBuf.remaining());
         IoBuffer expectedBuf = IoBuffer.allocate(DATA_SIZE * COUNT);
+        
         for (int i = 0; i < COUNT; i++) {
             expectedBuf.limit((i + 1) * DATA_SIZE);
             fillWriteBuffer(expectedBuf, i);
         }
+        
         expectedBuf.position(0);
 
-        assertEquals(expectedBuf, readBuf);
+        isEquals(expectedBuf, readBuf);
     }
 
     private void waitForResponse(EchoConnectorHandler handler, int bytes)
@@ -217,17 +226,13 @@ public class ConnectorTest extends AbstractTest {
             Thread.sleep(10);
         }
 
-        Assert.assertEquals(bytes, handler.readBuf.position());
+        assertEquals(bytes, handler.readBuf.position());
     }
 
     private void fillWriteBuffer(IoBuffer writeBuf, int i) {
         while (writeBuf.remaining() > 0) {
             writeBuf.put((byte) i++);
         }
-    }
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(ConnectorTest.class);
     }
 
     private static class EchoConnectorHandler extends IoHandlerAdapter {
