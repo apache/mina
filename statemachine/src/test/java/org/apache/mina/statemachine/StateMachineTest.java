@@ -19,23 +19,23 @@
  */
 package org.apache.mina.statemachine;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-import org.apache.mina.statemachine.State;
-import org.apache.mina.statemachine.StateControl;
-import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.context.DefaultStateContext;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.AbstractTransition;
+import org.junit.Test;
 
 /**
  * Tests {@link StateMachine}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class StateMachineTest extends TestCase {
+public class StateMachineTest {
 
+    @Test
     public void testBreakAndContinue() throws Exception {
         State s1 = new State("s1");
         s1.addTransition(new BreakAndContinueTransition("foo"));
@@ -47,6 +47,7 @@ public class StateMachineTest extends TestCase {
         assertEquals(true, context.getAttribute("success"));
     }
     
+    @Test
     public void testBreakAndGotoNow() throws Exception {
         State s1 = new State("s1");
         State s2 = new State("s2");
@@ -59,6 +60,7 @@ public class StateMachineTest extends TestCase {
         assertEquals(true, context.getAttribute("success"));
     }
     
+    @Test
     public void testBreakAndGotoNext() throws Exception {
         State s1 = new State("s1");
         State s2 = new State("s2");

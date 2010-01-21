@@ -19,25 +19,26 @@
  */
 package org.apache.mina.statemachine;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Method;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.mina.statemachine.State;
-import org.apache.mina.statemachine.StateMachine;
-import org.apache.mina.statemachine.StateMachineCreationException;
-import org.apache.mina.statemachine.StateMachineFactory;
 import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.transition.MethodTransition;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests {@link StateMachineFactory}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class StateMachineFactoryTest extends TestCase {
+public class StateMachineFactoryTest {
     Method barInA;
     Method error;
     Method fooInA;
@@ -45,7 +46,8 @@ public class StateMachineFactoryTest extends TestCase {
     Method barInC;
     Method fooOrBarInCOrFooInD;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         barInA = States.class.getDeclaredMethod("barInA", new Class[0]);
         error = States.class.getDeclaredMethod("error", new Class[0]);
         fooInA = States.class.getDeclaredMethod("fooInA", new Class[0]);
@@ -54,6 +56,7 @@ public class StateMachineFactoryTest extends TestCase {
         fooOrBarInCOrFooInD = States.class.getDeclaredMethod("fooOrBarInCOrFooInD", new Class[0]);
     }
 
+    @Test
     public void testCreate() throws Exception {
         States states = new States();
         StateMachine sm = StateMachineFactory.getInstance(Transition.class).create(States.A, states);
@@ -95,6 +98,7 @@ public class StateMachineFactoryTest extends TestCase {
         assertEquals(new MethodTransition("foo", fooOrBarInCOrFooInD, states), trans.get(0));
     }
     
+    @Test
     public void testCreateStates() throws Exception {
         State[] states = StateMachineFactory.createStates(StateMachineFactory.getFields(States.class));
         assertEquals(States.A, states[0].getId());
@@ -107,6 +111,7 @@ public class StateMachineFactoryTest extends TestCase {
         assertEquals(states[0], states[3].getParent());
     }
     
+    @Test
     public void testCreateStatesMissingParents() throws Exception {
         try {
             StateMachineFactory.createStates(StateMachineFactory.getFields(StatesWithMissingParents.class));

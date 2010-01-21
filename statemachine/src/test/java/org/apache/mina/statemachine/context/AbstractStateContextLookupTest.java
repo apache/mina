@@ -19,22 +19,20 @@
  */
 package org.apache.mina.statemachine.context;
 
+import static org.junit.Assert.assertSame;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.mina.statemachine.context.AbstractStateContextLookup;
-import org.apache.mina.statemachine.context.DefaultStateContextFactory;
-import org.apache.mina.statemachine.context.StateContext;
-
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests {@link AbstractStateContextLookup}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class AbstractStateContextLookupTest extends TestCase {
-
+public class AbstractStateContextLookupTest {
+    @Test
     public void testLookup() throws Exception {
         Map<String, StateContext> map = new HashMap<String, StateContext>();
         AbstractStateContextLookup lookup = new AbstractStateContextLookup(
