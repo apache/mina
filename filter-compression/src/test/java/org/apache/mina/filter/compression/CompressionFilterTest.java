@@ -19,7 +19,7 @@
  */
 package org.apache.mina.filter.compression;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterChain;
@@ -29,11 +29,13 @@ import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class CompressionFilterTest extends TestCase {
+public class CompressionFilterTest {
     private MockControl mockSession;
 
     private MockControl mockNextFilter;
@@ -83,8 +85,8 @@ public class CompressionFilterTest extends TestCase {
             + "The quick brown fox jumps over the lazy dog.  "
             + "The quick brown fox jumps over the lazy dog.  ";
 
-    @Override
-    protected void setUp() {
+    @Before
+    public void setUp() {
         // create the necessary mock controls.
         mockSession = MockControl.createControl(IoSession.class);
         mockNextFilter = MockControl.createControl(NextFilter.class);
@@ -109,6 +111,7 @@ public class CompressionFilterTest extends TestCase {
         actualInflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
     }
 
+    @Test
     public void testCompression() throws Exception {
         // prepare the input data
         IoBuffer buf = IoBuffer.wrap(strCompress.getBytes("UTF8"));
@@ -154,6 +157,7 @@ public class CompressionFilterTest extends TestCase {
         assertTrue(true);
     }
 
+    @Test
     public void testDecompression() throws Exception {
         // prepare the input data
         IoBuffer buf = IoBuffer.wrap(strCompress.getBytes("UTF8"));

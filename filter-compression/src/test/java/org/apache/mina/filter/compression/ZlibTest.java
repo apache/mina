@@ -19,27 +19,31 @@
  */
 package org.apache.mina.filter.compression;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.core.buffer.IoBuffer;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ZlibTest extends TestCase {
+public class ZlibTest {
     private Zlib deflater = null;
 
     private Zlib inflater = null;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         deflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER);
         inflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
     }
 
+    @Test
     public void testCompression() throws Exception {
         String strInput = "";
 
@@ -61,6 +65,7 @@ public class ZlibTest extends TestCase {
         }
     }
 
+    @Test
     public void testCorruptedData() throws Exception {
         String strInput = "Hello World";
         IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
@@ -75,6 +80,7 @@ public class ZlibTest extends TestCase {
         assertFalse(strOutput.equals(strInput));
     }
 
+    @Test
     public void testCorruptedHeader() throws Exception {
         String strInput = "Hello World";
         IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
@@ -92,6 +98,7 @@ public class ZlibTest extends TestCase {
         assertTrue(false);
     }
 
+    @Test
     public void testFragments() throws Exception {
         String strInput = "";
         for (int i = 0; i < 10; i++) {
