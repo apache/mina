@@ -20,6 +20,7 @@
 package org.apache.mina.proxy;
 
 import static org.apache.mina.proxy.utils.ByteUtilities.asHex;
+import static org.junit.Assert.assertEquals;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -27,8 +28,8 @@ import java.security.NoSuchProviderException;
 import java.security.Security;
 
 import org.apache.mina.proxy.utils.MD4Provider;
-
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * MD4Test.java - JUnit testcase that tests the rfc 1320 test suite.
@@ -37,13 +38,13 @@ import junit.framework.TestCase;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
-public class MD4Test extends TestCase {
+public class MD4Test {
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         if (Security.getProvider(MD4Provider.PROVIDER_NAME) == null) {
             System.out.print("Adding MINA provider...");
             Security.addProvider(new MD4Provider());
@@ -54,6 +55,7 @@ public class MD4Test extends TestCase {
     /**
      * Test suite for the MD4 algorithm. 
      */
+    @Test
     public void testRFCVectors() throws NoSuchAlgorithmException,
             NoSuchProviderException {
         MessageDigest md4 = MessageDigest.getInstance("MD4",
@@ -76,6 +78,7 @@ public class MD4Test extends TestCase {
      * Original test vector found on <a href="http://en.wikipedia.org/wiki/MD4">wikipedia(en)</a>
      * and <a href="http://fr.wikipedia.org/wiki/MD4">wikipedia(fr)</a>
      */
+    @Test
     public void testWikipediaVectors() throws NoSuchAlgorithmException,
             NoSuchProviderException {
         MessageDigest md4 = MessageDigest.getInstance("MD4",
@@ -98,10 +101,7 @@ public class MD4Test extends TestCase {
      */
     private static void doTest(MessageDigest md4, String expected,
             String testVector) {
-        System.out.print("Testing vector [" + testVector + "]: ");
         String result = asHex(md4.digest(testVector.getBytes()));
-        System.out.print(result);
         assertEquals(expected, result);
-        //System.out.println(" ... Ok");
     }
 }

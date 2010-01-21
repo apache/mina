@@ -19,27 +19,31 @@
  */
 package org.apache.mina.example.chat;
 
-import junit.framework.TestCase;
-import org.springframework.context.ConfigurableApplicationContext;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.mina.core.service.IoService;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SpringMainTest extends TestCase {
+public class SpringMainTest {
 
     private ConfigurableApplicationContext appContext;
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @Before
+    public void tearDown() throws Exception {
         if (appContext != null) {
             appContext.close();
         }
     }
 
+    @Test
     public void testContext() {
         appContext = SpringMain.getApplicationContext();
         IoService service = (IoService) appContext.getBean("ioAcceptor");

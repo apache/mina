@@ -19,11 +19,16 @@
  */
 package org.apache.mina.transport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Collection;
-
-import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
@@ -36,6 +41,9 @@ import org.apache.mina.transport.socket.DatagramAcceptor;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;
+import org.junit.After;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +52,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractBindTest extends TestCase {
+public abstract class AbstractBindTest {
     protected final IoAcceptor acceptor;
 
     protected int port;
@@ -99,7 +107,7 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
-    @Override
+    @After
     public void tearDown() {
         try {
             acceptor.dispose();
@@ -110,6 +118,7 @@ public abstract class AbstractBindTest extends TestCase {
         acceptor.setDefaultLocalAddress(null);
     }
 
+    @Test
     public void testAnonymousBind() throws Exception {
         acceptor.setHandler(new IoHandlerAdapter());
         acceptor.setDefaultLocalAddress(null);
@@ -124,6 +133,7 @@ public abstract class AbstractBindTest extends TestCase {
         acceptor.unbind(acceptor.getLocalAddress());
     }
 
+    @Test
     public void testDuplicateBind() throws IOException {
         bind(false);
 
@@ -136,6 +146,7 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
+    @Test
     public void testDuplicateUnbind() throws IOException {
         bind(false);
 
@@ -146,6 +157,7 @@ public abstract class AbstractBindTest extends TestCase {
         acceptor.unbind();
     }
 
+    @Test
     public void testManyTimes() throws IOException {
         bind(true);
 
@@ -155,6 +167,7 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
+    @Test
     public void testUnbindDisconnectsClients() throws Exception {
         bind(true);
         IoConnector connector = newConnector();
@@ -185,6 +198,7 @@ public abstract class AbstractBindTest extends TestCase {
         }
     }
 
+    @Test
     public void testUnbindResume() throws Exception {
         bind(true);
         IoConnector connector = newConnector();
@@ -230,7 +244,9 @@ public abstract class AbstractBindTest extends TestCase {
         assertEquals(1, managedSession.size());
     }
 
-    public void _testRegressively() throws IOException {
+    @Test
+    @Ignore
+    public void testRegressively() throws IOException {
         setReuseAddress(true);
 
         SocketAddress addr = createSocketAddress(port);
@@ -240,9 +256,6 @@ public abstract class AbstractBindTest extends TestCase {
         for (int i = 0; i < 1048576; i++) {
             acceptor.bind();
             acceptor.unbind();
-            //if (i % 100 == 0) {
-                //System.out.println(i + " (" + new Date() + ")");
-            //}
         }
         bind(false);
     }

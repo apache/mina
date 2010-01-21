@@ -19,10 +19,10 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.InetSocketAddress;
 import java.net.PortUnreachableException;
-
-import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
@@ -31,13 +31,14 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.util.AvailablePortFinder;
+import org.junit.Test;
 
 /**
  * Tests {@link DatagramSessionConfig#setCloseOnPortUnreachable(boolean)}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DatagramPortUnreachableTest extends TestCase {
+public class DatagramPortUnreachableTest {
 
     Object mutex = new Object();
     
@@ -78,11 +79,13 @@ public class DatagramPortUnreachableTest extends TestCase {
         connector.dispose();
     }
 
+    @Test
     public void testPortUnreachableClosesSession() throws Exception {
         // session should be closing
         runTest(true);
     }
 
+    @Test
     public void testNormal() throws Exception {
         // test that session is not closed on port unreachable exception
         runTest(false);

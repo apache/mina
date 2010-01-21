@@ -18,13 +18,12 @@
  *
  */
 package org.apache.mina.example.echoserver;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
-
-import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.IoAcceptor;
@@ -35,6 +34,8 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.util.AvailablePortFinder;
+import org.junit.After;
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractTest extends TestCase {
+public abstract class AbstractTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractTest.class);
 
     protected boolean useSSL;
@@ -60,11 +61,11 @@ public abstract class AbstractTest extends TestCase {
         // Do nothing
     }
 
-    protected static void assertEquals(byte[] expected, byte[] actual) {
+    protected static void isEquals(byte[] expected, byte[] actual) {
         assertEquals(toString(expected), toString(actual));
     }
 
-    protected static void assertEquals(IoBuffer expected, IoBuffer actual) {
+    protected static void isEquals(IoBuffer expected, IoBuffer actual) {
         assertEquals(toString(expected), toString(actual));
     }
 
@@ -81,8 +82,8 @@ public abstract class AbstractTest extends TestCase {
         return buf.getHexDump();
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         // Disable SSL by default
         useSSL = false;
 
@@ -182,8 +183,8 @@ public abstract class AbstractTest extends TestCase {
         LOGGER.info("Using port " + port + " for testing.");
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         if (boundAddress != null) {
             socketAcceptor.dispose();
             datagramAcceptor.dispose();

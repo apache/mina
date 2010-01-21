@@ -22,7 +22,6 @@ package org.apache.mina.transport.socket.nio;
 import java.net.InetSocketAddress;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter;
@@ -35,13 +34,16 @@ import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.AvailablePortFinder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests if {@link NioDatagramAcceptor} session is configured properly.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DatagramConfigTest extends TestCase {
+public class DatagramConfigTest {
     private IoAcceptor acceptor;
     private IoConnector connector;
     String result;
@@ -50,19 +52,20 @@ public class DatagramConfigTest extends TestCase {
         // Do nothing
     }
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         result = "";
         acceptor = new NioDatagramAcceptor();
         connector = new NioDatagramConnector();
     }
     
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         acceptor.dispose();
         connector.dispose();
     }
 
+    @Test
     public void testAcceptorFilterChain() throws Exception {
         int port = AvailablePortFinder.getNextAvailable(1024 + 1000);
         IoFilter mockFilter = new MockFilter();

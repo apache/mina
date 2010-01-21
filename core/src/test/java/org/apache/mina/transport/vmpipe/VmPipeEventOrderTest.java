@@ -23,7 +23,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
@@ -32,13 +31,15 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.executor.ExecutorFilter;
+import org.junit.Test;
 
 /**
  * Makes sure the order of events are correct.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class VmPipeEventOrderTest extends TestCase {
+public class VmPipeEventOrderTest {
+    @Test
     public void testServerToClient() throws Exception {
         IoAcceptor acceptor = new VmPipeAcceptor();
         IoConnector connector = new VmPipeConnector();
@@ -95,6 +96,7 @@ public class VmPipeEventOrderTest extends TestCase {
         Assert.assertEquals("ABC", actual.toString());
     }
 
+    @Test
     public void testClientToServer() throws Exception {
         IoAcceptor acceptor = new VmPipeAcceptor();
         IoConnector connector = new VmPipeConnector();
@@ -152,6 +154,7 @@ public class VmPipeEventOrderTest extends TestCase {
         Assert.assertEquals("ABC", actual.toString());
     }
 
+    @Test
     public void testSessionCreated() throws Exception {
         final Semaphore semaphore = new Semaphore(0);
         final StringBuffer stringBuffer = new StringBuffer();

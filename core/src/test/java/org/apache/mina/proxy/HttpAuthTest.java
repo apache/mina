@@ -19,13 +19,14 @@
  */
 package org.apache.mina.proxy;
 
-import java.util.HashMap;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import java.util.HashMap;
 
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.proxy.handlers.http.basic.HttpBasicAuthLogicHandler;
 import org.apache.mina.proxy.handlers.http.digest.DigestUtilities;
+import org.junit.Test;
 
 /**
  * HttpAuthTest.java - JUNIT tests of the HTTP Basic & Digest authentication mechanisms.
@@ -34,7 +35,7 @@ import org.apache.mina.proxy.handlers.http.digest.DigestUtilities;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
-public class HttpAuthTest extends TestCase {
+public class HttpAuthTest {
 
     /**
      * The charset in use.
@@ -44,6 +45,8 @@ public class HttpAuthTest extends TestCase {
     /**
      * Tests Basic authentication mechanism.
      */
+    @Test
+
     public void testBasicAuthResponse() {
         String USER = "Aladdin";
         String PWD = "open sesame";
@@ -55,6 +58,7 @@ public class HttpAuthTest extends TestCase {
     /**
      * Tests Http Digest authentication mechanism. 
      */
+    @Test
     public void testDigestAuthResponse() {
         String USER = "Mufasa";
         String PWD = "Circle Of Life";
