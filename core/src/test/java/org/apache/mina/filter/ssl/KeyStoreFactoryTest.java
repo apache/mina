@@ -25,14 +25,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests {@link KeyStoreFactory}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class KeyStoreFactoryTest extends TestCase {
+public class KeyStoreFactoryTest {
+    @Test
     public void testCreateInstanceFromResource() throws Exception {
         // Test using default for now.
         KeyStoreFactory factory = new KeyStoreFactory();
@@ -45,6 +46,7 @@ public class KeyStoreFactoryTest extends TestCase {
         ks.getKey("bogus", "boguspw".toCharArray());
     }
 
+    @Test
     public void testCreateInstanceFromFile() throws Exception {
         // Copy the keystore from the class path to a temporary file.
         File file = File.createTempFile("keystoretest ", null);
@@ -52,9 +54,11 @@ public class KeyStoreFactoryTest extends TestCase {
         InputStream in = getClass().getResourceAsStream("keystore.cert");
         OutputStream out = new FileOutputStream(file);
         int b;
+        
         while ((b = in.read()) != -1) {
             out.write(b);
         }
+        
         in.close();
         out.close();
 
@@ -68,5 +72,4 @@ public class KeyStoreFactoryTest extends TestCase {
         ks.getCertificate("bogus");
         ks.getKey("bogus", "boguspw".toCharArray());
     }
-
 }

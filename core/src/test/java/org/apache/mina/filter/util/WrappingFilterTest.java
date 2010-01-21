@@ -19,10 +19,10 @@
  */
 package org.apache.mina.filter.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterEvent;
@@ -33,6 +33,8 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests {@link CommonEventFilter}.
@@ -40,14 +42,13 @@ import org.easymock.EasyMock;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 
-public class WrappingFilterTest extends TestCase {
+public class WrappingFilterTest {
     private IoSession session;
 
     private IoFilter.NextFilter nextFilter;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         /*
          * Create the mocks.
          */
@@ -56,6 +57,7 @@ public class WrappingFilterTest extends TestCase {
         //nextFilter = (IoFilter.NextFilter) mockNextFilter.getClass();
     }
 
+    @Test
     public void testFilter() throws Exception {
         MyWrappingFilter wrappingFilter = new MyWrappingFilter();
 

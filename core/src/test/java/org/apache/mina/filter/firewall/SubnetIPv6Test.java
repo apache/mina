@@ -20,33 +20,37 @@
 
 package org.apache.mina.filter.firewall;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import junit.framework.TestCase;
-import junit.framework.Assert;
+import org.junit.Test;
 
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SubnetIPv6Test extends TestCase {
+public class SubnetIPv6Test {
 
     // Test Data
     private static final String TEST_V6ADDRESS = "1080:0:0:0:8:800:200C:417A";
 
+    @Test
     public void testIPv6() throws UnknownHostException {
         InetAddress a = InetAddress.getByName(TEST_V6ADDRESS);
         
         assertTrue(a instanceof Inet6Address);
+        
         try {
             new Subnet(a, 24);
             fail("IPv6 not supported");
         } catch(IllegalArgumentException e) {
             // signifies a successful test execution
-            Assert.assertTrue(true);
+            assertTrue(true);
         }
     }
 }

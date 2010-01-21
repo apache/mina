@@ -19,29 +19,37 @@
  */
 package org.apache.mina.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Iterator;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests {@link org.apache.mina.util.CircularQueue}
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class CircularQueueTest extends TestCase {
+public class CircularQueueTest {
     private volatile int pushCount;
     private volatile int popCount;
 
+    @Before
     public void setUp() {
         pushCount = 0;
         popCount = 0;
     }
 
+    @Test
     public void testRotation() {
         CircularQueue<Integer> q = new CircularQueue<Integer>(); // DEFAULT_CAPACITY = 4
         testRotation0(q);
     }
 
+    @Test
     public void testExpandingRotation() {
         CircularQueue<Integer> q = new CircularQueue<Integer>(); // DEFAULT_CAPACITY = 4
         for (int i = 0; i < 10; i++) {
@@ -65,6 +73,7 @@ public class CircularQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testRandomAddOnQueue() {
         CircularQueue<Integer> q = new CircularQueue<Integer>();
         // Create a queue with 5 elements and capacity 8;
@@ -96,6 +105,7 @@ public class CircularQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testRandomAddOnRotatedQueue() {
         CircularQueue<Integer> q = getRotatedQueue();
 
@@ -130,6 +140,7 @@ public class CircularQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testRandomRemoveOnQueue() {
         CircularQueue<Integer> q = new CircularQueue<Integer>();
 
@@ -156,6 +167,7 @@ public class CircularQueueTest extends TestCase {
         }
     }
 
+    @Test
     public void testRandomRemoveOnRotatedQueue() {
         CircularQueue<Integer> q = getRotatedQueue();
 
@@ -180,6 +192,7 @@ public class CircularQueueTest extends TestCase {
         }
     }
     
+    @Test
     public void testExpandAndShrink() throws Exception {
         CircularQueue<Integer> q = new CircularQueue<Integer>();
         for (int i = 0; i < 1024; i ++) {
@@ -223,9 +236,5 @@ public class CircularQueueTest extends TestCase {
         }
 
         return q;
-    }
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(CircularQueueTest.class);
     }
 }

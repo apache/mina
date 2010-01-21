@@ -19,6 +19,11 @@
  */
 package org.apache.mina.filter.stream;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.MessageDigest;
@@ -27,9 +32,6 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import junit.framework.TestCase;
-import junit.framework.Assert;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
@@ -46,13 +48,14 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.EasyMock;
+import org.junit.Test;
 
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamWriteFilter<M>> extends TestCase {
+public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamWriteFilter<M>> {
 
     protected final IoSession session = new DummySession();
 
@@ -60,6 +63,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
     
     abstract protected M createMessage(byte[] data) throws Exception;
     
+    @Test
     public void testWriteEmptyFile() throws Exception {
         AbstractStreamWriteFilter<M> filter = createFilter();
         M message = createMessage(new byte[0]);
@@ -94,6 +98,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
      *
      * @throws Exception when something goes wrong
      */
+    @Test
     public void testWriteNonFileRegionMessage() throws Exception {
         AbstractStreamWriteFilter<M> filter = createFilter();
 
@@ -127,6 +132,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
      *
      * @throws Exception when something goes wrong
      */
+    @Test
     public void testWriteSingleBufferFile() throws Exception {
         byte[] data = new byte[] { 1, 2, 3, 4 };
 
@@ -165,6 +171,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
      *
      * @throws Exception when something goes wrong
      */
+    @Test
     public void testWriteSeveralBuffersStream() throws Exception {
         AbstractStreamWriteFilter<M> filter = createFilter();
         filter.setWriteBufferSize(4);
@@ -212,6 +219,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         assertTrue(writeRequest.getFuture().isWritten());
     }
 
+    @Test
     public void testWriteWhileWriteInProgress() throws Exception {
         AbstractStreamWriteFilter<M> filter = createFilter();
         M message = createMessage(new byte[5]);
@@ -245,6 +253,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         session.removeAttribute(filter.WRITE_REQUEST_QUEUE);
     }
 
+    @Test
     public void testWritesWriteRequestQueueWhenFinished() throws Exception {
         AbstractStreamWriteFilter<M> filter = createFilter();
         M message = createMessage(new byte[0]);
@@ -294,6 +303,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
      * Tests that {@link StreamWriteFilter#setWriteBufferSize(int)} checks the
      * specified size.
      */
+    @Test
     public void testSetWriteBufferSize() {
         AbstractStreamWriteFilter<M> filter = createFilter();
 
@@ -303,7 +313,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         } catch (IllegalArgumentException iae) {
             // Pass, exception was thrown
             // Signifies a successful test execution
-            Assert.assertTrue(true);
+            assertTrue(true);
         }
 
         try {
@@ -312,7 +322,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         } catch (IllegalArgumentException iae) {
             // Pass, exception was thrown
             // Signifies a successful test execution
-            Assert.assertTrue(true);
+            assertTrue(true);
         }
 
         filter.setWriteBufferSize(1);
@@ -321,6 +331,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         assertEquals(1024, filter.getWriteBufferSize());
     }
 
+    @Test
     public void testWriteUsingSocketTransport() throws Exception {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
