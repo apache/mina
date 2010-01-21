@@ -19,24 +19,28 @@
  */
 package org.apache.mina.integration.beans;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests {@link InetAddressEditor}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class InetAddressEditorTest extends TestCase {
+public class InetAddressEditorTest {
     InetAddressEditor editor;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         editor = new InetAddressEditor();
     }
 
+    @Test
     public void testSetAsTextWithHostName() throws Exception {
         try {
             InetAddress expected = InetAddress.getByName("www.google.com");
@@ -50,6 +54,7 @@ public class InetAddressEditorTest extends TestCase {
         assertEquals(InetAddress.getByName("localhost"), editor.getValue());
     }
 
+    @Test
     public void testSetAsTextWithIpAddress() throws Exception {
         editor.setAsText("127.0.0.1");
         assertEquals(InetAddress.getByName("127.0.0.1"), editor.getValue());

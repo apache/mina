@@ -19,23 +19,27 @@
  */
 package org.apache.mina.integration.beans;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.apache.mina.transport.vmpipe.VmPipeAddress;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests {@link VmPipeAddressEditor}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class VmPipeAddressEditorTest extends TestCase {
+public class VmPipeAddressEditorTest {
     VmPipeAddressEditor editor;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         editor = new VmPipeAddressEditor();
     }
 
+    @Test
     public void testSetAsTextWithLegalValues() throws Exception {
         editor.setAsText("1");
         assertEquals(new VmPipeAddress(1), editor.getValue());
@@ -45,6 +49,7 @@ public class VmPipeAddressEditorTest extends TestCase {
         assertEquals(new VmPipeAddress(100), editor.getValue());
     }
 
+    @Test
     public void testSetAsTextWithIllegalValues() throws Exception {
         try {
             editor.setAsText("bar");
@@ -57,5 +62,4 @@ public class VmPipeAddressEditorTest extends TestCase {
         } catch (IllegalArgumentException iae) {
         }
     }
-
 }

@@ -19,23 +19,28 @@
  */
 package org.apache.mina.integration.beans;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.net.InetSocketAddress;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests {@link InetSocketAddressEditor}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class InetSocketAddressEditorTest extends TestCase {
+public class InetSocketAddressEditorTest {
     InetSocketAddressEditor editor;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         editor = new InetSocketAddressEditor();
     }
 
+    @Test
     public void testSetAsTextWithWildcardAddress() throws Exception {
         editor.setAsText("1");
         assertEquals(new InetSocketAddress(1), editor.getValue());
@@ -43,6 +48,7 @@ public class InetSocketAddressEditorTest extends TestCase {
         assertEquals(new InetSocketAddress(10), editor.getValue());
     }
 
+    @Test
     public void testSetAsTextWithHostName() throws Exception {
         editor.setAsText("www.google.com:80");
         assertEquals(new InetSocketAddress("www.google.com", 80), editor
@@ -55,6 +61,7 @@ public class InetSocketAddressEditorTest extends TestCase {
                 .getValue());
     }
 
+    @Test
     public void testSetAsTextWithIllegalValues() throws Exception {
         try {
             editor.setAsText("bar");
@@ -72,5 +79,4 @@ public class InetSocketAddressEditorTest extends TestCase {
         } catch (IllegalArgumentException iae) {
         }
     }
-
 }
