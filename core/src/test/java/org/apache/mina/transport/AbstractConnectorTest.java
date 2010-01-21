@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -28,8 +29,6 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import junit.framework.Assert;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
@@ -84,7 +83,7 @@ public abstract class AbstractConnectorTest {
             future.getSession().close(true);
             // sessionCreated() will fire before the connect future completes
             // but sessionOpened() may not
-            Assert.assertTrue(Pattern.matches("12?32?", buf.toString()));
+            assertTrue(Pattern.matches("12?32?", buf.toString()));
         } finally {
             acceptor.dispose();
         }
@@ -125,7 +124,7 @@ public abstract class AbstractConnectorTest {
                 // Signifies a successful test execution
                 assertTrue(true);
             }
-            Assert.assertEquals("1", buf.toString());
+            assertEquals("1", buf.toString());
         } finally {
             connector.dispose();
         }
