@@ -20,26 +20,31 @@
 
 package org.apache.mina.filter.firewall;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.net.InetSocketAddress;
 
-import junit.framework.TestCase;
-
 import org.apache.mina.core.session.DummySession;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ConnectionThrottleFilterTest extends TestCase
+public class ConnectionThrottleFilterTest
 {
     private ConnectionThrottleFilter filter;
 
     private DummySession sessionOne;
     private DummySession sessionTwo;
 
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         filter = new ConnectionThrottleFilter();
 
@@ -49,15 +54,17 @@ public class ConnectionThrottleFilterTest extends TestCase
         sessionTwo.setRemoteAddress( new InetSocketAddress(1235) );
     }
 
-    @Override
-    protected void tearDown() throws Exception
+    @After
+    public void tearDown() throws Exception
     {
         filter = null;
     }
 
+    @Test
     public void testGoodConnection(){
         filter.setAllowedInterval( 100 );
         filter.isConnectionOk( sessionOne );
+        
         try
         {
             Thread.sleep( 1000 );
@@ -71,13 +78,10 @@ public class ConnectionThrottleFilterTest extends TestCase
         assertTrue( result );
     }
 
+    @Test
     public void testBadConnection(){
         filter.setAllowedInterval( 1000 );
         filter.isConnectionOk( sessionTwo );
         assertFalse(filter.isConnectionOk( sessionTwo ));
-    }
-
-    public static void main(String[] args) {
-     junit.textui.TestRunner.run( ConnectionThrottleFilterTest.class );
     }
 }

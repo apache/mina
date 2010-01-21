@@ -19,41 +19,44 @@
  */
 package org.apache.mina.filter.executor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ExecutorFilterRegressionTest extends TestCase {
+public class ExecutorFilterRegressionTest {
     private ExecutorFilter filter;
 
     public ExecutorFilterRegressionTest() {
         // Do nothing
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         filter = new ExecutorFilter(8);
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         ((ExecutorService) filter.getExecutor()).shutdown();
         filter = null;
     }
 
+    @Test
     public void testEventOrder() throws Throwable {
         final EventOrderChecker nextFilter = new EventOrderChecker();
         final EventOrderCounter[] sessions = new EventOrderCounter[] {
@@ -84,7 +87,7 @@ public class ExecutorFilterRegressionTest extends TestCase {
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
         for (int i = end; i >= 0; i--) {
-            Assert.assertEquals(loop - 1, sessions[i].lastCount.intValue());
+            assertEquals(loop - 1, sessions[i].lastCount.intValue());
         }
     }
 
@@ -100,7 +103,7 @@ public class ExecutorFilterRegressionTest extends TestCase {
         
         public synchronized void setLastCount(Integer newCount) {
             if (lastCount != null) {
-                Assert.assertEquals(lastCount.intValue() + 1, newCount
+                assertEquals(lastCount.intValue() + 1, newCount
                         .intValue());
             }
 
@@ -159,9 +162,5 @@ public class ExecutorFilterRegressionTest extends TestCase {
         public void sessionCreated(IoSession session) {
             // Do nothing
         }
-    }
-
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(ExecutorFilterRegressionTest.class);
     }
 }

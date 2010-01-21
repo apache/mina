@@ -19,25 +19,22 @@
  */
 package org.apache.mina.filter.codec.textline;
 
-import java.nio.charset.Charset;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import java.nio.charset.Charset;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
+import org.junit.Test;
 
 /**
  * Tests {@link TextLineEncoder}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class TextLineEncoderTest extends TestCase {
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(TextLineEncoderTest.class);
-    }
-
+public class TextLineEncoderTest {
+    @Test
     public void testEncode() throws Exception {
         TextLineEncoder encoder = new TextLineEncoder(Charset.forName("UTF-8"),
                 LineDelimiter.WINDOWS);
@@ -45,13 +42,13 @@ public class TextLineEncoderTest extends TestCase {
         ProtocolEncoderOutput out = session.getEncoderOutput();
 
         encoder.encode(session, "ABC", out);
-        Assert.assertEquals(1, session.getEncoderOutputQueue().size());
+        assertEquals(1, session.getEncoderOutputQueue().size());
         IoBuffer buf = (IoBuffer) session.getEncoderOutputQueue().poll();
-        Assert.assertEquals(5, buf.remaining());
-        Assert.assertEquals('A', buf.get());
-        Assert.assertEquals('B', buf.get());
-        Assert.assertEquals('C', buf.get());
-        Assert.assertEquals('\r', buf.get());
-        Assert.assertEquals('\n', buf.get());
+        assertEquals(5, buf.remaining());
+        assertEquals('A', buf.get());
+        assertEquals('B', buf.get());
+        assertEquals('C', buf.get());
+        assertEquals('\r', buf.get());
+        assertEquals('\n', buf.get());
     }
 }

@@ -20,12 +20,11 @@
 package org.apache.mina.util.byteaccess;
 
 import static org.easymock.EasyMock.createStrictControl;
+import static org.junit.Assert.assertEquals;
 
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.util.byteaccess.ByteArray.Cursor;
@@ -33,13 +32,14 @@ import org.apache.mina.util.byteaccess.CompositeByteArray.CursorListener;
 import org.apache.mina.util.byteaccess.CompositeByteArrayRelativeWriter.ChunkedExpander;
 import org.apache.mina.util.byteaccess.CompositeByteArrayRelativeWriter.Flusher;
 import org.easymock.IMocksControl;
+import org.junit.Test;
 
 /**
  * Tests classes in the <code>byteaccess</code> package.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ByteAccessTest extends TestCase {
+public class ByteAccessTest {
 
     private List<String> operations = new ArrayList<String>();
 
@@ -55,6 +55,7 @@ public class ByteAccessTest extends TestCase {
         operations.add(description);
     }
 
+    @Test
     public void testBufferByteArray() throws Exception {
         ByteArray ba = getByteArrayFactory().create(1000);
         testAbsoluteReaderAndWriter(0, 1000, ba, ba);
@@ -64,6 +65,7 @@ public class ByteAccessTest extends TestCase {
         testRelativeReaderAndWriter(1000, readCursor, writeCursor);
     }
 
+    @Test
     public void testCompositeAddAndRemove() throws Exception {
         CompositeByteArray cba = new CompositeByteArray();
         assertEquals(0, cba.first());
@@ -120,6 +122,7 @@ public class ByteAccessTest extends TestCase {
         return string;
     }
 
+    @Test
     public void testCompositeStringJoin() throws Exception {
         ByteArray ba1 = wrapString("Hello");
         ByteArray ba2 = wrapString("MINA");
@@ -133,6 +136,7 @@ public class ByteAccessTest extends TestCase {
         assertEquals("HelloMINAWorld", toString(cba));
     }
 
+    @Test
     public void testCompositeCursor() throws Exception {
         IMocksControl mc = createStrictControl();
 
@@ -206,6 +210,7 @@ public class ByteAccessTest extends TestCase {
         mc.verify();
     }
 
+    @Test
     public void testCompositeByteArray() throws Exception {
         CompositeByteArray ba = new CompositeByteArray();
         for (int i = 0; i < 1000; i += 100) {
@@ -221,6 +226,7 @@ public class ByteAccessTest extends TestCase {
         assertOperationCountEquals(0);
     }
 
+    @Test
     public void testCompositeByteArrayRelativeReaderAndWriter() throws Exception {
         CompositeByteArray cba = new CompositeByteArray();
         CompositeByteArrayRelativeReader cbarr = new CompositeByteArrayRelativeReader(cba, true);
@@ -242,6 +248,7 @@ public class ByteAccessTest extends TestCase {
         assertOperationCountEquals(0); // Last free doesn't occur, since cursor only moves lazily.
     }
 
+    @Test
     public void testCompositeByteArrayRelativeReaderAndWriterWithFlush() throws Exception {
         CompositeByteArray cba = new CompositeByteArray();
         CompositeByteArrayRelativeReader cbarr = new CompositeByteArrayRelativeReader(cba, true);
@@ -263,6 +270,7 @@ public class ByteAccessTest extends TestCase {
         assertOperationCountEquals(0); // Last free doesn't occur, since cursor only moves lazily.
     }
 
+    @Test
     public void testCompositeRemoveTo() throws Exception {
         CompositeByteArray cba = new CompositeByteArray();
         {
@@ -357,6 +365,7 @@ public class ByteAccessTest extends TestCase {
         }
     }
     
+    @Test
     public void testCompositeByteArraySlicing() {
         CompositeByteArray cba = new CompositeByteArray();
         cba.addLast(getByteArrayFactory().create(10));
@@ -369,6 +378,7 @@ public class ByteAccessTest extends TestCase {
         testByteArraySlicing(cba, 19, 2);
     }
     
+    @Test
     public void testBufferByteArraySlicing() {
         ByteArray bba = getByteArrayFactory().create(30);
         testByteArraySlicing(bba, 0, 30);
@@ -456,6 +466,7 @@ public class ByteAccessTest extends TestCase {
         }
     }
 
+    @Test
     public void testByteArrayPrimitiveAccess() {
         ByteArray bbaBig = getByteArrayFactory().create(1000);
         bbaBig.order(ByteOrder.BIG_ENDIAN);
@@ -466,6 +477,7 @@ public class ByteAccessTest extends TestCase {
         testPrimitiveAccess(bbaLittle.cursor(), bbaLittle.cursor());
     }
 
+    @Test
     public void testByteArrayBufferAccess() {
         ByteArray ba = getByteArrayFactory().create(1);
         ba.put(0, (byte) 99);
@@ -484,6 +496,7 @@ public class ByteAccessTest extends TestCase {
         assertEquals(1, bb.remaining());
     }
     
+    @Test
     public void testCompositeByteArrayPrimitiveAccess() {
         CompositeByteArray cbaBig = new CompositeByteArray();
         cbaBig.order(ByteOrder.BIG_ENDIAN);
@@ -504,6 +517,7 @@ public class ByteAccessTest extends TestCase {
         testPrimitiveAccess(cbaLittle.cursor(), cbaLittle.cursor());
     }
 
+    @Test
     public void testCompositeByteArrayWrapperPrimitiveAccess() {
         CompositeByteArray cbaBig = new CompositeByteArray();
         cbaBig.order(ByteOrder.BIG_ENDIAN);
@@ -543,11 +557,11 @@ public class ByteAccessTest extends TestCase {
 
         float f = Float.intBitsToFloat(i);
         write.putFloat(f);
-        assertEquals(f, read.getFloat());
+        assertEquals(f, read.getFloat(), 0);
 
         double d = Double.longBitsToDouble(l);
         write.putDouble(d);
-        assertEquals(d, read.getDouble());
+        assertEquals(d, read.getDouble(), 0);
 
         char c = (char) 0x1234;
         write.putChar(c);

@@ -19,15 +19,15 @@
  */
 package org.apache.mina.filter.buffer;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.buffer.BufferedWriteFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +37,17 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M2
  */
-public class BufferedWriteFilterTest extends TestCase {
+public class BufferedWriteFilterTest {
     static final Logger LOGGER = LoggerFactory
             .getLogger(BufferedWriteFilterTest.class);
 
+    @Test
     public void testNonExpandableBuffer() throws Exception {
         IoBuffer dest = IoBuffer.allocate(1);
         assertEquals(false, dest.isAutoExpand());
     }
 
+    @Test
     public void testBasicBuffering() {
         DummySession sess = new DummySession();
         sess.getFilterChain().addFirst("peer", new IoFilterAdapter() {

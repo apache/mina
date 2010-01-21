@@ -21,9 +21,10 @@
 package org.apache.mina.util;
 
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Simple test that checks to see if the {@link ExpiringMap} can
@@ -31,7 +32,7 @@ import org.junit.Before;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ExpiringMapTest extends TestCase
+public class ExpiringMapTest
 {
     private ExpiringMap<String,String> theMap;
     
@@ -55,6 +56,7 @@ public class ExpiringMapTest extends TestCase
      * Check to see if the map has been cleaned up.
      *
      */
+    @Test
     public void testGet(){
         assertNull( theMap.get( "Apache" ) );
     }

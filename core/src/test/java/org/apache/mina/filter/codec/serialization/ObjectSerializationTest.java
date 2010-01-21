@@ -19,10 +19,9 @@
  */
 package org.apache.mina.filter.codec.serialization;
 
-import java.io.ByteArrayOutputStream;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import java.io.ByteArrayOutputStream;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
@@ -30,13 +29,15 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
+import org.junit.Test;
 
 /**
  * Tests object serialization codec and streams.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ObjectSerializationTest extends TestCase {
+public class ObjectSerializationTest {
+    @Test
     public void testEncoder() throws Exception {
         final String expected = "1234";
 
@@ -46,12 +47,13 @@ public class ObjectSerializationTest extends TestCase {
         ProtocolEncoder encoder = new ObjectSerializationEncoder();
         encoder.encode(session, expected, out);
 
-        Assert.assertEquals(1, session.getEncoderOutputQueue().size());
+        assertEquals(1, session.getEncoderOutputQueue().size());
         IoBuffer buf = (IoBuffer) session.getEncoderOutputQueue().poll();
 
         testDecoderAndInputStream(expected, buf);
     }
 
+    @Test
     public void testOutputStream() throws Exception {
         final String expected = "1234";
 
@@ -80,7 +82,7 @@ public class ObjectSerializationTest extends TestCase {
         ProtocolDecoderOutput decoderOut = session.getDecoderOutput();
         decoder.decode(session, in.duplicate(), decoderOut);
 
-        Assert.assertEquals(1, session.getDecoderOutputQueue().size());
-        Assert.assertEquals(expected, session.getDecoderOutputQueue().poll());
+        assertEquals(1, session.getDecoderOutputQueue().size());
+        assertEquals(expected, session.getDecoderOutputQueue().poll());
     }
 }

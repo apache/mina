@@ -20,18 +20,22 @@
 
 package org.apache.mina.filter.firewall;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SubnetIPv4Test extends TestCase {
-
+public class SubnetIPv4Test {
+    @Test
     public void test24() throws UnknownHostException {
         InetAddress a = InetAddress.getByName("127.2.3.0");
         InetAddress b = InetAddress.getByName("127.2.3.4");
@@ -46,6 +50,7 @@ public class SubnetIPv4Test extends TestCase {
         assertFalse(mask.inSubnet(d));
     }
 
+    @Test
     public void test16() throws UnknownHostException {
         InetAddress a = InetAddress.getByName("127.2.0.0");
         InetAddress b = InetAddress.getByName("127.2.3.4");
@@ -60,6 +65,7 @@ public class SubnetIPv4Test extends TestCase {
         assertFalse(mask.inSubnet(d));
     }
     
+    @Test
     public void testSingleIp() throws UnknownHostException {
         InetAddress a = InetAddress.getByName("127.2.3.4");
         InetAddress b = InetAddress.getByName("127.2.3.3");
@@ -74,6 +80,7 @@ public class SubnetIPv4Test extends TestCase {
         assertFalse(mask.inSubnet(d));
     }
     
+    @Test
     public void testToString() throws UnknownHostException {
         InetAddress a = InetAddress.getByName("127.2.3.0");
         Subnet mask = new Subnet(a, 24);
@@ -81,6 +88,7 @@ public class SubnetIPv4Test extends TestCase {
         assertEquals("127.2.3.0/24", mask.toString());
     }
 
+    @Test
     public void testToStringLiteral() throws UnknownHostException {
         InetAddress a = InetAddress.getByName("localhost");
         Subnet mask = new Subnet(a, 32);
@@ -89,6 +97,7 @@ public class SubnetIPv4Test extends TestCase {
     }
     
     
+    @Test
     public void testEquals() throws UnknownHostException {
         Subnet a = new Subnet(InetAddress.getByName("127.2.3.4"), 32);
         Subnet b = new Subnet(InetAddress.getByName("127.2.3.4"), 32);

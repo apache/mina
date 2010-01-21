@@ -19,12 +19,12 @@
  */
 package org.apache.mina.filter.keepalive;
 
-import static org.apache.mina.filter.keepalive.KeepAliveRequestTimeoutHandler.*;
+import static org.apache.mina.filter.keepalive.KeepAliveRequestTimeoutHandler.EXCEPTION;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import junit.framework.TestCase;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
@@ -33,6 +33,9 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests {@link KeepAliveFilter} used by the connector with different
@@ -40,7 +43,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class KeepAliveFilterTest extends TestCase {
+public class KeepAliveFilterTest {
     // Constants -----------------------------------------------------
     static final IoBuffer PING = IoBuffer.wrap(new byte[] { 1 });
     static final IoBuffer PONG = IoBuffer.wrap(new byte[] { 2 });
@@ -50,10 +53,8 @@ public class KeepAliveFilterTest extends TestCase {
     private int port;
     private NioSocketAcceptor acceptor;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         acceptor = new NioSocketAcceptor();
         KeepAliveMessageFactory factory = new ServerFactory();
         KeepAliveFilter filter = new KeepAliveFilter(factory,
@@ -65,21 +66,23 @@ public class KeepAliveFilterTest extends TestCase {
         port = acceptor.getLocalAddress().getPort();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         acceptor.unbind();
         acceptor.dispose();
-        super.tearDown();
     }
 
+    @Test
     public void testKeepAliveFilterForReaderIdle() throws Exception {
         keepAliveFilterForIdleStatus(IdleStatus.READER_IDLE);
     }
 
+    @Test
     public void testKeepAliveFilterForBothIdle() throws Exception {
         keepAliveFilterForIdleStatus(IdleStatus.BOTH_IDLE);
     }
 
+    @Test
     public void testKeepAliveFilterForWriterIdle() throws Exception {
         keepAliveFilterForIdleStatus(IdleStatus.WRITER_IDLE);
     }

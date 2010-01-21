@@ -19,11 +19,14 @@
  */
 package org.apache.mina.filter.reqres;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.NoSuchElementException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-
-import junit.framework.TestCase;
 
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
@@ -34,7 +37,6 @@ import org.apache.mina.core.write.WriteRequest;
 import org.easymock.AbstractMatcher;
 import org.easymock.MockControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,7 +45,7 @@ import org.junit.Test;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class RequestResponseFilterTest extends TestCase {
+public class RequestResponseFilterTest {
 
     private ScheduledExecutorService scheduler;
 
@@ -59,7 +61,6 @@ public class RequestResponseFilterTest extends TestCase {
 
     private final WriteRequestMatcher matcher = new WriteRequestMatcher();
 
-    @Override
     @Before
     public void setUp() throws Exception {
         scheduler = Executors.newScheduledThreadPool(1);
@@ -74,10 +75,9 @@ public class RequestResponseFilterTest extends TestCase {
         // Initialize the filter.
         filter.onPreAdd(chain, "reqres", nextFilter);
         filter.onPostAdd(chain, "reqres", nextFilter);
-        Assert.assertFalse(session.getAttributeKeys().isEmpty());
+        assertFalse(session.getAttributeKeys().isEmpty());
     }
 
-    @Override
     @After
     public void tearDown() throws Exception {
         // Destroy the filter.
@@ -111,7 +111,7 @@ public class RequestResponseFilterTest extends TestCase {
 
         // Verify
         nextFilterControl.verify();
-        Assert.assertEquals(res, req.awaitResponse());
+        assertEquals(res, req.awaitResponse());
         assertNoSuchElementException(req);
     }
 
@@ -120,10 +120,10 @@ public class RequestResponseFilterTest extends TestCase {
         // Make sure if an exception is thrown if a user waits one more time.
         try {
             req.awaitResponse();
-            Assert.fail();
+            fail();
         } catch (NoSuchElementException e) {
             // Signifies a successful test execution
-            Assert.assertTrue(true);
+            assertTrue(true);
         }
     }
 
@@ -155,8 +155,8 @@ public class RequestResponseFilterTest extends TestCase {
 
         // Verify
         nextFilterControl.verify();
-        Assert.assertEquals(res1, req.awaitResponse());
-        Assert.assertEquals(res2, req.awaitResponse());
+        assertEquals(res1, req.awaitResponse());
+        assertEquals(res2, req.awaitResponse());
         assertNoSuchElementException(req);
     }
 
@@ -192,10 +192,10 @@ public class RequestResponseFilterTest extends TestCase {
             throws InterruptedException {
         try {
             req.awaitResponse();
-            Assert.fail();
+            fail();
         } catch (RequestTimeoutException e) {
             // Signifies a successful test execution
-            Assert.assertTrue(true);
+            assertTrue(true);
         }
     }
 
@@ -228,7 +228,7 @@ public class RequestResponseFilterTest extends TestCase {
 
         // Verify
         nextFilterControl.verify();
-        Assert.assertEquals(res1, req.awaitResponse());
+        assertEquals(res1, req.awaitResponse());
         assertRequestTimeoutException(req);
         assertNoSuchElementException(req);
     }
