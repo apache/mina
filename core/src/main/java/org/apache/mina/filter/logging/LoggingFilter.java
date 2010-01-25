@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filter.logging;
 
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoEventType;
@@ -96,7 +97,7 @@ public class LoggingFilter extends IoFilterAdapter {
             this.name = name;
         }
         
-        logger = LoggerFactory.getLogger(name);
+        logger = LoggerFactory.getLogger(this.name);
     }
 
     /**
