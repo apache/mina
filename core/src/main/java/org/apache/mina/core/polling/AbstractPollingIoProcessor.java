@@ -1065,47 +1065,31 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                     long delta = (t1 - t0);
 
                     synchronized (wakeupCalled) {
-
-                        if (selected == 0) {
-                            if (!wakeupCalled.get()) {
-                                if (delta < 100) {
-                                    // Last chance : the select() may have been
-                                    // interrupted
-                                    // because we have had an closed channel.
-                                    if (isBrokenConnection()) {
-                                        // we can reselect immediately
-                                        continue;
-                                    } else {
-                                        LOG.warn("Create a new selector. Selected is 0, delta = "
-                                                        + (t1 - t0));
-                                        // Ok, we are hit by the nasty epoll
-                                        // spinning.
-                                        // Basically, there is a race condition
-                                        // which cause
-                                        // a closing file descriptor not to be
-                                        // considered as
-                                        // available as a selected channel, but
-                                        // it stopped
-                                        // the select. The next time we will
-                                        // call select(),
-                                        // it will exit immediately for the same
-                                        // reason,
-                                        // and do so forever, consuming 100%
-                                        // CPU.
-                                        // We have to destroy the selector, and
-                                        // register all
-                                        // the socket on a new one.
-                                        registerNewSelector();
-                                    }
-
-                                    // and continue the loop
-                                    continue;
-                                }
+                        if ((selected == 0) && !wakeupCalled.get() && (delta < 100)) {
+                            // Last chance : the select() may have been
+                            // interrupted because we have had an closed channel.
+                            if (isBrokenConnection()) {
+                                // we can reselect immediately
+                                continue;
                             } else {
-                                // System.out.println("Waited one second");
+                                LOG.warn("Create a new selector. Selected is 0, delta = "
+                                                + (t1 - t0));
+                                // Ok, we are hit by the nasty epoll
+                                // spinning.
+                                // Basically, there is a race condition
+                                // which causes a closing file descriptor not to be
+                                // considered as available as a selected channel, but
+                                // it stopped the select. The next time we will
+                                // call select(), it will exit immediately for the same
+                                // reason, and do so forever, consuming 100%
+                                // CPU.
+                                // We have to destroy the selector, and
+                                // register all the socket on a new one.
+                                registerNewSelector();
                             }
-                        } else {
-                            // System.out.println("Nb selected : " + selected);
+
+                            // and continue the loop
+                            continue;
                         }
 
                         wakeupCalled.getAndSet(false);
@@ -1113,6 +1097,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
 
                     // Manage newly created session first
                     nSessions += handleNewSessions();
+                    
                     updateTrafficMask();
 
                     // Now, if we have had some incoming or outgoing events,

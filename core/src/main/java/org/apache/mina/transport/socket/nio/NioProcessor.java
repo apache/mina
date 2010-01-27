@@ -131,11 +131,17 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             // Open a new selector
             Selector newSelector = Selector.open();
 
+            // Loop on all the registered keys, and register them on the new selector
             for (SelectionKey key : keys) {
                 SelectableChannel ch = key.channel();
-                ch.register(newSelector, key.interestOps());
+                
+                // Don't forget to attache the session, and back !
+                NioSession session = (NioSession)key.attachment();
+                SelectionKey newKey = ch.register(newSelector, key.interestOps(), session);
+                session.setSelectionKey( newKey );
             }
 
+            // Now we can close the old selector and switch it
             selector.close();
             selector = newSelector;
         }
