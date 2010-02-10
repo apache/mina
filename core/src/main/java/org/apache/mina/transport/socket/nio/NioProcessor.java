@@ -43,7 +43,7 @@ import org.apache.mina.core.session.SessionState;
  */
 public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     /** The selector associated with this processor */
-    private volatile Selector selector;
+    private Selector selector;
 
     /**
      * 
@@ -84,10 +84,8 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
     @Override
     protected void wakeup() {
-        synchronized (wakeupCalled) {
-            wakeupCalled.getAndSet(true);
-            selector.wakeup();
-        }
+        wakeupCalled.getAndSet(true);
+        selector.wakeup();
     }
 
     @Override
