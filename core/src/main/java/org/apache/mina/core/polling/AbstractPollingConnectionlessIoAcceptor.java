@@ -19,6 +19,10 @@
  */
 package org.apache.mina.core.polling;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,8 +73,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     private final Queue<AcceptorOperationFuture> cancelQueue =
         new ConcurrentLinkedQueue<AcceptorOperationFuture>();
     private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
-    private final Map<SocketAddress, H> boundHandles =
-        Collections.synchronizedMap(new HashMap<SocketAddress, H>());
+    private final Map<String, H> boundHandles =
+        Collections.synchronizedMap(new HashMap<String, H>());
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
 
@@ -82,6 +86,28 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     private Acceptor acceptor;
 
     private long lastIdleCheckTime;
+    
+    private String getAddressAsString(SocketAddress address) {
+    	InetAddress inetAddress = ((InetSocketAddress)address).getAddress();
+    	int port = ((InetSocketAddress)address).getPort();
+    	
+    	String result = null;
+    	
+    	if ( inetAddress instanceof Inet4Address ) {
+    		result = "/" + inetAddress.getHostAddress() + ":" + port;
+    	} else {
+    		// Inet6
+    		if ( ((Inet6Address)inetAddress).isIPv4CompatibleAddress() ) {
+    			byte[] bytes = inetAddress.getAddress();
+    			
+    			result = "/" + bytes[12] + "." + bytes[13] + "." + bytes[14] + "." + bytes[15] + ":" + port;
+    		} else {
+    			result = inetAddress.toString();
+    		}
+    	}
+    	
+    	return result;
+    }
 
     /**
      * Creates a new instance.
@@ -232,7 +258,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     private IoSession newSessionWithoutLock(
             SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
-        H handle = boundHandles.get(localAddress);
+        H handle = boundHandles.get(getAddressAsString(localAddress));
         
         if (handle == null) {
             throw new IllegalArgumentException("Unknown local address: " + localAddress);
@@ -535,13 +561,13 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                 break;
             }
 
-            Map<SocketAddress, H> newHandles = new HashMap<SocketAddress, H>();
+            Map<String, H> newHandles = new HashMap<String, H>();
             List<SocketAddress> localAddresses = req.getLocalAddresses();
             
             try {
                 for (SocketAddress socketAddress : localAddresses) {
                     H handle = open(socketAddress);
-                    newHandles.put(localAddress(handle), handle);
+                    newHandles.put(getAddressAsString(localAddress(handle)), handle);
                 }
                 
                 boundHandles.putAll(newHandles);
@@ -582,7 +608,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
             // close the channels
             for (SocketAddress socketAddress : request.getLocalAddresses()) {
-                H handle = boundHandles.remove(socketAddress);
+                H handle = boundHandles.remove(getAddressAsString(socketAddress));
                 
                 if (handle == null) {
                     continue;

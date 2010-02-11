@@ -76,7 +76,7 @@ public class DatagramSessionIdleTest {
         acceptor.getSessionConfig().setBothIdleTime(BOTH_IDLE_TIME);
         acceptor.getSessionConfig().setReaderIdleTime(READER_IDLE_TIME);
         acceptor.getSessionConfig().setWriterIdleTime(WRITER_IDLE_TIME);
-        InetSocketAddress bindAddress = new InetSocketAddress( "127.0.0.1", AvailablePortFinder.getNextAvailable());
+        InetSocketAddress bindAddress = new InetSocketAddress(  AvailablePortFinder.getNextAvailable());
         acceptor.setHandler(new TestHandler());
         acceptor.bind(bindAddress);
         IoSession session = acceptor.newSession(new InetSocketAddress(
