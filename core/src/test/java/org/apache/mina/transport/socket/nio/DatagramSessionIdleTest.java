@@ -27,6 +27,7 @@ import java.net.InetSocketAddress;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.util.AvailablePortFinder;
 import org.junit.Test;
 
 /**
@@ -75,11 +76,11 @@ public class DatagramSessionIdleTest {
         acceptor.getSessionConfig().setBothIdleTime(BOTH_IDLE_TIME);
         acceptor.getSessionConfig().setReaderIdleTime(READER_IDLE_TIME);
         acceptor.getSessionConfig().setWriterIdleTime(WRITER_IDLE_TIME);
-        InetSocketAddress bindAddress = new InetSocketAddress(58465);
+        InetSocketAddress bindAddress = new InetSocketAddress( "127.0.0.1", AvailablePortFinder.getNextAvailable());
         acceptor.setHandler(new TestHandler());
         acceptor.bind(bindAddress);
         IoSession session = acceptor.newSession(new InetSocketAddress(
-                "127.0.0.1", 56372), bindAddress);
+                "127.0.0.1", AvailablePortFinder.getNextAvailable()), bindAddress);
         
         //check properties to be copied from acceptor to session
         assertEquals(BOTH_IDLE_TIME, session.getConfig().getBothIdleTime());
