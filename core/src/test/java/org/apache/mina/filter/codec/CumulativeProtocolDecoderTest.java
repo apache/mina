@@ -19,6 +19,11 @@
  */
 package org.apache.mina.filter.codec;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +35,6 @@ import org.apache.mina.core.session.IoSessionConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -97,10 +98,8 @@ public class CumulativeProtocolDecoderTest {
         List<Object> expected = new ArrayList<Object>();
         
         for (int i = 0; i < 4; i++) {
-            expected.add(new Integer(i));
+            assertTrue( session.getDecoderOutputQueue().contains(i));
         }
-        
-        assertEquals(expected, session.getDecoderOutputQueue());
     }
 
     @Test

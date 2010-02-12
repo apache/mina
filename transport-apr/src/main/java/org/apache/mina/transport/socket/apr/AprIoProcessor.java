@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.RuntimeIoException;
@@ -32,7 +33,6 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.core.polling.AbstractPollingIoProcessor;
 import org.apache.mina.core.session.SessionState;
-import org.apache.mina.util.CircularQueue;
 import org.apache.tomcat.jni.File;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
@@ -58,7 +58,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     private final long bufferPool; // memory pool
     private final long pollset; // socket poller
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
-    private final List<AprSession> polledSessions = new CircularQueue<AprSession>(POLLSET_SIZE);
+    private final Queue<AprSession> polledSessions = new ConcurrentLinkedQueue<AprSession>();
 
     /**
      * Create a new instance of {@link AprIoProcessor} with a given Exector for

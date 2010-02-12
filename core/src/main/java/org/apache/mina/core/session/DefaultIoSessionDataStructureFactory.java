@@ -25,15 +25,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
-import org.apache.mina.util.CircularQueue;
 
 /**
  * The default {@link IoSessionDataStructureFactory} implementation
  * that creates a new {@link HashMap}-based {@link IoSessionAttributeMap}
- * instance and a new synchronized {@link CircularQueue} instance per
+ * instance and a new synchronized {@link ConcurrentLinkedQueue} instance per
  * {@link IoSession}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -166,7 +166,7 @@ public class DefaultIoSessionDataStructureFactory implements
     
     private static class DefaultWriteRequestQueue implements WriteRequestQueue {
         /** A queue to store incoming write requests */
-        private final Queue<WriteRequest> q = new CircularQueue<WriteRequest>(16);
+        private final Queue<WriteRequest> q = new ConcurrentLinkedQueue<WriteRequest>();
 
         /**
          * Default constructor

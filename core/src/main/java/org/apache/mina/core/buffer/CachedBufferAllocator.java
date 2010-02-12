@@ -24,8 +24,7 @@ import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
-
-import org.apache.mina.util.CircularQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * An {@link IoBufferAllocator} that caches the buffers which are likely to
@@ -136,11 +135,11 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         int poolSize = maxPoolSize == 0? DEFAULT_MAX_POOL_SIZE : maxPoolSize;
         
         for (int i = 0; i < 31; i ++) {
-            poolMap.put(1 << i, new CircularQueue<CachedBuffer>(poolSize));
+            poolMap.put(1 << i, new ConcurrentLinkedQueue<CachedBuffer>());
         }
         
-        poolMap.put(0, new CircularQueue<CachedBuffer>(poolSize));
-        poolMap.put(Integer.MAX_VALUE, new CircularQueue<CachedBuffer>(poolSize));
+        poolMap.put(0, new ConcurrentLinkedQueue<CachedBuffer>());
+        poolMap.put(Integer.MAX_VALUE, new ConcurrentLinkedQueue<CachedBuffer>());
         
         return poolMap;
     }

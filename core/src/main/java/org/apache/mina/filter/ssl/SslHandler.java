@@ -40,7 +40,6 @@ import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.util.CircularQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +67,7 @@ import org.slf4j.LoggerFactory;
     /** The current session */
     private final IoSession session;
     
-    private final Queue<IoFilterEvent> preHandshakeEventQueue = new CircularQueue<IoFilterEvent>();
+    private final Queue<IoFilterEvent> preHandshakeEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
     private final Queue<IoFilterEvent> filterWriteEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
     
     /** A queue used to stack all the incoming data until the SSL session is established */
