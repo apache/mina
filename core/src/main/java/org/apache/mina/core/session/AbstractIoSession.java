@@ -27,6 +27,7 @@ import java.nio.channels.FileChannel;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -53,7 +54,6 @@ import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteTimeoutException;
 import org.apache.mina.core.write.WriteToClosedSessionException;
-import org.apache.mina.util.CircularQueue;
 import org.apache.mina.util.ExceptionMonitor;
 
 
@@ -332,7 +332,7 @@ public abstract class AbstractIoSession implements IoSession {
         Queue<ReadFuture> readyReadFutures =
             (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES_KEY);
         if (readyReadFutures == null) {
-            readyReadFutures = new CircularQueue<ReadFuture>();
+            readyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
 
             Queue<ReadFuture> oldReadyReadFutures =
                 (Queue<ReadFuture>) setAttributeIfAbsent(
@@ -351,7 +351,7 @@ public abstract class AbstractIoSession implements IoSession {
         Queue<ReadFuture> waitingReadyReadFutures =
             (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES_KEY);
         if (waitingReadyReadFutures == null) {
-            waitingReadyReadFutures = new CircularQueue<ReadFuture>();
+            waitingReadyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
 
             Queue<ReadFuture> oldWaitingReadyReadFutures =
                 (Queue<ReadFuture>) setAttributeIfAbsent(

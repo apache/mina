@@ -21,6 +21,7 @@ package org.apache.mina.filter.stream;
 
 import java.io.IOException;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
@@ -29,7 +30,6 @@ import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.util.CircularQueue;
 
 /**
  * TODO Add documentation
@@ -70,7 +70,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
         if (session.getAttribute(CURRENT_STREAM) != null) {
             Queue<WriteRequest> queue = getWriteRequestQueue(session);
             if (queue == null) {
-                queue = new CircularQueue<WriteRequest>();
+                queue = new ConcurrentLinkedQueue<WriteRequest>();
                 session.setAttribute(WRITE_REQUEST_QUEUE, queue);
             }
             queue.add(writeRequest);

@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.RuntimeIoException;
@@ -36,7 +37,6 @@ import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;
-import org.apache.mina.util.CircularQueue;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
@@ -67,8 +67,8 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     private volatile long pool;
     private volatile long pollset; // socket poller
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
-    private final List<Long> polledHandles =
-        new CircularQueue<Long>(POLLSET_SIZE);
+    private final Queue<Long> polledHandles =
+        new ConcurrentLinkedQueue<Long>();
 
     /**
      * Constructor for {@link AprSocketAcceptor} using default parameters (multiple thread model).

@@ -20,8 +20,7 @@
 package org.apache.mina.filter.codec;
 
 import java.util.Queue;
-
-import org.apache.mina.util.CircularQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A {@link ProtocolDecoderOutput} based on queue.
@@ -29,7 +28,7 @@ import org.apache.mina.util.CircularQueue;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOutput {
-    private final Queue<Object> messageQueue = new CircularQueue<Object>();
+    private final Queue<Object> messageQueue = new ConcurrentLinkedQueue<Object>();
 
     public AbstractProtocolDecoderOutput() {
         // Do nothing
