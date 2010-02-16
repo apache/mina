@@ -927,8 +927,12 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
 
         if (!buf.hasRemaining() || !hasFragmentation && localWrittenBytes != 0) {
             // Buffer has been sent, clear the current request.
+            int pos = buf.position();
             buf.reset();
             fireMessageSent(session, req);
+            
+            // And set it back to its position
+            buf.position(pos);
         }
         return localWrittenBytes;
     }
