@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -511,7 +512,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
             // We create a temporary map to store the bound handles,
             // as we may have to remove them all if there is an exception
             // during the sockets opening.
-            Map<SocketAddress, H> newHandles = new HashMap<SocketAddress, H>();
+            Map<SocketAddress, H> newHandles = new ConcurrentHashMap<SocketAddress, H>();
             List<SocketAddress> localAddresses = future.getLocalAddresses();
 
             try {

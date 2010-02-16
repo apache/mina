@@ -22,11 +22,11 @@ package org.apache.mina.core.polling;
 import java.io.IOException;
 import java.net.PortUnreachableException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -81,7 +81,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
     private static final long SELECT_TIMEOUT = 1000L;
 
     /** A map containing the last Thread ID for each class */
-    private static final Map<Class<?>, AtomicInteger> threadIds = new HashMap<Class<?>, AtomicInteger>();
+    private static final Map<Class<?>, AtomicInteger> threadIds = new ConcurrentHashMap<Class<?>, AtomicInteger>();
 
     /** A lock used to protect the processor creation */
     private final Object lock = new Object();

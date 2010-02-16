@@ -20,10 +20,10 @@
 package org.apache.mina.handler.chain;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.core.session.IoSession;
 
@@ -40,7 +40,7 @@ public class IoHandlerChain implements IoHandlerCommand {
     private final String NEXT_COMMAND = IoHandlerChain.class.getName() + '.'
             + id + ".nextCommand";
 
-    private final Map<String, Entry> name2entry = new HashMap<String, Entry>();
+    private final Map<String, Entry> name2entry = new ConcurrentHashMap<String, Entry>();
 
     private final Entry head;
 
