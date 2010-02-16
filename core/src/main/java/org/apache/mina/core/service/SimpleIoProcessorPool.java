@@ -23,7 +23,6 @@ import java.lang.reflect.Constructor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.session.AbstractIoSession;
@@ -86,9 +85,6 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
 
     /** The pool table */
     private final IoProcessor<T>[] pool;
-
-    /** A protected counter used to loop on the pool when selecting a new one */
-    private final AtomicInteger processorDistributor = new AtomicInteger();
 
     /** The contained  which is passed to the IoProcessor when they are created */
     private final Executor executor;
@@ -325,7 +321,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
         IoProcessor<T> processor = (IoProcessor<T>) session.getAttribute(PROCESSOR);
         
         if (processor == null) {
-            processor = nextProcessor();
+            processor = nextProcessor(session);
             session.setAttributeIfAbsent(PROCESSOR, processor);
         }
 
@@ -335,12 +331,12 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
     /**
      * Get a new Processor in the pool, using a round-robin algorithm.
      */
-    private IoProcessor<T> nextProcessor() {
+    private IoProcessor<T> nextProcessor(T session) {
         if (disposed) {
             throw new IllegalStateException(
                     "A disposed processor cannot be accessed.");
         }
         
-        return pool[Math.abs(processorDistributor.getAndIncrement()) % pool.length];
+        return pool[Math.abs((int)session.getId()) % pool.length];
     }
 }

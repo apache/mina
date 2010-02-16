@@ -20,9 +20,9 @@
 package org.apache.mina.core.filterchain;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
@@ -56,7 +56,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
     /** The associated session */
     private final AbstractIoSession session;
 
-    private final Map<String, Entry> name2entry = new HashMap<String, Entry>();
+    private final Map<String, Entry> name2entry = new ConcurrentHashMap<String, Entry>();
 
     /** The chain head */
     private final EntryImpl head;

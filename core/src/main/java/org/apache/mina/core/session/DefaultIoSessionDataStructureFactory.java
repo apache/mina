@@ -19,12 +19,12 @@
  */
 package org.apache.mina.core.session;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.core.write.WriteRequest;
@@ -53,7 +53,7 @@ public class DefaultIoSessionDataStructureFactory implements
 
     private static class DefaultIoSessionAttributeMap implements IoSessionAttributeMap {
         private final Map<Object, Object> attributes =
-            Collections.synchronizedMap(new HashMap<Object, Object>(4));
+            new ConcurrentHashMap<Object, Object>(4);
 
         /**
          * Default constructor
