@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filter.util;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -128,7 +127,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      */
     public void setAttributes(Map<String, ? extends Object> attributes) {
         if (attributes == null) {
-            attributes = new HashMap<String, Object>();
+            attributes = new ConcurrentHashMap<String, Object>();
         }
 
         this.attributes.clear();

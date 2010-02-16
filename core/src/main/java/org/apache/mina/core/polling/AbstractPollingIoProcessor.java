@@ -746,15 +746,18 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
      * Write all the pending messages
      */
     private void flush(long currentTime) {
-        final T firstSession = flushingSessions.peek();
-        
-        if (firstSession == null) {
+        if (flushingSessions.isEmpty()) {
             return;
         }
 
-        T session = flushingSessions.poll(); // the same one with firstSession
+        do {
+            T session = flushingSessions.poll(); // the same one with firstSession
+            
+            if (session == null) {
+                // Just in case ... It should not happen.
+                break;
+            }
 
-        for (;;) {
             session.setScheduledForFlush(false);
             SessionState state = getState(session);
 
@@ -791,14 +794,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                     throw new IllegalStateException(String.valueOf(state));
             }
 
-            session = flushingSessions.peek();
-            
-            if ((session == null) || (session == firstSession)) {
-                break;
-            }
-            
-            session = flushingSessions.poll();
-        }
+        } while (!flushingSessions.isEmpty());
     }
 
     private boolean flushNow(T session, long currentTime) {

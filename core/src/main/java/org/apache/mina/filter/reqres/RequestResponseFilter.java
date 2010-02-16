@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -273,7 +274,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      */
     protected Map<Object, Request> createRequestStore(
             IoSession session) {
-        return new HashMap<Object, Request>();
+        return new ConcurrentHashMap<Object, Request>();
     }
 
     /**
