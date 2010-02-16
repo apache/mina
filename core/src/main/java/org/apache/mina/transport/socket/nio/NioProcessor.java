@@ -191,7 +191,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         }
 
         if (key.isValid()) {
-            // The session is oepened
+            // The session is opened
             return SessionState.OPENED;
         } else {
             // The session still as to be closed
