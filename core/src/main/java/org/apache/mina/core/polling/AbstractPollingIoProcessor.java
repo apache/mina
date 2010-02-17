@@ -428,15 +428,18 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
      * {@inheritDoc}
      */
     public final void flush(T session) {
-        if (session.setScheduledForFlush(true)) {
+        // add the session to the queue if it's not already
+        // in the queue, then wake up the select()
+        if (session.setScheduledForFlush( true )) {
             flushingSessions.add(session);
             wakeup();
         }
     }
 
     private void scheduleFlush(T session) {
+        // add the session to the queue if it's not already
+        // in the queue
         if (session.setScheduledForFlush(true)) {
-            // add the session to the queue
             flushingSessions.add(session);
         }
     }
@@ -666,9 +669,11 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         }
 
         // Process writes
-        if (isWritable(session) && !session.isWriteSuspended() && session.setScheduledForFlush(true)) {
-            // add the session to the queue
-            flushingSessions.add(session);
+        if (isWritable(session) && !session.isWriteSuspended()) {
+            // add the session to the queue, if it's not already there
+            if (session.setScheduledForFlush(true)) {
+                flushingSessions.add(session);
+            }       
         }
     }
 
@@ -758,7 +763,10 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                 break;
             }
 
-            session.setScheduledForFlush(false);
+            // Reset the Schedule for flush flag for this session,
+            // as we are flushing it now
+            session.unscheduledForFlush();
+            
             SessionState state = getState(session);
 
             switch (state) {

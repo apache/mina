@@ -206,22 +206,43 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Tells if the session is scheduled for flushed
+     * @param true if the session is scheduled for flush
      */
     public final boolean isScheduledForFlush() {
         return scheduledForFlush.get();
     }
 
     /**
-     * TODO Add method documentation
+     * Schedule the session for flushed
      */
-    public final boolean setScheduledForFlush(boolean flag) {
-        if (flag) {
-            // If the current tag is set to false, switch it to true 
-            return scheduledForFlush.compareAndSet(false, true);
+    public final void scheduledForFlush() {
+        scheduledForFlush.set(true);
+    }
+
+    /**
+     * Change the session's status : it's not anymore scheduled for flush
+     */
+    public final void unscheduledForFlush() {
+        scheduledForFlush.set(false);
+    }
+
+    /**
+     * Set the scheduledForFLush flag. As we may have concurrent access
+     * to this flag, we compare and set it in one call.
+     * @param schedule the new value to set if not already set.
+     * @return true if the session flag has been set, and if 
+     * it wasn't set already.
+     */
+    public final boolean setScheduledForFlush(boolean schedule) {
+        if (schedule) {
+            // If the current tag is set to false, switch it to true,
+            // otherwise, we do nothing but return false : the session
+            // is already scheduled for flush
+            return scheduledForFlush.compareAndSet(false, schedule);
         }
         
-        scheduledForFlush.set(false);
+        scheduledForFlush.set(schedule);
         return true;
     }
 
