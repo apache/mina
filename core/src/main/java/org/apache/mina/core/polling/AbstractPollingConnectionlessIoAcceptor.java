@@ -362,6 +362,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     }
 
     private boolean scheduleFlush(T session) {
+        // Set the schedule for flush flag if the session
+        // has not already be added to the flushingSessions
+        // queue
         if (session.setScheduledForFlush(true)) {
             flushingSessions.add(session);
             return true;
@@ -477,7 +480,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
                 break;
             }
 
-            session.setScheduledForFlush(false);
+            // Reset the Schedule for flush flag for this session,
+            // as we are flushing it now
+            session.unscheduledForFlush();
 
             try {
                 boolean flushedAll = flush(session, currentTime);
