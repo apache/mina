@@ -369,6 +369,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         public Object getMessage() {
             return EMPTY_BUFFER;
         }
+        
+        @Override
+        public String toString() {
+            return "EMPTY buffer";
+        }
     }
 
     private static class ProtocolDecoderOutputImpl extends
