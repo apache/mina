@@ -922,13 +922,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
                 length = buf.remaining();
             }
             
-            for (int i = WRITE_SPIN_COUNT; i > 0; i--) {
-                localWrittenBytes = write(session, buf, length);
-                
-                if (localWrittenBytes != 0) {
-                    break;
-                }
-            }
+            localWrittenBytes = write(session, buf, length);
         }
 
         session.increaseWrittenBytes(localWrittenBytes, currentTime);
@@ -937,6 +931,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
             // Buffer has been sent, clear the current request.
             int pos = buf.position();
             buf.reset();
+            
             fireMessageSent(session, req);
             
             // And set it back to its position
