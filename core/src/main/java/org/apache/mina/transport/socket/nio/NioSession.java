@@ -23,6 +23,7 @@ import java.nio.channels.ByteChannel;
 import java.nio.channels.SelectionKey;
 
 import org.apache.mina.core.session.AbstractIoSession;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * An {@link IoSession} which is managed by the NIO transport.
@@ -30,7 +31,20 @@ import org.apache.mina.core.session.AbstractIoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class NioSession extends AbstractIoSession {
+    /**
+     * @return The ByteChannel associated with this {@link IoSession} 
+     */
     abstract ByteChannel getChannel();
+    
+    /**
+     * @return The {@link SelectionKey} associated with this {@link IoSession}
+     */
     abstract SelectionKey getSelectionKey();
+    
+    /**
+     * Sets the {@link SelectionKey} for this {@link IoSession}
+     *
+     * @param key The new {@link SelectionKey}
+     */
     abstract void setSelectionKey(SelectionKey key);
 }
