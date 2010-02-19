@@ -372,7 +372,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         
         @Override
         public String toString() {
-            return "EMPTY buffer";
+            return "MessageWriteRequest, parent : " + super.toString();
         }
     }
 

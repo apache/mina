@@ -166,7 +166,7 @@ public class DefaultWriteRequest implements WriteRequest {
         
         sb.append("WriteRequest: ");
 
-        // Special case for the CLOSE_REQUEST writerequest : it just
+        // Special case for the CLOSE_REQUEST writeRequest : it just
         // carries a native Object instance
         if (message.getClass().getName().equals(Object.class.getName()) ) {
             sb.append("CLOSE_REQUEST");
