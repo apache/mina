@@ -679,7 +679,8 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
 
     private void read(T session) {
         IoSessionConfig config = session.getConfig();
-        IoBuffer buf = IoBuffer.allocate(config.getReadBufferSize());
+        int bufferSize = config.getReadBufferSize();
+        IoBuffer buf = IoBuffer.allocate(bufferSize);
 
         final boolean hasFragmentation = session.getTransportMetadata()
                 .hasFragmentation();
@@ -690,6 +691,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
 
             try {
                 if (hasFragmentation) {
+                    
                     while ((ret = read(session, buf)) > 0) {
                         readBytes += ret;
                         

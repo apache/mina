@@ -182,4 +182,9 @@ public class DefaultWriteRequest implements WriteRequest {
 
         return sb.toString();
     }
+
+    public boolean isEncoded()
+    {
+        return false;
+    }
 }

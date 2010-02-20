@@ -53,4 +53,11 @@ public interface WriteRequest {
      * @return <tt>null</tt> for the default destination
      */
     SocketAddress getDestination();
+    
+    /**
+     * Tells if the current message has been encoded
+     *
+     * @return true if the message has already been encoded
+     */
+    boolean isEncoded();
 }

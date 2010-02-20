@@ -72,6 +72,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         if (factory == null) {
             throw new NullPointerException("factory");
         }
+        
         this.factory = factory;
     }
 
@@ -144,15 +145,32 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     "decoderClass doesn't have a public default constructor.");
         }
 
-        // Create the inner factory based on the two parameters. We instantiate
-        // the encoder and decoder locally.
+        final ProtocolEncoder encoder;
+        
+        try {
+            encoder = encoderClass.newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "encoderClass cannot be initialized");
+        }
+
+        final ProtocolDecoder decoder;
+        
+        try {
+            decoder = decoderClass.newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                "decoderClass cannot be initialized");
+        }
+    
+        // Create the inner factory based on the two parameters.
         this.factory = new ProtocolCodecFactory() {
             public ProtocolEncoder getEncoder(IoSession session) throws Exception {
-                return encoderClass.newInstance();
+                return encoder;
             }
 
             public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-                return decoderClass.newInstance();
+                return decoder;
             }
         };
     }
@@ -175,9 +193,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             throw new IllegalArgumentException(
                     "You can't add the same filter instance more than once.  Create another instance and add it.");
         }
-        
-        // Initialize the encoder and decoder
-        initCodec(parent.getSession());
     }
 
     @Override
@@ -210,7 +225,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
 
         IoBuffer in = (IoBuffer) message;
-        ProtocolDecoder decoder = getDecoder0(session);
+        ProtocolDecoder decoder = factory.getDecoder(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         
         // Loop until we don't have anymore byte in the buffer,
@@ -219,6 +234,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         // data in the buffer
         while (in.hasRemaining()) {
             int oldPos = in.position();
+            
             try {
                 synchronized (decoderOut) {
                     // Call the decoder with the read bytes
@@ -282,13 +298,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         
         // Bypass the encoding if the message is contained in a IoBuffer,
         // as it has already been encoded before
-        if (message instanceof IoBuffer || message instanceof FileRegion) {
+        if ((message instanceof IoBuffer) || (message instanceof FileRegion)) {
             nextFilter.filterWrite(session, writeRequest);
             return;
         }
 
         // Get the encoder in the session
-        ProtocolEncoder encoder = getEncoder0(session);
+        ProtocolEncoder encoder = factory.getEncoder(session);
 
         ProtocolEncoderOutput encoderOut = getEncoderOut(session,
                 nextFilter, writeRequest);
@@ -306,7 +322,21 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             encoder.encode(session, message, encoderOut);
             
             // Send it directly
-            ((ProtocolEncoderOutputImpl)encoderOut).flushWithoutFuture();
+            Queue<Object> bufferQueue = ((AbstractProtocolEncoderOutput)encoderOut).getMessageQueue();
+            
+            // Write all the encoded messages now
+            while (!bufferQueue.isEmpty()) {
+                Object encodedMessage = bufferQueue.poll();
+                
+                // Flush only when the buffer has remaining.
+                if (!(encodedMessage instanceof IoBuffer) || ((IoBuffer) encodedMessage).hasRemaining()) {
+                    SocketAddress destination = writeRequest.getDestination();
+                    WriteRequest encodedWriteRequest = new EncodedWriteRequest(encodedMessage, null, destination); 
+
+                    nextFilter.filterWrite(session, encodedWriteRequest);
+                }
+            }
+
             
             // Call the next filter
             nextFilter.filterWrite(session, new MessageWriteRequest(
@@ -330,7 +360,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public void sessionClosed(NextFilter nextFilter, IoSession session)
             throws Exception {
         // Call finishDecode() first when a connection is closed.
-        ProtocolDecoder decoder = getDecoder0(session);
+        ProtocolDecoder decoder = factory.getDecoder(session);
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         
         try {
@@ -358,6 +388,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 WriteFuture future, SocketAddress destination) {
             super(encodedMessage, future, destination);
         }
+        
+        public boolean isEncoded() {
+            return true;
+        }
     }
 
     private static class MessageWriteRequest extends WriteRequestWrapper {
@@ -384,6 +418,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         public void flush(NextFilter nextFilter, IoSession session) {
             Queue<Object> messageQueue = getMessageQueue();
+            
             while (!messageQueue.isEmpty()) {
                 nextFilter.messageReceived(session, messageQueue.poll());
             }
@@ -408,15 +443,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         public WriteFuture flush() {
             Queue<Object> bufferQueue = getMessageQueue();
             WriteFuture future = null;
-            for (;;) {
+            
+            while (!bufferQueue.isEmpty()) {
                 Object encodedMessage = bufferQueue.poll();
-                if (encodedMessage == null) {
-                    break;
-                }
 
                 // Flush only when the buffer has remaining.
-                if (!(encodedMessage instanceof IoBuffer) ||
-                        ((IoBuffer) encodedMessage).hasRemaining()) {
+                if (!(encodedMessage instanceof IoBuffer) || ((IoBuffer) encodedMessage).hasRemaining()) {
                     future = new DefaultWriteFuture(session);
                     nextFilter.filterWrite(session, new EncodedWriteRequest(encodedMessage,
                             future, writeRequest.getDestination()));
@@ -430,42 +462,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
             return future;
         }
-        
-        public void flushWithoutFuture() {
-            Queue<Object> bufferQueue = getMessageQueue();
-            for (;;) {
-                Object encodedMessage = bufferQueue.poll();
-                if (encodedMessage == null) {
-                    break;
-                }
-
-                // Flush only when the buffer has remaining.
-                if (!(encodedMessage instanceof IoBuffer) ||
-                        ((IoBuffer) encodedMessage).hasRemaining()) {
-                    SocketAddress destination = writeRequest.getDestination();
-                    WriteRequest writeRequest = new EncodedWriteRequest(
-                        encodedMessage, null, destination); 
-                    nextFilter.filterWrite(session, writeRequest);
-                }
-            }
-        }
     }
     
     //----------- Helper methods ---------------------------------------------
-    /**
-     * Initialize the encoder and the decoder, storing them in the 
-     * session attributes.
-     */
-    private void initCodec(IoSession session) throws Exception {
-        // Creates the decoder and stores it into the newly created session 
-        ProtocolDecoder decoder = factory.getDecoder(session);
-        session.setAttribute(DECODER, decoder);
-
-        // Creates the encoder and stores it into the newly created session 
-        ProtocolEncoder encoder = factory.getEncoder(session);
-        session.setAttribute(ENCODER, encoder);
-    }
-    
     /**
      * Dispose the encoder, decoder, and the callback for the decoded
      * messages.
@@ -535,28 +534,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
         
         return out;
-    }
-
-    private ProtocolEncoder getEncoder0(IoSession session) throws Exception {
-        ProtocolEncoder encoder = (ProtocolEncoder) session
-                .getAttribute(ENCODER);
-        if (encoder == null) {
-            encoder = factory.getEncoder(session);
-            session.setAttribute(ENCODER, encoder);
-        }
-        return encoder;
-    }
-
-    private ProtocolDecoder getDecoder0(IoSession session) throws Exception {
-        ProtocolDecoder decoder = (ProtocolDecoder) session
-                .getAttribute(DECODER);
-        
-        if (decoder == null) {
-            decoder = factory.getDecoder(session);
-            session.setAttribute(DECODER, decoder);
-        }
-        
-        return decoder;
     }
 
     private ProtocolEncoderOutput getEncoderOut(IoSession session,
