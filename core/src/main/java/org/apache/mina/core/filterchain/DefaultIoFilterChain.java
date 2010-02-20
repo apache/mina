@@ -448,7 +448,10 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
 
         Entry head = this.head;
-        callNextMessageSent(head, session, request);
+        
+        if (!request.isEncoded()) {
+            callNextMessageSent(head, session, request);
+        }
     }
 
     private void callNextMessageSent(Entry entry, IoSession session,
