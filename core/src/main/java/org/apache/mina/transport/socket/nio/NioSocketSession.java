@@ -57,8 +57,6 @@ class NioSocketSession extends NioSession {
 
     private final SocketSessionConfig config = new SessionConfigImpl();
 
-    private final IoProcessor<NioSession> processor;
-
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
 
     private final SocketChannel ch;
@@ -77,8 +75,8 @@ class NioSocketSession extends NioSession {
      * @param ch the used channel
      */
     public NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel ch) {
+        super(processor);
         this.service = service;
-        this.processor = processor;
         this.ch = ch;
         this.handler = service.getHandler();
         this.config.setAll(service.getSessionConfig());
@@ -90,11 +88,6 @@ class NioSocketSession extends NioSession {
 
     public SocketSessionConfig getConfig() {
         return config;
-    }
-
-    @Override
-    public IoProcessor<NioSession> getProcessor() {
-        return processor;
     }
 
     public IoFilterChain getFilterChain() {

@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SelectionKey;
 
+import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IoSession;
 
@@ -31,6 +32,22 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class NioSession extends AbstractIoSession {
+    /** The NioSession processor */
+    protected final IoProcessor<NioSession> processor;
+    
+    
+    /**
+     * 
+     * Creates a new instance of NioSession, with its associated IoProcessor.
+     * <br>
+     * This method is only called by the inherited class.
+     *
+     * @param processor The associated IoProcessor
+     */
+    protected  NioSession(IoProcessor<NioSession> processor) {
+        this.processor = processor;
+    }
+
     /**
      * @return The ByteChannel associated with this {@link IoSession} 
      */
@@ -47,4 +64,11 @@ public abstract class NioSession extends AbstractIoSession {
      * @param key The new {@link SelectionKey}
      */
     abstract void setSelectionKey(SelectionKey key);
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoProcessor<NioSession> getProcessor() {
+        return processor;
+    }
 }

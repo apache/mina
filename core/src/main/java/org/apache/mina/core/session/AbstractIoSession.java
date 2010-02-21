@@ -180,7 +180,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * @return The associated IoProcessor for this session
      */
     public abstract IoProcessor getProcessor();
 
