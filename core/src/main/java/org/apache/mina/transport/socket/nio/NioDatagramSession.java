@@ -55,7 +55,6 @@ class NioDatagramSession extends NioSession {
     private final IoHandler handler;
     private final InetSocketAddress localAddress;
     private final InetSocketAddress remoteAddress;
-    private final IoProcessor<NioSession> processor;
 
     private SelectionKey key;
 
@@ -65,12 +64,12 @@ class NioDatagramSession extends NioSession {
     NioDatagramSession(IoService service,
                         DatagramChannel ch, IoProcessor<NioSession> processor,
                         SocketAddress remoteAddress) {
+        super(processor);
         this.service = service;
         this.ch = ch;
         this.config = new NioDatagramSessionConfig(ch);
         this.config.setAll(service.getSessionConfig());
         this.handler = service.getHandler();
-        this.processor = processor;
         this.remoteAddress = (InetSocketAddress) remoteAddress;
         this.localAddress = (InetSocketAddress) ch.socket().getLocalSocketAddress();
     }
@@ -78,18 +77,12 @@ class NioDatagramSession extends NioSession {
     /**
      * Creates a new connector-side session instance.
      */
-    NioDatagramSession(IoService service,
-                        DatagramChannel ch, IoProcessor<NioSession> processor) {
+    NioDatagramSession(IoService service, DatagramChannel ch, IoProcessor<NioSession> processor) {
         this(service, ch, processor, ch.socket().getRemoteSocketAddress());
     }
 
     public IoService getService() {
         return service;
-    }
-
-    @Override
-    public IoProcessor<NioSession> getProcessor() {
-        return processor;
     }
 
     public DatagramSessionConfig getConfig() {
