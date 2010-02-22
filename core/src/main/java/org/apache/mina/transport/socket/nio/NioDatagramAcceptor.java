@@ -191,18 +191,25 @@ public final class NioDatagramAcceptor
     }
 
     @Override
-    protected void setInterestedInWrite(NioSession session, boolean interested)
+    protected void setInterestedInWrite(NioSession session, boolean isInterested)
             throws Exception {
         SelectionKey key = session.getSelectionKey();
+
         if (key == null) {
             return;
         }
         
-        if (interested) {
-            key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+        int newInterestOps = key.interestOps();
+
+        if (isInterested) {
+            newInterestOps |= SelectionKey.OP_WRITE;
+            //newInterestOps &= ~SelectionKey.OP_READ;
         } else {
-            key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+            newInterestOps &= ~SelectionKey.OP_WRITE;
+            //newInterestOps |= SelectionKey.OP_READ;
         }
+
+        key.interestOps(newInterestOps);
     }
 
     @Override

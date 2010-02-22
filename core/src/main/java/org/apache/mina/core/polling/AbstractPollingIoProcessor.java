@@ -830,6 +830,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         try {
             // Clear OP_WRITE
             setInterestedInWrite(session, false);
+            
             do {
                 // Check for pending writes.
                 req = session.getCurrentWriteRequest();

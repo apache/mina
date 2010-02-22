@@ -252,18 +252,22 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     protected void setInterestedInWrite(NioSession session, boolean isInterested)
             throws Exception {
         SelectionKey key = session.getSelectionKey();
-        int oldInterestOps = key.interestOps();
-        int newInterestOps = oldInterestOps;
+
+        if (key == null) {
+            return;
+        }
+        
+        int newInterestOps = key.interestOps();
 
         if (isInterested) {
             newInterestOps |= SelectionKey.OP_WRITE;
+            //newInterestOps &= ~SelectionKey.OP_READ;
         } else {
             newInterestOps &= ~SelectionKey.OP_WRITE;
+            //newInterestOps |= SelectionKey.OP_READ;
         }
 
-        if (oldInterestOps != newInterestOps) {
-            key.interestOps(newInterestOps);
-        }
+        key.interestOps(newInterestOps);
     }
 
     @Override
