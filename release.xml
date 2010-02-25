@@ -48,7 +48,7 @@ OPEN ISSUES:
     <moduleSet>
       <includeSubModules/>
       <sources>
-        <outputDirectoryMapping>src/${module.artifactId}</outputDirectoryMapping>
+        <outputDirectoryMapping>src/${module.basedir.name}</outputDirectoryMapping>
         <fileSets>
           <fileSet>
             <includes>
