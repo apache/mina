@@ -28,9 +28,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
 
+import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.polling.AbstractPollingIoConnector;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
@@ -191,14 +193,14 @@ public final class NioSocketConnector
      * {@inheritDoc}
      */
     @Override
-    protected ConnectionRequest getConnectionRequest(SocketChannel handle) {
+    protected ConnectFuture<SocketChannel> getConnectFuture(SocketChannel handle) {
         SelectionKey key = handle.keyFor(selector);
         
         if ((key == null) || (!key.isValid())) { 
             return null;
         }
 
-        return (ConnectionRequest) key.attachment();
+        return (ConnectFuture<SocketChannel>) key.attachment();
     }
 
     /**
@@ -266,7 +268,7 @@ public final class NioSocketConnector
      * {@inheritDoc}
      */
     @Override
-    protected void register(SocketChannel handle, ConnectionRequest request)
+    protected void register(SocketChannel handle, ConnectFuture<SocketChannel> request)
             throws Exception {
         handle.register(selector, SelectionKey.OP_CONNECT, request);
     }

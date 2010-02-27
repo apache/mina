@@ -299,10 +299,10 @@ public class IoHandlerChain implements IoHandlerCommand {
         private Entry(Entry prevEntry, Entry nextEntry, String name,
                 IoHandlerCommand command) {
             if (command == null) {
-                throw new NullPointerException("command");
+                throw new IllegalArgumentException("command cannot be null");
             }
             if (name == null) {
-                throw new NullPointerException("name");
+                throw new IllegalArgumentException("name cannot be null");
             }
 
             this.prevEntry = prevEntry;

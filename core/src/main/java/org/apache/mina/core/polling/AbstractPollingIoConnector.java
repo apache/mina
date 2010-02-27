@@ -63,8 +63,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         extends AbstractIoConnector {
 
     private final Object lock = new Object();
-    private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
-    private final Queue<ConnectionRequest> cancelQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
+    private final Queue<ConnectFuture<H>> connectQueue = new ConcurrentLinkedQueue<ConnectFuture<H>>();
     private final IoProcessor<T> processor;
     private final boolean createdProcessor;
 
@@ -167,7 +166,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         super(sessionConfig, executor);
 
         if (processor == null) {
-            throw new NullPointerException("processor");
+            throw new IllegalArgumentException("processor cannot be null");
         }
 
         this.processor = processor;
@@ -282,17 +281,17 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     /**
      * Register a new client socket for connection, add it to connection polling
      * @param handle client socket handle 
-     * @param request the associated {@link ConnectionRequest}
+     * @param future the associated {@link ConnectFuture}
      * @throws Exception any exception thrown by the underlying systems calls
      */
-    protected abstract void register(H handle, ConnectionRequest request) throws Exception;
+    protected abstract void register(H handle, ConnectFuture<H> future) throws Exception;
     
     /**
-     * get the {@link ConnectionRequest} for a given client socket handle
+     * get the {@link ConnectFuture} for a given client socket handle
      * @param handle the socket client handle 
-     * @return the connection request if the socket is connecting otherwise <code>null</code>
+     * @return the connection future if the socket is connecting otherwise <code>null</code>
      */
-    protected abstract ConnectionRequest getConnectionRequest(H handle);
+    protected abstract ConnectFuture<H> getConnectFuture(H handle);
 
     /**
      * {@inheritDoc}
@@ -338,18 +337,32 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             }
         }
 
-        ConnectionRequest request = new ConnectionRequest(handle, sessionInitializer);
-        connectQueue.add(request);
+        ConnectFuture future = new DefaultConnectFuture();
+
+        long timeout = getConnectTimeoutMillis();
+        long currentTime = System.currentTimeMillis();
+
+        timeout = currentTime + timeout;
+        
+        if (timeout <= currentTime) {
+            timeout = Long.MAX_VALUE;
+        }
+
+        future.setConnector(this);
+        future.setHandle(handle);
+        future.setDeadline( timeout );
+        future.setSessionInitializer(sessionInitializer);
+
+        connectQueue.add(future);
         startupWorker();
         wakeup();
 
-        return request;
+        return future;
     }
 
     private void startupWorker() {
         if (!selectable) {
             connectQueue.clear();
-            cancelQueue.clear();
         }
 
         synchronized (lock) {
@@ -363,12 +376,14 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     private int registerNew() {
         int nHandles = 0;
         for (; ;) {
-            ConnectionRequest req = connectQueue.poll();
+            ConnectFuture<H> req = connectQueue.poll();
+            
             if (req == null) {
                 break;
             }
 
-            H handle = req.handle;
+            H handle = req.getHandle();
+            
             try {
                 register(handle, req);
                 nHandles ++;
@@ -385,14 +400,22 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     }
 
     private int cancelKeys() {
+        if (connectQueue.isEmpty()) {
+            return 0;
+        }
+        
         int nHandles = 0;
-        for (; ;) {
-            ConnectionRequest req = cancelQueue.poll();
-            if (req == null) {
-                break;
+
+        for (ConnectFuture<H> future:connectQueue ) {
+            if ( !future.isCanceled()) {
+                continue;
             }
 
-            H handle = req.handle;
+            connectQueue.remove(future);
+
+            IoConnector connector = future.getConnector();
+            H handle = future.getHandle();
+            
             try {
                 close(handle);
             } catch (Exception e) {
@@ -401,6 +424,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                 nHandles ++;
             }
         }
+        
         return nHandles;
     }
 
@@ -416,9 +440,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             H handle = handlers.next();
             handlers.remove();
 
-            ConnectionRequest connectionRequest = getConnectionRequest(handle);
+            ConnectFuture<H> connectFuture = getConnectFuture(handle);
             
-            if ( connectionRequest == null) {
+            if ( connectFuture == null) {
                 continue;
             }
             
@@ -426,18 +450,19 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             try {
                 if (finishConnect(handle)) {
                     T session = newSession(processor, handle);
-                    initSession(session, connectionRequest, connectionRequest.getSessionInitializer());
+                    initSession(session, connectFuture, connectFuture.getSessionInitializer());
                     // Forward the remaining process to the IoProcessor.
                     session.getProcessor().add(session);
                     nHandles ++;
                 }
                 success = true;
             } catch (Throwable e) {
-                connectionRequest.setException(e);
+                connectFuture.setException(e);
             } finally {
                 if (!success) {
                     // The connection failed, we have to cancel it.
-                    cancelQueue.offer(connectionRequest);
+                    connectFuture.cancel();
+                    wakeup();
                 }
             }
         }
@@ -449,12 +474,13 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
         while (handles.hasNext()) {
             H handle = handles.next();
-            ConnectionRequest connectionRequest = getConnectionRequest(handle);
+            ConnectFuture<H> connectFuture = getConnectFuture(handle);
 
-            if ((connectionRequest != null) && (currentTime >= connectionRequest.deadline)) {
-                connectionRequest.setException(
+            if ((connectFuture != null) && (currentTime >= connectFuture.getDeadline())) {
+                connectFuture.setException(
                         new ConnectException("Connection timed out."));
-                cancelQueue.offer(connectionRequest);
+                connectFuture.cancel();
+                wakeup();
             }
         }
     }
@@ -518,45 +544,6 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                         disposalFuture.setDone();
                     }
                 }
-            }
-        }
-    }
-
-    public final class ConnectionRequest extends DefaultConnectFuture {
-        private final H handle;
-        private final long deadline;
-        private final IoSessionInitializer<? extends ConnectFuture> sessionInitializer;
-
-        public ConnectionRequest(H handle, IoSessionInitializer<? extends ConnectFuture> callback) {
-            this.handle = handle;
-            long timeout = getConnectTimeoutMillis();
-            if (timeout <= 0L) {
-                this.deadline = Long.MAX_VALUE;
-            } else {
-                this.deadline = System.currentTimeMillis() + timeout;
-            }
-            this.sessionInitializer = callback;
-        }
-
-        public H getHandle() {
-            return handle;
-        }
-
-        public long getDeadline() {
-            return deadline;
-        }
-
-        public IoSessionInitializer<? extends ConnectFuture> getSessionInitializer() {
-            return sessionInitializer;
-        }
-
-        @Override
-        public void cancel() {
-            if ( !isDone() ) {
-                super.cancel();
-                cancelQueue.add(this);
-                startupWorker();
-                wakeup();
             }
         }
     }

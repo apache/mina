@@ -142,7 +142,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
     public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType,
             Executor executor, int size) {
         if (processorType == null) {
-            throw new NullPointerException("processorType");
+            throw new IllegalArgumentException("processorType cannot be null");
         }
 
         if (size <= 0) {

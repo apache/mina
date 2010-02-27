@@ -64,7 +64,7 @@ public class DefaultIoSessionDataStructureFactory implements
         
         public Object getAttribute(IoSession session, Object key, Object defaultValue) {
             if (key == null) {
-                throw new NullPointerException("key");
+                throw new IllegalArgumentException("key cannot be null");
             }
 
             Object answer = attributes.get(key);
@@ -77,7 +77,7 @@ public class DefaultIoSessionDataStructureFactory implements
 
         public Object setAttribute(IoSession session, Object key, Object value) {
             if (key == null) {
-                throw new NullPointerException("key");
+                throw new IllegalArgumentException("key cannot be null");
             }
 
             if (value == null) {
@@ -89,7 +89,7 @@ public class DefaultIoSessionDataStructureFactory implements
 
         public Object setAttributeIfAbsent(IoSession session, Object key, Object value) {
             if (key == null) {
-                throw new NullPointerException("key");
+                throw new IllegalArgumentException("key cannot be null");
             }
 
             if (value == null) {
@@ -108,7 +108,7 @@ public class DefaultIoSessionDataStructureFactory implements
 
         public Object removeAttribute(IoSession session, Object key) {
             if (key == null) {
-                throw new NullPointerException("key");
+                throw new IllegalArgumentException("key cannot be null");
             }
 
             return attributes.remove(key);
@@ -116,7 +116,7 @@ public class DefaultIoSessionDataStructureFactory implements
 
         public boolean removeAttribute(IoSession session, Object key, Object value) {
             if (key == null) {
-                throw new NullPointerException("key");
+                throw new IllegalArgumentException("key cannot be null");
             }
 
             if (value == null) {

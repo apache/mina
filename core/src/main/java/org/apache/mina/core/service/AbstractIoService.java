@@ -163,11 +163,11 @@ public abstract class AbstractIoService implements IoService {
      */
     protected AbstractIoService(IoSessionConfig sessionConfig, Executor executor) {
         if (sessionConfig == null) {
-            throw new NullPointerException("sessionConfig");
+            throw new IllegalArgumentException("sessionConfig cannot be null");
         }
 
         if (getTransportMetadata() == null) {
-            throw new NullPointerException("TransportMetadata");
+            throw new IllegalArgumentException("TransportMetadata cannot be null");
         }
 
         if (!getTransportMetadata().getSessionConfigType().isAssignableFrom(
@@ -325,7 +325,7 @@ public abstract class AbstractIoService implements IoService {
      */
     public final void setHandler(IoHandler handler) {
         if (handler == null) {
-            throw new NullPointerException("handler cannot be null");
+            throw new IllegalArgumentException("handler cannot be null");
         }
 
         if (isActive()) {
@@ -356,7 +356,7 @@ public abstract class AbstractIoService implements IoService {
     public final void setSessionDataStructureFactory(
             IoSessionDataStructureFactory sessionDataStructureFactory) {
         if (sessionDataStructureFactory == null) {
-            throw new NullPointerException("sessionDataStructureFactory");
+            throw new IllegalArgumentException("sessionDataStructureFactory cannot be null");
         }
 
         if (isActive()) {
@@ -505,7 +505,7 @@ public abstract class AbstractIoService implements IoService {
 
         public final void setException(Exception exception) {
             if (exception == null) {
-                throw new NullPointerException("exception");
+                throw new IllegalArgumentException("exception cannot be null");
             }
             setValue(exception);
         }

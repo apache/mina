@@ -20,7 +20,9 @@
 package org.apache.mina.core.future;
 
 import org.apache.mina.core.RuntimeIoException;
+import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.IoSessionInitializer;
 
 
 /**
@@ -28,8 +30,11 @@ import org.apache.mina.core.session.IoSession;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DefaultConnectFuture extends DefaultIoFuture implements
-        ConnectFuture {
+public class DefaultConnectFuture<H> extends DefaultIoFuture implements ConnectFuture<H> {
+    private H handle;
+    private IoConnector connector;
+    private long deadline;
+    private IoSessionInitializer<? extends ConnectFuture<H>> sessionInitializer;
 
     private static final Object CANCELED = new Object();
 
@@ -48,7 +53,6 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
     public DefaultConnectFuture() {
         super(null);
     }
-
     @Override
     public IoSession getSession() {
         Object v = getValue();
@@ -98,9 +102,11 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
     }
 
     public void cancel() {
-        setValue(CANCELED);
+        if ( !isDone() ) {
+            setValue(CANCELED);
+        }
     }
-
+    
     @Override
     public ConnectFuture await() throws InterruptedException {
         return (ConnectFuture) super.await();
@@ -119,5 +125,49 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
     @Override
     public ConnectFuture removeListener(IoFutureListener<?> listener) {
         return (ConnectFuture) super.removeListener(listener);
+    }
+
+    public IoConnector getConnector() {
+        return connector;
+    }
+
+    public H getHandle() {
+        return handle;
+    }
+
+    public long getDeadline() {
+        return deadline;
+    }
+
+    public IoSessionInitializer<? extends ConnectFuture<H>> getSessionInitializer() {
+        return sessionInitializer;
+    }
+
+    /**
+     * @param handler the handle to set
+     */
+    public void setHandle( H handle ) {
+        this.handle = handle;
+    }
+
+    /**
+     * @param connector the connector to set
+     */
+    public void setConnector( IoConnector connector ) {
+        this.connector = connector;
+    }
+
+    /**
+     * @param deadline the deadline to set
+     */
+    public void setDeadline( long deadline ) {
+        this.deadline = deadline;
+    }
+
+    /**
+     * @param sessionInitializer the sessionInitializer to set
+     */
+    public void setSessionInitializer( IoSessionInitializer<? extends ConnectFuture<H>> sessionInitializer ){
+        this.sessionInitializer = sessionInitializer;
     }
 }

@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.RuntimeIoException;
+import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.polling.AbstractPollingIoConnector;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoProcessor;
@@ -63,8 +64,8 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
 
     private static final int POLLSET_SIZE = 1024;
 
-    private final Map<Long, ConnectionRequest> requests =
-        new HashMap<Long, ConnectionRequest>(POLLSET_SIZE);
+    private final Map<Long, ConnectFuture<Long>> futures =
+        new HashMap<Long, ConnectFuture<Long>>(POLLSET_SIZE);
 
     private final Object wakeupLock = new Object();
     private volatile long wakeupSocket;
@@ -213,8 +214,8 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      * {@inheritDoc}
      */
     @Override
-    protected ConnectionRequest getConnectionRequest(Long handle) {
-        return requests.get(handle);
+    protected ConnectFuture<Long> getConnectFuture(Long handle) {
+        return futures.get(handle);
     }
 
     /**
@@ -235,7 +236,8 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     @Override
     protected boolean finishConnect(Long handle) throws Exception {
         Poll.remove(pollset, handle);
-        requests.remove(handle);
+        futures.remove(handle);
+        
         if (failedHandles.remove(handle)) {
             int rv = Socket.recvb(handle, dummyBuffer, 0, 1);
             throwException(rv);
@@ -303,14 +305,15 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      * {@inheritDoc}
      */
     @Override
-    protected void register(Long handle, ConnectionRequest request)
+    protected void register(Long handle, ConnectFuture<Long> future)
             throws Exception {
         int rv = Poll.add(pollset, handle, Poll.APR_POLLOUT);
+        
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
         }
 
-        requests.put(handle, request);
+        futures.put(handle, future);
     }
 
     /**

@@ -52,35 +52,39 @@ public class DefaultTransportMetadata implements TransportMetadata {
             Class<?>... envelopeTypes) {
 
         if (providerName == null) {
-            throw new NullPointerException("providerName");
+            throw new IllegalArgumentException("providerName cannot be null");
         }
+        
         if (name == null) {
-            throw new NullPointerException("name");
+            throw new IllegalArgumentException("name cannot be null");
         }
 
         providerName = providerName.trim().toLowerCase();
+        
         if (providerName.length() == 0) {
             throw new IllegalArgumentException("providerName is empty.");
         }
+        
         name = name.trim().toLowerCase();
+        
         if (name.length() == 0) {
             throw new IllegalArgumentException("name is empty.");
         }
         
         if (addressType == null) {
-            throw new NullPointerException("addressType");
+            throw new IllegalArgumentException("addressType cannot be null");
         }
 
         if (envelopeTypes == null) {
-            throw new NullPointerException("envelopeTypes");
+            throw new IllegalArgumentException("envelopeTypes cannot be null");
         }
 
         if (envelopeTypes.length == 0) {
-            throw new NullPointerException("envelopeTypes is empty.");
+            throw new IllegalArgumentException("envelopeTypes is empty.");
         }
 
         if (sessionConfigType == null) {
-            throw new NullPointerException("sessionConfigType");
+            throw new IllegalArgumentException("sessionConfigType cannot be null");
         }
 
         this.providerName = providerName;

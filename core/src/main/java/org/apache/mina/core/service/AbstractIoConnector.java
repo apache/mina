@@ -129,7 +129,7 @@ public abstract class AbstractIoConnector
      */
     public final void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress) {
         if (defaultRemoteAddress == null) {
-            throw new NullPointerException("defaultRemoteAddress");
+            throw new IllegalArgumentException("defaultRemoteAddress cannot be null");
         }
         
         if (!getTransportMetadata().getAddressType().isAssignableFrom(
@@ -198,7 +198,7 @@ public abstract class AbstractIoConnector
         }
 
         if (remoteAddress == null) {
-            throw new NullPointerException("remoteAddress");
+            throw new IllegalArgumentException("remoteAddress is null, cannot connect");
         }
 
         if (!getTransportMetadata().getAddressType().isAssignableFrom(

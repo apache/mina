@@ -47,7 +47,7 @@ public class ChainedIoHandler extends IoHandlerAdapter {
      */
     public ChainedIoHandler(IoHandlerChain chain) {
         if (chain == null) {
-            throw new NullPointerException("chain");
+            throw new IllegalArgumentException("chain cannot be null");
         }
         this.chain = chain;
     }

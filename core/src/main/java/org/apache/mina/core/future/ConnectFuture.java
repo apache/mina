@@ -19,7 +19,9 @@
  */
 package org.apache.mina.core.future;
 
+import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.IoSessionInitializer;
 
 /**
  * An {@link IoFuture} for asynchronous connect requests.
@@ -35,7 +37,16 @@ import org.apache.mina.core.session.IoSession;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface ConnectFuture extends IoFuture {
+public interface ConnectFuture<H> extends IoFuture {
+    H getHandle();
+    void setHandle(H handle);
+    IoConnector getConnector();
+    void setConnector(IoConnector connector);
+    long getDeadline();
+    void setDeadline(long deadline);
+    IoSessionInitializer<? extends ConnectFuture<H>> getSessionInitializer();
+    void setSessionInitializer(IoSessionInitializer<? extends ConnectFuture<H>> sessionInitializer);
+    
     /**
      * Returns {@link IoSession} which is the result of connect operation.
      *

@@ -46,7 +46,7 @@ public class IoFilterEvent extends IoEvent {
         super(type, session, parameter);
 
         if (nextFilter == null) {
-            throw new NullPointerException("nextFilter");
+            throw new IllegalArgumentException("nextFilter cannot be null");
         }
         this.nextFilter = nextFilter;
     }

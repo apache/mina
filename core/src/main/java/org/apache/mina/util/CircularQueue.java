@@ -119,7 +119,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
 
     public boolean offer(E item) {
         if (item == null) {
-            throw new NullPointerException("item");
+            throw new IllegalArgumentException("item cannot be null");
         }
         
         expandIfNeeded();

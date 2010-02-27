@@ -76,7 +76,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
      */
     public DefaultIoFilterChain(AbstractIoSession session) {
         if (session == null) {
-            throw new NullPointerException("session");
+            throw new IllegalArgumentException("session cannot be null");
         }
 
         this.session = session;
@@ -755,10 +755,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         private EntryImpl(EntryImpl prevEntry, EntryImpl nextEntry,
                 String name, IoFilter filter) {
             if (filter == null) {
-                throw new NullPointerException("filter");
+                throw new IllegalArgumentException("filter cannot be null");
             }
+            
             if (name == null) {
-                throw new NullPointerException("name");
+                throw new IllegalArgumentException("name cannnot be null");
             }
 
             this.prevEntry = prevEntry;
@@ -829,7 +830,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
         private void setFilter(IoFilter filter) {
             if (filter == null) {
-                throw new NullPointerException("filter");
+                throw new IllegalArgumentException("filter cannot be null");
             }
 
             this.filter = filter;

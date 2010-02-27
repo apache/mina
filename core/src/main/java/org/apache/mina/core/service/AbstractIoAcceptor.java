@@ -132,7 +132,7 @@ public abstract class AbstractIoAcceptor
      */
     public final void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
-            throw new NullPointerException("localAddresses");
+            throw new IllegalArgumentException("localAddresses cannot be null");
         }
         setDefaultLocalAddresses((Iterable<? extends SocketAddress>) localAddresses);
     }
@@ -142,7 +142,7 @@ public abstract class AbstractIoAcceptor
      */
     public final void setDefaultLocalAddresses(Iterable<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
-            throw new NullPointerException("localAddresses");
+            throw new IllegalArgumentException("localAddresses cannot be null");
         }
         
         synchronized (bindLock) {
@@ -213,7 +213,7 @@ public abstract class AbstractIoAcceptor
      */
     public final void bind(SocketAddress localAddress) throws IOException {
         if (localAddress == null) {
-            throw new NullPointerException("localAddress");
+            throw new IllegalArgumentException("localAddress cannot be null");
         }
         
         List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(1);
@@ -252,7 +252,7 @@ public abstract class AbstractIoAcceptor
         }
         
         if (localAddresses == null) {
-            throw new NullPointerException("localAddresses");
+            throw new IllegalArgumentException("localAddresses cannot be null");
         }
         
         List<SocketAddress> localAddressesCopy = new ArrayList<SocketAddress>();
@@ -305,7 +305,7 @@ public abstract class AbstractIoAcceptor
      */
     public final void unbind(SocketAddress localAddress) {
         if (localAddress == null) {
-            throw new NullPointerException("localAddress");
+            throw new IllegalArgumentException("localAddress cannot be null");
         }
         
         List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(1);
@@ -319,10 +319,10 @@ public abstract class AbstractIoAcceptor
     public final void unbind(SocketAddress firstLocalAddress,
             SocketAddress... otherLocalAddresses) {
         if (firstLocalAddress == null) {
-            throw new NullPointerException("firstLocalAddress");
+            throw new IllegalArgumentException("firstLocalAddress cannot be null");
         }
         if (otherLocalAddresses == null) {
-            throw new NullPointerException("otherLocalAddresses");
+            throw new IllegalArgumentException("otherLocalAddresses cannot be null");
         }
         
         List<SocketAddress> localAddresses = new ArrayList<SocketAddress>();
@@ -336,7 +336,7 @@ public abstract class AbstractIoAcceptor
      */
     public final void unbind(Iterable<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
-            throw new NullPointerException("localAddresses");
+            throw new IllegalArgumentException("localAddresses cannot be null");
         }
         
         boolean deactivate = false;

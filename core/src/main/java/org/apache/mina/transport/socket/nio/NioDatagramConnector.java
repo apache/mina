@@ -24,7 +24,9 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.Executor;
 
+import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.polling.AbstractPollingIoConnector;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoProcessor;
@@ -166,7 +168,7 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected ConnectionRequest getConnectionRequest(DatagramChannel handle) {
+    protected ConnectFuture<DatagramChannel> getConnectFuture(DatagramChannel handle) {
         throw new UnsupportedOperationException();
     }
 
@@ -181,7 +183,7 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected void register(DatagramChannel handle, ConnectionRequest request)
+    protected void register(DatagramChannel handle, ConnectFuture<DatagramChannel> future)
             throws Exception {
         throw new UnsupportedOperationException();
     }

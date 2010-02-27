@@ -245,7 +245,7 @@ class ByteArrayList
             
             if ( ba == null )
             {
-                throw new NullPointerException( "ByteArray must not be null." );
+                throw new IllegalArgumentException( "ByteArray must not be null." );
             }
             this.ba = ba;
         }

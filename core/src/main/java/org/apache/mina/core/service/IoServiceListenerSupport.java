@@ -70,7 +70,7 @@ public class IoServiceListenerSupport {
      */
     public IoServiceListenerSupport(IoService service) {
         if (service == null) {
-            throw new NullPointerException("service");
+            throw new IllegalArgumentException("service cannot be null");
         }
         
         this.service = service;
