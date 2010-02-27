@@ -312,18 +312,31 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         H handle = null;
         boolean success = false;
+        
         try {
             handle = newHandle(localAddress);
+            
             if (connect(handle, remoteAddress)) {
+                // The connection has been established : it was a blocking handle
+                // We create the Future that will be returned to the user
                 ConnectFuture future = new DefaultConnectFuture();
+                
+                // We create the session
                 T session = newSession(processor, handle);
+                
+                // and we initialize it
                 initSession(session, future, sessionInitializer);
+                
                 // Forward the remaining process to the IoProcessor.
                 session.getProcessor().add(session);
                 success = true;
+                
                 return future;
             }
 
+            // The connect wasn't achieve immediately, but we didn't
+            // get an exception : this is ok, but we have to wait for
+            // the connecton completion.
             success = true;
         } catch (Exception e) {
             return DefaultConnectFuture.newFailedFuture(e);

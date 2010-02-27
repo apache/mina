@@ -201,16 +201,14 @@ public abstract class AbstractIoConnector
             throw new IllegalArgumentException("remoteAddress is null, cannot connect");
         }
 
-        if (!getTransportMetadata().getAddressType().isAssignableFrom(
-                remoteAddress.getClass())) {
+        if (!getTransportMetadata().getAddressType().isAssignableFrom(remoteAddress.getClass())) {
             throw new IllegalArgumentException("remoteAddress type: "
                     + remoteAddress.getClass() + " (expected: "
                     + getTransportMetadata().getAddressType() + ")");
         }
 
-        if (localAddress != null
-                && !getTransportMetadata().getAddressType().isAssignableFrom(
-                        localAddress.getClass())) {
+        if ((localAddress != null)
+                && !getTransportMetadata().getAddressType().isAssignableFrom(localAddress.getClass())) {
             throw new IllegalArgumentException("localAddress type: "
                     + localAddress.getClass() + " (expected: "
                     + getTransportMetadata().getAddressType() + ")");

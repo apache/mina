@@ -31,9 +31,16 @@ import org.apache.mina.core.session.IoSessionInitializer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultConnectFuture<H> extends DefaultIoFuture implements ConnectFuture<H> {
+    /** The Handle we connect to */
     private H handle;
+    
+    /** The associated connector */
     private IoConnector connector;
+    
+    /** The maximum delay for the connection establishment */
     private long deadline;
+    
+    /** The session initializer callback */
     private IoSessionInitializer<? extends ConnectFuture<H>> sessionInitializer;
 
     private static final Object CANCELED = new Object();
@@ -53,9 +60,11 @@ public class DefaultConnectFuture<H> extends DefaultIoFuture implements ConnectF
     public DefaultConnectFuture() {
         super(null);
     }
+    
     @Override
     public IoSession getSession() {
         Object v = getValue();
+        
         if (v instanceof RuntimeException) {
             throw (RuntimeException) v;
         } else if (v instanceof Error) {
@@ -83,6 +92,9 @@ public class DefaultConnectFuture<H> extends DefaultIoFuture implements ConnectF
         return getValue() instanceof IoSession;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isCanceled() {
         return getValue() == CANCELED;
     }

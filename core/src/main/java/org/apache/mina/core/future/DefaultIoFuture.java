@@ -50,7 +50,7 @@ public class DefaultIoFuture implements IoFuture {
     private Object result;
     private boolean ready;
     private int waiters;
-
+    
     /**
      * Creates a new instance associated with an {@link IoSession}.
      *
@@ -175,9 +175,9 @@ public class DefaultIoFuture implements IoFuture {
 
         synchronized (lock) {
             if (ready) {
-                return ready;
+                return true;
             } else if (timeoutMillis <= 0) {
-                return ready;
+                return false;
             }
 
             waiters++;
