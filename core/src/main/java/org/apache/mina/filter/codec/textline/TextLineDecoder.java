@@ -42,11 +42,17 @@ public class TextLineDecoder implements ProtocolDecoder {
 
     private final Charset charset;
 
+    /** The delimiter used to determinate when a line has been fully decoded */
     private final LineDelimiter delimiter;
 
+    /** An IoBuffer containing the delimiter */
     private IoBuffer delimBuf;
 
+    /** The default maximum Line length. Default to 1024. */
     private int maxLineLength = 1024;
+
+    /** The default maximum buffer length. Default to 128 chars. */
+    private int bufferLength = 128;
 
     /**
      * Creates a new instance with the current default {@link Charset}
@@ -94,14 +100,29 @@ public class TextLineDecoder implements ProtocolDecoder {
      */
     public TextLineDecoder(Charset charset, LineDelimiter delimiter) {
         if (charset == null) {
-            throw new NullPointerException("charset");
+            throw new IllegalArgumentException("charset parameter shuld not be null");
         }
+        
         if (delimiter == null) {
-            throw new NullPointerException("delimiter");
+            throw new IllegalArgumentException("delimiter parameter should not be null");
         }
 
         this.charset = charset;
         this.delimiter = delimiter;
+        
+        // Convert delimiter to ByteBuffer if not done yet.
+        if (delimBuf == null) {
+            IoBuffer tmp = IoBuffer.allocate(2).setAutoExpand(true);
+            
+            try{
+                tmp.putString(delimiter.getValue(), charset.newEncoder());
+            } catch (CharacterCodingException cce) {
+                
+            }
+            
+            tmp.flip();
+            delimBuf = tmp;
+        }
     }
 
     /**
@@ -122,13 +143,41 @@ public class TextLineDecoder implements ProtocolDecoder {
      */
     public void setMaxLineLength(int maxLineLength) {
         if (maxLineLength <= 0) {
-            throw new IllegalArgumentException("maxLineLength: "
-                    + maxLineLength);
+            throw new IllegalArgumentException("maxLineLength ("
+                    + maxLineLength + ") should be a positive value");
         }
 
         this.maxLineLength = maxLineLength;
     }
+    
+    /**
+     * Sets the default buffer size. This buffer is used in the Context
+     * to store the decoded line.
+     *
+     * @param bufferLength The default bufer size
+     */
+    public void setBufferLength(int bufferLength) {
+        if ( bufferLength <= 0) {
+            throw new IllegalArgumentException("bufferLength ("
+                + maxLineLength + ") should be a positive value");
+            
+        }
+        
+        this.bufferLength = bufferLength;
+    }
+    
+    /**
+     * Returns the allowed buffer size used to store the decoded line
+     * in the Context instance.
+     */
+    public int getBufferLength() {
+        return bufferLength;
+    }
 
+
+    /**
+     * {@inheritDoc}
+     */
     public void decode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
         Context ctx = getContext(session);
@@ -140,52 +189,70 @@ public class TextLineDecoder implements ProtocolDecoder {
         }
     }
 
+    /**
+     * Return the context for this session
+     */
     private Context getContext(IoSession session) {
         Context ctx;
         ctx = (Context) session.getAttribute(CONTEXT);
+        
         if (ctx == null) {
-            ctx = new Context();
+            ctx = new Context(bufferLength);
             session.setAttribute(CONTEXT, ctx);
         }
+        
         return ctx;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void dispose(IoSession session) throws Exception {
         Context ctx = (Context) session.getAttribute(CONTEXT);
+        
         if (ctx != null) {
             session.removeAttribute(CONTEXT);
         }
     }
 
+    /**
+     * Decode a line using the default delimiter on the current system
+     */
     private void decodeAuto(Context ctx, IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws CharacterCodingException, ProtocolDecoderException {
-
         int matchCount = ctx.getMatchCount();
 
         // Try to find a match
         int oldPos = in.position();
         int oldLimit = in.limit();
+
         while (in.hasRemaining()) {
             byte b = in.get();
             boolean matched = false;
+            
             switch (b) {
-            case '\r':
-                // Might be Mac, but we don't auto-detect Mac EOL
-                // to avoid confusion.
-                matchCount++;
-                break;
-            case '\n':
-                // UNIX
-                matchCount++;
-                matched = true;
-                break;
-            default:
-                matchCount = 0;
+                case '\r':
+                    // Might be Mac, but we don't auto-detect Mac EOL
+                    // to avoid confusion.
+                    matchCount++;
+                    break;
+                    
+                case '\n':
+                    // UNIX
+                    matchCount++;
+                    matched = true;
+                    break;
+                    
+                default:
+                    matchCount = 0;
             }
 
             if (matched) {
@@ -203,6 +270,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                     IoBuffer buf = ctx.getBuffer();
                     buf.flip();
                     buf.limit(buf.limit() - matchCount);
+                    
                     try {
                         writeText(session, buf.getString(ctx.getDecoder()), out);
                     } finally {
@@ -227,26 +295,23 @@ public class TextLineDecoder implements ProtocolDecoder {
         ctx.setMatchCount(matchCount);
     }
 
+    /**
+     * Decode a line using the delimiter defined by the caller
+     */
     private void decodeNormal(Context ctx, IoSession session, IoBuffer in, ProtocolDecoderOutput out)
             throws CharacterCodingException, ProtocolDecoderException {
-
         int matchCount = ctx.getMatchCount();
-
-        // Convert delimiter to ByteBuffer if not done yet.
-        if (delimBuf == null) {
-            IoBuffer tmp = IoBuffer.allocate(2).setAutoExpand(true);
-            tmp.putString(delimiter.getValue(), charset.newEncoder());
-            tmp.flip();
-            delimBuf = tmp;
-        }
 
         // Try to find a match
         int oldPos = in.position();
         int oldLimit = in.limit();
+        
         while (in.hasRemaining()) {
             byte b = in.get();
+            
             if (delimBuf.get(matchCount) == b) {
                 matchCount++;
+                
                 if (matchCount == delimBuf.limit()) {
                     // Found a match.
                     int pos = in.position();
@@ -257,10 +322,12 @@ public class TextLineDecoder implements ProtocolDecoder {
 
                     in.limit(oldLimit);
                     in.position(pos);
+                    
                     if (ctx.getOverflowPosition() == 0) {
                         IoBuffer buf = ctx.getBuffer();
                         buf.flip();
                         buf.limit(buf.limit() - matchCount);
+                        
                         try {
                             writeText(session, buf.getString(ctx.getDecoder()), out);
                         } finally {
@@ -303,15 +370,30 @@ public class TextLineDecoder implements ProtocolDecoder {
         out.write(text);
     }
 
+    /**
+     * A Context used during the decoding of a lin. It stores the decoder, 
+     * the temporary buffer containing the decoded line, and other status flags.
+     *
+     * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+     * @version $Rev$, $Date$
+     */
     private class Context {
+        /** The decoder */
         private final CharsetDecoder decoder;
+        
+        /** The temporary buffer containing the decoded line */
         private final IoBuffer buf;
+        
+        /** The number of lines found so far */
         private int matchCount = 0;
+        
+        /** A counter to signal that the line is too long */
         private int overflowPosition = 0;
 
-        private Context() {
+        /** Create a new Context object with a default buffer */
+        private Context(int bufferLength) {
             decoder = charset.newDecoder();
-            buf = IoBuffer.allocate(80).setAutoExpand(true);
+            buf = IoBuffer.allocate(bufferLength).setAutoExpand(true);
         }
 
         public CharsetDecoder getDecoder() {
@@ -358,6 +440,7 @@ public class TextLineDecoder implements ProtocolDecoder {
             } else {
                 overflowPosition += in.remaining();
             }
+            
             in.position(in.limit());
         }
     }
