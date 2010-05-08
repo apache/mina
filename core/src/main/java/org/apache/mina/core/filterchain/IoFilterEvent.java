@@ -38,6 +38,9 @@ import org.slf4j.LoggerFactory;
 public class IoFilterEvent extends IoEvent {
     /** A logger for this class */
     static Logger LOGGER = LoggerFactory.getLogger(IoFilterEvent.class);
+    
+    /** A speedup for logs */
+    static boolean DEBUG = LOGGER.isDebugEnabled();
 
     private final NextFilter nextFilter;
 
@@ -46,8 +49,9 @@ public class IoFilterEvent extends IoEvent {
         super(type, session, parameter);
 
         if (nextFilter == null) {
-            throw new NullPointerException("nextFilter");
+            throw new IllegalArgumentException("nextFilter must not be null");
         }
+        
         this.nextFilter = nextFilter;
     }
 
@@ -61,7 +65,7 @@ public class IoFilterEvent extends IoEvent {
         NextFilter nextFilter = getNextFilter();
         IoEventType type = getType();
 
-        if ( LOGGER.isDebugEnabled()) {
+        if (DEBUG) {
             LOGGER.debug( "Firing a {} event for session {}",type, session.getId() );
         }
 
@@ -70,38 +74,47 @@ public class IoFilterEvent extends IoEvent {
             Object parameter = getParameter();
             nextFilter.messageReceived(session, parameter);
             break;
+            
         case MESSAGE_SENT:
             WriteRequest writeRequest = (WriteRequest)getParameter();
             nextFilter.messageSent(session, writeRequest);
             break;
+            
         case WRITE:
             writeRequest = (WriteRequest)getParameter();
             nextFilter.filterWrite(session, writeRequest);
             break;
+            
         case CLOSE:
             nextFilter.filterClose(session);
             break;
+            
         case EXCEPTION_CAUGHT:
             Throwable throwable = (Throwable)getParameter();
             nextFilter.exceptionCaught(session, throwable);
             break;
+            
         case SESSION_IDLE:
             nextFilter.sessionIdle(session, (IdleStatus) getParameter());
             break;
+            
         case SESSION_OPENED:
             nextFilter.sessionOpened(session);
             break;
+            
         case SESSION_CREATED:
             nextFilter.sessionCreated(session);
             break;
+            
         case SESSION_CLOSED:
             nextFilter.sessionClosed(session);
             break;
+            
         default:
             throw new IllegalArgumentException("Unknown event type: " + type);
         }
         
-        if ( LOGGER.isDebugEnabled()) {
+        if (DEBUG) {
             LOGGER.debug( "Event {} has been fired for session {}", type, session.getId() );
         }
     }
