@@ -36,7 +36,7 @@ public class ArrayEditor extends AbstractPropertyEditor {
     
     public ArrayEditor(Class<?> componentType) {
         if (componentType == null) {
-            throw new NullPointerException("componentType");
+            throw new IllegalArgumentException("componentType");
         }
         
         this.componentType = componentType;

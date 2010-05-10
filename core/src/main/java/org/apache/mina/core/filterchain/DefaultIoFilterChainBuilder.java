@@ -77,7 +77,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      */
     public DefaultIoFilterChainBuilder(DefaultIoFilterChainBuilder filterChain) {
         if (filterChain == null) {
-            throw new NullPointerException("filterChain");
+            throw new IllegalArgumentException("filterChain");
         }
         entries = new CopyOnWriteArrayList<Entry>(filterChain.entries);
     }
@@ -233,7 +233,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      */
     public synchronized IoFilter remove(String name) {
         if (name == null) {
-            throw new NullPointerException("name");
+            throw new IllegalArgumentException("name");
         }
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
@@ -252,7 +252,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      */
     public synchronized IoFilter remove(IoFilter filter) {
         if (filter == null) {
-            throw new NullPointerException("filter");
+            throw new IllegalArgumentException("filter");
         }
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
@@ -271,7 +271,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      */
     public synchronized IoFilter remove(Class<? extends IoFilter> filterType) {
         if (filterType == null) {
-            throw new NullPointerException("filterType");
+            throw new IllegalArgumentException("filterType");
         }
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
@@ -332,7 +332,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      */
     public void setFilters(Map<String, ? extends IoFilter> filters) {
         if (filters == null) {
-            throw new NullPointerException("filters");
+            throw new IllegalArgumentException("filters");
         }
         
         if (!isOrderedMap(filters)) {
@@ -344,10 +344,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         filters = new LinkedHashMap<String, IoFilter>(filters);
         for (Map.Entry<String, ? extends IoFilter> e: filters.entrySet()) {
             if (e.getKey() == null) {
-                throw new NullPointerException("filters contains a null key.");
+                throw new IllegalArgumentException("filters contains a null key.");
             }
             if (e.getValue() == null) {
-                throw new NullPointerException("filters contains a null value.");
+                throw new IllegalArgumentException("filters contains a null value.");
             }
         }
         
@@ -485,7 +485,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     private void checkBaseName(String baseName) {
         if (baseName == null) {
-            throw new NullPointerException("baseName");
+            throw new IllegalArgumentException("baseName");
         }
 
         if (!contains(baseName)) {
@@ -509,10 +509,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
         private EntryImpl(String name, IoFilter filter) {
             if (name == null) {
-                throw new NullPointerException("name");
+                throw new IllegalArgumentException("name");
             }
             if (filter == null) {
-                throw new NullPointerException("filter");
+                throw new IllegalArgumentException("filter");
             }
 
             this.name = name;

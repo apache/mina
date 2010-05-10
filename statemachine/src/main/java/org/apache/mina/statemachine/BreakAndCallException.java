@@ -37,7 +37,7 @@ class BreakAndCallException extends BreakException {
 
     public BreakAndCallException(String stateId, String returnToStateId, boolean now) {
         if (stateId == null) {
-            throw new NullPointerException("stateId");
+            throw new IllegalArgumentException("stateId");
         }
         this.stateId = stateId;
         this.returnToStateId = returnToStateId;

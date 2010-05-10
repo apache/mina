@@ -39,7 +39,7 @@ public class SynchronizedProtocolEncoder implements ProtocolEncoder {
      */
     public SynchronizedProtocolEncoder(ProtocolEncoder encoder) {
         if (encoder == null) {
-            throw new NullPointerException("encoder");
+            throw new IllegalArgumentException("encoder");
         }
         this.encoder = encoder;
     }

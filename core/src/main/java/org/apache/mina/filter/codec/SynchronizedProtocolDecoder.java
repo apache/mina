@@ -41,7 +41,7 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
      */
     public SynchronizedProtocolDecoder(ProtocolDecoder decoder) {
         if (decoder == null) {
-            throw new NullPointerException("decoder");
+            throw new IllegalArgumentException("decoder");
         }
         this.decoder = decoder;
     }

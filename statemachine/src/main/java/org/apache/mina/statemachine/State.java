@@ -131,7 +131,7 @@ public class State {
      */
     public State addTransition(Transition transition, int weight) {
         if (transition == null) {
-            throw new NullPointerException("transition");
+            throw new IllegalArgumentException("transition");
         }
 
         transitionHolders.add(new TransitionHolder(transition, weight));

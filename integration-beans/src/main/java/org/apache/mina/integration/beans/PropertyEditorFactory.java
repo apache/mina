@@ -84,7 +84,7 @@ public final class PropertyEditorFactory {
     // parent type / property name / property type
     public static PropertyEditor getInstance(Class<?> type) {
         if (type == null) {
-            throw new NullPointerException("type");
+            throw new IllegalArgumentException("type");
         }
         
         if (type.isEnum()) {

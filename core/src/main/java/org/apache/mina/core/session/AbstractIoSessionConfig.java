@@ -47,7 +47,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
      */
     public final void setAll(IoSessionConfig config) {
         if (config == null) {
-            throw new NullPointerException("config");
+            throw new IllegalArgumentException("config");
         }
 
         setReadBufferSize(config.getReadBufferSize());

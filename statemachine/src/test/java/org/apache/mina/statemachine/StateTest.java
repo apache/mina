@@ -87,8 +87,8 @@ public class StateTest extends RMockTestCase {
     public void testAddNullTransitionThrowsException() throws Exception {
         try {
             state.addTransition(null);
-            fail("null transition added. NullPointerException expected.");
-        } catch (NullPointerException npe) {
+            fail("null transition added. IllegalArgumentException expected.");
+        } catch (IllegalArgumentException npe) {
         }
     }
     

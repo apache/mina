@@ -235,7 +235,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
 
         if (remoteAddress == null) {
-            throw new NullPointerException("remoteAddress");
+            throw new IllegalArgumentException("remoteAddress");
         }
 
         synchronized (bindLock) {

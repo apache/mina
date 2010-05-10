@@ -160,7 +160,7 @@ public class IoBufferDecoder {
      */
     public void setDelimiter(byte[] delim, boolean resetMatchCount) {
         if (delim == null) {
-            throw new NullPointerException("Null delimiter not allowed");
+            throw new IllegalArgumentException("Null delimiter not allowed");
         }
 
         // Convert delimiter to IoBuffer.

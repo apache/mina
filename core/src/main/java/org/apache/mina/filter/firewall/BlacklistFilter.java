@@ -53,7 +53,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void setBlacklist(InetAddress[] addresses) {
         if (addresses == null) {
-            throw new NullPointerException("addresses");
+            throw new IllegalArgumentException("addresses");
         }
         blacklist.clear();
         for (int i = 0; i < addresses.length; i++) {
@@ -71,7 +71,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void setSubnetBlacklist(Subnet[] subnets) {
         if (subnets == null) {
-            throw new NullPointerException("Subnets must not be null");
+            throw new IllegalArgumentException("Subnets must not be null");
         }
         blacklist.clear();
         for (Subnet subnet : subnets) {
@@ -91,7 +91,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void setBlacklist(Iterable<InetAddress> addresses) {
         if (addresses == null) {
-            throw new NullPointerException("addresses");
+            throw new IllegalArgumentException("addresses");
         }
 
         blacklist.clear();
@@ -110,7 +110,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void setSubnetBlacklist(Iterable<Subnet> subnets) {
         if (subnets == null) {
-            throw new NullPointerException("Subnets must not be null");
+            throw new IllegalArgumentException("Subnets must not be null");
         }
         blacklist.clear();
         for (Subnet subnet : subnets) {
@@ -123,7 +123,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void block(InetAddress address) {
         if (address == null) {
-            throw new NullPointerException("Adress to block can not be null");
+            throw new IllegalArgumentException("Adress to block can not be null");
         }
 
         block(new Subnet(address, 32));
@@ -134,7 +134,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void block(Subnet subnet) {
         if(subnet == null) {
-            throw new NullPointerException("Subnet can not be null");
+            throw new IllegalArgumentException("Subnet can not be null");
         }
         
         blacklist.add(subnet);
@@ -145,7 +145,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void unblock(InetAddress address) {
         if (address == null) {
-            throw new NullPointerException("Adress to unblock can not be null");
+            throw new IllegalArgumentException("Adress to unblock can not be null");
         }
         
         unblock(new Subnet(address, 32));
@@ -156,7 +156,7 @@ public class BlacklistFilter extends IoFilterAdapter {
      */
     public void unblock(Subnet subnet) {
         if (subnet == null) {
-            throw new NullPointerException("Subnet can not be null");
+            throw new IllegalArgumentException("Subnet can not be null");
         }
         blacklist.remove(subnet);
     }

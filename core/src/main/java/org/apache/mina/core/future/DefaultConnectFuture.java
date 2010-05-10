@@ -85,14 +85,14 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
 
     public void setSession(IoSession session) {
         if (session == null) {
-            throw new NullPointerException("session");
+            throw new IllegalArgumentException("session");
         }
         setValue(session);
     }
 
     public void setException(Throwable exception) {
         if (exception == null) {
-            throw new NullPointerException("exception");
+            throw new IllegalArgumentException("exception");
         }
         setValue(exception);
     }

@@ -33,15 +33,15 @@ public class Response {
 
     public Response(Request request, Object message, ResponseType type) {
         if (request == null) {
-            throw new NullPointerException("request");
+            throw new IllegalArgumentException("request");
         }
 
         if (message == null) {
-            throw new NullPointerException("message");
+            throw new IllegalArgumentException("message");
         }
 
         if (type == null) {
-            throw new NullPointerException("type");
+            throw new IllegalArgumentException("type");
         }
 
         this.request = request;

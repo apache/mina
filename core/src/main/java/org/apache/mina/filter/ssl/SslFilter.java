@@ -185,7 +185,7 @@ public class SslFilter extends IoFilterAdapter {
      */
     public SslFilter(SSLContext sslContext, boolean autoStart) {
         if (sslContext == null) {
-            throw new NullPointerException("sslContext");
+            throw new IllegalArgumentException("sslContext");
         }
 
         this.sslContext = sslContext;

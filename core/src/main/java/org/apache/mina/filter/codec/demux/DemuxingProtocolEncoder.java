@@ -61,7 +61,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     @SuppressWarnings("unchecked")
     public void addMessageEncoder(Class<?> messageType, Class<? extends MessageEncoder> encoderClass) {
         if (encoderClass == null) {
-            throw new NullPointerException("encoderClass");
+            throw new IllegalArgumentException("encoderClass");
         }
 
         try {
@@ -90,11 +90,11 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
 
     public <T> void addMessageEncoder(Class<T> messageType, MessageEncoderFactory<? super T> factory) {
         if (messageType == null) {
-            throw new NullPointerException("messageType");
+            throw new IllegalArgumentException("messageType");
         }
         
         if (factory == null) {
-            throw new NullPointerException("factory");
+            throw new IllegalArgumentException("factory");
         }
         
         synchronized (type2encoderFactory) {
@@ -244,7 +244,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
 
         private SingletonMessageEncoderFactory(MessageEncoder<T> encoder) {
             if (encoder == null) {
-                throw new NullPointerException("encoder");
+                throw new IllegalArgumentException("encoder");
             }
             this.encoder = encoder;
         }
@@ -260,7 +260,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
 
         private DefaultConstructorMessageEncoderFactory(Class<MessageEncoder<T>> encoderClass) {
             if (encoderClass == null) {
-                throw new NullPointerException("encoderClass");
+                throw new IllegalArgumentException("encoderClass");
             }
 
             if (!MessageEncoder.class.isAssignableFrom(encoderClass)) {

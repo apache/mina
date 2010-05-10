@@ -42,7 +42,7 @@ public class CollectionEditor extends AbstractPropertyEditor {
     
     public CollectionEditor(Class<?> elementType) {
         if (elementType == null) {
-            throw new NullPointerException("elementType");
+            throw new IllegalArgumentException("elementType");
         }
         
         this.elementType = elementType;

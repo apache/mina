@@ -47,11 +47,11 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
      * instance.
      * 
      * @param state the {@link DecodingState}.
-     * @throws NullPointerException if the specified state is <code>null</code>.
+     * @throws IllegalArgumentException if the specified state is <code>null</code>.
      */
     public DecodingStateProtocolDecoder(DecodingState state) {
         if (state == null) {
-            throw new NullPointerException("state");
+            throw new IllegalArgumentException("state");
         }
         this.state = state;
     }

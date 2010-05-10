@@ -555,7 +555,7 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     private void init(Executor executor, boolean manageableExecutor, IoEventType... eventTypes) {
         if (executor == null) {
-            throw new NullPointerException("executor");
+            throw new IllegalArgumentException("executor");
         }
 
         initEventTypes(eventTypes);

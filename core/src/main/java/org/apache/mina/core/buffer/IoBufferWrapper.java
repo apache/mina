@@ -58,7 +58,7 @@ public class IoBufferWrapper extends IoBuffer {
      */
     protected IoBufferWrapper(IoBuffer buf) {
         if (buf == null) {
-            throw new NullPointerException("buf");
+            throw new IllegalArgumentException("buf");
         }
         this.buf = buf;
     }

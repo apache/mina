@@ -187,7 +187,7 @@ public class NTLMUtilities implements NTLMConstants {
         }
 
         if (workStation == null || domain == null) {
-            throw new NullPointerException(
+            throw new IllegalArgumentException(
                     "workStation and domain must be non null");
         }
 

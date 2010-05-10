@@ -59,10 +59,10 @@ public class RequestResponseFilter extends WriteRequestFilter {
     public RequestResponseFilter(final ResponseInspector responseInspector,
             ScheduledExecutorService timeoutScheduler) {
         if (responseInspector == null) {
-            throw new NullPointerException("responseInspector");
+            throw new IllegalArgumentException("responseInspector");
         }
         if (timeoutScheduler == null) {
-            throw new NullPointerException("timeoutScheduler");
+            throw new IllegalArgumentException("timeoutScheduler");
         }
         this.responseInspectorFactory = new ResponseInspectorFactory() {
             public ResponseInspector getResponseInspector() {
@@ -76,10 +76,10 @@ public class RequestResponseFilter extends WriteRequestFilter {
             ResponseInspectorFactory responseInspectorFactory,
             ScheduledExecutorService timeoutScheduler) {
         if (responseInspectorFactory == null) {
-            throw new NullPointerException("responseInspectorFactory");
+            throw new IllegalArgumentException("responseInspectorFactory");
         }
         if (timeoutScheduler == null) {
-            throw new NullPointerException("timeoutScheduler");
+            throw new IllegalArgumentException("timeoutScheduler");
         }
         this.responseInspectorFactory = responseInspectorFactory;
         this.timeoutScheduler = timeoutScheduler;

@@ -71,7 +71,7 @@ public abstract class WriteRequestFilter extends IoFilterAdapter {
             super(writeRequest);
 
             if (filteredMessage == null) {
-                throw new NullPointerException("filteredMessage");
+                throw new IllegalArgumentException("filteredMessage");
             }
             this.filteredMessage = filteredMessage;
         }

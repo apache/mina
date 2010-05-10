@@ -60,7 +60,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      */
     public SingleSessionIoHandlerDelegate(SingleSessionIoHandlerFactory factory) {
         if (factory == null) {
-            throw new NullPointerException("factory");
+            throw new IllegalArgumentException("factory");
         }
         this.factory = factory;
     }

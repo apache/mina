@@ -188,7 +188,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         super(sessionConfig, executor);
 
         if (processor == null) {
-            throw new NullPointerException("processor");
+            throw new IllegalArgumentException("processor");
         }
 
         this.processor = processor;

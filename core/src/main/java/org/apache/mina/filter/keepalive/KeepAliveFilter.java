@@ -216,13 +216,13 @@ public class KeepAliveFilter extends IoFilterAdapter {
             IdleStatus interestedIdleStatus, KeepAliveRequestTimeoutHandler policy,
             int keepAliveRequestInterval, int keepAliveRequestTimeout) {
         if (messageFactory == null) {
-            throw new NullPointerException("messageFactory");
+            throw new IllegalArgumentException("messageFactory");
         }
         if (interestedIdleStatus == null) {
-            throw new NullPointerException("interestedIdleStatus");
+            throw new IllegalArgumentException("interestedIdleStatus");
         }
         if (policy == null) {
-            throw new NullPointerException("policy");
+            throw new IllegalArgumentException("policy");
         }
 
         this.messageFactory = messageFactory;
@@ -243,7 +243,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
     public void setRequestTimeoutHandler(KeepAliveRequestTimeoutHandler timeoutHandler) {
         if (timeoutHandler == null) {
-            throw new NullPointerException("timeoutHandler");
+            throw new IllegalArgumentException("timeoutHandler");
         }
         requestTimeoutHandler = timeoutHandler;
     }

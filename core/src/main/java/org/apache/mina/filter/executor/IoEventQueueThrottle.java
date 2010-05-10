@@ -53,7 +53,7 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
 
     public IoEventQueueThrottle(IoEventSizeEstimator eventSizeEstimator, int threshold) {
         if (eventSizeEstimator == null) {
-            throw new NullPointerException("eventSizeEstimator");
+            throw new IllegalArgumentException("eventSizeEstimator");
         }
         this.eventSizeEstimator = eventSizeEstimator;
 

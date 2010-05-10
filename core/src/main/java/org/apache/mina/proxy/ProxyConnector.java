@@ -129,11 +129,11 @@ public class ProxyConnector extends AbstractIoConnector {
      */
     public void setProxyIoSession(ProxyIoSession proxyIoSession) {
         if (proxyIoSession == null) {
-            throw new NullPointerException("proxySession object cannot be null");
+            throw new IllegalArgumentException("proxySession object cannot be null");
         }
 
         if (proxyIoSession.getProxyAddress() == null) {
-            throw new NullPointerException(
+            throw new IllegalArgumentException(
                     "proxySession.proxyAddress cannot be null");
         }
 
@@ -220,7 +220,7 @@ public class ProxyConnector extends AbstractIoConnector {
      */
     private final void setConnector(final SocketConnector connector) {
         if (connector == null) {
-            throw new NullPointerException("connector cannot be null");
+            throw new IllegalArgumentException("connector cannot be null");
         }
 
         this.connector = connector;

@@ -41,7 +41,7 @@ public abstract class AbstractStateContextLookup implements StateContextLookup {
      */
     public AbstractStateContextLookup(StateContextFactory contextFactory) {
         if (contextFactory == null) {
-            throw new NullPointerException("contextFactory");
+            throw new IllegalArgumentException("contextFactory");
         }
         this.contextFactory = contextFactory;
     }

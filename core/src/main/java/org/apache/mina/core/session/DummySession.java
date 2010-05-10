@@ -198,7 +198,7 @@ public class DummySession extends AbstractIoSession {
      */
     public void setConfig(IoSessionConfig config) {
         if (config == null) {
-            throw new NullPointerException("config");
+            throw new IllegalArgumentException("config");
         }
 
         this.config = config;
@@ -217,7 +217,7 @@ public class DummySession extends AbstractIoSession {
      */
     public void setHandler(IoHandler handler) {
         if (handler == null) {
-            throw new NullPointerException("handler");
+            throw new IllegalArgumentException("handler");
         }
 
         this.handler = handler;
@@ -237,7 +237,7 @@ public class DummySession extends AbstractIoSession {
      */
     public void setLocalAddress(SocketAddress localAddress) {
         if (localAddress == null) {
-            throw new NullPointerException("localAddress");
+            throw new IllegalArgumentException("localAddress");
         }
 
         this.localAddress = localAddress;
@@ -248,7 +248,7 @@ public class DummySession extends AbstractIoSession {
      */
     public void setRemoteAddress(SocketAddress remoteAddress) {
         if (remoteAddress == null) {
-            throw new NullPointerException("remoteAddress");
+            throw new IllegalArgumentException("remoteAddress");
         }
 
         this.remoteAddress = remoteAddress;
@@ -263,7 +263,7 @@ public class DummySession extends AbstractIoSession {
      */
     public void setService(IoService service) {
         if (service == null) {
-            throw new NullPointerException("service");
+            throw new IllegalArgumentException("service");
         }
 
         this.service = service;
@@ -283,7 +283,7 @@ public class DummySession extends AbstractIoSession {
      */
     public void setTransportMetadata(TransportMetadata transportMetadata) {
         if (transportMetadata == null) {
-            throw new NullPointerException("transportMetadata");
+            throw new IllegalArgumentException("transportMetadata");
         }
 
         this.transportMetadata = transportMetadata;

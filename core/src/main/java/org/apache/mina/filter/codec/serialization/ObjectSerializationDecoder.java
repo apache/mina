@@ -52,7 +52,7 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
      */
     public ObjectSerializationDecoder(ClassLoader classLoader) {
         if (classLoader == null) {
-            throw new NullPointerException("classLoader");
+            throw new IllegalArgumentException("classLoader");
         }
         this.classLoader = classLoader;
     }

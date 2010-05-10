@@ -41,7 +41,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements
 
     public ObjectSerializationOutputStream(OutputStream out) {
         if (out == null) {
-            throw new NullPointerException("out");
+            throw new IllegalArgumentException("out");
         }
 
         if (out instanceof DataOutputStream) {

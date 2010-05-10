@@ -210,7 +210,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
 
     public static String getProperty(IoSession session, String key) {
         if (key == null) {
-            throw new NullPointerException("key should not be null");
+            throw new IllegalArgumentException("key should not be null");
         }
 
         Map<String, String> context = getContext(session);
@@ -232,7 +232,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
      */
     public static void setProperty(IoSession session, String key, String value) {
         if (key == null) {
-            throw new NullPointerException("key should not be null");
+            throw new IllegalArgumentException("key should not be null");
         }
         if (value == null) {
             removeProperty(session, key);
@@ -244,7 +244,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
 
     public static void removeProperty(IoSession session, String key) {
         if (key == null) {
-            throw new NullPointerException("key should not be null");
+            throw new IllegalArgumentException("key should not be null");
         }
         Map<String, String> context = getContext(session);
         context.remove(key);

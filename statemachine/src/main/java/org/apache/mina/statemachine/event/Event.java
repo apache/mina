@@ -55,13 +55,13 @@ public class Event {
      */
     public Event(Object id, StateContext context, Object[] arguments) {
         if (id == null) {
-            throw new NullPointerException("id");
+            throw new IllegalArgumentException("id");
         }
         if (context == null) {
-            throw new NullPointerException("context");
+            throw new IllegalArgumentException("context");
         }
         if (arguments == null) {
-            throw new NullPointerException("arguments");
+            throw new IllegalArgumentException("arguments");
         }
         this.id = id;
         this.context = context;

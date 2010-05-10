@@ -131,7 +131,7 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
      */
     protected AbstractPollingIoProcessor(Executor executor) {
         if (executor == null) {
-            throw new NullPointerException("executor");
+            throw new IllegalArgumentException("executor");
         }
 
         this.threadName = nextThreadName();

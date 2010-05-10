@@ -76,7 +76,7 @@ public class WriteRequestFilter extends IoFilterAdapter {
      */
     public WriteRequestFilter(IoEventQueueHandler queueHandler) {
         if (queueHandler == null) {
-            throw new NullPointerException("queueHandler");
+            throw new IllegalArgumentException("queueHandler");
         }
         this.queueHandler = queueHandler;
     }

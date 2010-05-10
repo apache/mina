@@ -62,10 +62,10 @@ public class Request {
     public Request(Object id, Object message, boolean useResponseQueue,
                    long timeout, TimeUnit unit) {
         if (id == null) {
-            throw new NullPointerException("id");
+            throw new IllegalArgumentException("id");
         }
         if (message == null) {
-            throw new NullPointerException("message");
+            throw new IllegalArgumentException("message");
         }
         if (timeout < 0) {
             throw new IllegalArgumentException("timeout: " + timeout
@@ -75,7 +75,7 @@ public class Request {
         }
 
         if (unit == null) {
-            throw new NullPointerException("unit");
+            throw new IllegalArgumentException("unit");
         }
 
         this.id = id;

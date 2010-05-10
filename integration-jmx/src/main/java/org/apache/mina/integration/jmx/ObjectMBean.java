@@ -134,7 +134,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
      */
     public ObjectMBean(T source) {
         if (source == null) {
-            throw new NullPointerException("source");
+            throw new IllegalArgumentException("source");
         }
         
         this.source = source;
@@ -523,7 +523,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     private boolean isWritable(Class<?> type, PropertyDescriptor pdesc) {
         if (type == null) {
-            throw new NullPointerException("type");
+            throw new IllegalArgumentException("type");
         }
         if (pdesc == null) {
             return false;
@@ -976,11 +976,11 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     protected PropertyEditor getPropertyEditor(Class<?> type, String attrName, Class<?> attrType) {
         if (type == null) {
-            throw new NullPointerException("type");
+            throw new IllegalArgumentException("type");
         }
         
         if (attrName == null) {
-            throw new NullPointerException("attrName");
+            throw new IllegalArgumentException("attrName");
         }
         
         if (transportMetadata != null && attrType == SocketAddress.class) {

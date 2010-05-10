@@ -87,7 +87,7 @@ public class KeyStoreFactory {
      */
     public void setType(String type) {
         if (type == null) {
-            throw new NullPointerException("type");
+            throw new IllegalArgumentException("type");
         }
         this.type = type;
     }

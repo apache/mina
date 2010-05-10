@@ -37,10 +37,10 @@ public class IoEvent implements Runnable {
 
     public IoEvent(IoEventType type, IoSession session, Object parameter) {
         if (type == null) {
-            throw new NullPointerException("type");
+            throw new IllegalArgumentException("type");
         }
         if (session == null) {
-            throw new NullPointerException("session");
+            throw new IllegalArgumentException("session");
         }
         this.type = type;
         this.session = session;
