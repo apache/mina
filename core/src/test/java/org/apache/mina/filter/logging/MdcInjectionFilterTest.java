@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -63,7 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tests {@link MdcInjectionFilter} in variuos scenarios.
+ * Tests {@link MdcInjectionFilter} in various scenarios.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -72,11 +74,13 @@ public class MdcInjectionFilterTest {
     static Logger LOGGER = LoggerFactory.getLogger(MdcInjectionFilterTest.class);
     private static final int TIMEOUT = 5000;
 
-    final MyAppender appender = new MyAppender();
+    private final MyAppender appender = new MyAppender();
     private int port;
     private NioSocketAcceptor acceptor;
 
     private Level previousLevelRootLogger;
+    private ExecutorFilter executorFilter1;
+    private ExecutorFilter executorFilter2;
 
     @Before
     public void setUp() throws Exception {
@@ -93,6 +97,35 @@ public class MdcInjectionFilterTest {
     public void tearDown() throws Exception {
         acceptor.dispose();
         org.apache.log4j.Logger.getRootLogger().setLevel(previousLevelRootLogger);
+
+        destroy(executorFilter1);
+        destroy(executorFilter2);
+
+        List<String> after = getThreadNames();
+        System.out.println("");
+        System.out.println("after = " + after);
+
+        while (contains(after, "Nio")) {
+            Thread.sleep(50);
+            after = getThreadNames();
+            System.out.println("after = " + after);
+        }
+        System.out.println("============================");
+        
+        // The problem is that we clear the events of the appender here, but it's possible that a thread from
+        // a previous test still generates events during the execution of the next test
+        appender.clear();
+    }
+
+    private void destroy(ExecutorFilter executorFilter) throws InterruptedException {
+        if (executorFilter != null) {
+            ExecutorService executor = (ExecutorService) executorFilter.getExecutor();
+            executor.shutdown();
+            while (!executor.isTerminated()) {
+                System.out.println("Waiting for termination of " + executorFilter);  
+                executor.awaitTermination(10, TimeUnit.MILLISECONDS);
+            }
+        }
     }
 
     @Test
@@ -106,21 +139,23 @@ public class MdcInjectionFilterTest {
 
     @Test
     public void testExecutorFilterAtTheEnd() throws IOException, InterruptedException {
+        executorFilter1 = new ExecutorFilter();
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
         chain.addFirst("mdc-injector1", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
-        chain.addLast("executor" , new ExecutorFilter());
+        chain.addLast("executor" , executorFilter1);
         chain.addLast("mdc-injector2", mdcInjectionFilter);
         test(chain);
     }
 
     @Test
     public void testExecutorFilterAtBeginning() throws IOException, InterruptedException {
+        executorFilter1 = new ExecutorFilter();
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , new ExecutorFilter());
+        chain.addLast("executor" , executorFilter1);
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
@@ -129,9 +164,10 @@ public class MdcInjectionFilterTest {
 
     @Test
     public void testExecutorFilterBeforeProtocol() throws IOException, InterruptedException {
+        executorFilter1 = new ExecutorFilter();
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , new ExecutorFilter());
+        chain.addLast("executor" , executorFilter1);
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
@@ -140,9 +176,10 @@ public class MdcInjectionFilterTest {
 
     @Test
     public void testMultipleFilters() throws IOException, InterruptedException {
+        executorFilter1 = new ExecutorFilter();
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , new ExecutorFilter());
+        chain.addLast("executor" , executorFilter1);
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("profiler", new ProfilerTimerFilter());
         chain.addLast("dummy", new DummyIoFilter());
@@ -155,11 +192,13 @@ public class MdcInjectionFilterTest {
     public void testTwoExecutorFilters() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor1" , new ExecutorFilter());
+        executorFilter1 = new ExecutorFilter();
+        executorFilter2 = new ExecutorFilter();
+        chain.addLast("executorFilter1" , executorFilter1);
         chain.addLast("mdc-injector1", mdcInjectionFilter);
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("executor2" , new ExecutorFilter());
+        chain.addLast("executorFilter2" , executorFilter2);
         // add the MdcInjectionFilter instance after every ExecutorFilter
         // it's important to use the same MdcInjectionFilter instance
         chain.addLast("mdc-injector2",  mdcInjectionFilter);
@@ -235,7 +274,7 @@ public class MdcInjectionFilterTest {
 
         // verify that all logging events have correct MDC
         for (LoggingEvent event : events) {
-             
+
             if (loggersToCheck.contains(event.getLoggerName())) {
                 Object remoteAddress = event.getMDC("remoteAddress");
                 assertNotNull("MDC[remoteAddress] not set for [" + event.getMessage() + "]", remoteAddress);
@@ -307,7 +346,7 @@ public class MdcInjectionFilterTest {
         public SimpleIoHandler() {
             super();
         }
-        
+
         @Override
         public void sessionCreated(IoSession session) throws Exception {
             LOGGER.info("sessionCreated");
@@ -364,7 +403,7 @@ public class MdcInjectionFilterTest {
         public DummyProtocolCodecFactory() {
             super();
         }
-        
+
         public ProtocolEncoder getEncoder(IoSession session) throws Exception {
             return new ProtocolEncoderAdapter() {
                 public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
@@ -397,7 +436,11 @@ public class MdcInjectionFilterTest {
         public MyAppender() {
             super();
         }
-        
+
+        public void clear() {
+            events.clear();
+        }
+
         @Override
         protected void append(final LoggingEvent loggingEvent) {
             loggingEvent.getMDCCopy();
@@ -423,4 +466,28 @@ public class MdcInjectionFilterTest {
         }
     }
 
+
+    private List<String> getThreadNames() {
+        List<String> list = new ArrayList<String>();
+        int active = Thread.activeCount();
+        Thread[] threads = new Thread[active];
+        Thread.enumerate(threads);
+        for (Thread thread : threads) {
+            try {
+                String name = thread.getName();
+                list.add(name);
+            } catch (NullPointerException ignore) {
+            }
+        }
+        return list;
+    }
+
+    private boolean contains(List<String> list, String search) {
+        for (String s : list) {
+            if (s.contains(search)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
