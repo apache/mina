@@ -45,10 +45,10 @@ public class MapEditor extends AbstractPropertyEditor {
     
     public MapEditor(Class<?> keyType, Class<?> valueType) {
         if (keyType == null) {
-            throw new NullPointerException("keyType");
+            throw new IllegalArgumentException("keyType");
         }
         if (valueType == null) {
-            throw new NullPointerException("valueType");
+            throw new IllegalArgumentException("valueType");
         }
         this.keyType = keyType;
         this.valueType = valueType;

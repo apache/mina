@@ -44,7 +44,7 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler {
      */
     public SingleSessionIoHandlerAdapter(IoSession session) {
         if (session == null) {
-            throw new NullPointerException("session");
+            throw new IllegalArgumentException("session");
         }
         this.session = session;
     }

@@ -122,7 +122,7 @@ public class WriteException extends IOException {
     
     private static List<WriteRequest> asRequestList(Collection<WriteRequest> requests) {
         if (requests == null) {
-            throw new NullPointerException("requests");
+            throw new IllegalArgumentException("requests");
         }
         if (requests.isEmpty()) {
             throw new IllegalArgumentException("requests is empty.");
@@ -139,7 +139,7 @@ public class WriteException extends IOException {
 
     private static List<WriteRequest> asRequestList(WriteRequest request) {
         if (request == null) {
-            throw new NullPointerException("request");
+            throw new IllegalArgumentException("request");
         }
         
         List<WriteRequest> requests = new ArrayList<WriteRequest>(1);

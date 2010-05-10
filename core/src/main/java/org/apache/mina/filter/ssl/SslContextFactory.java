@@ -173,7 +173,7 @@ public class SslContextFactory {
      */
     public void setProtocol(String protocol) {
         if (protocol == null) {
-            throw new NullPointerException("protocol");
+            throw new IllegalArgumentException("protocol");
         }
         this.protocol = protocol;
     }

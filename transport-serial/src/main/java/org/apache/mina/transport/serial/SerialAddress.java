@@ -70,7 +70,7 @@ public class SerialAddress extends SocketAddress {
     public SerialAddress(String name, int bauds, DataBits dataBits,
             StopBits stopBits, Parity parity, FlowControl flowControl) {
         if (name == null) {
-            throw new NullPointerException("name");
+            throw new IllegalArgumentException("name");
         }
         name = name.trim();
         if (name.length() == 0) {
@@ -80,16 +80,16 @@ public class SerialAddress extends SocketAddress {
             throw new IllegalArgumentException("bauds: " + bauds);
         }
         if (dataBits == null) {
-            throw new NullPointerException("dataBits");
+            throw new IllegalArgumentException("dataBits");
         }
         if (stopBits == null) {
-            throw new NullPointerException("stopBits");
+            throw new IllegalArgumentException("stopBits");
         }
         if (parity == null) {
-            throw new NullPointerException("parity");
+            throw new IllegalArgumentException("parity");
         }
         if (flowControl == null) {
-            throw new NullPointerException("flowControl");
+            throw new IllegalArgumentException("flowControl");
         }
         
         this.name = name;

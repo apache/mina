@@ -304,7 +304,7 @@ public class DefaultIoFuture implements IoFuture {
      */
     public IoFuture addListener(IoFutureListener<?> listener) {
         if (listener == null) {
-            throw new NullPointerException("listener");
+            throw new IllegalArgumentException("listener");
         }
 
         boolean notifyNow = false;
@@ -334,7 +334,7 @@ public class DefaultIoFuture implements IoFuture {
      */
     public IoFuture removeListener(IoFutureListener<?> listener) {
         if (listener == null) {
-            throw new NullPointerException("listener");
+            throw new IllegalArgumentException("listener");
         }
 
         synchronized (lock) {

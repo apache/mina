@@ -45,7 +45,7 @@ public class SingletonStateContextLookup implements StateContextLookup {
      */
     public SingletonStateContextLookup(StateContextFactory contextFactory) {
         if (contextFactory == null) {
-            throw new NullPointerException("contextFactory");
+            throw new IllegalArgumentException("contextFactory");
         }
         context = contextFactory.create();
     }

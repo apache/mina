@@ -43,7 +43,7 @@ public class IoSessionFinder {
      */
     public IoSessionFinder(String query) {
         if (query == null) {
-            throw new NullPointerException("query");
+            throw new IllegalArgumentException("query");
         }
         
         query = query.trim();
@@ -66,7 +66,7 @@ public class IoSessionFinder {
      */
     public Set<IoSession> find(Iterable<IoSession> sessions) throws OgnlException {
         if (sessions == null) {
-            throw new NullPointerException("sessions");
+            throw new IllegalArgumentException("sessions");
         }
         
         Set<IoSession> answer = new LinkedHashSet<IoSession>();

@@ -176,7 +176,6 @@ class ByteArrayList
      *
      * @param nodeToInsert  new node to insert
      * @param insertBeforeNode  node to insert before
-     * @throws NullPointerException if either node is null
      */
     protected void addNode( Node nodeToInsert, Node insertBeforeNode )
     {
@@ -192,7 +191,6 @@ class ByteArrayList
      * Removes the specified node from the list.
      *
      * @param node  the node to remove
-     * @throws NullPointerException if <code>node</code> is null
      */
     protected Node removeNode( Node node )
     {
@@ -245,8 +243,9 @@ class ByteArrayList
             
             if ( ba == null )
             {
-                throw new NullPointerException( "ByteArray must not be null." );
+                throw new IllegalArgumentException( "ByteArray must not be null." );
             }
+            
             this.ba = ba;
         }
 

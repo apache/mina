@@ -37,7 +37,7 @@ public class WriteRequestWrapper implements WriteRequest {
      */
     public WriteRequestWrapper(WriteRequest parentRequest) {
         if (parentRequest == null) {
-            throw new NullPointerException("parentRequest");
+            throw new IllegalArgumentException("parentRequest");
         }
         this.parentRequest = parentRequest;
     }

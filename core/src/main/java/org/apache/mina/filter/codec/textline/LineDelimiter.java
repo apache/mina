@@ -88,7 +88,7 @@ public class LineDelimiter {
      */
     public LineDelimiter(String value) {
         if (value == null) {
-            throw new NullPointerException("delimiter");
+            throw new IllegalArgumentException("delimiter");
         }
         
         this.value = value;

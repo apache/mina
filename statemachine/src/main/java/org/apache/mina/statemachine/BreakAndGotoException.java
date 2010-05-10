@@ -32,7 +32,7 @@ class BreakAndGotoException extends BreakException {
 
     public BreakAndGotoException(String stateId, boolean now) {
         if (stateId == null) {
-            throw new NullPointerException("stateId");
+            throw new IllegalArgumentException("stateId");
         }
         this.stateId = stateId;
         this.now = now;

@@ -83,7 +83,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
 
     public void addMessageDecoder(Class<? extends MessageDecoder> decoderClass) {
         if (decoderClass == null) {
-            throw new NullPointerException("decoderClass");
+            throw new IllegalArgumentException("decoderClass");
         }
 
         try {
@@ -111,7 +111,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
 
     public void addMessageDecoder(MessageDecoderFactory factory) {
         if (factory == null) {
-            throw new NullPointerException("factory");
+            throw new IllegalArgumentException("factory");
         }
         MessageDecoderFactory[] decoderFactories = this.decoderFactories;
         MessageDecoderFactory[] newDecoderFactories = new MessageDecoderFactory[decoderFactories.length + 1];
@@ -244,7 +244,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
 
         private SingletonMessageDecoderFactory(MessageDecoder decoder) {
             if (decoder == null) {
-                throw new NullPointerException("decoder");
+                throw new IllegalArgumentException("decoder");
             }
             this.decoder = decoder;
         }
@@ -260,7 +260,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
 
         private DefaultConstructorMessageDecoderFactory(Class<?> decoderClass) {
             if (decoderClass == null) {
-                throw new NullPointerException("decoderClass");
+                throw new IllegalArgumentException("decoderClass");
             }
 
             if (!MessageDecoder.class.isAssignableFrom(decoderClass)) {

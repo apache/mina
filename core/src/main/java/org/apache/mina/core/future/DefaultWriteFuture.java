@@ -91,7 +91,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
      */
     public void setException(Throwable exception) {
         if (exception == null) {
-            throw new NullPointerException("exception");
+            throw new IllegalArgumentException("exception");
         }
         
         setValue(exception);

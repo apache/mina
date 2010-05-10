@@ -51,7 +51,7 @@ public class ObjectSerializationInputStream extends InputStream implements
     public ObjectSerializationInputStream(InputStream in,
             ClassLoader classLoader) {
         if (in == null) {
-            throw new NullPointerException("in");
+            throw new IllegalArgumentException("in");
         }
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();

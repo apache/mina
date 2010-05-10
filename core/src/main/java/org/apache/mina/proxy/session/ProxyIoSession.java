@@ -190,7 +190,7 @@ public class ProxyIoSession {
      */
     private void setRequest(ProxyRequest request) {
         if (request == null) {
-            throw new NullPointerException("request cannot be null");
+            throw new IllegalArgumentException("request cannot be null");
         }
 
         this.request = request;

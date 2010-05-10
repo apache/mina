@@ -48,7 +48,7 @@ public class Subnet {
      */
     public Subnet(InetAddress subnet, int mask) {
         if(subnet == null) {
-            throw new NullPointerException("Subnet address can not be null");
+            throw new IllegalArgumentException("Subnet address can not be null");
         }
         if(!(subnet instanceof Inet4Address)) {
             throw new IllegalArgumentException("Only IPv4 supported");

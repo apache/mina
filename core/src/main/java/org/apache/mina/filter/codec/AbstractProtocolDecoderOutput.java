@@ -40,7 +40,7 @@ public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOu
 
     public void write(Object message) {
         if (message == null) {
-            throw new NullPointerException("message");
+            throw new IllegalArgumentException("message");
         }
 
         messageQueue.add(message);

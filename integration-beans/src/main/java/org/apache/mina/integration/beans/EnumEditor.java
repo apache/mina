@@ -39,7 +39,7 @@ public class EnumEditor extends AbstractPropertyEditor {
 
     public EnumEditor(Class enumType) {
         if (enumType == null) {
-            throw new NullPointerException("enumType");
+            throw new IllegalArgumentException("enumType");
         }
         
         this.enumType = enumType;

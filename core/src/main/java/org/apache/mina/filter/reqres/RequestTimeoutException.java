@@ -36,7 +36,7 @@ public class RequestTimeoutException extends RuntimeException {
      */
     public RequestTimeoutException(Request request) {
         if (request == null) {
-            throw new NullPointerException("request");
+            throw new IllegalArgumentException("request");
         }
         this.request = request;
     }
@@ -47,7 +47,7 @@ public class RequestTimeoutException extends RuntimeException {
     public RequestTimeoutException(Request request, String s) {
         super(s);
         if (request == null) {
-            throw new NullPointerException("request");
+            throw new IllegalArgumentException("request");
         }
         this.request = request;
     }
@@ -60,7 +60,7 @@ public class RequestTimeoutException extends RuntimeException {
         super(message);
         initCause(cause);
         if (request == null) {
-            throw new NullPointerException("request");
+            throw new IllegalArgumentException("request");
         }
         this.request = request;
     }
@@ -71,7 +71,7 @@ public class RequestTimeoutException extends RuntimeException {
     public RequestTimeoutException(Request request, Throwable cause) {
         initCause(cause);
         if (request == null) {
-            throw new NullPointerException("request");
+            throw new IllegalArgumentException("request");
         }
         this.request = request;
     }

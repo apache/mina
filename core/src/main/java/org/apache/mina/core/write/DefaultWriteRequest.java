@@ -132,7 +132,7 @@ public class DefaultWriteRequest implements WriteRequest {
     public DefaultWriteRequest(Object message, WriteFuture future,
             SocketAddress destination) {
         if (message == null) {
-            throw new NullPointerException("message");
+            throw new IllegalArgumentException("message");
         }
 
         if (future == null) {

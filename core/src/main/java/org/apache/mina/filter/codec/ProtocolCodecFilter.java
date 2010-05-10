@@ -70,7 +70,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      */
     public ProtocolCodecFilter(ProtocolCodecFactory factory) {
         if (factory == null) {
-            throw new NullPointerException("factory");
+            throw new IllegalArgumentException("factory");
         }
         
         this.factory = factory;
@@ -88,10 +88,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     public ProtocolCodecFilter(final ProtocolEncoder encoder,
             final ProtocolDecoder decoder) {
         if (encoder == null) {
-            throw new NullPointerException("encoder");
+            throw new IllegalArgumentException("encoder");
         }
         if (decoder == null) {
-            throw new NullPointerException("decoder");
+            throw new IllegalArgumentException("decoder");
         }
 
         // Create the inner Factory based on the two parameters
@@ -119,10 +119,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             final Class<? extends ProtocolEncoder> encoderClass,
             final Class<? extends ProtocolDecoder> decoderClass) {
         if (encoderClass == null) {
-            throw new NullPointerException("encoderClass");
+            throw new IllegalArgumentException("encoderClass");
         }
         if (decoderClass == null) {
-            throw new NullPointerException("decoderClass");
+            throw new IllegalArgumentException("decoderClass");
         }
         if (!ProtocolEncoder.class.isAssignableFrom(encoderClass)) {
             throw new IllegalArgumentException("encoderClass: "

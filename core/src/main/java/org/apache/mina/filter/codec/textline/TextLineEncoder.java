@@ -90,10 +90,10 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
      */
     public TextLineEncoder(Charset charset, LineDelimiter delimiter) {
         if (charset == null) {
-            throw new NullPointerException("charset");
+            throw new IllegalArgumentException("charset");
         }
         if (delimiter == null) {
-            throw new NullPointerException("delimiter");
+            throw new IllegalArgumentException("delimiter");
         }
         if (LineDelimiter.AUTO.equals(delimiter)) {
             throw new IllegalArgumentException(

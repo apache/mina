@@ -168,7 +168,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      */
     public static void setAllocator(IoBufferAllocator newAllocator) {
         if (newAllocator == null) {
-            throw new NullPointerException("allocator");
+            throw new IllegalArgumentException("allocator");
         }
 
         IoBufferAllocator oldAllocator = allocator;
