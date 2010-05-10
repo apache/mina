@@ -165,7 +165,8 @@ public interface IoSession {
      * {@link CloseFuture} if you want to wait for the session actually closed.
      *
      * @param immediately {@code true} to close this session immediately
-     *                    (i.e. {@link #close()}).
+     *                    (i.e. {@link #close()}). The pending write requests
+     *                    will simply be discarded.
      *                    {@code false} to close this session after all queued
      *                    write requests are flushed (i.e. {@link #closeOnFlush()}).
      */
