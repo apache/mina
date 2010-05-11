@@ -105,7 +105,16 @@ public class MdcInjectionFilterTest {
         System.out.println("");
         System.out.println("after = " + after);
 
-        while (contains(after, "Nio")) {
+        // give acceptor some time to shut down
+        Thread.sleep(50);
+        after = getThreadNames();
+
+        int count = 0;
+
+        // NOTE: this is *not* intended to be a permanenet fix for this test-case.
+        // There just is no API to block until the ExecutorService of AbstractIoService is terminated.
+
+        while (contains(after, "Nio") && count++ < 10) {
             Thread.sleep(50);
             after = getThreadNames();
             System.out.println("after = " + after);
