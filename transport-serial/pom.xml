@@ -40,12 +40,14 @@
       <groupId>${groupId}</groupId>
       <artifactId>mina-core</artifactId>
       <version>${version}</version>
+      <type>bundle</type>
     </dependency>
 
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>mina-integration-beans</artifactId>
       <version>${version}</version>
+      <type>bundle</type>
     </dependency>
 
     <dependency>
