@@ -41,6 +41,7 @@
       <artifactId>mina-core</artifactId>
       <version>${version}</version>
       <optional>true</optional>
+      <type>bundle</type>
     </dependency>
 
     <dependency>
