@@ -77,6 +77,9 @@ public class SslFilterTest {
     }
 
     private void testMessageSentIsCalled(boolean useSSL) throws Exception {
+        // Workaround to fix TLS issue : http://java.sun.com/javase/javaseforbusiness/docs/TLSReadme.html
+        java.lang.System.setProperty( "sun.security.ssl.allowUnsafeRenegotiation", "true" );
+
         SslFilter sslFilter = null;
         if (useSSL) {
             sslFilter = new SslFilter(BogusSslContextFactory.getInstance(true));
