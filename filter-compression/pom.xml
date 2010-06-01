@@ -47,6 +47,11 @@
       <groupId>com.jcraft</groupId>
       <artifactId>jzlib</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
   </dependencies>
 </project>
 

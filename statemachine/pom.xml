@@ -38,8 +38,8 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mina-core</artifactId>
       <version>${project.version}</version>
+      <artifactId>mina-core</artifactId>
       <optional>true</optional>
       <type>bundle</type>
     </dependency>
@@ -48,6 +48,13 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>com.agical.rmock</groupId>
+      <artifactId>rmock</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
 </project>
 

@@ -40,14 +40,13 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>${version.easymock}</version>
     </dependency>
     
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymockclassextension</artifactId>
-      <version>${version.easymockclassextension}</version>
     </dependency>
   </dependencies>
+  
 </project>
 
