@@ -43,7 +43,6 @@
        <type>bundle</type>
     </dependency>
 
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mina-integration-jmx</artifactId>
@@ -69,5 +68,11 @@
       <version>1.2.0</version>
       <scope>test</scope>
     </dependency>
+  
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+
   </dependencies>
 </project>

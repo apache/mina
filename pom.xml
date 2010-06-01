@@ -34,7 +34,7 @@
 
   <groupId>org.apache.mina</groupId>
   <version>2.0.0-RC2-SNAPSHOT</version>
-  <artifactId>build</artifactId>
+  <artifactId>mina-parent</artifactId>
   <name>Apache MINA</name>
   <packaging>pom</packaging>
 
@@ -80,7 +80,7 @@
 
   <!-- Define the version for each of the used jar and maven plugins -->
   <properties>
-    <!-- Plugins -->
+    <!-- Maven Plugins -->
     <version.assembly.plugin>2.2-beta-5</version.assembly.plugin>
     <version.clean.plugin>2.3</version.clean.plugin>
     <version.compiler.plugin>2.1</version.compiler.plugin>
@@ -101,29 +101,27 @@
     <version.maven.model>2.2.1</version.maven.model>
 
     <!-- Jars -->
-    <version.springframework>2.5.6</version.springframework>
-    <version.ognl>2.7.3</version.ognl>
+    <version.commons.lang>2.5</version.commons.lang>
     <version.easymock>2.5.2</version.easymock>
     <version.easymockclassextension>2.5.2</version.easymockclassextension>
-    <version.tomcat.apr>5.5.23</version.tomcat.apr>
-    <version.jzlib>1.0.7</version.jzlib>
-    <version.slf4j.api>1.5.10</version.slf4j.api>
-    <version.slf4j.log4j12>1.5.10</version.slf4j.log4j12>
-    <version.slf4j.jcl.over.slf4j>1.5.10</version.slf4j.jcl.over.slf4j>
-    <version.log4j>1.2.14</version.log4j>
-    <version.rmock>2.0.2</version.rmock>
-    <version.junit>4.7</version.junit>
-    <version.jdom>1.0</version.jdom>
-    <version.pmd>4.2.5</version.pmd>
     <version.jboss.javassist>3.7.ga</version.jboss.javassist>
+    <version.jdom>1.0</version.jdom>
+    <version.jzlib>1.0.7</version.jzlib>
+    <version.junit>4.7</version.junit>
+    <version.log4j>1.2.14</version.log4j>
+    <version.ognl>2.7.3</version.ognl>
+    <version.pmd>4.2.5</version.pmd>
+    <version.rmock>2.0.2</version.rmock>
+    <version.slf4j.api>1.5.11</version.slf4j.api>
+    <version.slf4j.log4j12>1.5.11</version.slf4j.log4j12>
+    <version.slf4j.jcl.over.slf4j>1.5.11</version.slf4j.jcl.over.slf4j>
+    <version.springframework>2.5.6</version.springframework>
+    <version.tomcat.apr>5.5.23</version.tomcat.apr>
     <version.xbean.spring>3.6</version.xbean.spring>
-    <!--version.></version.>
-    <version.></version.-->
   </properties>
 
   <modules>
     <module>legal</module>
-    <module>parent</module>
     <module>core</module>
     <module>transport-apr</module>
     <module>filter-compression</module>
@@ -133,12 +131,221 @@
     <module>integration-ognl</module>
     <module>integration-jmx</module>
     <module>example</module>
+    <!-- This module should be the last one -->
+    <module>distribution</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Submodules -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mina-core</artifactId>
+        <version>${project.version}</version>
+        <type>bundle</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mina-transport-apr</artifactId>
+        <version>${project.version}</version>
+        <type>bundle</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mina-filter-compression</artifactId>
+        <version>${project.version}</version>
+        <type>bundle</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mina-integration-beans</artifactId>
+        <version>${project.version}</version>
+        <type>bundle</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mina-integration-ognl</artifactId>
+        <version>${project.version}</version>
+        <type>bundle</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mina-integration-jmx</artifactId>
+        <version>${project.version}</version>
+        <type>bundle</type>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mina-statemachine</artifactId>
+        <version>${project.version}</version>
+        <type>bundle</type>
+      </dependency>
+
+      <!-- Transport -->
+      <dependency>
+        <groupId>tomcat</groupId>
+        <artifactId>tomcat-apr</artifactId>
+        <version>${version.tomcat.apr}</version>
+      </dependency>
+
+      <!-- Filter -->
+      <dependency>
+        <groupId>com.jcraft</groupId>
+        <artifactId>jzlib</artifactId>
+        <version>${version.jzlib}</version>
+      </dependency>
+
+      <!-- Integration -->
+
+      <dependency>
+        <groupId>org.apache.xbean</groupId>
+        <artifactId>xbean-spring</artifactId>
+        <version>${version.xbean.spring}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring</artifactId>
+        <version>${version.springframework}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>ognl</groupId>
+        <artifactId>ognl</artifactId>
+        <version>${version.ognl}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jboss</groupId>
+        <artifactId>javassist</artifactId>
+        <version>${version.jboss.javassist}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jdom</groupId>
+        <artifactId>jdom</artifactId>
+        <version>${version.jdom}</version>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
+        <groupId>pmd</groupId>
+        <artifactId>pmd</artifactId>
+        <version>${version.pmd}</version>
+      </dependency>
+
+      <!-- State Machine -->
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>${version.commons.lang}</version>
+      </dependency>
+
+      <!-- Logging -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${version.slf4j.api}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${version.slf4j.jcl.over.slf4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${version.slf4j.log4j12}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
+      <!-- Testing -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>${version.easymock}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymockclassextension</artifactId>
+        <version>${version.easymockclassextension}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.agical.rmock</groupId>
+        <artifactId>rmock</artifactId>
+        <version>${version.rmock}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <!-- ==================================== -->
+  <!-- Common dependencies for all projects -->
+  <!-- ==================================== -->
+  <dependencies>
+    <!-- common logging interface -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <!-- logging implementation used for unit tests -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <profiles>
     <profile>
       <id>default</id>
     </profile>
+
     <profile>
       <id>serial</id>
       <activation>
@@ -191,19 +398,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>${version.assembly.plugin}</version>
-        <configuration>
-          <descriptors>
-            <descriptor>release.xml</descriptor>
-          </descriptors>
-          <finalName>mina-${pom.version}</finalName>
-          <appendAssemblyId>false</appendAssemblyId>
-          <tarLongFileMode>gnu</tarLongFileMode>
-        </configuration>
       </plugin>
 
       <plugin>
