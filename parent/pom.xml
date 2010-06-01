@@ -38,51 +38,51 @@
     <dependencies>
       <!-- Submodules -->
       <dependency>
-        <groupId>${groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>mina-core</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
         <type>bundle</type>
       </dependency>
 
       <dependency>
-        <groupId>${groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>mina-transport-apr</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
         <type>bundle</type>
       </dependency>
 
       <dependency>
-        <groupId>${groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>mina-filter-compression</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
         <type>bundle</type>
       </dependency>
 
       <dependency>
-        <groupId>${groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>mina-integration-beans</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
         <type>bundle</type>
       </dependency>
 
       <dependency>
-        <groupId>${groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>mina-integration-ognl</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
         <type>bundle</type>
       </dependency>
 
       <dependency>
-        <groupId>${groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>mina-integration-jmx</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
         <type>bundle</type>
       </dependency>
 
       <dependency>
-        <groupId>${groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>mina-statemachine</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
         <type>bundle</type>
       </dependency>
 
@@ -280,9 +280,9 @@
         <version>1.0</version>
         <dependencies>
           <dependency>
-            <groupId>org.apache.mina</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>mina-legal</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
           </dependency>
         </dependencies>
         <executions>

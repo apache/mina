@@ -32,28 +32,28 @@
   <packaging>bundle</packaging>  
 
   <properties>
-    <exportedPackage>${groupId}.integration.jmx</exportedPackage>
+    <exportedPackage>${project.groupId}.integration.jmx</exportedPackage>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
 
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-integration-beans</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
 
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-integration-ognl</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
 

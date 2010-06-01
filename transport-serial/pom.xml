@@ -32,21 +32,21 @@
   <packaging>bundle</packaging>  
 
   <properties>
-    <exportedPackage>${groupId}.transport.serial</exportedPackage>
+    <exportedPackage>${project.groupId}.transport.serial</exportedPackage>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
 
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-integration-beans</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
 

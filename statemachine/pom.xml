@@ -32,14 +32,14 @@
   <packaging>bundle</packaging>  
 
   <properties>
-    <exportedPackage>${groupId}.statemachine</exportedPackage>
+    <exportedPackage>${project.groupId}.statemachine</exportedPackage>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <optional>true</optional>
       <type>bundle</type>
     </dependency>
