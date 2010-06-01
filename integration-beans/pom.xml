@@ -32,14 +32,14 @@
   <packaging>bundle</packaging>  
 
   <properties>
-    <exportedPackage>${groupId}.integration.beans</exportedPackage>
+    <exportedPackage>${project.groupId}.integration.beans</exportedPackage>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
   </dependencies>

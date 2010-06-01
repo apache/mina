@@ -30,14 +30,14 @@
   <packaging>bundle</packaging>  
 
   <properties>
-    <exportedPackage>${groupId}.transport.socket.apr</exportedPackage>
+    <exportedPackage>${project.groupId}.transport.socket.apr</exportedPackage>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
 

@@ -32,21 +32,21 @@
   <packaging>bundle</packaging>  
 
   <properties>
-    <exportedPackage>${groupId}.integration.ognl</exportedPackage>
+    <exportedPackage>${project.groupId}.integration.ognl</exportedPackage>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
 
     <dependency>
-      <groupId>${groupId}</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mina-integration-beans</artifactId>
-      <version>${version}</version>
+      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
 

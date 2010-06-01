@@ -32,8 +32,8 @@
   <packaging>bundle</packaging>
 
   <properties>
-    <symbolicName>${groupId}.core</symbolicName>
-    <exportedPackage>${groupId}</exportedPackage>
+    <symbolicName>${project.groupId}.core</symbolicName>
+    <exportedPackage>${project.groupId}</exportedPackage>
   </properties>
 
   <dependencies>
