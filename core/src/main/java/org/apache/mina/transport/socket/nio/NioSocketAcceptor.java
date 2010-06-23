@@ -244,9 +244,6 @@ public final class NioSocketAcceptor
             // Set the reuseAddress flag accordingly with the setting
             socket.setReuseAddress(isReuseAddress());
             
-            // XXX: Do we need to provide this property? (I think we need to remove it.)
-            socket.setReceiveBufferSize(getSessionConfig().getReceiveBufferSize());
-            
             // and bind.
             socket.bind(localAddress, getBacklog());
             

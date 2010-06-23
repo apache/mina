@@ -28,21 +28,23 @@ import org.apache.mina.core.service.IoService;
  */
 public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     private static boolean DEFAULT_REUSE_ADDRESS = false;
-    private static int DEFAULT_RECEIVE_BUFFER_SIZE = 1024;
-    private static int DEFAULT_SEND_BUFFER_SIZE = 1024;
     private static int DEFAULT_TRAFFIC_CLASS = 0;
     private static boolean DEFAULT_KEEP_ALIVE = false;
     private static boolean DEFAULT_OOB_INLINE = false;
     private static int DEFAULT_SO_LINGER = -1;
     private static boolean DEFAULT_TCP_NO_DELAY = false;
 
-    private IoService parent;
+    protected IoService parent;
     private boolean defaultReuseAddress;
-    private int defaultReceiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
 
     private boolean reuseAddress;
-    private int receiveBufferSize = defaultReceiveBufferSize;
-    private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
+    
+    /* The SO_RCVBUF parameter. Set to -1 (ie, will default to OS default) */
+    private int receiveBufferSize = -1;
+
+    /* The SO_SNDBUF parameter. Set to -1 (ie, will default to OS default) */
+    private int sendBufferSize = -1;
+    
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
     private boolean keepAlive = DEFAULT_KEEP_ALIVE;
     private boolean oobInline = DEFAULT_OOB_INLINE;
@@ -61,7 +63,6 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
         
         if (parent instanceof SocketAcceptor) {
             defaultReuseAddress = true;
-            defaultReceiveBufferSize = receiveBufferSize;
         } else {
             defaultReuseAddress = DEFAULT_REUSE_ADDRESS;
         }
@@ -83,18 +84,6 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     public void setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
-
-        // The acceptor configures the SO_RCVBUF value of the
-        // server socket when it is activated.  Consequently,
-        // a newly accepted session doesn't need to update its
-        // SO_RCVBUF parameter.  Therefore, we need to update
-        // the default receive buffer size if the acceptor is
-        // not bound yet to avoid a unnecessary system call
-        // when the acceptor is activated and new sessions are
-        // created.
-        if ((parent != null) && !parent.isActive() && parent instanceof SocketAcceptor) {
-            defaultReceiveBufferSize = receiveBufferSize;
-        }
     }
 
     public int getSendBufferSize() {
@@ -157,7 +146,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     @Override
     protected boolean isReceiveBufferSizeChanged() {
-        return receiveBufferSize != defaultReceiveBufferSize;
+        return receiveBufferSize != -1;
     }
 
     @Override
@@ -167,7 +156,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     @Override
     protected boolean isSendBufferSizeChanged() {
-        return sendBufferSize != DEFAULT_SEND_BUFFER_SIZE;
+        return sendBufferSize != -1;
     }
 
     @Override
