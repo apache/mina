@@ -131,6 +131,9 @@
     <module>integration-ognl</module>
     <module>integration-jmx</module>
     <module>example</module>
+
+    <!-- This module *must* be the last one -->
+    <module>distribution</module>
   </modules>
 
   <dependencyManagement>
