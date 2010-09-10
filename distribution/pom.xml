@@ -32,7 +32,11 @@
 
   <artifactId>distribution</artifactId>
   <packaging>pom</packaging>
-  <name>Apache MINA distribution</name>
+  <name>Apache MINA Distribution</name>
+
+  <properties>
+    <docsFolder>${project.build.directory}/docs</docsFolder>
+  </properties>
 
   <build>
     <finalName>apache-mina-${project.version}</finalName>
@@ -41,7 +45,6 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.2-beta-2</version>
         <executions>
-
           <execution>
             <id>release</id>
             <phase>package</phase>
@@ -55,21 +58,6 @@
               <tarLongFileMode>gnu</tarLongFileMode>
             </configuration>
           </execution>
-
-          <execution>
-            <id>src</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attached</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>sources.xml</descriptor>
-              </descriptors>
-              <tarLongFileMode>gnu</tarLongFileMode>
-            </configuration>
-          </execution>
-
         </executions>
       </plugin>
 
@@ -77,14 +65,97 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>rat-maven-plugin</artifactId>
         <version>1.0-alpha-3</version>
-        <configuration>
-          <excludes>
-            <exclude>LICENSE.slf4j.txt</exclude>
-            <exclude>LICENSE.springframework.txt</exclude>
-          </excludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+              <execution>
+                <id>copy-javadocs</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo>Copying Javadocs</echo>
+                    <mkdir dir="${docsFolder}"></mkdir>
+                    <copy todir="${docsFolder}">
+                      <fileset dir="../target/site/">
+                        <include name="apidocs" />
+                        <include name="xref" />
+                        <include name="xref-test" />
+                      </fileset>
+                    </copy>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-example</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-filter-compression</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-integration-beans</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-integration-jmx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-integration-ognl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-integration-xbean</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-statemachine</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-transport-apr</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-transport-serial</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 
 </project>
