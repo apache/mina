@@ -131,8 +131,6 @@
     <module>integration-ognl</module>
     <module>integration-jmx</module>
     <module>example</module>
-    <!-- This module should be the last one -->
-    <module>distribution</module>
   </modules>
 
   <dependencyManagement>
@@ -356,6 +354,18 @@
       <modules>
         <module>transport-serial</module>
       </modules>
+    </profile>
+    
+    <profile>
+      <id>distribution</id>
+      <activation>
+       <file>
+         <exists>pom.xml</exists>
+       </file>
+     </activation>
+     <modules>
+       <module>distribution</module>
+     </modules>
     </profile>
   </profiles>
   
