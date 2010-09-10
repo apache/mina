@@ -121,16 +121,16 @@
   </properties>
 
   <modules>
-    <module>legal</module>
-    <module>core</module>
-    <module>transport-apr</module>
-    <module>filter-compression</module>
-    <module>statemachine</module>
-    <module>integration-beans</module>
-    <module>integration-xbean</module>
-    <module>integration-ognl</module>
-    <module>integration-jmx</module>
-    <module>example</module>
+    <module>mina-legal</module>
+    <module>mina-core</module>
+    <module>mina-transport-apr</module>
+    <module>mina-filter-compression</module>
+    <module>mina-statemachine</module>
+    <module>mina-integration-beans</module>
+    <module>mina-integration-xbean</module>
+    <module>mina-integration-ognl</module>
+    <module>mina-integration-jmx</module>
+    <module>mina-example</module>
 
     <!-- This module *must* be the last one -->
     <module>distribution</module>
