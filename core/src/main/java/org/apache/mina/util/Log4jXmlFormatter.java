@@ -20,10 +20,10 @@
 package org.apache.mina.util;
 
 import org.slf4j.MDC;
-import org.slf4j.helpers.BasicMDCAdapter;
 
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
+import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
 
@@ -140,16 +140,16 @@ public class Log4jXmlFormatter extends Formatter {
         }
 
         if (properties) {
-            if (MDC.getMDCAdapter() instanceof BasicMDCAdapter) {
-                BasicMDCAdapter mdcAdapter = (BasicMDCAdapter) MDC.getMDCAdapter();
-                Set keySet = mdcAdapter.getKeys();
+            Map contextMap = MDC.getCopyOfContextMap();
+            if (contextMap != null) {
+                Set keySet = contextMap.keySet();
                 if (keySet != null && keySet.size() > 0) {
                     buf.append("<log4j:properties>\r\n");
                     Object[] keys = keySet.toArray();
                     Arrays.sort(keys);
                     for (Object key1 : keys) {
                         String key = key1.toString();
-                        Object val = mdcAdapter.get(key);
+                        Object val = contextMap.get(key);
                         if (val != null) {
                             buf.append("<log4j:data name=\"");
                             buf.append(Transform.escapeTags(key));
@@ -161,6 +161,7 @@ public class Log4jXmlFormatter extends Formatter {
                     buf.append("</log4j:properties>\r\n");
                 }
             }
+            
         }
         buf.append("</log4j:event>\r\n\r\n");
 
