@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<spring:beans xmlns:spring="http://xbean.apache.org/schemas/spring/1.0" 
+			  xmlns:s="http://www.springframework.org/schema/beans"
+			  xmlns="http://mina.apache.org/config/1.0">
+  
+  <nioDatagramAcceptor id="datagramAcceptor0" />
+  
+  <nioDatagramAcceptor id="datagramAcceptor1" defaultLocalAddress="192.168.0.1:110" />
+  
+  <nioDatagramAcceptor id="datagramAcceptor2" executor="#threadPoolExecutor" closeOnDeactivation="false" />
+
+  <nioDatagramAcceptor id="datagramAcceptor3">
+    <defaultLocalAddresses>
+      <socketAddress>192.168.0.1:10001</socketAddress>
+      <socketAddress>192.168.0.2:10002</socketAddress>
+      <socketAddress>192.168.0.3:10003</socketAddress>
+    </defaultLocalAddresses>
+  </nioDatagramAcceptor>
+
+  <nioDatagramAcceptor id="datagramAcceptor4" />
+  
+  <standardThreadPool id="threadPoolExecutor" maxThreads="4"/>
+  
+  <!--
+    Sets up the MinaPropertyEditorRegistrar which conveniently installs all the 
+    required MINA PropertyEditor implementations found in the MINA Integration 
+    Beans module.
+  -->
+  <s:bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+    <s:property name="propertyEditorRegistrars">
+      <s:list>
+        <s:bean class="org.apache.mina.integration.xbean.MinaPropertyEditorRegistrar"/>
+      </s:list>
+    </s:property>
+  </s:bean>     
+</spring:beans>

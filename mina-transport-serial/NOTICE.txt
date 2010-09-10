@@ -1,0 +1,7 @@
+Serial port communication is provided by the RXTX library package,
+which is open source software, written by Keane Jarvi et al,
+and copyright by Keane Jarvi.  The orifinal software is available
+from
+
+   http://www.rxtx.org/
+
