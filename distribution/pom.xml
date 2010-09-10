@@ -22,27 +22,20 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
   <parent>
     <artifactId>mina-parent</artifactId>
     <groupId>org.apache.mina</groupId>
     <version>2.0.0-RC2-SNAPSHOT</version>
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.mina</groupId>
-  <artifactId>build</artifactId>
+  <artifactId>distribution</artifactId>
   <packaging>pom</packaging>
-  <name>Apache MINA build</name>
-  <version>2.0.0-RC2-SNAPSHOT</version>
-
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/trunk/distribution</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/trunk/distribution</developerConnection>
-    <url>http://svn.apache.org/viewvc/mina/trunk/distribution</url>
-  </scm>
+  <name>Apache MINA distribution</name>
 
   <build>
-    <finalName>apache-${project.artifactId}-${project.version}</finalName>
+    <finalName>apache-mina-${project.version}</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -50,14 +43,14 @@
         <executions>
 
           <execution>
-            <id>bin</id>
+            <id>release</id>
             <phase>package</phase>
             <goals>
               <goal>attached</goal>
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/assemblies/bin.xml</descriptor>
+                <descriptor>release.xml</descriptor>
               </descriptors>
               <tarLongFileMode>gnu</tarLongFileMode>
             </configuration>
@@ -71,7 +64,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/assemblies/src.xml</descriptor>
+                <descriptor>sources.xml</descriptor>
               </descriptors>
               <tarLongFileMode>gnu</tarLongFileMode>
             </configuration>
@@ -79,6 +72,7 @@
 
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>rat-maven-plugin</artifactId>
