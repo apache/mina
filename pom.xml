@@ -355,7 +355,7 @@
         </property>
       </activation>
       <modules>
-        <module>transport-serial</module>
+        <module>mina-transport-serial</module>
       </modules>
     </profile>
     
