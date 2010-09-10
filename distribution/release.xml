@@ -19,67 +19,16 @@
   under the License.
 -->
 <assembly>
-  <id>all</id>
   <formats>
     <format>tar.gz</format>
     <format>tar.bz2</format> 
     <format>zip</format>
   </formats>
   
-  <moduleSets>
-    <moduleSet>
-      <includeSubModules/>
-      <sources>
-        <outputDirectoryMapping>src/${module.basedir.name}</outputDirectoryMapping>
-        <fileSets>
-          <fileSet>
-            <includes>
-              <!-- copy per-module sources into src/mina-*/ -->
-              <include>src/**</include>
-              <include>pom.xml</include>
-              <include>LICENSE*</include>
-              <include>NOTICE*</include>
-            </includes>
-          </fileSet>
-        </fileSets>
-      </sources>
-      <binaries>
-        <!-- copy project jars into dist/ -->
-        <outputDirectory>dist</outputDirectory>
-        <includeDependencies>false</includeDependencies>
-        <unpack>false</unpack>
-        <dependencySets>
-          <dependencySet>
-            <!-- copy project dependencies into lib/ -->
-            <outputDirectory>lib</outputDirectory>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <unpack>false</unpack>
-            <useProjectArtifact>false</useProjectArtifact>
-            <excludes>
-              <!-- during build, the plugin warns that this exclusion is never
-                   triggered, but the truth is it works just fine and you can't
-                   do without it. -->
-              <exclude>org.apache.mina:*</exclude>
-              <exclude>org.rxtx:*</exclude>
-            </excludes>
-          </dependencySet>
-        </dependencySets>
-      </binaries> 
-    </moduleSet>    
-  </moduleSets>
-  
   <fileSets>
+    <!-- Copy licenses into '/' -->
     <fileSet>
-      <!-- copy the root pom into src/ -->
-      <outputDirectory>src</outputDirectory>
-      <filtered>false</filtered>
-      <includes>
-        <include>pom.xml</include>
-      </includes>
-    </fileSet>
-    
-    <fileSet>
-      <!-- copy the licenses into / -->
+      <directory>..</directory>
       <outputDirectory></outputDirectory>
       <filtered>false</filtered>
       <includes>
@@ -89,16 +38,70 @@
       </includes>
     </fileSet>
     
+    <!-- Copy Javadoc into '/docs' -->
     <fileSet>
-      <!-- copy the javadoc into docs/ -->
-      <directory>target/site</directory>
+      <directory>target/docs</directory>
       <outputDirectory>docs</outputDirectory>
       <includes>
         <include>apidocs*/**</include>
         <include>xref*/**</include>
       </includes>
     </fileSet>
+      
+    <!-- Copy sources into '/src' -->
+    <fileSet>
+      <directory>..</directory>
+      <outputDirectory>src</outputDirectory>
+      <filtered>false</filtered>
+      <includes>
+        <include>**/*</include>
+      </includes>
+      <excludes>
+        <exclude>KEYS</exclude>
+        <exclude>LICENSE*.txt</exclude>
+        <exclude>NOTICE.txt</exclude>
+        <exclude>**/target</exclude>
+        <exclude>**/target/**/*</exclude>
+        <exclude>**/.settings</exclude>
+        <exclude>**/.settings/**/*</exclude>
+        <exclude>**/.classpath</exclude>
+        <exclude>**/.project</exclude>
+        <exclude>**/*.gen</exclude>
+        <exclude>**/.wtpmodules</exclude>
+        <exclude>**/surefire*</exclude>
+        <exclude>**/cobertura.ser</exclude>
+        <exclude>**/velocity.log</exclude>
+        <exclude>**/derby.log</exclude>
+      </excludes>
+    </fileSet>
 
   </fileSets>
+  
+  <dependencySets>
+    <!-- Copy Mina modules into '/dist' -->
+    <dependencySet>
+      <outputDirectory>dist</outputDirectory>
+      <includes>
+        <!-- Including only Mina modules -->
+        <include>${project.groupId}:*</include>
+      </includes>
+      <excludes>
+        <!-- Excluding sources jars -->
+        <exclude>*:sources</exclude>
+      </excludes> 
+    </dependencySet>
+    
+    <!-- Copy Mina dependencies into '/lib' -->
+    <dependencySet>
+      <outputDirectory>lib</outputDirectory>
+      <excludes>
+        <!-- Excluding Mina modules -->
+        <exclude>${project.groupId}:*</exclude>
+        <!-- Excluding sources jars -->
+        <exclude>*:sources</exclude>
+        <!-- Explicitely excluding RXTX jars -->
+        <exclude>org.rxtx:*</exclude>
+      </excludes> 
+    </dependencySet>
+  </dependencySets>
 </assembly>
-
