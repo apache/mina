@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.mina.core.IoUtil;
@@ -47,6 +48,8 @@ import org.apache.mina.core.session.IoSessionInitializationException;
 import org.apache.mina.core.session.IoSessionInitializer;
 import org.apache.mina.util.ExceptionMonitor;
 import org.apache.mina.util.NamePreservingRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base implementation of {@link IoService}s.
@@ -57,6 +60,8 @@ import org.apache.mina.util.NamePreservingRunnable;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoService implements IoService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIoService.class);
     /** 
      * The unique number identifying the Service. It's incremented
      * for each new IoService created.
@@ -269,28 +274,48 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     public final void dispose() {
-        if (disposed) {
-            return;
-        }
+      dispose(false);
+    }
 
-        synchronized (disposalLock) {
-            if (!disposing) {
-                disposing = true;
-            
-                try {
-                    dispose0();
-                } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                }
+  /**
+   * {@inheritDoc}
+   */
+    public final void dispose(boolean awaitTermination) {
+      if (disposed) {
+          return;
+      }
+
+      synchronized (disposalLock) {
+          if (!disposing) {
+              disposing = true;
+
+              try {
+                  dispose0();
+              } catch (Exception e) {
+                  ExceptionMonitor.getInstance().exceptionCaught(e);
+              }
+          }
+      }
+
+      if (createdExecutor) {
+          ExecutorService e = (ExecutorService) executor;
+          e.shutdownNow();
+          if (awaitTermination) {
+
+            //Thread.currentThread().setName();
+
+            try {
+              LOGGER.debug("awaitTermination on {} called by thread=[{}]", this, Thread.currentThread().getName());
+              e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+              LOGGER.debug("awaitTermination on {} finished", this);
+            } catch (InterruptedException e1) {
+              LOGGER.warn("awaitTermination on [{}] was interrupted", this);
+              // Restore the interrupted status
+              Thread.currentThread().interrupt();
             }
-        }
-        
-        if (createdExecutor) {
-            ExecutorService e = (ExecutorService) executor;
-            e.shutdownNow();
-        }
-
-        disposed = true;
+          }
+      }
+      disposed = true;
     }
 
     /**
@@ -474,7 +499,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * Implement this method to perform additional tasks required for session
      * initialization. Do not call this method directly;
-     * {@link #finishSessionInitialization(IoSession, IoFuture, IoSessionInitializer)} will call
+     * {@link #initSession(IoSession, IoFuture, IoSessionInitializer)} will call
      * this method instead.
      */
     protected void finishSessionInitialization0(IoSession session,
