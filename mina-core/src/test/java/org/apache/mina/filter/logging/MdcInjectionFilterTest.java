@@ -95,15 +95,13 @@ public class MdcInjectionFilterTest {
 
     @After
     public void tearDown() throws Exception {
-        acceptor.dispose();
+        acceptor.dispose(true);
         org.apache.log4j.Logger.getRootLogger().setLevel(previousLevelRootLogger);
 
         destroy(executorFilter1);
         destroy(executorFilter2);
 
         List<String> after = getThreadNames();
-        System.out.println("");
-        System.out.println("after = " + after);
 
         // give acceptor some time to shut down
         Thread.sleep(50);
@@ -111,16 +109,24 @@ public class MdcInjectionFilterTest {
 
         int count = 0;
 
-        // NOTE: this is *not* intended to be a permanenet fix for this test-case.
-        // There just is no API to block until the ExecutorService of AbstractIoService is terminated.
+        // NOTE: this is *not* intended to be a permanent fix for this test-case.
+        // There used to be no API to block until the ExecutorService of AbstractIoService is terminated.
+        // The API exists now : dispose(true) so we should get rid of this code.
 
         while (contains(after, "Nio") && count++ < 10) {
             Thread.sleep(50);
             after = getThreadNames();
-            System.out.println("after = " + after);
+            System.out.println("** after = " + after);
         }
         System.out.println("============================");
-        
+
+      while (contains(after, "pool") && count++ < 10) {
+          Thread.sleep(50);
+          after = getThreadNames();
+          System.out.println("** after = " + after);
+      }
+      System.out.println("============================");
+
         // The problem is that we clear the events of the appender here, but it's possible that a thread from
         // a previous test still generates events during the execution of the next test
         appender.clear();
@@ -131,7 +137,7 @@ public class MdcInjectionFilterTest {
             ExecutorService executor = (ExecutorService) executorFilter.getExecutor();
             executor.shutdown();
             while (!executor.isTerminated()) {
-                System.out.println("Waiting for termination of " + executorFilter);  
+                //System.out.println("Waiting for termination of " + executorFilter);  
                 executor.awaitTermination(10, TimeUnit.MILLISECONDS);
             }
         }
@@ -235,12 +241,15 @@ public class MdcInjectionFilterTest {
         simpleIoHandler.messageSentLatch.await();
         simpleIoHandler.sessionIdleLatch.await();
         simpleIoHandler.sessionClosedLatch.await();
-        connector.dispose();
+        connector.dispose(true);
 
         // make a copy to prevent ConcurrentModificationException
         List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
         // verify that all logging events have correct MDC
         for (LoggingEvent event : events) {
+            if (event.getLoggerName().startsWith("org.apache.mina.core.service.AbstractIoService")) {
+              continue;
+            }
             for (MdcInjectionFilter.MdcKey mdcKey : MdcInjectionFilter.MdcKey.values()) {
               String key = mdcKey.name();
               Object value = event.getMDC(key);
@@ -271,7 +280,7 @@ public class MdcInjectionFilterTest {
         simpleIoHandler.messageSentLatch.await();
         simpleIoHandler.sessionIdleLatch.await();
         simpleIoHandler.sessionClosedLatch.await();
-        connector.dispose();
+        connector.dispose(true);
 
         // make a copy to prevent ConcurrentModificationException
         List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
