@@ -421,6 +421,7 @@
             https://svn.apache.org/repos/asf/mina/tags
           </tagBase>
           <preparationGoals>clean install</preparationGoals>
+          <goals>clean install deploy</goals>
         </configuration>
       </plugin>
 
