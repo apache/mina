@@ -420,6 +420,7 @@
           <tagBase>
             https://svn.apache.org/repos/asf/mina/tags
           </tagBase>
+          <preparationGoals>clean install</preparationGoals>
         </configuration>
       </plugin>
 
