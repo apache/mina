@@ -430,7 +430,7 @@
                 </goals>
                 <configuration>
                   <descriptors>
-                    <descriptor>src.xml</descriptor>
+                    <descriptor>src/main/assembly/src.xml</descriptor>
                   </descriptors>
                   <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
@@ -445,7 +445,7 @@
                 </goals>
                 <configuration>
                   <descriptors>
-                    <descriptor>bin.xml</descriptor>
+                    <descriptor>src/main/assembly/bin.xml</descriptor>
                   </descriptors>
                   <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
