@@ -357,13 +357,6 @@
     </profile>
     
     <profile>
-      <id>distribution</id>
-       <modules>
-         <module>mina-transport-serial</module>
-         <module>distribution</module>
-       </modules>
-    </profile>
-    <profile>
       <id>mina-release</id>
       <build>
         <plugins>
@@ -382,6 +375,7 @@
               </execution>
             </executions>
           </plugin>
+
           <!-- We want to deploy the artifact to a staging location for perusal -->
           <plugin>
             <inherited>true</inherited>
@@ -391,6 +385,7 @@
               <updateReleaseInfo>true</updateReleaseInfo>
             </configuration>
           </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
@@ -403,6 +398,7 @@
               </execution>
             </executions>
           </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
@@ -418,6 +414,45 @@
               </execution>
             </executions>
           </plugin>
+
+          <!-- Creates the packages -->
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-2</version>
+            <executions>
+
+              <!-- Creates the sources package -->
+              <execution>
+                <id>src</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>attached</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>src.xml</descriptor>
+                  </descriptors>
+                  <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
+              </execution>
+
+              <!-- Creates the binaries package -->
+              <execution>
+                <id>bin</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>attached</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>bin.xml</descriptor>
+                  </descriptors>
+                  <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
         </plugins>
       </build>
     </profile>      
@@ -473,7 +508,7 @@
           </tagBase>
           <preparationGoals>clean install</preparationGoals>
           <goals>clean deploy</goals>
-          <arguments>-Pmina-release -Pserial</arguments>
+          <arguments>-Pmina-release</arguments>
           <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
       </plugin>
