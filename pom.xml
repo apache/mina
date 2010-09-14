@@ -506,8 +506,8 @@
           <tagBase>
             https://svn.apache.org/repos/asf/mina/tags
           </tagBase>
-          <preparationGoals>clean install</preparationGoals>
-          <goals>clean deploy</goals>
+          <preparationGoals>install</preparationGoals>
+          <goals>deploy</goals>
           <arguments>-Pmina-release</arguments>
           <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
