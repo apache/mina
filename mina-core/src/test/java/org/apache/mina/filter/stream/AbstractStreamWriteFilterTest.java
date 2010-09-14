@@ -49,6 +49,8 @@ import org.apache.mina.util.AvailablePortFinder;
 import org.easymock.IArgumentMatcher;
 import org.easymock.classextension.EasyMock;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO Add documentation
@@ -56,6 +58,8 @@ import org.junit.Test;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamWriteFilter<M>> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractStreamWriteFilterTest.class);
 
     protected final IoSession session = new DummySession();
 
@@ -394,24 +398,29 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         @Override
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
+            LOGGER.error("SenderHandler: exceptionCaught", cause);
             latch.countDown();
         }
 
         @Override
         public void sessionClosed(IoSession session) throws Exception {
+            LOGGER.info("SenderHandler: sessionClosed");
             latch.countDown();
         }
 
         @Override
         public void sessionIdle(IoSession session, IdleStatus status)
                 throws Exception {
+            LOGGER.info("SenderHandler: sessionIdle");
             latch.countDown();
         }
 
         @Override
         public void messageSent(IoSession session, Object message)
                 throws Exception {
+            LOGGER.info("SenderHandler: messageSent");
             if (message == this.message) {
+                LOGGER.info("message == this.message");
                 latch.countDown();
             }
         }
@@ -441,28 +450,33 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         @Override
         public void sessionIdle(IoSession session, IdleStatus status)
                 throws Exception {
+            LOGGER.info("ReceiverHandler: sessionIdle");
             session.close(true);
         }
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause)
                 throws Exception {
+            LOGGER.error("ReceiverHandler: exceptionCaught", cause);
             latch.countDown();
         }
 
         @Override
         public void sessionClosed(IoSession session) throws Exception {
+            LOGGER.info("ReceiverHandler: sessionClosed");
             latch.countDown();
         }
 
         @Override
         public void messageReceived(IoSession session, Object message)
                 throws Exception {
+            LOGGER.info("messageReceived");
             IoBuffer buf = (IoBuffer) message;
             while (buf.hasRemaining()) {
                 digest.update(buf.get());
                 bytesRead++;
             }
+            LOGGER.info("messageReceived: bytesRead = {}", bytesRead);
             if (bytesRead >= size) {
                 session.close(true);
             }
