@@ -473,7 +473,7 @@
           </tagBase>
           <preparationGoals>clean install</preparationGoals>
           <goals>clean deploy</goals>
-          <arguments>-Pmina-release,serial</arguments>
+          <arguments>-Pmina-release -Pserial</arguments>
           <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
       </plugin>
