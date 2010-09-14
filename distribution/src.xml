@@ -19,6 +19,7 @@
   under the License.
 -->
 <assembly>
+  <id>src</id>
   <formats>
     <format>tar.gz</format>
     <format>tar.bz2</format> 
@@ -71,37 +72,8 @@
         <exclude>**/surefire*</exclude>
         <exclude>**/cobertura.ser</exclude>
         <exclude>**/velocity.log</exclude>
-        <exclude>**/derby.log</exclude>
       </excludes>
     </fileSet>
-
   </fileSets>
   
-  <dependencySets>
-    <!-- Copy Mina modules into '/dist' -->
-    <dependencySet>
-      <outputDirectory>dist</outputDirectory>
-      <includes>
-        <!-- Including only Mina modules -->
-        <include>${project.groupId}:*</include>
-      </includes>
-      <excludes>
-        <!-- Excluding sources jars -->
-        <exclude>*:sources</exclude>
-      </excludes> 
-    </dependencySet>
-    
-    <!-- Copy Mina dependencies into '/lib' -->
-    <dependencySet>
-      <outputDirectory>lib</outputDirectory>
-      <excludes>
-        <!-- Excluding Mina modules -->
-        <exclude>${project.groupId}:*</exclude>
-        <!-- Excluding sources jars -->
-        <exclude>*:sources</exclude>
-        <!-- Explicitely excluding RXTX jars -->
-        <exclude>org.rxtx:*</exclude>
-      </excludes> 
-    </dependencySet>
-  </dependencySets>
 </assembly>
