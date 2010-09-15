@@ -81,6 +81,7 @@
   <!-- Define the version for each of the used jar and maven plugins -->
   <properties>
     <!-- Maven Plugins -->
+    <version.api.plugin>2.2.1</version.api.plugin>
     <version.assembly.plugin>2.2-beta-5</version.assembly.plugin>
     <version.clean.plugin>2.3</version.clean.plugin>
     <version.compiler.plugin>2.1</version.compiler.plugin>
@@ -89,9 +90,8 @@
     <version.jar.plugin>2.3</version.jar.plugin>
     <version.javadoc.plugin>2.6.1</version.javadoc.plugin>
     <version.jxr.plugin>2.1</version.jxr.plugin>
-    <version.api.plugin>2.2.1</version.api.plugin>
-    <version.project>2.2.1</version.project>
-    <version.model>2.2.1</version.model>
+    <version.model.plugin>2.2.1</version.model.plugin>
+    <version.project.plugin>2.2.1</version.project.plugin>
     <version.rat.maven.plugin>1.0-alpha-3</version.rat.maven.plugin>
     <version.release.plugin>2.0</version.release.plugin>
     <version.remote.resources.plugin>1.1</version.remote.resources.plugin>
