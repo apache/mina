@@ -366,7 +366,6 @@
             <artifactId>maven-gpg-plugin</artifactId>
             <configuration>
               <passphrase>${gpg.passphrase}</passphrase>
-              <exclude>./distribution/**</exclude>
             </configuration>
             <executions>
               <execution>
@@ -384,16 +383,12 @@
             <artifactId>maven-deploy-plugin</artifactId>
             <configuration>
               <updateReleaseInfo>true</updateReleaseInfo>
-              <exclude>./distribution/**</exclude>
             </configuration>
           </plugin>
 
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <configuration>
-              <exclude>./distribution/**</exclude>
-            </configuration>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -410,7 +405,6 @@
             <version>${version.javadoc.plugin}</version>
             <configuration>
               <encoding>${project.build.sourceEncoding}</encoding>
-              <exclude>./distribution/**</exclude>
             </configuration>
             <executions>
               <execution>
@@ -421,7 +415,45 @@
               </execution>
             </executions>
           </plugin>
-
+        
+          <!-- Creates the packages --> 	 
+          <plugin> 	 
+            <artifactId>maven-assembly-plugin</artifactId> 	 
+            <version>2.2-beta-2</version> 	 
+            <executions> 	 
+  	
+              <!-- Creates the sources package --> 	 
+              <execution> 	 
+                <id>src</id> 	 
+                <phase>package</phase> 	 
+                <goals> 	 
+                  <goal>single</goal> 	 
+                </goals> 	 
+                <configuration> 	 
+                  <descriptors> 	 
+                    <descriptor>src/main/assembly/src.xml</descriptor> 	 
+                  </descriptors> 	 
+                  <tarLongFileMode>gnu</tarLongFileMode> 	 
+                </configuration> 	 
+              </execution> 	 
+  	 
+              <!-- Creates the binaries package --> 	 
+              <execution> 	 
+                <id>bin</id> 	 
+                <phase>deploy</phase> 	 
+                <goals> 	 
+                  <goal>single</goal> 	 
+                </goals> 	 
+                <configuration> 	 
+                  <descriptors> 	 
+                    <descriptor>src/main/assembly/bin.xml</descriptor> 	 
+                  </descriptors> 	 
+                  <tarLongFileMode>gnu</tarLongFileMode> 	 
+                </configuration> 	 
+              </execution> 	 
+            </executions> 	 
+          </plugin> 	 
+ 
         </plugins>
       </build>
     </profile>      
@@ -475,8 +507,8 @@
           <tagBase>
             https://svn.apache.org/repos/asf/mina/tags
           </tagBase>
-          <preparationGoals>install</preparationGoals>
-          <goals>deploy</goals>
+          <preparationGoals>clean install</preparationGoals>
+          <goals>clean deploy</goals>
           <arguments>-Pmina-release</arguments>
           <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
