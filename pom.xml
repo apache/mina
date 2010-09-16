@@ -106,8 +106,9 @@
     <version.easymockclassextension>2.5.2</version.easymockclassextension>
     <version.jboss.javassist>3.7.ga</version.jboss.javassist>
     <version.jdom>1.0</version.jdom>
-    <version.jzlib>1.0.7</version.jzlib>
+    <version.jmock>1.2.0</version.jmock>
     <version.junit>4.7</version.junit>
+    <version.jzlib>1.0.7</version.jzlib>
     <version.log4j>1.2.14</version.log4j>
     <version.ognl>2.7.3</version.ognl>
     <version.pmd>4.2.5</version.pmd>
@@ -133,6 +134,21 @@
     <module>mina-example</module>
   </modules>
 
+  <!-- Waiting until we are sure the plugins are correct. Atm, using those from the apache-7 pom
+  <pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId></groupId>
+        <artifactId></artifactId>
+        <version></version>
+      </plugin>
+    </plugins>
+  </pluginManagement>
+  -->
+
+  <!-- =========================================== -->
+  <!-- The dependencies for all the projects       -->
+  <!-- =========================================== -->
   <dependencyManagement>
     <dependencies>
       <!-- Submodules -->
@@ -247,6 +263,13 @@
       </dependency>
 
       <dependency>
+        <groupId>jmock</groupId>
+        <artifactId>jmock</artifactId>
+        <version>${version.jmock}</version>
+        <optional>true</optional>
+      </dependency>
+
+      <dependency>
         <groupId>pmd</groupId>
         <artifactId>pmd</artifactId>
         <version>${version.pmd}</version>
@@ -341,10 +364,6 @@
 
   <profiles>
     <profile>
-      <id>default</id>
-    </profile>
-
-    <profile>
       <id>serial</id>
       <activation>
         <property>
@@ -355,114 +374,11 @@
         <module>mina-transport-serial</module>
       </modules>
     </profile>
-    
-    <profile>
-      <id>mina-release</id>
-      <build>
-        <plugins>
-          <!-- We want to sign the artifact, the POM, and all attached artifacts -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <configuration>
-              <passphrase>${gpg.passphrase}</passphrase>
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- We want to deploy the artifact to a staging location for perusal -->
-          <plugin>
-            <inherited>true</inherited>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <configuration>
-              <updateReleaseInfo>true</updateReleaseInfo>
-            </configuration>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>${version.javadoc.plugin}</version>
-            <configuration>
-              <encoding>${project.build.sourceEncoding}</encoding>
-            </configuration>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        
-          <!-- Creates the packages --> 	 
-          <plugin> 	 
-            <artifactId>maven-assembly-plugin</artifactId> 	 
-            <version>2.2-beta-2</version> 	 
-            <executions> 	 
-  	
-              <!-- Creates the sources package --> 	 
-              <execution> 	 
-                <id>src</id> 	 
-                <phase>package</phase> 	 
-                <goals> 	 
-                  <goal>single</goal> 	 
-                </goals> 	 
-                <configuration> 	 
-                  <descriptors> 	 
-                    <descriptor>src/main/assembly/src.xml</descriptor> 	 
-                  </descriptors> 	 
-                  <tarLongFileMode>gnu</tarLongFileMode> 	 
-                </configuration> 	 
-              </execution> 	 
-  	 
-              <!-- Creates the binaries package --> 	 
-              <execution> 	 
-                <id>bin</id> 	 
-                <phase>deploy</phase> 	 
-                <goals> 	 
-                  <goal>single</goal> 	 
-                </goals> 	 
-                <configuration> 	 
-                  <descriptors> 	 
-                    <descriptor>src/main/assembly/bin.xml</descriptor> 	 
-                  </descriptors> 	 
-                  <tarLongFileMode>gnu</tarLongFileMode> 	 
-                </configuration> 	 
-              </execution> 	 
-            </executions> 	 
-          </plugin> 	 
- 
-        </plugins>
-      </build>
-    </profile>      
   </profiles>
   
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${version.compiler.plugin}</version>
         <configuration>
@@ -487,7 +403,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
         <version>${version.source.plugin}</version>
         <executions>
@@ -509,7 +424,6 @@
           </tagBase>
           <preparationGoals>clean install</preparationGoals>
           <goals>clean deploy</goals>
-          <arguments>-Pmina-release</arguments>
           <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
       </plugin>
