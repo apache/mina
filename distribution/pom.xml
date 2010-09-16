@@ -69,46 +69,6 @@
     </plugins>
   </build>
  
-  <!-- Uses this profile to copy the Javadoc when releasing --> 
-  <profiles>
-    <profile>
-      <id>apache-release</id>
-
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>process-resources</phase>
-
-                <goals>
-                  <goal>run</goal>
-                </goals>
-
-                <configuration>
-                  <tasks>
-                    <echo>Copying Javadocs</echo>
-                    <mkdir dir="${docsFolder}"></mkdir>
-                    <copy todir="${docsFolder}">
-                      <fileset dir="../target/site/">
-                        <include name="apidocs" />
-                        <include name="xref" />
-                        <include name="xref-test" />
-                      </fileset>
-                    </copy>
-                  </tasks>
-                </configuration>
-
-              </execution>
-            </executions>
-          </plugin>
-
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
