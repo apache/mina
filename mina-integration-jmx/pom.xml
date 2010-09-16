@@ -60,7 +60,6 @@
     <dependency>
       <groupId>ognl</groupId>
       <artifactId>ognl</artifactId>
-      <version>${version.ognl}</version>
     </dependency>
   </dependencies>
 </project>

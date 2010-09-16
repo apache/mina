@@ -38,7 +38,6 @@
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
             <optional>true</optional>
-            <version>${version.jdom}</version>
         </dependency>
 
         <dependency>
@@ -79,7 +78,6 @@
         <dependency>
             <groupId>pmd</groupId>
             <artifactId>pmd</artifactId>
-            <version>${version.pmd}</version>
         </dependency>
     </dependencies>
 </project>
