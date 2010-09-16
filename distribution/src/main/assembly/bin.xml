@@ -62,6 +62,9 @@
       <excludes>
         <!-- Excluding sources jars -->
         <exclude>*:sources</exclude>
+
+        <!-- Excluding transport-serial jar -->
+        <exclude>${project.groupId}:mina-transport-serial</exclude>
       </excludes> 
     </dependencySet>
     
