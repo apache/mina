@@ -19,7 +19,7 @@
   under the License.
 -->
 <assembly>
-  <id>bin</id>
+  <id>src</id>
   <formats>
     <format>tar.gz</format>
     <format>tar.bz2</format> 
@@ -31,7 +31,6 @@
     <fileSet>
       <directory>..</directory>
       <outputDirectory></outputDirectory>
-      <filtered>false</filtered>
       <includes>
         <include>README*</include>
         <include>LICENSE*</include>
@@ -49,35 +48,32 @@
       </includes>
     </fileSet>
       
-  </fileSets>
-  
-  <dependencySets>
-    <!-- Copy Mina modules into '/dist' -->
-    <dependencySet>
-      <outputDirectory>dist</outputDirectory>
+    <!-- Copy sources into '/src' -->
+    <fileSet>
+      <directory>..</directory>
+      <outputDirectory>src</outputDirectory>
       <includes>
-        <!-- Including only Mina modules -->
-        <include>${project.groupId}:*</include>
+        <include>**/*</include>
       </includes>
       <excludes>
-        <!-- Excluding sources jars -->
-        <exclude>*:sources</exclude>
-        <exclude>${project.groupId}:mina-transport-serial</exclude>
-      </excludes> 
-    </dependencySet>
-    
-    <!-- Copy Mina dependencies into '/lib' -->
-    <dependencySet>
-      <outputDirectory>lib</outputDirectory>
-      <excludes>
-        <!-- Excluding Mina modules -->
-        <exclude>${project.groupId}:*</exclude>
-        <exclude>${project.groupId}:mina-transport-serial</exclude>
-        <!-- Excluding sources jars -->
-        <exclude>*:sources</exclude>
-        <!-- Explicitely excluding RXTX jars -->
-        <exclude>org.rxtx:*</exclude>
-      </excludes> 
-    </dependencySet>
-  </dependencySets>
+        <exclude>KEYS</exclude>
+        <exclude>LICENSE*.txt</exclude>
+        <exclude>NOTICE.txt</exclude>
+        <exclude>**/target</exclude>
+        <exclude>**/target/**</exclude>
+        <exclude>**/.settings</exclude>
+        <exclude>**/.settings/**</exclude>
+        <exclude>**/.classpath</exclude>
+        <exclude>**/.project</exclude>
+        <exclude>**/*.gen</exclude>
+        <exclude>**/.wtpmodules</exclude>
+        <exclude>**/surefire*</exclude>
+        <exclude>**/cobertura.ser</exclude>
+        <exclude>**/velocity.log</exclude>
+        <exclude>distribution</exclude>
+        <exclude>distribution/**</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+  
 </assembly>
