@@ -372,7 +372,7 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <executions>
               <execution>
-                <phase>install</phase>
+                <phase>post-install</phase>
 
                 <goals>
                   <goal>aggregate</goal>
@@ -403,16 +403,6 @@
       </build>
       
       <modules>
-        <module>mina-legal</module>
-        <module>mina-core</module>
-        <module>mina-transport-apr</module>
-        <module>mina-filter-compression</module>
-        <module>mina-statemachine</module>
-        <module>mina-integration-beans</module>
-        <module>mina-integration-xbean</module>
-        <module>mina-integration-ognl</module>
-        <module>mina-integration-jmx</module>
-        <module>mina-example</module>
         <module>distribution</module>
       </modules>
     </profile>
