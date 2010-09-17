@@ -47,9 +47,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-
             <phase>package</phase>
-
             <goals>
               <goal>single</goal>
             </goals>
@@ -65,7 +63,13 @@
           </execution>
         </executions>
       </plugin>
-
+  
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
  
