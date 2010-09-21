@@ -741,6 +741,28 @@ public abstract class AbstractPollingIoProcessor<T extends AbstractIoSession>
         }
     }
 
+
+    private static String byteArrayToHex( byte[] barray )
+    {
+        char[] c = new char[barray.length * 2];
+        int pos = 0;
+
+        for ( byte b : barray )
+        {
+            int bb = ( b & 0x00FF ) >> 4;
+            c[pos++] = ( char ) ( bb > 9 ? bb + 0x37 : bb + 0x30 );
+            bb = b & 0x0F;
+            c[pos++] = ( char ) ( bb > 9 ? bb + 0x37 : bb + 0x30 );
+            if ( pos > 60 )
+            {
+                break;
+            }
+        }
+
+        return new String( c );
+    }
+
+
     private void notifyIdleSessions(long currentTime) throws Exception {
         // process idle sessions
         if (currentTime - lastIdleCheckTime >= SELECT_TIMEOUT) {
