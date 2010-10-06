@@ -23,7 +23,6 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.IoFilterChain;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.AbstractIoSession;
@@ -41,18 +40,12 @@ public abstract class AprSession extends AbstractIoSession {
     // good old socket descriptor
     private long descriptor;
 
-    // the service handling this session
-    private final IoService service;
-    
     // the processor processing this session
     private final IoProcessor<AprSession> processor;
 
     // the mandatory filter chain of this session
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
     
-    // handler listeneing this session event
-    private final IoHandler handler;
-
     // the two endpoint addresses
     private final InetSocketAddress remoteAddress;
     private final InetSocketAddress localAddress;
@@ -71,11 +64,10 @@ public abstract class AprSession extends AbstractIoSession {
      * @param descriptor the low level APR socket descriptor for this socket. {@see Socket#create(int, int, int, long)}
      * @throws Exception exception produced during the setting of all the socket parameters. 
      */
-    AprSession(
-            IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
-        this.service = service;
+    AprSession( IoService service, IoProcessor<AprSession> processor, long descriptor ) throws Exception
+    {
+        super( service );
         this.processor = processor;
-        this.handler = service.getHandler();
         this.descriptor = descriptor;
 
         long ra = Address.get(Socket.APR_REMOTE, descriptor);
@@ -98,9 +90,8 @@ public abstract class AprSession extends AbstractIoSession {
     AprSession(
             IoService service, IoProcessor<AprSession> processor,
             long descriptor, InetSocketAddress remoteAddress) throws Exception {
-        this.service = service;
+        super( service );
         this.processor = processor;
-        this.handler = service.getHandler();
         this.descriptor = descriptor;
 
         long la = Address.get(Socket.APR_LOCAL, descriptor);
@@ -108,6 +99,7 @@ public abstract class AprSession extends AbstractIoSession {
         this.remoteAddress = remoteAddress;
         this.localAddress = new InetSocketAddress(Address.getip(la), Address.getInfo(la).port);
     }
+
 
     /**
      * Get the socket descriptor {@see Socket#create(int, int, int, long)}.
@@ -152,20 +144,6 @@ public abstract class AprSession extends AbstractIoSession {
      */
     public IoFilterChain getFilterChain() {
         return filterChain;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public IoHandler getHandler() {
-        return handler;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public IoService getService() {
-        return service;
     }
 
     /**

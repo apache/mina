@@ -46,8 +46,6 @@ class AprSocketSession extends AprSession {
                 InetSocketAddress.class,
                 SocketSessionConfig.class,
                 IoBuffer.class);
-
-    private final SocketSessionConfig config = new SessionConfigImpl();
     
     /**
      * Create an instance of {@link AprSocketSession}. 
@@ -57,6 +55,7 @@ class AprSocketSession extends AprSession {
     AprSocketSession(
             IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
         super(service, processor, descriptor);
+        config = new SessionConfigImpl();
         this.config.setAll(service.getSessionConfig());
     }
 
@@ -64,7 +63,7 @@ class AprSocketSession extends AprSession {
      * {@inheritDoc}
      */
     public SocketSessionConfig getConfig() {
-        return config;
+        return ( SocketSessionConfig ) config;
     }
 
     /**

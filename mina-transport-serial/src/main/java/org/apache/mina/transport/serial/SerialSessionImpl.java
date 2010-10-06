@@ -29,19 +29,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
-import org.apache.mina.core.session.AbstractIoSession;
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
-import org.apache.mina.core.service.DefaultTransportMetadata;
-import org.apache.mina.util.ExceptionMonitor;
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.DefaultIoFilterChain;
 import org.apache.mina.core.filterchain.IoFilterChain;
-import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoProcessor;
-import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.IoServiceListenerSupport;
 import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.write.WriteRequest;
-
+import org.apache.mina.util.ExceptionMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,11 +55,8 @@ class SerialSessionImpl extends AbstractIoSession implements
                 "rxtx", "serial", false, true, SerialAddress.class,
                 SerialSessionConfig.class, IoBuffer.class);
 
-    private final SerialSessionConfig config = new DefaultSerialSessionConfig();
     private final IoProcessor<SerialSessionImpl> processor = new SerialIoProcessor();
-    private final IoHandler ioHandler;
     private final IoFilterChain filterChain;
-    private final SerialConnector service;
     private final IoServiceListenerSupport serviceListeners;
     private final SerialAddress address;
     private final SerialPort port;
@@ -74,9 +68,9 @@ class SerialSessionImpl extends AbstractIoSession implements
     SerialSessionImpl(
             SerialConnector service, IoServiceListenerSupport serviceListeners,
             SerialAddress address, SerialPort port) {
-        this.service = service;
+        super( service );
+        config = new DefaultSerialSessionConfig();
         this.serviceListeners = serviceListeners;
-        ioHandler = service.getHandler();
         filterChain = new DefaultIoFilterChain(this);
         this.port = port;
         this.address = address;
@@ -84,16 +78,15 @@ class SerialSessionImpl extends AbstractIoSession implements
         log = LoggerFactory.getLogger(SerialSessionImpl.class);
     }
 
-    public SerialSessionConfig getConfig() {
-        return config;
+
+    public SerialSessionConfig getConfig()
+    {
+        return ( SerialSessionConfig ) config;
     }
+
 
     public IoFilterChain getFilterChain() {
         return filterChain;
-    }
-
-    public IoHandler getHandler() {
-        return ioHandler;
     }
 
     public TransportMetadata getTransportMetadata() {
@@ -111,10 +104,6 @@ class SerialSessionImpl extends AbstractIoSession implements
     @Override
     public SerialAddress getServiceAddress() {
         return (SerialAddress) super.getServiceAddress();
-    }
-
-    public IoService getService() {
-        return service;
     }
 
     public void setDTR(boolean dtr) {
@@ -145,7 +134,7 @@ class SerialSessionImpl extends AbstractIoSession implements
         ReadWorker w = new ReadWorker();
         w.start();
         port.addEventListener(this);
-        service.getIdleStatusChecker0().addSession(this);
+        ( ( SerialConnector ) getService() ).getIdleStatusChecker0().addSession( this );
         try {
             getService().getFilterChainBuilder().buildFilterChain(getFilterChain());
             serviceListeners.fireSessionCreated(this);
