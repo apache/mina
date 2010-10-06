@@ -42,12 +42,8 @@ import org.apache.mina.core.write.WriteRequestQueue;
  */
 class VmPipeSession extends AbstractIoSession {
 
-    static final TransportMetadata METADATA =
-            new DefaultTransportMetadata(
-                    "mina", "vmpipe", false, false,
-                    VmPipeAddress.class,
-                    VmPipeSessionConfig.class,
-                    Object.class);
+    static final TransportMetadata METADATA = new DefaultTransportMetadata("mina", "vmpipe", false, false,
+            VmPipeAddress.class, VmPipeSessionConfig.class, Object.class);
 
     private final IoServiceListenerSupport serviceListeners;
 
@@ -68,10 +64,9 @@ class VmPipeSession extends AbstractIoSession {
     /*
      * Constructor for client-side session.
      */
-    VmPipeSession(IoService service,
-                      IoServiceListenerSupport serviceListeners,
-                      VmPipeAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
-        super( service );
+    VmPipeSession(IoService service, IoServiceListenerSupport serviceListeners, VmPipeAddress localAddress,
+            IoHandler handler, VmPipe remoteEntry) {
+        super(service);
         config = new DefaultVmPipeSessionConfig();
         this.serviceListeners = serviceListeners;
         lock = new ReentrantLock();
@@ -87,7 +82,7 @@ class VmPipeSession extends AbstractIoSession {
      * Constructor for server-side session.
      */
     private VmPipeSession(VmPipeSession remoteSession, VmPipe entry) {
-        super( entry.getAcceptor() );
+        super(entry.getAcceptor());
         config = new DefaultVmPipeSessionConfig();
         serviceListeners = entry.getListeners();
         lock = remoteSession.lock;
@@ -108,7 +103,7 @@ class VmPipeSession extends AbstractIoSession {
     }
 
     public VmPipeSessionConfig getConfig() {
-        return ( VmPipeSessionConfig ) config;
+        return (VmPipeSessionConfig) config;
     }
 
     public IoFilterChain getFilterChain() {

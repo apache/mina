@@ -40,20 +40,15 @@ import org.apache.tomcat.jni.Socket;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class AprSocketSession extends AprSession {
-    static final TransportMetadata METADATA =
-        new DefaultTransportMetadata(
-                "apr", "socket", false, true,
-                InetSocketAddress.class,
-                SocketSessionConfig.class,
-                IoBuffer.class);
-    
+    static final TransportMetadata METADATA = new DefaultTransportMetadata("apr", "socket", false, true,
+            InetSocketAddress.class, SocketSessionConfig.class, IoBuffer.class);
+
     /**
      * Create an instance of {@link AprSocketSession}. 
      * 
      * {@inheritDoc} 
      */
-    AprSocketSession(
-            IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
+    AprSocketSession(IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
         super(service, processor, descriptor);
         config = new SessionConfigImpl();
         this.config.setAll(service.getSessionConfig());
@@ -63,7 +58,7 @@ class AprSocketSession extends AprSession {
      * {@inheritDoc}
      */
     public SocketSessionConfig getConfig() {
-        return ( SocketSessionConfig ) config;
+        return (SocketSessionConfig) config;
     }
 
     /**
@@ -88,7 +83,7 @@ class AprSocketSession extends AprSession {
                 throw new RuntimeIoException("Failed to get SO_KEEPALIVE.", e);
             }
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -189,7 +184,7 @@ class AprSocketSession extends AprSession {
                 throw new RuntimeException("APR Exception", e);
             }
         }
-        
+
         /**
          * {@inheritDoc}
          */

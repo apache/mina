@@ -37,50 +37,42 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class NioDatagramSession extends NioSession {
-    static final TransportMetadata METADATA =
-            new DefaultTransportMetadata(
-                    "nio", "datagram", true, false,
-                    InetSocketAddress.class,
-                    DatagramSessionConfig.class, IoBuffer.class);
+    static final TransportMetadata METADATA = new DefaultTransportMetadata("nio", "datagram", true, false,
+            InetSocketAddress.class, DatagramSessionConfig.class, IoBuffer.class);
 
-    //private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
     private final InetSocketAddress localAddress;
+
     private final InetSocketAddress remoteAddress;
 
     /**
      * Creates a new acceptor-side session instance.
      */
-    NioDatagramSession(IoService service,
-                        DatagramChannel channel, IoProcessor<NioSession> processor,
-                        SocketAddress remoteAddress) {
-        super( processor, service, channel );
-        config = new NioDatagramSessionConfig( channel );
-        config.setAll( service.getSessionConfig() );
+    NioDatagramSession(IoService service, DatagramChannel channel, IoProcessor<NioSession> processor,
+            SocketAddress remoteAddress) {
+        super(processor, service, channel);
+        config = new NioDatagramSessionConfig(channel);
+        config.setAll(service.getSessionConfig());
         this.remoteAddress = (InetSocketAddress) remoteAddress;
-        this.localAddress = ( InetSocketAddress ) channel.socket().getLocalSocketAddress();
+        this.localAddress = (InetSocketAddress) channel.socket().getLocalSocketAddress();
     }
 
     /**
      * Creates a new connector-side session instance.
      */
-    NioDatagramSession( IoService service, DatagramChannel channel, IoProcessor<NioSession> processor )
-    {
-        this( service, channel, processor, channel.socket().getRemoteSocketAddress() );
+    NioDatagramSession(IoService service, DatagramChannel channel, IoProcessor<NioSession> processor) {
+        this(service, channel, processor, channel.socket().getRemoteSocketAddress());
     }
-
 
     /**
      * {@inheritDoc}
      */
-    public DatagramSessionConfig getConfig()
-    {
-        return ( DatagramSessionConfig ) config;
+    public DatagramSessionConfig getConfig() {
+        return (DatagramSessionConfig) config;
     }
-
 
     @Override
     DatagramChannel getChannel() {
-        return ( DatagramChannel ) channel;
+        return (DatagramChannel) channel;
     }
 
     public TransportMetadata getTransportMetadata() {

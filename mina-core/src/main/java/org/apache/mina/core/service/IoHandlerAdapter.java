@@ -32,8 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class IoHandlerAdapter implements IoHandler
-{
+public class IoHandlerAdapter implements IoHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(IoHandlerAdapter.class);
 
     public void sessionCreated(IoSession session) throws Exception {
