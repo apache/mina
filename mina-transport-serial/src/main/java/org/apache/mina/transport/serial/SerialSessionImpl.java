@@ -47,28 +47,30 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-class SerialSessionImpl extends AbstractIoSession implements
-        SerialSession, SerialPortEventListener {
+class SerialSessionImpl extends AbstractIoSession implements SerialSession, SerialPortEventListener {
 
-    static final TransportMetadata METADATA =
-        new DefaultTransportMetadata(
-                "rxtx", "serial", false, true, SerialAddress.class,
-                SerialSessionConfig.class, IoBuffer.class);
+    static final TransportMetadata METADATA = new DefaultTransportMetadata("rxtx", "serial", false, true,
+            SerialAddress.class, SerialSessionConfig.class, IoBuffer.class);
 
     private final IoProcessor<SerialSessionImpl> processor = new SerialIoProcessor();
+
     private final IoFilterChain filterChain;
+
     private final IoServiceListenerSupport serviceListeners;
+
     private final SerialAddress address;
+
     private final SerialPort port;
+
     private final Logger log;
 
     private InputStream inputStream;
+
     private OutputStream outputStream;
 
-    SerialSessionImpl(
-            SerialConnector service, IoServiceListenerSupport serviceListeners,
-            SerialAddress address, SerialPort port) {
-        super( service );
+    SerialSessionImpl(SerialConnector service, IoServiceListenerSupport serviceListeners, SerialAddress address,
+            SerialPort port) {
+        super(service);
         config = new DefaultSerialSessionConfig();
         this.serviceListeners = serviceListeners;
         filterChain = new DefaultIoFilterChain(this);
@@ -78,12 +80,9 @@ class SerialSessionImpl extends AbstractIoSession implements
         log = LoggerFactory.getLogger(SerialSessionImpl.class);
     }
 
-
-    public SerialSessionConfig getConfig()
-    {
-        return ( SerialSessionConfig ) config;
+    public SerialSessionConfig getConfig() {
+        return (SerialSessionConfig) config;
     }
-
 
     public IoFilterChain getFilterChain() {
         return filterChain;
@@ -134,7 +133,7 @@ class SerialSessionImpl extends AbstractIoSession implements
         ReadWorker w = new ReadWorker();
         w.start();
         port.addEventListener(this);
-        ( ( SerialConnector ) getService() ).getIdleStatusChecker0().addSession( this );
+        ((SerialConnector) getService()).getIdleStatusChecker0().addSession(this);
         try {
             getService().getFilterChainBuilder().buildFilterChain(getFilterChain());
             serviceListeners.fireSessionCreated(this);
@@ -145,6 +144,7 @@ class SerialSessionImpl extends AbstractIoSession implements
     }
 
     private final Object writeMonitor = new Object();
+
     private WriteWorker writeWorker;
 
     private class WriteWorker extends Thread {
@@ -166,7 +166,7 @@ class SerialSessionImpl extends AbstractIoSession implements
     }
 
     private void flushWrites() {
-        for (; ;) {
+        for (;;) {
             WriteRequest req = getCurrentWriteRequest();
             if (req == null) {
                 req = getWriteRequestQueue().poll(this);
@@ -187,13 +187,13 @@ class SerialSessionImpl extends AbstractIoSession implements
             try {
                 outputStream.write(buf.array(), buf.position(), writtenBytes);
                 buf.position(buf.position() + writtenBytes);
-                
+
                 // increase written bytes
                 increaseWrittenBytes(writtenBytes, System.currentTimeMillis());
-                
+
                 setCurrentWriteRequest(null);
                 buf.reset();
-                
+
                 // fire the message sent event
                 getFilterChain().fireMessageSent(req);
             } catch (IOException e) {
@@ -225,16 +225,13 @@ class SerialSessionImpl extends AbstractIoSession implements
                         int readBytes = inputStream.read(data);
 
                         if (readBytes > 0) {
-                            IoBuffer buf = IoBuffer
-                                    .wrap(data, 0, readBytes);
+                            IoBuffer buf = IoBuffer.wrap(data, 0, readBytes);
                             buf.put(data, 0, readBytes);
                             buf.flip();
-                            getFilterChain().fireMessageReceived(
-                                    buf);
+                            getFilterChain().fireMessageReceived(buf);
                         }
                     } catch (IOException e) {
-                        getFilterChain().fireExceptionCaught(
-                                e);
+                        getFilterChain().fireExceptionCaught(e);
                     }
                 }
             }

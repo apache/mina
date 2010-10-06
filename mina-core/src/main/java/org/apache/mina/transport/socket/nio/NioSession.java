@@ -56,45 +56,37 @@ public abstract class NioSession extends AbstractIoSession {
      *
      * @param processor The associated IoProcessor
      */
-    protected NioSession( IoProcessor<NioSession> processor, IoService service, Channel channel )
-    {
-        super( service );
+    protected NioSession(IoProcessor<NioSession> processor, IoService service, Channel channel) {
+        super(service);
         this.channel = channel;
         this.processor = processor;
-        filterChain = new DefaultIoFilterChain( this );
+        filterChain = new DefaultIoFilterChain(this);
     }
 
     /**
      * @return The ByteChannel associated with this {@link IoSession} 
      */
     abstract ByteChannel getChannel();
-    
 
-    public IoFilterChain getFilterChain()
-    {
+    public IoFilterChain getFilterChain() {
         return filterChain;
     }
-
 
     /**
      * @return The {@link SelectionKey} associated with this {@link IoSession}
      */
-    /* No qualifier*/SelectionKey getSelectionKey()
-    {
+    /* No qualifier*/SelectionKey getSelectionKey() {
         return key;
     }
 
-    
     /**
      * Sets the {@link SelectionKey} for this {@link IoSession}
      *
      * @param key The new {@link SelectionKey}
      */
-    /* No qualifier*/void setSelectionKey( SelectionKey key )
-    {
+    /* No qualifier*/void setSelectionKey(SelectionKey key) {
         this.key = key;
     }
-
 
     /**
      * {@inheritDoc}
