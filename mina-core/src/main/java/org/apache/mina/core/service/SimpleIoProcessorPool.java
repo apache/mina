@@ -137,6 +137,7 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
      *
      * @param processorType The type of IoProcessor to use
      * @param executor The {@link Executor}
+     * @param size The number of IoProcessor in the pool
      */
     @SuppressWarnings("unchecked")
     public SimpleIoProcessorPool(Class<? extends IoProcessor<T>> processorType,
@@ -171,23 +172,21 @@ public class SimpleIoProcessorPool<T extends AbstractIoSession> implements IoPro
                 try {
                     processorConstructor = processorType.getConstructor(ExecutorService.class);
                     pool[0] = processorConstructor.newInstance(this.executor);
-                } catch (NoSuchMethodException e) {
+                } catch (NoSuchMethodException e1) {
                     // To the next step...
-                }
-
-                try {
-                    processorConstructor = processorType.getConstructor(Executor.class);
-                    pool[0] = processorConstructor.newInstance(this.executor);
-                } catch (NoSuchMethodException e) {
-                    // To the next step...
-                }
-
-                try {
-                    processorConstructor = processorType.getConstructor();
-                    usesExecutorArg = false;
-                    pool[0] = processorConstructor.newInstance();
-                } catch (NoSuchMethodException e) {
-                    // To the next step...
+                    try {
+                        processorConstructor = processorType.getConstructor(Executor.class);
+                        pool[0] = processorConstructor.newInstance(this.executor);
+                    } catch (NoSuchMethodException e2) {
+                        // To the next step...
+                        try {
+                            processorConstructor = processorType.getConstructor();
+                            usesExecutorArg = false;
+                            pool[0] = processorConstructor.newInstance();
+                        } catch (NoSuchMethodException e3) {
+                            // To the next step...
+                        }
+                    }
                 }
             } catch (RuntimeException re) {
                 LOGGER.error("Cannot create an IoProcessor :{}", re.getMessage());
