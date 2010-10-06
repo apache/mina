@@ -31,7 +31,6 @@ import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.DefaultTransportMetadata;
-import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.service.IoProcessor;
@@ -88,8 +87,10 @@ public class DummySession extends AbstractIoSession {
      * Creates a new instance.
      */
     public DummySession() {
+        super(
+
         // Initialize dummy service.
-        IoAcceptor acceptor = new AbstractIoAcceptor(
+            new AbstractIoAcceptor(
                 new AbstractIoSessionConfig() {
                     @Override
                     protected void doSetAll(IoSessionConfig config) {
@@ -123,12 +124,7 @@ public class DummySession extends AbstractIoSession {
             @Override
             protected void dispose0() throws Exception {
             }
-        };
-
-        // Set meaningless default values.
-        acceptor.setHandler(new IoHandlerAdapter());
-
-        service = acceptor;
+            } );
 
         processor = new IoProcessor<AbstractIoSession>() {
             public void add(AbstractIoSession session) {

@@ -75,17 +75,17 @@ public interface IoSession {
      * respected. It uses the HashCode() method which don't guarantee the key
      * unicity.
      */
-    long getId();
+    long getId(); // DONE
 
     /**
      * @return the {@link IoService} which provides I/O service to this session.
      */
-    IoService getService();
+    IoService getService(); // DONE
 
     /**
      * @return the {@link IoHandler} which handles this session.
      */
-    IoHandler getHandler();
+    IoHandler getHandler(); // DONE
 
     /**
      * @return the configuration of this session.
@@ -170,7 +170,7 @@ public interface IoSession {
      *                    {@code false} to close this session after all queued
      *                    write requests are flushed (i.e. {@link #closeOnFlush()}).
      */
-    CloseFuture close(boolean immediately);
+    CloseFuture close( boolean immediately ); // DONE
     
     /**
      * Closes this session after all queued write requests
@@ -324,13 +324,13 @@ public interface IoSession {
     /**
      * Returns <code>true</code> if this session is connected with remote peer.
      */
-    boolean isConnected();
+    boolean isConnected(); // DONE
 
     /**
      * Returns <code>true</tt> if and only if this session is being closed
      * (but not disconnected yet) or is closed.
      */
-    boolean isClosing();
+    boolean isClosing(); // DONE
 
     /**
      * Returns the {@link CloseFuture} of this session.  This method returns
@@ -341,13 +341,13 @@ public interface IoSession {
     /**
      * Returns the socket address of remote peer.
      */
-    SocketAddress getRemoteAddress();
+    SocketAddress getRemoteAddress(); // DONE
 
     /**
      * Returns the socket address of local machine which is associated with this
      * session.
      */
-    SocketAddress getLocalAddress();
+    SocketAddress getLocalAddress(); // DONE
 
     /**
      * Returns the socket address of the {@link IoService} listens to to manage

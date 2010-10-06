@@ -742,7 +742,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 if (time <= 0) {
                     return null;
                 }
-                System.out.println("Converted to date");
+
                 return new Date((Long) v);
             }
         }

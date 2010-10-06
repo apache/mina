@@ -26,13 +26,14 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * An abstract adapter class for {@link IoHandler}.  You can extend this
+ * An adapter class for {@link IoHandler}.  You can extend this
  * class and selectively override required event handler methods only.  All
  * methods do nothing by default.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class IoHandlerAdapter implements IoHandler {
+public class IoHandlerAdapter implements IoHandler
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(IoHandlerAdapter.class);
 
     public void sessionCreated(IoSession session) throws Exception {

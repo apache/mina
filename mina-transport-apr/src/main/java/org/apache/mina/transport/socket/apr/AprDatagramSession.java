@@ -46,8 +46,6 @@ class AprDatagramSession extends AprSession {
                 InetSocketAddress.class,
                 DatagramSessionConfig.class, IoBuffer.class);
 
-    private final DatagramSessionConfig config = new SessionConfigImpl();
-
     /**
      * Create an instance of {@link AprDatagramSession}. 
      * 
@@ -57,6 +55,7 @@ class AprDatagramSession extends AprSession {
             IoService service, IoProcessor<AprSession> processor,
             long descriptor, InetSocketAddress remoteAddress) throws Exception {
         super(service, processor, descriptor, remoteAddress);
+        config = new SessionConfigImpl();
         this.config.setAll(service.getSessionConfig());
     }
 
@@ -64,7 +63,7 @@ class AprDatagramSession extends AprSession {
      * {@inheritDoc}
      */
     public DatagramSessionConfig getConfig() {
-        return config;
+        return ( DatagramSessionConfig ) config;
     }
 
     /**

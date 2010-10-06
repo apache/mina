@@ -45,6 +45,7 @@ import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.AbstractIoService;
 import org.apache.mina.core.service.IoAcceptor;
+import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
@@ -63,6 +64,14 @@ import org.apache.mina.util.ExceptionMonitor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoSession implements IoSession {
+    /** The associated handler */
+    private final IoHandler handler;
+
+    /** The session config */
+    protected IoSessionConfig config;
+
+    /** The service which will manage this session */
+    private final IoService service;
 
     private static final AttributeKey READY_READ_FUTURES_KEY =
         new AttributeKey(AbstractIoSession.class, "readyReadFutures");
@@ -96,7 +105,7 @@ public abstract class AbstractIoSession implements IoSession {
     private WriteRequestQueue writeRequestQueue;
     private WriteRequest currentWriteRequest;
     
-    // The Session creation's time */
+    /** The Session creation's time */
     private final long creationTime;
 
     /** An id generator guaranteed to generate unique IDs for the session */
@@ -151,7 +160,11 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * TODO Add method documentation
      */
-    protected AbstractIoSession() {
+    protected AbstractIoSession( IoService service )
+    {
+        this.service = service;
+        this.handler = service.getHandler();
+
         // Initialize all the Session counters to the current time 
         long currentTime = System.currentTimeMillis();
         creationTime = currentTime;
@@ -278,6 +291,24 @@ public abstract class AbstractIoSession implements IoSession {
         getProcessor().flush(this);
         return closeFuture;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoHandler getHandler()
+    {
+        return handler;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoSessionConfig getConfig()
+    {
+        return config;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -1202,6 +1233,16 @@ public abstract class AbstractIoSession implements IoSession {
         
         return tm.getProviderName() + ' ' + tm.getName();
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoService getService()
+    {
+        return service;
+    }
+
 
     /**
      * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable
