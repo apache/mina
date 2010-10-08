@@ -470,7 +470,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${symbolicName}</Bundle-SymbolicName>
-            <Export-Package>${exportedPackage}.*;version=${pom.version}</Export-Package>
+            <Export-Package>${exportedPackage}.*;version=${project.version}</Export-Package>
           </instructions>
         </configuration>
       </plugin>
