@@ -82,7 +82,7 @@
           <execution>
             <configuration>
               <namespace>http://mina.apache.org/config/1.0</namespace>
-              <schema>target/xbean/${pom.artifactId}.xsd</schema>
+              <schema>target/xbean/${project.artifactId}.xsd</schema>
             </configuration>
             <goals>
               <goal>mapping</goal>
@@ -105,11 +105,11 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>${basedir}/target/xbean/${pom.artifactId}.xsd</file>
+                  <file>${basedir}/target/xbean/${project.artifactId}.xsd</file>
                   <type>xsd</type>
                 </artifact>
                 <artifact>
-                  <file>${basedir}/target/xbean/${pom.artifactId}.xsd.html</file>
+                  <file>${basedir}/target/xbean/${project.artifactId}.xsd.html</file>
                   <type>xsd.html</type>
                 </artifact>
               </artifacts>
