@@ -29,9 +29,9 @@ import org.apache.mina.core.session.IoSession;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
- * @param <T> the type of the {@link IoSession} this processor can handle
+ * @param <S> the type of the {@link IoSession} this processor can handle
  */
-public interface IoProcessor<T extends IoSession> {
+public interface IoProcessor<S extends IoSession> {
 
     /**
      * Returns <tt>true</tt> if and if only {@link #dispose()} method has
@@ -59,20 +59,20 @@ public interface IoProcessor<T extends IoSession> {
      * the I/O processor starts to perform any I/O operations related
      * with the {@code session}.
      */
-    void add(T session);
+    void add(S session);
 
     /**
      * Flushes the internal write request queue of the specified
      * {@code session}.
      */
-    void flush(T session);
+    void flush(S session);
 
     /**
      * Controls the traffic of the specified {@code session} depending of the
      * {@link IoSession#isReadSuspended()} and {@link IoSession#isWriteSuspended()}
      * flags
      */
-    void updateTrafficControl(T session);
+    void updateTrafficControl(S session);
 
     /**
      * Removes and closes the specified {@code session} from the I/O
@@ -80,5 +80,5 @@ public interface IoProcessor<T extends IoSession> {
      * associated with the {@code session} and releases any other related
      * resources.
      */
-    void remove(T session);
+    void remove(S session);
 }
