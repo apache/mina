@@ -20,6 +20,7 @@
 package org.apache.mina.core.service;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -284,21 +285,15 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
             if (!disposing) {
                 disposing = true;
                 
-                // Loop on all the IoProcessor and release them
-                for (int i = pool.length - 1; i >= 0; i--) {
-                    if ((pool[i] == null) || pool[i].isDisposing()) {
-                        // Already done
+                for (IoProcessor<S> ioProcessor : pool) {
+                    if (ioProcessor.isDisposing()) {
                         continue;
                     }
 
                     try {
-                        pool[i].dispose();
+                        ioProcessor.dispose();
                     } catch (Exception e) {
-                        LOGGER.warn("Failed to dispose a "
-                                + pool[i].getClass().getSimpleName()
-                                + " at index " + i + ".", e);
-                    } finally {
-                        pool[i] = null;
+                        LOGGER.warn("Failed to dispose the {} IoProcessor.", ioProcessor.getClass().getSimpleName(), e);
                     }
                 }
 
@@ -306,9 +301,10 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
                     ((ExecutorService) executor).shutdown();
                 }
             }
-        }
 
-        disposed = true;
+            Arrays.fill(pool, null);
+            disposed = true;
+        }
     }
 
     /**
@@ -320,22 +316,14 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
         IoProcessor<S> processor = (IoProcessor<S>) session.getAttribute(PROCESSOR);
         
         if (processor == null) {
-            processor = nextProcessor(session);
+            if (disposed || disposing) {
+                throw new IllegalStateException("A disposed processor cannot be accessed.");
+            }
+
+            processor = pool[Math.abs((int) session.getId()) % pool.length];
             session.setAttributeIfAbsent(PROCESSOR, processor);
         }
 
         return processor;
-    }
-
-    /**
-     * Get a new Processor in the pool, using a round-robin algorithm.
-     */
-    private IoProcessor<S> nextProcessor(S session) {
-        if (disposed) {
-            throw new IllegalStateException(
-                    "A disposed processor cannot be accessed.");
-        }
-        
-        return pool[Math.abs((int)session.getId()) % pool.length];
     }
 }
