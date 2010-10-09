@@ -61,7 +61,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected void dispose0() throws Exception {
+    protected void doDispose() throws Exception {
         selector.close();
     }
 
