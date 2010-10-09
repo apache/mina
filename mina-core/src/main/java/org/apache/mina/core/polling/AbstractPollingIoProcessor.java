@@ -192,15 +192,13 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * {@inheritDoc}
      */
     public final void dispose() {
-        if (disposed) {
+        if (disposed || disposing) {
             return;
         }
 
         synchronized (disposalLock) {
-            if (!disposing) {
-                disposing = true;
-                startupProcessor();
-            }
+            disposing = true;
+            startupProcessor();
         }
 
         disposalFuture.awaitUninterruptibly();
@@ -209,12 +207,11 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
 
     /**
      * Dispose the resources used by this {@link IoProcessor} for polling the
-     * client connections
+     * client connections. The implementing class doDispose method will be called.
      * 
-     * @throws Exception
-     *             if some low level IO error occurs
+     * @throws Exception if some low level IO error occurs
      */
-    protected abstract void dispose0() throws Exception;
+    protected abstract void doDispose() throws Exception;
 
     /**
      * poll those sessions for the given timeout
@@ -404,7 +401,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * {@inheritDoc}
      */
     public final void add(S session) {
-        if (isDisposing()) {
+        if (disposed || disposing) {
             throw new IllegalStateException("Already disposed.");
         }
 
@@ -1124,8 +1121,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
 
             try {
                 synchronized (disposalLock) {
-                    if (isDisposing()) {
-                        dispose0();
+                    if (disposing) {
+                        doDispose();
                     }
                 }
             } catch (Throwable t) {

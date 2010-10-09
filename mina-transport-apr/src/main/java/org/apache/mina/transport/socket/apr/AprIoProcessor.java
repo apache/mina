@@ -117,7 +117,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
      * {@inheritDoc}
      */
     @Override
-    protected void dispose0() {
+    protected void doDispose() {
         Poll.destroy(pollset);
         Socket.close(wakeupSocket);
         Pool.destroy(bufferPool);
