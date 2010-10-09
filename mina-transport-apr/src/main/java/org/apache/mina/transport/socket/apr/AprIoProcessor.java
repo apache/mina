@@ -466,19 +466,4 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     private void throwException(int code) throws IOException {
         throw new IOException(org.apache.tomcat.jni.Error.strerror(-code) + " (code: " + code + ")");
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void registerNewSelector() {
-        // Do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected boolean isBrokenConnection() throws IOException {
-        // Here, we assume that this is the case.
-        return true;
-    }
 }

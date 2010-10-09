@@ -21,7 +21,6 @@ package org.apache.mina.transport.socket.nio;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.util.Iterator;
@@ -158,17 +157,6 @@ public class PollingIoProcessorTest {
                         throw new NoRouteToHostException(
                                 "No Route To Host Test");
                     }
-
-                    @Override
-                    protected boolean isBrokenConnection() throws IOException {
-                        return proc.isBrokenConnection();
-                    }
-
-                    @Override
-                    protected void registerNewSelector() throws IOException {
-                        proc.registerNewSelector();
-                    }
-
                 });
         connector.setHandler(new IoHandlerAdapter());
 
