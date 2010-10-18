@@ -328,6 +328,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             while (!bufferQueue.isEmpty()) {
                 Object encodedMessage = bufferQueue.poll();
                 
+                if (encodedMessage == null) {
+                    break;
+                }
+
                 // Flush only when the buffer has remaining.
                 if (!(encodedMessage instanceof IoBuffer) || ((IoBuffer) encodedMessage).hasRemaining()) {
                     SocketAddress destination = writeRequest.getDestination();
