@@ -45,6 +45,7 @@ import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.AbstractIoService;
 import org.apache.mina.core.service.IoAcceptor;
+import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
@@ -56,94 +57,122 @@ import org.apache.mina.core.write.WriteTimeoutException;
 import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.apache.mina.util.ExceptionMonitor;
 
-
 /**
  * Base implementation of {@link IoSession}.
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoSession implements IoSession {
+    /** The associated handler */
+    private final IoHandler handler;
 
-    private static final AttributeKey READY_READ_FUTURES_KEY =
-        new AttributeKey(AbstractIoSession.class, "readyReadFutures");
-    
-    private static final AttributeKey WAITING_READ_FUTURES_KEY =
-        new AttributeKey(AbstractIoSession.class, "waitingReadFutures");
+    /** The session config */
+    protected IoSessionConfig config;
 
-    private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER =
-        new IoFutureListener<CloseFuture>() {
-            public void operationComplete(CloseFuture future) {
-                AbstractIoSession session = (AbstractIoSession) future.getSession();
-                session.scheduledWriteBytes.set(0);
-                session.scheduledWriteMessages.set(0);
-                session.readBytesThroughput = 0;
-                session.readMessagesThroughput = 0;
-                session.writtenBytesThroughput = 0;
-                session.writtenMessagesThroughput = 0;
-            }
+    /** The service which will manage this session */
+    private final IoService service;
+
+    private static final AttributeKey READY_READ_FUTURES_KEY = new AttributeKey(AbstractIoSession.class,
+            "readyReadFutures");
+
+    private static final AttributeKey WAITING_READ_FUTURES_KEY = new AttributeKey(AbstractIoSession.class,
+            "waitingReadFutures");
+
+    private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER = new IoFutureListener<CloseFuture>() {
+        public void operationComplete(CloseFuture future) {
+            AbstractIoSession session = (AbstractIoSession) future.getSession();
+            session.scheduledWriteBytes.set(0);
+            session.scheduledWriteMessages.set(0);
+            session.readBytesThroughput = 0;
+            session.readMessagesThroughput = 0;
+            session.writtenBytesThroughput = 0;
+            session.writtenMessagesThroughput = 0;
+        }
     };
 
     /**
      * An internal write request object that triggers session close.
+     * 
      * @see #writeRequestQueue
      */
-    private static final WriteRequest CLOSE_REQUEST =
-        new DefaultWriteRequest(new Object());
+    private static final WriteRequest CLOSE_REQUEST = new DefaultWriteRequest(new Object());
 
     private final Object lock = new Object();
 
     private IoSessionAttributeMap attributes;
+
     private WriteRequestQueue writeRequestQueue;
+
     private WriteRequest currentWriteRequest;
-    
-    // The Session creation's time */
+
+    /** The Session creation's time */
     private final long creationTime;
 
     /** An id generator guaranteed to generate unique IDs for the session */
     private static AtomicLong idGenerator = new AtomicLong(0);
-    
+
     /** The session ID */
     private long sessionId;
-    
+
     /**
      * A future that will be set 'closed' when the connection is closed.
      */
     private final CloseFuture closeFuture = new DefaultCloseFuture(this);
 
     private volatile boolean closing;
-    
+
     // traffic control
-    private boolean readSuspended=false;
-    private boolean writeSuspended=false;
+    private boolean readSuspended = false;
+
+    private boolean writeSuspended = false;
 
     // Status variables
     private final AtomicBoolean scheduledForFlush = new AtomicBoolean();
+
     private final AtomicInteger scheduledWriteBytes = new AtomicInteger();
+
     private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
 
     private long readBytes;
+
     private long writtenBytes;
+
     private long readMessages;
+
     private long writtenMessages;
+
     private long lastReadTime;
+
     private long lastWriteTime;
 
     private long lastThroughputCalculationTime;
+
     private long lastReadBytes;
+
     private long lastWrittenBytes;
+
     private long lastReadMessages;
+
     private long lastWrittenMessages;
+
     private double readBytesThroughput;
+
     private double writtenBytesThroughput;
+
     private double readMessagesThroughput;
+
     private double writtenMessagesThroughput;
 
     private AtomicInteger idleCountForBoth = new AtomicInteger();
+
     private AtomicInteger idleCountForRead = new AtomicInteger();
+
     private AtomicInteger idleCountForWrite = new AtomicInteger();
 
     private long lastIdleTimeForBoth;
+
     private long lastIdleTimeForRead;
+
     private long lastIdleTimeForWrite;
 
     private boolean deferDecreaseReadBuffer = true;
@@ -151,8 +180,11 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * TODO Add method documentation
      */
-    protected AbstractIoSession() {
-        // Initialize all the Session counters to the current time 
+    protected AbstractIoSession(IoService service) {
+        this.service = service;
+        this.handler = service.getHandler();
+
+        // Initialize all the Session counters to the current time
         long currentTime = System.currentTimeMillis();
         creationTime = currentTime;
         lastThroughputCalculationTime = currentTime;
@@ -161,10 +193,10 @@ public abstract class AbstractIoSession implements IoSession {
         lastIdleTimeForBoth = currentTime;
         lastIdleTimeForRead = currentTime;
         lastIdleTimeForWrite = currentTime;
-        
+
         // TODO add documentation
         closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);
-        
+
         // Set a new ID for this session
         sessionId = idGenerator.incrementAndGet();
     }
@@ -172,8 +204,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      * 
-     * We use an AtomicLong to guarantee that the session ID are
-     * unique.
+     * We use an AtomicLong to guarantee that the session ID are unique.
      */
     public final long getId() {
         return sessionId;
@@ -207,6 +238,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * Tells if the session is scheduled for flushed
+     * 
      * @param true if the session is scheduled for flush
      */
     public final boolean isScheduledForFlush() {
@@ -228,11 +260,13 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * Set the scheduledForFLush flag. As we may have concurrent access
-     * to this flag, we compare and set it in one call.
-     * @param schedule the new value to set if not already set.
-     * @return true if the session flag has been set, and if 
-     * it wasn't set already.
+     * Set the scheduledForFLush flag. As we may have concurrent access to this
+     * flag, we compare and set it in one call.
+     * 
+     * @param schedule
+     *            the new value to set if not already set.
+     * @return true if the session flag has been set, and if it wasn't set
+     *         already.
      */
     public final boolean setScheduledForFlush(boolean schedule) {
         if (schedule) {
@@ -241,7 +275,7 @@ public abstract class AbstractIoSession implements IoSession {
             // is already scheduled for flush
             return scheduledForFlush.compareAndSet(false, schedule);
         }
-        
+
         scheduledForFlush.set(schedule);
         return true;
     }
@@ -253,7 +287,7 @@ public abstract class AbstractIoSession implements IoSession {
         if (rightNow) {
             return close();
         }
-        
+
         return closeOnFlush();
     }
 
@@ -265,7 +299,7 @@ public abstract class AbstractIoSession implements IoSession {
             if (isClosing()) {
                 return closeFuture;
             }
-            
+
             closing = true;
         }
 
@@ -277,6 +311,20 @@ public abstract class AbstractIoSession implements IoSession {
         getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);
         return closeFuture;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoHandler getHandler() {
+        return handler;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IoSessionConfig getConfig() {
+        return config;
     }
 
     /**
@@ -350,14 +398,12 @@ public abstract class AbstractIoSession implements IoSession {
      * TODO Add method documentation
      */
     private Queue<ReadFuture> getReadyReadFutures() {
-        Queue<ReadFuture> readyReadFutures =
-            (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES_KEY);
+        Queue<ReadFuture> readyReadFutures = (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES_KEY);
         if (readyReadFutures == null) {
             readyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
 
-            Queue<ReadFuture> oldReadyReadFutures =
-                (Queue<ReadFuture>) setAttributeIfAbsent(
-                        READY_READ_FUTURES_KEY, readyReadFutures);
+            Queue<ReadFuture> oldReadyReadFutures = (Queue<ReadFuture>) setAttributeIfAbsent(READY_READ_FUTURES_KEY,
+                    readyReadFutures);
             if (oldReadyReadFutures != null) {
                 readyReadFutures = oldReadyReadFutures;
             }
@@ -369,14 +415,12 @@ public abstract class AbstractIoSession implements IoSession {
      * TODO Add method documentation
      */
     private Queue<ReadFuture> getWaitingReadFutures() {
-        Queue<ReadFuture> waitingReadyReadFutures =
-            (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES_KEY);
+        Queue<ReadFuture> waitingReadyReadFutures = (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES_KEY);
         if (waitingReadyReadFutures == null) {
             waitingReadyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
 
-            Queue<ReadFuture> oldWaitingReadyReadFutures =
-                (Queue<ReadFuture>) setAttributeIfAbsent(
-                        WAITING_READ_FUTURES_KEY, waitingReadyReadFutures);
+            Queue<ReadFuture> oldWaitingReadyReadFutures = (Queue<ReadFuture>) setAttributeIfAbsent(
+                    WAITING_READ_FUTURES_KEY, waitingReadyReadFutures);
             if (oldWaitingReadyReadFutures != null) {
                 waitingReadyReadFutures = oldWaitingReadyReadFutures;
             }
@@ -399,14 +443,12 @@ public abstract class AbstractIoSession implements IoSession {
             throw new IllegalArgumentException("message");
         }
 
-        // We can't send a message to a connected session if we don't have 
+        // We can't send a message to a connected session if we don't have
         // the remote address
-        if (!getTransportMetadata().isConnectionless() &&
-                remoteAddress != null) {
+        if (!getTransportMetadata().isConnectionless() && remoteAddress != null) {
             throw new UnsupportedOperationException();
         }
 
-        
         // If the session has been closed or is closing, we can't either
         // send a message to the remote side. We generate a future
         // containing an exception.
@@ -419,15 +461,13 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         FileChannel openedFileChannel = null;
-        
+
         // TODO: remove this code as soon as we use InputStream
         // instead of Object for the message.
         try {
-            if (message instanceof IoBuffer
-                    && !((IoBuffer) message).hasRemaining()) {
+            if (message instanceof IoBuffer && !((IoBuffer) message).hasRemaining()) {
                 // Nothing to write : probably an error in the user code
-                throw new IllegalArgumentException(
-                "message is empty. Forgot to call flip()?");
+                throw new IllegalArgumentException("message is empty. Forgot to call flip()?");
             } else if (message instanceof FileChannel) {
                 FileChannel fileChannel = (FileChannel) message;
                 message = new DefaultFileRegion(fileChannel, 0, fileChannel.size());
@@ -444,15 +484,17 @@ public abstract class AbstractIoSession implements IoSession {
         // Now, we can write the message. First, create a future
         WriteFuture writeFuture = new DefaultWriteFuture(this);
         WriteRequest writeRequest = new DefaultWriteRequest(message, writeFuture, remoteAddress);
-        
+
         // Then, get the chain and inject the WriteRequest into it
         IoFilterChain filterChain = getFilterChain();
         filterChain.fireFilterWrite(writeRequest);
 
-        // TODO : This is not our business ! The caller has created a FileChannel,
+        // TODO : This is not our business ! The caller has created a
+        // FileChannel,
         // he has to close it !
         if (openedFileChannel != null) {
-            // If we opened a FileChannel, it needs to be closed when the write has completed
+            // If we opened a FileChannel, it needs to be closed when the write
+            // has completed
             final FileChannel finalChannel = openedFileChannel;
             writeFuture.addListener(new IoFutureListener<WriteFuture>() {
                 public void operationComplete(WriteFuture future) {
@@ -577,13 +619,12 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * Create a new close aware write queue, based on the given write queue.
      * 
-     * @param writeRequestQueue The write request queue
+     * @param writeRequestQueue
+     *            The write request queue
      */
     public final void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
-        this.writeRequestQueue =
-            new CloseAwareWriteQueue(writeRequestQueue);
+        this.writeRequestQueue = new CloseAwareWriteQueue(writeRequestQueue);
     }
-
 
     /**
      * {@inheritDoc}
@@ -642,9 +683,9 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     public boolean isWriteSuspended() {
-        return writeSuspended; 
+        return writeSuspended;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -744,7 +785,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * TODO Add method documentation
      */
-    protected void setScheduledWriteBytes(int byteCount){
+    protected void setScheduledWriteBytes(int byteCount) {
         scheduledWriteBytes.set(byteCount);
     }
 
@@ -810,8 +851,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * TODO Add method documentation
      */
-    public final void increaseWrittenMessages(
-            WriteRequest request, long currentTime) {
+    public final void increaseWrittenMessages(WriteRequest request, long currentTime) {
         Object message = request.getMessage();
         if (message instanceof IoBuffer) {
             IoBuffer b = (IoBuffer) message;
@@ -1129,7 +1169,7 @@ public abstract class AbstractIoSession implements IoSession {
         if (service instanceof IoAcceptor) {
             return ((IoAcceptor) service).getLocalAddress();
         }
-        
+
         return getRemoteAddress();
     }
 
@@ -1142,8 +1182,8 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * {@inheritDoc}
-     * TODO This is a ridiculous implementation. Need to be replaced.
+     * {@inheritDoc} TODO This is a ridiculous implementation. Need to be
+     * replaced.
      */
     @Override
     public final boolean equals(Object o) {
@@ -1155,23 +1195,22 @@ public abstract class AbstractIoSession implements IoSession {
      */
     @Override
     public String toString() {
-        if (isConnected()||isClosing()) {
+        if (isConnected() || isClosing()) {
             try {
                 SocketAddress remote = getRemoteAddress();
                 SocketAddress local = getLocalAddress();
-                
+
                 if (getService() instanceof IoAcceptor) {
-                    return "(" + getIdAsString() + ": " + getServiceName() + ", server, " +
-                            remote + " => " + local + ')';
+                    return "(" + getIdAsString() + ": " + getServiceName() + ", server, " + remote + " => " + local
+                            + ')';
                 }
-    
-                return "(" + getIdAsString() + ": " + getServiceName() + ", client, " +
-                            local + " => " + remote + ')';
+
+                return "(" + getIdAsString() + ": " + getServiceName() + ", client, " + local + " => " + remote + ')';
             } catch (Exception e) {
                 return "Session is disconnecting ...";
             }
         }
-        
+
         return "Session disconnected ...";
     }
 
@@ -1199,15 +1238,23 @@ public abstract class AbstractIoSession implements IoSession {
         if (tm == null) {
             return "null";
         }
-        
+
         return tm.getProviderName() + ' ' + tm.getName();
     }
 
     /**
-     * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable
-     * sessions in the specified collection.
-     *
-     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
+     * {@inheritDoc}
+     */
+    public IoService getService() {
+        return service;
+    }
+
+    /**
+     * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable sessions
+     * in the specified collection.
+     * 
+     * @param currentTime
+     *            the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleness(Iterator<? extends IoSession> sessions, long currentTime) {
         IoSession s = null;
@@ -1220,50 +1267,37 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * Fires a {@link IoEventType#SESSION_IDLE} event if applicable for the
      * specified {@code session}.
-     *
-     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
+     * 
+     * @param currentTime
+     *            the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleSession(IoSession session, long currentTime) {
-        notifyIdleSession0(
-                session, currentTime,
-                session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
-                IdleStatus.BOTH_IDLE, Math.max(
-                    session.getLastIoTime(),
-                    session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
+        notifyIdleSession0(session, currentTime, session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
+                IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
 
-        notifyIdleSession0(
-                session, currentTime,
-                session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
-                IdleStatus.READER_IDLE, Math.max(
-                    session.getLastReadTime(),
-                    session.getLastIdleTime(IdleStatus.READER_IDLE)));
+        notifyIdleSession0(session, currentTime, session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
+                IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(), session
+                        .getLastIdleTime(IdleStatus.READER_IDLE)));
 
-        notifyIdleSession0(
-                session, currentTime,
-                session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
-                IdleStatus.WRITER_IDLE, Math.max(
-                    session.getLastWriteTime(),
-                    session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
+        notifyIdleSession0(session, currentTime, session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
+                IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(), session
+                        .getLastIdleTime(IdleStatus.WRITER_IDLE)));
 
         notifyWriteTimeout(session, currentTime);
     }
 
-    private static void notifyIdleSession0(
-            IoSession session, long currentTime,
-            long idleTime, IdleStatus status, long lastIoTime) {
-        if (idleTime > 0 && lastIoTime != 0
-                && currentTime - lastIoTime >= idleTime) {
+    private static void notifyIdleSession0(IoSession session, long currentTime, long idleTime, IdleStatus status,
+            long lastIoTime) {
+        if (idleTime > 0 && lastIoTime != 0 && currentTime - lastIoTime >= idleTime) {
             session.getFilterChain().fireSessionIdle(status);
         }
     }
 
-    private static void notifyWriteTimeout(
-            IoSession session, long currentTime) {
+    private static void notifyWriteTimeout(IoSession session, long currentTime) {
 
         long writeTimeout = session.getConfig().getWriteTimeoutInMillis();
-        if (writeTimeout > 0 &&
-                currentTime - session.getLastWriteTime() >= writeTimeout &&
-                !session.getWriteRequestQueue().isEmpty(session)) {
+        if (writeTimeout > 0 && currentTime - session.getLastWriteTime() >= writeTimeout
+                && !session.getWriteRequestQueue().isEmpty(session)) {
             WriteRequest request = session.getCurrentWriteRequest();
             if (request != null) {
                 session.setCurrentWriteRequest(null);
@@ -1276,13 +1310,11 @@ public abstract class AbstractIoSession implements IoSession {
         }
     }
 
-    
-    
     /**
      * A queue which handles the CLOSE request.
      * 
-     * TODO : Check that when closing a session, all the pending
-     * requests are correctly sent.
+     * TODO : Check that when closing a session, all the pending requests are
+     * correctly sent.
      */
     private class CloseAwareWriteQueue implements WriteRequestQueue {
 
@@ -1306,7 +1338,7 @@ public abstract class AbstractIoSession implements IoSession {
                 dispose(session);
                 answer = null;
             }
-            
+
             return answer;
         }
 

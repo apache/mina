@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * An abstract adapter class for {@link IoHandler}.  You can extend this
+ * An adapter class for {@link IoHandler}.  You can extend this
  * class and selectively override required event handler methods only.  All
  * methods do nothing by default.
  *

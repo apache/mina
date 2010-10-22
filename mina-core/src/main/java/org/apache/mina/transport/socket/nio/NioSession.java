@@ -20,9 +20,13 @@
 package org.apache.mina.transport.socket.nio;
 
 import java.nio.channels.ByteChannel;
+import java.nio.channels.Channel;
 import java.nio.channels.SelectionKey;
 
+import org.apache.mina.core.filterchain.DefaultIoFilterChain;
+import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IoSession;
 
@@ -34,8 +38,16 @@ import org.apache.mina.core.session.IoSession;
 public abstract class NioSession extends AbstractIoSession {
     /** The NioSession processor */
     protected final IoProcessor<NioSession> processor;
-    
-    
+
+    /** The communication channel */
+    protected final Channel channel;
+
+    /** The SelectionKey used for this session */
+    protected SelectionKey key;
+
+    /** The FilterChain created for this session */
+    private final IoFilterChain filterChain;
+
     /**
      * 
      * Creates a new instance of NioSession, with its associated IoProcessor.
@@ -44,26 +56,37 @@ public abstract class NioSession extends AbstractIoSession {
      *
      * @param processor The associated IoProcessor
      */
-    protected  NioSession(IoProcessor<NioSession> processor) {
+    protected NioSession(IoProcessor<NioSession> processor, IoService service, Channel channel) {
+        super(service);
+        this.channel = channel;
         this.processor = processor;
+        filterChain = new DefaultIoFilterChain(this);
     }
 
     /**
      * @return The ByteChannel associated with this {@link IoSession} 
      */
     abstract ByteChannel getChannel();
-    
+
+    public IoFilterChain getFilterChain() {
+        return filterChain;
+    }
+
     /**
      * @return The {@link SelectionKey} associated with this {@link IoSession}
      */
-    abstract SelectionKey getSelectionKey();
-    
+    /* No qualifier*/SelectionKey getSelectionKey() {
+        return key;
+    }
+
     /**
      * Sets the {@link SelectionKey} for this {@link IoSession}
      *
      * @param key The new {@link SelectionKey}
      */
-    abstract void setSelectionKey(SelectionKey key);
+    /* No qualifier*/void setSelectionKey(SelectionKey key) {
+        this.key = key;
+    }
 
     /**
      * {@inheritDoc}

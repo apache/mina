@@ -54,8 +54,10 @@ import org.apache.mina.util.ExceptionMonitor;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
- */
-public abstract class AbstractPollingConnectionlessIoAcceptor<T extends AbstractIoSession, H>
+ * 
+  * @param <S> the type of the {@link IoSession} this processor can handle
+*/
+public abstract class AbstractPollingConnectionlessIoAcceptor<S extends AbstractIoSession, H>
         extends AbstractIoAcceptor {
 
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
@@ -67,12 +69,14 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     private static final long SELECT_TIMEOUT = 1000L;
 
     private final Object lock = new Object();
-    private final IoProcessor<T> processor = new ConnectionlessAcceptorProcessor();
+
+    private final IoProcessor<S> processor = new ConnectionlessAcceptorProcessor();
     private final Queue<AcceptorOperationFuture> registerQueue =
         new ConcurrentLinkedQueue<AcceptorOperationFuture>();
     private final Queue<AcceptorOperationFuture> cancelQueue =
         new ConcurrentLinkedQueue<AcceptorOperationFuture>();
-    private final Queue<T> flushingSessions = new ConcurrentLinkedQueue<T>();
+
+    private final Queue<S> flushingSessions = new ConcurrentLinkedQueue<S>();
     private final Map<String, H> boundHandles =
         Collections.synchronizedMap(new HashMap<String, H>());
 
@@ -152,9 +156,12 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
     protected abstract boolean isReadable(H handle);
     protected abstract boolean isWritable(H handle);
     protected abstract SocketAddress receive(H handle, IoBuffer buffer) throws Exception;
-    protected abstract int send(T session, IoBuffer buffer, SocketAddress remoteAddress) throws Exception;
-    protected abstract T newSession(IoProcessor<T> processor, H handle, SocketAddress remoteAddress) throws Exception;
-    protected abstract void setInterestedInWrite(T session, boolean interested) throws Exception;
+
+    protected abstract int send(S session, IoBuffer buffer, SocketAddress remoteAddress) throws Exception;
+
+    protected abstract S newSession(IoProcessor<S> processor, H handle, SocketAddress remoteAddress) throws Exception;
+
+    protected abstract void setInterestedInWrite(S session, boolean interested) throws Exception;
 
     /**
      * {@inheritDoc}
@@ -275,7 +282,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
             }
 
             // If a new session needs to be created.
-            T newSession = newSession(processor, handle, remoteAddress);
+            S newSession = newSession(processor, handle, remoteAddress);
             getSessionRecycler().put(newSession);
             session = newSession;
         }
@@ -311,23 +318,23 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    private class ConnectionlessAcceptorProcessor implements IoProcessor<T> {
+    private class ConnectionlessAcceptorProcessor implements IoProcessor<S> {
 
-        public void add(T session) {
+        public void add(S session) {
         }
 
-        public void flush(T session) {
+        public void flush(S session) {
             if (scheduleFlush(session)) {
                 wakeup();
             }
         }
 
-        public void remove(T session) {
+        public void remove(S session) {
             getSessionRecycler().remove(session);
             getListeners().fireSessionDestroyed(session);
         }
 
-        public void updateTrafficControl(T session) {
+        public void updateTrafficControl(S session) {
             throw new UnsupportedOperationException();
         }
 
@@ -361,7 +368,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    private boolean scheduleFlush(T session) {
+    private boolean scheduleFlush(S session) {
         // Set the schedule for flush flag if the session
         // has not already be added to the flushingSessions
         // queue
@@ -443,7 +450,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
                 if (isWritable(h)) {
                     for (IoSession session : getManagedSessions().values()) {
-                        scheduleFlush((T) session);
+                        scheduleFlush((S) session);
                     }
                 }
             } catch (Throwable t) {
@@ -474,7 +481,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
 
     private void flushSessions(long currentTime) {
         for (;;) {
-            T session = flushingSessions.poll();
+            S session = flushingSessions.poll();
             
             if (session == null) {
                 break;
@@ -496,7 +503,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<T extends Abstract
         }
     }
 
-    private boolean flush(T session, long currentTime) throws Exception {
+    private boolean flush(S session, long currentTime) throws Exception {
         // Clear OP_WRITE
         setInterestedInWrite(session, false);
 

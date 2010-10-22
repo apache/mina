@@ -22,13 +22,9 @@ package org.apache.mina.transport.socket.nio;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
-import java.nio.channels.SelectionKey;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.DefaultTransportMetadata;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
@@ -41,75 +37,42 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class NioDatagramSession extends NioSession {
+    static final TransportMetadata METADATA = new DefaultTransportMetadata("nio", "datagram", true, false,
+            InetSocketAddress.class, DatagramSessionConfig.class, IoBuffer.class);
 
-    static final TransportMetadata METADATA =
-            new DefaultTransportMetadata(
-                    "nio", "datagram", true, false,
-                    InetSocketAddress.class,
-                    DatagramSessionConfig.class, IoBuffer.class);
-
-    private final IoService service;
-    private final DatagramSessionConfig config;
-    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
-    private final DatagramChannel ch;
-    private final IoHandler handler;
     private final InetSocketAddress localAddress;
-    private final InetSocketAddress remoteAddress;
 
-    private SelectionKey key;
+    private final InetSocketAddress remoteAddress;
 
     /**
      * Creates a new acceptor-side session instance.
      */
-    NioDatagramSession(IoService service,
-                        DatagramChannel ch, IoProcessor<NioSession> processor,
-                        SocketAddress remoteAddress) {
-        super(processor);
-        this.service = service;
-        this.ch = ch;
-        this.config = new NioDatagramSessionConfig(ch);
-        this.config.setAll(service.getSessionConfig());
-        this.handler = service.getHandler();
+    NioDatagramSession(IoService service, DatagramChannel channel, IoProcessor<NioSession> processor,
+            SocketAddress remoteAddress) {
+        super(processor, service, channel);
+        config = new NioDatagramSessionConfig(channel);
+        config.setAll(service.getSessionConfig());
         this.remoteAddress = (InetSocketAddress) remoteAddress;
-        this.localAddress = (InetSocketAddress) ch.socket().getLocalSocketAddress();
+        this.localAddress = (InetSocketAddress) channel.socket().getLocalSocketAddress();
     }
 
     /**
      * Creates a new connector-side session instance.
      */
-    NioDatagramSession(IoService service, DatagramChannel ch, IoProcessor<NioSession> processor) {
-        this(service, ch, processor, ch.socket().getRemoteSocketAddress());
+    NioDatagramSession(IoService service, DatagramChannel channel, IoProcessor<NioSession> processor) {
+        this(service, channel, processor, channel.socket().getRemoteSocketAddress());
     }
 
-    public IoService getService() {
-        return service;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public DatagramSessionConfig getConfig() {
-        return config;
-    }
-
-    public IoFilterChain getFilterChain() {
-        return filterChain;
+        return (DatagramSessionConfig) config;
     }
 
     @Override
     DatagramChannel getChannel() {
-        return ch;
-    }
-
-    @Override
-    SelectionKey getSelectionKey() {
-        return key;
-    }
-
-    @Override
-    void setSelectionKey(SelectionKey key) {
-        this.key = key;
-    }
-
-    public IoHandler getHandler() {
-        return handler;
+        return (DatagramChannel) channel;
     }
 
     public TransportMetadata getTransportMetadata() {

@@ -42,16 +42,8 @@ import org.apache.mina.core.write.WriteRequestQueue;
  */
 class VmPipeSession extends AbstractIoSession {
 
-    static final TransportMetadata METADATA =
-            new DefaultTransportMetadata(
-                    "mina", "vmpipe", false, false,
-                    VmPipeAddress.class,
-                    VmPipeSessionConfig.class,
-                    Object.class);
-
-    private static final VmPipeSessionConfig CONFIG = new DefaultVmPipeSessionConfig();
-
-    private final IoService service;
+    static final TransportMetadata METADATA = new DefaultTransportMetadata("mina", "vmpipe", false, false,
+            VmPipeAddress.class, VmPipeSessionConfig.class, Object.class);
 
     private final IoServiceListenerSupport serviceListeners;
 
@@ -60,8 +52,6 @@ class VmPipeSession extends AbstractIoSession {
     private final VmPipeAddress remoteAddress;
 
     private final VmPipeAddress serviceAddress;
-
-    private final IoHandler handler;
 
     private final VmPipeFilterChain filterChain;
 
@@ -74,15 +64,14 @@ class VmPipeSession extends AbstractIoSession {
     /*
      * Constructor for client-side session.
      */
-    VmPipeSession(IoService service,
-                      IoServiceListenerSupport serviceListeners,
-                      VmPipeAddress localAddress, IoHandler handler, VmPipe remoteEntry) {
-        this.service = service;
+    VmPipeSession(IoService service, IoServiceListenerSupport serviceListeners, VmPipeAddress localAddress,
+            IoHandler handler, VmPipe remoteEntry) {
+        super(service);
+        config = new DefaultVmPipeSessionConfig();
         this.serviceListeners = serviceListeners;
         lock = new ReentrantLock();
         this.localAddress = localAddress;
         remoteAddress = serviceAddress = remoteEntry.getAddress();
-        this.handler = handler;
         filterChain = new VmPipeFilterChain(this);
         receivedMessageQueue = new LinkedBlockingQueue<Object>();
 
@@ -93,19 +82,15 @@ class VmPipeSession extends AbstractIoSession {
      * Constructor for server-side session.
      */
     private VmPipeSession(VmPipeSession remoteSession, VmPipe entry) {
-        service = entry.getAcceptor();
+        super(entry.getAcceptor());
+        config = new DefaultVmPipeSessionConfig();
         serviceListeners = entry.getListeners();
         lock = remoteSession.lock;
         localAddress = serviceAddress = remoteSession.remoteAddress;
         remoteAddress = remoteSession.localAddress;
-        handler = entry.getHandler();
         filterChain = new VmPipeFilterChain(this);
         this.remoteSession = remoteSession;
         receivedMessageQueue = new LinkedBlockingQueue<Object>();
-    }
-
-    public IoService getService() {
-        return service;
     }
 
     @Override
@@ -118,7 +103,7 @@ class VmPipeSession extends AbstractIoSession {
     }
 
     public VmPipeSessionConfig getConfig() {
-        return CONFIG;
+        return (VmPipeSessionConfig) config;
     }
 
     public IoFilterChain getFilterChain() {
@@ -127,10 +112,6 @@ class VmPipeSession extends AbstractIoSession {
 
     public VmPipeSession getRemoteSession() {
         return remoteSession;
-    }
-
-    public IoHandler getHandler() {
-        return handler;
     }
 
     public TransportMetadata getTransportMetadata() {

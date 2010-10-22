@@ -21,11 +21,9 @@ package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
 import java.nio.channels.ByteChannel;
-import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -63,7 +61,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected void dispose0() throws Exception {
+    protected void doDispose() throws Exception {
         selector.close();
     }
 
@@ -115,67 +113,6 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             key.cancel();
         }
         ch.close();
-    }
-
-    /**
-     * In the case we are using the java select() method, this method is used to
-     * trash the buggy selector and create a new one, registering all the
-     * sockets on it.
-     */
-    protected void registerNewSelector() throws IOException {
-        synchronized (selector) {
-            Set<SelectionKey> keys = selector.keys();
-
-            // Open a new selector
-            Selector newSelector = Selector.open();
-
-            // Loop on all the registered keys, and register them on the new selector
-            for (SelectionKey key : keys) {
-                SelectableChannel ch = key.channel();
-                
-                // Don't forget to attache the session, and back !
-                NioSession session = (NioSession)key.attachment();
-                SelectionKey newKey = ch.register(newSelector, key.interestOps(), session);
-                session.setSelectionKey( newKey );
-            }
-
-            // Now we can close the old selector and switch it
-            selector.close();
-            selector = newSelector;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected boolean isBrokenConnection() throws IOException {
-        // A flag set to true if we find a broken session
-        boolean brokenSession = false;
-
-        synchronized (selector) {
-            // Get the selector keys
-            Set<SelectionKey> keys = selector.keys();
-
-            // Loop on all the keys to see if one of them
-            // has a closed channel
-            for (SelectionKey key : keys) {
-                SelectableChannel channel = key.channel();
-
-                if ((((channel instanceof DatagramChannel) && ((DatagramChannel) channel)
-                        .isConnected()))
-                        || ((channel instanceof SocketChannel) && ((SocketChannel) channel)
-                                .isConnected())) {
-                    // The channel is not connected anymore. Cancel
-                    // the associated key then.
-                    key.cancel();
-
-                    // Set the flag to true to avoid a selector switch
-                    brokenSession = true;
-                }
-            }
-        }
-
-        return brokenSession;
     }
 
     /**

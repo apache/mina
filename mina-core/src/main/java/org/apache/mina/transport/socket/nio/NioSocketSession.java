@@ -22,16 +22,12 @@ package org.apache.mina.transport.socket.nio;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
-import org.apache.mina.core.filterchain.DefaultIoFilterChain;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.DefaultTransportMetadata;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
@@ -45,27 +41,13 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class NioSocketSession extends NioSession {
+    static final TransportMetadata METADATA = new DefaultTransportMetadata("nio", "socket", false, true,
+            InetSocketAddress.class, SocketSessionConfig.class, IoBuffer.class, FileRegion.class);
 
-    static final TransportMetadata METADATA =
-            new DefaultTransportMetadata(
-                    "nio", "socket", false, true,
-                    InetSocketAddress.class,
-                    SocketSessionConfig.class,
-                    IoBuffer.class, FileRegion.class);
+    private Socket getSocket() {
+        return ((SocketChannel) channel).socket();
+    }
 
-    private final IoService service;
-
-    private final SocketSessionConfig config = new SessionConfigImpl();
-
-    private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
-
-    private final SocketChannel ch;
-
-    private final IoHandler handler;
-
-    private SelectionKey key;
-
-    
     /**
      * 
      * Creates a new instance of NioSocketSession.
@@ -74,63 +56,42 @@ class NioSocketSession extends NioSession {
      * @param processor the associated IoProcessor
      * @param ch the used channel
      */
-    public NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel ch) {
-        super(processor);
-        this.service = service;
-        this.ch = ch;
-        this.handler = service.getHandler();
+    public NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel channel) {
+        super(processor, service, channel);
+        config = new SessionConfigImpl();
         this.config.setAll(service.getSessionConfig());
-    }
-
-    public IoService getService() {
-        return service;
-    }
-
-    public SocketSessionConfig getConfig() {
-        return config;
-    }
-
-    public IoFilterChain getFilterChain() {
-        return filterChain;
     }
 
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public SocketSessionConfig getConfig() {
+        return (SocketSessionConfig) config;
+    }
+
     @Override
     SocketChannel getChannel() {
-        return ch;
-    }
-
-    @Override
-    SelectionKey getSelectionKey() {
-        return key;
-    }
-
-    @Override
-    void setSelectionKey(SelectionKey key) {
-        this.key = key;
-    }
-
-    public IoHandler getHandler() {
-        return handler;
+        return (SocketChannel) channel;
     }
 
     /**
      * {@inheritDoc}
      */
     public InetSocketAddress getRemoteAddress() {
-        if ( ch == null ) {
+        if (channel == null) {
             return null;
         }
-        
-        Socket socket = ch.socket();
-        
-        if ( socket == null ) {
+
+        Socket socket = getSocket();
+
+        if (socket == null) {
             return null;
         }
-        
+
         return (InetSocketAddress) socket.getRemoteSocketAddress();
     }
 
@@ -138,16 +99,16 @@ class NioSocketSession extends NioSession {
      * {@inheritDoc}
      */
     public InetSocketAddress getLocalAddress() {
-        if ( ch == null ) {
+        if (channel == null) {
             return null;
         }
-        
-        Socket socket = ch.socket();
-        
-        if ( socket == null ) {
+
+        Socket socket = getSocket();
+
+        if (socket == null) {
             return null;
         }
-        
+
         return (InetSocketAddress) socket.getLocalSocketAddress();
     }
 
@@ -159,7 +120,7 @@ class NioSocketSession extends NioSession {
     private class SessionConfigImpl extends AbstractSocketSessionConfig {
         public boolean isKeepAlive() {
             try {
-                return ch.socket().getKeepAlive();
+                return getSocket().getKeepAlive();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -167,7 +128,7 @@ class NioSocketSession extends NioSession {
 
         public void setKeepAlive(boolean on) {
             try {
-                ch.socket().setKeepAlive(on);
+                getSocket().setKeepAlive(on);
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -175,7 +136,7 @@ class NioSocketSession extends NioSession {
 
         public boolean isOobInline() {
             try {
-                return ch.socket().getOOBInline();
+                return getSocket().getOOBInline();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -183,7 +144,7 @@ class NioSocketSession extends NioSession {
 
         public void setOobInline(boolean on) {
             try {
-                ch.socket().setOOBInline(on);
+                getSocket().setOOBInline(on);
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -191,7 +152,7 @@ class NioSocketSession extends NioSession {
 
         public boolean isReuseAddress() {
             try {
-                return ch.socket().getReuseAddress();
+                return getSocket().getReuseAddress();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -199,7 +160,7 @@ class NioSocketSession extends NioSession {
 
         public void setReuseAddress(boolean on) {
             try {
-                ch.socket().setReuseAddress(on);
+                getSocket().setReuseAddress(on);
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -207,7 +168,7 @@ class NioSocketSession extends NioSession {
 
         public int getSoLinger() {
             try {
-                return ch.socket().getSoLinger();
+                return getSocket().getSoLinger();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -216,9 +177,9 @@ class NioSocketSession extends NioSession {
         public void setSoLinger(int linger) {
             try {
                 if (linger < 0) {
-                    ch.socket().setSoLinger(false, 0);
+                    getSocket().setSoLinger(false, 0);
                 } else {
-                    ch.socket().setSoLinger(true, linger);
+                    getSocket().setSoLinger(true, linger);
                 }
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
@@ -231,7 +192,7 @@ class NioSocketSession extends NioSession {
             }
 
             try {
-                return ch.socket().getTcpNoDelay();
+                return getSocket().getTcpNoDelay();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -239,7 +200,7 @@ class NioSocketSession extends NioSession {
 
         public void setTcpNoDelay(boolean on) {
             try {
-                ch.socket().setTcpNoDelay(on);
+                getSocket().setTcpNoDelay(on);
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -250,7 +211,7 @@ class NioSocketSession extends NioSession {
          */
         public int getTrafficClass() {
             try {
-                return ch.socket().getTrafficClass();
+                return getSocket().getTrafficClass();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -261,7 +222,7 @@ class NioSocketSession extends NioSession {
          */
         public void setTrafficClass(int tc) {
             try {
-                ch.socket().setTrafficClass(tc);
+                getSocket().setTrafficClass(tc);
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -269,7 +230,7 @@ class NioSocketSession extends NioSession {
 
         public int getSendBufferSize() {
             try {
-                return ch.socket().getSendBufferSize();
+                return getSocket().getSendBufferSize();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -277,7 +238,7 @@ class NioSocketSession extends NioSession {
 
         public void setSendBufferSize(int size) {
             try {
-                ch.socket().setSendBufferSize(size);
+                getSocket().setSendBufferSize(size);
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -285,7 +246,7 @@ class NioSocketSession extends NioSession {
 
         public int getReceiveBufferSize() {
             try {
-                return ch.socket().getReceiveBufferSize();
+                return getSocket().getReceiveBufferSize();
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
@@ -293,7 +254,7 @@ class NioSocketSession extends NioSession {
 
         public void setReceiveBufferSize(int size) {
             try {
-                ch.socket().setReceiveBufferSize(size);
+                getSocket().setReceiveBufferSize(size);
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
