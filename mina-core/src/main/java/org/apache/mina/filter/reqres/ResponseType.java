@@ -20,7 +20,20 @@
 package org.apache.mina.filter.reqres;
 
 /**
- * TODO Add documentation
+ * Type of Response contained within the {@code Response} class
+ *
+ * Response can be either a single entity or a multiple partial messages, in which
+ * case PARTIAL_LAST signifies the end of partial messages
+ *
+ * For response contained within a single message/entity the ResponseType shall be
+ * WHOLE
+ *
+ * For response with multiple partial messages, we have respnse type sepcified as
+ *
+ * [PARTIAL]+ PARTIAL_LAST
+ *
+ * meaning, we have One or more PARTIAL response type with one PARTIAL_LAST which
+ * signifies end of partial messages or completion of response message
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
