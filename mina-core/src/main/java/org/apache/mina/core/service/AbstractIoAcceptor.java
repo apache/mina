@@ -96,9 +96,11 @@ public abstract class AbstractIoAcceptor
      */
     public final Set<SocketAddress> getLocalAddresses() {
         Set<SocketAddress> localAddresses = new HashSet<SocketAddress>();
-        synchronized (bindLock) {
+        
+        synchronized (boundAddresses){
             localAddresses.addAll(boundAddresses);
         }
+        
         return localAddresses;
     }
 
@@ -146,24 +148,27 @@ public abstract class AbstractIoAcceptor
         }
         
         synchronized (bindLock) {
-            if (!boundAddresses.isEmpty()) {
-                throw new IllegalStateException(
-                        "localAddress can't be set while the acceptor is bound.");
-            }
+            synchronized (boundAddresses) {
+                if (!boundAddresses.isEmpty()) {
+                    throw new IllegalStateException(
+                            "localAddress can't be set while the acceptor is bound." );
+                }
 
-            Collection<SocketAddress> newLocalAddresses = 
-                new ArrayList<SocketAddress>();
-            for (SocketAddress a: localAddresses) {
-                checkAddressType(a);
-                newLocalAddresses.add(a);
+                Collection<SocketAddress> newLocalAddresses =
+                    new ArrayList<SocketAddress>();
+
+                for (SocketAddress a: localAddresses) {
+                    checkAddressType(a);
+                    newLocalAddresses.add(a);
+                }
+
+                if (newLocalAddresses.isEmpty()) {
+                    throw new IllegalArgumentException("empty localAddresses");
+                }
+
+                this.defaultLocalAddresses.clear();
+                this.defaultLocalAddresses.addAll( newLocalAddresses );
             }
-            
-            if (newLocalAddresses.isEmpty()) {
-                throw new IllegalArgumentException("empty localAddresses");
-            }
-            
-            this.defaultLocalAddresses.clear();
-            this.defaultLocalAddresses.addAll(newLocalAddresses);
         }
     }
 
@@ -268,8 +273,10 @@ public abstract class AbstractIoAcceptor
         
         boolean activate = false;
         synchronized (bindLock) {
-            if (boundAddresses.isEmpty()) {
-                activate = true;
+            synchronized (boundAddresses) {
+                if (boundAddresses.isEmpty()) {
+                    activate = true;
+                }
             }
 
             if (getHandler() == null) {
@@ -277,7 +284,11 @@ public abstract class AbstractIoAcceptor
             }
             
             try {
-                boundAddresses.addAll(bindInternal(localAddressesCopy));
+                Set<SocketAddress> addresses = bindInternal( localAddressesCopy );
+                
+                synchronized (boundAddresses) {
+                    boundAddresses.addAll(addresses);
+                }
             } catch (IOException e) {
                 throw e;
             } catch (RuntimeException e) {
@@ -341,35 +352,41 @@ public abstract class AbstractIoAcceptor
         
         boolean deactivate = false;
         synchronized (bindLock) {
-            if (boundAddresses.isEmpty()) {
-                return;
-            }
-
-            List<SocketAddress> localAddressesCopy = new ArrayList<SocketAddress>();
-            int specifiedAddressCount = 0;
-            for (SocketAddress a: localAddresses) {
-                specifiedAddressCount ++;
-                if (a != null && boundAddresses.contains(a)) {
-                    localAddressesCopy.add(a);
+            synchronized (boundAddresses) {
+                if (boundAddresses.isEmpty()) {
+                    return;
                 }
-            }
-            if (specifiedAddressCount == 0) {
-                throw new IllegalArgumentException("localAddresses is empty.");
-            }
-            
-            if (!localAddressesCopy.isEmpty()) {
-                try {
-                    unbind0(localAddressesCopy);
-                } catch (RuntimeException e) {
-                    throw e;
-                } catch (Throwable e) {
-                    throw new RuntimeIoException(
-                            "Failed to unbind from: " + getLocalAddresses(), e);
+
+                List<SocketAddress> localAddressesCopy = new ArrayList<SocketAddress>();
+                int specifiedAddressCount = 0;
+                
+                for (SocketAddress a: localAddresses ) {
+                    specifiedAddressCount++;
+
+                    if ((a != null) && boundAddresses.contains(a) ) {
+                        localAddressesCopy.add(a);
+                    }
                 }
                 
-                boundAddresses.removeAll(localAddressesCopy);
-                if (boundAddresses.isEmpty()) {
-                    deactivate = true;
+                if (specifiedAddressCount == 0) {
+                    throw new IllegalArgumentException( "localAddresses is empty." );
+                }
+                
+                if (!localAddressesCopy.isEmpty()) {
+                    try {
+                        unbind0(localAddressesCopy);
+                    } catch (RuntimeException e) {
+                        throw e;
+                    } catch (Throwable e) {
+                        throw new RuntimeIoException(
+                                "Failed to unbind from: " + getLocalAddresses(), e );
+                    }
+
+                    boundAddresses.removeAll(localAddressesCopy);
+                    
+                    if (boundAddresses.isEmpty()) {
+                        deactivate = true;
+                    }
                 }
             }
         }
