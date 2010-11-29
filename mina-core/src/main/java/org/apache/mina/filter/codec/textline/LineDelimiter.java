@@ -41,7 +41,7 @@ public class LineDelimiter {
     /** Compute the default delimiter on he current OS */
     static {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        PrintWriter out = new PrintWriter(bout);
+        PrintWriter out = new PrintWriter(bout, true);
         out.println();
         DEFAULT = new LineDelimiter(new String(bout.toByteArray()));
     }
