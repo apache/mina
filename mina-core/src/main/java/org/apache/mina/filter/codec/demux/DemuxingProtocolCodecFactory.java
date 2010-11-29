@@ -43,10 +43,16 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ProtocolEncoder getEncoder(IoSession session) throws Exception {
         return encoder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ProtocolDecoder getDecoder(IoSession session) throws Exception {
         return decoder;
     }
