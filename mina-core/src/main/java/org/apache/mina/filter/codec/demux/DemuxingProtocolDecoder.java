@@ -121,6 +121,9 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         this.decoderFactories = newDecoderFactories;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean doDecode(IoSession session, IoBuffer in,
             ProtocolDecoderOutput out) throws Exception {
@@ -191,6 +194,9 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void finishDecode(IoSession session, ProtocolDecoderOutput out)
             throws Exception {
@@ -204,6 +210,9 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         currentDecoder.finishDecode(session, out);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose(IoSession session) throws Exception {
         super.dispose(session);

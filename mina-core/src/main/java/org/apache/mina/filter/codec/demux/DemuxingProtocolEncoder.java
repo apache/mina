@@ -126,6 +126,9 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void encode(IoSession session, Object message,
             ProtocolEncoderOutput out) throws Exception {
         State state = getState(session);
@@ -207,6 +210,9 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         return encoder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void dispose(IoSession session) throws Exception {
         session.removeAttribute(STATE);
     }
