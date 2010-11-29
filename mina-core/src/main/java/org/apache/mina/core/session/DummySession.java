@@ -176,6 +176,8 @@ public class DummySession extends AbstractIoSession {
 
         };
 
+        this.service = super.getService();
+
         try {
             IoSessionDataStructureFactory factory = new DefaultIoSessionDataStructureFactory();
             setAttributeMap(factory.getAttributeMap(this));
