@@ -20,12 +20,21 @@
 package org.apache.mina.core.session;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
- * A key that makes its parent {@link Map} or session attribute to search
- * fast while being debug-friendly by providing the string representation.
- *
+ * Creates a Key from a class name and an attribute name. The resulting Key will
+ * be stored in the session Map.<br>
+ * For instance, we can create a 'processor' AttributeKey this way :
+ * 
+ * <pre>
+ * private static final AttributeKey PROCESSOR = new AttributeKey(
+ * 	SimpleIoProcessorPool.class, &quot;processor&quot;);
+ * </pre>
+ * 
+ * This will create the <b>SimpleIoProcessorPool.processor@7DE45C99</b> key
+ * which will be stored in the session map.<br>
+ * Such an attributeKey is mainly useful for debug purposes.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class AttributeKey implements Serializable {
@@ -37,16 +46,23 @@ public final class AttributeKey implements Serializable {
 
     /**
      * Creates a new instance. It's built from :
-     * - the class' name
-     * - the attribute's name
-     * - this attribute hashCode
+     * <ul>
+     * <li>the class' name</li>
+     * <li>the attribute's name</li>
+     * <li>this attribute hashCode</li>
+     * </ul>
+     * 
+     * @param source
+     *            The class this AttributeKey will be attached to
+     * @param name
+     *            The Attribute name
      */
     public AttributeKey(Class<?> source, String name) {
         this.name = source.getName() + '.' + name + '@' + Integer.toHexString(this.hashCode());
     }
 
     /**
-     * The String representation of tis objection is its constructed name.
+     * The String representation of this object.
      */
     @Override
     public String toString() {
