@@ -19,6 +19,8 @@
  */
 package org.apache.mina.proxy.handlers.socks;
 
+import java.util.Arrays;
+
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.proxy.session.ProxyIoSession;
@@ -66,7 +68,8 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
     protected void writeRequest(final NextFilter nextFilter,
             final SocksProxyRequest request) {
         try {
-            boolean isV4ARequest = request.getHost() != null;
+            boolean isV4ARequest = Arrays.equals(request.getIpAddress(),
+                    SocksProxyConstants.FAKE_IP); 
             byte[] userID = request.getUserName().getBytes("ASCII");
             byte[] host = isV4ARequest ? request.getHost().getBytes("ASCII")
                     : null;
