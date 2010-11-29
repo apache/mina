@@ -24,6 +24,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.channels.ClosedSelectorException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -414,6 +415,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                             }
                         }
                     }
+                } catch (ClosedSelectorException cse) {
+                    // If the selector has been closed, we can exit the loop
+                    break;
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
 

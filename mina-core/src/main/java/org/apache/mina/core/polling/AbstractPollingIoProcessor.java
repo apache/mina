@@ -21,6 +21,7 @@ package org.apache.mina.core.polling;
 
 import java.io.IOException;
 import java.net.PortUnreachableException;
+import java.nio.channels.ClosedSelectorException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -1108,6 +1109,9 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                         
                         wakeup();
                     }
+                } catch (ClosedSelectorException cse) {
+                    // If the selector has been closed, we can exit the loop
+                    break;
                 } catch (Throwable t) {
                     ExceptionMonitor.getInstance().exceptionCaught(t);
 

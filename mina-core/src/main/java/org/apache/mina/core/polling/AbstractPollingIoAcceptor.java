@@ -20,6 +20,7 @@
 package org.apache.mina.core.polling;
 
 import java.net.SocketAddress;
+import java.nio.channels.ClosedSelectorException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -425,6 +426,9 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                             }
                         }
                     }
+                } catch (ClosedSelectorException cse) {
+                    // If the selector has been closed, we can exit the loop
+                    break;
                 } catch (Throwable e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
 
