@@ -83,22 +83,24 @@
     <!-- Maven Plugins -->
     <version.api.plugin>2.2.1</version.api.plugin>
     <version.assembly.plugin>2.2-beta-5</version.assembly.plugin>
+    <version.bundle.plugin>2.2.0</version.bundle.plugin>
     <version.clean.plugin>2.3</version.clean.plugin>
-    <version.compiler.plugin>2.1</version.compiler.plugin>
+    <version.compiler.plugin>2.3.2</version.compiler.plugin>
     <version.deploy.plugin>2.5</version.deploy.plugin>
     <version.gpg.plugin>1.1</version.gpg.plugin>
     <version.jar.plugin>2.3</version.jar.plugin>
-    <version.javadoc.plugin>2.6.1</version.javadoc.plugin>
-    <version.jxr.plugin>2.1</version.jxr.plugin>
+    <version.javadoc.plugin>2.7</version.javadoc.plugin>
+    <version.jxr.plugin>2.2</version.jxr.plugin>
     <version.model.plugin>2.2.1</version.model.plugin>
     <version.project.plugin>2.2.1</version.project.plugin>
     <version.rat.maven.plugin>1.0-alpha-3</version.rat.maven.plugin>
-    <version.release.plugin>2.0</version.release.plugin>
+    <version.release.plugin>2.1</version.release.plugin>
     <version.remote.resources.plugin>1.1</version.remote.resources.plugin>
     <version.site.plugin>2.1</version.site.plugin>
-    <version.source.plugin>2.1.1</version.source.plugin>
+    <version.source.plugin>2.1.2</version.source.plugin>
     <version.shade.plugin>1.4</version.shade.plugin>
-    <version.surefire.plugin>2.4.3</version.surefire.plugin>
+    <version.surefire.plugin>2.7.1</version.surefire.plugin>
+    <version.xbean.plugin>2.7.1</version.xbean.plugin>
 
     <!-- Jars -->
     <version.commons.lang>2.6</version.commons.lang>
@@ -464,7 +466,7 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>1.4.1</version>
+        <version>${version.bundle.plugin}</version>
         <inherited>true</inherited>
         <extensions>true</extensions>
         <configuration>
