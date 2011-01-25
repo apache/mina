@@ -286,6 +286,11 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
                 disposing = true;
                 
                 for (IoProcessor<S> ioProcessor : pool) {
+                    if (ioProcessor == null) {
+                        // Special case if the pool has not been initialized properly
+                        continue;
+                    }
+                    
                     if (ioProcessor.isDisposing()) {
                         continue;
                     }
