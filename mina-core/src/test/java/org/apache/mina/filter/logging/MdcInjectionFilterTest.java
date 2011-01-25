@@ -465,12 +465,10 @@ public class MdcInjectionFilterTest {
             events.add(loggingEvent);
         }
 
-        @Override
         public boolean requiresLayout() {
             return false;
         }
 
-        @Override
         public void close() {
             // Do nothing
         }
