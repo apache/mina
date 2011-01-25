@@ -30,6 +30,7 @@
   <packaging>bundle</packaging>  
 
   <properties>
+    <symbolicName>${project.groupId}.transport.socket.apr</symbolicName>
     <exportedPackage>${project.groupId}.transport.socket.apr</exportedPackage>
   </properties>
 

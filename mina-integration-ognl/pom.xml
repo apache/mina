@@ -32,6 +32,7 @@
   <packaging>bundle</packaging>  
 
   <properties>
+    <symbolicName>${project.groupId}.integration.ognl</symbolicName>
     <exportedPackage>${project.groupId}.integration.ognl</exportedPackage>
   </properties>
 
