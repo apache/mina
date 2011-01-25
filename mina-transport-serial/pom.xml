@@ -32,6 +32,7 @@
   <packaging>bundle</packaging>  
 
   <properties>
+    <symbolicName>${project.groupId}.transport.serial</symbolicName>
     <exportedPackage>${project.groupId}.transport.serial</exportedPackage>
   </properties>
 
