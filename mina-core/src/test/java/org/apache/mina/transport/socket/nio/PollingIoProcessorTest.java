@@ -21,6 +21,7 @@ package org.apache.mina.transport.socket.nio;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.util.Iterator;
@@ -43,7 +44,7 @@ import org.junit.Test;
 
 /**
  * Tests non regression on issue DIRMINA-632.
- * 
+ *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PollingIoProcessorTest {
@@ -149,6 +150,16 @@ public class PollingIoProcessorTest {
             @Override
             protected int write(NioSession session, IoBuffer buf, int length) throws Exception {
                 throw new NoRouteToHostException("No Route To Host Test");
+            }
+
+            @Override
+            protected boolean isBrokenConnection() throws IOException {
+                return proc.isBrokenConnection();
+            }
+
+            @Override
+            protected void registerNewSelector() throws IOException {
+                proc.registerNewSelector();
             }
         });
         connector.setHandler(new IoHandlerAdapter());

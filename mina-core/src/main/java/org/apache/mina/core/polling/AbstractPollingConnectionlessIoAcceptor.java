@@ -55,7 +55,7 @@ import org.apache.mina.util.ExceptionMonitor;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
- * 
+ *
   * @param <S> the type of the {@link IoSession} this processor can handle
 */
 public abstract class AbstractPollingConnectionlessIoAcceptor<S extends AbstractIoSession, H>
@@ -86,32 +86,36 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     private final ServiceOperationFuture disposalFuture =
         new ServiceOperationFuture();
     private volatile boolean selectable;
-    
-    /** The thread responsible of accepting incoming requests */ 
+
+    /** The thread responsible of accepting incoming requests */
     private Acceptor acceptor;
 
     private long lastIdleCheckTime;
-    
+
     private String getAddressAsString(SocketAddress address) {
-    	InetAddress inetAddress = ((InetSocketAddress)address).getAddress();
-    	int port = ((InetSocketAddress)address).getPort();
-    	
-    	String result = null;
-    	
-    	if ( inetAddress instanceof Inet4Address ) {
-    		result = "/" + inetAddress.getHostAddress() + ":" + port;
-    	} else {
-    		// Inet6
-    		if ( ((Inet6Address)inetAddress).isIPv4CompatibleAddress() ) {
-    			byte[] bytes = inetAddress.getAddress();
-    			
-    			result = "/" + bytes[12] + "." + bytes[13] + "." + bytes[14] + "." + bytes[15] + ":" + port;
-    		} else {
-    			result = inetAddress.toString();
-    		}
-    	}
-    	
-    	return result;
+        InetAddress inetAddress = ((InetSocketAddress)address).getAddress();
+        int port = ((InetSocketAddress)address).getPort();
+
+        if (inetAddress == null) {
+            return "null";
+        }
+
+        String result = null;
+
+        if ( inetAddress instanceof Inet4Address ) {
+            result = "/" + inetAddress.getHostAddress() + ":" + port;
+        } else {
+            // Inet6
+            if ( ((Inet6Address)inetAddress).isIPv4CompatibleAddress() ) {
+                byte[] bytes = inetAddress.getAddress();
+
+                result = "/" + bytes[12] + "." + bytes[13] + "." + bytes[14] + "." + bytes[15] + ":" + port;
+            } else {
+                result = inetAddress.toString();
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -191,9 +195,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         // creates the Acceptor instance and has the local
         // executor kick it off.
         startupAcceptor();
-        
+
         // As we just started the acceptor, we have to unblock the select()
-        // in order to process the bind request we just have added to the 
+        // in order to process the bind request we just have added to the
         // registerQueue.
         wakeup();
 
@@ -212,7 +216,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         for (H handle : boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
         }
-        
+
         return newLocalAddresses;
     }
 
@@ -267,17 +271,17 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     private IoSession newSessionWithoutLock(
             SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
         H handle = boundHandles.get(getAddressAsString(localAddress));
-        
+
         if (handle == null) {
             throw new IllegalArgumentException("Unknown local address: " + localAddress);
         }
 
         IoSession session;
         IoSessionRecycler sessionRecycler = getSessionRecycler();
-        
+
         synchronized (sessionRecycler) {
             session = sessionRecycler.recycle(localAddress, remoteAddress);
-            
+
             if (session != null) {
                 return session;
             }
@@ -314,7 +318,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
             if (sessionRecycler == null) {
                 sessionRecycler = DEFAULT_RECYCLER;
             }
-            
+
             this.sessionRecycler = sessionRecycler;
         }
     }
@@ -382,9 +386,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     }
 
     /**
-     * This private class is used to accept incoming connection from 
+     * This private class is used to accept incoming connection from
      * clients. It's an infinite loop, which can be stopped when all
-     * the registered handles have been removed (unbound). 
+     * the registered handles have been removed (unbound).
      */
     private class Acceptor implements Runnable {
         public void run() {
@@ -446,7 +450,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         while (handles.hasNext()) {
             H h = handles.next();
             handles.remove();
-            
+
             try {
                 if (isReadable(h)) {
                     readHandle(h);
@@ -468,7 +472,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                 getSessionConfig().getReadBufferSize());
 
         SocketAddress remoteAddress = receive(handle, readBuf);
-        
+
         if (remoteAddress != null) {
             IoSession session = newSessionWithoutLock(
                     remoteAddress, localAddress(handle));
@@ -486,7 +490,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     private void flushSessions(long currentTime) {
         for (;;) {
             S session = flushingSessions.poll();
-            
+
             if (session == null) {
                 break;
             }
@@ -517,11 +521,11 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
             (session.getConfig().getMaxReadBufferSize() >>> 1);
 
         int writtenBytes = 0;
-        
+
         try {
             for (;;) {
                 WriteRequest req = session.getCurrentWriteRequest();
-                
+
                 if (req == null) {
                     req = writeRequestQueue.poll(session);
                     if (req == null) {
@@ -531,7 +535,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                 }
 
                 IoBuffer buf = (IoBuffer) req.getMessage();
-                
+
                 if (buf.remaining() == 0) {
                     // Clear and fire event
                     session.setCurrentWriteRequest(null);
@@ -541,14 +545,14 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                 }
 
                 SocketAddress destination = req.getDestination();
-                
+
                 if (destination == null) {
                     destination = session.getRemoteAddress();
                 }
 
                 int localWrittenBytes = send(session, buf, destination);
-                
-                if (localWrittenBytes == 0 || writtenBytes >= maxWrittenBytes) {
+
+                if (( localWrittenBytes == 0 ) || ( writtenBytes >= maxWrittenBytes )) {
                     // Kernel buffer is full or wrote too much
                     setInterestedInWrite(session, true);
                     return false;
@@ -572,25 +576,25 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     private int registerHandles() {
         for (;;) {
             AcceptorOperationFuture req = registerQueue.poll();
-            
+
             if (req == null) {
                 break;
             }
 
             Map<String, H> newHandles = new HashMap<String, H>();
             List<SocketAddress> localAddresses = req.getLocalAddresses();
-            
+
             try {
                 for (SocketAddress socketAddress : localAddresses) {
                     H handle = open(socketAddress);
                     newHandles.put(getAddressAsString(localAddress(handle)), handle);
                 }
-                
+
                 boundHandles.putAll(newHandles);
 
                 getListeners().fireServiceActivated();
                 req.setDone();
-                
+
                 return newHandles.size();
             } catch (Exception e) {
                 req.setException(e);
@@ -604,7 +608,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                             ExceptionMonitor.getInstance().exceptionCaught(e);
                         }
                     }
-                    
+
                     wakeup();
                 }
             }
@@ -615,7 +619,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
     private int unregisterHandles() {
         int nHandles = 0;
-        
+
         for (;;) {
             AcceptorOperationFuture request = cancelQueue.poll();
             if (request == null) {
@@ -625,7 +629,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
             // close the channels
             for (SocketAddress socketAddress : request.getLocalAddresses()) {
                 H handle = boundHandles.remove(getAddressAsString(socketAddress));
-                
+
                 if (handle == null) {
                     continue;
                 }
