@@ -42,7 +42,7 @@ import org.apache.tomcat.jni.Status;
 /**
  * The class in charge of processing socket level IO events for the
  * {@link AprSocketConnector}
- * 
+ *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
@@ -63,7 +63,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     /**
      * Create a new instance of {@link AprIoProcessor} with a given Exector for
      * handling I/Os events.
-     * 
+     *
      * @param executor
      *            the {@link Executor} for handling I/O events
      */
@@ -465,5 +465,22 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
 
     private void throwException(int code) throws IOException {
         throw new IOException(org.apache.tomcat.jni.Error.strerror(-code) + " (code: " + code + ")");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void registerNewSelector() {
+        // Do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isBrokenConnection() throws IOException {
+        // Here, we assume that this is the case.
+        return true;
     }
 }

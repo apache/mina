@@ -21,9 +21,11 @@ package org.apache.mina.transport.socket.nio;
 
 import java.io.IOException;
 import java.nio.channels.ByteChannel;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -36,7 +38,7 @@ import org.apache.mina.core.session.SessionState;
 
 /**
  * TODO Add documentation
- * 
+ *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
@@ -44,14 +46,14 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     private Selector selector;
 
     /**
-     * 
+     *
      * Creates a new instance of NioProcessor.
-     * 
+     *
      * @param executor
      */
     public NioProcessor(Executor executor) {
         super(executor);
-        
+
         try {
             // Open a new selector
             selector = Selector.open();
@@ -115,6 +117,70 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         ch.close();
     }
 
+
+    /**
+     * In the case we are using the java select() method, this method is used to
+     * trash the buggy selector and create a new one, registering all the
+     * sockets on it.
+     */
+    @Override
+    protected void registerNewSelector() throws IOException {
+        synchronized (selector) {
+            Set<SelectionKey> keys = selector.keys();
+
+            // Open a new selector
+            Selector newSelector = Selector.open();
+
+            // Loop on all the registered keys, and register them on the new selector
+            for (SelectionKey key : keys) {
+                SelectableChannel ch = key.channel();
+
+                // Don't forget to attache the session, and back !
+                NioSession session = (NioSession)key.attachment();
+                SelectionKey newKey = ch.register(newSelector, key.interestOps(), session);
+                session.setSelectionKey( newKey );
+            }
+
+            // Now we can close the old selector and switch it
+            selector.close();
+            selector = newSelector;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean isBrokenConnection() throws IOException {
+        // A flag set to true if we find a broken session
+        boolean brokenSession = false;
+
+        synchronized (selector) {
+            // Get the selector keys
+            Set<SelectionKey> keys = selector.keys();
+
+            // Loop on all the keys to see if one of them
+            // has a closed channel
+            for (SelectionKey key : keys) {
+                SelectableChannel channel = key.channel();
+
+                if ((((channel instanceof DatagramChannel) && ((DatagramChannel) channel)
+                        .isConnected()))
+                        || ((channel instanceof SocketChannel) && ((SocketChannel) channel)
+                                .isConnected())) {
+                    // The channel is not connected anymore. Cancel
+                    // the associated key then.
+                    key.cancel();
+
+                    // Set the flag to true to avoid a selector switch
+                    brokenSession = true;
+                }
+            }
+        }
+
+        return brokenSession;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -151,14 +217,14 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     @Override
     protected boolean isInterestedInRead(NioSession session) {
         SelectionKey key = session.getSelectionKey();
-        return key.isValid() && (key.interestOps() & SelectionKey.OP_READ) != 0;
+        return key.isValid() && ( (key.interestOps() & SelectionKey.OP_READ) != 0 );
     }
 
     @Override
     protected boolean isInterestedInWrite(NioSession session) {
         SelectionKey key = session.getSelectionKey();
         return key.isValid()
-                && (key.interestOps() & SelectionKey.OP_WRITE) != 0;
+                && ( (key.interestOps() & SelectionKey.OP_WRITE) != 0 );
     }
 
     /**
@@ -193,7 +259,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         if (key == null) {
             return;
         }
-        
+
         int newInterestOps = key.interestOps();
 
         if (isInterested) {
@@ -210,7 +276,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     @Override
     protected int read(NioSession session, IoBuffer buf) throws Exception {
         ByteChannel channel = session.getChannel();
-        
+
         return session.getChannel().read(buf.buf());
     }
 
@@ -240,7 +306,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             // Check to see if the IOException is being thrown due to
             // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
             String message = e.getMessage();
-            if (message != null && message.contains("temporarily unavailable")) {
+            if (( message != null ) && message.contains("temporarily unavailable")) {
                 return 0;
             }
 
@@ -258,7 +324,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
         /**
          * Create this iterator as a wrapper on top of the selectionKey Set.
-         * 
+         *
          * @param keys
          *            The set of selected sessions
          */
