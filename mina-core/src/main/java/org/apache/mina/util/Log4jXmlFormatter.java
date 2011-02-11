@@ -19,13 +19,13 @@
  */
 package org.apache.mina.util;
 
-import org.slf4j.MDC;
-
-import java.util.logging.Formatter;
-import java.util.logging.LogRecord;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.Arrays;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
+
+import org.slf4j.MDC;
 
 /**
  * Implementation of {@link java.util.logging.Formatter} that generates xml in the log4j format.
@@ -41,7 +41,7 @@ import java.util.Arrays;
  * <p>
  * The implementation is heavily based on org.apache.log4j.xml.XMLLayout
  * </p>
- * 
+ *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Log4jXmlFormatter extends Formatter {
@@ -93,6 +93,7 @@ public class Log4jXmlFormatter extends Formatter {
         return properties;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public String format(final LogRecord record) {
         // Reset working buffer. If the buffer is too large, then we need a new
@@ -143,12 +144,12 @@ public class Log4jXmlFormatter extends Formatter {
             Map contextMap = MDC.getCopyOfContextMap();
             if (contextMap != null) {
                 Set keySet = contextMap.keySet();
-                if (keySet != null && keySet.size() > 0) {
+                if (( keySet != null ) && ( keySet.size() > 0 )) {
                     buf.append("<log4j:properties>\r\n");
                     Object[] keys = keySet.toArray();
                     Arrays.sort(keys);
                     for (Object key1 : keys) {
-                        String key = key1.toString();
+                        String key = (key1 == null?"":key1.toString());
                         Object val = contextMap.get(key);
                         if (val != null) {
                             buf.append("<log4j:data name=\"");
@@ -161,7 +162,7 @@ public class Log4jXmlFormatter extends Formatter {
                     buf.append("</log4j:properties>\r\n");
                 }
             }
-            
+
         }
         buf.append("</log4j:event>\r\n\r\n");
 
