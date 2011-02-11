@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,26 +97,26 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ModelMBean} wrapper implementation for a POJO.
- * 
+ *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
+ *
  * @param <T> the type of the managed object
  */
 public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     private static final Map<ObjectName, Object> sources =
         new ConcurrentHashMap<ObjectName, Object>();
-    
+
     public static Object getSource(ObjectName oname) {
         return sources.get(oname);
     }
-    
+
     static {
         OgnlRuntime.setPropertyAccessor(IoService.class, new IoServicePropertyAccessor());
         OgnlRuntime.setPropertyAccessor(IoSession.class, new IoSessionPropertyAccessor());
         OgnlRuntime.setPropertyAccessor(IoFilter.class, new IoFilterPropertyAccessor());
     }
-    
+
     protected final static Logger LOGGER = LoggerFactory.getLogger(ObjectMBean.class);
 
     private final T source;
@@ -136,9 +136,9 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (source == null) {
             throw new IllegalArgumentException("source");
         }
-        
+
         this.source = source;
-        
+
         if (source instanceof IoService) {
             transportMetadata = ((IoService) source).getTransportMetadata();
         } else if (source instanceof IoSession) {
@@ -146,10 +146,10 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         } else {
             transportMetadata = null;
         }
-        
+
         this.info = createModelMBeanInfo(source);
     }
-    
+
     public final Object getAttribute(String fqan) throws AttributeNotFoundException,
             MBeanException, ReflectionException {
         try {
@@ -166,12 +166,12 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             throwMBeanException(new IllegalArgumentException(
                     "Unknown attribute: " + fqan));
         }
-        
+
         try {
 
             Object parent = getParent(fqan);
             boolean writable = isWritable(source.getClass(), pdesc);
-            
+
             return convertValue(
                     parent.getClass(), getLeafAttributeName(fqan),
                     getAttribute(source, fqan, pdesc.getPropertyType()),
@@ -179,16 +179,16 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         } catch (Throwable e) {
             throwMBeanException(e);
         }
-        
+
         throw new IllegalStateException();
     }
-    
+
     public final void setAttribute(Attribute attribute)
             throws AttributeNotFoundException, MBeanException,
             ReflectionException {
         String aname = attribute.getName();
         Object avalue = attribute.getValue();
-        
+
         try {
             setAttribute0(aname, avalue);
         } catch (AttributeNotFoundException e) {
@@ -196,13 +196,13 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         } catch (Throwable e) {
             throwMBeanException(e);
         }
-        
+
         PropertyDescriptor pdesc = propertyDescriptors.get(aname);
         if (pdesc == null) {
             throwMBeanException(new IllegalArgumentException(
                     "Unknown attribute: " + aname));
         }
-        
+
         try {
             PropertyEditor e = getPropertyEditor(
                     getParent(aname).getClass(),
@@ -215,10 +215,10 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             throwMBeanException(e);
         }
     }
-    
+
     public final Object invoke(String name, Object params[], String signature[])
             throws MBeanException, ReflectionException {
-    
+
         // Handle synthetic operations first.
         if (name.equals("unregisterMBean")) {
             try {
@@ -228,7 +228,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 throwMBeanException(e);
             }
         }
-        
+
         try {
             return convertValue(
                     null, null, invoke0(name, params, signature), false);
@@ -237,7 +237,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         } catch (Throwable e) {
             throwMBeanException(e);
         }
-        
+
         // And then try reflection.
         Class<?>[] paramTypes = new Class[signature.length];
         for (int i = 0; i < paramTypes.length; i ++) {
@@ -246,17 +246,17 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             } catch (ClassNotFoundException e) {
                 throwMBeanException(e);
             }
-            
+
             PropertyEditor e = getPropertyEditor(
                     source.getClass(), "p" + i, paramTypes[i]);
             if (e == null) {
                 throwMBeanException(new RuntimeException("Conversion failure: " + params[i]));
             }
-            
+
             e.setValue(params[i]);
             params[i] = e.getAsText();
         }
-        
+
         try {
             // Find the right method.
             for (Method m: source.getClass().getMethods()) {
@@ -267,7 +267,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 if (methodParamTypes.length != params.length) {
                     continue;
                 }
-                
+
                 Object[] convertedParams = new Object[params.length];
                 for (int i = 0; i < params.length; i ++) {
                     if (Iterable.class.isAssignableFrom(methodParamTypes[i])) {
@@ -287,29 +287,29 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 if (convertedParams == null) {
                     continue;
                 }
-                
+
                 return convertValue(
                         m.getReturnType(), "returnValue",
                         m.invoke(source, convertedParams), false);
             }
-            
+
             // No methods matched.
             throw new IllegalArgumentException("Failed to find a matching operation: " + name);
         } catch (Throwable e) {
             throwMBeanException(e);
         }
-        
+
         throw new IllegalStateException();
     }
 
     public final T getSource() {
         return source;
     }
-    
+
     public final MBeanServer getServer() {
         return server;
     }
-    
+
     public final ObjectName getName() {
         return name;
     }
@@ -344,7 +344,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 // Ignore all exceptions
             }
         }
-    
+
         return getAttributes(names);
     }
 
@@ -361,7 +361,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     @Override
     public final String toString() {
-        return source.toString();
+        return (source == null ? "" : source.toString());
     }
 
     public void addAttributeChangeNotificationListener(
@@ -446,21 +446,21 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     private MBeanInfo createModelMBeanInfo(T source) {
         String className = source.getClass().getName();
         String description = "";
-        
+
         ModelMBeanConstructorInfo[] constructors = new ModelMBeanConstructorInfo[0];
         ModelMBeanNotificationInfo[] notifications = new ModelMBeanNotificationInfo[0];
-        
+
         List<ModelMBeanAttributeInfo> attributes = new ArrayList<ModelMBeanAttributeInfo>();
         List<ModelMBeanOperationInfo> operations = new ArrayList<ModelMBeanOperationInfo>();
-        
+
         addAttributes(attributes, source);
         addExtraAttributes(attributes);
-        
+
         addOperations(operations, source);
         addExtraOperations(operations);
         operations.add(new ModelMBeanOperationInfo(
                 "unregisterMBean", "unregisterMBean",
-                new MBeanParameterInfo[0], void.class.getName(), 
+                new MBeanParameterInfo[0], void.class.getName(),
                 ModelMBeanOperationInfo.ACTION));
 
         return new ModelMBeanInfoSupport(
@@ -470,7 +470,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 operations.toArray(new ModelMBeanOperationInfo[operations.size()]),
                 notifications);
     }
-    
+
     private void addAttributes(
             List<ModelMBeanAttributeInfo> attributes, Object object) {
         addAttributes(attributes, object, object.getClass(), "");
@@ -479,7 +479,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     private void addAttributes(
             List<ModelMBeanAttributeInfo> attributes,
             Object object, Class<?> type, String prefix) {
-        
+
         PropertyDescriptor[] pdescs;
         try {
             pdescs = Introspector.getBeanInfo(type).getPropertyDescriptors();
@@ -492,7 +492,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             if (pdesc.getReadMethod() == null) {
                 continue;
             }
-            
+
             // Ignore unmanageable property.
             String attrName = pdesc.getName();
             Class<?> attrType = pdesc.getPropertyType();
@@ -502,13 +502,13 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             if (!isReadable(type, attrName)) {
                 continue;
             }
-            
+
             // Expand if possible.
             if (isExpandable(type, attrName)) {
                 expandAttribute(attributes, object, prefix, pdesc);
                 continue;
             }
-    
+
             // Ordinary property.
             String fqan = prefix + attrName;
             boolean writable = isWritable(type, pdesc);
@@ -516,7 +516,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                     fqan, convertType(
                             object.getClass(), attrName, attrType, writable).getName(),
                     pdesc.getShortDescription(), true, writable, false));
-            
+
             propertyDescriptors.put(fqan, pdesc);
         }
     }
@@ -530,7 +530,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
         String attrName = pdesc.getName();
         Class<?> attrType = pdesc.getPropertyType();
-        boolean writable = pdesc.getWriteMethod() != null || isWritable(type, attrName);
+        boolean writable = ( pdesc.getWriteMethod() != null ) || isWritable(type, attrName);
         if (getPropertyEditor(type, attrName, attrType) == null) {
             writable = false;
         }
@@ -561,27 +561,27 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     private void addOperations(
             List<ModelMBeanOperationInfo> operations, Object object) {
-    
+
         for (Method m: object.getClass().getMethods()) {
             String mname = m.getName();
-            
+
             // Ignore getters and setters.
             if (mname.startsWith("is") || mname.startsWith("get") ||
                 mname.startsWith("set")) {
                 continue;
             }
-            
+
             // Ignore Object methods.
             if (mname.matches(
                     "(wait|notify|notifyAll|toString|equals|compareTo|hashCode|clone)")) {
                 continue;
             }
-            
+
             // Ignore other user-defined non-operations.
             if (!isOperation(mname, m.getParameterTypes())) {
                 continue;
             }
-            
+
             List<MBeanParameterInfo> signature = new ArrayList<MBeanParameterInfo>();
             int i = 1;
             for (Class<?> paramType: m.getParameterTypes()) {
@@ -594,7 +594,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                                 null, null, paramType, true).getName(),
                         paramName));
             }
-    
+
             Class<?> returnType = convertType(null, null, m.getReturnType(), false);
             operations.add(new ModelMBeanOperationInfo(
                     m.getName(), m.getName(),
@@ -648,7 +648,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (signature.equals(Short.TYPE.getName())) {
             return Short.TYPE;
         }
-    
+
         try {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if (cl != null) {
@@ -657,7 +657,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         } catch (ClassNotFoundException e) {
             // Do nothing
         }
-        
+
         return Class.forName(signature);
     }
 
@@ -672,15 +672,15 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
         return property;
     }
-    
+
     private Class<?> convertType(Class<?> type, String attrName, Class<?> attrType, boolean writable) {
-        if (attrName != null && (attrType == Long.class || attrType == long.class)) {
+        if (( attrName != null ) && (( attrType == Long.class ) || ( attrType == long.class ))) {
             if (attrName.endsWith("Time") &&
-                    attrName.indexOf("Total") < 0 &&
-                    attrName.indexOf("Min") < 0 &&
-                    attrName.indexOf("Max") < 0 &&
-                    attrName.indexOf("Avg") < 0 &&
-                    attrName.indexOf("Average") < 0 &&
+                    ( attrName.indexOf("Total") < 0 ) &&
+                    ( attrName.indexOf("Min") < 0 ) &&
+                    ( attrName.indexOf("Max") < 0 ) &&
+                    ( attrName.indexOf("Avg") < 0 ) &&
+                    ( attrName.indexOf("Average") < 0 ) &&
                     !propertyDescriptors.containsKey(attrName + "InMillis")) {
                 return Date.class;
             }
@@ -689,11 +689,11 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (IoFilterChain.class.isAssignableFrom(attrType)) {
             return Map.class;
         }
-        
+
         if (IoFilterChainBuilder.class.isAssignableFrom(attrType)) {
             return Map.class;
         }
-        
+
         if (!writable) {
             if (Collection.class.isAssignableFrom(attrType) ||
                     Map.class.isAssignableFrom(attrType)) {
@@ -708,20 +708,20 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 }
                 return Collection.class;
             }
-            
+
             if (attrType.isPrimitive() ||
                     Date.class.isAssignableFrom(attrType) ||
                     Boolean.class.isAssignableFrom(attrType) ||
                     Character.class.isAssignableFrom(attrType) ||
                     Number.class.isAssignableFrom(attrType)) {
-                if (attrName == null || !attrName.endsWith("InMillis") ||
+                if (( attrName == null ) || !attrName.endsWith("InMillis") ||
                         !propertyDescriptors.containsKey(
                                 attrName.substring(0, attrName.length() - 8))) {
                     return attrType;
                 }
             }
         }
-        
+
         return String.class;
     }
 
@@ -729,14 +729,14 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (v == null) {
             return null;
         }
-        
-        if (attrName != null && v instanceof Long) {
+
+        if (( attrName != null ) && ( v instanceof Long )) {
             if (attrName.endsWith("Time") &&
-                    attrName.indexOf("Total") < 0 &&
-                    attrName.indexOf("Min") < 0 &&
-                    attrName.indexOf("Max") < 0 &&
-                    attrName.indexOf("Avg") < 0 &&
-                    attrName.indexOf("Average") < 0 &&
+                    ( attrName.indexOf("Total") < 0 ) &&
+                    ( attrName.indexOf("Min") < 0 ) &&
+                    ( attrName.indexOf("Max") < 0 ) &&
+                    ( attrName.indexOf("Avg") < 0 ) &&
+                    ( attrName.indexOf("Average") < 0 ) &&
                     !propertyDescriptors.containsKey(attrName + "InMillis")) {
                 long time = (Long) v;
                 if (time <= 0) {
@@ -747,11 +747,11 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             }
         }
 
-        if (v instanceof IoSessionDataStructureFactory ||
-            v instanceof IoHandler) {
+        if (( v instanceof IoSessionDataStructureFactory ) ||
+            ( v instanceof IoHandler )) {
             return v.getClass().getName();
         }
-        
+
         if (v instanceof IoFilterChainBuilder) {
             Map<String, String> filterMapping = new LinkedHashMap<String, String>();
             if (v instanceof DefaultIoFilterChainBuilder) {
@@ -763,7 +763,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             }
             return filterMapping;
         }
-    
+
         if (v instanceof IoFilterChain) {
             Map<String, String> filterMapping = new LinkedHashMap<String, String>();
             for (IoFilterChain.Entry e: ((IoFilterChain) v).getAll()) {
@@ -771,9 +771,9 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             }
             return filterMapping;
         }
-        
+
         if (!writable) {
-            if (v instanceof Collection || v instanceof Map) {
+            if (( v instanceof Collection ) || ( v instanceof Map )) {
                 if (v instanceof List) {
                     return convertCollection(v, new ArrayList<Object>());
                 }
@@ -785,34 +785,34 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 }
                 return convertCollection(v, new ArrayList<Object>());
             }
-            
-            if (v instanceof Date ||
-                    v instanceof Boolean ||
-                    v instanceof Character ||
-                    v instanceof Number) {
-                if (attrName == null || !attrName.endsWith("InMillis") ||
+
+            if (( v instanceof Date ) ||
+                    ( v instanceof Boolean ) ||
+                    ( v instanceof Character ) ||
+                    ( v instanceof Number )) {
+                if (( attrName == null ) || !attrName.endsWith("InMillis") ||
                         !propertyDescriptors.containsKey(
                                 attrName.substring(0, attrName.length() - 8))) {
                     return v;
                 }
             }
         }
-        
+
         PropertyEditor editor = getPropertyEditor(type, attrName, v.getClass());
         if (editor != null) {
             editor.setValue(v);
             return editor.getAsText();
         }
-        
+
         return v.toString();
     }
-    
+
     private Object convertCollection(Object src, Collection<Object> dst) {
         Collection<?> srcCol = (Collection<?>) src;
         for (Object e: srcCol) {
             Object convertedValue = convertValue(dst.getClass(), "element", e, false);
-            if (e != null && convertedValue == null) {
-                convertedValue = e.toString();
+            if (( e != null ) && ( convertedValue == null )) {
+                convertedValue = (e == null ? "" : e.toString() );
             }
             dst.add(convertedValue);
         }
@@ -824,10 +824,10 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         for (Map.Entry<?, ?> e: srcCol.entrySet()) {
             Object convertedKey = convertValue(dst.getClass(), "key", e.getKey(), false);
             Object convertedValue = convertValue(dst.getClass(), "value", e.getValue(), false);
-            if (e.getKey() != null && convertedKey == null) {
+            if (( e.getKey() != null ) && ( convertedKey == null )) {
                 convertedKey = e.getKey().toString();
             }
-            if (e.getValue() != null && convertedValue == null) {
+            if (( e.getValue() != null ) && ( convertedValue == null )) {
                 convertedKey = e.getValue().toString();
             }
             dst.put(convertedKey, convertedValue);
@@ -856,7 +856,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (e instanceof InvocationTargetException) {
             throwMBeanException(e.getCause());
         }
-        
+
         LOGGER.warn("Unexpected exception.", e);
         if (e.getClass().getPackage().getName().matches("javax?\\..+")) {
             if (e instanceof Exception) {
@@ -866,7 +866,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             throw new MBeanException(
                         new RuntimeException(e), e.getMessage());
         }
-        
+
         throw new MBeanException(new RuntimeException(
                 e.getClass().getName() + ": " + e.getMessage()),
                 e.getMessage());
@@ -903,23 +903,23 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (IoSession.class.isAssignableFrom(type) && attrName.equals("closeFuture")) {
             return false;
         }
-        
+
         if (ThreadPoolExecutor.class.isAssignableFrom(type) && attrName.equals("queue")) {
             return false;
         }
 
         return true;
     }
-    
+
     protected boolean isWritable(Class<?> type, String attrName) {
         if (IoService.class.isAssignableFrom(type) && attrName.startsWith("defaultLocalAddress")) {
             return true;
         }
         return false;
     }
-    
+
     protected Class<?> getElementType(Class<?> type, String attrName) {
-        if (transportMetadata != null &&
+        if (( transportMetadata != null ) &&
                 IoAcceptor.class.isAssignableFrom(type) &&
                 "defaultLocalAddresses".equals(attrName)) {
             return transportMetadata.getAddressType();
@@ -961,15 +961,15 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
         return false;
     }
-    
+
     protected boolean isOperation(String methodName, Class<?>[] paramTypes) {
         return true;
     }
-    
+
     protected void addExtraAttributes(List<ModelMBeanAttributeInfo> attributes) {
         // Do nothing
     }
-    
+
     protected void addExtraOperations(List<ModelMBeanOperationInfo> operations) {
         // Do nothing
     }
@@ -978,39 +978,39 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (type == null) {
             throw new IllegalArgumentException("type");
         }
-        
+
         if (attrName == null) {
             throw new IllegalArgumentException("attrName");
         }
-        
-        if (transportMetadata != null && attrType == SocketAddress.class) {
+
+        if (( transportMetadata != null ) && ( attrType == SocketAddress.class )) {
             attrType = transportMetadata.getAddressType();
         }
 
-        if ((attrType == Long.class || attrType == long.class)) {
+        if ((( attrType == Long.class ) || ( attrType == long.class ))) {
             if (attrName.endsWith("Time") &&
-                    attrName.indexOf("Total") < 0 &&
-                    attrName.indexOf("Min") < 0 &&
-                    attrName.indexOf("Max") < 0 &&
-                    attrName.indexOf("Avg") < 0 &&
-                    attrName.indexOf("Average") < 0 &&
+                    ( attrName.indexOf("Total") < 0 ) &&
+                    ( attrName.indexOf("Min") < 0 ) &&
+                    ( attrName.indexOf("Max") < 0 ) &&
+                    ( attrName.indexOf("Avg") < 0 ) &&
+                    ( attrName.indexOf("Average") < 0 ) &&
                     !propertyDescriptors.containsKey(attrName + "InMillis")) {
                 return PropertyEditorFactory.getInstance(Date.class);
             }
-            
+
             if (attrName.equals("id")) {
                 return PropertyEditorFactory.getInstance(String.class);
             }
         }
-        
+
         if (List.class.isAssignableFrom(attrType)) {
             return new ListEditor(getElementType(type, attrName));
         }
-        
+
         if (Set.class.isAssignableFrom(attrType)) {
             return new SetEditor(getElementType(type, attrName));
         }
-        
+
         if (Collection.class.isAssignableFrom(attrType)) {
             return new CollectionEditor(getElementType(type, attrName));
         }
@@ -1020,10 +1020,10 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                     getMapKeyType(type, attrName),
                     getMapValueType(type, attrName));
         }
-        
+
         return PropertyEditorFactory.getInstance(attrType);
     }
-    
+
     private class OgnlTypeConverter extends PropertyTypeConverter {
         @Override
         protected PropertyEditor getPropertyEditor(

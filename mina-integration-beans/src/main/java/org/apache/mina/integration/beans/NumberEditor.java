@@ -33,10 +33,10 @@ public class NumberEditor extends AbstractPropertyEditor {
             "[-+]?[0-9]*\\.?[0-9]*(?:[Ee][-+]?[0-9]+)?");
     private static final Pattern HEXADECIMAL = Pattern.compile("0x[0-9a-fA-F]+");
     private static final Pattern OCTET = Pattern.compile("0[0-9][0-9]*");
-    
+
     @Override
     protected final String toText(Object value) {
-        return value.toString();
+        return (value == null ? "" : value.toString());
     }
 
     @Override
@@ -44,26 +44,26 @@ public class NumberEditor extends AbstractPropertyEditor {
         if (text.length() == 0) {
             return defaultValue();
         }
-        
+
         if (HEXADECIMAL.matcher(text).matches()) {
             return toValue(text.substring(2), 16);
         }
-        
+
         if (OCTET.matcher(text).matches()) {
             return toValue(text, 8);
         }
-        
+
         if (DECIMAL.matcher(text).matches()) {
             return toValue(text, 10);
         }
-        
+
         throw new NumberFormatException("Not a number: " + text);
     }
-    
+
     protected Object toValue(String text, int radix) {
         return Integer.parseInt(text, radix);
     }
-    
+
     @Override
     protected Object defaultValue() {
         return Integer.valueOf(0);
