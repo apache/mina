@@ -51,7 +51,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     public TextLineEncoder() {
         this(Charset.defaultCharset(), LineDelimiter.UNIX);
     }
-    
+
     /**
      * Creates a new instance with the current default {@link Charset}
      * and the specified <tt>delimiter</tt>.
@@ -83,7 +83,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     public TextLineEncoder(Charset charset, String delimiter) {
         this(charset, new LineDelimiter(delimiter));
     }
-    
+
     /**
      * Creates a new instance with the spcified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.
@@ -132,18 +132,21 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     public void encode(IoSession session, Object message,
             ProtocolEncoderOutput out) throws Exception {
         CharsetEncoder encoder = (CharsetEncoder) session.getAttribute(ENCODER);
+
         if (encoder == null) {
             encoder = charset.newEncoder();
             session.setAttribute(ENCODER, encoder);
         }
 
-        String value = message.toString();
+        String value = (message == null ? "" : message.toString());
         IoBuffer buf = IoBuffer.allocate(value.length())
                 .setAutoExpand(true);
         buf.putString(value, encoder);
+
         if (buf.position() > maxLineLength) {
             throw new IllegalArgumentException("Line length: " + buf.position());
         }
+
         buf.putString(delimiter.getValue(), encoder);
         buf.flip();
         out.write(buf);

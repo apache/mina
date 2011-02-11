@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unchecked")
 public class EnumEditor extends AbstractPropertyEditor {
     private static final Pattern ORDINAL = Pattern.compile("[0-9]+");
-    
+
     private final Class enumType;
     private final Set<Enum> enums;
 
@@ -41,14 +41,14 @@ public class EnumEditor extends AbstractPropertyEditor {
         if (enumType == null) {
             throw new IllegalArgumentException("enumType");
         }
-        
+
         this.enumType = enumType;
         this.enums = EnumSet.allOf(enumType);
     }
 
     @Override
     protected String toText(Object value) {
-        return value.toString();
+        return (value == null ? "" : value.toString());
     }
 
     @Override
@@ -60,16 +60,16 @@ public class EnumEditor extends AbstractPropertyEditor {
                     return e;
                 }
             }
-            
+
             throw new IllegalArgumentException("wrong ordinal: " + ordinal);
         }
-        
+
         for (Enum e: enums) {
             if (text.equalsIgnoreCase(e.toString())) {
                 return e;
             }
         }
-        
+
         return Enum.valueOf(enumType, text);
     }
 }
