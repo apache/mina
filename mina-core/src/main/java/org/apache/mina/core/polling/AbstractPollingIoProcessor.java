@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
@@ -85,9 +86,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     /** A map containing the last Thread ID for each class */
     private static final Map<Class<?>, AtomicInteger> threadIds = new ConcurrentHashMap<Class<?>, AtomicInteger>();
 
-    /** A lock used to protect the processor creation */
-    private final Object lock = new Object();
-
     /** This IoProcessor instance name */
     private final String threadName;
 
@@ -110,7 +108,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     private final Queue<S> trafficControllingSessions = new ConcurrentLinkedQueue<S>();
 
     /** The processor thread : it handles the incoming messages */
-    private Processor processor;
+    private final AtomicReference<Processor> processorRef = new AtomicReference<Processor>();
 
     private long lastIdleCheckTime;
 
@@ -456,9 +454,12 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * pool. The Runnable will be renamed
      */
     private void startupProcessor() {
-        synchronized (lock) {
-            if (processor == null) {
-                processor = new Processor();
+        Processor processor = processorRef.get();
+
+        if (processor == null) {
+            processor = new Processor();
+
+            if (processorRef.compareAndSet(null, processor)) {
                 executor.execute(new NamePreservingRunnable(processor, threadName));
             }
         }
@@ -1077,6 +1078,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      */
     private class Processor implements Runnable {
         public void run() {
+            assert (processorRef.get() == this);
+
             int nSessions = 0;
             lastIdleCheckTime = System.currentTimeMillis();
 
@@ -1151,12 +1154,23 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // Get a chance to exit the infinite loop if there are no
                     // more sessions on this Processor
                     if (nSessions == 0) {
-                        synchronized (lock) {
-                            if (newSessions.isEmpty() && isSelectorEmpty()) {
-                                processor = null;
-                                break;
-                            }
+                        processorRef.set(null);
+                        
+                        if (newSessions.isEmpty() && isSelectorEmpty()) {
+                            // newSessions.add() precedes startupProcessor
+                            assert (processorRef.get() != this);
+                            break;
                         }
+                        
+                        assert (processorRef.get() != this);
+                        
+                        if (!processorRef.compareAndSet(null, this)) {
+                            // startupProcessor won race, so must exit processor
+                            assert (processorRef.get() != this);
+                            break;
+                        }
+                        
+                        assert (processorRef.get() == this);
                     }
 
                     // Disconnect all sessions immediately if disposal has been

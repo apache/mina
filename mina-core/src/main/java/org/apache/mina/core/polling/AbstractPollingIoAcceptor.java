@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.filterchain.IoFilter;
@@ -70,8 +71,6 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
     private final boolean createdProcessor;
 
-    private final Object lock = new Object();
-
     private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
 
     private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
@@ -85,7 +84,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     private volatile boolean selectable;
 
     /** The thread responsible of accepting incoming requests */ 
-    private Acceptor acceptor;
+    private AtomicReference<Acceptor> acceptorRef = new AtomicReference<Acceptor>();
 
     /**
      * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
@@ -355,9 +354,12 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
         }
 
         // start the acceptor if not already started
-        synchronized (lock) {
-            if (acceptor == null) {
-                acceptor = new Acceptor();
+        Acceptor acceptor = acceptorRef.get();
+
+        if (acceptor == null) {
+            acceptor = new Acceptor();
+
+            if (acceptorRef.compareAndSet(null, acceptor)) {
                 executeWorker(acceptor);
             }
         }
@@ -390,6 +392,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      */
     private class Acceptor implements Runnable {
         public void run() {
+            assert (acceptorRef.get() == this);
+
             int nHandles = 0;
 
             while (selectable) {
@@ -418,13 +422,19 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
                     // quit the loop: we don't have any socket listening
                     // for incoming connection.
                     if (nHandles == 0) {
-                        synchronized (lock) {
-                            if (registerQueue.isEmpty()
-                                    && cancelQueue.isEmpty()) {
-                                acceptor = null;
-                                break;
-                            }
+                        acceptorRef.set(null);
+
+                        if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
+                            assert (acceptorRef.get() != this);
+                            break;
                         }
+                        
+                        if (!acceptorRef.compareAndSet(null, this)) {
+                            assert (acceptorRef.get() != this);
+                            break;
+                        }
+                        
+                        assert (acceptorRef.get() == this);
                     }
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
