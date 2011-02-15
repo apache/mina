@@ -27,6 +27,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.filterchain.IoFilter;
@@ -63,7 +64,6 @@ import org.apache.mina.util.ExceptionMonitor;
 public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         extends AbstractIoConnector {
 
-    private final Object lock = new Object();
     private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
     private final Queue<ConnectionRequest> cancelQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
     private final IoProcessor<T> processor;
@@ -74,7 +74,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     private volatile boolean selectable;
     
     /** The connector thread */
-    private Connector connector;
+    private final AtomicReference<Connector> connectorRef = new AtomicReference<Connector>();
 
     /**
      * Constructor for {@link AbstractPollingIoConnector}. You need to provide a default
@@ -353,9 +353,12 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             cancelQueue.clear();
         }
 
-        synchronized (lock) {
-            if (connector == null) {
-                connector = new Connector();
+        Connector connector = connectorRef.get();
+        
+        if (connector == null) {
+            connector = new Connector();
+            
+            if (connectorRef.compareAndSet(null, connector)) {
                 executeWorker(connector);
             }
         }
@@ -463,7 +466,10 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     private class Connector implements Runnable {
 
         public void run() {
+            assert (connectorRef.get() == this);
+            
             int nHandles = 0;
+            
             while (selectable) {
                 try {
                     // the timeout for select shall be smaller of the connect
@@ -482,12 +488,19 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     nHandles -= cancelKeys();
 
                     if (nHandles == 0) {
-                        synchronized (lock) {
-                            if (connectQueue.isEmpty()) {
-                                connector = null;
-                                break;
-                            }
+                        connectorRef.set(null);
+
+                        if (connectQueue.isEmpty()) {
+                            assert (connectorRef.get() != this);
+                            break;
                         }
+                        
+                        if (!connectorRef.compareAndSet(null, this)) {
+                            assert (connectorRef.get() != this);
+                            break;
+                        }
+                        
+                        assert (connectorRef.get() == this);
                     }
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
