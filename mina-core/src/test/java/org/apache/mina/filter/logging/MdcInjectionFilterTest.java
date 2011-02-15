@@ -116,16 +116,12 @@ public class MdcInjectionFilterTest {
         while (contains(after, "Nio") && count++ < 10) {
             Thread.sleep(50);
             after = getThreadNames();
-            System.out.println("** after = " + after);
         }
-        System.out.println("============================");
 
       while (contains(after, "pool") && count++ < 10) {
           Thread.sleep(50);
           after = getThreadNames();
-          System.out.println("** after = " + after);
       }
-      System.out.println("============================");
 
         // The problem is that we clear the events of the appender here, but it's possible that a thread from
         // a previous test still generates events during the execution of the next test
