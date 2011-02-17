@@ -54,9 +54,9 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
             NextFilter nextFilter) throws Exception {
         if (0 == count) {
             filter.init();
-
-            ++count;
         }
+
+        ++count;
 
         filter.onPreAdd(parent, name, nextFilter);
     }
