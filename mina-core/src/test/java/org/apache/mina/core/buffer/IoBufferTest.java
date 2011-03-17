@@ -21,9 +21,14 @@ package org.apache.mina.core.buffer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -33,6 +38,13 @@ import org.junit.Test;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoBufferTest {
+
+    private static interface NonserializableInterface {
+    }
+
+    public static class NonserializableClass {
+    }
+
     @Test
     public void testNormalizeCapacity() {
         // A few sanity checks
@@ -72,7 +84,7 @@ public class IoBufferTest {
         }
 
         long time2 = System.currentTimeMillis();
-        System.out.println("Time for performance test 1: " + (time2 - time) + "ms");
+        //System.out.println("Time for performance test 1: " + (time2 - time) + "ms");
 
         // The second performance test measures the time to normalize integers
         // from Integer.MAX_VALUE to Integer.MAX_VALUE - 2^27 (it tests 2^27
@@ -89,7 +101,7 @@ public class IoBufferTest {
         }
 
         time2 = System.currentTimeMillis();
-        System.out.println("Time for performance test 2: " + (time2 - time) + "ms");
+        //System.out.println("Time for performance test 2: " + (time2 - time) + "ms");
     }
     
     @Test 
@@ -153,5 +165,55 @@ public class IoBufferTest {
             return false;
         }
 
+    }
+
+    @Test
+    public void testObjectSerialization() throws Exception {
+        IoBuffer buf = IoBuffer.allocate(16);
+        buf.setAutoExpand(true);
+        List<Object> o = new ArrayList<Object>();
+        o.add(new Date());
+        o.add(long.class);
+
+        // Test writing an object.
+        buf.putObject(o);
+
+        // Test reading an object.
+        buf.clear();
+        Object o2 = buf.getObject();
+        assertEquals(o, o2);
+
+        // This assertion is just to make sure that deserialization occurred.
+        assertNotSame(o, o2);
+    }
+    
+    @Test
+    public void testNonserializableClass() throws Exception {
+        Class<?> c = NonserializableClass.class;
+
+        IoBuffer buffer = IoBuffer.allocate(16);
+        buffer.setAutoExpand(true);
+        buffer.putObject(c);
+
+        buffer.flip();
+        Object o = buffer.getObject();
+
+        assertEquals(c, o);
+        assertSame(c, o);
+    }
+    
+    @Test
+    public void testNonserializableInterface() throws Exception {
+        Class<?> c = NonserializableInterface.class;
+
+        IoBuffer buffer = IoBuffer.allocate(16);
+        buffer.setAutoExpand(true);
+        buffer.putObject(c);
+
+        buffer.flip();
+        Object o = buffer.getObject();
+
+        assertEquals(c, o);
+        assertSame(c, o);
     }
 }
