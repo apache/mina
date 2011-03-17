@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.StreamCorruptedException;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
@@ -1955,9 +1956,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         throw new EOFException();
                     }
                     switch (type) {
-                    case 0: // Primitive types
+                    case 0: // NON-Serializable class or Primitive types
                         return super.readClassDescriptor();
-                    case 1: // Non-primitive types
+                    case 1: // Serializable class
                         String className = readUTF();
                         Class<?> clazz = Class.forName(className, true,
                                 classLoader);
@@ -1999,13 +2000,20 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 @Override
                 protected void writeClassDescriptor(ObjectStreamClass desc)
                         throws IOException {
-                    if (desc.forClass().isPrimitive()) {
+                    try {
+                        Class<?> clz = Class.forName(desc.getName());
+                        if (!Serializable.class.isAssignableFrom(clz)) { // NON-Serializable class
+                          write(0);
+                          super.writeClassDescriptor(desc);
+                        } else { // Serializable class
+                          write(1);
+                          writeUTF(desc.getName());
+                        }
+                      }
+                      catch (ClassNotFoundException ex) { // Primitive types
                         write(0);
                         super.writeClassDescriptor(desc);
-                    } else {
-                        write(1);
-                        writeUTF(desc.getName());
-                    }
+                      }
                 }
             };
             out.writeObject(o);
