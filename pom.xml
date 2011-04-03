@@ -746,7 +746,6 @@
 
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>${version.release.plugin}</version>
         <configuration>
           <tagBase>
             https://svn.apache.org/repos/asf/mina/tags
@@ -754,6 +753,7 @@
           <preparationGoals>clean install</preparationGoals>
           <goals>clean deploy</goals>
           <mavenExecutorId>forked-path</mavenExecutorId>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
         </configuration>
       </plugin>
 
