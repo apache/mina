@@ -84,12 +84,12 @@
     <version.api.plugin>2.2.1</version.api.plugin>
     <version.assembly.plugin>2.2-beta-5</version.assembly.plugin>
     <version.bundle.plugin>2.2.0</version.bundle.plugin>
-    <version.clean.plugin>2.3</version.clean.plugin>
+    <version.clean.plugin>2.4.1</version.clean.plugin>
     <version.compiler.plugin>2.3.2</version.compiler.plugin>
     <version.deploy.plugin>2.5</version.deploy.plugin>
     <version.gpg.plugin>1.1</version.gpg.plugin>
-    <version.jar.plugin>2.3</version.jar.plugin>
-    <version.javadoc.plugin>2.7</version.javadoc.plugin>
+    <version.jar.plugin>2.3.1</version.jar.plugin>
+    <version.javadoc.plugin>2.5</version.javadoc.plugin>
     <version.jxr.plugin>2.2</version.jxr.plugin>
     <version.model.plugin>2.2.1</version.model.plugin>
     <version.project.plugin>2.2.1</version.project.plugin>
@@ -422,7 +422,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2.1</version>
+          <version>${version.assembly.plugin}</version>
         </plugin>
 
         <plugin>
@@ -440,14 +440,14 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>2.4.1</version>
+          <version>${version.clean.plugin}</version>
         </plugin>
 
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.3.2</version>
+          <version>${version.compiler.plugin}</version>
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
@@ -466,7 +466,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.5</version>
+          <version>${version.deploy.plugin}</version>
           <inherited>true</inherited>
         </plugin>
 
@@ -496,7 +496,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.1</version>
+          <version>${version.gpg.plugin}</version>
         </plugin>
 
         <plugin>
@@ -508,19 +508,19 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>2.3.1</version>
+          <version>${version.jar.plugin}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.7</version>
+          <version>${version.javadoc.plugin}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jxr-plugin</artifactId>
-          <version>2.2</version>
+          <version>${version.jxr.plugin}</version>
         </plugin>
 
         <plugin>
