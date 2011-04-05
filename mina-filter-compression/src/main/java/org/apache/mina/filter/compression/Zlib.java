@@ -124,37 +124,39 @@ class Zlib {
         IoBuffer outBuffer = IoBuffer.allocate(outBytes.length);
         outBuffer.setAutoExpand(true);
 
-        zStream.next_in = inBytes;
-        zStream.next_in_index = 0;
-        zStream.avail_in = inBytes.length;
-        zStream.next_out = outBytes;
-        zStream.next_out_index = 0;
-        zStream.avail_out = outBytes.length;
-        int retval = 0;
-
-        do {
-            retval = zStream.inflate(JZlib.Z_SYNC_FLUSH);
-            switch (retval) {
-            case JZlib.Z_OK:
-                // completed decompression, lets copy data and get out
-            case JZlib.Z_BUF_ERROR:
-                // need more space for output. store current output and get more
-                outBuffer.put(outBytes, 0, zStream.next_out_index);
-                zStream.next_out_index = 0;
-                zStream.avail_out = outBytes.length;
-                break;
-            default:
-                // unknown error
-                outBuffer = null;
-                if (zStream.msg == null) {
-                    throw new IOException("Unknown error. Error code : "
-                            + retval);
-                } else {
-                    throw new IOException("Unknown error. Error code : "
-                            + retval + " and message : " + zStream.msg);
+        synchronized( zStream ) {
+            zStream.next_in = inBytes;
+            zStream.next_in_index = 0;
+            zStream.avail_in = inBytes.length;
+            zStream.next_out = outBytes;
+            zStream.next_out_index = 0;
+            zStream.avail_out = outBytes.length;
+            int retval = 0;
+    
+            do {
+                retval = zStream.inflate(JZlib.Z_SYNC_FLUSH);
+                switch (retval) {
+                case JZlib.Z_OK:
+                    // completed decompression, lets copy data and get out
+                case JZlib.Z_BUF_ERROR:
+                    // need more space for output. store current output and get more
+                    outBuffer.put(outBytes, 0, zStream.next_out_index);
+                    zStream.next_out_index = 0;
+                    zStream.avail_out = outBytes.length;
+                    break;
+                default:
+                    // unknown error
+                    outBuffer = null;
+                    if (zStream.msg == null) {
+                        throw new IOException("Unknown error. Error code : "
+                                + retval);
+                    } else {
+                        throw new IOException("Unknown error. Error code : "
+                                + retval + " and message : " + zStream.msg);
+                    }
                 }
-            }
-        } while (zStream.avail_in > 0);
+            } while (zStream.avail_in > 0);
+        }
 
         return outBuffer.flip();
     }
@@ -182,25 +184,27 @@ class Zlib {
         int outLen = (int) Math.round(inBytes.length * 1.001) + 1 + 12;
         byte[] outBytes = new byte[outLen];
 
-        zStream.next_in = inBytes;
-        zStream.next_in_index = 0;
-        zStream.avail_in = inBytes.length;
-        zStream.next_out = outBytes;
-        zStream.next_out_index = 0;
-        zStream.avail_out = outBytes.length;
+        synchronized(zStream) {
+            zStream.next_in = inBytes;
+            zStream.next_in_index = 0;
+            zStream.avail_in = inBytes.length;
+            zStream.next_out = outBytes;
+            zStream.next_out_index = 0;
+            zStream.avail_out = outBytes.length;
+    
+            int retval = zStream.deflate(JZlib.Z_SYNC_FLUSH);
+            if (retval != JZlib.Z_OK) {
+                outBytes = null;
+                inBytes = null;
+                throw new IOException("Compression failed with return value : "
+                        + retval);
+            }
+    
+            IoBuffer outBuf = IoBuffer
+                    .wrap(outBytes, 0, zStream.next_out_index);
 
-        int retval = zStream.deflate(JZlib.Z_SYNC_FLUSH);
-        if (retval != JZlib.Z_OK) {
-            outBytes = null;
-            inBytes = null;
-            throw new IOException("Compression failed with return value : "
-                    + retval);
+            return outBuf;
         }
-
-        IoBuffer outBuf = IoBuffer
-                .wrap(outBytes, 0, zStream.next_out_index);
-
-        return outBuf;
     }
 
     /**
