@@ -326,6 +326,11 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
             }
 
             processor = pool[Math.abs((int) session.getId()) % pool.length];
+            
+            if (processor == null) {
+                throw new IllegalStateException("A disposed processor cannot be accessed.");
+            }
+            
             session.setAttributeIfAbsent(PROCESSOR, processor);
         }
 
