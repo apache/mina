@@ -19,9 +19,11 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
+import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -33,6 +35,7 @@ import java.util.concurrent.Executor;
 import org.apache.mina.core.polling.AbstractPollingIoAcceptor;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
@@ -48,14 +51,6 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
 public final class NioSocketAcceptor
         extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel>
         implements SocketAcceptor {
-
-    /** 
-     * Define the number of socket that can wait to be accepted. Default
-     * to 50 (as in the SocketServer default).
-     */
-    private int backlog = 50;
-
-    private boolean reuseAddress = false;
 
     private volatile Selector selector;
 
@@ -156,48 +151,6 @@ public final class NioSocketAcceptor
      */
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         setDefaultLocalAddress((SocketAddress) localAddress);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isReuseAddress() {
-        return reuseAddress;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setReuseAddress(boolean reuseAddress) {
-        synchronized (bindLock) {
-            if (isActive()) {
-                throw new IllegalStateException(
-                        "reuseAddress can't be set while the acceptor is bound.");
-            }
-
-            this.reuseAddress = reuseAddress;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getBacklog() {
-        return backlog;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setBacklog(int backlog) {
-        synchronized (bindLock) {
-            if (isActive()) {
-                throw new IllegalStateException(
-                        "backlog can't be set while the acceptor is bound.");
-            }
-
-            this.backlog = backlog;
-        }
     }
 
     /**
