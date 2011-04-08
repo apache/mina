@@ -64,10 +64,10 @@ import org.apache.mina.util.ExceptionMonitor;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
+public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         extends AbstractIoAcceptor {
 
-    private final IoProcessor<T> processor;
+    private final IoProcessor<S> processor;
 
     private final boolean createdProcessor;
 
@@ -86,6 +86,14 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     /** The thread responsible of accepting incoming requests */ 
     private AtomicReference<Acceptor> acceptorRef = new AtomicReference<Acceptor>();
 
+    protected boolean reuseAddress = false;
+
+    /** 
+     * Define the number of socket that can wait to be accepted. Default
+     * to 50 (as in the SocketServer default).
+     */
+    protected int backlog = 50;
+
     /**
      * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
      * session configuration, a class of {@link IoProcessor} which will be instantiated in a
@@ -100,8 +108,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      *            type.
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            Class<? extends IoProcessor<T>> processorClass) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass),
+            Class<? extends IoProcessor<S>> processorClass) {
+        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass),
                 true);
     }
 
@@ -120,8 +128,8 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      * @param processorCount the amount of processor to instantiate for the pool
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            Class<? extends IoProcessor<T>> processorClass, int processorCount) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass,
+            Class<? extends IoProcessor<S>> processorClass, int processorCount) {
+        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass,
                 processorCount), true);
     }
 
@@ -138,7 +146,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter} 
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            IoProcessor<T> processor) {
+            IoProcessor<S> processor) {
         this(sessionConfig, null, processor, false);
     }
 
@@ -159,7 +167,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter} 
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            Executor executor, IoProcessor<T> processor) {
+            Executor executor, IoProcessor<S> processor) {
         this(sessionConfig, executor, processor, false);
     }
 
@@ -183,7 +191,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      * will be automatically disposed 
      */
     private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            Executor executor, IoProcessor<T> processor,
+            Executor executor, IoProcessor<S> processor,
             boolean createdProcessor) {
         super(sessionConfig, executor);
 
@@ -273,7 +281,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
      * @return the created {@link IoSession}
      * @throws Exception any exception thrown by the underlying systems calls
      */
-    protected abstract T accept(IoProcessor<T> processor, H handle)
+    protected abstract S accept(IoProcessor<S> processor, H handle)
             throws Exception;
 
     /**
@@ -490,7 +498,7 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
 
                 // Associates a new created connection to a processor,
                 // and get back a session
-                T session = accept(processor, handle);
+                S session = accept(processor, handle);
                 
                 if (session == null) {
                     break;
@@ -608,5 +616,47 @@ public abstract class AbstractPollingIoAcceptor<T extends AbstractIoSession, H>
     public final IoSession newSession(SocketAddress remoteAddress,
             SocketAddress localAddress) {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getBacklog() {
+        return backlog;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setBacklog(int backlog) {
+        synchronized (bindLock) {
+            if (isActive()) {
+                throw new IllegalStateException(
+                        "backlog can't be set while the acceptor is bound.");
+            }
+
+            this.backlog = backlog;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isReuseAddress() {
+        return reuseAddress;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setReuseAddress(boolean reuseAddress) {
+        synchronized (bindLock) {
+            if (isActive()) {
+                throw new IllegalStateException(
+                        "backlog can't be set while the acceptor is bound.");
+            }
+
+            this.reuseAddress = reuseAddress;
+        }
     }
 }

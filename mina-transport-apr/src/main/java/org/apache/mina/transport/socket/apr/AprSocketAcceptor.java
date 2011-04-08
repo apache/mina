@@ -61,9 +61,6 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     private volatile long wakeupSocket;
     private volatile boolean toBeWakenUp;
 
-    private int backlog = 50;
-    private boolean reuseAddress = false;
-
     private volatile long pool;
     private volatile long pollset; // socket poller
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
@@ -342,34 +339,6 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     /**
      * {@inheritDoc}
      */
-    public int getBacklog() {
-        return backlog;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isReuseAddress() {
-        return reuseAddress;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setBacklog(int backlog) {
-        synchronized (bindLock) {
-            if (isActive()) {
-                throw new IllegalStateException(
-                        "backlog can't be set while the acceptor is bound.");
-            }
-
-            this.backlog = backlog;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
@@ -388,17 +357,6 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
      */
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         super.setDefaultLocalAddress(localAddress);
-    }
-
-    public void setReuseAddress(boolean reuseAddress) {
-        synchronized (bindLock) {
-            if (isActive()) {
-                throw new IllegalStateException(
-                        "backlog can't be set while the acceptor is bound.");
-            }
-
-            this.reuseAddress = reuseAddress;
-        }
     }
 
     /**
