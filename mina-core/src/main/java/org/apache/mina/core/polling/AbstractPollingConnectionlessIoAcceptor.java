@@ -35,6 +35,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
@@ -88,7 +89,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     private volatile boolean selectable;
 
     /** The thread responsible of accepting incoming requests */
-    private Acceptor acceptor;
+    private AtomicReference<Acceptor> acceptorRef = new AtomicReference<Acceptor>();
 
     private long lastIdleCheckTime;
 
@@ -365,9 +366,12 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
             flushingSessions.clear();
         }
 
-        synchronized (lock) {
-            if (acceptor == null) {
-                acceptor = new Acceptor();
+        Acceptor acceptor = acceptorRef.get();
+
+        if (acceptor == null) {
+            acceptor = new Acceptor();
+
+            if (acceptorRef.compareAndSet(null, acceptor)) {
                 executeWorker(acceptor);
             }
         }
@@ -414,7 +418,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                     if (nHandles == 0) {
                         synchronized (lock) {
                             if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
-                                acceptor = null;
+                                acceptorRef.set(null);
                                 break;
                             }
                         }
