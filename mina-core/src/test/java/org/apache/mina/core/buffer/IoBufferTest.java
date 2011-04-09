@@ -1331,4 +1331,29 @@ public class IoBufferTest {
 
         buf.flip();
     }
+    
+    @Test
+    public void testPutUnsignedInt() {
+        IoBuffer buf = IoBuffer.allocate(16);
+        byte b = (byte)0x80;                // We should get 0x00000080
+        short s = (short)0x8181;           // We should get 0x00008181
+        int i = 0x82828282;                // We should get 0x82828282
+        long l = 0x8383838383838383L;      // We should get 0x83838383
+        
+        buf.mark();
+
+        // Put the unsigned bytes
+        buf.putUnsignedInt( b );
+        buf.putUnsignedInt( s );
+        buf.putUnsignedInt( i );
+        buf.putUnsignedInt( l );
+
+        buf.reset();
+        
+        // Read back the unsigned bytes
+        assertEquals( 0x0000000000000080L, buf.getUnsignedInt() );
+        assertEquals( 0x0000000000008181L, buf.getUnsignedInt() );
+        assertEquals( 0x0000000082828282L, buf.getUnsignedInt() );
+        assertEquals( 0x0000000083838383L, buf.getUnsignedInt() );
+    }
 }

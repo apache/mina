@@ -354,6 +354,24 @@ public class IoBufferWrapper extends IoBuffer {
     }
     
     @Override
+    public IoBuffer putUnsignedInt(byte value) {
+        buf.putUnsignedInt(value);
+        return this;
+    }
+    
+    @Override
+    public IoBuffer putUnsignedInt(short value) {
+        buf.putUnsignedInt(value);
+        return this;
+    }
+    
+    @Override
+    public IoBuffer putUnsignedInt(int value) {
+        buf.putUnsignedInt(value);
+        return this;
+    }
+
+    @Override
     public IoBuffer putUnsignedInt(long value) {
         buf.putUnsignedInt(value);
         return this;
