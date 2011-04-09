@@ -514,6 +514,78 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    public IoBuffer putUnsigned(byte value) {
+        autoExpand(1);
+        buf().put( (byte)(value & 0xff) );
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoBuffer putUnsigned(int index, byte value) {
+        autoExpand(index, 1);
+        buf().put( index, (byte)(value & 0xff) );
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoBuffer putUnsigned(short value) {
+        autoExpand(1);
+        buf().put( (byte)(value & 0x00ff) );
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoBuffer putUnsigned(int index, short value) {
+        autoExpand(index, 1);
+        buf().put( index, (byte)(value & 0x00ff) );
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoBuffer putUnsigned(int value) {
+        autoExpand(1);
+        buf().put( (byte)(value & 0x000000ff) );
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoBuffer putUnsigned(int index, int value) {
+        autoExpand(index, 1);
+        buf().put( index, (byte)(value & 0x000000ff) );
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoBuffer putUnsigned(long value) {
+        autoExpand(1);
+        buf().put( (byte)(value & 0x00000000000000ffL) );
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public IoBuffer putUnsigned(int index, long value) {
+        autoExpand(index, 1);
+        buf().put( index, (byte)(value & 0x00000000000000ffL) );
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final byte get(int index) {
         return buf().get(index);
@@ -742,6 +814,16 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public final IoBuffer putInt(int value) {
         autoExpand(4);
         buf().putInt(value);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedInt(long value) {
+        autoExpand(4);
+        buf().putInt( (int)(value&0x00000000ffffffff) );
         return this;
     }
 

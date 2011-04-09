@@ -352,6 +352,12 @@ public class IoBufferWrapper extends IoBuffer {
         buf.putInt(value);
         return this;
     }
+    
+    @Override
+    public IoBuffer putUnsignedInt(long value) {
+        buf.putUnsignedInt(value);
+        return this;
+    }
 
     @Override
     public int getInt(int index) {
@@ -895,6 +901,54 @@ public class IoBufferWrapper extends IoBuffer {
     @Override
     public <E extends Enum<E>> IoBuffer putEnumSetLong(int index, Set<E> set) {
         buf.putEnumSetLong(index, set);
+        return this;
+    }
+
+    @Override
+    public IoBuffer putUnsigned(byte value) {
+        buf.putUnsigned(value);
+        return this;
+    }
+
+    @Override
+    public IoBuffer putUnsigned(int index, byte value) {
+        buf.putUnsigned(index, value);
+        return this;
+    }
+
+    @Override
+    public IoBuffer putUnsigned(short value) {
+        buf.putUnsigned(value);
+        return this;
+    }
+
+    @Override
+    public IoBuffer putUnsigned(int index, short value) {
+        buf.putUnsigned(index, value);
+        return this;
+    }
+
+    @Override
+    public IoBuffer putUnsigned(int value) {
+        buf.putUnsigned(value);
+        return this;
+    }
+
+    @Override
+    public IoBuffer putUnsigned(int index, int value) {
+        buf.putUnsigned(index, value);
+        return this;
+    }
+
+    @Override
+    public IoBuffer putUnsigned(long value) {
+        buf.putUnsigned(value);
+        return this;
+    }
+
+    @Override
+    public IoBuffer putUnsigned(int index, long value) {
+        buf.putUnsigned(index, value);
         return this;
     }
 }
