@@ -932,6 +932,56 @@ public class IoBufferTest {
         buf.reset();
         assertEquals(0xCDB3D0A4L, buf.getUnsignedInt());
     }
+    
+    @Test
+    public void testPutUnsigned() {
+        IoBuffer buf = IoBuffer.allocate(4);
+        byte b = (byte)0x80;                // We should get 0x0080
+        short s = (short)0x8F81;           // We should get 0x0081
+        int i = 0x8FFFFF82;                // We should get 0x0082
+        long l = 0x8FFFFFFFFFFFFF83L;      // We should get 0x0083
+        
+        buf.mark();
+
+        // Put the unsigned bytes
+        buf.putUnsigned( b );
+        buf.putUnsigned( s );
+        buf.putUnsigned( i );
+        buf.putUnsigned( l );
+
+        buf.reset();
+        
+        // Read back the unsigned bytes
+        assertEquals( 0x0080, buf.getUnsigned() );
+        assertEquals( 0x0081, buf.getUnsigned() );
+        assertEquals( 0x0082, buf.getUnsigned() );
+        assertEquals( 0x0083, buf.getUnsigned() );
+    }
+    
+    @Test
+    public void testPutUnsignedIndex() {
+        IoBuffer buf = IoBuffer.allocate(4);
+        byte b = (byte)0x80;               // We should get 0x0080
+        short s = (short)0x8F81;           // We should get 0x0081
+        int i = 0x8FFFFF82;                // We should get 0x0082
+        long l = 0x8FFFFFFFFFFFFF83L;      // We should get 0x0083
+        
+        buf.mark();
+
+        // Put the unsigned bytes
+        buf.putUnsigned( 3, b );
+        buf.putUnsigned( 2, s );
+        buf.putUnsigned( 1, i );
+        buf.putUnsigned( 0, l );
+
+        buf.reset();
+        
+        // Read back the unsigned bytes
+        assertEquals( 0x0083, buf.getUnsigned() );
+        assertEquals( 0x0082, buf.getUnsigned() );
+        assertEquals( 0x0081, buf.getUnsigned() );
+        assertEquals( 0x0080, buf.getUnsigned() );
+    }
 
     @Test
     public void testIndexOf() throws Exception {
