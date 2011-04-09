@@ -901,6 +901,86 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
+    public final IoBuffer putUnsignedShort(byte value) {
+        autoExpand(2);
+        buf().putShort( (short)((short)value&0x00ff) );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedShort(int index, byte value) {
+        autoExpand(index, 2);
+        buf().putShort( (short)((short)value&0x00ff) );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedShort(short value) {
+        autoExpand(2);
+        buf().putShort( value );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedShort(int index, short value) {
+        autoExpand(index, 2);
+        buf().putShort( value );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedShort(int value) {
+        autoExpand(2);
+        buf().putShort( (short)value );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedShort(int index, int value) {
+        autoExpand(index, 2);
+        buf().putShort( (short)value );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedShort(long value) {
+        autoExpand(2);
+        buf().putShort( (short)(value) );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedShort(int index, long value) {
+        autoExpand(index, 2);
+        buf().putShort( (short)(value) );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final int getInt(int index) {
         return buf().getInt(index);
     }
