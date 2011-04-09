@@ -821,6 +821,36 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
+    public final IoBuffer putUnsignedInt(byte value) {
+        autoExpand(4);
+        buf().putInt( (int)((short)value&0x00ff) );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedInt(short value) {
+        autoExpand(4);
+        buf().putInt( (int)((int)value&0x0000ffff) );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final IoBuffer putUnsignedInt(int value) {
+        autoExpand(4);
+        buf().putInt( value );
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final IoBuffer putUnsignedInt(long value) {
         autoExpand(4);
         buf().putInt( (int)(value&0x00000000ffffffff) );

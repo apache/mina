@@ -792,6 +792,21 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Writes an unsigned int into the ByteBuffer
      */
+    public abstract IoBuffer putUnsignedInt(byte value);
+    
+    /**
+     * Writes an unsigned int into the ByteBuffer
+     */
+    public abstract IoBuffer putUnsignedInt(short value);
+    
+    /**
+     * Writes an unsigned int into the ByteBuffer
+     */
+    public abstract IoBuffer putUnsignedInt(int value);
+    
+    /**
+     * Writes an unsigned int into the ByteBuffer
+     */
     public abstract IoBuffer putUnsignedInt(long value);
 
     /**
