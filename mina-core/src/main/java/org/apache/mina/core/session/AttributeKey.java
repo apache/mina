@@ -52,10 +52,8 @@ public final class AttributeKey implements Serializable {
      * <li>this attribute hashCode</li>
      * </ul>
      * 
-     * @param source
-     *            The class this AttributeKey will be attached to
-     * @param name
-     *            The Attribute name
+     * @param source The class this AttributeKey will be attached to
+     * @param name The Attribute name
      */
     public AttributeKey(Class<?> source, String name) {
         this.name = source.getName() + '.' + name + '@' + Integer.toHexString(this.hashCode());
@@ -67,5 +65,26 @@ public final class AttributeKey implements Serializable {
     @Override
     public String toString() {
         return name;
+    }
+    
+    @Override
+    public int hashCode() {
+        int h = 17 * 37 + ((name == null) ? 0 : name.hashCode());
+        return h;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+ 
+        if (!(obj instanceof AttributeKey)) {
+            return false;
+        }
+
+        AttributeKey other = (AttributeKey) obj;
+        
+        return name.equals(other.name);
     }
 }
