@@ -934,56 +934,6 @@ public class IoBufferTest {
     }
     
     @Test
-    public void testPutUnsigned() {
-        IoBuffer buf = IoBuffer.allocate(4);
-        byte b = (byte)0x80;                // We should get 0x0080
-        short s = (short)0x8F81;           // We should get 0x0081
-        int i = 0x8FFFFF82;                // We should get 0x0082
-        long l = 0x8FFFFFFFFFFFFF83L;      // We should get 0x0083
-        
-        buf.mark();
-
-        // Put the unsigned bytes
-        buf.putUnsigned( b );
-        buf.putUnsigned( s );
-        buf.putUnsigned( i );
-        buf.putUnsigned( l );
-
-        buf.reset();
-        
-        // Read back the unsigned bytes
-        assertEquals( 0x0080, buf.getUnsigned() );
-        assertEquals( 0x0081, buf.getUnsigned() );
-        assertEquals( 0x0082, buf.getUnsigned() );
-        assertEquals( 0x0083, buf.getUnsigned() );
-    }
-    
-    @Test
-    public void testPutUnsignedIndex() {
-        IoBuffer buf = IoBuffer.allocate(4);
-        byte b = (byte)0x80;               // We should get 0x0080
-        short s = (short)0x8F81;           // We should get 0x0081
-        int i = 0x8FFFFF82;                // We should get 0x0082
-        long l = 0x8FFFFFFFFFFFFF83L;      // We should get 0x0083
-        
-        buf.mark();
-
-        // Put the unsigned bytes
-        buf.putUnsigned( 3, b );
-        buf.putUnsigned( 2, s );
-        buf.putUnsigned( 1, i );
-        buf.putUnsigned( 0, l );
-
-        buf.reset();
-        
-        // Read back the unsigned bytes
-        assertEquals( 0x0083, buf.getUnsigned() );
-        assertEquals( 0x0082, buf.getUnsigned() );
-        assertEquals( 0x0081, buf.getUnsigned() );
-        assertEquals( 0x0080, buf.getUnsigned() );
-    }
-
-    @Test
     public void testIndexOf() throws Exception {
         boolean direct = false;
         for (int i = 0; i < 2; i++, direct = !direct) {
@@ -1333,9 +1283,109 @@ public class IoBufferTest {
     }
     
     @Test
+    public void testPutUnsigned() {
+        IoBuffer buf = IoBuffer.allocate(4);
+        byte b = (byte)0x80;                // We should get 0x0080
+        short s = (short)0x8F81;           // We should get 0x0081
+        int i = 0x8FFFFF82;                // We should get 0x0082
+        long l = 0x8FFFFFFFFFFFFF83L;      // We should get 0x0083
+        
+        buf.mark();
+
+        // Put the unsigned bytes
+        buf.putUnsigned( b );
+        buf.putUnsigned( s );
+        buf.putUnsigned( i );
+        buf.putUnsigned( l );
+
+        buf.reset();
+        
+        // Read back the unsigned bytes
+        assertEquals( 0x0080, buf.getUnsigned() );
+        assertEquals( 0x0081, buf.getUnsigned() );
+        assertEquals( 0x0082, buf.getUnsigned() );
+        assertEquals( 0x0083, buf.getUnsigned() );
+    }
+    
+    @Test
+    public void testPutUnsignedIndex() {
+        IoBuffer buf = IoBuffer.allocate(4);
+        byte b = (byte)0x80;               // We should get 0x0080
+        short s = (short)0x8F81;           // We should get 0x0081
+        int i = 0x8FFFFF82;                // We should get 0x0082
+        long l = 0x8FFFFFFFFFFFFF83L;      // We should get 0x0083
+        
+        buf.mark();
+
+        // Put the unsigned bytes
+        buf.putUnsigned( 3, b );
+        buf.putUnsigned( 2, s );
+        buf.putUnsigned( 1, i );
+        buf.putUnsigned( 0, l );
+
+        buf.reset();
+        
+        // Read back the unsigned bytes
+        assertEquals( 0x0083, buf.getUnsigned() );
+        assertEquals( 0x0082, buf.getUnsigned() );
+        assertEquals( 0x0081, buf.getUnsigned() );
+        assertEquals( 0x0080, buf.getUnsigned() );
+    }
+
+    @Test
+    public void testPutUnsignedShort() {
+        IoBuffer buf = IoBuffer.allocate(8);
+        byte b = (byte)0x80;               // We should get 0x0080
+        short s = (short)0x8181;           // We should get 0x8181
+        int i = 0x82828282;                // We should get 0x8282
+        long l = 0x8383838383838383L;      // We should get 0x8383
+        
+        buf.mark();
+
+        // Put the unsigned bytes
+        buf.putUnsignedShort( b );
+        buf.putUnsignedShort( s );
+        buf.putUnsignedShort( i );
+        buf.putUnsignedShort( l );
+
+        buf.reset();
+        
+        // Read back the unsigned bytes
+        assertEquals( 0x0080L, buf.getUnsignedShort() );
+        assertEquals( 0x8181L, buf.getUnsignedShort() );
+        assertEquals( 0x8282L, buf.getUnsignedShort() );
+        assertEquals( 0x8383L, buf.getUnsignedShort() );
+    }
+    
+    @Test
+    public void testPutUnsignedShortIndex() {
+        IoBuffer buf = IoBuffer.allocate(8);
+        byte b = (byte)0x80;               // We should get 0x00000080
+        short s = (short)0x8181;           // We should get 0x00008181
+        int i = 0x82828282;                // We should get 0x82828282
+        long l = 0x8383838383838383L;      // We should get 0x83838383
+        
+        buf.mark();
+
+        // Put the unsigned bytes
+        buf.putUnsignedShort( 3, b );
+        buf.putUnsignedShort( 2, s );
+        buf.putUnsignedShort( 1, i );
+        buf.putUnsignedShort( 0, l );
+
+        buf.reset();
+        
+        // Read back the unsigned bytes
+        assertEquals( 0x0080L, buf.getUnsignedShort() );
+        assertEquals( 0x8181L, buf.getUnsignedShort() );
+        assertEquals( 0x8282L, buf.getUnsignedShort() );
+        assertEquals( 0x8383L, buf.getUnsignedShort() );
+    }
+    
+    @Test
     public void testPutUnsignedInt() {
         IoBuffer buf = IoBuffer.allocate(16);
-        byte b = (byte)0x80;                // We should get 0x00000080
+        byte b = (byte)0x80;               // We should get 0x00000080
         short s = (short)0x8181;           // We should get 0x00008181
         int i = 0x82828282;                // We should get 0x82828282
         long l = 0x8383838383838383L;      // We should get 0x83838383
@@ -1358,9 +1408,9 @@ public class IoBufferTest {
     }
     
     @Test
-    public void testPutUnsignedIntPosition() {
+    public void testPutUnsignedIntIndex() {
         IoBuffer buf = IoBuffer.allocate(16);
-        byte b = (byte)0x80;                // We should get 0x00000080
+        byte b = (byte)0x80;               // We should get 0x00000080
         short s = (short)0x8181;           // We should get 0x00008181
         int i = 0x82828282;                // We should get 0x82828282
         long l = 0x8383838383838383L;      // We should get 0x83838383
