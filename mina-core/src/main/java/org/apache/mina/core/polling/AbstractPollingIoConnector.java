@@ -390,13 +390,16 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
     private int cancelKeys() {
         int nHandles = 0;
+        
         for (; ;) {
             ConnectionRequest req = cancelQueue.poll();
+            
             if (req == null) {
                 break;
             }
 
             H handle = req.handle;
+            
             try {
                 close(handle);
             } catch (Exception e) {
@@ -405,6 +408,11 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                 nHandles ++;
             }
         }
+        
+        if ( nHandles > 0 ) {
+            wakeup();
+        }
+        
         return nHandles;
     }
 
@@ -479,14 +487,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
                     nHandles += registerNew();
 
-                    if (selected > 0) {
-                        nHandles -= processConnections(selectedHandles());
-                    }
-
-                    processTimedOutSessions(allHandles());
-
-                    nHandles -= cancelKeys();
-
+                    // get a chance to get out of the connector loop, if we don't have any more handles
                     if (nHandles == 0) {
                         connectorRef.set(null);
 
@@ -502,6 +503,14 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                         
                         assert (connectorRef.get() == this);
                     }
+
+                    if (selected > 0) {
+                        nHandles -= processConnections(selectedHandles());
+                    }
+
+                    processTimedOutSessions(allHandles());
+
+                    nHandles -= cancelKeys();
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
                     break;

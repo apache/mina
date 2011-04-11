@@ -417,15 +417,6 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
                     // listen on
                     nHandles += registerHandles();
 
-                    if (selected > 0) {
-                        // We have some connection request, let's process 
-                        // them here. 
-                        processHandles(selectedHandles());
-                    }
-
-                    // check to see if any cancellation request has been made.
-                    nHandles -= unregisterHandles();
-
                     // Now, if the number of registred handles is 0, we can
                     // quit the loop: we don't have any socket listening
                     // for incoming connection.
@@ -444,6 +435,15 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
                         
                         assert (acceptorRef.get() == this);
                     }
+
+                    if (selected > 0) {
+                        // We have some connection request, let's process 
+                        // them here. 
+                        processHandles(selectedHandles());
+                    }
+
+                    // check to see if any cancellation request has been made.
+                    nHandles -= unregisterHandles();
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
                     break;
