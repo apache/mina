@@ -175,22 +175,27 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
             }
         }
 
-        MessageDecoderResult result = state.currentDecoder.decode(session, in,
-                out);
-        if (result == MessageDecoder.OK) {
-            state.currentDecoder = null;
-            return true;
-        } else if (result == MessageDecoder.NEED_DATA) {
-            return false;
-        } else if (result == MessageDecoder.NOT_OK) {
-            state.currentDecoder = null;
-            throw new ProtocolDecoderException(
-                    "Message decoder returned NOT_OK.");
-        } else {
-            state.currentDecoder = null;
-            throw new IllegalStateException(
-                    "Unexpected decode result (see your decode()): "
-                            + result);
+        try {
+            MessageDecoderResult result = state.currentDecoder.decode(session, in,
+                    out);
+            if (result == MessageDecoder.OK) {
+                state.currentDecoder = null;
+                return true;
+            } else if (result == MessageDecoder.NEED_DATA) {
+                return false;
+            } else if (result == MessageDecoder.NOT_OK) {
+                state.currentDecoder = null;
+                throw new ProtocolDecoderException(
+                        "Message decoder returned NOT_OK.");
+            } else {
+                state.currentDecoder = null;
+                throw new IllegalStateException(
+                        "Unexpected decode result (see your decode()): "
+                                + result);
+            }
+        } catch (Exception e) {
+            state.currentDecoder = null; 
+            throw e;
         }
     }
 

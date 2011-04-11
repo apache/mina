@@ -401,6 +401,15 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
                     nHandles += registerHandles();
 
+                    if (nHandles == 0) {
+                        synchronized (lock) {
+                            if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
+                                acceptor = null;
+                                break;
+                            }
+                        }
+                    }
+
                     if (selected > 0) {
                         processReadySessions(selectedHandles());
                     }
@@ -410,15 +419,6 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                     nHandles -= unregisterHandles();
 
                     notifyIdleSessions(currentTime);
-
-                    if (nHandles == 0) {
-                        synchronized (lock) {
-                            if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
-                                acceptor = null;
-                                break;
-                            }
-                        }
-                    }
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
                     break;

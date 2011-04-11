@@ -28,11 +28,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
 
+import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.polling.AbstractPollingIoConnector;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.SocketSessionConfig;
@@ -211,6 +214,10 @@ public final class NioSocketConnector
         if (key != null) {
             key.cancel();
         }
+        
+        IoSession session = (IoSession)key.attach(null);
+        IoFilterChain filterChain = session.getFilterChain(); 
+        filterChain.fireSessionClosed();
         
         handle.close();
     }
