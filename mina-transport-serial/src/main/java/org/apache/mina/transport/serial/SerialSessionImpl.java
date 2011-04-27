@@ -150,11 +150,11 @@ class SerialSessionImpl extends AbstractIoSession implements SerialSession, Seri
     private class WriteWorker extends Thread {
         @Override
         public void run() {
-            while (isConnected() && !isClosing()) {
-                flushWrites();
+            synchronized (writeMonitor) {
+                while (isConnected() && !isClosing()) {
+                    flushWrites();
 
-                // wait for more data
-                synchronized (writeMonitor) {
+                    // wait for more data
                     try {
                         writeMonitor.wait();
                     } catch (InterruptedException e) {
