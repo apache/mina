@@ -521,12 +521,42 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer get(byte[] dst);
 
     /**
-     * TODO document me.
+     * Creates a new buffer whose content is a shared subsequence of
+     * this buffer's content.
+     *
+     * <p> The content of the new buffer will start at this buffer's index
+     * position and will finish at this buffer's index+length position.
+     * Changes to this buffer's content will be visible in the new
+     * buffer, and vice versa; the two buffers' position, limit, and mark
+     * values will be independent.
+     *
+     * <p> The new buffer's position will be zero, its capacity and its limit
+     * will be the number of bytes remaining in this buffer, and its mark
+     * will be undefined.  The new buffer will be direct if, and only if, this
+     * buffer is direct, and it will be read-only if, and only if, this buffer
+     * is read-only.  </p>
+     *
+     * @return  The new buffer
      */
     public abstract IoBuffer getSlice(int index, int length);
 
     /**
-     * TODO document me.
+     * Creates a new byte buffer whose content is a shared subsequence of
+     * this buffer's content.
+     *
+     * <p> The content of the new buffer will start at this buffer's current
+     * position, and will finish at this buffer's current position+length.
+     * Changes to this buffer's content will be visible in the new
+     * buffer, and vice versa; the two buffers' position, limit, and mark
+     * values will be independent.
+     *
+     * <p> The new buffer's position will be zero, its capacity and its limit
+     * will be the number of bytes remaining in this buffer, and its mark
+     * will be undefined.  The new buffer will be direct if, and only if, this
+     * buffer is direct, and it will be read-only if, and only if, this buffer
+     * is read-only.  </p>
+     *
+     * @return  The new byte buffer
      */
     public abstract IoBuffer getSlice(int length);
 
