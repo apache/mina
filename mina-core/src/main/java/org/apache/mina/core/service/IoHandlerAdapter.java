@@ -35,23 +35,38 @@ import org.slf4j.LoggerFactory;
 public class IoHandlerAdapter implements IoHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(IoHandlerAdapter.class);
 
+    /**
+     * {@inheritDoc}
+     */
     public void sessionCreated(IoSession session) throws Exception {
         // Empty handler
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void sessionOpened(IoSession session) throws Exception {
         // Empty handler
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void sessionClosed(IoSession session) throws Exception {
         // Empty handler
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void sessionIdle(IoSession session, IdleStatus status)
             throws Exception {
         // Empty handler
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void exceptionCaught(IoSession session, Throwable cause)
             throws Exception {
         if (LOGGER.isWarnEnabled()) {
@@ -61,11 +76,17 @@ public class IoHandlerAdapter implements IoHandler {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void messageReceived(IoSession session, Object message)
             throws Exception {
         // Empty handler
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void messageSent(IoSession session, Object message) throws Exception {
         // Empty handler
     }
