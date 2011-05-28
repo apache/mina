@@ -47,9 +47,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/branches/2.0.3</connection>
-    <url>http://svn.apache.org/viewvc/directory/mina/branches/2.0.3</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/2.0.3</developerConnection>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/branches/2.0.4</connection>
+    <url>http://svn.apache.org/viewvc/directory/mina/branches/2.0.4</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/2.0.4</developerConnection>
   </scm>
 
   <distributionManagement>
