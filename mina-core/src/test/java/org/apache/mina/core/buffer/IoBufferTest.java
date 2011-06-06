@@ -1367,19 +1367,19 @@ public class IoBufferTest {
         
         buf.mark();
 
-        // Put the unsigned bytes
-        buf.putUnsignedShort( 3, b );
-        buf.putUnsignedShort( 2, s );
-        buf.putUnsignedShort( 1, i );
+        // Put the unsigned shorts
+        buf.putUnsignedShort( 6, b );
+        buf.putUnsignedShort( 4, s );
+        buf.putUnsignedShort( 2, i );
         buf.putUnsignedShort( 0, l );
 
         buf.reset();
         
         // Read back the unsigned bytes
-        assertEquals( 0x0080L, buf.getUnsignedShort() );
-        assertEquals( 0x8181L, buf.getUnsignedShort() );
-        assertEquals( 0x8282L, buf.getUnsignedShort() );
         assertEquals( 0x8383L, buf.getUnsignedShort() );
+        assertEquals( 0x8282L, buf.getUnsignedShort() );
+        assertEquals( 0x8181L, buf.getUnsignedShort() );
+        assertEquals( 0x0080L, buf.getUnsignedShort() );
     }
     
     @Test
@@ -1418,17 +1418,17 @@ public class IoBufferTest {
         buf.mark();
 
         // Put the unsigned bytes
-        buf.putUnsignedInt( 3, b );
-        buf.putUnsignedInt( 2, s );
-        buf.putUnsignedInt( 1, i );
+        buf.putUnsignedInt( 12, b );
+        buf.putUnsignedInt( 8, s );
+        buf.putUnsignedInt( 4, i );
         buf.putUnsignedInt( 0, l );
 
         buf.reset();
         
         // Read back the unsigned bytes
-        assertEquals( 0x0000000000000080L, buf.getUnsignedInt() );
-        assertEquals( 0x0000000000008181L, buf.getUnsignedInt() );
-        assertEquals( 0x0000000082828282L, buf.getUnsignedInt() );
         assertEquals( 0x0000000083838383L, buf.getUnsignedInt() );
+        assertEquals( 0x0000000082828282L, buf.getUnsignedInt() );
+        assertEquals( 0x0000000000008181L, buf.getUnsignedInt() );
+        assertEquals( 0x0000000000000080L, buf.getUnsignedInt() );
     }
 }
