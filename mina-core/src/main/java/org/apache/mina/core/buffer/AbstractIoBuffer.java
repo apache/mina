@@ -833,7 +833,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, byte value) {
         autoExpand(index, 4);
-        buf().putInt( (int)((short)value&0x00ff) );
+        buf().putInt( index, (int)((short)value&0x00ff) );
         return this;
     }
 
@@ -853,7 +853,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, short value) {
         autoExpand(index, 4);
-        buf().putInt( (int)((int)value&0x0000ffff) );
+        buf().putInt( index, (int)((int)value&0x0000ffff) );
         return this;
     }
 
@@ -873,7 +873,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, int value) {
         autoExpand(index, 4);
-        buf().putInt( value );
+        buf().putInt( index, value );
         return this;
     }
 
@@ -893,7 +893,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, long value) {
         autoExpand(index, 4);
-        buf().putInt( (int)(value&0x00000000ffffffffL) );
+        buf().putInt( index, (int)(value&0x00000000ffffffffL) );
         return this;
     }
 
@@ -913,7 +913,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, byte value) {
         autoExpand(index, 2);
-        buf().putShort( (short)((short)value&0x00ff) );
+        buf().putShort( index, (short)((short)value&0x00ff) );
         return this;
     }
 
@@ -933,7 +933,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, short value) {
         autoExpand(index, 2);
-        buf().putShort( value );
+        buf().putShort( index, value );
         return this;
     }
 
@@ -953,7 +953,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, int value) {
         autoExpand(index, 2);
-        buf().putShort( (short)value );
+        buf().putShort( index, (short)value );
         return this;
     }
 
@@ -973,7 +973,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, long value) {
         autoExpand(index, 2);
-        buf().putShort( (short)(value) );
+        buf().putShort( index, (short)(value) );
         return this;
     }
 
