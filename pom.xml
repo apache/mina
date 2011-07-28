@@ -89,7 +89,7 @@
     <version.deploy.plugin>2.5</version.deploy.plugin>
     <version.gpg.plugin>1.1</version.gpg.plugin>
     <version.jar.plugin>2.3.1</version.jar.plugin>
-    <version.javadoc.plugin>2.5</version.javadoc.plugin>
+    <version.javadoc.plugin>2.8</version.javadoc.plugin>
     <version.jxr.plugin>2.2</version.jxr.plugin>
     <version.model.plugin>2.2.1</version.model.plugin>
     <version.project.plugin>2.2.1</version.project.plugin>

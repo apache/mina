@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.session.AbstractIoSession;
@@ -157,6 +158,8 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
         
         if (createdExecutor) {
             this.executor = Executors.newCachedThreadPool();
+            // Set a default reject handler
+            ((ThreadPoolExecutor)this.executor).setRejectedExecutionHandler( new ThreadPoolExecutor.CallerRunsPolicy() );
         } else {
             this.executor = executor;
         }
