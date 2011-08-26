@@ -189,7 +189,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.0-beta-9</version>
         <configuration>
           <tagBase>
             https://svn.apache.org/repos/asf/mina/tags
