@@ -24,16 +24,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoServiceListener;
 import org.apache.mina.api.IoSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Base implementation for {@link IoService}s.
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoService implements IoService {
@@ -86,7 +86,7 @@ public abstract class AbstractIoService implements IoService {
     }
 
     /**
-     *
+     * 
      * {@inheritDoc}
      */
     @Override
@@ -100,7 +100,7 @@ public abstract class AbstractIoService implements IoService {
     }
 
     /**
-     *
+     * 
      * {@inheritDoc}
      */
     @Override
@@ -128,11 +128,8 @@ public abstract class AbstractIoService implements IoService {
         // TODO: check the service state, we should not be able to set the handler
         // if the service is already started
         /*
-        if (isActive()) {
-            throw new IllegalStateException(
-                    "handler cannot be set while the service is active.");
-        }
-        */
+         * if (isActive()) { throw new IllegalStateException( "handler cannot be set while the service is active."); }
+         */
 
         this.handler = handler;
     }
@@ -231,16 +228,28 @@ public abstract class AbstractIoService implements IoService {
             listener.serviceInactivated(this);
         }
     }
-    
+
     public void fireSessionCreated(IoSession session) {
         for (IoServiceListener listener : listeners) {
             listener.sessionCreated(session);
         }
     }
-    
+
     public void fireSessionDestroyed(IoSession session) {
         for (IoServiceListener listener : listeners) {
             listener.sessionDestroyed(session);
         }
+    }
+
+    private IoFilter[] filters;
+
+    @Override
+    public IoFilter[] getFilters() {
+        return filters;
+    }
+
+    @Override
+    public void setFilters(IoFilter... filters) {
+        this.filters = filters;
     }
 }

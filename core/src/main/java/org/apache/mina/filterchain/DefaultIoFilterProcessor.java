@@ -19,8 +19,6 @@
  */
 package org.apache.mina.filterchain;
 
-import java.util.List;
-
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
@@ -35,12 +33,12 @@ public class DefaultIoFilterProcessor implements IoFilterProcessor, ReadFilterCh
     /**
      * The list of {@link IoFilter} implementing this chain.
      */
-    private final List<IoFilter> chain;
+    private final IoFilter[] chain;
 
     /**
      * The instance of {@link DefaultIoFilterProcessor} with the {@link IoService} chain.
      */
-    public DefaultIoFilterProcessor(List<IoFilter> chain) {
+    public DefaultIoFilterProcessor(IoFilter[] chain) {
         this.chain = chain;
     }
 
@@ -73,12 +71,12 @@ public class DefaultIoFilterProcessor implements IoFilterProcessor, ReadFilterCh
     @Override
     public void processMessageReceived(IoSession session, Object message) {
         LOG.debug("processing message '{}' received event ", message);
-        if (chain.isEmpty()) {
+        if (chain.length < 1) {
             LOG.debug("Nothing to do, the chain is empty");
         } else {
             readChainPosition = 0;
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
-            chain.get(readChainPosition).messageReceived(session, message, this);
+            chain[readChainPosition].messageReceived(session, message, this);
         }
     }
 
@@ -87,33 +85,33 @@ public class DefaultIoFilterProcessor implements IoFilterProcessor, ReadFilterCh
     @Override
     public void processMessageWriting(IoSession session, Object message) {
         LOG.debug("processing message '{}' writing event ", message);
-        if (chain.isEmpty()) {
+        if (chain.length < 1) {
             LOG.debug("Nothing to do, the chain is empty");
         } else {
-            writeChainPosition = chain.size() - 1;
+            writeChainPosition = chain.length - 1;
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
-            chain.get(writeChainPosition).messageWriting(session, message, this);
+            chain[writeChainPosition].messageWriting(session, message, this);
         }
     }
 
     @Override
     public void callWriteNextFilter(IoSession session, Object message) {
         writeChainPosition--;
-        if (writeChainPosition < 0 || chain.size() == 0) {
+        if (writeChainPosition < 0 || chain.length == 0) {
             // end of chain processing
             session.enqueueWriteRequest(message);
         } else {
-            chain.get(writeChainPosition).messageWriting(session, message, this);
+            chain[writeChainPosition].messageWriting(session, message, this);
         }
     }
 
     @Override
     public void callReadNextFilter(IoSession session, Object message) {
         readChainPosition++;
-        if (readChainPosition >= chain.size()) {
+        if (readChainPosition >= chain.length) {
             // end of chain processing
         } else {
-            chain.get(readChainPosition).messageReceived(session, message, this);
+            chain[readChainPosition].messageReceived(session, message, this);
         }
     }
 

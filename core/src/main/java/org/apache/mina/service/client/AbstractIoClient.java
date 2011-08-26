@@ -20,11 +20,9 @@
 package org.apache.mina.service.client;
 
 import java.net.SocketAddress;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.api.IoClient;
-import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoServiceListener;
 import org.apache.mina.api.IoSession;
@@ -75,15 +73,4 @@ public abstract class AbstractIoClient extends AbstractIoService implements IoCl
         return null;
     }
 
-    private List<IoFilter> filters;
-
-    @Override
-    public List<IoFilter> getFilters() {
-        return filters;
-    }
-
-    @Override
-    public void setFilters(List<IoFilter> filters) {
-        this.filters = filters;
-    }
 }

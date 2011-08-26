@@ -19,37 +19,33 @@
  */
 package org.apache.mina.api;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.service.IoHandler;
 
 /**
- * Base interface for all {@link IoServer}s and {@link IoClient}s
- * that provide I/O service and manage {@link IoSession}s.
- *
+ * Base interface for all {@link IoServer}s and {@link IoClient}s that provide I/O service and manage {@link IoSession}
+ * s.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoService {
 
     /**
-     * Returns the map of all sessions which are currently managed by this
-     * service.  The key of map is the {@link IoSession#getId() ID} of the
-     * session.
-     *
+     * Returns the map of all sessions which are currently managed by this service. The key of map is the
+     * {@link IoSession#getId() ID} of the session.
+     * 
      * @return the sessions. An empty collection if there's no session.
      */
     Map<Long, IoSession> getManagedSessions();
 
     /**
-     * Adds an {@link IoServiceListener} that listens any events related with
-     * this service.
+     * Adds an {@link IoServiceListener} that listens any events related with this service.
      */
     void addListener(IoServiceListener listener);
 
     /**
-     * Removed an existing {@link IoServiceListener} that listens any events
-     * related with this service.
+     * Removed an existing {@link IoServiceListener} that listens any events related with this service.
      */
     void removeListener(IoServiceListener listener);
 
@@ -60,20 +56,21 @@ public interface IoService {
     IoHandler getHandler();
 
     /**
-     * Sets the handler which will handle all connections managed by this service. The handler
-     * can only be set before the service is started.
+     * Sets the handler which will handle all connections managed by this service. The handler can only be set before
+     * the service is started.
      */
     void setHandler(IoHandler handler);
 
     /**
      * Get the list of filters installed on this service
+     * 
      * @return
      */
-    List<IoFilter> getFilters();
+    IoFilter[] getFilters();
 
     /**
      * Set the list of filters for this service. Must be called before the service is bound/connected
      */
-    void setFilters(List<IoFilter> filters);
+    void setFilters(IoFilter... filters);
 
 }
