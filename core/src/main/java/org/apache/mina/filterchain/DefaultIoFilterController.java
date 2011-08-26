@@ -25,10 +25,10 @@ import org.apache.mina.api.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultIoFilterProcessor implements IoFilterProcessor, ReadFilterChainController,
+public class DefaultIoFilterController implements IoFilterController, ReadFilterChainController,
         WriteFilterChainController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultIoFilterProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultIoFilterController.class);
 
     /**
      * The list of {@link IoFilter} implementing this chain.
@@ -36,9 +36,9 @@ public class DefaultIoFilterProcessor implements IoFilterProcessor, ReadFilterCh
     private final IoFilter[] chain;
 
     /**
-     * The instance of {@link DefaultIoFilterProcessor} with the {@link IoService} chain.
+     * The instance of {@link DefaultIoFilterController} with the {@link IoService} chain.
      */
-    public DefaultIoFilterProcessor(IoFilter[] chain) {
+    public DefaultIoFilterController(IoFilter[] chain) {
         this.chain = chain;
     }
 

@@ -29,7 +29,7 @@ import org.apache.mina.api.IoSession;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface IoFilterProcessor {
+public interface IoFilterController {
 
     /**
      * Call this method for processing a session created event using this chain.
