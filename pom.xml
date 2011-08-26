@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+  
+  http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>4</version>
+  </parent>
+  <organization>
+    <name>Apache MINA Project</name>
+    <url>http://mina.apache.org/</url>
+  </organization>
+
+  <groupId>org.apache.mina</groupId>
+  <version>3.0.0-M1-SNAPSHOT</version>
+  <artifactId>mina-parent</artifactId>
+  <name>Apache MINA</name>
+  <packaging>pom</packaging>
+
+  <url>http://mina.apache.org/</url>
+  <inceptionYear>2009</inceptionYear>
+
+  <issueManagement>
+    <system>jira</system>
+    <url>http://issues.apache.org/jira/browse/DIRMINA</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/tags/build-3.0.0-M1-SNAPSHOT</connection>
+    <url>http://svn.apache.org/viewvc/directory/mina/tags/build-3.0.0-M1-SNAPSHOT</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/build-3.0.0-M1-SNAPSHOT</developerConnection>
+  </scm>
+
+  <distributionManagement>
+    <site>
+      <id>apache.websites</id>
+      <url>scp://people.apache.org/www/mina.apache.org/report/3.0/</url>
+    </site>
+  </distributionManagement>
+
+  <ciManagement>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <address>dev@mina.apache.org</address>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+
+  <description>Apache MINA is a network application framework which helps users develop high performance and highly scalable network applications easily. It provides an abstract event-driven asynchronous API over various transports such as TCP/IP and UDP/IP via Java NIO.</description>
+
+  <licenses>
+    <license>
+      <name>Apache 2.0 License</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <properties>
+    <version.slf4j.api>1.5.11</version.slf4j.api>
+    <version.slf4j.log4j12>1.5.11</version.slf4j.log4j12>
+    <version.slf4j.jcl.over.slf4j>1.5.11</version.slf4j.jcl.over.slf4j>
+    <version.log4j>1.2.14</version.log4j>
+    <version.junit>4.7</version.junit>
+  </properties>
+
+
+  <modules>
+    <module>core</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Logging -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${version.slf4j.api}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${version.slf4j.jcl.over.slf4j}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${version.slf4j.log4j12}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
+
+      <!-- Testing -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
+          <version>1.8.5</version>
+          <scope>test</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <!-- ==================================== -->
+  <!-- Common dependencies for all projects -->
+  <!-- ==================================== -->
+  <dependencies>
+    <!-- common logging interface -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <!-- logging implementation used for unit tests -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <source>1.6</source>
+          <target>1.6</target>
+          <debug>true</debug>
+          <optimize>true</optimize>
+          <showDeprecations>true</showDeprecations>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-source</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0-beta-9</version>
+        <configuration>
+          <tagBase>
+            https://svn.apache.org/repos/asf/mina/tags
+          </tagBase>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
+        <inherited>true</inherited>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${symbolicName}</Bundle-SymbolicName>
+            <Export-Package>${exportedPackage}.*;version=${project.version}</Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.6</version>
+        <inherited>false</inherited>
+        <configuration>
+          <aggregate>true</aggregate>
+          <breakiterator>true</breakiterator>
+          <charset>UTF-8</charset>
+          <docencoding>UTF-8</docencoding>
+          <windowtitle>Apache MINA ${project.version} API Documentation</windowtitle>
+          <doctitle>Apache MINA ${project.version} API Documentation</doctitle>
+          <encoding>UTF-8</encoding>
+          <links>
+            <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
+            <link>http://www.slf4j.org/api/</link>
+          </links>
+          <locale>en_US</locale>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.1</version>
+        <inherited>false</inherited>
+        <configuration>
+          <aggregate>true</aggregate>
+          <inputEncoding>UTF-8</inputEncoding>
+          <outputEncoding>UTF-8</outputEncoding>
+          <windowTitle>Apache MINA ${project.version} Cross Reference</windowTitle>
+          <docTitle>Apache MINA ${project.version} Cross Reference</docTitle>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>rat-maven-plugin</artifactId>
+        <version>1.0-alpha-3</version>
+        <configuration>
+          <excludes>
+            <exclude>**/target/**/*</exclude>
+            <exclude>**/.*</exclude>
+            <exclude>**/NOTICE.txt</exclude>
+            <exclude>**/LICENSE*.txt</exclude>
+          </excludes>
+          <excludeSubProjects>false</excludeSubProjects>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+  <profiles>
+    <!-- Specific profile used to append a string to project name -->
+    <profile>
+      <id>append-to-project-name</id>
+      <activation>
+        <property>
+          <name>append.to.project.name</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-eclipse-plugin</artifactId>
+            <configuration>
+              <projectNameTemplate>
+                [artifactId]-${append.to.project.name}
+              </projectNameTemplate>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
