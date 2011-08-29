@@ -47,5 +47,6 @@
     	<version>r09</version>
     </dependency>
   </dependencies>
+  <description>Low level HTTP codec for building simple &amp; fast HTTP server and clients</description>
 </project>
 
