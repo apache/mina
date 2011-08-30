@@ -21,4 +21,8 @@ package org.apache.mina.http.api;
 
 public class HttpEndOfContent {
 
+    @Override
+    public String toString() {
+        return "HttpEndOfContent";
+    }
 }

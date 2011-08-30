@@ -103,6 +103,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         } else {
             chain[writeChainPosition].messageWriting(session, message, this);
         }
+        writeChainPosition++;
     }
 
     @Override
@@ -113,6 +114,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         } else {
             chain[readChainPosition].messageReceived(session, message, this);
         }
+        readChainPosition--;
     }
 
     @Override

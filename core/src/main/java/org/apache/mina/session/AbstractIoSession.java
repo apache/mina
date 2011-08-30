@@ -36,8 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base implementation of {@link IoSession} shared with all the different
- * transports.
+ * Base implementation of {@link IoSession} shared with all the different transports.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -179,17 +178,19 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public Object getAttribute(Object name) {
-        return attributes.get(name);
+    public <T> T getAttribute(String name) {
+        return (T) attributes.get(name);
     }
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public Object setAttribute(Object name, Object value) {
-        return attributes.put(name, value);
+    public <T> T setAttribute(String name, T value) {
+        return (T) attributes.put(name, value);
     }
 
     /**
