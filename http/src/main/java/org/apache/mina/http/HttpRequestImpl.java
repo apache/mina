@@ -17,17 +17,24 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.http.api;
+package org.apache.mina.http;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.http.api.HttpMethod;
+import org.apache.mina.http.api.HttpRequest;
+import org.apache.mina.http.api.HttpVersion;
+
 public class HttpRequestImpl implements HttpRequest {
 
     private final HttpVersion version;
+
     private final HttpMethod method;
+
     private final String requestedPath;
+
     private final Map<String, String> headers;
 
     public HttpRequestImpl(HttpVersion version, HttpMethod method, String requestedPath, Map<String, String> headers) {
@@ -93,7 +100,7 @@ public class HttpRequestImpl implements HttpRequest {
 
     @Override
     public String toString() {
-        String result = "METHOD: " + method + "\n";
+        String result = "HTTP REQUEST METHOD: " + method + "\n";
         result += "VERSION: " + version + "\n";
         result += "PATH: " + requestedPath + "\n";
 

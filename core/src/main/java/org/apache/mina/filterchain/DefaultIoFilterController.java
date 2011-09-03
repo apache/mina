@@ -86,7 +86,8 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     public void processMessageWriting(IoSession session, Object message) {
         LOG.debug("processing message '{}' writing event ", message);
         if (chain.length < 1) {
-            LOG.debug("Nothing to do, the chain is empty");
+            LOG.debug("Nothing to do, the chain is empty, we just enqueue the message");
+            session.enqueueWriteRequest(message);
         } else {
             writeChainPosition = chain.length - 1;
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
@@ -96,9 +97,11 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
 
     @Override
     public void callWriteNextFilter(IoSession session, Object message) {
+        LOG.debug("calling next filter for writing for message '{}' position : {}", message, writeChainPosition);
         writeChainPosition--;
         if (writeChainPosition < 0 || chain.length == 0) {
             // end of chain processing
+            LOG.debug("end of write chan we enque the message in the session : {}", message);
             session.enqueueWriteRequest(message);
         } else {
             chain[writeChainPosition].messageWriting(session, message, this);

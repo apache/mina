@@ -17,7 +17,7 @@
  *  under the License. 
  *  
  */
-package org.apache.mina;
+package org.apache.mina.http;
 
 @SuppressWarnings("serial")
 public class HttpException extends RuntimeException {

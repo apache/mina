@@ -17,20 +17,9 @@
  *  under the License. 
  *  
  */
-package org.apache.mina;
+package org.apache.mina.http.api;
 
-public class ArrayUtil {
+public enum HttpVerb {
 
-    public static String[] dropFromEndWhile(String[] array, String regex) {
-        for (int i = array.length - 1; i >= 0; i--) {
-            if (!array[i].trim().equals("")) {
-                String[] trimmedArray = new String[i + 1];
-                System.arraycopy(array, 0, trimmedArray, 0, i + 1);
-                return trimmedArray;
-            }
-        }
-        return null;
-
-    }
-
+    GET, HEAD, POST, PUT, DELETE, OPTIONS, TRACE, CONNECT
 }
