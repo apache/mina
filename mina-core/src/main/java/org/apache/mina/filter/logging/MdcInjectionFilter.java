@@ -77,8 +77,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
     }
 
     /** key used for storing the context map in the IoSession */
-    private static final AttributeKey CONTEXT_KEY = new AttributeKey(
-            MdcInjectionFilter.class, "context");
+    private static final AttributeKey CONTEXT_KEY = new AttributeKey(MdcInjectionFilter.class, "context");
 
     private ThreadLocal<Integer> callDepth = new ThreadLocal<Integer>() {
         @Override
@@ -173,37 +172,36 @@ public class MdcInjectionFilter extends CommonEventFilter {
      */
     protected void fillContext(final IoSession session, final Map<String, String> context) {
         if (mdcKeys.contains(MdcKey.handlerClass)) {
-            context.put(MdcKey.handlerClass.name(), session.getHandler()
-                    .getClass().getName());
+            context.put(MdcKey.handlerClass.name(),
+                        session.getHandler().getClass().getName());
         }
         if (mdcKeys.contains(MdcKey.remoteAddress)) {
-            context.put(MdcKey.remoteAddress.name(), session.getRemoteAddress()
-                    .toString());
+            context.put(MdcKey.remoteAddress.name(),
+                        session.getRemoteAddress().toString());
         }
         if (mdcKeys.contains(MdcKey.localAddress)) {
-            context.put(MdcKey.localAddress.name(), session.getLocalAddress()
-                    .toString());
+            context.put(MdcKey.localAddress.name(),
+                        session.getLocalAddress().toString());
         }
         if (session.getTransportMetadata().getAddressType() == InetSocketAddress.class) {
-            InetSocketAddress remoteAddress = (InetSocketAddress) session
-                    .getRemoteAddress();
-            InetSocketAddress localAddress = (InetSocketAddress) session
-                    .getLocalAddress();
+            InetSocketAddress remoteAddress = (InetSocketAddress) session.getRemoteAddress();
+            InetSocketAddress localAddress = (InetSocketAddress) session.getLocalAddress();
+
             if (mdcKeys.contains(MdcKey.remoteIp)) {
-                context.put(MdcKey.remoteIp.name(), remoteAddress.getAddress()
-                        .getHostAddress());
+                context.put(MdcKey.remoteIp.name(),
+                            remoteAddress.getAddress().getHostAddress());
             }
             if (mdcKeys.contains(MdcKey.remotePort)) {
-                context.put(MdcKey.remotePort.name(), String
-                        .valueOf(remoteAddress.getPort()));
+                context.put(MdcKey.remotePort.name(),
+                            String.valueOf(remoteAddress.getPort()));
             }
             if (mdcKeys.contains(MdcKey.localIp)) {
-                context.put(MdcKey.localIp.name(), localAddress.getAddress()
-                        .getHostAddress());
+                context.put(MdcKey.localIp.name(),
+                            localAddress.getAddress().getHostAddress());
             }
             if (mdcKeys.contains(MdcKey.localPort)) {
-                context.put(MdcKey.localPort.name(), String
-                        .valueOf(localAddress.getPort()));
+                context.put(MdcKey.localPort.name(),
+                            String.valueOf(localAddress.getPort()));
             }
         }
     }
