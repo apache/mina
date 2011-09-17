@@ -43,21 +43,21 @@ public interface SelectorStrategy {
      * This processor will be in charge of selecting the socket for write ready events.
      * 
      * @param session the session in need of writing
-     * @return the selector processor for handling this sessino write events
+     * @return the selector processor for handling this session write events
      */
     SelectorProcessor getSelectorForWrite(IoSession session);
     
     /**
      * Provide a {@link SelectorProcessor} for processing a newly bound address.
      * The processor will accept the incoming connections.
-     * @return
+     * @return a {@link SelectorProcessor} for processing a newly bound address
      */
     SelectorProcessor getSelectorForBindNewAddress();
     
     /**
      * Unbind an address and remove it from its {@link SelectorProcessor} 
-     * @param address
-     * @throws IOException
+     * @param address the address to be unbound and removed
+     * @throws IOException thrown if any problem occurs while unbinding
      */
     void unbind(SocketAddress address) throws IOException;
 }
