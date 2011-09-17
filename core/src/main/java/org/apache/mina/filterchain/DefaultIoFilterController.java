@@ -105,7 +105,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         writeChainPosition.set(writeChainPosition.get() - 1);
         if (writeChainPosition.get() < 0 || chain.length == 0) {
             // end of chain processing
-            LOG.debug("end of write chan we enque the message in the session : {}", message);
+            LOG.debug("end of write chan we enqueue the message in the session : {}", message);
             session.enqueueWriteRequest(message);
         } else {
             chain[writeChainPosition.get()].messageWriting(session, message, this);

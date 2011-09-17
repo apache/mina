@@ -18,24 +18,25 @@
  *
  */
 
-package org.apache.mina.transport.socket.nio;
+package org.apache.mina.examples.echoserver;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
-import junit.framework.Assert;
-
+import org.apache.mina.api.IdleStatus;
+import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoServiceListener;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
+import org.apache.mina.filterchain.ReadFilterChainController;
+import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.service.OneThreadSelectorStrategy;
 import org.apache.mina.service.SelectorFactory;
 import org.apache.mina.transport.tcp.NioSelectorProcessor;
 import org.apache.mina.transport.tcp.nio.NioTcpServer;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,20 +46,55 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class NioAcceptorTest {
+public class NioEchoServer {
 
-    static final private Logger LOG = LoggerFactory.getLogger(NioAcceptorTest.class);
+    static final private Logger LOG = LoggerFactory.getLogger(NioEchoServer.class);
 
-    @Test
-    public void acceptorTest() {
-        LOG.info("starting NioAcceptorTest");
+    public static void main(String[] args) {
+        LOG.info("starting echo server");
 
         OneThreadSelectorStrategy strategy = new OneThreadSelectorStrategy(new SelectorFactory(
                 NioSelectorProcessor.class));
         NioTcpServer acceptor = new NioTcpServer(strategy);
 
         // create the fitler chain for this service
-        acceptor.setFilters(new LoggingFilter("LoggingFilter1"), new LoggingFilter("LoggingFilter2"));
+        acceptor.setFilters(new LoggingFilter("LoggingFilter1"), new IoFilter() {
+
+            @Override
+            public void sessionOpened(IoSession session) {
+                LOG.info("session {} open", session);
+            }
+
+            @Override
+            public void sessionIdle(IoSession session, IdleStatus status) {
+                LOG.info("session {} idle", session);
+            }
+
+            @Override
+            public void sessionCreated(IoSession session) {
+                LOG.info("session {} created", session);
+            }
+
+            @Override
+            public void sessionClosed(IoSession session) {
+                LOG.info("session {} open", session);
+            }
+
+            @Override
+            public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
+                // we just push the message in the chain
+                controller.callWriteNextFilter(session, message);
+            }
+
+            @Override
+            public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
+
+                if (message instanceof ByteBuffer) {
+                    LOG.info("echoing");
+                    session.write(message);
+                }
+            }
+        });
 
         acceptor.addListener(new IoServiceListener() {
 
@@ -72,8 +108,9 @@ public class NioAcceptorTest {
             public void sessionCreated(IoSession session) {
                 LOG.info("session created {}", session);
 
-                ByteBuffer bf = ByteBuffer.allocate("toto".length());
-                bf.put("toto".getBytes());
+                String welcomeStr = "welcome\n";
+                ByteBuffer bf = ByteBuffer.allocate(welcomeStr.length());
+                bf.put(welcomeStr.getBytes());
                 bf.flip();
                 session.write(bf);
             }
@@ -92,35 +129,14 @@ public class NioAcceptorTest {
         try {
             SocketAddress address = new InetSocketAddress(9999);
             acceptor.bind(address);
-            LOG.debug("Waiting 25 sec");
+            LOG.debug("Running the server for 25 sec");
             Thread.sleep(25000);
-            LOG.debug("Unbinding");
-
+            LOG.debug("Unbinding the TCP port");
             acceptor.unbind(address);
-
-            LOG.debug("Trying to rebind the freed port");
-            acceptor.bind(address);
-            LOG.debug("Bound");
         } catch (IOException e) {
-            e.printStackTrace();
-            Assert.fail();
+            LOG.error("I/O exception", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            Assert.fail();
+            LOG.error("Interrupted exception", e);
         }
-        Exception ex = null;
-        try {
-            LOG.info("Trying to bind an already bound port");
-            // try to bind an already bound port
-            acceptor.bind(new InetSocketAddress(9999));
-
-            Assert.fail();
-
-        } catch (IOException e) {
-            LOG.info("catching the exception", e);
-            ex = e;
-        }
-        Assert.assertNotNull(ex);
-
     }
 }

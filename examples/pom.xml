@@ -41,6 +41,11 @@
       <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
+    <dependency>
+    	<groupId>${project.groupId}</groupId>
+    	<artifactId>mina-http</artifactId>
+    	<version>${project.version}</version>
+    </dependency>
   </dependencies>
   <description>Apache MINA server and client examples</description>
 </project>
