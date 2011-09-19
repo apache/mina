@@ -18,15 +18,17 @@
  */
 package org.apache.mina.session;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.net.SocketAddress;
 
 import junit.framework.Assert;
 
+import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
+import org.junit.Before;
 import org.junit.Test;
 
 public class AbstractIoSessionTest {
@@ -93,17 +95,25 @@ public class AbstractIoSessionTest {
         }
     }
 
+    private IoService service = null;
+
+    @Before
+    public void setup() {
+        service = mock(IoService.class);
+        when(service.getFilters()).thenReturn(new IoFilter[] {});
+    }
+
     @Test
     public void testGetId() {
-        Assert.assertNotSame((new DummySession(mock(IoService.class))).getId(),
-                (new DummySession(mock(IoService.class))).getId());
+
+        Assert.assertNotSame((new DummySession(service)).getId(), (new DummySession(service)).getId());
 
     }
 
     @Test
     public void testCreationTime() {
         long before = System.currentTimeMillis();
-        long creation = (new DummySession(mock(IoService.class))).getCreationTime();
+        long creation = (new DummySession(service)).getCreationTime();
         long after = System.currentTimeMillis();
         Assert.assertTrue(creation <= after);
         Assert.assertTrue(creation >= before);
@@ -111,7 +121,7 @@ public class AbstractIoSessionTest {
 
     @Test
     public void testAttachment() {
-        AbstractIoSession aio = new DummySession(mock(IoService.class));
+        AbstractIoSession aio = new DummySession(service);
         String value = "value";
         Assert.assertNull(aio.getAttribute("test"));
         Assert.assertEquals(null, aio.setAttribute("test", value));
