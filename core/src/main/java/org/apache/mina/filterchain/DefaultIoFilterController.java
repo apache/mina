@@ -39,6 +39,9 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
      * The instance of {@link DefaultIoFilterController} with the {@link IoService} chain.
      */
     public DefaultIoFilterController(IoFilter[] chain) {
+        if (chain == null) {
+            throw new IllegalArgumentException("chain");
+        }
         this.chain = chain;
     }
 
@@ -51,7 +54,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     }
 
     @Override
-    public void processSessionOpen(IoSession session) {
+    public void processSessionOpened(IoSession session) {
         LOG.debug("processing session open event");
         for (IoFilter filter : chain) {
             filter.sessionOpened(session);

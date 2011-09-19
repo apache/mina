@@ -41,7 +41,7 @@ public interface IoFilterController {
      * Call this method for processing a session open event using this chain.
      * @param session {@link IoSession} the opened session
      */
-    void processSessionOpen(IoSession session);
+    void processSessionOpened(IoSession session);
 
     /**
      * Call this method for processing a session closed event using the chain.

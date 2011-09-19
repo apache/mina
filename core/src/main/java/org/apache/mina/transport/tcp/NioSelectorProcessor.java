@@ -233,7 +233,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                             session.setConnected();
                             // fire the event
                             ((AbstractIoService) session.getService()).fireSessionCreated(session);
-                            session.getFilterChain().processSessionOpen(session);
+                            session.getFilterChain().processSessionOpened(session);
                         }
                     }
 
