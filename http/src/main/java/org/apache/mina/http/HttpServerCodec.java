@@ -128,7 +128,7 @@ public class HttpServerCodec implements IoFilter {
             // send the chunk of body
             controller.callReadNextFilter(session, msg);
             // do we have reach end of body ?
-            int remaining = session.getAttribute(BODY_REMAINING_BYTES);
+            int remaining = (Integer) session.getAttribute(BODY_REMAINING_BYTES);
             remaining -= chunkSize;
 
             if (remaining <= 0) {

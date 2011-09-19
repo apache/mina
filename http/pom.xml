@@ -31,7 +31,7 @@
   <packaging>bundle</packaging>
   <properties>
     <symbolicName>${project.groupId}.http</symbolicName>
-    <exportedPackage>${project.groupId}</exportedPackage>
+    <exportedPackage>${project.groupId}.http.api</exportedPackage>
   </properties>
 
   <dependencies>
