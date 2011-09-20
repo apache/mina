@@ -78,9 +78,9 @@
   </licenses>
 
   <properties>
-    <version.slf4j.api>1.5.11</version.slf4j.api>
-    <version.slf4j.log4j12>1.5.11</version.slf4j.log4j12>
-    <version.slf4j.jcl.over.slf4j>1.5.11</version.slf4j.jcl.over.slf4j>
+    <version.slf4j.api>1.6.2</version.slf4j.api>
+    <version.slf4j.log4j12>1.6.2</version.slf4j.log4j12>
+    <version.slf4j.jcl.over.slf4j>1.6.2</version.slf4j.jcl.over.slf4j>
     <version.log4j>1.2.14</version.log4j>
     <version.junit>4.7</version.junit>
   </properties>
