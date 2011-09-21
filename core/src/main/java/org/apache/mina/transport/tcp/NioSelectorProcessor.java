@@ -320,6 +320,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                 // if the session is no more interested in writing, we need
                                 // to stop listening for OP_WRITE events
                                 if (queue.isEmpty()) {
+                                    session.setNotRegisteredForWrite();
                                     // a key registered for read ? (because we can have a
                                     // Selector for reads and another for the writes
                                     SelectionKey readKey = sessionReadKey.get(session);

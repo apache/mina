@@ -79,7 +79,7 @@ public abstract class AbstractIoSession implements IoSession {
     protected SessionState state;
 
     /** is this session registered for being polled for write ready events */
-    AtomicBoolean registeredForWrite = new AtomicBoolean();
+    private AtomicBoolean registeredForWrite = new AtomicBoolean();
 
     /** the queue of pending writes for the session, to be dequeued by the {@link SelectorProcessor} */
     private Queue<WriteRequest> writeQueue = new DefaultWriteQueue();
@@ -242,7 +242,10 @@ public abstract class AbstractIoSession implements IoSession {
         if (!registeredForWrite.getAndSet(true)) {
             writeProcessor.flush(this);
         }
+    }
 
+    public void setNotRegisteredForWrite() {
+        registeredForWrite.set(false);
     }
 
     @Override
