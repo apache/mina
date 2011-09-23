@@ -166,7 +166,6 @@ public class HttpServerCodec implements IoFilter {
         } else if (message instanceof HttpEndOfContent) {
             // end of HTTP content
             // keep alive ?
-            session.close(false);
         }
     }
 
