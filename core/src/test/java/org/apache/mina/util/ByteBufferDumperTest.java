@@ -40,8 +40,31 @@ public class ByteBufferDumperTest {
         }
         myBuffer.flip();
 
+        int remaining = myBuffer.remaining();
+        int pos = myBuffer.position();
         String dump = dumper.dump(myBuffer);
         assertEquals("ByteBuffer[len=8,str='" + toTest + "'", dump);
+        assertEquals(remaining, myBuffer.remaining());
+        assertEquals(pos, myBuffer.position());
+    }
+
+    @Test
+    public void binary_test() {
+        ByteBufferDumper dumper = new ByteBufferDumper();
+        ByteBuffer myBuffer = ByteBuffer.allocate(4);
+        myBuffer.put((byte) 0x88);
+        myBuffer.put((byte) 0x03);
+        myBuffer.put((byte) 0xFF);
+        myBuffer.flip();
+
+        int remaining = myBuffer.remaining();
+        int pos = myBuffer.position();
+        String dump = dumper.dump(myBuffer);
+        System.err.println(dump);
+        assertEquals("ByteBuffer[len=3,bytes='88 03 FF'", dump);
+        assertEquals(remaining, myBuffer.remaining());
+        assertEquals(pos, myBuffer.position());
+
     }
 
 }
