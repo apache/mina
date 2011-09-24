@@ -98,8 +98,12 @@ public class HttpServerCodec implements IoFilter {
             LOG.debug("decoding NEW");
             HttpRequestImpl rq = parseHttpRequestHead(msg);
             if (rq == null) {
+                // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
+                ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
+                partial.put(msg);
+                partial.flip();
                 // no request decoded, we accumulate
-                session.setAttribute(PARTIAL_HEAD_ATT, msg);
+                session.setAttribute(PARTIAL_HEAD_ATT, partial);
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
                 return;
             } else {

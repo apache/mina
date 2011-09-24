@@ -276,6 +276,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                 LOGGER.debug("readable client {}", key);
                                 NioTcpSession session = (NioTcpSession) key.attachment();
                                 SocketChannel channel = session.getSocketChannel();
+                                readBuffer.rewind();
                                 int readCount = channel.read(readBuffer);
                                 LOGGER.debug("read {} bytes", readCount);
                                 if (readCount < 0) {
@@ -293,6 +294,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                             if (key.isWritable()) {
                                 LOGGER.debug("writable session : {}", key.attachment());
                                 NioTcpSession session = (NioTcpSession) key.attachment();
+                                session.setNotRegisteredForWrite();
                                 // write from the session write queue
                                 Queue<WriteRequest> queue = session.getWriteQueue();
                                 do {
@@ -320,7 +322,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                 // if the session is no more interested in writing, we need
                                 // to stop listening for OP_WRITE events
                                 if (queue.isEmpty()) {
-                                    session.setNotRegisteredForWrite();
                                     // a key registered for read ? (because we can have a
                                     // Selector for reads and another for the writes
                                     SelectionKey readKey = sessionReadKey.get(session);
