@@ -936,29 +936,25 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     }
 
     protected boolean isExpandable(Class<?> type, String attrName) {
-        if (IoService.class.isAssignableFrom(type) && attrName.equals("sessionConfig")) {
-            return true;
-        }
-        if (IoService.class.isAssignableFrom(type) && attrName.equals("transportMetadata")) {
-            return true;
-        }
-        if (IoSession.class.isAssignableFrom(type) && attrName.equals("config")) {
-            return true;
-        }
-        if (IoSession.class.isAssignableFrom(type) && attrName.equals("transportMetadata")) {
-            return true;
+       
+        if (IoService.class.isAssignableFrom(type)) {
+            if (attrName.equals("statistics") || 
+                attrName.equals("sessionConfig") ||
+                attrName.equals("transportMetadata") ||
+                attrName.equals("config") ||
+                attrName.equals("transportMetadata")) {
+                return true;
+            }
         }
 
-        if (ExecutorFilter.class.isAssignableFrom(type)) {
-            if (attrName.equals("executor")) {
-                return true;
-            }
+        if (ExecutorFilter.class.isAssignableFrom(type) && attrName.equals("executor")) {
+            return true;
         }
-        if (ThreadPoolExecutor.class.isAssignableFrom(type)) {
-            if (attrName.equals("queueHandler")) {
-                return true;
-            }
+        
+        if (ThreadPoolExecutor.class.isAssignableFrom(type) && attrName.equals("queueHandler")) {
+            return true;
         }
+        
         return false;
     }
 
