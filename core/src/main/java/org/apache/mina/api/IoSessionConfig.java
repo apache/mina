@@ -19,6 +19,8 @@
  */
 package org.apache.mina.api;
 
+import org.apache.mina.service.SelectorProcessor;
+
 /**
  * The configuration of {@link IoSession}.
  *
@@ -41,4 +43,17 @@ public interface IoSessionConfig {
      * @param ildeTimeInMilli the timeout in milliseconds
      */
     void setIdleTimeInMillis(IdleStatus status, long ildeTimeInMilli);
+
+    /**
+     * Returns the size of the read buffer the {@link SelectorProcessor} allocates
+     * per each read.
+     */
+    int getReadBufferSize();
+
+    /**
+     * Sets the size of the read buffer the {@link SelectorProcessor} allocates
+     * per each read.
+     */
+    void setReadBufferSize(int readBufferSize);
+
 }
