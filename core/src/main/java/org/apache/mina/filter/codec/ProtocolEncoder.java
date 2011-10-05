@@ -20,6 +20,7 @@
 package org.apache.mina.filter.codec;
 
 import org.apache.mina.api.IoSession;
+import org.apache.mina.filterchain.WriteFilterChainController;
 
 /**
  * Encodes higher-level message objects into binary or protocol-specific data.
@@ -47,7 +48,7 @@ public interface ProtocolEncoder {
      *
      * @throws Exception if the message violated protocol specification
      */
-    Object encode(IoSession session, Object message); // throws Exception;
+    Object encode(IoSession session, Object message, WriteFilterChainController controller); // throws Exception;
 
     /**
      * Releases all resources related with this encoder.

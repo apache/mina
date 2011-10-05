@@ -175,6 +175,17 @@ public class ProtocolCodecFilter implements IoFilter {
         return (ProtocolEncoder) session.getAttribute(ENCODER);
     }
 
+    
+    /**
+     * Get the decoder instance from a given session.
+     *
+     * @param session The associated session we will get the decoder from
+     * @return The decoder instance, if any
+     */
+    public ProtocolDecoder getDecoder(IoSession session) {
+        return (ProtocolDecoder) session.getAttribute(DECODER);
+    }
+
     /**
      * Process the incoming message, calling the session decoder. As the incoming
      * buffer might contains more than one messages, we have to loop until the decoder
@@ -198,7 +209,7 @@ public class ProtocolCodecFilter implements IoFilter {
         }
 
         ByteBuffer in = (ByteBuffer) message;
-        ProtocolDecoder decoder = session.getAttribute(DECODER);
+        ProtocolDecoder decoder = getDecoder( session );
         
         // Loop until we don't have anymore byte in the buffer,
         // or until the decoder throws an unrecoverable exception or 
@@ -206,14 +217,7 @@ public class ProtocolCodecFilter implements IoFilter {
         // data in the buffer
         while (in.hasRemaining()) {
             // Call the decoder with the read bytes
-            Object decoded = decoder.decode(session, in);
-            
-            // Finish decoding if no exception was thrown.
-            if (decoded != null) {
-                controller.callReadNextFilter(session, decoded);
-            } else {
-                break;
-            }
+            decoder.decode(session, in, controller);
         }
     }
 
@@ -221,9 +225,7 @@ public class ProtocolCodecFilter implements IoFilter {
     public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
         ProtocolEncoder encoder = session.getAttribute(ENCODER);
         
-        Object encoded = encoder.encode(session, message);
-        
-        controller.callWriteNextFilter(session, encoded);
+        encoder.encode(session, message, controller);
     }
 
     @Override
