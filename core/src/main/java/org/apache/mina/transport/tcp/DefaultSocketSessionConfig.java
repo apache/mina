@@ -109,10 +109,10 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
         this.readBufferSize = readBufferSize;
     }
 
-    private int receiveBufferSize;
+    private Integer receiveBufferSize = null;
 
     @Override
-    public int getReceiveBufferSize() {
+    public Integer getReceiveBufferSize() {
         return receiveBufferSize;
     }
 
@@ -121,10 +121,10 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
         this.receiveBufferSize = receiveBufferSize;
     }
 
-    private int sendBufferSize;
+    private Integer sendBufferSize = null;
 
     @Override
-    public int getSendBufferSize() {
+    public Integer getSendBufferSize() {
         return sendBufferSize;
     }
 
@@ -137,10 +137,10 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
     // socket options
     //=====================
 
-    private boolean tcpNoDelay;
+    private Boolean tcpNoDelay = null;
 
     @Override
-    public boolean isTcpNoDelay() {
+    public Boolean isTcpNoDelay() {
         return tcpNoDelay;
     }
 
@@ -149,10 +149,10 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
         this.tcpNoDelay = tcpNoDelay;
     }
 
-    private boolean reuseAddress;
+    private Boolean reuseAddress = null;
 
     @Override
-    public boolean isReuseAddress() {
+    public Boolean isReuseAddress() {
         return reuseAddress;
     }
 
@@ -161,10 +161,10 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
         this.reuseAddress = reuseAddress;
     }
 
-    private int trafficClass;
+    private Integer trafficClass;
 
     @Override
-    public int getTrafficClass() {
+    public Integer getTrafficClass() {
         return trafficClass;
     }
 
@@ -173,10 +173,10 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
         this.trafficClass = trafficClass;
     }
 
-    private boolean keepAlive;
+    private Boolean keepAlive = null;
 
     @Override
-    public boolean isKeepAlive() {
+    public Boolean isKeepAlive() {
         return keepAlive;
     }
 
@@ -185,10 +185,10 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
         this.keepAlive = keepAlive;
     }
 
-    private boolean oobInline;
+    private Boolean oobInline = null;
 
     @Override
-    public boolean isOobInline() {
+    public Boolean isOobInline() {
         return oobInline;
     }
 
@@ -198,10 +198,10 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     }
 
-    private int soLinger;
+    private Integer soLinger;
 
     @Override
-    public int getSoLinger() {
+    public Integer getSoLinger() {
         return soLinger;
     }
 

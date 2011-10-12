@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.tcp.nio;
 
+import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.transport.tcp.AbstractTcpClient;
 
 /**
@@ -32,5 +33,11 @@ public class NioTcpClient extends AbstractTcpClient {
      */
     public NioTcpClient() {
         super();
+    }
+
+    @Override
+    public IoSessionConfig getSessionConfig() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

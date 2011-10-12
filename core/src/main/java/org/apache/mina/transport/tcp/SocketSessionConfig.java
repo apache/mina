@@ -32,7 +32,7 @@ public interface SocketSessionConfig extends IoSessionConfig {
     /**
      * @see Socket#getTcpNoDelay()
      */
-    boolean isTcpNoDelay();
+    Boolean isTcpNoDelay();
 
     /**
      * @see Socket#setTcpNoDelay(boolean)
@@ -41,8 +41,9 @@ public interface SocketSessionConfig extends IoSessionConfig {
 
     /**
      * @see Socket#getReuseAddress()
+     * return <code>null</code> if the default system value is used 
      */
-    boolean isReuseAddress();
+    Boolean isReuseAddress();
 
     /**
      * @see Socket#setReuseAddress(boolean)
@@ -51,8 +52,9 @@ public interface SocketSessionConfig extends IoSessionConfig {
 
     /**
      * @see Socket#getReceiveBufferSize() 
+     * return <code>null</code> if the default system value is used
      */
-    int getReceiveBufferSize();
+    Integer getReceiveBufferSize();
 
     /**
      * @see Socket#setReceiveBufferSize(int)
@@ -61,8 +63,9 @@ public interface SocketSessionConfig extends IoSessionConfig {
 
     /**
      * @see Socket#getSendBufferSize() 
+     * return <code>null</code> if the default system value is used
      */
-    int getSendBufferSize();
+    Integer getSendBufferSize();
 
     /**
      * @see Socket#setSendBufferSize(int)
@@ -71,8 +74,9 @@ public interface SocketSessionConfig extends IoSessionConfig {
 
     /**
      * @see Socket#getTrafficClass()
+     * return <code>null</code> if the default system value is used
      */
-    int getTrafficClass();
+    Integer getTrafficClass();
 
     /**
      * @see Socket#setTrafficClass(int) 
@@ -81,8 +85,9 @@ public interface SocketSessionConfig extends IoSessionConfig {
 
     /**
      * @see Socket#getKeepAlive() 
+     * return <code>null</code> if the default system value is used
      */
-    boolean isKeepAlive();
+    Boolean isKeepAlive();
 
     /**
      * @see Socket#setKeepAlive(boolean) 
@@ -91,8 +96,9 @@ public interface SocketSessionConfig extends IoSessionConfig {
 
     /**
      * @see Socket#getOOBInline() 
+     * return <code>null</code> if the default system value is used
      */
-    boolean isOobInline();
+    Boolean isOobInline();
 
     /**
      * @see Socket#setOOBInline(boolean) 
@@ -105,8 +111,9 @@ public interface SocketSessionConfig extends IoSessionConfig {
      *
      * @see Socket#getSoLinger()
      * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6179351">Sun Bug Database</a>
+     * return <code>null</code> if the default system value is used
      */
-    int getSoLinger();
+    Integer getSoLinger();
 
     /**
      * Please note that enabling <tt>SO_LINGER</tt> in Java NIO can result

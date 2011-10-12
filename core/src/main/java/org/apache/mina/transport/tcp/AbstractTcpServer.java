@@ -30,7 +30,7 @@ import org.apache.mina.service.server.AbstractIoServer;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class AbstractTcpServer extends AbstractIoServer {
+public abstract class AbstractTcpServer extends AbstractIoServer {
     /**
      * Create an new AbsractTcpServer instance
      */

@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filter.codec;
 
-
 import java.nio.ByteBuffer;
 
 import org.apache.mina.api.IdleStatus;
@@ -36,7 +35,6 @@ import org.slf4j.LoggerFactory;
  * {@link ProtocolEncoder}, or {@link ProtocolDecoder}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * @org.apache.xbean.XBean
  */
 public class ProtocolCodecFilter implements IoFilter {
     /** A logger for this class */
@@ -45,8 +43,9 @@ public class ProtocolCodecFilter implements IoFilter {
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
     private final String ENCODER = ProtocolCodecFilter.class.getSimpleName() + "encoder";
+
     private final String DECODER = ProtocolCodecFilter.class.getSimpleName() + "decoder";
-    
+
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
 
@@ -61,11 +60,10 @@ public class ProtocolCodecFilter implements IoFilter {
         if (factory == null) {
             throw new IllegalArgumentException("factory");
         }
-        
+
         this.factory = factory;
     }
 
-    
     /**
      * Creates a new instance of ProtocolCodecFilter, without any factory.
      * The encoder/decoder factory will be created as an inner class, using
@@ -74,8 +72,7 @@ public class ProtocolCodecFilter implements IoFilter {
      * @param encoder The class responsible for encoding the message
      * @param decoder The class responsible for decoding the message
      */
-    public ProtocolCodecFilter(final ProtocolEncoder encoder,
-            final ProtocolDecoder decoder) {
+    public ProtocolCodecFilter(final ProtocolEncoder encoder, final ProtocolDecoder decoder) {
         if (encoder == null) {
             throw new IllegalArgumentException("encoder");
         }
@@ -104,8 +101,7 @@ public class ProtocolCodecFilter implements IoFilter {
      * @param encoder The class responsible for encoding the message
      * @param decoder The class responsible for decoding the message
      */
-    public ProtocolCodecFilter(
-            final Class<? extends ProtocolEncoder> encoderClass,
+    public ProtocolCodecFilter(final Class<? extends ProtocolEncoder> encoderClass,
             final Class<? extends ProtocolDecoder> decoderClass) {
         if (encoderClass == null) {
             throw new IllegalArgumentException("encoderClass");
@@ -114,44 +110,38 @@ public class ProtocolCodecFilter implements IoFilter {
             throw new IllegalArgumentException("decoderClass");
         }
         if (!ProtocolEncoder.class.isAssignableFrom(encoderClass)) {
-            throw new IllegalArgumentException("encoderClass: "
-                    + encoderClass.getName());
+            throw new IllegalArgumentException("encoderClass: " + encoderClass.getName());
         }
         if (!ProtocolDecoder.class.isAssignableFrom(decoderClass)) {
-            throw new IllegalArgumentException("decoderClass: "
-                    + decoderClass.getName());
+            throw new IllegalArgumentException("decoderClass: " + decoderClass.getName());
         }
         try {
             encoderClass.getConstructor(EMPTY_PARAMS);
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(
-                    "encoderClass doesn't have a public default constructor.");
+            throw new IllegalArgumentException("encoderClass doesn't have a public default constructor.");
         }
         try {
             decoderClass.getConstructor(EMPTY_PARAMS);
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(
-                    "decoderClass doesn't have a public default constructor.");
+            throw new IllegalArgumentException("decoderClass doesn't have a public default constructor.");
         }
 
         final ProtocolEncoder encoder;
-        
+
         try {
             encoder = encoderClass.newInstance();
         } catch (Exception e) {
-            throw new IllegalArgumentException(
-                "encoderClass cannot be initialized");
+            throw new IllegalArgumentException("encoderClass cannot be initialized");
         }
 
         final ProtocolDecoder decoder;
-        
+
         try {
             decoder = decoderClass.newInstance();
         } catch (Exception e) {
-            throw new IllegalArgumentException(
-                "decoderClass cannot be initialized");
+            throw new IllegalArgumentException("decoderClass cannot be initialized");
         }
-    
+
         // Create the inner factory based on the two parameters.
         this.factory = new ProtocolCodecFactory() {
             public ProtocolEncoder getEncoder(IoSession session) {
@@ -164,7 +154,6 @@ public class ProtocolCodecFilter implements IoFilter {
         };
     }
 
-    
     /**
      * Get the encoder instance from a given session.
      *
@@ -175,7 +164,6 @@ public class ProtocolCodecFilter implements IoFilter {
         return (ProtocolEncoder) session.getAttribute(ENCODER);
     }
 
-    
     /**
      * Get the decoder instance from a given session.
      *
@@ -199,18 +187,17 @@ public class ProtocolCodecFilter implements IoFilter {
      *    
      */
     @Override
-    public void messageReceived(IoSession session,
-            Object message, ReadFilterChainController controller) {
+    public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session.getId());
-        
+
         if (!(message instanceof ByteBuffer)) {
             controller.callReadNextFilter(session, message);
             return;
         }
 
         ByteBuffer in = (ByteBuffer) message;
-        ProtocolDecoder decoder = getDecoder( session );
-        
+        ProtocolDecoder decoder = getDecoder(session);
+
         // Loop until we don't have anymore byte in the buffer,
         // or until the decoder throws an unrecoverable exception or 
         // can't decoder a message, because there are not enough 
@@ -224,7 +211,7 @@ public class ProtocolCodecFilter implements IoFilter {
     @Override
     public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
         ProtocolEncoder encoder = session.getAttribute(ENCODER);
-        
+
         encoder.encode(session, message, controller);
     }
 
@@ -265,7 +252,7 @@ public class ProtocolCodecFilter implements IoFilter {
         disposeEncoder(session);
         disposeDecoder(session);
     }
-    
+
     /**
      * Dispose the encoder, removing its instance from the
      * session's attributes, and calling the associated
@@ -273,7 +260,7 @@ public class ProtocolCodecFilter implements IoFilter {
      */
     private void disposeEncoder(IoSession session) {
         ProtocolEncoder encoder = (ProtocolEncoder) session.removeAttribute(ENCODER);
-        
+
         if (encoder == null) {
             return;
         }
@@ -281,8 +268,7 @@ public class ProtocolCodecFilter implements IoFilter {
         try {
             encoder.dispose(session);
         } catch (Throwable t) {
-            LOGGER.warn(
-                    "Failed to dispose: " + encoder.getClass().getName() + " (" + encoder + ')');
+            LOGGER.warn("Failed to dispose: " + encoder.getClass().getName() + " (" + encoder + ')');
         }
     }
 
@@ -300,8 +286,7 @@ public class ProtocolCodecFilter implements IoFilter {
         try {
             decoder.dispose(session);
         } catch (Throwable t) {
-            LOGGER.warn(
-                    "Failed to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
+            LOGGER.warn("Failed to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }
 }

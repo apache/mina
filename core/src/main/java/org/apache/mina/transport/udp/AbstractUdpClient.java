@@ -26,7 +26,7 @@ import org.apache.mina.service.client.AbstractIoClient;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class AbstractUdpClient extends AbstractIoClient{
+public abstract class AbstractUdpClient extends AbstractIoClient {
     /**
      * Create an new AbsractUdpClient instance
      */

@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.udp.bio;
 
+import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.transport.udp.AbstractUdpServer;
 
 /**
@@ -32,5 +33,11 @@ public class BioUdpServer extends AbstractUdpServer {
      */
     public BioUdpServer() {
         super();
+    }
+
+    @Override
+    public IoSessionConfig getSessionConfig() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Set;
 
+import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
 
 /**
@@ -43,19 +44,22 @@ public class BioTcpServer extends AbstractTcpServer {
         return null;
     }
 
-
     @Override
-    public void bind( SocketAddress... localAddress ) throws IOException {
+    public void bind(SocketAddress... localAddress) throws IOException {
     }
-
 
     @Override
     public void unbindAll() throws IOException {
     }
 
+    @Override
+    public void unbind(SocketAddress... localAddresses) throws IOException {
+    }
 
     @Override
-    public void unbind( SocketAddress... localAddresses ) throws IOException {
+    public IoSessionConfig getSessionConfig() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -73,4 +73,9 @@ public interface IoService {
      */
     void setFilters(IoFilter... filters);
 
+    /**
+     * Returns the default configuration of the new {@link IoSession}s
+     * created by this service.
+     */
+    IoSessionConfig getSessionConfig();
 }

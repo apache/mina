@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.udp.nio;
 
+import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.transport.udp.AbstractUdpClient;
 
 /**
@@ -32,5 +33,11 @@ public class NioUdpClient extends AbstractUdpClient {
      */
     public NioUdpClient() {
         super();
+    }
+
+    @Override
+    public IoSessionConfig getSessionConfig() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

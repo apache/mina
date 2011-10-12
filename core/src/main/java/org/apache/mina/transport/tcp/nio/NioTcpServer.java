@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.mina.service.SelectorStrategy;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
 import org.apache.mina.transport.tcp.NioSelectorProcessor;
+import org.apache.mina.transport.tcp.SocketSessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +50,21 @@ public class NioTcpServer extends AbstractTcpServer {
     // the strategy for dispatching servers and client to selector threads.
     private SelectorStrategy strategy;
 
+    private SocketSessionConfig config;
+
     public NioTcpServer(SelectorStrategy strategy) {
         super();
         this.strategy = strategy;
+
+    }
+
+    @Override
+    public SocketSessionConfig getSessionConfig() {
+        return config;
+    }
+
+    public void setSessionConfig(SocketSessionConfig config) {
+        this.config = config;
     }
 
     @Override

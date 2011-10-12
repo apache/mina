@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.tcp.bio;
 
+import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.transport.tcp.AbstractTcpClient;
 
 /**
@@ -32,5 +33,11 @@ public class BioTcpClient extends AbstractTcpClient {
      */
     public BioTcpClient() {
         super();
+    }
+
+    @Override
+    public IoSessionConfig getSessionConfig() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

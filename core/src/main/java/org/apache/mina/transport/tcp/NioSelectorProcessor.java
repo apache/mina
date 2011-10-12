@@ -158,8 +158,8 @@ public class NioSelectorProcessor implements SelectorProcessor {
         SocketChannel socketChannel = (SocketChannel) clientSocket;
         NioTcpSession session = new NioTcpSession((NioTcpServer) service, socketChannel,
                 strategy.getSelectorForNewSession(this));
+        SocketSessionConfig sessionConfig = (SocketSessionConfig) service.getSessionConfig();
 
-        // TODO : configure
         try {
             socketChannel.configureBlocking(false);
         } catch (IOException e) {

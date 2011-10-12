@@ -30,7 +30,7 @@ import org.apache.mina.service.server.AbstractIoServer;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class AbstractUdpServer extends AbstractIoServer {
+public abstract class AbstractUdpServer extends AbstractIoServer {
     /**
      * Create an new AbsractUdpServer instance
      */
@@ -39,32 +39,25 @@ public class AbstractUdpServer extends AbstractIoServer {
     }
 
     @Override
-    public Set<SocketAddress> getLocalAddresses()
-    {
+    public Set<SocketAddress> getLocalAddresses() {
         // TODO Auto-generated method stub
         return null;
     }
 
-
     @Override
-    public void bind( SocketAddress... localAddress ) throws IOException
-    {
+    public void bind(SocketAddress... localAddress) throws IOException {
         // TODO Auto-generated method stub
 
     }
 
-
     @Override
-    public void unbindAll() throws IOException
-    {
+    public void unbindAll() throws IOException {
         // TODO Auto-generated method stub
 
     }
 
-
     @Override
-    public void unbind( SocketAddress... localAddresses ) throws IOException
-    {
+    public void unbind(SocketAddress... localAddresses) throws IOException {
         // TODO Auto-generated method stub
 
     }
