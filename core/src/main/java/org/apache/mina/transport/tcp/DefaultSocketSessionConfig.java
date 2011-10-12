@@ -18,9 +18,6 @@
  */
 package org.apache.mina.transport.tcp;
 
-import java.net.Socket;
-import java.net.SocketException;
-
 import org.apache.mina.api.IdleStatus;
 
 /**
@@ -31,25 +28,6 @@ import org.apache.mina.api.IdleStatus;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultSocketSessionConfig implements SocketSessionConfig {
-
-    /**
-     * Create a socket configuration with the default value of the given {@link Socket}.
-     * Will help to create
-     * 
-     * @param socket
-     * @throws SocketException 
-     */
-    public DefaultSocketSessionConfig(Socket socket) throws SocketException {
-        this.receiveBufferSize = socket.getReceiveBufferSize();
-        this.sendBufferSize = socket.getSendBufferSize();
-        this.tcpNoDelay = socket.getTcpNoDelay();
-        this.reuseAddress = socket.getReuseAddress();
-        this.trafficClass = socket.getTrafficClass();
-        this.keepAlive = socket.getKeepAlive();
-        this.oobInline = socket.getOOBInline();
-        this.soLinger = socket.getSoLinger();
-        this.readBufferSize = 1024; // FIXME : dumb default value
-    }
 
     //=====================
     // idle management
@@ -66,7 +44,6 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
         switch (status) {
         case READ_IDLE:
             return idleTimeRead;
-
         case WRITE_IDLE:
             return idleTimeWrite;
         case READ_WRITE_IDLE:
@@ -96,18 +73,6 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
     //=====================
     // buffers
     //=====================
-
-    private int readBufferSize;
-
-    @Override
-    public int getReadBufferSize() {
-        return readBufferSize;
-    }
-
-    @Override
-    public void setReadBufferSize(int readBufferSize) {
-        this.readBufferSize = readBufferSize;
-    }
 
     private Integer receiveBufferSize = null;
 

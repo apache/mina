@@ -24,7 +24,6 @@ import java.net.Socket;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.api.IoFuture;
-import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.transport.tcp.nio.NioTcpServer;
@@ -39,9 +38,12 @@ public class NioTcpSession extends AbstractIoSession {
 
     private SocketChannel channel;
 
+    private final SocketSessionConfig configuration;
+
     NioTcpSession(NioTcpServer service, SocketChannel channel, SelectorProcessor writeProcessor) {
         super(service, writeProcessor);
         this.channel = channel;
+        this.configuration = new ProxySocketSessionConfig(channel.socket());
     }
 
     public SocketChannel getSocketChannel() {
@@ -138,9 +140,8 @@ public class NioTcpSession extends AbstractIoSession {
     }
 
     @Override
-    public IoSessionConfig getConfig() {
-        // TODO Auto-generated method stub
-        return null;
+    public SocketSessionConfig getConfig() {
+        return configuration;
     }
 
     void setConnected() {

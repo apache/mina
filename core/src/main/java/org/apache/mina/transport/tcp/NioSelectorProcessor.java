@@ -155,15 +155,47 @@ public class NioSelectorProcessor implements SelectorProcessor {
     @Override
     public void createSession(IoService service, Object clientSocket) {
         LOGGER.debug("create session");
-        SocketChannel socketChannel = (SocketChannel) clientSocket;
-        NioTcpSession session = new NioTcpSession((NioTcpServer) service, socketChannel,
+        final SocketChannel socketChannel = (SocketChannel) clientSocket;
+        final SocketSessionConfig defaultConfig = (SocketSessionConfig) service.getSessionConfig();
+        final NioTcpSession session = new NioTcpSession((NioTcpServer) service, socketChannel,
                 strategy.getSelectorForNewSession(this));
-        SocketSessionConfig sessionConfig = (SocketSessionConfig) service.getSessionConfig();
 
         try {
             socketChannel.configureBlocking(false);
         } catch (IOException e) {
             LOGGER.error("Unexpected exception, while configuring socket as non blocking", e);
+        }
+
+        // apply the default service socket configuration
+
+        Boolean keepAlive = defaultConfig.isKeepAlive();
+        if (keepAlive != null) {
+            session.getConfig().setKeepAlive(keepAlive);
+        }
+
+        Boolean oobInline = defaultConfig.isOobInline();
+        if (oobInline != null) {
+            session.getConfig().setOobInline(oobInline);
+        }
+
+        Boolean reuseAddress = defaultConfig.isReuseAddress();
+        if (reuseAddress != null) {
+            session.getConfig().setReuseAddress(reuseAddress);
+        }
+
+        Boolean tcpNoDelay = defaultConfig.isTcpNoDelay();
+        if (tcpNoDelay != null) {
+            session.getConfig().setTcpNoDelay(tcpNoDelay);
+        }
+
+        Integer receiveBufferSize = defaultConfig.getReceiveBufferSize();
+        if (receiveBufferSize != null) {
+            session.getConfig().setReceiveBufferSize(receiveBufferSize);
+        }
+
+        Integer sendBufferSize = defaultConfig.getSendBufferSize();
+        if (sendBufferSize != null) {
+            session.getConfig().setSendBufferSize(sendBufferSize);
         }
 
         // event session created
