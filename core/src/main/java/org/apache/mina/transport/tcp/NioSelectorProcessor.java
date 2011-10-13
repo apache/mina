@@ -198,6 +198,16 @@ public class NioSelectorProcessor implements SelectorProcessor {
             session.getConfig().setSendBufferSize(sendBufferSize);
         }
 
+        Integer trafficClass = defaultConfig.getTrafficClass();
+        if (trafficClass != null) {
+            session.getConfig().setTrafficClass(trafficClass);
+        }
+
+        Integer soLinger = defaultConfig.getSoLinger();
+        if (soLinger != null) {
+            session.getConfig().setSoLinger(soLinger);
+        }
+
         // event session created
         session.getFilterChain().processSessionCreated(session);
 
