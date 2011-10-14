@@ -90,6 +90,7 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     @Override
     public void setTcpNoDelay(boolean tcpNoDelay) {
+        LOG.debug("set TCP no delay '{}' for session '{}'", tcpNoDelay, this);
         try {
             socket.setTcpNoDelay(tcpNoDelay);
         } catch (SocketException e) {
@@ -108,6 +109,7 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     @Override
     public void setReuseAddress(boolean reuseAddress) {
+        LOG.debug("set reuse address '{}' for session '{}'", reuseAddress, this);
         try {
             socket.setReuseAddress(reuseAddress);
         } catch (SocketException e) {
@@ -126,6 +128,7 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     @Override
     public void setReceiveBufferSize(int receiveBufferSize) {
+        LOG.debug("set receive buffer size '{}' for session '{}'", receiveBufferSize, this);
         try {
             socket.setReceiveBufferSize(receiveBufferSize);
         } catch (SocketException e) {
@@ -144,6 +147,7 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     @Override
     public void setSendBufferSize(int sendBufferSize) {
+        LOG.debug("set send buffer size '{}' for session '{}'", sendBufferSize, this);
         try {
             socket.setSendBufferSize(sendBufferSize);
         } catch (SocketException e) {
@@ -162,6 +166,7 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     @Override
     public void setTrafficClass(int trafficClass) {
+        LOG.debug("set traffic class '{}' for session '{}'", trafficClass, this);
         try {
             socket.setTrafficClass(trafficClass);
         } catch (SocketException e) {
@@ -180,6 +185,7 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     @Override
     public void setKeepAlive(boolean keepAlive) {
+        LOG.debug("set keep alive '{}' for session '{}'", keepAlive, this);
         try {
             socket.setKeepAlive(keepAlive);
         } catch (SocketException e) {
@@ -198,6 +204,7 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     @Override
     public void setOobInline(boolean oobInline) {
+        LOG.debug("set oob inline '{}' for session '{}'", oobInline, this);
         try {
             socket.setOOBInline(oobInline);
         } catch (SocketException e) {
@@ -216,6 +223,7 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     @Override
     public void setSoLinger(int soLinger) {
+        LOG.debug("set so linger '{}' for session '{}'", soLinger, this);
         try {
             socket.setSoLinger(soLinger > 0, soLinger);
         } catch (SocketException e) {
