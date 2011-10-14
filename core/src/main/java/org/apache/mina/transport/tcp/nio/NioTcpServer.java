@@ -44,10 +44,6 @@ public class NioTcpServer extends AbstractTcpServer {
     // list of bound addresses
     private Set<SocketAddress> addresses = Collections.synchronizedSet(new HashSet<SocketAddress>());
 
-    // map of the created selection keys, mainly used for cancelling them.
-    // private Map<SocketAddress,NioSelectorProcessor> serverSocketChannels =
-    // new ConcurrentHashMap<SocketAddress, NioSelectorProcessor>();
-
     // the strategy for dispatching servers and client to selector threads.
     private SelectorStrategy strategy;
 
