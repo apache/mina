@@ -26,12 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoFilter;
+import org.apache.mina.api.DefaultIoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
-import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.http.DateUtil;
 import org.apache.mina.http.HttpServerCodec;
 import org.apache.mina.http.api.DefaultHttpResponse;
@@ -69,30 +67,7 @@ public class HttpTest {
 
     }
 
-    private static class DummyHttpSever implements IoFilter {
-
-        @Override
-        public void sessionCreated(IoSession session) {
-
-        }
-
-        @Override
-        public void sessionOpened(IoSession session) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void sessionClosed(IoSession session) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void sessionIdle(IoSession session, IdleStatus status) {
-            // TODO Auto-generated method stub
-
-        }
+    private static class DummyHttpSever extends DefaultIoFilter {
 
         private HttpRequest incomingRequest;
 
@@ -134,12 +109,5 @@ public class HttpTest {
             session.write(new HttpEndOfContent());
 
         }
-
-        @Override
-        public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
-            // we just push the message in the chain
-            controller.callWriteNextFilter(session, message);
-        }
-
     }
 }
