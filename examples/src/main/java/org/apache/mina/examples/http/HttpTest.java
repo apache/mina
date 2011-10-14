@@ -59,6 +59,8 @@ public class HttpTest {
         acceptor.setFilters(new LoggingFilter("INCOMING"), new HttpServerCodec(), new LoggingFilter("DECODED"),
                 new DummyHttpSever());
 
+        acceptor.getSessionConfig().setTcpNoDelay(true);
+
         acceptor.bind(new InetSocketAddress(8080));
 
         // run for 20 seconds
