@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.mina.service.SelectorStrategy;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
+import org.apache.mina.transport.tcp.DefaultSocketSessionConfig;
 import org.apache.mina.transport.tcp.NioSelectorProcessor;
 import org.apache.mina.transport.tcp.SocketSessionConfig;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class NioTcpServer extends AbstractTcpServer {
     public NioTcpServer(SelectorStrategy strategy) {
         super();
         this.strategy = strategy;
-
+        this.config = new DefaultSocketSessionConfig();
     }
 
     @Override
