@@ -62,4 +62,16 @@ public class BioTcpServer extends AbstractTcpServer {
         return null;
     }
 
+    @Override
+    public void setReuseAddress(boolean reuseAddress) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean isReuseAddress() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

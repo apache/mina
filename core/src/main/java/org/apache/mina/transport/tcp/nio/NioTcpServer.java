@@ -49,6 +49,8 @@ public class NioTcpServer extends AbstractTcpServer {
 
     private SocketSessionConfig config;
 
+    private boolean reuseAddress = false;
+
     public NioTcpServer(SelectorStrategy strategy) {
         super();
         this.strategy = strategy;
@@ -62,6 +64,16 @@ public class NioTcpServer extends AbstractTcpServer {
 
     public void setSessionConfig(SocketSessionConfig config) {
         this.config = config;
+    }
+
+    @Override
+    public void setReuseAddress(boolean reuseAddress) {
+        this.reuseAddress = reuseAddress;
+    }
+
+    @Override
+    public boolean isReuseAddress() {
+        return reuseAddress;
     }
 
     @Override

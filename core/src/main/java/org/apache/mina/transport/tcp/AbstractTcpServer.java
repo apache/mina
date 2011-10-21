@@ -1,5 +1,5 @@
 /*
- *  Licensed to the Apache Software Foundation (ASF) under one
+ *  Licensed to the Apache Software Foundation () under one
  *  or more contributor license agreements.  See the NOTICE file
  *  distributed with this work for additional information
  *  regarding copyright ownership.  The ASF licenses this file
@@ -19,10 +19,6 @@
  */
 package org.apache.mina.transport.tcp;
 
-import java.io.IOException;
-import java.net.SocketAddress;
-import java.util.Set;
-
 import org.apache.mina.service.server.AbstractIoServer;
 
 /**
@@ -38,21 +34,15 @@ public abstract class AbstractTcpServer extends AbstractIoServer {
         super();
     }
 
-    @Override
-    public Set<SocketAddress> getLocalAddresses() {
-        return null;
-    }
+    /**
+     * Set the reuse address flag on the server socket
+     * @param reuseAddress <code>true</code> to enable
+     */
+    public abstract void setReuseAddress(boolean reuseAddress);
 
-    @Override
-    public void bind(SocketAddress... localAddress) throws IOException {
-    }
-
-    @Override
-    public void unbindAll() throws IOException {
-    }
-
-    @Override
-    public void unbind(SocketAddress... localAddresses) throws IOException {
-    }
-
+    /**
+     * Is the reuse address enabled for this server.
+     * @return
+     */
+    public abstract boolean isReuseAddress();
 }

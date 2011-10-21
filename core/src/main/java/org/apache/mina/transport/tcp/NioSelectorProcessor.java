@@ -132,7 +132,9 @@ public class NioSelectorProcessor implements SelectorProcessor {
     @Override
     public void bindAndAcceptAddress(IoServer server, SocketAddress address) throws IOException {
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-
+        if (server instanceof AbstractTcpServer) {
+            serverSocketChannel.socket().setReuseAddress(((AbstractTcpServer) server).isReuseAddress());
+        }
         serverSocketChannel.socket().bind(address);
         serverSocketChannel.configureBlocking(false);
         serverSocketChannels.put(address, serverSocketChannel);
