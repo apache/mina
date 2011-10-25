@@ -76,6 +76,7 @@ public class ProtocolCodecFilter implements IoFilter {
         if (encoder == null) {
             throw new IllegalArgumentException("encoder");
         }
+        
         if (decoder == null) {
             throw new IllegalArgumentException("decoder");
         }
@@ -106,20 +107,25 @@ public class ProtocolCodecFilter implements IoFilter {
         if (encoderClass == null) {
             throw new IllegalArgumentException("encoderClass");
         }
+        
         if (decoderClass == null) {
             throw new IllegalArgumentException("decoderClass");
         }
+        
         if (!ProtocolEncoder.class.isAssignableFrom(encoderClass)) {
             throw new IllegalArgumentException("encoderClass: " + encoderClass.getName());
         }
+        
         if (!ProtocolDecoder.class.isAssignableFrom(decoderClass)) {
             throw new IllegalArgumentException("decoderClass: " + decoderClass.getName());
         }
+        
         try {
             encoderClass.getConstructor(EMPTY_PARAMS);
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("encoderClass doesn't have a public default constructor.");
         }
+        
         try {
             decoderClass.getConstructor(EMPTY_PARAMS);
         } catch (NoSuchMethodException e) {
@@ -161,7 +167,7 @@ public class ProtocolCodecFilter implements IoFilter {
      * @return The encoder instance, if any
      */
     public ProtocolEncoder getEncoder(IoSession session) {
-        return (ProtocolEncoder) session.getAttribute(ENCODER);
+        return factory.getEncoder(session);
     }
 
     /**
@@ -171,7 +177,7 @@ public class ProtocolCodecFilter implements IoFilter {
      * @return The decoder instance, if any
      */
     public ProtocolDecoder getDecoder(IoSession session) {
-        return (ProtocolDecoder) session.getAttribute(DECODER);
+        return factory.getDecoder(session);
     }
 
     /**
