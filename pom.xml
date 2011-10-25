@@ -89,6 +89,7 @@
   <modules>
     <module>core</module>
     <module>http</module>
+    <module>ldap</module>
     <module>examples</module>
   </modules>
 

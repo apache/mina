@@ -41,19 +41,28 @@
       <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
+    
     <dependency>
-    	<groupId>${project.groupId}</groupId>
-    	<artifactId>mina-http</artifactId>
-    	<version>${project.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-http</artifactId>
+      <version>${project.version}</version>
     </dependency>
+    
     <dependency>
-    	<groupId>log4j</groupId>
-    	<artifactId>log4j</artifactId>
-    	<scope>runtime</scope>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-ldap</artifactId>
+      <version>${project.version}</version>
     </dependency>
+    
     <dependency>
-    	<groupId>org.slf4j</groupId>
-    	<artifactId>slf4j-log4j12</artifactId>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
         <scope>runtime</scope>
     </dependency>
   </dependencies>
