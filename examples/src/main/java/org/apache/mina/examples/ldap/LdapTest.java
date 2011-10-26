@@ -21,15 +21,23 @@ package org.apache.mina.examples.ldap;
 
 import java.net.InetSocketAddress;
 
+import javax.naming.ldap.ExtendedRequest;
+
+import org.apache.directory.shared.ldap.model.message.AbandonRequest;
+import org.apache.directory.shared.ldap.model.message.AddRequest;
 import org.apache.directory.shared.ldap.model.message.BindRequest;
 import org.apache.directory.shared.ldap.model.message.BindResponse;
+import org.apache.directory.shared.ldap.model.message.CompareRequest;
+import org.apache.directory.shared.ldap.model.message.DeleteRequest;
+import org.apache.directory.shared.ldap.model.message.ModifyDnRequest;
+import org.apache.directory.shared.ldap.model.message.ModifyRequest;
 import org.apache.directory.shared.ldap.model.message.ResultCodeEnum;
-import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoFilter;
+import org.apache.directory.shared.ldap.model.message.SearchRequest;
+import org.apache.directory.shared.ldap.model.message.UnbindRequest;
+import org.apache.mina.api.DefaultIoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
-import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.ldap.LdapCodec;
 import org.apache.mina.service.OneThreadSelectorStrategy;
 import org.apache.mina.service.SelectorFactory;
@@ -46,12 +54,12 @@ public class LdapTest {
     private static final Logger LOG = LoggerFactory.getLogger(LdapTest.class);
 
     public static void main(String[] args) throws Exception {
-
+        LdapTest ldapServer = new LdapTest();
         OneThreadSelectorStrategy strategy = new OneThreadSelectorStrategy(new SelectorFactory(
                 NioSelectorProcessor.class));
         NioTcpServer acceptor = new NioTcpServer(strategy);
         acceptor.setFilters(new LoggingFilter("INCOMING"), new LdapCodec(), new LoggingFilter("DECODED"),
-                new DummyLdapSever());
+            ldapServer.new DummyLdapSever());
 
         acceptor.bind(new InetSocketAddress(10389));
 
@@ -61,47 +69,105 @@ public class LdapTest {
 
     }
 
-    private static class DummyLdapSever implements IoFilter {
-
+    private class DummyLdapSever extends DefaultIoFilter {
         @Override
-        public void sessionCreated(IoSession session) {
-            System.out.println("Session created");
-        }
-
-        @Override
-        public void sessionOpened(IoSession session) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void sessionClosed(IoSession session) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void sessionIdle(IoSession session, IdleStatus status) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
-            if (message instanceof BindRequest) {
-                BindRequest bindRequest = (BindRequest)message;
-                
-                BindResponse response = (BindResponse) bindRequest.getResultResponse();
-                response.getLdapResult().setResultCode(ResultCodeEnum.SUCCESS);
-
-                session.write(response);
+        public void messageReceived( IoSession session, Object message, ReadFilterChainController controller )
+        {
+            if (message instanceof AbandonRequest) {
+                handle(session, (AbandonRequest)message);
+            } else if (message instanceof AddRequest) {
+                handle(session, (AddRequest)message);
+            } else if (message instanceof BindRequest) {
+                handle(session, (BindRequest)message);
+            } else if (message instanceof CompareRequest) {
+                handle(session, (CompareRequest)message);
+            } else if (message instanceof DeleteRequest) {
+                handle(session, (DeleteRequest)message);
+            } else if (message instanceof ExtendedRequest) {
+                handle(session, (ExtendedRequest)message);
+            } else if (message instanceof ModifyRequest) {
+                handle(session, (ModifyRequest)message);
+            } else if (message instanceof ModifyDnRequest) {
+                handle(session, (ModifyDnRequest)message);
+            } else if (message instanceof SearchRequest) {
+                handle(session, (SearchRequest)message);
+            } else if (message instanceof UnbindRequest) {
+                handle(session, (UnbindRequest)message);
             }
         }
         
-        @Override
-        public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
-            // we just push the message in the chain
-            controller.callWriteNextFilter(session, message);
+        /**
+         * Process the AbandonRequest message
+         */
+        private void handle(IoSession session, AbandonRequest abandonRequest) {
+            // Do nothing
+        }
+        
+        /**
+         * Process the AddRequest message
+         */
+        private void handle(IoSession session, AddRequest addRequest) {
+            // Do nothing
+        }
+        
+        /**
+         * Process the BindRequest message
+         */
+        private void handle(IoSession session, BindRequest bindRequest) {
+            // Build a faked BindResponse
+            BindResponse response = (BindResponse) bindRequest.getResultResponse();
+            response.getLdapResult().setResultCode(ResultCodeEnum.SUCCESS);
+
+            session.write(response);
+        }
+        
+        /**
+         * Process the CompareRequest message
+         */
+        private void handle(IoSession session, CompareRequest compareRequest) {
+            // Do nothing
+        }
+        
+        /**
+         * Process the DeleteRequest message
+         */
+        private void handle(IoSession session, DeleteRequest deleteRequest) {
+            // Do nothing
+        }
+        
+        /**
+         * Process the ExtendedRequest message
+         */
+        private void handle(IoSession session, ExtendedRequest extendedRequest) {
+            // Do nothing
+        }
+        
+        /**
+         * Process the ModifyRequest message
+         */
+        private void handle(IoSession session, ModifyRequest modifyRequest) {
+            // Do nothing
+        }
+        
+        /**
+         * Process the ModifyDnRequest message
+         */
+        private void handle(IoSession session, ModifyDnRequest modifyDnRequest) {
+            // Do nothing
+        }
+        
+        /**
+         * Process the SearchRequest message
+         */
+        private void handle(IoSession session, SearchRequest searchRequest) {
+            // Do nothing
+        }
+        
+        /**
+         * Process the UnbindRequest message
+         */
+        private void handle(IoSession session, UnbindRequest unbindRequest) {
+            // Do nothing
         }
     }
 }
