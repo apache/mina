@@ -20,6 +20,7 @@
 package org.apache.mina.http;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -32,8 +33,6 @@ import org.apache.mina.http.api.HttpMethod;
 import org.apache.mina.http.api.HttpVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Charsets;
 
 public class HttpServerDecoder implements ProtocolDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
@@ -74,105 +73,105 @@ public class HttpServerDecoder implements ProtocolDecoder {
     @Override
     public Object decode(IoSession session, ByteBuffer msg, ReadFilterChainController controller) {
         DecoderState state = session.getAttribute(DECODER_STATE_ATT);
-        
+
         switch (state) {
-            case HEAD:
-                LOG.debug("decoding HEAD");
-                // grab the stored a partial HEAD request
-                ByteBuffer oldBuffer = session.getAttribute(PARTIAL_HEAD_ATT);
-                // concat the old buffer and the new incoming one
-                msg = ByteBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg);
-                msg.flip();
-                // now let's decode like it was a new message
-                
-            case NEW:
-                LOG.debug("decoding NEW");
-                HttpRequestImpl rq = parseHttpRequestHead(msg);
-                
-                if (rq == null) {
-                    // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
-                    ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
-                    partial.put(msg);
-                    partial.flip();
-                    // no request decoded, we accumulate
-                    session.setAttribute(PARTIAL_HEAD_ATT, partial);
-                    session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
-                } else {
-                    controller.callReadNextFilter(session, rq);
-                    
-                    // is it a request with some body content ?
-                    if (rq.getMethod() == HttpMethod.POST || rq.getMethod() == HttpMethod.PUT) {
-                        LOG.debug("request with content");
-                        session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
-    
-                        String contentLen = rq.getHeader("content-length");
-                        
-                        if (contentLen != null) {
-                            LOG.debug("found content len : {}", contentLen);
-                            session.setAttribute(BODY_REMAINING_BYTES, new Integer(contentLen));
-                        } else {
-                            throw new RuntimeException("no content length !");
-                        }
+        case HEAD:
+            LOG.debug("decoding HEAD");
+            // grab the stored a partial HEAD request
+            ByteBuffer oldBuffer = session.getAttribute(PARTIAL_HEAD_ATT);
+            // concat the old buffer and the new incoming one
+            msg = ByteBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg);
+            msg.flip();
+            // now let's decode like it was a new message
+
+        case NEW:
+            LOG.debug("decoding NEW");
+            HttpRequestImpl rq = parseHttpRequestHead(msg);
+
+            if (rq == null) {
+                // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
+                ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
+                partial.put(msg);
+                partial.flip();
+                // no request decoded, we accumulate
+                session.setAttribute(PARTIAL_HEAD_ATT, partial);
+                session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
+            } else {
+                controller.callReadNextFilter(session, rq);
+
+                // is it a request with some body content ?
+                if (rq.getMethod() == HttpMethod.POST || rq.getMethod() == HttpMethod.PUT) {
+                    LOG.debug("request with content");
+                    session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
+
+                    String contentLen = rq.getHeader("content-length");
+
+                    if (contentLen != null) {
+                        LOG.debug("found content len : {}", contentLen);
+                        session.setAttribute(BODY_REMAINING_BYTES, new Integer(contentLen));
                     } else {
-                        LOG.debug("request without content");
-                        session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
-                        
+                        throw new RuntimeException("no content length !");
                     }
-                }
-                
-                return null;
-                
-            case BODY:
-                LOG.debug("decoding BODY");
-                int chunkSize = msg.remaining();
-                // send the chunk of body
-                controller.callReadNextFilter(session, msg);
-                // do we have reach end of body ?
-                int remaining = (Integer) session.getAttribute(BODY_REMAINING_BYTES);
-                remaining -= chunkSize;
-
-                if (remaining <= 0) {
-                    LOG.debug("end of HTTP body");
-                    controller.callReadNextFilter(session, new HttpEndOfContent());
-                    session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
-                    session.removeAttribute(BODY_REMAINING_BYTES);
                 } else {
-                    session.setAttribute(BODY_REMAINING_BYTES, new Integer(remaining));
+                    LOG.debug("request without content");
+                    session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
+
                 }
-                
-                break;
-    
-            default:
-                throw new RuntimeException("Unknonwn decoder state : " + state);
+            }
+
+            return null;
+
+        case BODY:
+            LOG.debug("decoding BODY");
+            int chunkSize = msg.remaining();
+            // send the chunk of body
+            controller.callReadNextFilter(session, msg);
+            // do we have reach end of body ?
+            int remaining = (Integer) session.getAttribute(BODY_REMAINING_BYTES);
+            remaining -= chunkSize;
+
+            if (remaining <= 0) {
+                LOG.debug("end of HTTP body");
+                controller.callReadNextFilter(session, new HttpEndOfContent());
+                session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
+                session.removeAttribute(BODY_REMAINING_BYTES);
+            } else {
+                session.setAttribute(BODY_REMAINING_BYTES, new Integer(remaining));
+            }
+
+            break;
+
+        default:
+            throw new RuntimeException("Unknonwn decoder state : " + state);
         }
-        
+
         return null;
     }
 
     @Override
-    public Object finishDecode( IoSession session ) throws Exception {
+    public Object finishDecode(IoSession session) throws Exception {
         return null;
     }
 
     @Override
-    public void dispose( IoSession session ) throws Exception {
+    public void dispose(IoSession session) throws Exception {
     }
 
     private HttpRequestImpl parseHttpRequestHead(ByteBuffer buffer) {
-        String raw = new String(buffer.array(), 0, buffer.limit(), Charsets.ISO_8859_1);
+        String raw = new String(buffer.array(), 0, buffer.limit(), Charset.forName("ISO-8859-1"));
         String[] headersAndBody = RAW_VALUE_PATTERN.split(raw, -1);
-        
+
         if (headersAndBody.length <= 1) {
             // we didn't receive the full HTTP head
             return null;
         }
-        
+
         String[] headerFields = HEADERS_BODY_PATTERN.split(headersAndBody[0]);
         headerFields = ArrayUtil.dropFromEndWhile(headerFields, "");
 
         String requestLine = headerFields[0];
         Map<String, String> generalHeaders = new HashMap<String, String>();
-        
+
         for (int i = 1; i < headerFields.length; i++) {
             String[] header = HEADER_VALUE_PATTERN.split(headerFields[i]);
             generalHeaders.put(header[0].toLowerCase(), header[1]);
@@ -186,7 +185,7 @@ public class HttpServerDecoder implements ProtocolDecoder {
 
         // we put the buffer position where we found the beginning of the HTTP body
         buffer.position(headersAndBody[0].length() + 4);
-        
+
         return new HttpRequestImpl(version, method, requestedPath, generalHeaders);
     }
 }

@@ -41,11 +41,6 @@
       <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
-    <dependency>
-    	<groupId>com.google.guava</groupId>
-    	<artifactId>guava</artifactId>
-    	<version>r09</version>
-    </dependency>
   </dependencies>
   <description>Low level HTTP codec for building simple &amp; fast HTTP server and clients</description>
 </project>
