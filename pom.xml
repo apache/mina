@@ -115,9 +115,9 @@
     <version.ognl>3.0.1</version.ognl>
     <version.pmd>4.2.5</version.pmd>
     <version.rmock>2.0.2</version.rmock>
-    <version.slf4j.api>1.6.3</version.slf4j.api>
-    <version.slf4j.log4j12>1.6.3</version.slf4j.log4j12>
-    <version.slf4j.jcl.over.slf4j>1.6.3</version.slf4j.jcl.over.slf4j>
+    <version.slf4j.api>1.6.4</version.slf4j.api>
+    <version.slf4j.log4j12>1.6.4</version.slf4j.log4j12>
+    <version.slf4j.jcl.over.slf4j>1.6.4</version.slf4j.jcl.over.slf4j>
     <version.springframework>2.5.6</version.springframework>
     <version.tomcat.apr>5.5.23</version.tomcat.apr>
     <version.xbean.spring>3.7</version.xbean.spring>
