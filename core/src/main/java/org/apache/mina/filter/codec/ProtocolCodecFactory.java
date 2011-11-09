@@ -32,6 +32,7 @@ import org.apache.mina.api.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface ProtocolCodecFactory {
+
     /**
      * Returns a new (or reusable) instance of {@link ProtocolEncoder} which
      * encodes message objects into binary or protocol-specific data.

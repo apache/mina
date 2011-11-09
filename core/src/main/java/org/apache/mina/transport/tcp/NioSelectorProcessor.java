@@ -336,7 +336,9 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
                             }
                             if (key.isWritable()) {
-                                LOGGER.debug("writable session : {}", key.attachment());
+                                if (LOGGER.isDebugEnabled()) {
+                                    LOGGER.debug("writable session : {}", key.attachment());
+                                }
                                 NioTcpSession session = (NioTcpSession) key.attachment();
                                 session.setNotRegisteredForWrite();
                                 // write from the session write queue
@@ -348,8 +350,12 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                         break;
                                     }
                                     ByteBuffer buf = (ByteBuffer) wreq.getMessage();
-                                    int wrote = session.getSocketChannel().write(buf);
-                                    LOGGER.debug("wrote {} bytes to {}", wrote, session);
+
+                                    if (LOGGER.isDebugEnabled()) {
+                                        int wrote = session.getSocketChannel().write(buf);
+                                        LOGGER.debug("wrote {} bytes to {}", wrote, session);
+                                    }
+
                                     if (buf.remaining() == 0) {
                                         // completed write request, let's remove
                                         // it
@@ -433,6 +439,9 @@ public class NioSelectorProcessor implements SelectorProcessor {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void flush(IoSession session) {
         LOGGER.debug("scheduling session {} for writing", session.toString());

@@ -40,6 +40,7 @@ import org.apache.mina.filterchain.ReadFilterChainController;
  * @see ProtocolDecoderException
  */
 public interface ProtocolDecoder {
+
     /**
      * Decodes binary or protocol-specific content into higher-level message objects.
      * MINA invokes {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}

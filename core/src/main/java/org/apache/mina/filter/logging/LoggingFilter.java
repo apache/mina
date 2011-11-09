@@ -151,27 +151,42 @@ public class LoggingFilter implements IoFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionCreated(IoSession session) {
         log(sessionCreatedLevel, "CREATED");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionOpened(IoSession session) {
         log(sessionOpenedLevel, "OPENED");
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionClosed(IoSession session) {
         log(sessionClosedLevel, "CLOSED");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
         log(sessionIdleLevel, "IDLE");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
         if (message instanceof ByteBuffer) {
@@ -183,6 +198,9 @@ public class LoggingFilter implements IoFilter {
         controller.callReadNextFilter(session, message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
         if (message instanceof ByteBuffer) {

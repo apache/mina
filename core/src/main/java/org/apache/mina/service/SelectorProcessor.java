@@ -34,30 +34,30 @@ import org.apache.mina.api.IoSession;
  *
  */
 public interface SelectorProcessor {
-    
+
     /**
      * create a session for a freshly accepted client socket
      * @param service
      * @param clientChannel
      */
-    void createSession(IoService service,Object clientSocket);
-    
+    void createSession(IoService service, Object clientSocket);
+
     /**
      * Bind and start processing this new server address
      * @param address local address to bind
      * @throws IOException exception thrown if any problem occurs while binding
      */
     void bindAndAcceptAddress(IoServer server, SocketAddress address) throws IOException;
-    
+
     /**
      * Stop processing and unbind this server address
      * @param address the local server address to unbind
      * @throws IOException exception thrown if any problem occurs while unbinding
      */
     void unbind(SocketAddress address) throws IOException;
-    
+
     /**
-     * Schedule a session for flushing, to be called after a session write.
+     * Schedule a session for flushing, will be called after a {@link IoSession#write(Object)}.
      * @param session the session to flush
      */
     void flush(IoSession session);

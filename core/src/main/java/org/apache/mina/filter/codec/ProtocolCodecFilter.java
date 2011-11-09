@@ -21,7 +21,7 @@ package org.apache.mina.filter.codec;
 
 import java.nio.ByteBuffer;
 
-import org.apache.mina.api.IdleStatus;
+import org.apache.mina.api.DefaultIoFilter;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
@@ -36,14 +36,16 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProtocolCodecFilter implements IoFilter {
+public class ProtocolCodecFilter extends DefaultIoFilter {
     /** A logger for this class */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolCodecFilter.class);
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
+    /** key for session attribute holding the encoder */
     private final String ENCODER = ProtocolCodecFilter.class.getSimpleName() + "encoder";
 
+    /** key for session attribute holding the decoder */
     private final String DECODER = ProtocolCodecFilter.class.getSimpleName() + "decoder";
 
     /** The factory responsible for creating the encoder and decoder */
@@ -76,7 +78,7 @@ public class ProtocolCodecFilter implements IoFilter {
         if (encoder == null) {
             throw new IllegalArgumentException("encoder");
         }
-        
+
         if (decoder == null) {
             throw new IllegalArgumentException("decoder");
         }
@@ -95,7 +97,7 @@ public class ProtocolCodecFilter implements IoFilter {
 
     /**
      * Creates a new instance of ProtocolCodecFilter, without any factory.
-     * The encoder/decoder factory will be created as an inner class, using
+     * The encoder/decoder factory will be created as an anonymous class, using
      * the two parameters (encoder and decoder), which are class names. Instances
      * for those classes will be created in this constructor.
      * 
@@ -107,25 +109,25 @@ public class ProtocolCodecFilter implements IoFilter {
         if (encoderClass == null) {
             throw new IllegalArgumentException("encoderClass");
         }
-        
+
         if (decoderClass == null) {
             throw new IllegalArgumentException("decoderClass");
         }
-        
+
         if (!ProtocolEncoder.class.isAssignableFrom(encoderClass)) {
             throw new IllegalArgumentException("encoderClass: " + encoderClass.getName());
         }
-        
+
         if (!ProtocolDecoder.class.isAssignableFrom(decoderClass)) {
             throw new IllegalArgumentException("decoderClass: " + decoderClass.getName());
         }
-        
+
         try {
             encoderClass.getConstructor(EMPTY_PARAMS);
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("encoderClass doesn't have a public default constructor.");
         }
-        
+
         try {
             decoderClass.getConstructor(EMPTY_PARAMS);
         } catch (NoSuchMethodException e) {
@@ -184,17 +186,17 @@ public class ProtocolCodecFilter implements IoFilter {
      * Process the incoming message, calling the session decoder. As the incoming
      * buffer might contains more than one messages, we have to loop until the decoder
      * throws an exception.
-     * 
+     * <code>
      *  while ( buffer not empty )
      *    try 
      *      decode ( buffer )
      *    catch
      *      break;
-     *    
+     * </code>
      */
     @Override
     public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
-        LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session.getId());
+        LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session);
 
         if (!(message instanceof ByteBuffer)) {
             controller.callReadNextFilter(session, message);
@@ -214,13 +216,21 @@ public class ProtocolCodecFilter implements IoFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
+        LOGGER.debug("Processing a MESSAGE_WRITTING for session {}", session);
+
         ProtocolEncoder encoder = session.getAttribute(ENCODER);
 
         encoder.encode(session, message, controller);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionCreated(IoSession session) {
         // Initialize the encoder and decoder if we use a factory
@@ -232,19 +242,12 @@ public class ProtocolCodecFilter implements IoFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionClosed(IoSession session) {
         disposeCodec(session);
-    }
-
-    @Override
-    public void sessionOpened(IoSession session) {
-        // Nothing to do
-    }
-
-    @Override
-    public void sessionIdle(IoSession session, IdleStatus status) {
-        // Nothing to do
     }
 
     //----------- Helper methods ---------------------------------------------

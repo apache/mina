@@ -19,12 +19,19 @@
  */
 package org.apache.mina.filterchain;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The default implementation of the {@link IoFilterController}
+ *
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class DefaultIoFilterController implements IoFilterController, ReadFilterChainController,
         WriteFilterChainController {
 
@@ -45,14 +52,20 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         this.chain = chain;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void processSessionCreated(IoSession session) {
-        LOG.debug("processing session created event");
+        LOG.debug("processing session created event for session {}", session);
         for (IoFilter filter : chain) {
             filter.sessionCreated(session);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void processSessionOpened(IoSession session) {
         LOG.debug("processing session open event");
@@ -61,6 +74,9 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void processSessionClosed(IoSession session) {
         LOG.debug("processing session closed event");
@@ -69,8 +85,12 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         }
     }
 
+    /** the current position in the read chain for this thread */
     private static final ThreadLocal<Integer> readChainPosition = new ThreadLocal<Integer>();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void processMessageReceived(IoSession session, Object message) {
         LOG.debug("processing message '{}' received event ", message);
@@ -83,14 +103,24 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         }
     }
 
+    /** the current position n the write chain for this thread */
     private static final ThreadLocal<Integer> writeChainPosition = new ThreadLocal<Integer>();
 
+    /** old he currently encoded high level message, will be used for messageSent event */
+    private static final ThreadLocal<Object> writtenMessage = new ThreadLocal<Object>();
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void processMessageWriting(IoSession session, Object message) {
         LOG.debug("processing message '{}' writing event ", message);
+
+        // save the high level message before chain of transformation
+        writtenMessage.set(message);
+
         if (chain.length < 1) {
-            LOG.debug("Nothing to do, the chain is empty, we just enqueue the message");
-            session.enqueueWriteRequest(message);
+            enqueueFinalWriteMessage(session, message);
         } else {
 
             writeChainPosition.set(chain.length - 1);
@@ -99,6 +129,9 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void callWriteNextFilter(IoSession session, Object message) {
         if (LOG.isDebugEnabled()) {
@@ -108,14 +141,25 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         writeChainPosition.set(writeChainPosition.get() - 1);
         if (writeChainPosition.get() < 0 || chain.length == 0) {
             // end of chain processing
-            LOG.debug("end of write chan we enqueue the message in the session : {}", message);
-            session.enqueueWriteRequest(message);
+            enqueueFinalWriteMessage(session, message);
         } else {
             chain[writeChainPosition.get()].messageWriting(session, message, this);
         }
         writeChainPosition.set(writeChainPosition.get() + 1);
     }
 
+    /**
+     * At the end of write chain processing, enqueue final encoded {@link ByteBuffer} message in the session 
+     */
+    private void enqueueFinalWriteMessage(IoSession session, Object message) {
+        LOG.debug("end of write chan we enqueue the message in the session : {}", message);
+        session.enqueueWriteRequest(message);
+        // TODO : fire message written and handle the close the write future (if any)
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void callReadNextFilter(IoSession session, Object message) {
         readChainPosition.set(readChainPosition.get() + 1);
@@ -127,6 +171,9 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         readChainPosition.set(readChainPosition.get() - 1);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder bldr = new StringBuilder("IoFilterChain {");

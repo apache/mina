@@ -248,6 +248,9 @@ public abstract class AbstractIoSession implements IoSession {
         registeredForWrite.set(false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IoFuture<Void> writeWithFuture(Object message) {
         write(message);
@@ -255,11 +258,17 @@ public abstract class AbstractIoSession implements IoSession {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Queue<WriteRequest> getWriteQueue() {
         return writeQueue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IoFilterController getFilterChain() {
         return filterProcessor;
