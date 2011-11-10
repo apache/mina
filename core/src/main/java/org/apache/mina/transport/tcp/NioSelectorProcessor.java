@@ -42,6 +42,7 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.service.AbstractIoService;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.service.SelectorStrategy;
+import org.apache.mina.session.DefaultWriteFuture;
 import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.tcp.nio.NioTcpServer;
 import org.slf4j.Logger;
@@ -360,6 +361,8 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                         // completed write request, let's remove
                                         // it
                                         queue.remove();
+                                        // complete the future
+                                        ((DefaultWriteFuture) wreq.getFuture()).complete();
                                     } else {
                                         // output socket buffer is full, we need
                                         // to give up until next selection for

@@ -19,6 +19,8 @@
  */
 package org.apache.mina.session;
 
+import org.apache.mina.api.IoFuture;
+
 /**
  * The write request created by the {@link org.apache.mina.api.IoSession#write} method, travel around the filter chain and finish as a
  * socket write.
@@ -26,11 +28,17 @@ package org.apache.mina.session;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface WriteRequest {
-	
-	/**
-	 * Get the message of this request.
-	 * 
-	 * @return the contained message
-	 */
-	Object getMessage();
+
+    /**
+     * Get the message of this request.
+     * 
+     * @return the contained message
+     */
+    Object getMessage();
+
+    /**
+     * The future to be completed on this write success
+     * @return the future
+     */
+    IoFuture<Void> getFuture();
 }

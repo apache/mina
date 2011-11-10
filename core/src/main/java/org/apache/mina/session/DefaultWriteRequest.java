@@ -19,21 +19,39 @@
  */
 package org.apache.mina.session;
 
+import org.apache.mina.api.IoFuture;
+
 /**
+ * Default implementation for write requests.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
 public class DefaultWriteRequest implements WriteRequest {
 
-	private Object message;
+    private Object message;
 
-	public DefaultWriteRequest(Object message) {
-		this.message = message;
-	}
+    // the future to complete when this message is written
+    private IoFuture<Void> future;
 
-	@Override
-	public Object getMessage() {
-		return message;
-	}
+    public DefaultWriteRequest(Object message) {
+        this.message = message;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getMessage() {
+        return message;
+    }
+
+    public IoFuture<Void> getFuture() {
+        return future;
+    }
+
+    public void setFuture(IoFuture<Void> future) {
+        this.future = future;
+    }
+
 }

@@ -73,7 +73,7 @@ public class DefaultIoFilterControllerTest {
         DefaultIoFilterController ctrl = new DefaultIoFilterController(new IoFilter[] { filter1, filter2, filter3 });
         IoSession session = mock(IoSession.class);
         ByteBuffer buffer = mock(ByteBuffer.class);
-        ctrl.processMessageWriting(session, buffer);
+        ctrl.processMessageWriting(session, buffer, null);
         verify(filter1).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
         verify(filter2).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
         verify(filter3).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));

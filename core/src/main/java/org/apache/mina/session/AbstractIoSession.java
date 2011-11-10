@@ -76,7 +76,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     protected final Object stateMonitor = new Object();
 
-    protected SessionState state;
+    protected volatile SessionState state;
 
     /** is this session registered for being polled for write ready events */
     private AtomicBoolean registeredForWrite = new AtomicBoolean();
@@ -222,30 +222,7 @@ public abstract class AbstractIoSession implements IoSession {
      */
     @Override
     public void write(Object message) {
-        LOG.debug("writing message {} to session {}", message, this);
-        if (state == SessionState.CLOSED || state == SessionState.CLOSING) {
-            // TODO actually we just just shallow the message if the session is closed/closing
-            LOG.error("writing to closed or closing session");
-            return;
-        }
-
-        // process the queue
-        getFilterChain().processMessageWriting(this, message);
-
-    }
-
-    public void enqueueWriteRequest(Object message) {
-        writeQueue.add(new DefaultWriteRequest(message));
-
-        // If it wasn't, we register this session as interested to write.
-        // It's done in atomic fashion for avoiding two concurrent registering.
-        if (!registeredForWrite.getAndSet(true)) {
-            writeProcessor.flush(this);
-        }
-    }
-
-    public void setNotRegisteredForWrite() {
-        registeredForWrite.set(false);
+        doWriteWithFuture(message, null);
     }
 
     /**
@@ -253,9 +230,40 @@ public abstract class AbstractIoSession implements IoSession {
      */
     @Override
     public IoFuture<Void> writeWithFuture(Object message) {
-        write(message);
-        // TODO implements IoFuture
-        return null;
+        IoFuture<Void> future = new DefaultWriteFuture();
+        doWriteWithFuture(message, future);
+        return future;
+    }
+
+    private void doWriteWithFuture(Object message, IoFuture<Void> future) {
+        LOG.debug("writing message {} to session {}", message, this);
+        if (state == SessionState.CLOSED || state == SessionState.CLOSING) {
+            LOG.error("writing to closed or closing session, the message is discarded");
+            return;
+        }
+
+        // process the queue
+        getFilterChain().processMessageWriting(this, message, future);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public WriteRequest enqueueWriteRequest(Object message) {
+        DefaultWriteRequest request = new DefaultWriteRequest(message);
+        writeQueue.add(request);
+
+        // If it wasn't, we register this session as interested to write.
+        // It's done in atomic fashion for avoiding two concurrent registering.
+        if (!registeredForWrite.getAndSet(true)) {
+            writeProcessor.flush(this);
+        }
+
+        return request;
+    }
+
+    public void setNotRegisteredForWrite() {
+        registeredForWrite.set(false);
     }
 
     /**

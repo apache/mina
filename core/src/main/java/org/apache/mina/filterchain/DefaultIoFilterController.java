@@ -22,8 +22,11 @@ package org.apache.mina.filterchain;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.api.IoFilter;
+import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.session.DefaultWriteRequest;
+import org.apache.mina.session.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,18 +109,17 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     /** the current position n the write chain for this thread */
     private static final ThreadLocal<Integer> writeChainPosition = new ThreadLocal<Integer>();
 
-    /** old he currently encoded high level message, will be used for messageSent event */
-    private static final ThreadLocal<Object> writtenMessage = new ThreadLocal<Object>();
+    /** hold the last WriteRequest created for the high level message currently written (can be null) */
+    private static final ThreadLocal<WriteRequest> lastWriteRequest = new ThreadLocal<WriteRequest>();
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void processMessageWriting(IoSession session, Object message) {
+    public void processMessageWriting(IoSession session, Object message, IoFuture<Void> future) {
         LOG.debug("processing message '{}' writing event ", message);
 
-        // save the high level message before chain of transformation
-        writtenMessage.set(message);
+        lastWriteRequest.set(null);
 
         if (chain.length < 1) {
             enqueueFinalWriteMessage(session, message);
@@ -126,6 +128,13 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
             writeChainPosition.set(chain.length - 1);
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
             chain[writeChainPosition.get()].messageWriting(session, message, this);
+        }
+        // put the future in the last write request
+        if (future != null) {
+            WriteRequest request = lastWriteRequest.get();
+            if (request != null) {
+                ((DefaultWriteRequest) request).setFuture(future);
+            }
         }
     }
 
@@ -153,8 +162,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
      */
     private void enqueueFinalWriteMessage(IoSession session, Object message) {
         LOG.debug("end of write chan we enqueue the message in the session : {}", message);
-        session.enqueueWriteRequest(message);
-        // TODO : fire message written and handle the close the write future (if any)
+        lastWriteRequest.set(session.enqueueWriteRequest(message));
     }
 
     /**

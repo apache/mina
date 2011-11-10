@@ -266,9 +266,10 @@ public interface IoSession {
     /**
      * Internal method for enqueue write request after {@link IoFilterController} processing
      * 
-     * @param message
+     * @param message the message to put in the write request
+     * @return the created write request
      */
-    public void enqueueWriteRequest(Object message);
+    public WriteRequest enqueueWriteRequest(Object message);
 
     /**
      * Get the {@link Queue} of this session. The write queue contains the pending writes.

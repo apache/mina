@@ -20,8 +20,8 @@
 
 package org.apache.mina.filterchain;
 
+import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
-
 
 /**
  * An implementation that is responsible for performing IO (network, file or
@@ -62,6 +62,7 @@ public interface IoFilterController {
      * Once the message is processed, the resulting ByteBuffers are enqueued in the session write requests queue
      * @param session {@link IoSession} associated with this message
      * @param message the message to write
+     * @param writeFuture the write future to iform of write success (optional can be <code>null</code>)
      */
-    void processMessageWriting(IoSession session, Object message);
+    void processMessageWriting(IoSession session, Object message, IoFuture<Void> writeFuture);
 }
