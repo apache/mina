@@ -133,6 +133,9 @@ public class NioTcpSession extends AbstractIoSession {
         return false;
     }
 
+    /**
+     * @inh
+     */
     @Override
     public boolean isWriteSuspended() {
         // TODO Auto-generated method stub
