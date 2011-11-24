@@ -93,6 +93,18 @@ public class AbstractIoSessionTest {
         @Override
         public void suspendWrite() {
         }
+
+        @Override
+        public boolean isSecuring()
+        {
+            return false;
+        }
+
+        @Override
+        public boolean isSecured()
+        {
+            return false;
+        }
     }
 
     private IoService service = null;

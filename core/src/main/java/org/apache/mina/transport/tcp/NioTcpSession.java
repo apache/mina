@@ -85,48 +85,87 @@ public class NioTcpSession extends AbstractIoSession {
         return (InetSocketAddress) socket.getLocalSocketAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isConnected() {
         // TODO Auto-generated method stub
         return false;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecuring() {
+        return state == SessionState.SECURING;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecured() {
+        return state == SessionState.CONNECTED_SECURED;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isClosing() {
         // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IoFuture<Void> close(boolean immediately) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void suspendRead() {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void suspendWrite() {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void resumeRead() {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void resumeWrite() {
         // TODO Auto-generated method stub
-
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isReadSuspended() {
         // TODO Auto-generated method stub
@@ -134,7 +173,7 @@ public class NioTcpSession extends AbstractIoSession {
     }
 
     /**
-     * @inh
+     * {@inheritDoc}
      */
     @Override
     public boolean isWriteSuspended() {
@@ -142,6 +181,9 @@ public class NioTcpSession extends AbstractIoSession {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SocketSessionConfig getConfig() {
         return configuration;

@@ -98,6 +98,20 @@ public interface IoSession {
     boolean isClosing();
 
     /**
+     * Tells if the session is processing a SSL/TLS handshake.
+     * 
+     * @return <code>true</tt> if and only if this session is processing a SSL/TLS handshake.
+     */
+    boolean isSecuring();
+
+    /**
+     * Tells if the session is using SSL/TLS.
+     * 
+     * @return <code>true</tt> if and only if this session is exchanging data over a SSL/TLS connection
+     */
+    boolean isSecured();
+
+    /**
      * Closes this session immediately or after all queued write requests are flushed. This operation is asynchronous.
      * Wait for the returned {@link IoFuture} if you want to wait for the session actually closed. Once this method has
      * been called, no incoming request will be accepted.
@@ -243,7 +257,7 @@ public interface IoSession {
      * 
      */
     public enum SessionState {
-        CREATED, CONNECTED, CLOSING, CLOSED
+        CREATED, CONNECTED, CLOSING, CLOSED, SECURING, CONNECTED_SECURED
     }
 
     /* SESSION WRITING */
