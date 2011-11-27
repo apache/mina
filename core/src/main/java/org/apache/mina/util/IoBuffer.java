@@ -29,7 +29,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import java.lang.UnsupportedOperationException;
 
 /**
  * A proxy class used to manage ByteBuffers as if they were just a big ByteBuffer. We can
@@ -150,7 +150,7 @@ public class IoBuffer {
      */
     public byte[] array() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -158,7 +158,7 @@ public class IoBuffer {
      */
     public int arrayOffset() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -166,7 +166,7 @@ public class IoBuffer {
      */
     public CharBuffer asCharBuffer() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -174,7 +174,7 @@ public class IoBuffer {
      */
     public DoubleBuffer asDoubleBuffer() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -182,7 +182,7 @@ public class IoBuffer {
      */
     public FloatBuffer asFloatBuffer() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -190,7 +190,7 @@ public class IoBuffer {
      */
     public IntBuffer asIntBuffer() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -198,7 +198,7 @@ public class IoBuffer {
      */
     public LongBuffer asLongBuffer() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -206,7 +206,7 @@ public class IoBuffer {
      */
     public IoBuffer asReadOnlyBuffer() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -214,7 +214,7 @@ public class IoBuffer {
      */
     public ShortBuffer asShortBuffer() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -229,7 +229,7 @@ public class IoBuffer {
      */
     public IoBuffer clear() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -237,7 +237,7 @@ public class IoBuffer {
      */
     public IoBuffer compact() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -245,7 +245,7 @@ public class IoBuffer {
      */
     public int compareTo(IoBuffer buffer) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -253,7 +253,7 @@ public class IoBuffer {
      */
     public IoBuffer duplicate() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -261,7 +261,7 @@ public class IoBuffer {
      */
     public boolean equals(Object object) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -269,7 +269,7 @@ public class IoBuffer {
      */
     public IoBuffer flip() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -311,7 +311,7 @@ public class IoBuffer {
      */
     public IoBuffer get(byte[] dst) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -319,7 +319,7 @@ public class IoBuffer {
      */
     public IoBuffer get(byte[] dst, int offset, int length) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -327,7 +327,7 @@ public class IoBuffer {
      */
     public IoBuffer get(int index) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -335,7 +335,7 @@ public class IoBuffer {
      */
     public IoBuffer getChar() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -343,7 +343,7 @@ public class IoBuffer {
      */
     public IoBuffer getChar(int index) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -351,7 +351,7 @@ public class IoBuffer {
      */
     public IoBuffer getDouble() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -359,7 +359,7 @@ public class IoBuffer {
      */
     public IoBuffer getDouble(int index) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -367,7 +367,7 @@ public class IoBuffer {
      */
     public IoBuffer getFloat() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -375,7 +375,7 @@ public class IoBuffer {
      */
     public IoBuffer getFloat(int index) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -383,7 +383,7 @@ public class IoBuffer {
      */
     public IoBuffer getInt() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -391,7 +391,7 @@ public class IoBuffer {
      */
     public IoBuffer getInt(int index) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -399,7 +399,7 @@ public class IoBuffer {
      */
     public IoBuffer getLong() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -407,7 +407,7 @@ public class IoBuffer {
      */
     public IoBuffer getLong(int index) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -415,7 +415,7 @@ public class IoBuffer {
      */
     public IoBuffer getShort() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -423,7 +423,7 @@ public class IoBuffer {
      */
     public IoBuffer getShort(int index) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -431,7 +431,7 @@ public class IoBuffer {
      */
     public boolean hasArray() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -439,7 +439,7 @@ public class IoBuffer {
      */
     public int hashCode() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -477,7 +477,7 @@ public class IoBuffer {
      */
     public IoBuffer limit(int newLimit) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -485,7 +485,7 @@ public class IoBuffer {
      */
     public IoBuffer mark() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -493,7 +493,7 @@ public class IoBuffer {
      */
     public IoBuffer order() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -501,7 +501,7 @@ public class IoBuffer {
      */
     public IoBuffer order(ByteOrder bo) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -516,7 +516,7 @@ public class IoBuffer {
      */
     public IoBuffer position(int newPosition) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -524,7 +524,7 @@ public class IoBuffer {
      */
     public IoBuffer put(byte b) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -532,7 +532,7 @@ public class IoBuffer {
      */
     public IoBuffer put(byte[] src) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -540,7 +540,7 @@ public class IoBuffer {
      */
     public IoBuffer put(byte[] src, int offset, int length) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -548,7 +548,7 @@ public class IoBuffer {
      */
     public IoBuffer put(int index, byte b) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -575,7 +575,7 @@ public class IoBuffer {
      */
     public IoBuffer putChar(char value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -583,7 +583,7 @@ public class IoBuffer {
      */
     public IoBuffer putChar(int index, char value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -591,7 +591,7 @@ public class IoBuffer {
      */
     public IoBuffer putDouble(double value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -599,7 +599,7 @@ public class IoBuffer {
      */
     public IoBuffer putDouble(int index, double value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -607,7 +607,7 @@ public class IoBuffer {
      */
     public IoBuffer putFloat(float value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -615,7 +615,7 @@ public class IoBuffer {
      */
     public IoBuffer putFloat(int index, float value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -623,7 +623,7 @@ public class IoBuffer {
      */
     public IoBuffer putInt(int value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -631,7 +631,7 @@ public class IoBuffer {
      */
     public IoBuffer putInt(int index, int value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -639,7 +639,7 @@ public class IoBuffer {
      */
     public IoBuffer putLong(long value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -647,7 +647,7 @@ public class IoBuffer {
      */
     public IoBuffer putLong(int index, long value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -655,7 +655,7 @@ public class IoBuffer {
      */
     public IoBuffer putShort(short value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -663,7 +663,7 @@ public class IoBuffer {
      */
     public IoBuffer putShort(int index, short value) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -671,7 +671,7 @@ public class IoBuffer {
      */
     public int remaining() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -679,7 +679,7 @@ public class IoBuffer {
      */
     public IoBuffer reset() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -687,7 +687,7 @@ public class IoBuffer {
      */
     public IoBuffer rewind() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -695,7 +695,7 @@ public class IoBuffer {
      */
     public IoBuffer slice() {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -703,7 +703,7 @@ public class IoBuffer {
      */
     public IoBuffer wrap(byte[] array) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
@@ -711,7 +711,7 @@ public class IoBuffer {
      */
     public IoBuffer wrap(byte[] array, int offset, int length) {
         // TODO code me !
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     /**
