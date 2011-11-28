@@ -60,6 +60,9 @@ public class IoBuffer {
     /** Tells if the IoBuffer is readonly */
     private boolean readOnly;
     
+    /** The bytes order (BIG_INDIAN or LITTLE_INDIAN) */
+    private ByteOrder order;
+    
     /** The two types of buffer we handle */
     public enum BufferType {
         HEAP, DIRECT;
@@ -76,6 +79,7 @@ public class IoBuffer {
         mark = 0;
         limit = 0;
         type = null;
+        order = null;
     }
     
     /**
@@ -101,6 +105,7 @@ public class IoBuffer {
         mark = 0;
         limit = byteBuffer.limit();
         type = byteBuffer.isDirect() ? BufferType.DIRECT : BufferType.HEAP;
+        order = byteBuffer.order();
     }
     
     /**
@@ -185,7 +190,7 @@ public class IoBuffer {
     }
     
     /**
-     * @see ByteBuffer#array()
+     * @see ByteBuffer#arrayOffset()
      * Returns the offset of the byte array which this IoBuffer is based on, if
      * there is one.
      * <p>
@@ -200,8 +205,8 @@ public class IoBuffer {
         if (isReadOnly()) {
             throw new ReadOnlyBufferException();
         }
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        // The offset is always 0
+        return 0;
     }
     
     /**
@@ -230,6 +235,19 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#asIntBuffer()
+     * Returns a int buffer which is based on the remaining content of this byte
+     * IoBuffer.
+     * <p>
+     * The new buffer's position is zero, its limit and capacity is the number
+     * of remaining bytes divided by four, and its mark is not set. The new
+     * buffer's read-only property and byte order are the same as this IoBuffer's.
+     * The new buffer is direct if this byte buffer is direct.
+     * <p>
+     * The new buffer does not share its content with this buffer, which means either
+     * buffer's change of content will not be visible to the other. The two buffer's
+     * position, limit and mark are independent.
+     *
+     * @return a int buffer which is based on the content of this byte buffer.
      */
     public IntBuffer asIntBuffer() {
         // TODO code me !
@@ -439,10 +457,46 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#getInt()
+     * Returns the int at the current position and increases the position by 4.
+     * <p>
+     * The 4 bytes starting at the current position are composed into a int
+     * according to the current byte order and returned.
+     *
+     * @return the int at the current position.
+     * @exception BufferUnderflowException if the position is greater than {@code limit - 4}.
      */
-    public IoBuffer getInt() {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+    public int getInt() {
+        int newPosition = position + 4;
+        
+        if (newPosition > limit) {
+            throw new BufferUnderflowException();
+        }
+        
+        int result = loadInt(position);
+        position = newPosition;
+        
+        return result;
+    }
+    
+    /**
+     * Load an int from the underlying byteBuffers, taking the order into account.
+     */
+    private final int loadInt(int index) {
+        int bytes = 0;
+        
+        if (order == ByteOrder.BIG_ENDIAN) {
+            for (int i = 0; i < 4; i++) {
+                bytes = bytes << 8;
+                bytes = bytes | (get() & 0xFF);
+            }
+        } else {
+            for (int i = 0; i < 4; i++) {
+                int val = get() & 0xFF;
+                bytes = bytes | (val << (i << 3));
+            }
+        }
+        
+        return bytes;
     }
     
     /**
@@ -904,6 +958,8 @@ public class IoBuffer {
          */
         private void add(ByteBuffer byteBuffer) {
             assert(byteBuffer != null);
+            
+            // Check the buffer type
             if (type == null) {
                 if (byteBuffer.isDirect()) {
                     type = BufferType.DIRECT;
@@ -914,6 +970,13 @@ public class IoBuffer {
                 if (isDirect() != byteBuffer.isDirect()) {
                     throw new RuntimeException();
                 }
+            }
+            
+            // Check the endianness
+            if (order == null) {
+                order = byteBuffer.order();
+            } else if (order != byteBuffer.order()) {
+                throw new RuntimeException();
             }
             
             BufferNode newNode = new BufferNode(byteBuffer);

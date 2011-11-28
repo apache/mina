@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -89,7 +90,7 @@ public class IoBufferTest
     }
     
     /**
-     * Test the additio of mixed type buffers
+     * Test the addition of mixed type buffers
      */
     @Test ( expected=RuntimeException.class)
     public void testAddMixedTypeBuffers() {
@@ -98,6 +99,25 @@ public class IoBufferTest
         bb1.flip();
 
         ByteBuffer bb2 = ByteBuffer.allocateDirect(5);
+        bb2.put("3456".getBytes());
+        bb2.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2);
+    }
+    
+    /**
+     * Test the addition of mixed order buffers
+     */
+    @Test ( expected=RuntimeException.class)
+    public void testAddMixedOrderBuffers() {
+        ByteBuffer bb1 = ByteBuffer.allocate(5);
+        bb1.order(ByteOrder.LITTLE_ENDIAN);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocateDirect(5);
+        bb1.order(ByteOrder.BIG_ENDIAN);
         bb2.put("3456".getBytes());
         bb2.flip();
 
@@ -323,5 +343,101 @@ public class IoBufferTest
         assertNotNull(array);
         assertEquals(7, array.length);
         assertTrue(Arrays.equals(new byte[]{'0', '1', '2', '3', '4', '5', '6'}, array));
+    }
+    
+    /**
+     * Test the getInt() method, on a buffer containing 2 ints in one ByteBuffer
+     */
+    @Test
+    public void testGetInt2IntsOneBB() {
+        ByteBuffer bb = ByteBuffer.allocate(8);
+        bb.putInt(12345);
+        bb.putInt(67890);
+        bb.flip();
+
+        IoBuffer ioBuffer = new IoBuffer(bb);
+        assertEquals(12345, ioBuffer.getInt());
+        assertEquals(67890, ioBuffer.getInt());
+    }
+    
+    /**
+     * Test the getInt() method, on a buffer containing 2 ints in two ByteBuffers
+     */
+    @Test
+    public void testGetInt2Ints2BBs() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.putInt(12345);
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.putInt(67890);
+        bb2.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2);
+
+        assertEquals(12345, ioBuffer.getInt());
+        assertEquals(67890, ioBuffer.getInt());
+    }
+    
+    /**
+     * Test the getInt() method, on a buffer containing 2 ints in two ByteBuffers
+     * with LittleInidan order
+     */
+    @Test
+    public void testGetInt2Ints2BBsLittleIndian() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.order(ByteOrder.LITTLE_ENDIAN);
+        bb1.putInt(12345);
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.order(ByteOrder.LITTLE_ENDIAN);
+        bb2.putInt(67890);
+        bb2.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2);
+
+        assertEquals(12345, ioBuffer.getInt());
+        assertEquals(67890, ioBuffer.getInt());
+    }
+    
+    /**
+     * Test the getInt() method, on a buffer containing 1 int spread in two ByteBuffers
+     */
+    @Test
+    public void testGetInt1Int2BBs() {
+        ByteBuffer bb1 = ByteBuffer.allocate(1);
+        bb1.put((byte)0x01);
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(3);
+        bb2.put(new byte[]{0x02, 0x03, 0x04});
+        bb2.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2);
+
+        assertEquals(0x01020304, ioBuffer.getInt());
+    }
+    
+    /**
+     * Test the getInt() method, on a buffer containing 1 incomplet int spread in two ByteBuffers
+     */
+    @Test( expected=BufferUnderflowException.class )
+    public void testGetIntIncompletInt2BBs() {
+        ByteBuffer bb1 = ByteBuffer.allocate(1);
+        bb1.put((byte)0x01);
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(2);
+        bb2.put(new byte[]{0x02, 0x03});
+        bb2.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2);
+
+        ioBuffer.getInt();
     }
 }
