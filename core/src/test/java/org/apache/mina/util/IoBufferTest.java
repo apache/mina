@@ -3,10 +3,12 @@ package org.apache.mina.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -253,5 +255,73 @@ public class IoBufferTest
             // expected
             assertEquals(6, ioBuffer.position());
         }
+    }
+    
+    /**
+     * Test the array method for a IoBuffer containing one ByteBuffer
+     */
+    @Test
+    public void testArrayOneByteBuffer() {
+        ByteBuffer bb1 = ByteBuffer.allocate(5);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        IoBuffer ioBuffer = new IoBuffer(bb1);
+        
+        byte[] array = ioBuffer.array();
+        assertNotNull(array);
+        assertEquals(3, array.length);
+        assertTrue(Arrays.equals(new byte[]{'0', '1', '2'}, array));
+    }
+    
+    /**
+     * Test the array method for a IoBuffer containing one empty ByteBuffer
+     */
+    @Test
+    public void testArrayEmptyByteBuffer() {
+        IoBuffer ioBuffer = new IoBuffer();
+        
+        byte[] array = ioBuffer.array();
+        assertNotNull(array);
+        assertEquals(0, array.length);
+        assertTrue(Arrays.equals(new byte[]{}, array));
+    }
+    
+    /**
+     * Test the array method for a IoBuffer containing one ByteBuffer not initialized
+     */
+    @Test
+    public void testArrayByteBufferNotInitialized() {
+        ByteBuffer bb = ByteBuffer.allocate(3);
+        IoBuffer ioBuffer = new IoBuffer(bb);
+        
+        byte[] array = ioBuffer.array();
+        assertNotNull(array);
+        assertEquals(3, array.length);
+        assertTrue(Arrays.equals(new byte[]{0x00, 0x00, 0x00}, array));
+    }
+    
+    /**
+     * Test the array method for a IoBuffer containing three ByteBuffers
+     */
+    @Test
+    public void testArrayThreeByteBuffers() {
+        ByteBuffer bb1 = ByteBuffer.allocate(5);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(0);
+
+        ByteBuffer bb3 = ByteBuffer.allocate(5);
+        bb3.put("3456".getBytes());
+        bb3.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2, bb3);
+        
+        byte[] array = ioBuffer.array();
+        assertNotNull(array);
+        assertEquals(7, array.length);
+        assertTrue(Arrays.equals(new byte[]{'0', '1', '2', '3', '4', '5', '6'}, array));
     }
 }

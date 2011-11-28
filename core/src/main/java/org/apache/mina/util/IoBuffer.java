@@ -27,6 +27,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.nio.ReadOnlyBufferException;
 import java.nio.ShortBuffer;
 
 import java.lang.UnsupportedOperationException;
@@ -63,6 +64,9 @@ public class IoBuffer {
     public enum BufferType {
         HEAP, DIRECT;
     }
+    
+    /** A empty bytes array */
+    private final static byte[] EMPTY_BYTES = new byte[]{};
     
     /**
      * Construct a IoBuffer, with no buffer in it
@@ -147,16 +151,55 @@ public class IoBuffer {
 
     /**
      * @see ByteBuffer#array()
+     * Returns the byte array which this IoBuffer is based on, if there is one.
+     * 
+     * @return the byte array which this IoBuffer is based on.
+     * @exception ReadOnlyBufferException if this IoBuffer is based on a read-only array.
+     * @exception UnsupportedOperationException if this IoBuffer is not based on an array.
      */
     public byte[] array() {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        if (isReadOnly()) {
+            throw new ReadOnlyBufferException();
+        }
+        
+        if (buffers.size == 0) {
+            return EMPTY_BYTES;
+        }
+        
+        byte[] array = new byte[buffers.length];
+        BufferNode node = buffers.getFirst();
+        int pos = 0;
+        
+        while (node != null) {
+            ByteBuffer buffer = node.buffer;
+            byte[] src = buffer.array();
+            int length = buffer.limit();
+            
+            System.arraycopy( src, 0, array, pos, length );
+            pos += length;
+            
+            node = buffers.getNext();
+        }
+        
+        return array;
     }
     
     /**
      * @see ByteBuffer#array()
+     * Returns the offset of the byte array which this IoBuffer is based on, if
+     * there is one.
+     * <p>
+     * The offset is the index of the array which corresponds to the zero
+     * position of the IoBuffer.
+     *
+     * @return the offset of the byte array which this IoBuffer is based on.
+     * @exception ReadOnlyBufferException if this IoBuffer is based on a read-only array.
+     * @exception UnsupportedOperationException if this IoBuffer is not based on an array.
      */
     public int arrayOffset() {
+        if (isReadOnly()) {
+            throw new ReadOnlyBufferException();
+        }
         // TODO code me !
         throw new UnsupportedOperationException();
     }
@@ -226,6 +269,14 @@ public class IoBuffer {
 
     /**
      * @see Buffer#clear()
+     * Clears this IoBuffer.
+     * <p>
+     * While the content of this IoBuffer is not changed, the following internal
+     * changes take place: the current position is reset back to the start of
+     * the buffer, the value of the buffer limit is made equal to the capacity
+     * and mark is cleared.
+     *
+     * @return this buffer.
      */
     public IoBuffer clear() {
         // TODO code me !
@@ -266,6 +317,14 @@ public class IoBuffer {
     
     /**
      * @see Buffer#flip()
+     * Flips this buffer.
+     * <p>
+     * The limit is set to the current position, then the position is set to
+     * zero, and the mark is cleared.
+     * <p>
+     * The content of this IoBuffer is not changed.
+     *
+     * @return this IoBuffer.
      */
     public IoBuffer flip() {
         // TODO code me !
@@ -277,7 +336,7 @@ public class IoBuffer {
      * @return The byte found a the current position.
      */
     public byte get() {
-        if (position>limit) {
+        if (position>=limit) {
             // No more byte to read
             throw new BufferUnderflowException();
         }
@@ -444,6 +503,11 @@ public class IoBuffer {
     
     /**
      * @see Buffer#hasRemaining()
+     * Indicates if there are elements remaining in this IoBuffer, that is if
+     * {@code position < limit}.
+     *
+     * @return {@code true} if there are elements remaining in this IoBuffer,
+     * {@code false} otherwise.
      */
     public boolean hasRemaining() {
         return position < limit;
@@ -460,6 +524,10 @@ public class IoBuffer {
 
     /**
      * @see Buffer#isReadOnly()
+     * Indicates whether this IoBuffer is read-only.
+     *
+     * @return {@code true} if this IoBuffer is read-only, {@code false}
+     * otherwise.
      */
     public boolean isReadOnly() {
         return readOnly;
@@ -474,6 +542,16 @@ public class IoBuffer {
     
     /**
      * @see Buffer#limit(int)
+     * Sets the limit of this IoBuffer.
+     * <p>
+     * If the current position in the IoBuffer is in excess of
+     * <code>newLimit</code> then, on returning from this call, it will have
+     * been adjusted to be equivalent to <code>newLimit</code>. If the mark
+     * is set and is greater than the new limit, then it is cleared.
+     *
+     * @param newLimit the new limit, must not be negative and not greater than capacity.
+     * @return this IoBuffer.
+     * @exception IllegalArgumentException if <code>newLimit</code> is invalid.
      */
     public IoBuffer limit(int newLimit) {
         // TODO code me !
@@ -482,6 +560,10 @@ public class IoBuffer {
     
     /**
      * @see Buffer#mark()
+     * Marks the current position, so that the position may return to this point
+     * later by calling <code>reset()</code>.
+     *
+     * @return this IoBuffer.
      */
     public IoBuffer mark() {
         // TODO code me !
@@ -505,7 +587,8 @@ public class IoBuffer {
     }
     
     /**
-     * @return The current position across all the ByteBuffers
+     * @see Buffer#position()
+     * @return The current position across all the ByteBuffers contained in the IoBuffer
      */
     public int position() {
         return position;
@@ -513,6 +596,15 @@ public class IoBuffer {
 
     /**
      * @see Buffer#position(int)
+     * Sets the position in the IoBuffer.
+     * <p>
+     * If the mark is set and it is greater than the new position, then it is
+     * cleared.
+     *
+     * @param newPosition the new position, must be not negative and not greater than
+     * limit.
+     * @return this IoBuffer.
+     * @exception IllegalArgumentException if <code>newPosition</code> is invalid.
      */
     public IoBuffer position(int newPosition) {
         // TODO code me !
@@ -668,6 +760,10 @@ public class IoBuffer {
     
     /**
      * @see Buffer#remaining()
+     * Returns the number of remaining elements in this IoBuffer, that is
+     * {@code limit - position}.
+     *
+     * @return the number of remaining elements in this IoBuffer.
      */
     public int remaining() {
         // TODO code me !
@@ -676,6 +772,10 @@ public class IoBuffer {
     
     /**
      * @see Buffer#reset()
+     * Resets the position of this IoBuffer to the <code>mark</code>.
+     * 
+     * @return this IoBuffer.
+     * @exception InvalidMarkException if the mark is not set.
      */
     public IoBuffer reset() {
         // TODO code me !
@@ -684,6 +784,12 @@ public class IoBuffer {
     
     /**
      * @see Buffer#rewind()
+     * Rewinds this IoBuffer.
+     * <p>
+     * The position is set to zero, and the mark is cleared. The content of this
+     * IoBuffer is not changed.
+     *
+     * @return this IoBuffer.
      */
     public IoBuffer rewind() {
         // TODO code me !
@@ -853,9 +959,13 @@ public class IoBuffer {
             }
             
             if (current == tail) {
-                pastTail = true;
-                
-                return null;
+                if (pastTail) {
+                    return null;
+                } else {
+                    pastTail = true;
+
+                    return current;
+                }
             } else {
                 current = current.next;
                 
