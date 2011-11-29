@@ -61,7 +61,7 @@ public class IoBuffer {
     private boolean readOnly;
     
     /** The bytes order (BIG_INDIAN or LITTLE_INDIAN) */
-    private ByteOrder order;
+    private ByteOrder order = ByteOrder.BIG_ENDIAN;
     
     /** The two types of buffer we handle */
     public enum BufferType {
@@ -92,6 +92,28 @@ public class IoBuffer {
         mark = 0;
         limit = 0;
         type = bufferType;
+    }
+    
+    /**
+     * Construct a IoBuffer with some ByteBuffers. The IoBuffer type will be selected
+     * from the first ByteBuffer type, so will the order.
+     * @param byteBuffers the ByteBuffers added to the IoBuffer list
+     */
+    public IoBuffer(ByteBuffer... byteBuffers) {
+        if ((byteBuffers == null) || (byteBuffers.length == 0)){
+            position = 0;
+            mark = 0;
+            limit = 0;
+            type = null;
+            order = null;
+        } else {
+            for (ByteBuffer byteBuffer : byteBuffers) {
+                
+                if (byteBuffer.limit() > 0) {
+                    buffers.add(byteBuffer);
+                }
+            }
+        }
     }
     
     /**
@@ -385,10 +407,33 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#get(byte[])
+     * Reads bytes from the current position into the specified byte array and
+     * increases the position by the number of bytes read.
+     * <p>
+     * Calling this method has the same effect as
+     * {@code get(dest, 0, dest.length)}.
+     *
+     * @param dest the destination byte array.
+     * @return this IoBuffer.
+     * @exception BufferUnderflowException if {@code dest.length} is greater than {@code remaining()}.
      */
     public IoBuffer get(byte[] dst) {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        if (dst.length > remaining()) {
+            throw new BufferUnderflowException();
+        }
+        
+        int size = dst.length;
+        int destPos = 0;
+        BufferNode node = buffers.current;
+        
+        while (size > 0) {
+            int length = node.buffer.limit() - node.buffer.position();
+            System.arraycopy(node.buffer.array(), node.buffer.position(), dst, destPos, length );
+            destPos += length;
+            node = buffers.getNext();
+        }
+        
+        return this;
     }
     
     /**
@@ -626,18 +671,37 @@ public class IoBuffer {
 
     /**
      * @see ByteBuffer#order()
+     * Returns the byte order used by this Iouffer when converting bytes from/to
+     * other primitive types.
+     * <p>
+     * The default byte order of byte buffer is always
+     * {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}
+     *
+     * @return the byte order used by this IoBuffer when converting bytes from/to
+     * other primitive types.
+
      */
-    public IoBuffer order() {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+    public ByteOrder order() {
+        return order;
     }
     
     /**
      * @see ByteBuffer#order(ByteOrder)
+     * Sets the byte order of this IoBuffer.
+     * 
+     * @param byteOrder the byte order to set. If {@code null} then the order
+     * will be {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}.
+     * @return this IoBuffer.
+     * @see ByteOrder
      */
     public IoBuffer order(ByteOrder bo) {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        if (bo == null) {
+            order = ByteOrder.LITTLE_ENDIAN;
+        } else {
+            order = bo;
+        }
+        
+        return this;
     }
     
     /**
@@ -972,8 +1036,8 @@ public class IoBuffer {
                 }
             }
             
-            // Check the endianness
-            if (order == null) {
+            // Check the ByteOrder
+            if (size == 0) {
                 order = byteBuffer.order();
             } else if (order != byteBuffer.order()) {
                 throw new RuntimeException();

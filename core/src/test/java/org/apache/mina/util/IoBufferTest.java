@@ -249,8 +249,8 @@ public class IoBufferTest
         bb2.put("345".getBytes());
         bb2.flip();
         
-        IoBuffer ioBuffer = new IoBuffer();
-        ioBuffer.add(bb1, bb2);
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
+
         assertEquals(0, ioBuffer.position());
         assertEquals(6, ioBuffer.limit());
         assertTrue(ioBuffer.hasRemaining());
@@ -336,8 +336,7 @@ public class IoBufferTest
         bb3.put("3456".getBytes());
         bb3.flip();
 
-        IoBuffer ioBuffer = new IoBuffer();
-        ioBuffer.add(bb1, bb2, bb3);
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2, bb3);
         
         byte[] array = ioBuffer.array();
         assertNotNull(array);
@@ -373,8 +372,7 @@ public class IoBufferTest
         bb2.putInt(67890);
         bb2.flip();
 
-        IoBuffer ioBuffer = new IoBuffer();
-        ioBuffer.add(bb1, bb2);
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
 
         assertEquals(12345, ioBuffer.getInt());
         assertEquals(67890, ioBuffer.getInt());
@@ -396,8 +394,7 @@ public class IoBufferTest
         bb2.putInt(67890);
         bb2.flip();
 
-        IoBuffer ioBuffer = new IoBuffer();
-        ioBuffer.add(bb1, bb2);
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
 
         assertEquals(12345, ioBuffer.getInt());
         assertEquals(67890, ioBuffer.getInt());
@@ -416,8 +413,7 @@ public class IoBufferTest
         bb2.put(new byte[]{0x02, 0x03, 0x04});
         bb2.flip();
 
-        IoBuffer ioBuffer = new IoBuffer();
-        ioBuffer.add(bb1, bb2);
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
 
         assertEquals(0x01020304, ioBuffer.getInt());
     }
@@ -435,8 +431,7 @@ public class IoBufferTest
         bb2.put(new byte[]{0x02, 0x03});
         bb2.flip();
 
-        IoBuffer ioBuffer = new IoBuffer();
-        ioBuffer.add(bb1, bb2);
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
 
         ioBuffer.getInt();
     }
