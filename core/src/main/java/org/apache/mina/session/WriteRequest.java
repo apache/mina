@@ -41,4 +41,5 @@ public interface WriteRequest {
      * @return the future
      */
     IoFuture<Void> getFuture();
+
 }

@@ -82,6 +82,7 @@ public interface IoSession {
     IoService getService();
 
     /* READ / WRITE / CLOSE */
+
     /**
      * Tells if the session is currently connected and able to process incoming requests and to send outgoing responses.
      * 
@@ -90,12 +91,11 @@ public interface IoSession {
     boolean isConnected();
 
     /**
-     * Tells if the session is being closed, but is not yet in Closed state.
+     * Tells if the session is currently closed.
      * 
-     * @return <code>true</tt> if and only if this session is being closed
-     * (but not disconnected yet) or is closed.
+     * @return <code>true</code> if this session is disconnected with remote peer.
      */
-    boolean isClosing();
+    boolean isClosed();
 
     /**
      * Tells if the session is processing a SSL/TLS handshake.

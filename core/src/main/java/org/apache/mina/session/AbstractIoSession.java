@@ -54,7 +54,7 @@ public abstract class AbstractIoSession implements IoSession {
     private final IoService service;
 
     /** The {@link SelectorProcessor} used for handling this session writing */
-    private SelectorProcessor writeProcessor;
+    protected SelectorProcessor writeProcessor;
 
     /** The number of bytes read since this session has been created */
     private volatile long readBytes;

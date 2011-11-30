@@ -59,11 +59,6 @@ public class AbstractIoSessionTest {
         }
 
         @Override
-        public boolean isClosing() {
-            return false;
-        }
-
-        @Override
         public boolean isConnected() {
             return false;
         }
@@ -95,14 +90,18 @@ public class AbstractIoSessionTest {
         }
 
         @Override
-        public boolean isSecuring()
-        {
+        public boolean isSecuring() {
             return false;
         }
 
         @Override
-        public boolean isSecured()
-        {
+        public boolean isSecured() {
+            return false;
+        }
+
+        @Override
+        public boolean isClosed() {
+            // TODO Auto-generated method stub
             return false;
         }
     }

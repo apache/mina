@@ -19,27 +19,27 @@
 package org.apache.mina.api;
 
 /**
- * A {@link RuntimeException} thrown when something wrong happened during {@link IoService} or {@link IoSession} configuration.
+ *  A {@link RuntimeException} thrown when something wrong happened during {@link IoService} or {@link IoSession} I/O processing.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ConfigurationException extends RuntimeException {
+public class RuntimeIoException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    public ConfigurationException() {
+    public RuntimeIoException() {
         super();
     }
 
-    public ConfigurationException(String message, Throwable cause) {
+    public RuntimeIoException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ConfigurationException(String message) {
+    public RuntimeIoException(String message) {
         super(message);
     }
 
-    public ConfigurationException(Throwable cause) {
+    public RuntimeIoException(Throwable cause) {
         super(cause);
     }
 

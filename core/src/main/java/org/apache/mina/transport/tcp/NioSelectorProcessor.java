@@ -252,18 +252,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
         wakeupWorker();
     }
 
-    /** 
-     * {@inheritDoc}
-     */
-    @Override
-    public void scheduleForClose(IoSession session) {
-        LOGGER.debug("scheduling session {} for close", session);
-        // add the session in the list of session for close.
-        sessionsToClose.add((NioTcpSession) session);
-        // wake the selector for unlocking the I/O thread
-        wakeupWorker();
-    }
-
     /**
      * The worker processing incoming session creation, session destruction requests, session write and reads.
      * It will also bind new servers.

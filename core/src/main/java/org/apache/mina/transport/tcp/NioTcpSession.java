@@ -19,26 +19,53 @@
  */
 package org.apache.mina.transport.tcp;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.api.IoFuture;
+import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.session.AbstractIoSession;
+import org.apache.mina.transport.tcp.nio.NioTcpClient;
 import org.apache.mina.transport.tcp.nio.NioTcpServer;
+import org.apache.mina.util.AbstractIoFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * 
+ * A NIO based TCP session, should be used by {@link NioTcpServer} and {@link NioTcpClient}.
+ * A TCP session is a connection between a our server/client and the remote end-point.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  */
 public class NioTcpSession extends AbstractIoSession {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NioTcpSession.class);
+
+    /** the NIO socket channel for this TCP session */
     private SocketChannel channel;
 
+    /** the socket configuration */
     private final SocketSessionConfig configuration;
+
+    // this session requested to close
+    private volatile boolean closeRequested = false;
+
+    /** we pre-allocate a close future for lock-less {@link #close(boolean)} */
+    private final IoFuture<Void> closeFuture = new AbstractIoFuture<Void>() {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected boolean cancelOwner(boolean mayInterruptIfRunning) {
+            // we don't cancel close
+            return false;
+        }
+    };
 
     NioTcpSession(NioTcpServer service, SocketChannel channel, SelectorProcessor writeProcessor) {
         super(service, writeProcessor);
@@ -46,7 +73,11 @@ public class NioTcpSession extends AbstractIoSession {
         this.configuration = new ProxySocketSessionConfig(channel.socket());
     }
 
-    public SocketChannel getSocketChannel() {
+    /**
+     * Get the underlying {@link SocketChannel} of this session
+     * @return the socket channel used by this session
+     */
+    SocketChannel getSocketChannel() {
         return channel;
     }
 
@@ -90,10 +121,9 @@ public class NioTcpSession extends AbstractIoSession {
      */
     @Override
     public boolean isConnected() {
-        // TODO Auto-generated method stub
-        return false;
+        return state == SessionState.CONNECTED;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -101,7 +131,7 @@ public class NioTcpSession extends AbstractIoSession {
     public boolean isSecuring() {
         return state == SessionState.SECURING;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -114,9 +144,8 @@ public class NioTcpSession extends AbstractIoSession {
      * {@inheritDoc}
      */
     @Override
-    public boolean isClosing() {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isClosed() {
+        return state == SessionState.CLOSED;
     }
 
     /**
@@ -124,8 +153,36 @@ public class NioTcpSession extends AbstractIoSession {
      */
     @Override
     public IoFuture<Void> close(boolean immediately) {
-        // TODO Auto-generated method stub
-        return null;
+        switch (state) {
+        case CREATED:
+            LOG.error("Session {} not opened", this);
+            throw new RuntimeIoException("cannot close an not opened session");
+        case CONNECTED:
+            closeRequested = true;
+            state = SessionState.CLOSING;
+            if (immediately) {
+                try {
+                    channel.close();
+                } catch (IOException e) {
+                    throw new RuntimeIoException(e);
+                }
+            } else {
+                // flush this session the flushing code will close the session
+                writeProcessor.flush(this);
+            }
+            break;
+        case CLOSING:
+            // return the same future
+            LOG.warn("Already closing session {}", this);
+            break;
+        case CLOSED:
+            LOG.warn("Already closed session {}", this);
+            break;
+        default:
+            throw new RuntimeIoException("not implemented session state : " + state);
+        }
+
+        return closeFuture;
     }
 
     /**
@@ -133,8 +190,8 @@ public class NioTcpSession extends AbstractIoSession {
      */
     @Override
     public void suspendRead() {
-        // TODO Auto-generated method stub
-
+        // TODO
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -142,8 +199,8 @@ public class NioTcpSession extends AbstractIoSession {
      */
     @Override
     public void suspendWrite() {
-        // TODO Auto-generated method stub
-
+        // TODO
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -151,8 +208,8 @@ public class NioTcpSession extends AbstractIoSession {
      */
     @Override
     public void resumeRead() {
-        // TODO Auto-generated method stub
-
+        // TODO
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -160,7 +217,8 @@ public class NioTcpSession extends AbstractIoSession {
      */
     @Override
     public void resumeWrite() {
-        // TODO Auto-generated method stub
+        // TODO
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -168,8 +226,8 @@ public class NioTcpSession extends AbstractIoSession {
      */
     @Override
     public boolean isReadSuspended() {
-        // TODO Auto-generated method stub
-        return false;
+        // TODO
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -177,8 +235,8 @@ public class NioTcpSession extends AbstractIoSession {
      */
     @Override
     public boolean isWriteSuspended() {
-        // TODO Auto-generated method stub
-        return false;
+        // TODO
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -189,6 +247,9 @@ public class NioTcpSession extends AbstractIoSession {
         return configuration;
     }
 
+    /**
+     * Set this session status as connected. To be called by the processor selecting/polling this session.
+     */
     void setConnected() {
         if (getState() != SessionState.CREATED) {
             throw new RuntimeException("Trying to open a non created session");

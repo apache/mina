@@ -61,4 +61,5 @@ public interface SelectorProcessor {
      * @param session the session to flush
      */
     void flush(IoSession session);
+
 }
