@@ -55,6 +55,28 @@ public class ByteBufferDumper {
         highDigits = high;
         lowDigits = low;
     }
+    
+    public static String dump(IoBuffer buffer) {
+        StringBuilder sb = new StringBuilder();
+        
+        boolean isFirst = true;
+        
+        for (int i = 0; i < buffer.limit(); i++) {
+            int byteValue = buffer.get(i) & 0xFF;
+            
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(' ');
+            }
+            
+            sb.append("0x");
+            sb.append((char) highDigits[byteValue]);
+            sb.append((char) lowDigits[byteValue]);
+        }
+            
+        return sb.toString();
+    }
 
     public static String dump(ByteBuffer buffer) {
 

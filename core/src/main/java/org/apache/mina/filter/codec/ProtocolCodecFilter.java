@@ -19,13 +19,12 @@
  */
 package org.apache.mina.filter.codec;
 
-import java.nio.ByteBuffer;
-
 import org.apache.mina.api.DefaultIoFilter;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.util.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +68,7 @@ public class ProtocolCodecFilter extends DefaultIoFilter {
     /**
      * Creates a new instance of ProtocolCodecFilter, without any factory.
      * The encoder/decoder factory will be created as an inner class, using
-     * the two parameters (encoder and decoder). 
+     * the two parameters (encoder and decoder).
      * 
      * @param encoder The class responsible for encoding the message
      * @param decoder The class responsible for decoding the message
@@ -188,7 +187,7 @@ public class ProtocolCodecFilter extends DefaultIoFilter {
      * throws an exception.
      * <code>
      *  while ( buffer not empty )
-     *    try 
+     *    try
      *      decode ( buffer )
      *    catch
      *      break;
@@ -198,17 +197,17 @@ public class ProtocolCodecFilter extends DefaultIoFilter {
     public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session);
 
-        if (!(message instanceof ByteBuffer)) {
+        if (!(message instanceof IoBuffer)) {
             controller.callReadNextFilter(session, message);
             return;
         }
 
-        ByteBuffer in = (ByteBuffer) message;
+        IoBuffer in = (IoBuffer) message;
         ProtocolDecoder decoder = getDecoder(session);
 
         // Loop until we don't have anymore byte in the buffer,
-        // or until the decoder throws an unrecoverable exception or 
-        // can't decoder a message, because there are not enough 
+        // or until the decoder throws an unrecoverable exception or
+        // can't decoder a message, because there are not enough
         // data in the buffer
         while (in.hasRemaining()) {
             // Call the decoder with the read bytes

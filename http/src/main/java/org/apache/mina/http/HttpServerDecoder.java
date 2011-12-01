@@ -6,20 +6,19 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ * 
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ * 
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ * 
  */
 package org.apache.mina.http;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +30,7 @@ import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpMethod;
 import org.apache.mina.http.api.HttpVersion;
+import org.apache.mina.util.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,18 +71,12 @@ public class HttpServerDecoder implements ProtocolDecoder {
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
 
     @Override
-    public Object decode(IoSession session, ByteBuffer msg, ReadFilterChainController controller) {
+    public Object decode(IoSession session, IoBuffer msg, ReadFilterChainController controller) {
         DecoderState state = session.getAttribute(DECODER_STATE_ATT);
 
         switch (state) {
         case HEAD:
             LOG.debug("decoding HEAD");
-            // grab the stored a partial HEAD request
-            ByteBuffer oldBuffer = session.getAttribute(PARTIAL_HEAD_ATT);
-            // concat the old buffer and the new incoming one
-            msg = ByteBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg);
-            msg.flip();
-            // now let's decode like it was a new message
 
         case NEW:
             LOG.debug("decoding NEW");
@@ -90,9 +84,8 @@ public class HttpServerDecoder implements ProtocolDecoder {
 
             if (rq == null) {
                 // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
-                ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
-                partial.put(msg);
-                partial.flip();
+                //ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
+                IoBuffer partial = new IoBuffer(msg);
                 // no request decoded, we accumulate
                 session.setAttribute(PARTIAL_HEAD_ATT, partial);
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
@@ -157,7 +150,7 @@ public class HttpServerDecoder implements ProtocolDecoder {
     public void dispose(IoSession session) throws Exception {
     }
 
-    private HttpRequestImpl parseHttpRequestHead(ByteBuffer buffer) {
+    private HttpRequestImpl parseHttpRequestHead(IoBuffer buffer) {
         String raw = new String(buffer.array(), 0, buffer.limit(), Charset.forName("ISO-8859-1"));
         String[] headersAndBody = RAW_VALUE_PATTERN.split(raw, -1);
 

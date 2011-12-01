@@ -435,4 +435,120 @@ public class IoBufferTest
 
         ioBuffer.getInt();
     }
+    
+    /**
+     * test the get(int) method on one buffer
+     */
+    @Test
+    public void testGetIntOneBuffer() {
+        ByteBuffer bb = ByteBuffer.allocate(4);
+        bb.put("0123".getBytes());
+        bb.flip();
+    
+        IoBuffer ioBuffer = new IoBuffer(bb);
+
+        assertEquals('0', ioBuffer.get());
+        assertEquals('1', ioBuffer.get());
+        assertEquals('0', ioBuffer.get(0));
+        assertEquals('3', ioBuffer.get(3));
+        assertEquals('1', ioBuffer.get(1));
+        assertEquals('2', ioBuffer.get(2));
+        assertEquals('2', ioBuffer.get());
+        
+        try {
+            ioBuffer.get(4);
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // expected
+            assertTrue(true);
+        }
+    }
+    
+    /**
+     * test the get(int) method on two buffers
+     */
+    @Test
+    public void testGetIntTwoBuffer() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("0123".getBytes());
+        bb1.flip();
+    
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("4567".getBytes());
+        bb2.flip();
+    
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
+
+        assertEquals('0', ioBuffer.get());
+        assertEquals('1', ioBuffer.get());
+        assertEquals('0', ioBuffer.get(0));
+        assertEquals('4', ioBuffer.get(4));
+        assertEquals('7', ioBuffer.get(7));
+        assertEquals('2', ioBuffer.get(2));
+        assertEquals('2', ioBuffer.get());
+        assertEquals('3', ioBuffer.get());
+        assertEquals('4', ioBuffer.get());
+        
+        try {
+            ioBuffer.get(8);
+            fail();
+        } catch (IndexOutOfBoundsException ioobe) {
+            // expected
+            assertTrue(true);
+        }
+    }
+    
+    /**
+     * Test the clear() method
+     */
+    @Test
+    public void testClear() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("0123".getBytes());
+        bb1.flip();
+    
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("4567".getBytes());
+        bb2.flip();
+    
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
+
+        // Move forward a bit
+        ioBuffer.get();
+        ioBuffer.get();
+        
+        // Clear
+        ioBuffer.clear();
+        
+        // We should be back to the origin
+        assertEquals(0, ioBuffer.position());
+        assertEquals(8, ioBuffer.limit());
+    }
+    
+    /**
+     * Test the flip() method
+     */
+    @Test
+    public void testFlip() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("0123".getBytes());
+        bb1.flip();
+    
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("4567".getBytes());
+        bb2.flip();
+    
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
+
+        // Move forward a bit
+        ioBuffer.get();
+        ioBuffer.get();
+        
+        // Clear
+        ioBuffer.clear();
+        
+        // We should be back to the origin
+        assertEquals(0, ioBuffer.position());
+        assertEquals(8, ioBuffer.limit());
+    }
 }

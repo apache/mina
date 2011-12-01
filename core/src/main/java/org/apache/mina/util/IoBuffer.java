@@ -22,14 +22,7 @@ import java.nio.Buffer;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.CharBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 import java.nio.ReadOnlyBufferException;
-import java.nio.ShortBuffer;
-
 import java.lang.UnsupportedOperationException;
 
 /**
@@ -71,6 +64,9 @@ public class IoBuffer {
     /** A empty bytes array */
     private final static byte[] EMPTY_BYTES = new byte[]{};
     
+    /** <code>UNSET_MARK</code> means the mark has not been set. */
+    private final static int UNSET_MARK = -1;
+
     /**
      * Construct a IoBuffer, with no buffer in it
      */
@@ -117,17 +113,28 @@ public class IoBuffer {
     }
     
     /**
-     * Construct a IoBuffer with no ByteBuffer. The IoBuffer type is not direct.
-     * (ie direct or heap will be deduce from this first ByteBuffer characteristic.
-     * @param byteBuffer the first ByteBuffer added to the IoBuffer list
+     * Construct a IoBuffer from an existing IoBuffer.
+     * @param ioBuffer the IoBuffer we want to copy
      */
-    public IoBuffer(ByteBuffer byteBuffer) {
-        buffers.add(byteBuffer);
-        position = 0;
+    public IoBuffer(IoBuffer ioBuffer) {
+        // Find the position to start with
+        BufferNode node = ioBuffer.buffers.getFirst();
+        int pos = 0;
+        
+        while (node != null) {
+            if (node.offset + node.buffer.limit() < position) {
+                node = buffers.getNext();
+                pos = node.offset + node.buffer.limit();
+            } else {
+                buffers.add(node.buffer);
+            }
+        }
+
+        position = position - pos;
         mark = 0;
-        limit = byteBuffer.limit();
-        type = byteBuffer.isDirect() ? BufferType.DIRECT : BufferType.HEAP;
-        order = byteBuffer.order();
+        limit = ioBuffer.limit() - pos;
+        type = ioBuffer.type;
+        order = ioBuffer.order();
     }
     
     /**
@@ -227,13 +234,14 @@ public class IoBuffer {
         if (isReadOnly()) {
             throw new ReadOnlyBufferException();
         }
+        
         // The offset is always 0
         return 0;
     }
     
     /**
      * @see ByteBuffer#asCharBuffer()
-     */
+     *
     public CharBuffer asCharBuffer() {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -241,7 +249,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#asDoubleBuffer()
-     */
+     *
     public DoubleBuffer asDoubleBuffer() {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -249,7 +257,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#asFloatBuffer()
-     */
+     *
     public FloatBuffer asFloatBuffer() {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -270,7 +278,7 @@ public class IoBuffer {
      * position, limit and mark are independent.
      *
      * @return a int buffer which is based on the content of this byte buffer.
-     */
+     *
     public IntBuffer asIntBuffer() {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -278,7 +286,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#asLongBuffer()
-     */
+     *
     public LongBuffer asLongBuffer() {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -294,7 +302,7 @@ public class IoBuffer {
 
     /**
      * @see ByteBuffer#asShortBuffer()
-     */
+     *
     public ShortBuffer asShortBuffer() {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -319,8 +327,10 @@ public class IoBuffer {
      * @return this buffer.
      */
     public IoBuffer clear() {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        position = 0;
+        mark = UNSET_MARK;
+        
+        return this;
     }
     
     /**
@@ -367,8 +377,11 @@ public class IoBuffer {
      * @return this IoBuffer.
      */
     public IoBuffer flip() {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        limit = position;
+        position = 0;
+        mark = UNSET_MARK;
+
+        return this;
     }
     
     /**
@@ -446,10 +459,38 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#get(int)
+     * Returns the byte at the specified index and does not change the position.
+     * 
+     * @param index the index, must not be negative and less than limit.
+     * @return the byte at the specified index.
+     * @exception IndexOutOfBoundsException if index is invalid.
      */
-    public IoBuffer get(int index) {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+    public byte get(int index) {
+        if ((index < 0) || (index >= limit)) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        BufferNode currentNode = buffers.current;
+        BufferNode node = buffers.getFirst();
+        
+        while (node != null) {
+            if (node.offset + node.buffer.limit() > index) {
+                byte result = node.buffer.get(index - node.offset);
+                
+                // Reset the initial position before returning
+                buffers.current = currentNode;
+                
+                return result;
+            } else {
+                node = buffers.getNext();
+            }
+        }
+
+        // Reset the initial position before returning
+        buffers.current = currentNode;
+        
+        // Unlikely to happen
+        throw new IndexOutOfBoundsException();
     }
     
     /**
@@ -586,7 +627,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#hasArray()
-     */
+     *
     public boolean hasArray() {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -651,7 +692,7 @@ public class IoBuffer {
      * @param newLimit the new limit, must not be negative and not greater than capacity.
      * @return this IoBuffer.
      * @exception IllegalArgumentException if <code>newLimit</code> is invalid.
-     */
+     *
     public IoBuffer limit(int newLimit) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -665,8 +706,9 @@ public class IoBuffer {
      * @return this IoBuffer.
      */
     public IoBuffer mark() {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        mark = position;
+        
+        return this;
     }
 
     /**
@@ -725,13 +767,14 @@ public class IoBuffer {
      * @exception IllegalArgumentException if <code>newPosition</code> is invalid.
      */
     public IoBuffer position(int newPosition) {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        position = newPosition;
+        
+        return this;
     }
     
     /**
      * @see ByteBuffer#put(byte)
-     */
+     *
     public IoBuffer put(byte b) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -739,7 +782,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#put(byte[])
-     */
+     *
     public IoBuffer put(byte[] src) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -747,7 +790,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#put(byte[], int, int)
-     */
+     *
     public IoBuffer put(byte[] src, int offset, int length) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -755,7 +798,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#put(int, byte)
-     */
+     *
     public IoBuffer put(int index, byte b) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -766,7 +809,7 @@ public class IoBuffer {
      * The argument is also supposed to have a position set to 0.
      * @param byteBuffer The added ByteBuffer.
      * @return The IoBuffer instance
-     */
+     *
     public IoBuffer put(ByteBuffer byteBuffer) {
         assert(byteBuffer != null);
         
@@ -782,7 +825,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putChar(char)
-     */
+     *
     public IoBuffer putChar(char value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -790,7 +833,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putChar(int, char)
-     */
+     *
     public IoBuffer putChar(int index, char value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -798,7 +841,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putDouble(double)
-     */
+     *
     public IoBuffer putDouble(double value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -806,7 +849,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putDouble(int, double)
-     */
+     *
     public IoBuffer putDouble(int index, double value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -814,7 +857,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putFloat(float)
-     */
+     *
     public IoBuffer putFloat(float value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -822,7 +865,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putFloat(int, float)
-     */
+     *
     public IoBuffer putFloat(int index, float value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -830,7 +873,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putInt(int)
-     */
+     *
     public IoBuffer putInt(int value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -838,7 +881,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putInt(int, int)
-     */
+     *
     public IoBuffer putInt(int index, int value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -846,7 +889,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putLong(long)
-     */
+     *
     public IoBuffer putLong(long value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -854,7 +897,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putLong(int, long)
-     */
+     *
     public IoBuffer putLong(int index, long value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -862,7 +905,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putShort(short)
-     */
+     *
     public IoBuffer putShort(short value) {
         // TODO code me !
         throw new UnsupportedOperationException();
@@ -870,7 +913,7 @@ public class IoBuffer {
     
     /**
      * @see ByteBuffer#putShort(int, short)
-     */
+     *
     public IoBuffer putShort(int index, short value) {
         // TODO code me !
         throw new UnsupportedOperationException();

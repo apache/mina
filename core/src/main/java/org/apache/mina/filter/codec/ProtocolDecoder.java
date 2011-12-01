@@ -19,10 +19,9 @@
  */
 package org.apache.mina.filter.codec;
 
-import java.nio.ByteBuffer;
-
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
+import org.apache.mina.util.IoBuffer;
 
 /**
  * Decodes binary or protocol-specific data into higher-level message objects.
@@ -49,7 +48,7 @@ public interface ProtocolDecoder {
      *
      * @throws Exception if the read data violated protocol specification
      */
-    Object decode(IoSession session, ByteBuffer in, ReadFilterChainController controller);// throws Exception;
+    Object decode(IoSession session, IoBuffer in, ReadFilterChainController controller);// throws Exception;
 
     /**
      * Invoked when the specified <tt>session</tt> is closed.  This method is useful

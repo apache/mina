@@ -6,16 +6,16 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *  
+ * 
  *    http://www.apache.org/licenses/LICENSE-2.0
- *  
+ * 
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License. 
- *  
+ *  under the License.
+ * 
  */
 package org.apache.mina.ldap;
 
@@ -34,6 +34,7 @@ import org.apache.directory.shared.util.Strings;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filterchain.ReadFilterChainController;
+import org.apache.mina.util.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,10 +68,10 @@ public class LdapProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
-    public Object decode(IoSession session, ByteBuffer in, ReadFilterChainController controller) {
+    public Object decode(IoSession session, IoBuffer in, ReadFilterChainController controller) {
         @SuppressWarnings("unchecked")
         LdapMessageContainer<MessageDecorator<? extends Message>> messageContainer =
-            (LdapMessageContainer<MessageDecorator<? extends Message>>) 
+            (LdapMessageContainer<MessageDecorator<? extends Message>>)
             session.getAttribute("messageContainer");
 
         if (session.containsAttribute("maxPDUSize")) {
@@ -83,7 +84,10 @@ public class LdapProtocolDecoder implements ProtocolDecoder {
             Object message = null;
             
             do {
-                message = decode( in, messageContainer );
+                byte[] bytes = in.array();
+                ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+                buffer.wrap(bytes);
+                message = decode( buffer, messageContainer );
                 
                 controller.callReadNextFilter(session, message );
             } while( message != null);
@@ -97,7 +101,7 @@ public class LdapProtocolDecoder implements ProtocolDecoder {
 
     
     /**
-     * Decode an incoming buffer into LDAP messages. The result can be 0, 1 or many 
+     * Decode an incoming buffer into LDAP messages. The result can be 0, 1 or many
      * LDAP messages, which will be stored into the array the caller has created.
      * 
      * @param buffer The incoming byte buffer

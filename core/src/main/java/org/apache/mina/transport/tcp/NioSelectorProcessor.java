@@ -46,6 +46,7 @@ import org.apache.mina.service.SelectorStrategy;
 import org.apache.mina.session.DefaultWriteFuture;
 import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.tcp.nio.NioTcpServer;
+import org.apache.mina.util.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -337,7 +338,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     LOGGER.debug("... done selecting : {}", readyCount);
 
                     if (readyCount > 0) {
-
                         // process selected keys
                         Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
 
@@ -348,27 +348,37 @@ public class NioSelectorProcessor implements SelectorProcessor {
                             if (!key.isValid()) {
                                 continue;
                             }
+                            
                             selector.selectedKeys().remove(key);
 
                             if (key.isReadable()) {
                                 LOGGER.debug("readable client {}", key);
                                 NioTcpSession session = (NioTcpSession) key.attachment();
                                 SocketChannel channel = session.getSocketChannel();
-                                readBuffer.rewind();
-                                int readCount = channel.read(readBuffer);
-                                LOGGER.debug("read {} bytes", readCount);
-                                if (readCount < 0) {
-                                    // session closed by the remote peer
-                                    LOGGER.debug("session closed by the remote peer");
-                                    sessionsToClose.add(session);
-                                } else {
-                                    // we have read some data
-                                    // limit at the current position & rewind buffer back to start & push to the chain
-                                    readBuffer.flip();
-                                    session.getFilterChain().processMessageReceived(session, readBuffer);
-                                }
-
+                                int readCount = 0;
+                                IoBuffer ioBuffer = session.getIoBuffer();
+                                
+                                do {
+                                    ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+                                    readCount = channel.read(readBuffer);
+                                    LOGGER.debug("read {} bytes", readCount);
+    
+                                    if (readCount < 0) {
+                                        // session closed by the remote peer
+                                        LOGGER.debug("session closed by the remote peer");
+                                        sessionsToClose.add(session);
+                                        break;
+                                    } else if (readCount > 0) {
+                                        readBuffer.flip();
+                                        ioBuffer.add(readBuffer);
+                                    }
+                                } while (readCount > 0);
+                                
+                                // we have read some data
+                                // limit at the current position & rewind buffer back to start & push to the chain
+                                session.getFilterChain().processMessageReceived(session, ioBuffer);
                             }
+                            
                             if (key.isWritable()) {
                                 if (LOGGER.isDebugEnabled()) {
                                     LOGGER.debug("writable session : {}", key.attachment());
@@ -377,6 +387,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                 session.setNotRegisteredForWrite();
                                 // write from the session write queue
                                 Queue<WriteRequest> queue = session.getWriteQueue();
+                                
                                 do {
                                     // get a write request from the queue
                                     WriteRequest wreq = queue.peek();
