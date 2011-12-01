@@ -19,6 +19,8 @@
  */
 package org.apache.mina.filter.codec;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.api.DefaultIoFilter;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
@@ -197,12 +199,12 @@ public class ProtocolCodecFilter extends DefaultIoFilter {
     public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session);
 
-        if (!(message instanceof IoBuffer)) {
+        if (!(message instanceof ByteBuffer)) {
             controller.callReadNextFilter(session, message);
             return;
         }
 
-        IoBuffer in = (IoBuffer) message;
+        ByteBuffer in = (ByteBuffer) message;
         ProtocolDecoder decoder = getDecoder(session);
 
         // Loop until we don't have anymore byte in the buffer,

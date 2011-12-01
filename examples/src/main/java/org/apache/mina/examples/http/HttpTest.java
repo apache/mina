@@ -62,7 +62,7 @@ public class HttpTest {
         acceptor.bind(new InetSocketAddress(8080));
 
         // run for 20 seconds
-        Thread.sleep(200000);
+        Thread.sleep(300000);
         acceptor.unbindAll();
 
     }

@@ -19,6 +19,7 @@
  */
 package org.apache.mina.http;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,6 @@ import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpMethod;
 import org.apache.mina.http.api.HttpVersion;
-import org.apache.mina.util.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,12 +71,18 @@ public class HttpServerDecoder implements ProtocolDecoder {
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
 
     @Override
-    public Object decode(IoSession session, IoBuffer msg, ReadFilterChainController controller) {
+    public Object decode(IoSession session, ByteBuffer msg, ReadFilterChainController controller) {
         DecoderState state = session.getAttribute(DECODER_STATE_ATT);
 
         switch (state) {
         case HEAD:
             LOG.debug("decoding HEAD");
+            // grab the stored a partial HEAD request
+            ByteBuffer oldBuffer = session.getAttribute(PARTIAL_HEAD_ATT);
+            // concat the old buffer and the new incoming one
+            msg = ByteBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg);
+            msg.flip();
+            // now let's decode like it was a new message
 
         case NEW:
             LOG.debug("decoding NEW");
@@ -84,8 +90,9 @@ public class HttpServerDecoder implements ProtocolDecoder {
 
             if (rq == null) {
                 // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
-                //ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
-                IoBuffer partial = new IoBuffer(msg);
+                ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
+                partial.put(msg);
+                partial.flip();
                 // no request decoded, we accumulate
                 session.setAttribute(PARTIAL_HEAD_ATT, partial);
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
@@ -150,7 +157,7 @@ public class HttpServerDecoder implements ProtocolDecoder {
     public void dispose(IoSession session) throws Exception {
     }
 
-    private HttpRequestImpl parseHttpRequestHead(IoBuffer buffer) {
+    private HttpRequestImpl parseHttpRequestHead(ByteBuffer buffer) {
         String raw = new String(buffer.array(), 0, buffer.limit(), Charset.forName("ISO-8859-1"));
         String[] headersAndBody = RAW_VALUE_PATTERN.split(raw, -1);
 

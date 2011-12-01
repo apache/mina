@@ -34,7 +34,6 @@ import org.apache.directory.shared.util.Strings;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filterchain.ReadFilterChainController;
-import org.apache.mina.util.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +67,7 @@ public class LdapProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
-    public Object decode(IoSession session, IoBuffer in, ReadFilterChainController controller) {
+    public Object decode(IoSession session, ByteBuffer in, ReadFilterChainController controller) {
         @SuppressWarnings("unchecked")
         LdapMessageContainer<MessageDecorator<? extends Message>> messageContainer =
             (LdapMessageContainer<MessageDecorator<? extends Message>>)
@@ -84,10 +83,7 @@ public class LdapProtocolDecoder implements ProtocolDecoder {
             Object message = null;
             
             do {
-                byte[] bytes = in.array();
-                ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
-                buffer.wrap(bytes);
-                message = decode( buffer, messageContainer );
+                message = decode( in, messageContainer );
                 
                 controller.callReadNextFilter(session, message );
             } while( message != null);

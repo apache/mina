@@ -32,7 +32,6 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.DefaultIoFilterController;
 import org.apache.mina.filterchain.IoFilterController;
 import org.apache.mina.service.SelectorProcessor;
-import org.apache.mina.util.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,9 +86,6 @@ public abstract class AbstractIoSession implements IoSession {
 
     private IoFilterController filterProcessor;
     
-    /** The internal buffer used to store incoming data */
-    private IoBuffer ioBuffer;
-
     /**
      * Create an {@link org.apache.mina.api.IoSession} with a unique identifier (
      * {@link org.apache.mina.api.IoSession#getId()}) and an associated {@link IoService}
@@ -104,7 +100,6 @@ public abstract class AbstractIoSession implements IoSession {
         this.service = service;
         this.writeProcessor = writeProcessor;
         this.filterProcessor = new DefaultIoFilterController(service.getFilters());
-        ioBuffer = new IoBuffer();
 
         LOG.debug("Created new session with id : {}", id);
         synchronized (stateMonitor) {
@@ -285,12 +280,5 @@ public abstract class AbstractIoSession implements IoSession {
     @Override
     public IoFilterController getFilterChain() {
         return filterProcessor;
-    }
-    
-    /**
-     * @return The inner buffer
-     */
-    public IoBuffer getIoBuffer() {
-        return ioBuffer;
     }
 }

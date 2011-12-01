@@ -248,14 +248,6 @@ public class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#asShortBuffer()
-     *
-    public ShortBuffer asShortBuffer() {
-        // TODO code me !
-        throw new UnsupportedOperationException();
-    }
-    
-    /**
      * @return the IoBuffer total capacity
      */
     public int capacity() {

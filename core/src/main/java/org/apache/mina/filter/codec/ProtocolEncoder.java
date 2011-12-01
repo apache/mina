@@ -43,7 +43,7 @@ public interface ProtocolEncoder {
      * Encodes higher-level message objects into binary or protocol-specific data.
      * MINA invokes {@link #encode(IoSession, Object, ProtocolEncoderOutput)}
      * method with message which is popped from the session write queue, and then
-     * the encoder implementation puts encoded messages (typically {@link IoBuffer}s)
+     * the encoder implementation puts encoded messages (typically {@link ByteBuffer}s)
      * into {@link ProtocolEncoderOutput}.
      *
      * @throws Exception if the message violated protocol specification

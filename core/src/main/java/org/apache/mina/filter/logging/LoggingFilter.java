@@ -27,7 +27,6 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.util.ByteBufferDumper;
-import org.apache.mina.util.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,8 +189,8 @@ public class LoggingFilter implements IoFilter {
      */
     @Override
     public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
-        if (message instanceof IoBuffer) {
-            log(messageReceivedLevel, "RECEIVED: {}", ByteBufferDumper.dump((IoBuffer) message));
+        if (message instanceof ByteBuffer) {
+            log(messageReceivedLevel, "RECEIVED: {}", ByteBufferDumper.dump((ByteBuffer) message));
         } else {
             log(messageReceivedLevel, "RECEIVED: {}", message);
         }
