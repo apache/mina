@@ -104,6 +104,9 @@ public class IoBuffer {
             order = null;
         } else {
             for (ByteBuffer byteBuffer : byteBuffers) {
+                if (type == null) {
+                    type = byteBuffer.isDirect() ? BufferType.DIRECT : BufferType.HEAP;
+                }
                 
                 if (byteBuffer.limit() > 0) {
                     buffers.add(byteBuffer);
