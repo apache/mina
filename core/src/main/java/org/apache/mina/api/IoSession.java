@@ -98,6 +98,13 @@ public interface IoSession {
     boolean isClosed();
 
     /**
+     * Tells if the session is being closed.
+     * 
+     * @return <code>true</code> if this session is in the process of being closed.
+     */
+    boolean isClosing();
+
+    /**
      * Tells if the session is processing a SSL/TLS handshake.
      * 
      * @return <code>true</tt> if and only if this session is processing a SSL/TLS handshake.
@@ -105,11 +112,18 @@ public interface IoSession {
     boolean isSecuring();
 
     /**
+     * Tells if the session is belonging to a secured connection.
+     * 
+     * @return <code>true</tt> if and only if this session is belonging a secured connection.
+     */
+    boolean isSecured();
+
+    /**
      * Tells if the session is using SSL/TLS.
      * 
      * @return <code>true</tt> if and only if this session is exchanging data over a SSL/TLS connection
      */
-    boolean isSecured();
+    boolean isConnectedSecured();
 
     /**
      * Closes this session immediately or after all queued write requests are flushed. This operation is asynchronous.

@@ -77,6 +77,9 @@ public abstract class AbstractIoSession implements IoSession {
     protected final Object stateMonitor = new Object();
 
     protected volatile SessionState state;
+    
+    /** Tells if the session is secured or not */
+    protected volatile boolean secured;
 
     /** is this session registered for being polled for write ready events */
     private AtomicBoolean registeredForWrite = new AtomicBoolean();
@@ -102,13 +105,73 @@ public abstract class AbstractIoSession implements IoSession {
         this.filterProcessor = new DefaultIoFilterController(service.getFilters());
 
         LOG.debug("Created new session with id : {}", id);
-        synchronized (stateMonitor) {
-            this.state = SessionState.CREATED;
-        }
+
+        this.state = SessionState.CREATED;
+    }
+
+    //------------------------------------------------------------------------
+    // Session State management
+    //------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isClosed() {
+        return state == SessionState.CLOSED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isClosing() {
+        return state == SessionState.CLOSING;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isConnected() {
+        return state == SessionState.CONNECTED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecuring() {
+        return state == SessionState.SECURING;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isConnectedSecured() {
+        return state == SessionState.CONNECTED_SECURED;
     }
 
     public SessionState getState() {
         return state;
+    }
+
+    //------------------------------------------------------------------------
+    // SSL/TLS session state management
+    //------------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecured() {
+        return secured;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setSecured(boolean secured) {
+        this.secured = secured;
     }
 
     /**

@@ -42,6 +42,9 @@ public abstract class AbstractIoService implements IoService {
 
     /** The service state */
     private ServiceState state;
+    
+    /** The service mode : secured or not */
+    private ServiceMode mode;
 
     private final Map<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
 
@@ -72,12 +75,23 @@ public abstract class AbstractIoService implements IoService {
         /** The service is stopped */
         DISPOSED
     }
+    
+    /**
+     * The Service secured mode
+     */
+    protected enum ServiceMode {
+        /** SSL/TLS activated */
+        SECURED,
+        /** SSL/TLS not activated */
+        NOT_SECURED
+    }
 
     /**
      * Create an AbstractIoService
      */
     protected AbstractIoService() {
         state = ServiceState.NONE;
+        mode = ServiceMode.NOT_SECURED;
     }
 
     @Override
@@ -243,13 +257,39 @@ public abstract class AbstractIoService implements IoService {
 
     private IoFilter[] filters;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IoFilter[] getFilters() {
         return filters;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setFilters(IoFilter... filters) {
         this.filters = filters;
+    }
+    
+    /**
+     * Tells if the service provide some encryption (SSL/TLS)
+     * @return <code>true</code> if the service is secured
+     */
+    public boolean isSecured() {
+        return mode == ServiceMode.SECURED;
+    }
+    
+    /**
+     * Set the mode to use, either secured or not secured
+     * @param secured The mode to use
+     */
+    public void setSecured(boolean secured) {
+        if (secured) {
+            mode = ServiceMode.SECURED;
+        } else {
+            mode = ServiceMode.NOT_SECURED;
+        }
     }
 }

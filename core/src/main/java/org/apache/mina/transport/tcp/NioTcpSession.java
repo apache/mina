@@ -120,38 +120,6 @@ public class NioTcpSession extends AbstractIoSession {
      * {@inheritDoc}
      */
     @Override
-    public boolean isConnected() {
-        return state == SessionState.CONNECTED;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isSecuring() {
-        return state == SessionState.SECURING;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isSecured() {
-        return state == SessionState.CONNECTED_SECURED;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isClosed() {
-        return state == SessionState.CLOSED;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public IoFuture<Void> close(boolean immediately) {
         switch (state) {
         case CREATED:

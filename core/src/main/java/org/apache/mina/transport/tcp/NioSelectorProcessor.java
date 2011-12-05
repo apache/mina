@@ -191,45 +191,57 @@ public class NioSelectorProcessor implements SelectorProcessor {
         }
 
         // apply the default service socket configuration
-
         Boolean keepAlive = defaultConfig.isKeepAlive();
+        
         if (keepAlive != null) {
             session.getConfig().setKeepAlive(keepAlive);
         }
 
         Boolean oobInline = defaultConfig.isOobInline();
+        
         if (oobInline != null) {
             session.getConfig().setOobInline(oobInline);
         }
 
         Boolean reuseAddress = defaultConfig.isReuseAddress();
+        
         if (reuseAddress != null) {
             session.getConfig().setReuseAddress(reuseAddress);
         }
 
         Boolean tcpNoDelay = defaultConfig.isTcpNoDelay();
+        
         if (tcpNoDelay != null) {
             session.getConfig().setTcpNoDelay(tcpNoDelay);
         }
 
         Integer receiveBufferSize = defaultConfig.getReceiveBufferSize();
+        
         if (receiveBufferSize != null) {
             session.getConfig().setReceiveBufferSize(receiveBufferSize);
         }
 
         Integer sendBufferSize = defaultConfig.getSendBufferSize();
+        
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
         }
 
         Integer trafficClass = defaultConfig.getTrafficClass();
+        
         if (trafficClass != null) {
             session.getConfig().setTrafficClass(trafficClass);
         }
 
         Integer soLinger = defaultConfig.getSoLinger();
+        
         if (soLinger != null) {
             session.getConfig().setSoLinger(soLinger);
+        }
+        
+        // Set the secured fag if the service is to be used over SSL/TLS
+        if (service.isSecured()) {
+            session.setSecured(true);
         }
 
         // event session created
@@ -308,10 +320,16 @@ public class NioSelectorProcessor implements SelectorProcessor {
                             SelectionKey key = session.getSocketChannel().register(selector, SelectionKey.OP_READ);
                             key.attach(session);
                             sessionReadKey.put(session, key);
-                            session.setConnected();
-                            // fire the event
-                            ((AbstractIoService) session.getService()).fireSessionCreated(session);
-                            session.getFilterChain().processSessionOpened(session);
+
+                            // Switch to CONNECTED, only if the session is not secured, as the SSL Handshake
+                            // will occur later.
+                            if (!session.isSecured()) {
+                                session.setConnected();
+                                
+                                // fire the event
+                                ((AbstractIoService) session.getService()).fireSessionCreated(session);
+                                session.getFilterChain().processSessionOpened(session);
+                            }
                         }
                     }
 
@@ -366,7 +384,12 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                     // we have read some data
                                     // limit at the current position & rewind buffer back to start & push to the chain
                                     readBuffer.flip();
-                                    session.getFilterChain().processMessageReceived(session, readBuffer);
+                                    
+                                    if (session.isSecured() && !session.isConnectedSecured()) {
+                                            // Process the SSL handshake now
+                                    } else {
+                                        session.getFilterChain().processMessageReceived(session, readBuffer);
+                                    }
                                 }
                             }
 

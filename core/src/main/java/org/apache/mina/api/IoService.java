@@ -78,4 +78,16 @@ public interface IoService {
      * created by this service.
      */
     IoSessionConfig getSessionConfig();
+    
+    /**
+     * Tells if the service provide some encryption (SSL/TLS)
+     * @return <code>true</code> if the service is secured
+     */
+    boolean isSecured();
+    
+    /**
+     * Set the mode to use, either secured or not secured
+     * @param secured The mode to use
+     */
+    void setSecured(boolean secured);
 }
