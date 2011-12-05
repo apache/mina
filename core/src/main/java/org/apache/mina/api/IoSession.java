@@ -246,21 +246,21 @@ public interface IoSession {
      * @param name the attribute's name
      * @return The old attribute's value. <tt>null</tt> if not found or if the attribute had no value
      */
-    Object removeAttribute(Object name);
+    <T> T removeAttribute(String name);
 
     /**
      * Tells if the session has an attached attribute.
      * 
      * @return <tt>true</tt> if this session contains the attribute with the specified <tt>name</tt>.
      */
-    boolean containsAttribute(Object name);
+    boolean containsAttribute(String name);
 
     /**
      * Gets the set of attributes stored within the session.
      * 
      * @return the set of names of all user-defined attributes.
      */
-    Set<Object> getAttributeNames();
+    Set<String> getAttributeNames();
 
     SessionState getState();
 

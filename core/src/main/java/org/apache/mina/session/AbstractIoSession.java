@@ -69,7 +69,7 @@ public abstract class AbstractIoSession implements IoSession {
     private volatile long lastWriteTime;
 
     /** attributes map */
-    private final Map<Object, Object> attributes = new ConcurrentHashMap<Object, Object>(4);
+    private final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>(4);
 
     /** unique identifier generator */
     private static final AtomicLong NEXT_ID = new AtomicLong(0);
@@ -260,7 +260,7 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     @Override
-    public boolean containsAttribute(Object name) {
+    public boolean containsAttribute(String name) {
         return attributes.containsKey(name);
     }
 
@@ -268,7 +268,7 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     @Override
-    public Object removeAttribute(Object name) {
+    public Object removeAttribute(String name) {
         return attributes.remove(name);
     }
 
@@ -276,7 +276,7 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     @Override
-    public Set<Object> getAttributeNames() {
+    public Set<String> getAttributeNames() {
         return attributes.keySet();
     }
 
