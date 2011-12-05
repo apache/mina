@@ -347,7 +347,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                             if (!key.isValid()) {
                                 continue;
                             }
-                            
+
                             selector.selectedKeys().remove(key);
 
                             if (key.isReadable()) {
@@ -369,7 +369,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                     session.getFilterChain().processMessageReceived(session, readBuffer);
                                 }
                             }
-                            
+
                             if (key.isWritable()) {
                                 if (LOGGER.isDebugEnabled()) {
                                     LOGGER.debug("writable session : {}", key.attachment());
@@ -378,7 +378,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                 session.setNotRegisteredForWrite();
                                 // write from the session write queue
                                 Queue<WriteRequest> queue = session.getWriteQueue();
-                                
+
                                 do {
                                     // get a write request from the queue
                                     WriteRequest wreq = queue.peek();
@@ -387,8 +387,8 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                     }
                                     ByteBuffer buf = (ByteBuffer) wreq.getMessage();
 
+                                    int wrote = session.getSocketChannel().write(buf);
                                     if (LOGGER.isDebugEnabled()) {
-                                        int wrote = session.getSocketChannel().write(buf);
                                         LOGGER.debug("wrote {} bytes to {}", wrote, session);
                                     }
 
