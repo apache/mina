@@ -29,6 +29,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
@@ -185,6 +188,18 @@ public abstract class AbstractIoSession implements IoSession {
     public void setSecured(boolean secured) {
         this.secured = secured;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void initSecure(SSLContext sslContext) throws SSLException {
+        SslHelper sslHelper = new SslHelper(this, sslContext);
+        sslHelper.init();
+        
+        attributes.put(SSL_HELPER, sslHelper);
+        setSecured(true);
+    }
+
 
     /**
      * {@inheritDoc}

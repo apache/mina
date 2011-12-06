@@ -97,10 +97,11 @@ public interface IoService {
      * Inject a {@link SSLContex} valid for the service. This {@link SSLContex} will be used
      * by the SSLEngine to handle secured connections.<br/>
      * The {@link SSLContex} must have been created and initialized before being injected in
-     * the service.
+     * the service.<br/>
+     * By setting a {@link SSLContext}, the service switch to secured.
      * @param sslContext The configured {@link SSLContex}.
      */
-    void addSslContext(SSLContext sslContext);
+    void setSslContext(SSLContext sslContext);
     
     /**
      * @return The {@link SSLContext} instance stored in the service.

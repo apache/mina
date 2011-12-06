@@ -36,6 +36,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.SSLException;
+
 import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
@@ -176,7 +178,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
      * {@inheritDoc}
      */
     @Override
-    public void createSession(IoService service, Object clientSocket) {
+    public void createSession(IoService service, Object clientSocket) throws SSLException {
         LOGGER.debug("create session");
         final SocketChannel socketChannel = (SocketChannel) clientSocket;
         final SocketSessionConfig defaultConfig = (SocketSessionConfig) service.getSessionConfig();
@@ -239,9 +241,9 @@ public class NioSelectorProcessor implements SelectorProcessor {
             session.getConfig().setSoLinger(soLinger);
         }
         
-        // Set the secured fag if the service is to be used over SSL/TLS
+        // Set the secured flag if the service is to be used over SSL/TLS
         if (service.isSecured()) {
-            session.setSecured(true);
+            session.initSecure( service.getSslContext() );
         }
 
         // event session created
@@ -315,39 +317,12 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
                     // pop new session for starting read/write
                     if (sessionsToConnect.size() > 0) {
-                        while (!sessionsToConnect.isEmpty()) {
-                            NioTcpSession session = sessionsToConnect.poll();
-                            SelectionKey key = session.getSocketChannel().register(selector, SelectionKey.OP_READ);
-                            key.attach(session);
-                            sessionReadKey.put(session, key);
-
-                            // Switch to CONNECTED, only if the session is not secured, as the SSL Handshake
-                            // will occur later.
-                            if (!session.isSecured()) {
-                                session.setConnected();
-                                
-                                // fire the event
-                                ((AbstractIoService) session.getService()).fireSessionCreated(session);
-                                session.getFilterChain().processSessionOpened(session);
-                            }
-                        }
+                        processConnectSessions();
                     }
 
-                    // pop session for close
+                    // pop session for close, if any
                     if (sessionsToClose.size() > 0) {
-                        while (!sessionsToClose.isEmpty()) {
-                            NioTcpSession session = sessionsToClose.poll();
-
-                            SelectionKey key = sessionReadKey.remove(session);
-                            key.cancel();
-
-                            // closing underlying socket
-                            session.getSocketChannel().close();
-                            // fire the event
-                            session.getFilterChain().processSessionClosed(session);
-                            ((AbstractIoService) session.getService()).fireSessionDestroyed(session);
-
-                        }
+                        processCloseSessions();
                     }
 
                     LOGGER.debug("selecting...");
@@ -358,6 +333,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                         // process selected keys
                         Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
 
+                        // Loop on each SelectionKey and process any valid action
                         while (selectedKeys.hasNext()) {
                             SelectionKey key = selectedKeys.next();
                             selectedKeys.remove();
@@ -369,134 +345,23 @@ public class NioSelectorProcessor implements SelectorProcessor {
                             selector.selectedKeys().remove(key);
 
                             if (key.isReadable()) {
-                                LOGGER.debug("readable client {}", key);
-                                NioTcpSession session = (NioTcpSession) key.attachment();
-                                SocketChannel channel = session.getSocketChannel();
-                                readBuffer.rewind();
-                                int readCount = channel.read(readBuffer);
-                                LOGGER.debug("read {} bytes", readCount);
-
-                                if (readCount < 0) {
-                                    // session closed by the remote peer
-                                    LOGGER.debug("session closed by the remote peer");
-                                    sessionsToClose.add(session);
-                                } else {
-                                    // we have read some data
-                                    // limit at the current position & rewind buffer back to start & push to the chain
-                                    readBuffer.flip();
-                                    
-                                    if (session.isSecured() && !session.isConnectedSecured()) {
-                                        // Process the SSL handshake now
-                                        //processHandShake(session, readBuffer);
-                                    } else {
-                                        session.getFilterChain().processMessageReceived(session, readBuffer);
-                                    }
-                                }
+                                processRead(key);
                             }
 
                             if (key.isWritable()) {
-                                if (LOGGER.isDebugEnabled()) {
-                                    LOGGER.debug("writable session : {}", key.attachment());
-                                }
-                                NioTcpSession session = (NioTcpSession) key.attachment();
-                                session.setNotRegisteredForWrite();
-
-                                // write from the session write queue
-                                boolean isEmpty = false;
-                                
-                                try {
-                                    Queue<WriteRequest> queue = session.acquireWriteQueue();
-    
-                                    do {
-                                        // get a write request from the queue
-                                        WriteRequest wreq = queue.peek();
-                                        
-                                        if (wreq == null) {
-                                            break;
-                                        }
-                                        
-                                        ByteBuffer buf = (ByteBuffer) wreq.getMessage();
-    
-                                        int wrote = session.getSocketChannel().write(buf);
-                                        
-                                        if (LOGGER.isDebugEnabled()) {
-                                            LOGGER.debug("wrote {} bytes to {}", wrote, session);
-                                        }
-    
-                                        if (buf.remaining() == 0) {
-                                            // completed write request, let's remove
-                                            // it
-                                            queue.remove();
-                                            // complete the future
-                                            DefaultWriteFuture future = (DefaultWriteFuture) wreq.getFuture();
-                                            
-                                            if (future != null) {
-                                                future.complete();
-                                            }
-                                        } else {
-                                            // output socket buffer is full, we need
-                                            // to give up until next selection for
-                                            // writing
-                                            break;
-                                        }
-                                    } while (!queue.isEmpty());
-                                    
-                                    isEmpty = queue.isEmpty();
-                                } finally {
-                                    session.releaseWriteQueue();
-                                }
-
-                                // if the session is no more interested in writing, we need
-                                // to stop listening for OP_WRITE events
-                                if (isEmpty) {
-                                    // a key registered for read ? (because we can have a
-                                    // Selector for reads and another for the writes
-                                    SelectionKey readKey = sessionReadKey.get(session);
-                                    
-                                    if (readKey != null) {
-                                        LOGGER.debug("registering key for only reading");
-                                        SelectionKey mykey = session.getSocketChannel().register(selector,
-                                                SelectionKey.OP_READ, session);
-                                        sessionReadKey.put(session, mykey);
-                                    } else {
-                                        LOGGER.debug("cancel key for writing");
-                                        session.getSocketChannel().keyFor(selector).cancel();
-                                    }
-                                }
+                                processWrite(key);
                             }
 
                             if (key.isAcceptable()) {
-                                LOGGER.debug("acceptable new client {}", key);
-                                ServerSocketChannel serverSocket = (ServerSocketChannel) ((Object[]) key.attachment())[0];
-                                IoServer server = (IoServer) (((Object[]) key.attachment())[1]);
-                                // accepted connection
-                                SocketChannel newClientChannel = serverSocket.accept();
-                                LOGGER.debug("client accepted");
-                                // and give it's to the strategy
-                                strategy.getSelectorForNewSession(NioSelectorProcessor.this).createSession(server,
-                                        newClientChannel);
+                                processAccept(key);
                             }
-
                         }
                     }
 
                     // registering session with data in the write queue for
                     // writing
                     while (!flushingSessions.isEmpty()) {
-                        NioTcpSession session = flushingSessions.poll();
-                        // a key registered for read ? (because we can have a
-                        // Selector for reads and another for the writes
-                        SelectionKey readKey = sessionReadKey.get(session);
-                        if (readKey != null) {
-                            // register for read/write
-                            SelectionKey key = session.getSocketChannel().register(selector,
-                                    SelectionKey.OP_READ | SelectionKey.OP_WRITE, session);
-
-                            sessionReadKey.put(session, key);
-
-                        } else {
-                            session.getSocketChannel().register(selector, SelectionKey.OP_WRITE, session);
-                        }
+                        processFushSessions();
                     }
                 } catch (IOException e) {
                     LOGGER.error("IOException while selecting selector", e);
@@ -512,6 +377,184 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 } finally {
                     workerLock.unlock();
                 }
+            }
+        }
+        
+        /**
+         * Handles all the sessions that must be connected
+         */
+        private void processConnectSessions() throws IOException {
+            while (!sessionsToConnect.isEmpty()) {
+                NioTcpSession session = sessionsToConnect.poll();
+                SelectionKey key = session.getSocketChannel().register(selector, SelectionKey.OP_READ);
+                key.attach(session);
+                sessionReadKey.put(session, key);
+
+                // Switch to CONNECTED, only if the session is not secured, as the SSL Handshake
+                // will occur later.
+                if (!session.isSecured()) {
+                    session.setConnected();
+                    
+                    // fire the event
+                    ((AbstractIoService) session.getService()).fireSessionCreated(session);
+                    session.getFilterChain().processSessionOpened(session);
+                }
+            }
+        }
+        
+        /**
+         * Handles all the sessions that must be closed
+         */
+        private void processCloseSessions() throws IOException {
+            while (!sessionsToClose.isEmpty()) {
+                NioTcpSession session = sessionsToClose.poll();
+
+                SelectionKey key = sessionReadKey.remove(session);
+                key.cancel();
+
+                // closing underlying socket
+                session.getSocketChannel().close();
+                // fire the event
+                session.getFilterChain().processSessionClosed(session);
+                ((AbstractIoService) session.getService()).fireSessionDestroyed(session);
+            }
+        }
+        
+        /**
+         * Processes the Accept action for the given SelectionKey
+         */
+        private void processAccept(SelectionKey key) throws IOException {
+            LOGGER.debug("acceptable new client {}", key);
+            ServerSocketChannel serverSocket = (ServerSocketChannel) ((Object[]) key.attachment())[0];
+            IoServer server = (IoServer) (((Object[]) key.attachment())[1]);
+            // accepted connection
+            SocketChannel newClientChannel = serverSocket.accept();
+            LOGGER.debug("client accepted");
+            // and give it's to the strategy
+            strategy.getSelectorForNewSession(NioSelectorProcessor.this).createSession(server,
+                    newClientChannel);
+        }
+        
+        /**
+         * Processes the Read action for the given SelectionKey
+         */
+        private void processRead(SelectionKey key) throws IOException{
+            LOGGER.debug("readable client {}", key);
+            NioTcpSession session = (NioTcpSession) key.attachment();
+            SocketChannel channel = session.getSocketChannel();
+            readBuffer.rewind();
+            int readCount = channel.read(readBuffer);
+            LOGGER.debug("read {} bytes", readCount);
+
+            if (readCount < 0) {
+                // session closed by the remote peer
+                LOGGER.debug("session closed by the remote peer");
+                sessionsToClose.add(session);
+            } else {
+                // we have read some data
+                // limit at the current position & rewind buffer back to start & push to the chain
+                readBuffer.flip();
+                
+                if (session.isSecured() && !session.isConnectedSecured()) {
+                    // Process the SSL handshake now
+                    //processHandShake(session, readBuffer);
+                } else {
+                    session.getFilterChain().processMessageReceived(session, readBuffer);
+                }
+            }
+        }
+        
+        /**
+         * Processes the Write action for the given SelectionKey
+         */
+        private void processWrite(SelectionKey key) throws IOException {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("writable session : {}", key.attachment());
+            }
+            NioTcpSession session = (NioTcpSession) key.attachment();
+            session.setNotRegisteredForWrite();
+
+            // write from the session write queue
+            boolean isEmpty = false;
+            
+            try {
+                Queue<WriteRequest> queue = session.acquireWriteQueue();
+
+                do {
+                    // get a write request from the queue
+                    WriteRequest wreq = queue.peek();
+                    
+                    if (wreq == null) {
+                        break;
+                    }
+                    
+                    ByteBuffer buf = (ByteBuffer) wreq.getMessage();
+
+                    int wrote = session.getSocketChannel().write(buf);
+                    
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("wrote {} bytes to {}", wrote, session);
+                    }
+
+                    if (buf.remaining() == 0) {
+                        // completed write request, let's remove
+                        // it
+                        queue.remove();
+                        // complete the future
+                        DefaultWriteFuture future = (DefaultWriteFuture) wreq.getFuture();
+                        
+                        if (future != null) {
+                            future.complete();
+                        }
+                    } else {
+                        // output socket buffer is full, we need
+                        // to give up until next selection for
+                        // writing
+                        break;
+                    }
+                } while (!queue.isEmpty());
+                
+                isEmpty = queue.isEmpty();
+            } finally {
+                session.releaseWriteQueue();
+            }
+
+            // if the session is no more interested in writing, we need
+            // to stop listening for OP_WRITE events
+            if (isEmpty) {
+                // a key registered for read ? (because we can have a
+                // Selector for reads and another for the writes
+                SelectionKey readKey = sessionReadKey.get(session);
+                
+                if (readKey != null) {
+                    LOGGER.debug("registering key for only reading");
+                    SelectionKey mykey = session.getSocketChannel().register(selector,
+                            SelectionKey.OP_READ, session);
+                    sessionReadKey.put(session, mykey);
+                } else {
+                    LOGGER.debug("cancel key for writing");
+                    session.getSocketChannel().keyFor(selector).cancel();
+                }
+            }
+        }
+        
+        /**
+         * Flushes the sessions
+         */
+        private void processFushSessions() throws IOException {
+            NioTcpSession session = flushingSessions.poll();
+            // a key registered for read ? (because we can have a
+            // Selector for reads and another for the writes
+            SelectionKey readKey = sessionReadKey.get(session);
+            
+            if (readKey != null) {
+                // register for read/write
+                SelectionKey key = session.getSocketChannel().register(selector,
+                        SelectionKey.OP_READ | SelectionKey.OP_WRITE, session);
+
+                sessionReadKey.put(session, key);
+            } else {
+                session.getSocketChannel().register(selector, SelectionKey.OP_WRITE, session);
             }
         }
     }

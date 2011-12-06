@@ -23,6 +23,9 @@ import java.net.SocketAddress;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+
 import org.apache.mina.filterchain.IoFilterController;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.session.WriteRequest;
@@ -50,7 +53,9 @@ import org.apache.mina.session.WriteRequest;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoSession {
-
+    /** The SslHelper instance name, stored in the session's attributes */
+    static final String SSL_HELPER = "internal_sslHelper";
+    
     /**
      * The unique identifier of this session.
      * 
@@ -117,6 +122,14 @@ public interface IoSession {
      * @return <code>true</tt> if and only if this session is belonging a secured connection.
      */
     boolean isSecured();
+    
+    /**
+     * Initializes the SSL/TLS environment for this session.
+     * 
+     * @param sslContext The SLLCOntext instance to use.
+     * @throws SSLException If the SSL/TLS configuration can't be initialized
+     */
+    void initSecure(SSLContext sslContext) throws SSLException;
 
     /**
      * Tells if the session is using SSL/TLS.
