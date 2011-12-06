@@ -40,7 +40,7 @@ public interface SelectorProcessor {
      * @param service
      * @param clientChannel
      */
-    void createSession(IoService service, Object clientSocket);
+    void createSession(IoService service, Object clientSocket) throws IOException;
 
     /**
      * Bind and start processing this new server address

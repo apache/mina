@@ -297,8 +297,12 @@ public abstract class AbstractIoService implements IoService {
         }
     }
     
-    public void addSslContext(SSLContext sslContext) {
+    /**
+     * {@inheritDoc}
+     */
+    public void setSslContext(SSLContext sslContext) {
         this.sslContext = sslContext;
+        mode = ServiceMode.SECURED;
     }
     
     /**
