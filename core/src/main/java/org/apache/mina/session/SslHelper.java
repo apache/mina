@@ -33,12 +33,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An helper class used to manage everyting related to SSL/TLS establishement
+ * An helper class used to manage everything related to SSL/TLS establishement
  * and management.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-/** No qualifier */ class SslHelper
+public class SslHelper
 {
     /** A logger for this class */
     private final static Logger LOGGER = LoggerFactory.getLogger(SslHelper.class);
@@ -95,7 +95,7 @@ import org.slf4j.LoggerFactory;
     /**
      * @return The associated SSLEngine
      */
-    /* no qualifier */ SSLEngine getEngine() {
+    public SSLEngine getEngine() {
         return sslEngine;
     }
 

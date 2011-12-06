@@ -82,8 +82,19 @@ public abstract class AbstractIoSession implements IoSession {
 
     protected final Object stateMonitor = new Object();
 
+    /** The session's state : one of CREATED, CONNECTED, CLOSING, CLOSED, SECURING, CONNECTED_SECURED */
     protected volatile SessionState state;
     
+    /** A lock to protect the access to the session's state */
+    private final ReadWriteLock stateLock = new ReentrantReadWriteLock();
+    
+    /** A Read lock on the reentrant session's state lock */
+    private final Lock stateReadLock = stateLock.readLock();
+
+    /** A Write lock on the reentrant session's state lock */
+    private final Lock stateWriteLock = stateLock.writeLock();
+
+
     /** Tells if the session is secured or not */
     protected volatile boolean secured;
 
@@ -132,7 +143,13 @@ public abstract class AbstractIoSession implements IoSession {
      */
     @Override
     public boolean isClosed() {
-        return state == SessionState.CLOSED;
+        try {
+            stateReadLock.lock();
+            
+            return state == SessionState.CLOSED;
+        } finally {
+            stateReadLock.unlock();
+        }
     }
 
     /**
@@ -140,7 +157,13 @@ public abstract class AbstractIoSession implements IoSession {
      */
     @Override
     public boolean isClosing() {
-        return state == SessionState.CLOSING;
+        try {
+            stateReadLock.lock();
+            
+            return state == SessionState.CLOSING;
+        } finally {
+            stateReadLock.unlock();
+        }
     }
     
     /**
@@ -148,7 +171,27 @@ public abstract class AbstractIoSession implements IoSession {
      */
     @Override
     public boolean isConnected() {
-        return state == SessionState.CONNECTED;
+        try {
+            stateReadLock.lock();
+            
+            return state == SessionState.CONNECTED;
+        } finally {
+            stateReadLock.unlock();
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCreated() {
+        try {
+            stateReadLock.lock();
+            
+            return state == SessionState.CREATED;
+        } finally {
+            stateReadLock.unlock();
+        }
     }
 
     /**
@@ -156,7 +199,13 @@ public abstract class AbstractIoSession implements IoSession {
      */
     @Override
     public boolean isSecuring() {
-        return state == SessionState.SECURING;
+        try {
+            stateReadLock.lock();
+            
+            return state == SessionState.SECURING;
+        } finally {
+            stateReadLock.unlock();
+        }
     }
 
     /**
@@ -164,11 +213,91 @@ public abstract class AbstractIoSession implements IoSession {
      */
     @Override
     public boolean isConnectedSecured() {
-        return state == SessionState.CONNECTED_SECURED;
+        try {
+            stateReadLock.lock();
+            
+            return state == SessionState.SECURED;
+        } finally {
+            stateReadLock.unlock();
+        }
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void changeState(SessionState from, SessionState to) throws IllegalStateException {
+        try {
+            stateWriteLock.lock();
+            
+            switch (from) {
+                case CREATED :
+                    switch (to) {
+                        case CONNECTED :
+                        case SECURING :
+                        case CLOSING :
+                            state = to;
+                            break;
+                            
+                        default :
+                            throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                    }
+                    
+                    break;
+                    
+                case CONNECTED :
+                    switch (to) {
+                        case SECURING :
+                        case CLOSING :
+                            state = to;
+                            break;
+                            
+                        default :
+                            throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                    }
+                    
+                    break;
+                    
+                case SECURING :
+                    switch (to) {
+                        case SECURED :
+                        case CLOSING :
+                            state = to;
+                            break;
+                            
+                        default :
+                            throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                    }
+                    
+                    break;
+                    
+                    
+                case SECURED :
+                    switch (to) {
+                        case CONNECTED :
+                        case CLOSING :
+                            state = to;
+                            break;
+                            
+                        default :
+                            throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                    }
+                    
+                    break;
+                case CLOSING :
+                    if (to != SessionState.CLOSED) {
+                        throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                    }
 
-    public SessionState getState() {
-        return state;
+                    state = to;
+                    
+                    break;
+                    
+                case CLOSED :
+                    throw new IllegalStateException("The session is already closed. cannot switch to " + to );
+            }
+        } finally {
+            stateWriteLock.unlock();
+        }
     }
 
     //------------------------------------------------------------------------

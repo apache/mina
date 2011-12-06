@@ -219,7 +219,8 @@ public class NioTcpSession extends AbstractIoSession {
      * Set this session status as connected. To be called by the processor selecting/polling this session.
      */
     void setConnected() {
-        if (getState() != SessionState.CREATED) {
+        
+        if (!isCreated()) {
             throw new RuntimeException("Trying to open a non created session");
         }
         state = SessionState.CONNECTED;

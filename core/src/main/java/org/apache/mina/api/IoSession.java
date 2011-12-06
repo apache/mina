@@ -89,13 +89,6 @@ public interface IoSession {
     /* READ / WRITE / CLOSE */
 
     /**
-     * Tells if the session is currently connected and able to process incoming requests and to send outgoing responses.
-     * 
-     * @return <code>true</code> if this session is connected with remote peer.
-     */
-    boolean isConnected();
-
-    /**
      * Tells if the session is currently closed.
      * 
      * @return <code>true</code> if this session is disconnected with remote peer.
@@ -110,6 +103,20 @@ public interface IoSession {
     boolean isClosing();
 
     /**
+     * Tells if the session is currently connected and able to process incoming requests and to send outgoing responses.
+     * 
+     * @return <code>true</code> if this session is connected with remote peer.
+     */
+    boolean isConnected();
+
+    /**
+     * Tells if the session is created.
+     * 
+     * @return <code>true</code> if this session is created.
+     */
+    boolean isCreated();
+
+    /**
      * Tells if the session is processing a SSL/TLS handshake.
      * 
      * @return <code>true</tt> if and only if this session is processing a SSL/TLS handshake.
@@ -122,6 +129,27 @@ public interface IoSession {
      * @return <code>true</tt> if and only if this session is belonging a secured connection.
      */
     boolean isSecured();
+    
+    /**
+     * Changes the session's state from a given state to another state. Not all the
+     * transition are allowed. Here is the list of all the possible transitions :<br/>
+     * <ul>
+     *   <li>CREATED   -> CONNECTED</li>
+     *   <li>CREATED   -> SECURING</li>
+     *   <li>CREATED   -> CLOSING</li>
+     *   <li>CONNECTED -> SECURING</li>
+     *   <li>CONNECTED -> CLOSING</li>
+     *   <li>SECURING  -> SECURED</li>
+     *   <li>SECURING  -> CLOSING</li>
+     *   <li>SECURED   -> CONNECTED</li>
+     *   <li>SECURED   -> CLOSING</li>
+     *   <li>CLOSING   -> CLOSED</li>
+     * </ul>
+     * 
+     * @param from The initial SessionState
+     * @param to The final SessionState
+     */
+    void changeState(SessionState from, SessionState to) throws IllegalStateException;
     
     /**
      * Initializes the SSL/TLS environment for this session.
@@ -275,8 +303,6 @@ public interface IoSession {
      */
     Set<String> getAttributeNames();
 
-    SessionState getState();
-
     /**
      * State of a {@link IoSession}
      * 
@@ -284,7 +310,7 @@ public interface IoSession {
      * 
      */
     public enum SessionState {
-        CREATED, CONNECTED, CLOSING, CLOSED, SECURING, CONNECTED_SECURED
+        CREATED, CONNECTED, CLOSING, CLOSED, SECURING, SECURED
     }
 
     /* SESSION WRITING */

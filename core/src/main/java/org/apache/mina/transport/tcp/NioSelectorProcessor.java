@@ -36,7 +36,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 
 import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
@@ -46,6 +48,7 @@ import org.apache.mina.service.AbstractIoService;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.service.SelectorStrategy;
 import org.apache.mina.session.DefaultWriteFuture;
+import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.tcp.nio.NioTcpServer;
 import org.slf4j.Logger;
@@ -457,9 +460,37 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 
                 if (session.isSecured() && !session.isConnectedSecured()) {
                     // Process the SSL handshake now
-                    //processHandShake(session, readBuffer);
+                    processHandShake(session, readBuffer);
                 } else {
                     session.getFilterChain().processMessageReceived(session, readBuffer);
+                }
+            }
+        }
+        
+        private void processHandShake( IoSession session, ByteBuffer buffer) throws SSLException{
+            SslHelper sslHelper = session.getAttribute( IoSession.SSL_HELPER );
+            
+            SSLEngine engine = sslHelper.getEngine();
+            
+            HandshakeStatus hsStatus = engine.getHandshakeStatus();
+            
+            while ((hsStatus != HandshakeStatus.FINISHED) && (hsStatus != HandshakeStatus.NOT_HANDSHAKING)) {
+                switch (hsStatus) {
+                    case NOT_HANDSHAKING :
+                        // This is the very first step. We have to initialize the handShake
+                        engine.beginHandshake();
+                        break;
+                        
+                    case NEED_TASK :
+                    case NEED_WRAP :
+                    case NEED_UNWRAP :
+                    case FINISHED :
+                        if ( LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("{} processing the FINISHED state", session);
+                        }
+                        
+                        session.getState().
+                        break;
                 }
             }
         }
