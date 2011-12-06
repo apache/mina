@@ -386,7 +386,8 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                     readBuffer.flip();
                                     
                                     if (session.isSecured() && !session.isConnectedSecured()) {
-                                            // Process the SSL handshake now
+                                        // Process the SSL handshake now
+                                        //processHandShake(session, readBuffer);
                                     } else {
                                         session.getFilterChain().processMessageReceived(session, readBuffer);
                                     }
@@ -399,46 +400,59 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                 }
                                 NioTcpSession session = (NioTcpSession) key.attachment();
                                 session.setNotRegisteredForWrite();
+
                                 // write from the session write queue
-                                Queue<WriteRequest> queue = session.getWriteQueue();
-
-                                do {
-                                    // get a write request from the queue
-                                    WriteRequest wreq = queue.peek();
-                                    if (wreq == null) {
-                                        break;
-                                    }
-                                    ByteBuffer buf = (ByteBuffer) wreq.getMessage();
-
-                                    int wrote = session.getSocketChannel().write(buf);
-                                    if (LOGGER.isDebugEnabled()) {
-                                        LOGGER.debug("wrote {} bytes to {}", wrote, session);
-                                    }
-
-                                    if (buf.remaining() == 0) {
-                                        // completed write request, let's remove
-                                        // it
-                                        queue.remove();
-                                        // complete the future
-                                        DefaultWriteFuture future = (DefaultWriteFuture) wreq.getFuture();
-                                        if (future != null) {
-                                            future.complete();
+                                boolean isEmpty = false;
+                                
+                                try {
+                                    Queue<WriteRequest> queue = session.acquireWriteQueue();
+    
+                                    do {
+                                        // get a write request from the queue
+                                        WriteRequest wreq = queue.peek();
+                                        
+                                        if (wreq == null) {
+                                            break;
                                         }
-                                    } else {
-                                        // output socket buffer is full, we need
-                                        // to give up until next selection for
-                                        // writing
-                                        break;
-                                    }
-
-                                } while (!queue.isEmpty());
+                                        
+                                        ByteBuffer buf = (ByteBuffer) wreq.getMessage();
+    
+                                        int wrote = session.getSocketChannel().write(buf);
+                                        
+                                        if (LOGGER.isDebugEnabled()) {
+                                            LOGGER.debug("wrote {} bytes to {}", wrote, session);
+                                        }
+    
+                                        if (buf.remaining() == 0) {
+                                            // completed write request, let's remove
+                                            // it
+                                            queue.remove();
+                                            // complete the future
+                                            DefaultWriteFuture future = (DefaultWriteFuture) wreq.getFuture();
+                                            
+                                            if (future != null) {
+                                                future.complete();
+                                            }
+                                        } else {
+                                            // output socket buffer is full, we need
+                                            // to give up until next selection for
+                                            // writing
+                                            break;
+                                        }
+                                    } while (!queue.isEmpty());
+                                    
+                                    isEmpty = queue.isEmpty();
+                                } finally {
+                                    session.releaseWriteQueue();
+                                }
 
                                 // if the session is no more interested in writing, we need
                                 // to stop listening for OP_WRITE events
-                                if (queue.isEmpty()) {
+                                if (isEmpty) {
                                     // a key registered for read ? (because we can have a
                                     // Selector for reads and another for the writes
                                     SelectionKey readKey = sessionReadKey.get(session);
+                                    
                                     if (readKey != null) {
                                         LOGGER.debug("registering key for only reading");
                                         SelectionKey mykey = session.getSocketChannel().register(selector,
@@ -449,7 +463,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
                                         session.getSocketChannel().keyFor(selector).cancel();
                                     }
                                 }
-
                             }
 
                             if (key.isAcceptable()) {

@@ -25,6 +25,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
@@ -86,6 +89,15 @@ public abstract class AbstractIoSession implements IoSession {
 
     /** the queue of pending writes for the session, to be dequeued by the {@link SelectorProcessor} */
     private Queue<WriteRequest> writeQueue = new DefaultWriteQueue();
+
+    /** A lock to protect the access to the write queue */
+    private final ReadWriteLock writeQueueLock = new ReentrantReadWriteLock();
+    
+    /** A Read lock on the reentrant writeQueue lock */
+    private final Lock writeQueueReadLock = writeQueueLock.readLock();
+
+    /** A Write lock on the reentrant writeQueue lock */
+    private final Lock writeQueueWriteLock = writeQueueLock.writeLock();
 
     private IoFilterController filterProcessor;
     
@@ -314,7 +326,13 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public WriteRequest enqueueWriteRequest(Object message) {
         DefaultWriteRequest request = new DefaultWriteRequest(message);
-        writeQueue.add(request);
+        
+        try {
+            writeQueueReadLock.lock();
+            writeQueue.add(request);
+        } finally {
+            writeQueueReadLock.unlock();
+        }
 
         // If it wasn't, we register this session as interested to write.
         // It's done in atomic fashion for avoiding two concurrent registering.
@@ -333,8 +351,17 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     @Override
-    public Queue<WriteRequest> getWriteQueue() {
+    public Queue<WriteRequest> acquireWriteQueue() {
+        writeQueueWriteLock.lock();
         return writeQueue;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void releaseWriteQueue() {
+        writeQueueWriteLock.unlock();
     }
 
     /**
