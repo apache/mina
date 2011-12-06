@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoServiceListener;
@@ -45,6 +47,9 @@ public abstract class AbstractIoService implements IoService {
     
     /** The service mode : secured or not */
     private ServiceMode mode;
+    
+    /** The SSLContext instance */
+    private SSLContext sslContext;
 
     private final Map<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
 
@@ -282,8 +287,7 @@ public abstract class AbstractIoService implements IoService {
     }
     
     /**
-     * Set the mode to use, either secured or not secured
-     * @param secured The mode to use
+     * {@inheritDoc}
      */
     public void setSecured(boolean secured) {
         if (secured) {
@@ -291,5 +295,16 @@ public abstract class AbstractIoService implements IoService {
         } else {
             mode = ServiceMode.NOT_SECURED;
         }
+    }
+    
+    public void addSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public SSLContext getSslContext() {
+        return sslContext;
     }
 }

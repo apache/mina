@@ -21,6 +21,8 @@ package org.apache.mina.api;
 
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.mina.service.IoHandler;
 
 /**
@@ -90,4 +92,18 @@ public interface IoService {
      * @param secured The mode to use
      */
     void setSecured(boolean secured);
+    
+    /**
+     * Inject a {@link SSLContex} valid for the service. This {@link SSLContex} will be used
+     * by the SSLEngine to handle secured connections.<br/>
+     * The {@link SSLContex} must have been created and initialized before being injected in
+     * the service.
+     * @param sslContext The configured {@link SSLContex}.
+     */
+    void addSslContext(SSLContext sslContext);
+    
+    /**
+     * @return The {@link SSLContext} instance stored in the service.
+     */
+    SSLContext getSslContext();
 }
