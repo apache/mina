@@ -43,6 +43,7 @@ import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.IoSession.SessionState;
 import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.AbstractIoService;
 import org.apache.mina.service.SelectorProcessor;
@@ -489,7 +490,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                             LOGGER.debug("{} processing the FINISHED state", session);
                         }
                         
-                        session.getState().
+                        session.changeState(SessionState.SECURED);
                         break;
                 }
             }

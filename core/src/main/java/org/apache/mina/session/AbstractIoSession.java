@@ -225,11 +225,11 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
-    public void changeState(SessionState from, SessionState to) throws IllegalStateException {
+    public void changeState(SessionState to) throws IllegalStateException {
         try {
             stateWriteLock.lock();
             
-            switch (from) {
+            switch (state) {
                 case CREATED :
                     switch (to) {
                         case CONNECTED :
@@ -239,7 +239,7 @@ public abstract class AbstractIoSession implements IoSession {
                             break;
                             
                         default :
-                            throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                            throw new IllegalStateException("Cannot transit from " + state + " to " + to );
                     }
                     
                     break;
@@ -252,7 +252,7 @@ public abstract class AbstractIoSession implements IoSession {
                             break;
                             
                         default :
-                            throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                            throw new IllegalStateException("Cannot transit from " + state + " to " + to );
                     }
                     
                     break;
@@ -265,7 +265,7 @@ public abstract class AbstractIoSession implements IoSession {
                             break;
                             
                         default :
-                            throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                            throw new IllegalStateException("Cannot transit from " + state + " to " + to );
                     }
                     
                     break;
@@ -279,13 +279,13 @@ public abstract class AbstractIoSession implements IoSession {
                             break;
                             
                         default :
-                            throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                            throw new IllegalStateException("Cannot transit from " + state + " to " + to );
                     }
                     
                     break;
                 case CLOSING :
                     if (to != SessionState.CLOSED) {
-                        throw new IllegalStateException("Cannot transit from " + from + " to " + to );
+                        throw new IllegalStateException("Cannot transit from " + state + " to " + to );
                     }
 
                     state = to;

@@ -131,7 +131,7 @@ public interface IoSession {
     boolean isSecured();
     
     /**
-     * Changes the session's state from a given state to another state. Not all the
+     * Changes the session's state from the current state to a new state. Not all the
      * transition are allowed. Here is the list of all the possible transitions :<br/>
      * <ul>
      *   <li>CREATED   -> CONNECTED</li>
@@ -146,10 +146,9 @@ public interface IoSession {
      *   <li>CLOSING   -> CLOSED</li>
      * </ul>
      * 
-     * @param from The initial SessionState
-     * @param to The final SessionState
+     * @param newState The final SessionState
      */
-    void changeState(SessionState from, SessionState to) throws IllegalStateException;
+    void changeState(SessionState newState) throws IllegalStateException;
     
     /**
      * Initializes the SSL/TLS environment for this session.
