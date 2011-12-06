@@ -26,9 +26,12 @@
     <artifactId>mina-parent</artifactId>
     <version>3.0.0-M1-SNAPSHOT</version>
   </parent>
+
   <artifactId>mina-http</artifactId>
   <name>Apache MINA HTTP</name>
   <packaging>bundle</packaging>
+  <description>Low level HTTP codec for building simple &amp; fast HTTP server and clients</description>
+
   <properties>
     <symbolicName>${project.groupId}.http</symbolicName>
     <exportedPackage>${project.groupId}.http.api</exportedPackage>
@@ -42,6 +45,5 @@
       <type>bundle</type>
     </dependency>
   </dependencies>
-  <description>Low level HTTP codec for building simple &amp; fast HTTP server and clients</description>
 </project>
 

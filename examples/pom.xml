@@ -26,9 +26,12 @@
     <artifactId>mina-parent</artifactId>
     <version>3.0.0-M1-SNAPSHOT</version>
   </parent>
+
   <artifactId>mina-examples</artifactId>
   <name>Apache MINA examples</name>
   <packaging>jar</packaging>
+  <description>Apache MINA server and client examples</description>
+
   <properties>
     <symbolicName>${project.groupId}.examples</symbolicName>
     <exportedPackage>${project.groupId}</exportedPackage>
@@ -66,6 +69,5 @@
         <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <description>Apache MINA server and client examples</description>
 </project>
 

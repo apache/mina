@@ -26,9 +26,12 @@
     <artifactId>mina-parent</artifactId>
     <version>3.0.0-M1-SNAPSHOT</version>
   </parent>
+
   <artifactId>mina-ldap</artifactId>
   <name>Apache MINA LDAP</name>
   <packaging>bundle</packaging>
+  <description>Low level LDAP codec</description>
+
   <properties>
     <symbolicName>${project.groupId}.ldap</symbolicName>
     <exportedPackage>${project.groupId}.ldap.api</exportedPackage>
@@ -85,6 +88,5 @@
       <version>r09</version>
     </dependency>
   </dependencies>
-  <description>Low level LDAP codec</description>
 </project>
 
