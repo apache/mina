@@ -79,11 +79,16 @@ public class ByteBufferDumper {
     }
 
     public static String dump(ByteBuffer buffer) {
-
+        byte[] data = buffer.array();
+        int start = buffer.position();
+        int size = buffer.remaining();
+        
         // is not ASCII printable ?
         boolean binaryContent = false;
-        for (int i = 0; i < buffer.remaining(); i++) {
-            byte b = buffer.get(i);
+        
+        for (int i = start; i < size; i++) {
+            byte b = data[i];
+            
             if ((b < 32 || b > 126) && b != 13 && b != 10) {
                 binaryContent = true;
                 break;
@@ -91,38 +96,40 @@ public class ByteBufferDumper {
         }
 
         if (binaryContent) {
-            int pos = buffer.position();
-            int size = buffer.remaining();
             StringBuilder out = new StringBuilder(size * 3 + 24);
-            out.append("ByteBuffer[len=").append(size).append(",bytes='");
-            int mark = buffer.position();
+            out.append("ByteBuffer[len=").append(size).append(",bytes='\n");
 
             // fill the first
-            int byteValue = buffer.get() & 0xFF;
+            int byteValue = data[start] & 0xFF;
             out.append((char) highDigits[byteValue]);
             out.append((char) lowDigits[byteValue]);
-            size--;
 
             // and the others, too
-            for (; size > 0; size--) {
-                out.append(' ');
-                byteValue = buffer.get() & 0xFF;
+            for (int i = start + 1; i < size; i++) {
+                if (i%16 == 0) {
+                    out.append('\n');
+                } else {
+                    out.append(' ');
+                }
+                
+                byteValue = data[i] & 0xFF;
                 out.append((char) highDigits[byteValue]);
                 out.append((char) lowDigits[byteValue]);
             }
-            buffer.position(pos);
-            out.append("'");
+            
+            out.append("']");
+            
             return out.toString();
 
         } else {
-            byte[] data = new byte[buffer.remaining()];
-            int pos = buffer.position();
-            buffer.get(data);
-            buffer.position(pos);
-            StringBuilder out = new StringBuilder(buffer.remaining() + 22);
-            out.append("ByteBuffer[len=").append(buffer.remaining()).append(",str='").append(new String(data))
-                    .append("'");
-            return out.toString();
+            StringBuilder sb = new StringBuilder(size);
+            sb.append("ByteBuffer[len=")
+                .append(buffer.remaining())
+                .append(",str='")
+                .append(new String(data, start, size))
+                .append("']");
+            
+            return sb.toString();
         }
     }
 
