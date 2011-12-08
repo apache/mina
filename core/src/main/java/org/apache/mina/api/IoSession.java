@@ -142,6 +142,7 @@ public interface IoSession {
      *   <li>SECURING  -> SECURED</li>
      *   <li>SECURING  -> CLOSING</li>
      *   <li>SECURED   -> CONNECTED</li>
+     *   <li>SECURED   -> SECURING</li>
      *   <li>SECURED   -> CLOSING</li>
      *   <li>CLOSING   -> CLOSED</li>
      * </ul>

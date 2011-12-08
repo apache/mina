@@ -274,6 +274,7 @@ public abstract class AbstractIoSession implements IoSession {
                 case SECURED :
                     switch (to) {
                         case CONNECTED :
+                        case SECURING :
                         case CLOSING :
                             state = to;
                             break;
