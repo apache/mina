@@ -37,6 +37,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 
@@ -75,8 +76,14 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
     private Map<SocketAddress, ServerSocketChannel> serverSocketChannels = new ConcurrentHashMap<SocketAddress, ServerSocketChannel>();
 
-    // read buffer for all the incoming bytes
+    /** Read buffer for all the incoming bytes */
     private ByteBuffer readBuffer = ByteBuffer.allocate(64 * 1024);
+
+    /** Application buffer for all the outgoing messages */
+    private ByteBuffer appBuffer = ByteBuffer.allocate(16 * 1024);
+    
+    /** An empty buffer used during the handshake phase */
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
 
     // the thread polling and processing the I/O events
     private SelectorWorker worker = null;
@@ -446,8 +453,9 @@ public class NioSelectorProcessor implements SelectorProcessor {
             LOGGER.debug("readable client {}", key);
             NioTcpSession session = (NioTcpSession) key.attachment();
             SocketChannel channel = session.getSocketChannel();
-            readBuffer.rewind();
+            readBuffer.clear();
             int readCount = channel.read(readBuffer);
+            
             LOGGER.debug("read {} bytes", readCount);
 
             if (readCount < 0) {
@@ -468,32 +476,126 @@ public class NioSelectorProcessor implements SelectorProcessor {
             }
         }
         
-        private void processHandShake( IoSession session, ByteBuffer buffer) throws SSLException{
+        private boolean processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
             SslHelper sslHelper = session.getAttribute( IoSession.SSL_HELPER );
             
+            if (sslHelper == null) {
+                throw new IllegalStateException();
+            }
+            
             SSLEngine engine = sslHelper.getEngine();
-            
             HandshakeStatus hsStatus = engine.getHandshakeStatus();
+            ByteBuffer applicationBuffer = appBuffer;
+            boolean processingData = true;
+            ByteBuffer sslBufferIn = sslHelper.getSslInBuffer(inBuffer);
+            boolean waitingForMore = false;
             
-            while ((hsStatus != HandshakeStatus.FINISHED) && (hsStatus != HandshakeStatus.NOT_HANDSHAKING)) {
+            // Start the Handshake
+            engine.beginHandshake();
+            hsStatus = engine.getHandshakeStatus();
+
+            // If the SSLEngine has not be started, then the status will be NOT_HANDSHAKING
+            while ((hsStatus != HandshakeStatus.FINISHED) &&
+                   (hsStatus != HandshakeStatus.NOT_HANDSHAKING ) &&
+                   processingData) {
                 switch (hsStatus) {
-                    case NOT_HANDSHAKING :
-                        // This is the very first step. We have to initialize the handShake
-                        engine.beginHandshake();
+                    case NEED_TASK :
+                        Runnable runnable;
+                        
+                        while ((runnable = engine.getDelegatedTask()) != null) {
+                            // TODO : we may have to use a thread pool here to improve the
+                            // performances
+                            runnable.run();
+                        }
+
+                        hsStatus = engine.getHandshakeStatus();
+                        
                         break;
                         
-                    case NEED_TASK :
                     case NEED_WRAP :
-                    case NEED_UNWRAP :
-                    case FINISHED :
                         if ( LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("{} processing the FINISHED state", session);
+                            LOGGER.debug("{} processing the NEED_WRAP state", session);
                         }
                         
-                        session.changeState(SessionState.SECURED);
+                        int capacity = engine.getSession().getPacketBufferSize();
+                        ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
+
+                        while (true) {
+                            SSLEngineResult result = engine.wrap(EMPTY_BUFFER, outBuffer);
+                            
+                            if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
+                                // TODO : increase the AppBuffer size
+                            } else {
+                                break;
+                            }
+                        }
+        
+                        outBuffer.flip();
+                        session.write(outBuffer);
+                        hsStatus = engine.getHandshakeStatus();
+                        
+                        // Now that we have written the response, we can exit if there is nothing else to do,
+                        if (engine.isOutboundDone()) {
+                            processingData = false;
+                        }
+                        
                         break;
+                        
+                    case NEED_UNWRAP :
+                        if (engine.isInboundDone()) {
+                            processingData = false;
+                            sslHelper.releaseInBuffer();
+                            break;
+                        }
+
+                        // We will try to unwrap the incoming data, using the selector buffers.
+                        SSLEngineResult result = engine.unwrap(sslBufferIn, applicationBuffer);
+                        hsStatus = engine.getHandshakeStatus();
+
+                        switch (result.getStatus()) {
+                            case OK :
+                                // We have unwrapped the message. The inBuffer can contain
+                                // some more data to be unwrapped. Loop.
+                                break;
+                                
+                            case CLOSED :
+                                // We must exit immediately
+                                sslHelper.releaseInBuffer();
+                                throw new IllegalStateException();
+                                
+                            case BUFFER_OVERFLOW :
+                                // Not enough room in the appData : increase the buffer size
+                                ByteBuffer newBuffer = ByteBuffer.allocate(applicationBuffer.capacity() + 4 * 1024);
+                                applicationBuffer = newBuffer;
+                                
+                                // And now, try again.
+                                break;
+    
+                            case BUFFER_UNDERFLOW :
+                                // Not enough data in the received data. Accumulate and get some more.
+                                processingData = false;
+                                waitingForMore = true;
+                                sslHelper.addInBuffer(sslBufferIn);
+                                break;
+                        }
                 }
             }
+            
+            if (!waitingForMore) {
+                sslHelper.releaseInBuffer();
+            }
+            
+            if (hsStatus == HandshakeStatus.FINISHED) {
+                if ( LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} processing the FINISHED state", session);
+                }
+                
+                session.changeState(SessionState.SECURED);
+
+                return true;
+            }
+            
+            return false;
         }
         
         /**
@@ -503,6 +605,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("writable session : {}", key.attachment());
             }
+            
             NioTcpSession session = (NioTcpSession) key.attachment();
             session.setNotRegisteredForWrite();
 

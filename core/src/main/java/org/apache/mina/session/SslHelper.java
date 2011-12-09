@@ -20,6 +20,7 @@
 package org.apache.mina.session;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -73,6 +74,12 @@ public class SslHelper
     /** The Handshake status */
     private SSLEngineResult.HandshakeStatus handshakeStatus;
 
+    /** Application cleartext data to be read by application */
+    private ByteBuffer appBuffer;
+
+    /** Incoming buffer accumulating bytes read from the channel */
+    private ByteBuffer sslInBuffer;
+    
     /**
      * Create a new SSL Handler.
      *
@@ -127,15 +134,15 @@ public class SslHelper
         // Initialize the different SslEngine modes
         if (!sslEngine.getUseClientMode()) {
             // Those parameters are only valid when in server mode
-            boolean needClientAuth = session.<Boolean>getAttribute(NEED_CLIENT_AUTH);
-            boolean wantClientAuth = session.<Boolean>getAttribute(WANT_CLIENT_AUTH);
+            Boolean needClientAuth = session.<Boolean>getAttribute(NEED_CLIENT_AUTH);
+            Boolean wantClientAuth = session.<Boolean>getAttribute(WANT_CLIENT_AUTH);
 
             // The WantClientAuth superseed the NeedClientAuth, if set.
-            if (needClientAuth) {
+            if ((needClientAuth != null) && (needClientAuth)) {
                 sslEngine.setNeedClientAuth(true);
             }
             
-            if (wantClientAuth) {
+            if ((wantClientAuth != null) && (wantClientAuth)) {
                 sslEngine.setWantClientAuth(true);
             }
         }
@@ -145,5 +152,44 @@ public class SslHelper
         if ( LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} SSL Handler Initialization done.", session);
         }
+    }
+
+    /**
+     * Get the local AppBuffer
+     * @return The Application Buffer allocated in the SslHelper, if any
+     */
+    public ByteBuffer getAppBuffer() {
+        return appBuffer;
+    }
+
+    public ByteBuffer getSslInBuffer(ByteBuffer inBuffer) {
+        if (sslInBuffer == null) {
+            sslInBuffer = inBuffer;
+        } else {
+            addInBuffer(inBuffer);
+        }
+        
+        return sslInBuffer;
+    }
+
+    public void setInBuffer(ByteBuffer inBuffer) {
+        sslInBuffer = ByteBuffer.allocate(16*1024);
+        sslInBuffer.put(inBuffer);
+    }
+
+    public void addInBuffer(ByteBuffer inBuffer) {
+        if (sslInBuffer.capacity() - sslInBuffer.remaining() < inBuffer.remaining()) {
+            // Increase the internal buffer
+            ByteBuffer newBuffer = ByteBuffer.allocate(sslInBuffer.capacity() + inBuffer.remaining());
+            newBuffer.put(sslInBuffer);
+            newBuffer.put(inBuffer);
+            sslInBuffer = newBuffer;
+        } else {
+            sslInBuffer.put(inBuffer);
+        }
+    }
+    
+    public void releaseInBuffer() {
+        sslInBuffer = null;
     }
 }
