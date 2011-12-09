@@ -25,6 +25,8 @@ import java.nio.ByteBuffer;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLEngineResult.HandshakeStatus;
+import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
@@ -78,7 +80,7 @@ public class SslHelper
     private ByteBuffer appBuffer;
 
     /** Incoming buffer accumulating bytes read from the channel */
-    private ByteBuffer sslInBuffer;
+    private ByteBuffer accBuffer;
     
     /**
      * Create a new SSL Handler.
@@ -163,33 +165,127 @@ public class SslHelper
     }
 
     public ByteBuffer getSslInBuffer(ByteBuffer inBuffer) {
-        if (sslInBuffer == null) {
-            sslInBuffer = inBuffer;
+        if (inBuffer == null) {
+            inBuffer = inBuffer;
         } else {
             addInBuffer(inBuffer);
         }
         
-        return sslInBuffer;
+        return inBuffer;
     }
 
     public void setInBuffer(ByteBuffer inBuffer) {
-        sslInBuffer = ByteBuffer.allocate(16*1024);
-        sslInBuffer.put(inBuffer);
+        inBuffer = ByteBuffer.allocate(16*1024);
+        inBuffer.put(inBuffer);
     }
 
-    public void addInBuffer(ByteBuffer inBuffer) {
-        if (sslInBuffer.capacity() - sslInBuffer.remaining() < inBuffer.remaining()) {
+    private void addInBuffer(ByteBuffer buffer) {
+        if (accBuffer.capacity() - accBuffer.limit() < buffer.remaining()) {
             // Increase the internal buffer
-            ByteBuffer newBuffer = ByteBuffer.allocate(sslInBuffer.capacity() + inBuffer.remaining());
-            newBuffer.put(sslInBuffer);
-            newBuffer.put(inBuffer);
-            sslInBuffer = newBuffer;
+            ByteBuffer newBuffer = ByteBuffer.allocate(accBuffer.capacity() + buffer.remaining());
+            
+            // Copy the two buffers
+            newBuffer.put(accBuffer);
+            newBuffer.put(buffer);
+            
+            // And reset the position to the original position
+            newBuffer.flip();
+            
+            accBuffer = newBuffer;
         } else {
-            sslInBuffer.put(inBuffer);
+            accBuffer.put(buffer);
+            accBuffer.flip();
         }
     }
     
     public void releaseInBuffer() {
-        sslInBuffer = null;
+        accBuffer = null;
+    }
+    
+    /**
+     * Process the NEED_TASK action.
+     * 
+     * @param engine The SSLEngine instance
+     * @return The resulting HandshakeStatus
+     * @throws SSLException If we've got an error while processing the tasks
+     */
+    public HandshakeStatus processTasks(SSLEngine engine) throws SSLException {
+        Runnable runnable;
+        
+        while ((runnable = engine.getDelegatedTask()) != null) {
+            // TODO : we may have to use a thread pool here to improve the
+            // performances
+            runnable.run();
+        }
+
+        HandshakeStatus hsStatus = engine.getHandshakeStatus();
+        
+        return hsStatus;
+    }
+    
+    /**
+     * Process the NEED_UNWRAP action. We have to read the incoming buffer, and to feed
+     * the application buffer. We also have to cover the three special cases : <br/>
+     * <ul>
+     * <li>The incoming buffer does not contain enough data (then we need to read some
+     * more and to accumulate the bytes in a temporary buffer)</li>
+     * <li></li>
+     * </ul>
+     * 
+     * @param engine
+     * @param inBuffer
+     * @param appBuffer
+     * @return
+     * @throws SSLException
+     */
+    public Status processUnwrap(SSLEngine engine, ByteBuffer inBuffer, ByteBuffer appBuffer) throws SSLException {
+        ByteBuffer tempBuffer = null;
+        
+        // First work with either the new incoming buffer, or the accumulating buffer
+        if ((this.accBuffer != null) && (this.accBuffer.remaining() > 0)) {
+            // Add the new incoming data into the local buffer
+            addInBuffer(inBuffer);
+            tempBuffer = this.accBuffer;
+        } else {
+            tempBuffer = inBuffer;
+        }
+        
+        // Loop until we have processed the entire incoming buffer,
+        // or until we have to stop
+        while (true) {
+            SSLEngineResult result = engine.unwrap(tempBuffer, appBuffer);
+
+            switch (result.getStatus()) {
+                case OK :
+                    System.out.println( "------------------> OK" );
+                    accBuffer = null;
+                    
+                    return Status.OK;
+                    
+                case BUFFER_UNDERFLOW :
+                    System.out.println( "------------------> UNDERFLOW" );
+                    // We need to read some more data from the channel.
+                    if (this.accBuffer == null) {
+                        this.accBuffer = ByteBuffer.allocate(tempBuffer.capacity() + 4096);
+                        this.accBuffer.put(inBuffer);
+                    }
+                    
+                    inBuffer.clear();
+                    
+                    return Status.BUFFER_UNDERFLOW;
+    
+                case CLOSED :
+                    System.out.println( "------------------> CLOSED" );
+                    // Get out
+                    accBuffer = null;
+                    throw new IllegalStateException();
+    
+                case BUFFER_OVERFLOW :
+                    System.out.println( "------------------> OVERFLOW" );
+                    // We have to increase the appBuffer size. In any case
+                    // we aren't processing an handshake here. Read again.
+                    appBuffer = ByteBuffer.allocate(appBuffer.capacity() + 4096 );
+            }
+        }
     }
 }
