@@ -288,6 +288,8 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
         // map for finding read keys associated with a given session
         private Map<NioTcpSession, SelectionKey> sessionReadKey = new HashMap<NioTcpSession, SelectionKey>();
+        
+        private boolean handshaking = false;
 
         @Override
         public void run() {
@@ -456,7 +458,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
             SocketChannel channel = session.getSocketChannel();
             readBuffer.clear();
             int readCount = channel.read(readBuffer);
-            System.out.println( "------------------> read " + readCount + "bytes" );
 
             LOGGER.debug("read {} bytes", readCount);
 
@@ -489,8 +490,12 @@ public class NioSelectorProcessor implements SelectorProcessor {
             HandshakeStatus hsStatus = engine.getHandshakeStatus();
             boolean processingData = true;
             
-            // Start the Handshake
-            engine.beginHandshake();
+            // Start the Handshake if we aren't already processing a HandShake
+            if (!handshaking) {
+                engine.beginHandshake();
+                handshaking = true;
+            }
+            
             hsStatus = engine.getHandshakeStatus();
 
             // If the SSLEngine has not be started, then the status will be NOT_HANDSHAKING
@@ -499,22 +504,21 @@ public class NioSelectorProcessor implements SelectorProcessor {
                    processingData) {
                 switch (hsStatus) {
                     case NEED_TASK :
-                        System.out.println( "------------------> NEED_TASK" );
                         hsStatus = sslHelper.processTasks(engine);
                         
                         break;
                         
                     case NEED_WRAP :
-                        System.out.println( "------------------> NEED_WRAP" );
                         if ( LOGGER.isDebugEnabled()) {
                             LOGGER.debug("{} processing the NEED_WRAP state", session);
                         }
                         
                         int capacity = engine.getSession().getPacketBufferSize();
                         ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
+                        SSLEngineResult result = null;
 
                         while (true) {
-                            SSLEngineResult result = engine.wrap(EMPTY_BUFFER, outBuffer);
+                            result = engine.wrap(EMPTY_BUFFER, outBuffer);
                             
                             if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
                                 // TODO : increase the AppBuffer size
@@ -525,13 +529,15 @@ public class NioSelectorProcessor implements SelectorProcessor {
         
                         outBuffer.flip();
                         session.write(outBuffer);
-                        processingData = false;
-                        hsStatus = engine.getHandshakeStatus();
+                        hsStatus = result.getHandshakeStatus();
+
+                        // We continue to loop while we don't expect messages to unwrap,
+                        // otherwise, we have to exit the loop.
+                        processingData = (hsStatus != HandshakeStatus.NEED_UNWRAP);
 
                         break;
                         
                     case NEED_UNWRAP :
-                        System.out.println( "------------------> NEED_UNWRAP" );
                         Status status = sslHelper.processUnwrap(engine, inBuffer, EMPTY_BUFFER);
 
                         if ( status == Status.BUFFER_UNDERFLOW) {
@@ -545,15 +551,13 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 }
             }
             
-            System.out.println( "======================> " + hsStatus);
-            
             if (hsStatus == HandshakeStatus.FINISHED) {
-                System.out.println( "------------------> FINISHED" );
                 if ( LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} processing the FINISHED state", session);
                 }
                 
                 session.changeState(SessionState.SECURED);
+                handshaking = false;
 
                 return true;
             }
@@ -589,8 +593,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     ByteBuffer buf = (ByteBuffer) wreq.getMessage();
 
                     int wrote = session.getSocketChannel().write(buf);
-
-                    System.out.println( "------------------> Written" + buf.limit() + " bytes");
 
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("wrote {} bytes to {}", wrote, session);

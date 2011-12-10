@@ -257,13 +257,11 @@ public class SslHelper
 
             switch (result.getStatus()) {
                 case OK :
-                    System.out.println( "------------------> OK" );
                     accBuffer = null;
                     
                     return Status.OK;
                     
                 case BUFFER_UNDERFLOW :
-                    System.out.println( "------------------> UNDERFLOW" );
                     // We need to read some more data from the channel.
                     if (this.accBuffer == null) {
                         this.accBuffer = ByteBuffer.allocate(tempBuffer.capacity() + 4096);
@@ -275,13 +273,11 @@ public class SslHelper
                     return Status.BUFFER_UNDERFLOW;
     
                 case CLOSED :
-                    System.out.println( "------------------> CLOSED" );
                     // Get out
                     accBuffer = null;
                     throw new IllegalStateException();
     
                 case BUFFER_OVERFLOW :
-                    System.out.println( "------------------> OVERFLOW" );
                     // We have to increase the appBuffer size. In any case
                     // we aren't processing an handshake here. Read again.
                     appBuffer = ByteBuffer.allocate(appBuffer.capacity() + 4096 );
