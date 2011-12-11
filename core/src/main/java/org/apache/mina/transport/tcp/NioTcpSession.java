@@ -25,6 +25,7 @@ import java.net.Socket;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.api.IoFuture;
+import org.apache.mina.api.IoService;
 import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.session.AbstractIoSession;
@@ -67,7 +68,7 @@ public class NioTcpSession extends AbstractIoSession {
         }
     };
 
-    NioTcpSession(NioTcpServer service, SocketChannel channel, SelectorProcessor writeProcessor) {
+    NioTcpSession(IoService service, SocketChannel channel, SelectorProcessor writeProcessor) {
         super(service, writeProcessor);
         this.channel = channel;
         this.configuration = new ProxySocketSessionConfig(channel.socket());
@@ -222,7 +223,7 @@ public class NioTcpSession extends AbstractIoSession {
         if (!isCreated()) {
             throw new RuntimeException("Trying to open a non created session");
         }
-        
+
         state = SessionState.CONNECTED;
     }
 }

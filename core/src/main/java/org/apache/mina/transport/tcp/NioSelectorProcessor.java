@@ -53,7 +53,6 @@ import org.apache.mina.service.SelectorStrategy;
 import org.apache.mina.session.DefaultWriteFuture;
 import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.tcp.nio.NioTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,8 +193,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
         LOGGER.debug("create session");
         final SocketChannel socketChannel = (SocketChannel) clientSocket;
         final SocketSessionConfig defaultConfig = (SocketSessionConfig) service.getSessionConfig();
-        final NioTcpSession session = new NioTcpSession((NioTcpServer) service, socketChannel,
-                strategy.getSelectorForNewSession(this));
+        final NioTcpSession session = new NioTcpSession(service, socketChannel, strategy.getSelectorForNewSession(this));
 
         try {
             socketChannel.configureBlocking(false);
@@ -490,25 +488,25 @@ public class NioSelectorProcessor implements SelectorProcessor {
         }
 
         private void processUnwrap(IoSession session, ByteBuffer inBuffer) throws SSLException {
-            SslHelper sslHelper = session.getAttribute( IoSession.SSL_HELPER );
-            
+            SslHelper sslHelper = session.getAttribute(IoSession.SSL_HELPER);
+
             if (sslHelper == null) {
                 throw new IllegalStateException();
             }
-            
+
             SSLEngine engine = sslHelper.getEngine();
-            
+
             // Blind guess : once uncompressed, the resulting buffer will be 3 times bigger
-            ByteBuffer appBuffer = ByteBuffer.allocate(inBuffer.limit() * 3 );
-            Status status = sslHelper.processUnwrap(engine, inBuffer, appBuffer );
+            ByteBuffer appBuffer = ByteBuffer.allocate(inBuffer.limit() * 3);
+            Status status = sslHelper.processUnwrap(engine, inBuffer, appBuffer);
             appBuffer.flip();
-            
+
             if (status == Status.OK) {
                 // Ok, go through the chain now
                 session.getFilterChain().processMessageReceived(session, appBuffer);
             }
         }
-        
+
         private boolean processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
             SslHelper sslHelper = session.getAttribute(IoSession.SSL_HELPER);
 
