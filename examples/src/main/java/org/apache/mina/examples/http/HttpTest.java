@@ -107,6 +107,7 @@ public class HttpTest {
             session.write(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpStatus.SUCCESS_OK, headers));
             session.write(content);
             session.write(new HttpEndOfContent());
+            session.close(false);
 
         }
     }
