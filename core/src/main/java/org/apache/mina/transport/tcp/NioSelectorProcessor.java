@@ -474,15 +474,41 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 // limit at the current position & rewind buffer back to start & push to the chain
                 readBuffer.flip();
 
-                if (session.isSecured() && !session.isConnectedSecured()) {
-                    // Process the SSL handshake now
-                    processHandShake(session, readBuffer);
+                if (session.isSecured()) {
+                    if (!session.isConnectedSecured()) {
+                        // Process the SSL handshake now
+                        processHandShake(session, readBuffer);
+                    } else {
+                        // Unwrap the incoming data
+                        processUnwrap(session, readBuffer);
+                    }
                 } else {
+                    // Plain message, not encrypted : go directly to the chain
                     session.getFilterChain().processMessageReceived(session, readBuffer);
                 }
             }
         }
 
+        private void processUnwrap(IoSession session, ByteBuffer inBuffer) throws SSLException {
+            SslHelper sslHelper = session.getAttribute( IoSession.SSL_HELPER );
+            
+            if (sslHelper == null) {
+                throw new IllegalStateException();
+            }
+            
+            SSLEngine engine = sslHelper.getEngine();
+            
+            // Blind guess : once uncompressed, the resulting buffer will be 3 times bigger
+            ByteBuffer appBuffer = ByteBuffer.allocate(inBuffer.limit() * 3 );
+            Status status = sslHelper.processUnwrap(engine, inBuffer, appBuffer );
+            appBuffer.flip();
+            
+            if (status == Status.OK) {
+                // Ok, go through the chain now
+                session.getFilterChain().processMessageReceived(session, appBuffer);
+            }
+        }
+        
         private boolean processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
             SslHelper sslHelper = session.getAttribute(IoSession.SSL_HELPER);
 
