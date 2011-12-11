@@ -491,9 +491,11 @@ public class NioSelectorProcessor implements SelectorProcessor {
             boolean processingData = true;
             
             // Start the Handshake if we aren't already processing a HandShake
+            // and switch to the SECURING state
             if (!handshaking) {
                 engine.beginHandshake();
                 handshaking = true;
+                session.changeState( SessionState.SECURING );
             }
             
             hsStatus = engine.getHandshakeStatus();
