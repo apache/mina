@@ -464,7 +464,8 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         // process the queue
-        getFilterChain().processMessageWriting(this, message, future);
+        IoFilterController chain = getFilterChain();
+        chain.processMessageWriting(this, message, future);
     }
 
     /**

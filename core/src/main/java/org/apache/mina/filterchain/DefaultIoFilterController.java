@@ -127,7 +127,9 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
 
             writeChainPosition.set(chain.length - 1);
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
-            chain[writeChainPosition.get()].messageWriting(session, message, this);
+            int position = writeChainPosition.get();
+            IoFilter nextFilter = chain[position];
+            nextFilter.messageWriting(session, message, this);
         }
         // put the future in the last write request
         if (future != null) {
@@ -158,7 +160,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     }
 
     /**
-     * At the end of write chain processing, enqueue final encoded {@link ByteBuffer} message in the session 
+     * At the end of write chain processing, enqueue final encoded {@link ByteBuffer} message in the session
      */
     private void enqueueFinalWriteMessage(IoSession session, Object message) {
         LOG.debug("end of write chan we enqueue the message in the session : {}", message);
