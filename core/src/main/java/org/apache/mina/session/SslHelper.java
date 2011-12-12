@@ -402,9 +402,9 @@ public class SslHelper
         return false;
     }
     
-    public DefaultWriteRequest processWrite(IoSession sessions, Object message, Queue<WriteRequest> writeQueue) {
+    public DefaultWriteRequest processWrite(IoSession session, Object message, Queue<WriteRequest> writeQueue) {
         ByteBuffer buf = (ByteBuffer)message;
-        ByteBuffer appBuffer = ByteBuffer.allocate(buf.limit() + 50);
+        ByteBuffer appBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
         
         try {
             while (true) {
@@ -420,16 +420,11 @@ public class SslHelper
                     case CLOSED :
                         break;
                     case OK :
+                        appBuffer.flip();
                         DefaultWriteRequest request = new DefaultWriteRequest(appBuffer);
 
                         writeQueue.add(request);
                         return request;
-                }
-                
-                if ( result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW ) {
-                    // Increase the buffer size
-                    appBuffer = ByteBuffer.allocate(appBuffer.capacity() + 4096);
-                } else {
                 }
             }
         } catch (SSLException se) {
