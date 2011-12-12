@@ -116,9 +116,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
     public NioSelectorProcessor(String name, SelectorStrategy strategy) {
         this.strategy = strategy;
-
-        // FIXME : configurable parameter
-        readBuffer = ByteBuffer.allocate(1024);
     }
 
     /**
