@@ -36,16 +36,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLEngineResult.HandshakeStatus;
-import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.api.IoSession.SessionState;
 import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.AbstractIoService;
 import org.apache.mina.service.SelectorProcessor;
@@ -81,9 +76,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
     /** Application buffer for all the outgoing messages */
     private ByteBuffer appBuffer = ByteBuffer.allocate(16 * 1024);
-
-    /** An empty buffer used during the handshake phase */
-    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
 
     // the thread polling and processing the I/O events
     private SelectorWorker worker = null;
@@ -283,9 +275,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
         // map for finding read keys associated with a given session
         private Map<NioTcpSession, SelectionKey> sessionReadKey = new HashMap<NioTcpSession, SelectionKey>();
-
-        private boolean handshaking = false;
-
         @Override
         public void run() {
             try {
@@ -372,7 +361,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                         // registering session with data in the write queue for
                         // writing
                         while (!flushingSessions.isEmpty()) {
-                            processFushSessions();
+                            processFlushSessions();
                         }
                     } catch (IOException e) {
                         LOGGER.error("IOException while selecting selector", e);
@@ -459,7 +448,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
             int readCount = channel.read(readBuffer);
 
             LOGGER.debug("read {} bytes", readCount);
-
+            
             if (readCount < 0) {
                 // session closed by the remote peer
                 LOGGER.debug("session closed by the remote peer");
@@ -470,125 +459,18 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 readBuffer.flip();
 
                 if (session.isSecured()) {
-                    if (!session.isConnectedSecured()) {
-                        // Process the SSL handshake now
-                        processHandShake(session, readBuffer);
-                    } else {
-                        // Unwrap the incoming data
-                        processUnwrap(session, readBuffer);
+                    SslHelper sslHelper = session.getAttribute(IoSession.SSL_HELPER);
+
+                    if (sslHelper == null) {
+                        throw new IllegalStateException();
                     }
+                    
+                    sslHelper.processRead(session, readBuffer);
                 } else {
                     // Plain message, not encrypted : go directly to the chain
                     session.getFilterChain().processMessageReceived(session, readBuffer);
                 }
             }
-        }
-
-        private void processUnwrap(IoSession session, ByteBuffer inBuffer) throws SSLException {
-            SslHelper sslHelper = session.getAttribute(IoSession.SSL_HELPER);
-
-            if (sslHelper == null) {
-                throw new IllegalStateException();
-            }
-
-            SSLEngine engine = sslHelper.getEngine();
-
-            // Blind guess : once uncompressed, the resulting buffer will be 3 times bigger
-            ByteBuffer appBuffer = ByteBuffer.allocate(inBuffer.limit() * 3);
-            Status status = sslHelper.processUnwrap(engine, inBuffer, appBuffer);
-            appBuffer.flip();
-
-            if (status == Status.OK) {
-                // Ok, go through the chain now
-                session.getFilterChain().processMessageReceived(session, appBuffer);
-            }
-        }
-
-        private boolean processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
-            SslHelper sslHelper = session.getAttribute(IoSession.SSL_HELPER);
-
-            if (sslHelper == null) {
-                throw new IllegalStateException();
-            }
-
-            SSLEngine engine = sslHelper.getEngine();
-            HandshakeStatus hsStatus = engine.getHandshakeStatus();
-            boolean processingData = true;
-
-            // Start the Handshake if we aren't already processing a HandShake
-            // and switch to the SECURING state
-            if (!handshaking) {
-                engine.beginHandshake();
-                handshaking = true;
-                session.changeState(SessionState.SECURING);
-            }
-
-            hsStatus = engine.getHandshakeStatus();
-
-            // If the SSLEngine has not be started, then the status will be NOT_HANDSHAKING
-            while ((hsStatus != HandshakeStatus.FINISHED) && (hsStatus != HandshakeStatus.NOT_HANDSHAKING)
-                    && processingData) {
-                switch (hsStatus) {
-                case NEED_TASK:
-                    hsStatus = sslHelper.processTasks(engine);
-
-                    break;
-
-                case NEED_WRAP:
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} processing the NEED_WRAP state", session);
-                    }
-
-                    int capacity = engine.getSession().getPacketBufferSize();
-                    ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
-                    SSLEngineResult result = null;
-
-                    while (true) {
-                        result = engine.wrap(EMPTY_BUFFER, outBuffer);
-
-                        if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-                            // TODO : increase the AppBuffer size
-                        } else {
-                            break;
-                        }
-                    }
-
-                    outBuffer.flip();
-                    session.write(outBuffer);
-                    hsStatus = result.getHandshakeStatus();
-
-                    // We continue to loop while we don't expect messages to unwrap,
-                    // otherwise, we have to exit the loop.
-                    processingData = (hsStatus != HandshakeStatus.NEED_UNWRAP);
-
-                    break;
-
-                case NEED_UNWRAP:
-                    Status status = sslHelper.processUnwrap(engine, inBuffer, EMPTY_BUFFER);
-
-                    if (status == Status.BUFFER_UNDERFLOW) {
-                        // Read more data
-                        processingData = false;
-                    } else {
-                        hsStatus = engine.getHandshakeStatus();
-                    }
-
-                    break;
-                }
-            }
-
-            if (hsStatus == HandshakeStatus.FINISHED) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} processing the FINISHED state", session);
-                }
-
-                session.changeState(SessionState.SECURED);
-                handshaking = false;
-
-                return true;
-            }
-
-            return false;
         }
 
         /**
@@ -616,7 +498,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     }
 
                     ByteBuffer buf = (ByteBuffer) wreq.getMessage();
-
+                    
                     int wrote = session.getSocketChannel().write(buf);
 
                     if (LOGGER.isDebugEnabled()) {
@@ -674,7 +556,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
         /**
          * Flushes the sessions
          */
-        private void processFushSessions() throws IOException {
+        private void processFlushSessions() throws IOException {
             NioTcpSession session = flushingSessions.poll();
             // a key registered for read ? (because we can have a
             // Selector for reads and another for the writes

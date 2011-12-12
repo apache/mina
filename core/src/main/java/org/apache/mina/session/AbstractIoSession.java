@@ -457,7 +457,8 @@ public abstract class AbstractIoSession implements IoSession {
 
     private void doWriteWithFuture(Object message, IoFuture<Void> future) {
         LOG.debug("writing message {} to session {}", message, this);
-        if (state == SessionState.CLOSED || state == SessionState.CLOSING) {
+        
+        if ((state == SessionState.CLOSED) || (state == SessionState.CLOSING)) {
             LOG.error("writing to closed or closing session, the message is discarded");
             return;
         }
@@ -470,11 +471,24 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     public WriteRequest enqueueWriteRequest(Object message) {
-        DefaultWriteRequest request = new DefaultWriteRequest(message);
+        DefaultWriteRequest request = null;
         
         try {
             writeQueueReadLock.lock();
-            writeQueue.add(request);
+            
+            if ( isConnectedSecured()) {
+                SslHelper sslHelper = getAttribute( IoSession.SSL_HELPER );
+                
+                if (sslHelper == null) {
+                    throw new IllegalStateException();
+                }
+                
+                request = sslHelper.processWrite(this, message, writeQueue);
+            } else {
+                request = new DefaultWriteRequest(message);
+                
+                writeQueue.add(request);
+            }
         } finally {
             writeQueueReadLock.unlock();
         }

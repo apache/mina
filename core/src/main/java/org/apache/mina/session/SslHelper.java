@@ -21,6 +21,7 @@ package org.apache.mina.session;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.Queue;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -32,6 +33,7 @@ import javax.net.ssl.SSLSession;
 
 import org.apache.mina.api.IoClient;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.IoSession.SessionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,9 @@ public class SslHelper
     /** The current session */
     private final IoSession session;
 
+    /** A flag set when we process the handshake */
+    private boolean handshaking = false;
+
     /**
      * A session attribute key that should be set to an {@link InetSocketAddress}.
      * Setting this attribute causes
@@ -73,22 +78,25 @@ public class SslHelper
 
     public static final String NEED_CLIENT_AUTH = "internal_needClientAuth";
 
-    /** The Handshake status */
-    private SSLEngineResult.HandshakeStatus handshakeStatus;
-
     /** Application cleartext data to be read by application */
     private ByteBuffer appBuffer;
 
     /** Incoming buffer accumulating bytes read from the channel */
     private ByteBuffer accBuffer;
     
+    /** An empty buffer used during the handshake phase */
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
+
+    /** An empty buffer used during the handshake phase */
+    private static final ByteBuffer HANDSHAKE_BUFFER = ByteBuffer.allocate(1024);
+
     /**
      * Create a new SSL Handler.
      *
      * @param session The associated session
      * @throws SSLException
      */
-    SslHelper(IoSession session, SSLContext sslContext) throws SSLException {
+    public SslHelper(IoSession session, SSLContext sslContext) throws SSLException {
         this.session = session;
         this.sslContext = sslContext;
     }
@@ -96,7 +104,7 @@ public class SslHelper
     /**
      * @return The associated session
      */
-    /* no qualifier */ IoSession getSession() {
+    private IoSession getSession() {
         return session;
     }
     
@@ -104,7 +112,7 @@ public class SslHelper
     /**
      * @return The associated SSLEngine
      */
-    public SSLEngine getEngine() {
+    private SSLEngine getEngine() {
         return sslEngine;
     }
 
@@ -139,7 +147,7 @@ public class SslHelper
             Boolean needClientAuth = session.<Boolean>getAttribute(NEED_CLIENT_AUTH);
             Boolean wantClientAuth = session.<Boolean>getAttribute(WANT_CLIENT_AUTH);
 
-            // The WantClientAuth superseed the NeedClientAuth, if set.
+            // The WantClientAuth supersede the NeedClientAuth, if set.
             if ((needClientAuth != null) && (needClientAuth)) {
                 sslEngine.setNeedClientAuth(true);
             }
@@ -149,34 +157,9 @@ public class SslHelper
             }
         }
 
-        handshakeStatus = sslEngine.getHandshakeStatus();
-
         if ( LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} SSL Handler Initialization done.", session);
         }
-    }
-
-    /**
-     * Get the local AppBuffer
-     * @return The Application Buffer allocated in the SslHelper, if any
-     */
-    public ByteBuffer getAppBuffer() {
-        return appBuffer;
-    }
-
-    public ByteBuffer getSslInBuffer(ByteBuffer inBuffer) {
-        if (inBuffer == null) {
-            inBuffer = inBuffer;
-        } else {
-            addInBuffer(inBuffer);
-        }
-        
-        return inBuffer;
-    }
-
-    public void setInBuffer(ByteBuffer inBuffer) {
-        inBuffer = ByteBuffer.allocate(16*1024);
-        inBuffer.put(inBuffer);
     }
 
     private void addInBuffer(ByteBuffer buffer) {
@@ -198,10 +181,6 @@ public class SslHelper
         }
     }
     
-    public void releaseInBuffer() {
-        accBuffer = null;
-    }
-    
     /**
      * Process the NEED_TASK action.
      * 
@@ -209,7 +188,7 @@ public class SslHelper
      * @return The resulting HandshakeStatus
      * @throws SSLException If we've got an error while processing the tasks
      */
-    public HandshakeStatus processTasks(SSLEngine engine) throws SSLException {
+    private HandshakeStatus processTasks(SSLEngine engine) throws SSLException {
         Runnable runnable;
         
         while ((runnable = engine.getDelegatedTask()) != null) {
@@ -238,11 +217,11 @@ public class SslHelper
      * @return
      * @throws SSLException
      */
-    public Status processUnwrap(SSLEngine engine, ByteBuffer inBuffer, ByteBuffer appBuffer) throws SSLException {
+    private SSLEngineResult unwrap(ByteBuffer inBuffer, ByteBuffer appBuffer) throws SSLException {
         ByteBuffer tempBuffer = null;
         
         // First work with either the new incoming buffer, or the accumulating buffer
-        if ((this.accBuffer != null) && (this.accBuffer.remaining() > 0)) {
+        if ((accBuffer != null) && (accBuffer.remaining() > 0)) {
             // Add the new incoming data into the local buffer
             addInBuffer(inBuffer);
             tempBuffer = this.accBuffer;
@@ -253,13 +232,15 @@ public class SslHelper
         // Loop until we have processed the entire incoming buffer,
         // or until we have to stop
         while (true) {
-            SSLEngineResult result = engine.unwrap(tempBuffer, appBuffer);
+            // Do the unwrapping
+            SSLEngineResult result = sslEngine.unwrap(tempBuffer, appBuffer);
 
             switch (result.getStatus()) {
                 case OK :
+                    // Ok, we have unwrapped a message, return.
                     accBuffer = null;
                     
-                    return Status.OK;
+                    return result;
                     
                 case BUFFER_UNDERFLOW :
                     // We need to read some more data from the channel.
@@ -270,18 +251,189 @@ public class SslHelper
                     
                     inBuffer.clear();
                     
-                    return Status.BUFFER_UNDERFLOW;
+                    return result;
     
                 case CLOSED :
-                    // Get out
                     accBuffer = null;
-                    throw new IllegalStateException();
+
+                    // We have received a Close message, we
+                    if (session.isConnectedSecured()) {
+                        return result;
+                    } else {
+                        throw new IllegalStateException();
+                    }
     
                 case BUFFER_OVERFLOW :
                     // We have to increase the appBuffer size. In any case
                     // we aren't processing an handshake here. Read again.
                     appBuffer = ByteBuffer.allocate(appBuffer.capacity() + 4096 );
             }
+        }
+    }
+    
+    public void processRead(IoSession session, ByteBuffer readBuffer) throws SSLException {
+        if (session.isConnectedSecured()) {
+            // Unwrap the incoming data
+            processUnwrap(session, readBuffer);
+        } else {
+            // Process the SSL handshake now
+            processHandShake(session, readBuffer);
+        }
+    }
+    
+
+    private void processUnwrap(IoSession session, ByteBuffer inBuffer) throws SSLException {
+        // Blind guess : once uncompressed, the resulting buffer will be 3 times bigger
+        ByteBuffer appBuffer = ByteBuffer.allocate(inBuffer.limit() * 3);
+        SSLEngineResult result = unwrap(inBuffer, appBuffer );
+
+        switch (result.getStatus()) {
+            case OK :
+                // Ok, go through the chain now
+                appBuffer.flip();
+                session.getFilterChain().processMessageReceived(session, appBuffer);
+                break;
+                
+            case CLOSED :
+                processClosed( result);
+                
+                break;
+        }
+    }
+    
+    private void processClosed(SSLEngineResult result) throws SSLException {
+        // We have received a Alert_CLosure message, we will have to do a wrap
+        HandshakeStatus hsStatus = result.getHandshakeStatus();
+        
+        if (hsStatus == HandshakeStatus.NEED_WRAP) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} processing the NEED_WRAP state", session);
+            }
+
+            int capacity = sslEngine.getSession().getPacketBufferSize();
+            ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
+            session.changeState( SessionState.CONNECTED );
+
+            while (!sslEngine.isOutboundDone()) {
+                sslEngine.wrap(EMPTY_BUFFER, outBuffer);
+                outBuffer.flip();
+
+                // Get out of the Connected state
+                session.enqueueWriteRequest(outBuffer);
+            }
+        }
+    }
+    
+    private boolean processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
+        // Start the Handshake if we aren't already processing a HandShake
+        // and switch to the SECURING state
+        HandshakeStatus hsStatus = sslEngine.getHandshakeStatus();
+        
+        if ( hsStatus == HandshakeStatus.NOT_HANDSHAKING) {
+            session.changeState(SessionState.SECURING);
+        }
+
+        SSLEngineResult result = null;
+
+        // If the SSLEngine has not be started, then the status will be NOT_HANDSHAKING
+        while (hsStatus != HandshakeStatus.FINISHED) {
+            if (hsStatus == HandshakeStatus.NEED_TASK) {
+                    hsStatus = processTasks(sslEngine);
+            } else if (hsStatus == HandshakeStatus.NEED_WRAP) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} processing the NEED_WRAP state", session);
+                }
+
+                int capacity = sslEngine.getSession().getPacketBufferSize();
+                ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
+
+                boolean completed = false;
+                
+                while (!completed) {
+                    result = sslEngine.wrap(EMPTY_BUFFER, outBuffer);
+
+                    switch (result.getStatus()) {
+                        case OK :
+                        case CLOSED :
+                            completed = true;
+                            break;
+                            
+                        case BUFFER_OVERFLOW :
+                            ByteBuffer newBuffer = ByteBuffer.allocate(outBuffer.capacity() + 4096);
+                            outBuffer.flip();
+                            newBuffer.put(outBuffer);
+                            outBuffer = newBuffer;
+                            break;
+                    }
+                }
+
+                outBuffer.flip();
+                session.enqueueWriteRequest(outBuffer);
+                hsStatus = result.getHandshakeStatus();
+                
+                if (hsStatus != HandshakeStatus.NEED_WRAP) {
+                    break;
+                }
+            } else if ((hsStatus == HandshakeStatus.NEED_UNWRAP) || (hsStatus == HandshakeStatus.NOT_HANDSHAKING)) {
+                result = unwrap(inBuffer, HANDSHAKE_BUFFER);
+
+                if (result.getStatus() == Status.BUFFER_UNDERFLOW) {
+                    // Read more data
+                    break;
+                } else {
+                    hsStatus = result.getHandshakeStatus();
+                }
+            }
+        }
+
+        if (hsStatus == HandshakeStatus.FINISHED) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} processing the FINISHED state", session);
+            }
+            
+            HandshakeStatus stat = sslEngine.getHandshakeStatus();
+
+            session.changeState(SessionState.SECURED);
+            handshaking = false;
+
+            return true;
+        }
+
+        return false;
+    }
+    
+    public DefaultWriteRequest processWrite(IoSession sessions, Object message, Queue<WriteRequest> writeQueue) {
+        ByteBuffer buf = (ByteBuffer)message;
+        ByteBuffer appBuffer = ByteBuffer.allocate(buf.limit() + 50);
+        
+        try {
+            while (true) {
+                SSLEngineResult result = sslEngine.wrap(buf, appBuffer);
+                
+                switch (result.getStatus()) {
+                    case BUFFER_OVERFLOW :
+                        // Increase the buffer size
+                        appBuffer = ByteBuffer.allocate(appBuffer.capacity() + 4096);
+                        break;
+                        
+                    case BUFFER_UNDERFLOW :
+                    case CLOSED :
+                        break;
+                    case OK :
+                        DefaultWriteRequest request = new DefaultWriteRequest(appBuffer);
+
+                        writeQueue.add(request);
+                        return request;
+                }
+                
+                if ( result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW ) {
+                    // Increase the buffer size
+                    appBuffer = ByteBuffer.allocate(appBuffer.capacity() + 4096);
+                } else {
+                }
+            }
+        } catch (SSLException se) {
+            throw new IllegalStateException(se.getMessage());
         }
     }
 }
