@@ -28,18 +28,16 @@ import org.apache.mina.api.IoFuture;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface WriteRequest {
-
     /**
-     * Get the message of this request.
+     * Get the message stored for this request.
      * 
      * @return the contained message
      */
     Object getMessage();
 
     /**
-     * The future to be completed on this write success
+     * The future to be completed on a write success
      * @return the future
      */
     IoFuture<Void> getFuture();
-
 }
