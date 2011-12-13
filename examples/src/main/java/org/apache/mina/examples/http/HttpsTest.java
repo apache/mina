@@ -67,7 +67,7 @@ public class HttpsTest {
         acceptor.bind(new InetSocketAddress(8080));
 
         // run for 20 seconds
-        Thread.sleep(2000000);
+        Thread.sleep(20000);
         acceptor.unbindAll();
 
     }
@@ -112,7 +112,6 @@ public class HttpsTest {
             session.write(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpStatus.SUCCESS_OK, headers));
             session.write(content);
             session.write(new HttpEndOfContent());
-
         }
     }
 }
