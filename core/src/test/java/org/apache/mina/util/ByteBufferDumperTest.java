@@ -27,9 +27,7 @@ import org.junit.Test;
 public class ByteBufferDumperTest {
 
     @Test
-    public void string_test() {
-        ByteBufferDumper dumper = new ByteBufferDumper();
-
+    public void stringTest() {
         String toTest = "yopYOP\n\r";
         byte[] charData = toTest.getBytes();
         assertEquals(toTest.length(), charData.length);
@@ -42,14 +40,14 @@ public class ByteBufferDumperTest {
 
         int remaining = myBuffer.remaining();
         int pos = myBuffer.position();
-        String dump = dumper.dump(myBuffer);
+        String dump = ByteBufferDumper.dump(myBuffer);
         assertEquals("ByteBuffer[len=8,str='" + toTest + "']", dump);
         assertEquals(remaining, myBuffer.remaining());
         assertEquals(pos, myBuffer.position());
     }
 
     @Test
-    public void binary_test() {
+    public void binaryTest() {
         ByteBuffer myBuffer = ByteBuffer.allocate(4);
         myBuffer.put((byte) 0x88);
         myBuffer.put((byte) 0x03);
@@ -60,10 +58,21 @@ public class ByteBufferDumperTest {
         int pos = myBuffer.position();
         String dump = ByteBufferDumper.dump(myBuffer);
         System.err.println(dump);
-        assertEquals("ByteBuffer[len=3,bytes='\n88 03 FF']", dump);
+        assertEquals("ByteBuffer[len=3,bytes='0x88 0x03 0xFF']", dump);
         assertEquals(remaining, myBuffer.remaining());
         assertEquals(pos, myBuffer.position());
-
     }
 
+    @Test
+    public void testWithSizeLimit() {
+        ByteBuffer bb = ByteBuffer.allocate(10);
+        bb.put(new byte[]{0x01, (byte)0x8F, 0x04, 0x7A, (byte)0xc2, 0x23, (byte)0xA0, 0x08, 0x44});
+        bb.flip();
+        
+        assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2']", ByteBufferDumper.dump(bb, 5, false));
+        assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2']", ByteBufferDumper.dump(bb, 5, true));
+        assertEquals("ByteBuffer[len=9,str='']", ByteBufferDumper.dump(bb, 0, true));
+        assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2 0x23 0xA0 0x08 0x44']", ByteBufferDumper.dump(bb, 10, true));
+        assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2 0x23 0xA0 0x08 0x44']", ByteBufferDumper.dump(bb, -1, false));
+    }
 }

@@ -26,43 +26,23 @@ import java.nio.ByteBuffer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ByteBufferDumper {
-
-    /**
-     * The high digits lookup table.
-    */
-    private static final byte[] highDigits;
-
-    /**
-     * The low digits lookup table.
-     */
-    private static final byte[] lowDigits;
-
-    /**
-     * Initialize lookup tables.
-     */
-    static {
-        final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-        int i;
-        byte[] high = new byte[256];
-        byte[] low = new byte[256];
-
-        for (i = 0; i < 256; i++) {
-            high[i] = digits[i >>> 4];
-            low[i] = digits[i & 0x0F];
-        }
-
-        highDigits = high;
-        lowDigits = low;
-    }
+    /** Hex chars */
+    private static final byte[] HEX_CHAR = new byte[]
+        { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
     
+    /**
+     * Dump the content of a IoBuffer
+     * 
+     * @param buffer The IoBuffer to dump
+     * @return A string representing the IoBuffer content
+     */
     public static String dump(IoBuffer buffer) {
         StringBuilder sb = new StringBuilder();
         
         boolean isFirst = true;
         
         for (int i = 0; i < buffer.limit(); i++) {
-            int byteValue = buffer.get(i) & 0xFF;
+            byte byteValue = buffer.get(i);
             
             if (isFirst) {
                 isFirst = false;
@@ -70,51 +50,62 @@ public class ByteBufferDumper {
                 sb.append(' ');
             }
             
-            sb.append("0x");
-            sb.append((char) highDigits[byteValue]);
-            sb.append((char) lowDigits[byteValue]);
+            sb.append( new String( new byte[]
+                { '0', 'x', HEX_CHAR[( byteValue & 0x00F0 ) >> 4], HEX_CHAR[byteValue & 0x000F] } ));
         }
             
         return sb.toString();
     }
-
-    public static String dump(ByteBuffer buffer) {
+    
+    /**
+     * Dump the content of the given ByteBuffer, up to a number of bytes. If the
+     * toAscii flag is set to <code>true</code>, this method will try to convert
+     * the bytes to a String
+     * 
+     * @param buffer The buffer to dump
+     * @param nbBytes The number of bytes to dump (-1 for all of them)
+     * @param toAscii If we want to write the message as a String
+     * @return A dump of this ByteBuffer
+     */
+    public static String dump(ByteBuffer buffer, int nbBytes, boolean toAscii) {
         byte[] data = buffer.array();
         int start = buffer.position();
-        int size = buffer.remaining();
+        int size = Math.min(buffer.remaining(), nbBytes >= 0?nbBytes : Integer.MAX_VALUE);
+        int length = buffer.remaining();
         
         // is not ASCII printable ?
         boolean binaryContent = false;
         
-        for (int i = start; i < size; i++) {
-            byte b = data[i];
-            
-            if ((b < 32 || b > 126) && b != 13 && b != 10) {
-                binaryContent = true;
-                break;
+        if (toAscii) {
+            for (int i = start; i < size; i++) {
+                byte b = data[i];
+                
+                if (((b < 32) || (b > 126)) && (b != 13) && (b != 10)) {
+                    binaryContent = true;
+                    break;
+                }
             }
         }
 
-        if (binaryContent) {
-            StringBuilder out = new StringBuilder(size * 3 + 24);
-            out.append("ByteBuffer[len=").append(size).append(",bytes='\n");
+        if (!toAscii || binaryContent) {
+            StringBuilder out = new StringBuilder(size * 3 + 30);
+            out.append("ByteBuffer[len=").append(length).append(",bytes='");
 
             // fill the first
             int byteValue = data[start] & 0xFF;
-            out.append((char) highDigits[byteValue]);
-            out.append((char) lowDigits[byteValue]);
+            boolean isFirst = true;
 
             // and the others, too
-            for (int i = start + 1; i < size; i++) {
-                if (i%16 == 0) {
-                    out.append('\n');
+            for (int i = start; i < size; i++) {
+                if (isFirst) {
+                    isFirst = false;
                 } else {
                     out.append(' ');
                 }
                 
                 byteValue = data[i] & 0xFF;
-                out.append((char) highDigits[byteValue]);
-                out.append((char) lowDigits[byteValue]);
+                out.append( new String( new byte[]
+                    { '0', 'x', HEX_CHAR[( byteValue & 0x00F0 ) >> 4], HEX_CHAR[byteValue & 0x000F] } ));
             }
             
             out.append("']");
@@ -124,7 +115,7 @@ public class ByteBufferDumper {
         } else {
             StringBuilder sb = new StringBuilder(size);
             sb.append("ByteBuffer[len=")
-                .append(buffer.remaining())
+                .append(length)
                 .append(",str='")
                 .append(new String(data, start, size))
                 .append("']");
@@ -133,4 +124,14 @@ public class ByteBufferDumper {
         }
     }
 
+    /**
+     * Dumps the given buffer. If the buffer contains only ascii, it will write
+     * the buffer content as a String.
+     * 
+     * @param buffer The buffer to dump
+     * @return A string representing the buffer content
+     */
+    public static String dump(ByteBuffer buffer) {
+        return dump(buffer, -1, true);
+    }
 }
