@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An helper class used to manage everything related to SSL/TLS establishement
+ * An helper class used to manage everything related to SSL/TLS establishment
  * and management.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -56,9 +56,6 @@ public class SslHelper
     
     /** The current session */
     private final IoSession session;
-
-    /** A flag set when we process the handshake */
-    private boolean handshaking = false;
 
     /**
      * A session attribute key that should be set to an {@link InetSocketAddress}.
@@ -78,9 +75,6 @@ public class SslHelper
 
     public static final String NEED_CLIENT_AUTH = "internal_needClientAuth";
 
-    /** Application cleartext data to be read by application */
-    private ByteBuffer appBuffer;
-
     /** Incoming buffer accumulating bytes read from the channel */
     private ByteBuffer accBuffer;
     
@@ -94,9 +88,8 @@ public class SslHelper
      * Create a new SSL Handler.
      *
      * @param session The associated session
-     * @throws SSLException
      */
-    public SslHelper(IoSession session, SSLContext sslContext) throws SSLException {
+    public SslHelper(IoSession session, SSLContext sslContext) {
         this.session = session;
         this.sslContext = sslContext;
     }
@@ -104,7 +97,7 @@ public class SslHelper
     /**
      * @return The associated session
      */
-    private IoSession getSession() {
+    /* no qualifier */ IoSession getSession() {
         return session;
     }
     
@@ -112,7 +105,7 @@ public class SslHelper
     /**
      * @return The associated SSLEngine
      */
-    private SSLEngine getEngine() {
+    /* no qualifier */ SSLEngine getEngine() {
         return sslEngine;
     }
 
@@ -162,6 +155,11 @@ public class SslHelper
         }
     }
 
+    /**
+     * A helper method used to accumulate some ByteBuffer in the inner buffer.
+     * 
+     * @param buffer The buffer to add.
+     */
     private void addInBuffer(ByteBuffer buffer) {
         if (accBuffer.capacity() - accBuffer.limit() < buffer.remaining()) {
             // Increase the internal buffer
@@ -204,18 +202,7 @@ public class SslHelper
     
     /**
      * Process the NEED_UNWRAP action. We have to read the incoming buffer, and to feed
-     * the application buffer. We also have to cover the three special cases : <br/>
-     * <ul>
-     * <li>The incoming buffer does not contain enough data (then we need to read some
-     * more and to accumulate the bytes in a temporary buffer)</li>
-     * <li></li>
-     * </ul>
-     * 
-     * @param engine
-     * @param inBuffer
-     * @param appBuffer
-     * @return
-     * @throws SSLException
+     * the application buffer.
      */
     private SSLEngineResult unwrap(ByteBuffer inBuffer, ByteBuffer appBuffer) throws SSLException {
         ByteBuffer tempBuffer = null;
@@ -256,7 +243,7 @@ public class SslHelper
                 case CLOSED :
                     accBuffer = null;
 
-                    // We have received a Close message, we
+                    // We have received a Close message, we can exit now
                     if (session.isConnectedSecured()) {
                         return result;
                     } else {
@@ -271,6 +258,14 @@ public class SslHelper
         }
     }
     
+    /**
+     * Process a read ByteBuffer over a secured connection, or during the SSL/TLS
+     * Handshake.
+     * 
+     * @param session The session we are processing a read for
+     * @param readBuffer The data we get from the channel
+     * @throws SSLException If the unwrapping or handshaking failed
+     */
     public void processRead(IoSession session, ByteBuffer readBuffer) throws SSLException {
         if (session.isConnectedSecured()) {
             // Unwrap the incoming data
@@ -282,6 +277,10 @@ public class SslHelper
     }
     
 
+    /**
+     * Unwrap a SSL/TLS message. The message might not be encrypted (if we are processing
+     * a Handshake message or an Alert message).
+     */
     private void processUnwrap(IoSession session, ByteBuffer inBuffer) throws SSLException {
         // Blind guess : once uncompressed, the resulting buffer will be 3 times bigger
         ByteBuffer appBuffer = ByteBuffer.allocate(inBuffer.limit() * 3);
@@ -295,17 +294,22 @@ public class SslHelper
                 break;
                 
             case CLOSED :
+                // This was a Alert Closure message. Process it
                 processClosed( result);
                 
                 break;
         }
     }
     
+    /**
+     * Process the SSL/TLS Alert Closure message
+     */
     private void processClosed(SSLEngineResult result) throws SSLException {
         // We have received a Alert_CLosure message, we will have to do a wrap
         HandshakeStatus hsStatus = result.getHandshakeStatus();
         
         if (hsStatus == HandshakeStatus.NEED_WRAP) {
+            // We need to send back the Alert Closure message
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} processing the NEED_WRAP state", session);
             }
@@ -314,6 +318,7 @@ public class SslHelper
             ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
             session.changeState( SessionState.CONNECTED );
 
+            // Loop until the SSLEngine has nothing more to produce
             while (!sslEngine.isOutboundDone()) {
                 sslEngine.wrap(EMPTY_BUFFER, outBuffer);
                 outBuffer.flip();
@@ -324,11 +329,18 @@ public class SslHelper
         }
     }
     
-    private boolean processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
+    /**
+     * Process the SLL/TLS Handshake. We may enter in this method more than once,
+     * as the handshake is a dialogue between the client and the server.
+     */
+    private void processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
         // Start the Handshake if we aren't already processing a HandShake
         // and switch to the SECURING state
         HandshakeStatus hsStatus = sslEngine.getHandshakeStatus();
         
+        // Initilize the session status when we enter into the Handshake process.
+        // Not that we don't call the SSLEngine.beginHandshake() method  :
+        // It's implicitely done internally by the unwrap() method.
         if ( hsStatus == HandshakeStatus.NOT_HANDSHAKING) {
             session.changeState(SessionState.SECURING);
         }
@@ -336,19 +348,23 @@ public class SslHelper
         SSLEngineResult result = null;
 
         // If the SSLEngine has not be started, then the status will be NOT_HANDSHAKING
+        // We loop until we reach the FINISHED state
         while (hsStatus != HandshakeStatus.FINISHED) {
             if (hsStatus == HandshakeStatus.NEED_TASK) {
-                    hsStatus = processTasks(sslEngine);
+                hsStatus = processTasks(sslEngine);
             } else if (hsStatus == HandshakeStatus.NEED_WRAP) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} processing the NEED_WRAP state", session);
                 }
 
+                // Create an insanely wide buffer, as the SSLEngine requires it
                 int capacity = sslEngine.getSession().getPacketBufferSize();
                 ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
 
                 boolean completed = false;
                 
+                // Loop until we are able to wrap the message (we may have
+                // to increase the buffer size more than once.
                 while (!completed) {
                     result = sslEngine.wrap(EMPTY_BUFFER, outBuffer);
 
@@ -359,22 +375,26 @@ public class SslHelper
                             break;
                             
                         case BUFFER_OVERFLOW :
-                            ByteBuffer newBuffer = ByteBuffer.allocate(outBuffer.capacity() + 4096);
-                            outBuffer.flip();
-                            newBuffer.put(outBuffer);
-                            outBuffer = newBuffer;
+                            // Increase the target buffer size
+                            outBuffer = ByteBuffer.allocate(outBuffer.capacity() + 4096);
                             break;
                     }
                 }
 
+                // Done. We can now push this buffer into the write queue.
                 outBuffer.flip();
                 session.enqueueWriteRequest(outBuffer);
                 hsStatus = result.getHandshakeStatus();
                 
+                // Nothing more to wrap : get out.
+                // Note to self : we can probably use only one ByteBuffer for the
+                // multiple wrapped messages. (see https://issues.apache.org/jira/browse/DIRMINA-878)
                 if (hsStatus != HandshakeStatus.NEED_WRAP) {
                     break;
                 }
             } else if ((hsStatus == HandshakeStatus.NEED_UNWRAP) || (hsStatus == HandshakeStatus.NOT_HANDSHAKING)) {
+                // We cover the ongoing handshake (NEED_UNWRAP) and
+                // the initial call to the handshake (NOT_HANDSHAKING)
                 result = unwrap(inBuffer, HANDSHAKE_BUFFER);
 
                 if (result.getStatus() == Status.BUFFER_UNDERFLOW) {
@@ -387,43 +407,48 @@ public class SslHelper
         }
 
         if (hsStatus == HandshakeStatus.FINISHED) {
+            // The handshake has been completed. We can change the session's state.
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} processing the FINISHED state", session);
             }
             
-            HandshakeStatus stat = sslEngine.getHandshakeStatus();
-
             session.changeState(SessionState.SECURED);
-            handshaking = false;
-
-            return true;
         }
-
-        return false;
     }
     
-    public DefaultWriteRequest processWrite(IoSession session, Object message, Queue<WriteRequest> writeQueue) {
+    /**
+     * Process the application data encryption for a session.
+     * @param session The session sending encrypted data to the peer.
+     * @param message The message to encrypt
+     * @param writeQueue The queue in which the encrypted buffer will be written
+     * @return The written WriteRequest
+     */
+    /** No qualifier */ WriteRequest processWrite(IoSession session, Object message, Queue<WriteRequest> writeQueue) {
         ByteBuffer buf = (ByteBuffer)message;
         ByteBuffer appBuffer = ByteBuffer.allocate(sslEngine.getSession().getPacketBufferSize());
         
         try {
             while (true) {
+                // Encypt the message
                 SSLEngineResult result = sslEngine.wrap(buf, appBuffer);
                 
                 switch (result.getStatus()) {
                     case BUFFER_OVERFLOW :
-                        // Increase the buffer size
+                        // Increase the buffer size as needed
                         appBuffer = ByteBuffer.allocate(appBuffer.capacity() + 4096);
                         break;
                         
                     case BUFFER_UNDERFLOW :
                     case CLOSED :
                         break;
+                        
                     case OK :
+                        // We are done. Flip the buffer and push it to the write queue.
                         appBuffer.flip();
-                        DefaultWriteRequest request = new DefaultWriteRequest(appBuffer);
+                        WriteRequest request = new DefaultWriteRequest(appBuffer);
 
                         writeQueue.add(request);
+                        
                         return request;
                 }
             }
