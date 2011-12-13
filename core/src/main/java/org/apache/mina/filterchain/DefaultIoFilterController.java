@@ -61,6 +61,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void processSessionCreated(IoSession session) {
         LOG.debug("processing session created event for session {}", session);
+        
         for (IoFilter filter : chain) {
             filter.sessionCreated(session);
         }
@@ -72,6 +73,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void processSessionOpened(IoSession session) {
         LOG.debug("processing session open event");
+        
         for (IoFilter filter : chain) {
             filter.sessionOpened(session);
         }
@@ -83,6 +85,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void processSessionClosed(IoSession session) {
         LOG.debug("processing session closed event");
+        
         for (IoFilter filter : chain) {
             filter.sessionClosed(session);
         }
@@ -97,6 +100,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void processMessageReceived(IoSession session, Object message) {
         LOG.debug("processing message '{}' received event ", message);
+        
         if (chain.length < 1) {
             LOG.debug("Nothing to do, the chain is empty");
         } else {
@@ -134,6 +138,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         // put the future in the last write request
         if (future != null) {
             WriteRequest request = lastWriteRequest.get();
+            
             if (request != null) {
                 ((DefaultWriteRequest) request).setFuture(future);
             }
@@ -145,18 +150,24 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
      */
     @Override
     public void callWriteNextFilter(IoSession session, Object message) {
+        int position = writeChainPosition.get();
+        
         if (LOG.isDebugEnabled()) {
             LOG.debug("calling next filter for writing for message '{}' position : {}", message,
-                    writeChainPosition.get());
+                    position);
         }
-        writeChainPosition.set(writeChainPosition.get() - 1);
-        if (writeChainPosition.get() < 0 || chain.length == 0) {
+        
+        writeChainPosition.set(position - 1);
+        
+        if ((position< 0) || (chain.length == 0)) {
             // end of chain processing
             enqueueFinalWriteMessage(session, message);
         } else {
-            chain[writeChainPosition.get()].messageWriting(session, message, this);
+            IoFilter nextFilter = chain[position];
+            nextFilter.messageWriting(session, message, this);
         }
-        writeChainPosition.set(writeChainPosition.get() + 1);
+        
+        writeChainPosition.set(position + 1);
     }
 
     /**
@@ -172,13 +183,17 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
      */
     @Override
     public void callReadNextFilter(IoSession session, Object message) {
-        readChainPosition.set(readChainPosition.get() + 1);
-        if (readChainPosition.get() >= chain.length) {
+        int position = readChainPosition.get();
+        
+        readChainPosition.set(position + 1);
+        
+        if (position >= chain.length) {
             // end of chain processing
         } else {
-            chain[readChainPosition.get()].messageReceived(session, message, this);
+            chain[position].messageReceived(session, message, this);
         }
-        readChainPosition.set(readChainPosition.get() - 1);
+        
+        readChainPosition.set(position - 1);
     }
 
     /**
@@ -188,9 +203,11 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     public String toString() {
         StringBuilder bldr = new StringBuilder("IoFilterChain {");
         int index = 0;
+        
         for (IoFilter filter : chain) {
             bldr.append(index).append(":").append(filter).append(", ");
         }
+        
         return bldr.append("}").toString();
     }
 }
