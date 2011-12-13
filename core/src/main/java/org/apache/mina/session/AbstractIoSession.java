@@ -472,12 +472,14 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     public WriteRequest enqueueWriteRequest(Object message) {
-        DefaultWriteRequest request = null;
+        WriteRequest request = null;
         
         try {
+            // Lock the queue while the message is written into it
             writeQueueReadLock.lock();
             
             if ( isConnectedSecured()) {
+                // SSL/TLS : we have to encrypt the message
                 SslHelper sslHelper = getAttribute( IoSession.SSL_HELPER );
                 
                 if (sslHelper == null) {
@@ -486,6 +488,7 @@ public abstract class AbstractIoSession implements IoSession {
                 
                 request = sslHelper.processWrite(this, message, writeQueue);
             } else {
+                // Plain message
                 request = new DefaultWriteRequest(message);
                 
                 writeQueue.add(request);
