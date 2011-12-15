@@ -37,8 +37,17 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultIoFilterController implements IoFilterController, ReadFilterChainController,
         WriteFilterChainController {
-
+    /** A logger for this class */
     private static final Logger LOG = LoggerFactory.getLogger(DefaultIoFilterController.class);
+
+    /** the current position n the write chain for this thread */
+    private int writeChainPosition;
+
+    /** the current position in the read chain for this thread */
+    private int readChainPosition;
+
+    /** hold the last WriteRequest created for the high level message currently written (can be null) */
+    private WriteRequest lastWriteRequest;
 
     /**
      * The list of {@link IoFilter} implementing this chain.
@@ -52,6 +61,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         if (chain == null) {
             throw new IllegalArgumentException("chain");
         }
+        
         this.chain = chain;
     }
 
@@ -91,9 +101,6 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         }
     }
 
-    /** the current position in the read chain for this thread */
-    private static final ThreadLocal<Integer> readChainPosition = new ThreadLocal<Integer>();
-
     /**
      * {@inheritDoc}
      */
@@ -104,17 +111,11 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         if (chain.length < 1) {
             LOG.debug("Nothing to do, the chain is empty");
         } else {
-            readChainPosition.set(0);
+            readChainPosition = 0;
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
-            chain[readChainPosition.get()].messageReceived(session, message, this);
+            chain[readChainPosition].messageReceived(session, message, this);
         }
     }
-
-    /** the current position n the write chain for this thread */
-    private static final ThreadLocal<Integer> writeChainPosition = new ThreadLocal<Integer>();
-
-    /** hold the last WriteRequest created for the high level message currently written (can be null) */
-    private static final ThreadLocal<WriteRequest> lastWriteRequest = new ThreadLocal<WriteRequest>();
 
     /**
      * {@inheritDoc}
@@ -123,21 +124,22 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     public void processMessageWriting(IoSession session, Object message, IoFuture<Void> future) {
         LOG.debug("processing message '{}' writing event ", message);
 
-        lastWriteRequest.set(null);
+        lastWriteRequest = null;
 
         if (chain.length < 1) {
             enqueueFinalWriteMessage(session, message);
         } else {
-
-            writeChainPosition.set(chain.length - 1);
+            writeChainPosition = chain.length - 1;
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
-            int position = writeChainPosition.get();
+            int position = writeChainPosition;
             IoFilter nextFilter = chain[position];
             nextFilter.messageWriting(session, message, this);
         }
+        
         // put the future in the last write request
         if (future != null) {
-            WriteRequest request = lastWriteRequest.get();
+            WriteRequest request = lastWriteRequest;
+            
             
             if (request != null) {
                 ((DefaultWriteRequest) request).setFuture(future);
@@ -150,24 +152,21 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
      */
     @Override
     public void callWriteNextFilter(IoSession session, Object message) {
-        int position = writeChainPosition.get();
-        
         if (LOG.isDebugEnabled()) {
             LOG.debug("calling next filter for writing for message '{}' position : {}", message,
-                    position);
+                    writeChainPosition);
         }
         
-        writeChainPosition.set(position - 1);
+        writeChainPosition--;
         
-        if ((position< 0) || (chain.length == 0)) {
+        if (writeChainPosition < 0 || chain.length == 0) {
             // end of chain processing
             enqueueFinalWriteMessage(session, message);
         } else {
-            IoFilter nextFilter = chain[position];
-            nextFilter.messageWriting(session, message, this);
+            chain[writeChainPosition].messageWriting(session, message, this);
         }
         
-        writeChainPosition.set(position + 1);
+        writeChainPosition++;;
     }
 
     /**
@@ -175,7 +174,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
      */
     private void enqueueFinalWriteMessage(IoSession session, Object message) {
         LOG.debug("end of write chan we enqueue the message in the session : {}", message);
-        lastWriteRequest.set(session.enqueueWriteRequest(message));
+        lastWriteRequest = session.enqueueWriteRequest(message);
     }
 
     /**
@@ -183,17 +182,15 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
      */
     @Override
     public void callReadNextFilter(IoSession session, Object message) {
-        int position = readChainPosition.get();
+        readChainPosition++;
         
-        readChainPosition.set(position + 1);
-        
-        if (position >= chain.length) {
+        if (readChainPosition >= chain.length) {
             // end of chain processing
         } else {
-            chain[position].messageReceived(session, message, this);
+            chain[readChainPosition].messageReceived(session, message, this);
         }
         
-        readChainPosition.set(position - 1);
+        readChainPosition--;
     }
 
     /**
