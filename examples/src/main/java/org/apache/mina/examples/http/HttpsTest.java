@@ -54,11 +54,10 @@ public class HttpsTest {
         OneThreadSelectorStrategy strategy = new OneThreadSelectorStrategy(new SelectorFactory(
                 NioSelectorProcessor.class));
         NioTcpServer acceptor = new NioTcpServer(strategy);
-        
+
         // Make it use https, injecting a default SSLContext instance
-        acceptor.setSslContext(BogusSslContextFactory
-            .getInstance(true));
-        
+        acceptor.setSslContext(BogusSslContextFactory.getInstance(true));
+
         acceptor.setFilters(new LoggingFilter("INCOMING"), new HttpServerCodec(), new LoggingFilter("DECODED"),
                 new DummyHttpSever());
 

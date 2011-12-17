@@ -31,8 +31,11 @@ import java.util.regex.Pattern;
 public class DateUtil {
 
     private final static Locale LOCALE = Locale.US;
+
     private final static TimeZone GMT_ZONE;
+
     private final static String RFC_1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss zzz";
+
     private final static DateFormat RFC_1123_FORMAT;
 
     /** Pattern to find digits only. */

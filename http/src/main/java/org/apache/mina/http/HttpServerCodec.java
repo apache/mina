@@ -37,12 +37,13 @@ public class HttpServerCodec extends ProtocolCodecFilter {
     private static final String PARTIAL_HEAD_ATT = "http.ph";
 
     private static ProtocolEncoder encoder = new HttpServerEncoder();
+
     private static ProtocolDecoder decoder = new HttpServerDecoder();
 
     public HttpServerCodec() {
         super(encoder, decoder);
     }
-    
+
     @Override
     public void sessionCreated(IoSession session) {
         super.sessionCreated(session);

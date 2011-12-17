@@ -24,7 +24,6 @@ import java.net.SocketAddress;
 
 import org.apache.mina.api.IoSession;
 
-
 /**
  * A strategy for using only one thread, for accepting and processing all
  * the acceptor events.
@@ -35,7 +34,7 @@ import org.apache.mina.api.IoSession;
 public class OneThreadSelectorStrategy implements SelectorStrategy {
     /** The processor in charge of the messages processing */
     private SelectorProcessor processor;
-    
+
     /**
      * Creates an instance of the OneThreadSelectorStrategy class
      * @param selectorFactory The Selector factory to use to create the processor
@@ -43,7 +42,7 @@ public class OneThreadSelectorStrategy implements SelectorStrategy {
     public OneThreadSelectorStrategy(SelectorFactory selectorFactory) {
         this.processor = selectorFactory.getNewSelector("uniqueSelector", this);
     }
-    
+
     @Override
     public SelectorProcessor getSelectorForBindNewAddress() {
         return processor;
@@ -58,7 +57,7 @@ public class OneThreadSelectorStrategy implements SelectorStrategy {
     public SelectorProcessor getSelectorForWrite(IoSession session) {
         return processor;
     }
-    
+
     @Override
     public void unbind(SocketAddress address) throws IOException {
         processor.unbind(address);

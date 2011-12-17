@@ -76,7 +76,7 @@ public class VmPipeAddress extends SocketAddress implements Comparable<VmPipeAdd
         if (port >= 0) {
             return "vm:server:" + port;
         }
-        
+
         return "vm:client:" + -port;
     }
 }

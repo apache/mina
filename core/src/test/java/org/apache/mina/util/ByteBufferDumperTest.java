@@ -66,13 +66,15 @@ public class ByteBufferDumperTest {
     @Test
     public void testWithSizeLimit() {
         ByteBuffer bb = ByteBuffer.allocate(10);
-        bb.put(new byte[]{0x01, (byte)0x8F, 0x04, 0x7A, (byte)0xc2, 0x23, (byte)0xA0, 0x08, 0x44});
+        bb.put(new byte[] { 0x01, (byte) 0x8F, 0x04, 0x7A, (byte) 0xc2, 0x23, (byte) 0xA0, 0x08, 0x44 });
         bb.flip();
-        
+
         assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2']", ByteBufferDumper.dump(bb, 5, false));
         assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2']", ByteBufferDumper.dump(bb, 5, true));
         assertEquals("ByteBuffer[len=9,str='']", ByteBufferDumper.dump(bb, 0, true));
-        assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2 0x23 0xA0 0x08 0x44']", ByteBufferDumper.dump(bb, 10, true));
-        assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2 0x23 0xA0 0x08 0x44']", ByteBufferDumper.dump(bb, -1, false));
+        assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2 0x23 0xA0 0x08 0x44']",
+                ByteBufferDumper.dump(bb, 10, true));
+        assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2 0x23 0xA0 0x08 0x44']",
+                ByteBufferDumper.dump(bb, -1, false));
     }
 }

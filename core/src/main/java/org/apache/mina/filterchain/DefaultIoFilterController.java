@@ -61,7 +61,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
         if (chain == null) {
             throw new IllegalArgumentException("chain");
         }
-        
+
         this.chain = chain;
     }
 
@@ -71,7 +71,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void processSessionCreated(IoSession session) {
         LOG.debug("processing session created event for session {}", session);
-        
+
         for (IoFilter filter : chain) {
             filter.sessionCreated(session);
         }
@@ -83,7 +83,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void processSessionOpened(IoSession session) {
         LOG.debug("processing session open event");
-        
+
         for (IoFilter filter : chain) {
             filter.sessionOpened(session);
         }
@@ -95,7 +95,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void processSessionClosed(IoSession session) {
         LOG.debug("processing session closed event");
-        
+
         for (IoFilter filter : chain) {
             filter.sessionClosed(session);
         }
@@ -107,7 +107,7 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void processMessageReceived(IoSession session, Object message) {
         LOG.debug("processing message '{}' received event ", message);
-        
+
         if (chain.length < 1) {
             LOG.debug("Nothing to do, the chain is empty");
         } else {
@@ -135,12 +135,11 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
             IoFilter nextFilter = chain[position];
             nextFilter.messageWriting(session, message, this);
         }
-        
+
         // put the future in the last write request
         if (future != null) {
             WriteRequest request = lastWriteRequest;
-            
-            
+
             if (request != null) {
                 ((DefaultWriteRequest) request).setFuture(future);
             }
@@ -153,20 +152,20 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void callWriteNextFilter(IoSession session, Object message) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("calling next filter for writing for message '{}' position : {}", message,
-                    writeChainPosition);
+            LOG.debug("calling next filter for writing for message '{}' position : {}", message, writeChainPosition);
         }
-        
+
         writeChainPosition--;
-        
+
         if (writeChainPosition < 0 || chain.length == 0) {
             // end of chain processing
             enqueueFinalWriteMessage(session, message);
         } else {
             chain[writeChainPosition].messageWriting(session, message, this);
         }
-        
-        writeChainPosition++;;
+
+        writeChainPosition++;
+        ;
     }
 
     /**
@@ -183,13 +182,13 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     @Override
     public void callReadNextFilter(IoSession session, Object message) {
         readChainPosition++;
-        
+
         if (readChainPosition >= chain.length) {
             // end of chain processing
         } else {
             chain[readChainPosition].messageReceived(session, message, this);
         }
-        
+
         readChainPosition--;
     }
 
@@ -200,11 +199,11 @@ public class DefaultIoFilterController implements IoFilterController, ReadFilter
     public String toString() {
         StringBuilder bldr = new StringBuilder("IoFilterChain {");
         int index = 0;
-        
+
         for (IoFilter filter : chain) {
             bldr.append(index).append(":").append(filter).append(", ");
         }
-        
+
         return bldr.append("}").toString();
     }
 }

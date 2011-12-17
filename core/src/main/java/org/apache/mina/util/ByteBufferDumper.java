@@ -27,9 +27,9 @@ import java.nio.ByteBuffer;
  */
 public class ByteBufferDumper {
     /** Hex chars */
-    private static final byte[] HEX_CHAR = new byte[]
-        { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-    
+    private static final byte[] HEX_CHAR = new byte[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B',
+            'C', 'D', 'E', 'F' };
+
     /**
      * Dump the content of a IoBuffer
      * 
@@ -38,25 +38,25 @@ public class ByteBufferDumper {
      */
     public static String dump(IoBuffer buffer) {
         StringBuilder sb = new StringBuilder();
-        
+
         boolean isFirst = true;
-        
+
         for (int i = 0; i < buffer.limit(); i++) {
             byte byteValue = buffer.get(i);
-            
+
             if (isFirst) {
                 isFirst = false;
             } else {
                 sb.append(' ');
             }
-            
-            sb.append( new String( new byte[]
-                { '0', 'x', HEX_CHAR[( byteValue & 0x00F0 ) >> 4], HEX_CHAR[byteValue & 0x000F] } ));
+
+            sb.append(new String(new byte[] { '0', 'x', HEX_CHAR[(byteValue & 0x00F0) >> 4],
+                    HEX_CHAR[byteValue & 0x000F] }));
         }
-            
+
         return sb.toString();
     }
-    
+
     /**
      * Dump the content of the given ByteBuffer, up to a number of bytes. If the
      * toAscii flag is set to <code>true</code>, this method will try to convert
@@ -70,16 +70,16 @@ public class ByteBufferDumper {
     public static String dump(ByteBuffer buffer, int nbBytes, boolean toAscii) {
         byte[] data = buffer.array();
         int start = buffer.position();
-        int size = Math.min(buffer.remaining(), nbBytes >= 0?nbBytes : Integer.MAX_VALUE);
+        int size = Math.min(buffer.remaining(), nbBytes >= 0 ? nbBytes : Integer.MAX_VALUE);
         int length = buffer.remaining();
-        
+
         // is not ASCII printable ?
         boolean binaryContent = false;
-        
+
         if (toAscii) {
             for (int i = start; i < size; i++) {
                 byte b = data[i];
-                
+
                 if (((b < 32) || (b > 126)) && (b != 13) && (b != 10)) {
                     binaryContent = true;
                     break;
@@ -102,24 +102,21 @@ public class ByteBufferDumper {
                 } else {
                     out.append(' ');
                 }
-                
+
                 byteValue = data[i] & 0xFF;
-                out.append( new String( new byte[]
-                    { '0', 'x', HEX_CHAR[( byteValue & 0x00F0 ) >> 4], HEX_CHAR[byteValue & 0x000F] } ));
+                out.append(new String(new byte[] { '0', 'x', HEX_CHAR[(byteValue & 0x00F0) >> 4],
+                        HEX_CHAR[byteValue & 0x000F] }));
             }
-            
+
             out.append("']");
-            
+
             return out.toString();
 
         } else {
             StringBuilder sb = new StringBuilder(size);
-            sb.append("ByteBuffer[len=")
-                .append(length)
-                .append(",str='")
-                .append(new String(data, start, size))
-                .append("']");
-            
+            sb.append("ByteBuffer[len=").append(length).append(",str='").append(new String(data, start, size))
+                    .append("']");
+
             return sb.toString();
         }
     }

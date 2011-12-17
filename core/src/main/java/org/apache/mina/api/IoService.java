@@ -80,19 +80,19 @@ public interface IoService {
      * created by this service.
      */
     IoSessionConfig getSessionConfig();
-    
+
     /**
      * Tells if the service provide some encryption (SSL/TLS)
      * @return <code>true</code> if the service is secured
      */
     boolean isSecured();
-    
+
     /**
      * Set the mode to use, either secured or not secured
      * @param secured The mode to use
      */
     void setSecured(boolean secured);
-    
+
     /**
      * Inject a {@link SSLContex} valid for the service. This {@link SSLContex} will be used
      * by the SSLEngine to handle secured connections.<br/>
@@ -102,7 +102,7 @@ public interface IoService {
      * @param sslContext The configured {@link SSLContex}.
      */
     void setSslContext(SSLContext sslContext);
-    
+
     /**
      * @return The {@link SSLContext} instance stored in the service.
      */

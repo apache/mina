@@ -18,9 +18,7 @@
  */
 package org.apache.mina.api;
 
-
 import java.util.concurrent.Future;
-
 
 /**
  * A simple extension that allows listeners to register and receive results

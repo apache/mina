@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 public class NioSelectorProcessor implements SelectorProcessor {
     /** A logger for this class */
     private static final Logger LOGGER = LoggerFactory.getLogger(NioSelectorProcessor.class);
-    
+
     /**
      * A timeout used for the select, as we need to get out to deal with idle
      * sessions
@@ -268,6 +268,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
         // map for finding read keys associated with a given session
         private Map<NioTcpSession, SelectionKey> sessionReadKey = new HashMap<NioTcpSession, SelectionKey>();
+
         @Override
         public void run() {
             try {
@@ -348,7 +349,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
                     // stop the worker if needed
                     workerLock.lock();
-                    
+
                     try {
                         if (selector.keys().isEmpty()) {
                             worker = null;
@@ -362,7 +363,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 LOGGER.error("Unexpected exception : ", e);
             }
         }
-        
+
         /**
          * Handles the servers removal
          */
@@ -379,7 +380,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 }
             }
         }
-        
+
         /**
          * Handles the servers addition
          */
@@ -458,7 +459,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
             int readCount = channel.read(readBuffer);
 
             LOGGER.debug("read {} bytes", readCount);
-            
+
             if (readCount < 0) {
                 // session closed by the remote peer
                 LOGGER.debug("session closed by the remote peer");
@@ -476,7 +477,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     if (sslHelper == null) {
                         throw new IllegalStateException();
                     }
-                    
+
                     sslHelper.processRead(session, readBuffer);
                 } else {
                     // Plain message, not encrypted : go directly to the chain
@@ -510,7 +511,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     }
 
                     ByteBuffer buf = (ByteBuffer) wreq.getMessage();
-                    
+
                     // Note that if the connection is secured, the buffer already
                     // contains encrypted data.
                     int wrote = session.getSocketChannel().write(buf);

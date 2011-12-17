@@ -41,7 +41,6 @@ import static org.mockito.Mockito.verify;
 
 import org.apache.mina.api.IoFutureListener;
 
-
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -61,7 +60,7 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "ThrowableResultOfMethodCallIgnored"})
+    @SuppressWarnings({ "unchecked", "ThrowableResultOfMethodCallIgnored" })
     public void testSetListeners() {
         MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
@@ -77,11 +76,11 @@ public class AbstractIoFutureTest {
         assertTrue(future.isDone());
 
         verify(listener).completed(true);
-        verify(listener, never()).exception(Matchers.<Throwable>any());
+        verify(listener, never()).exception(Matchers.<Throwable> any());
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "ThrowableResultOfMethodCallIgnored"})
+    @SuppressWarnings({ "unchecked", "ThrowableResultOfMethodCallIgnored" })
     public void testSetListenersAlreadySet() {
         MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
@@ -96,7 +95,7 @@ public class AbstractIoFutureTest {
         assertTrue(future.isDone());
 
         verify(listener).completed(true);
-        verify(listener, never()).exception(Matchers.<Throwable>any());
+        verify(listener, never()).exception(Matchers.<Throwable> any());
     }
 
     @Test
@@ -156,7 +155,7 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "unchecked"})
+    @SuppressWarnings({ "ThrowableResultOfMethodCallIgnored", "unchecked" })
     public void testExceptionListeners() {
         MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
@@ -172,11 +171,11 @@ public class AbstractIoFutureTest {
         assertTrue(future.isDone());
 
         verify(listener).exception(argThat(matchesExecutionException()));
-        verify(listener, never()).completed(Matchers.<Boolean>any());
+        verify(listener, never()).completed(Matchers.<Boolean> any());
     }
 
     @Test
-    @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "unchecked"})
+    @SuppressWarnings({ "ThrowableResultOfMethodCallIgnored", "unchecked" })
     public void testExceptionListenersExceptionAlreadySet() {
         MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
@@ -191,7 +190,7 @@ public class AbstractIoFutureTest {
         assertTrue(future.isDone());
 
         verify(listener).exception(argThat(matchesExecutionException()));
-        verify(listener, never()).completed(Matchers.<Boolean>any());
+        verify(listener, never()).completed(Matchers.<Boolean> any());
     }
 
     @Test
@@ -302,7 +301,7 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "ThrowableResultOfMethodCallIgnored"})
+    @SuppressWarnings({ "unchecked", "ThrowableResultOfMethodCallIgnored" })
     public void testCanceledListeners() {
         MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         doReturn(true).when(future).cancelOwner(anyBoolean());
@@ -318,12 +317,12 @@ public class AbstractIoFutureTest {
         assertTrue(future.isCancelled());
         assertTrue(future.isDone());
 
-        verify(listener).exception(Matchers.<CancellationException>any());
-        verify(listener, never()).completed(Matchers.<Boolean>any());
+        verify(listener).exception(Matchers.<CancellationException> any());
+        verify(listener, never()).completed(Matchers.<Boolean> any());
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "ThrowableResultOfMethodCallIgnored"})
+    @SuppressWarnings({ "unchecked", "ThrowableResultOfMethodCallIgnored" })
     public void testCanceledListenersAlreadySet() {
         MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         doReturn(true).when(future).cancelOwner(anyBoolean());
@@ -338,8 +337,8 @@ public class AbstractIoFutureTest {
         assertTrue(future.isCancelled());
         assertTrue(future.isDone());
 
-        verify(listener).exception(Matchers.<CancellationException>any());
-        verify(listener, never()).completed(Matchers.<Boolean>any());
+        verify(listener).exception(Matchers.<CancellationException> any());
+        verify(listener, never()).completed(Matchers.<Boolean> any());
     }
 
     @Test
@@ -364,7 +363,8 @@ public class AbstractIoFutureTest {
         return new BaseMatcher<Throwable>() {
             @Override
             public boolean matches(Object item) {
-                return item instanceof ExecutionException && ((ExecutionException) item).getCause() instanceof NullPointerException;
+                return item instanceof ExecutionException
+                        && ((ExecutionException) item).getCause() instanceof NullPointerException;
             }
 
             @Override

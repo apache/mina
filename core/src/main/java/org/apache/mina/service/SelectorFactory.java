@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * A factory used by {@link SelectorStrategy} for instantiating selectors when needed.
  * 
@@ -34,39 +33,39 @@ import org.slf4j.LoggerFactory;
 public class SelectorFactory {
     /** A logger for this class */
     static final Logger LOG = LoggerFactory.getLogger(SelectorFactory.class);
-        
+
     private Constructor<? extends SelectorProcessor> constructor;
-    
+
     /**
      * create a factory for the given {@link SelectorProcessor} type.
      * @param selectorClass
      */
     public SelectorFactory(Class<? extends SelectorProcessor> selectorClass) {
         try {
-            constructor = selectorClass.getDeclaredConstructor(new Class<?>[]{String.class,SelectorStrategy.class});
+            constructor = selectorClass.getDeclaredConstructor(new Class<?>[] { String.class, SelectorStrategy.class });
         } catch (NoSuchMethodException e) {
-            LOG.error("NoSuchMethodException while instantiating selector",e);
+            LOG.error("NoSuchMethodException while instantiating selector", e);
         } catch (SecurityException e) {
-            LOG.error("SecurityException while instantiating selector",e);
-        }   
+            LOG.error("SecurityException while instantiating selector", e);
+        }
     }
-    
+
     /**
      * 
      */
-    public SelectorProcessor getNewSelector(String name,SelectorStrategy strategy) {
+    public SelectorProcessor getNewSelector(String name, SelectorStrategy strategy) {
         try {
-            return (SelectorProcessor)constructor.newInstance(name,strategy);
+            return (SelectorProcessor) constructor.newInstance(name, strategy);
         } catch (SecurityException e) {
-            LOG.error("SecurityException while instantiating selector",e);
+            LOG.error("SecurityException while instantiating selector", e);
         } catch (IllegalArgumentException e) {
-            LOG.error("IllegalArgumentException while instantiating selector",e);
+            LOG.error("IllegalArgumentException while instantiating selector", e);
         } catch (InstantiationException e) {
-            LOG.error("InstantiationException while instantiating selector",e);
+            LOG.error("InstantiationException while instantiating selector", e);
         } catch (IllegalAccessException e) {
-            LOG.error("IllegalAccessException while instantiating selector",e);
+            LOG.error("IllegalAccessException while instantiating selector", e);
         } catch (InvocationTargetException e) {
-            LOG.error("InvocationTargetException while instantiating selector",e);
+            LOG.error("InvocationTargetException while instantiating selector", e);
         }
         return null;
     }

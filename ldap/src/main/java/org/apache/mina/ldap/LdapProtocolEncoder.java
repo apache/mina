@@ -19,7 +19,6 @@
  */
 package org.apache.mina.ldap;
 
-
 import java.nio.ByteBuffer;
 
 import org.apache.directory.shared.ldap.codec.api.LdapApiServiceFactory;
@@ -29,48 +28,43 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filterchain.WriteFilterChainController;
 
-
 /**
  * A LDAP message encoder. It is based on shared-ldap encoder.
- *
+ * 
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  */
 public class LdapProtocolEncoder implements ProtocolEncoder {
     /** The stateful encoder */
     private LdapEncoder encoder;
-    
-    
+
     /**
      * Creates a new instance of LdapProtocolEncoder.
-     *
+     * 
      * @param codec The LDAP codec service associated with this encoder.
      */
     public LdapProtocolEncoder() {
         this.encoder = new LdapEncoder(LdapApiServiceFactory.getSingleton());
     }
 
-
     /**
      * {@inheritDoc}
      */
     public Object encode(IoSession session, Object message, WriteFilterChainController controller) {
         try {
-            ByteBuffer buffer = encoder.encodeMessage( ( Message ) message );
-    
+            ByteBuffer buffer = encoder.encodeMessage((Message) message);
+
             controller.callWriteNextFilter(session, buffer);
         } catch (Exception e) {
             return null;
         }
-        
+
         return null;
     }
-
 
     /**
      * {@inheritDoc}
      */
-    public void dispose( IoSession session ) throws Exception
-    {
+    public void dispose(IoSession session) throws Exception {
         // Nothing to do
     }
 }

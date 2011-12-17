@@ -66,26 +66,26 @@ public class DefaultWriteRequest implements WriteRequest {
     public void setFuture(IoFuture<Void> future) {
         this.future = future;
     }
-    
+
     /**
      * @see Object#toString()
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("WriteRequest[");
-        
+
         if (future != null) {
             sb.append("Future,");
         }
-        
+
         if (message != null) {
             // Just dump the first 16 bytes
-            sb.append(ByteBufferDumper.dump((ByteBuffer)message, 16, false));
+            sb.append(ByteBufferDumper.dump((ByteBuffer) message, 16, false));
         }
-        
+
         sb.append("]");
-        
+
         return sb.toString();
     }
 }

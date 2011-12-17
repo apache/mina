@@ -44,10 +44,10 @@ public abstract class AbstractIoService implements IoService {
 
     /** The service state */
     private ServiceState state;
-    
+
     /** The service mode : secured or not */
     private ServiceMode mode;
-    
+
     /** The SSLContext instance */
     private SSLContext sslContext;
 
@@ -80,7 +80,7 @@ public abstract class AbstractIoService implements IoService {
         /** The service is stopped */
         DISPOSED
     }
-    
+
     /**
      * The Service secured mode
      */
@@ -277,7 +277,7 @@ public abstract class AbstractIoService implements IoService {
     public void setFilters(IoFilter... filters) {
         this.filters = filters;
     }
-    
+
     /**
      * Tells if the service provide some encryption (SSL/TLS)
      * @return <code>true</code> if the service is secured
@@ -285,7 +285,7 @@ public abstract class AbstractIoService implements IoService {
     public boolean isSecured() {
         return mode == ServiceMode.SECURED;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -296,7 +296,7 @@ public abstract class AbstractIoService implements IoService {
             mode = ServiceMode.NOT_SECURED;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -304,7 +304,7 @@ public abstract class AbstractIoService implements IoService {
         this.sslContext = sslContext;
         mode = ServiceMode.SECURED;
     }
-    
+
     /**
      * {@inheritDoc}
      */

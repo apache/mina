@@ -30,7 +30,7 @@ import javax.net.ssl.SSLContext;
 
 /**
  * Factory to create a bogus SSLContext.
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class BogusSslContextFactory {
@@ -43,8 +43,7 @@ public class BogusSslContextFactory {
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
 
     static {
-        String algorithm = Security
-                .getProperty("ssl.KeyManagerFactory.algorithm");
+        String algorithm = Security.getProperty("ssl.KeyManagerFactory.algorithm");
         if (algorithm == null) {
             algorithm = KeyManagerFactory.getDefaultAlgorithm();
         }
@@ -58,10 +57,10 @@ public class BogusSslContextFactory {
     private static final String BOGUS_KEYSTORE = "bogus.cert";
 
     // NOTE: The keystore was generated using keytool:
-    //   keytool -genkey -alias bogus -keysize 512 -validity 3650
-    //           -keyalg RSA -dname "CN=bogus.com, OU=XXX CA,
-    //               O=Bogus Inc, L=Stockholm, S=Stockholm, C=SE"
-    //           -keypass boguspw -storepass boguspw -keystore bogus.cert
+    // keytool -genkey -alias bogus -keysize 512 -validity 3650
+    // -keyalg RSA -dname "CN=bogus.com, OU=XXX CA,
+    // O=Bogus Inc, L=Stockholm, S=Stockholm, C=SE"
+    // -keypass boguspw -storepass boguspw -keystore bogus.cert
 
     /**
      * Bougus keystore password.
@@ -69,27 +68,25 @@ public class BogusSslContextFactory {
     private static final char[] BOGUS_PW = { 'b', 'o', 'g', 'u', 's', 'p', 'w' };
 
     private static SSLContext serverInstance = null;
-    
+
     private static SSLContext clientInstance = null;
 
     /**
      * Get SSLContext singleton.
-     *
+     * 
      * @return SSLContext
      * @throws java.security.GeneralSecurityException
-     *
+     * 
      */
-    public static SSLContext getInstance(boolean server)
-            throws GeneralSecurityException {
+    public static SSLContext getInstance(boolean server) throws GeneralSecurityException {
         SSLContext retInstance = null;
         if (server) {
-            synchronized(BogusSslContextFactory.class) {
+            synchronized (BogusSslContextFactory.class) {
                 if (serverInstance == null) {
                     try {
                         serverInstance = createBougusServerSslContext();
                     } catch (Exception ioe) {
-                        throw new GeneralSecurityException(
-                                "Can't create Server SSLContext:" + ioe);
+                        throw new GeneralSecurityException("Can't create Server SSLContext:" + ioe);
                     }
                 }
             }
@@ -105,14 +102,12 @@ public class BogusSslContextFactory {
         return retInstance;
     }
 
-    private static SSLContext createBougusServerSslContext()
-            throws GeneralSecurityException, IOException {
+    private static SSLContext createBougusServerSslContext() throws GeneralSecurityException, IOException {
         // Create keystore
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream in = null;
         try {
-            in = BogusSslContextFactory.class
-                    .getResourceAsStream(BOGUS_KEYSTORE);
+            in = BogusSslContextFactory.class.getResourceAsStream(BOGUS_KEYSTORE);
             ks.load(in, BOGUS_PW);
         } finally {
             if (in != null) {
@@ -124,20 +119,17 @@ public class BogusSslContextFactory {
         }
 
         // Set up key manager factory to use our key store
-        KeyManagerFactory kmf = KeyManagerFactory
-                .getInstance(KEY_MANAGER_FACTORY_ALGORITHM);
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KEY_MANAGER_FACTORY_ALGORITHM);
         kmf.init(ks, BOGUS_PW);
 
         // Initialize the SSLContext to work with our key managers.
         SSLContext sslContext = SSLContext.getInstance(PROTOCOL);
-        sslContext.init(kmf.getKeyManagers(),
-                BogusTrustManagerFactory.X509_MANAGERS, null);
+        sslContext.init(kmf.getKeyManagers(), BogusTrustManagerFactory.X509_MANAGERS, null);
 
         return sslContext;
     }
 
-    private static SSLContext createBougusClientSslContext()
-            throws GeneralSecurityException {
+    private static SSLContext createBougusClientSslContext() throws GeneralSecurityException {
         SSLContext context = SSLContext.getInstance(PROTOCOL);
         context.init(null, BogusTrustManagerFactory.X509_MANAGERS, null);
         return context;

@@ -31,9 +31,7 @@ package org.apache.mina.api;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum IdleStatus {
-    READ_IDLE("read idle"),
-    WRITE_IDLE("write idle"),
-    READ_WRITE_IDLE("both idle");
+    READ_IDLE("read idle"), WRITE_IDLE("write idle"), READ_WRITE_IDLE("both idle");
 
     private final String description;
 

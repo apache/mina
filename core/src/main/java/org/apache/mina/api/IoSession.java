@@ -55,7 +55,7 @@ import org.apache.mina.session.WriteRequest;
 public interface IoSession {
     /** The SslHelper instance name, stored in the session's attributes */
     static final String SSL_HELPER = "internal_sslHelper";
-    
+
     /**
      * The unique identifier of this session.
      * 
@@ -129,7 +129,7 @@ public interface IoSession {
      * @return <code>true</tt> if and only if this session is belonging a secured connection.
      */
     boolean isSecured();
-    
+
     /**
      * Changes the session's state from the current state to a new state. Not all the
      * transition are allowed. Here is the list of all the possible transitions :<br/>
@@ -150,7 +150,7 @@ public interface IoSession {
      * @param newState The final SessionState
      */
     void changeState(SessionState newState) throws IllegalStateException;
-    
+
     /**
      * Initializes the SSL/TLS environment for this session.
      * 
@@ -356,7 +356,7 @@ public interface IoSession {
      * @return the write queue of this session
      */
     public Queue<WriteRequest> acquireWriteQueue();
-    
+
     /**
      * Release the WriteQueue after having acquired it with the {@link acquireWriteQeuee()} method.
      */

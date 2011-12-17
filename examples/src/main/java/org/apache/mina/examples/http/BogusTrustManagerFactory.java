@@ -32,18 +32,16 @@ import javax.net.ssl.X509TrustManager;
 
 /**
  * Bogus trust manager factory. Creates BogusX509TrustManager
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class BogusTrustManagerFactory extends TrustManagerFactorySpi {
 
     static final X509TrustManager X509 = new X509TrustManager() {
-        public void checkClientTrusted(X509Certificate[] x509Certificates,
-                String s) throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
         }
 
-        public void checkServerTrusted(X509Certificate[] x509Certificates,
-                String s) throws CertificateException {
+        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
         }
 
         public X509Certificate[] getAcceptedIssuers() {

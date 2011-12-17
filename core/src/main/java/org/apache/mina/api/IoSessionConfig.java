@@ -19,7 +19,6 @@
  */
 package org.apache.mina.api;
 
-
 /**
  * The configuration of {@link IoSession}.
  *

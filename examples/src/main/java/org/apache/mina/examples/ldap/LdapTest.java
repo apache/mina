@@ -47,8 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple LDAP server class used to test theLDAP encoder/decoder. It only deal with the 
- * BindRequest message.
+ * A simple LDAP server class used to test theLDAP encoder/decoder. It only deal with the BindRequest message.
  */
 public class LdapTest {
     private static final Logger LOG = LoggerFactory.getLogger(LdapTest.class);
@@ -59,7 +58,7 @@ public class LdapTest {
                 NioSelectorProcessor.class));
         NioTcpServer acceptor = new NioTcpServer(strategy);
         acceptor.setFilters(new LoggingFilter("INCOMING"), new LdapCodec(), new LoggingFilter("DECODED"),
-            ldapServer.new DummyLdapSever());
+                ldapServer.new DummyLdapSever());
 
         acceptor.bind(new InetSocketAddress(10389));
 
@@ -71,45 +70,44 @@ public class LdapTest {
 
     private class DummyLdapSever extends DefaultIoFilter {
         @Override
-        public void messageReceived( IoSession session, Object message, ReadFilterChainController controller )
-        {
+        public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
             if (message instanceof AbandonRequest) {
-                handle(session, (AbandonRequest)message);
+                handle(session, (AbandonRequest) message);
             } else if (message instanceof AddRequest) {
-                handle(session, (AddRequest)message);
+                handle(session, (AddRequest) message);
             } else if (message instanceof BindRequest) {
-                handle(session, (BindRequest)message);
+                handle(session, (BindRequest) message);
             } else if (message instanceof CompareRequest) {
-                handle(session, (CompareRequest)message);
+                handle(session, (CompareRequest) message);
             } else if (message instanceof DeleteRequest) {
-                handle(session, (DeleteRequest)message);
+                handle(session, (DeleteRequest) message);
             } else if (message instanceof ExtendedRequest) {
-                handle(session, (ExtendedRequest)message);
+                handle(session, (ExtendedRequest) message);
             } else if (message instanceof ModifyRequest) {
-                handle(session, (ModifyRequest)message);
+                handle(session, (ModifyRequest) message);
             } else if (message instanceof ModifyDnRequest) {
-                handle(session, (ModifyDnRequest)message);
+                handle(session, (ModifyDnRequest) message);
             } else if (message instanceof SearchRequest) {
-                handle(session, (SearchRequest)message);
+                handle(session, (SearchRequest) message);
             } else if (message instanceof UnbindRequest) {
-                handle(session, (UnbindRequest)message);
+                handle(session, (UnbindRequest) message);
             }
         }
-        
+
         /**
          * Process the AbandonRequest message
          */
         private void handle(IoSession session, AbandonRequest abandonRequest) {
             // Do nothing
         }
-        
+
         /**
          * Process the AddRequest message
          */
         private void handle(IoSession session, AddRequest addRequest) {
             // Do nothing
         }
-        
+
         /**
          * Process the BindRequest message
          */
@@ -120,49 +118,49 @@ public class LdapTest {
 
             session.write(response);
         }
-        
+
         /**
          * Process the CompareRequest message
          */
         private void handle(IoSession session, CompareRequest compareRequest) {
             // Do nothing
         }
-        
+
         /**
          * Process the DeleteRequest message
          */
         private void handle(IoSession session, DeleteRequest deleteRequest) {
             // Do nothing
         }
-        
+
         /**
          * Process the ExtendedRequest message
          */
         private void handle(IoSession session, ExtendedRequest extendedRequest) {
             // Do nothing
         }
-        
+
         /**
          * Process the ModifyRequest message
          */
         private void handle(IoSession session, ModifyRequest modifyRequest) {
             // Do nothing
         }
-        
+
         /**
          * Process the ModifyDnRequest message
          */
         private void handle(IoSession session, ModifyDnRequest modifyDnRequest) {
             // Do nothing
         }
-        
+
         /**
          * Process the SearchRequest message
          */
         private void handle(IoSession session, SearchRequest searchRequest) {
             // Do nothing
         }
-        
+
         /**
          * Process the UnbindRequest message
          */

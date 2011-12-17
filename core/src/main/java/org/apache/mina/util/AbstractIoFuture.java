@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoFutureListener;
 
-
 /**
  * An abstract implementation of {@link IoFuture}.  Owners of this future
  * must implement {@link #cancelOwner(boolean)} to receive notifications of
@@ -51,14 +50,17 @@ import org.apache.mina.api.IoFutureListener;
 public abstract class AbstractIoFuture<V> implements IoFuture<V> {
 
     static final Logger LOG = LoggerFactory.getLogger(AbstractIoFuture.class);
+
     private final CountDownLatch latch = new CountDownLatch(1);
+
     private final List<IoFutureListener<V>> listeners = new ArrayList<IoFutureListener<V>>();
+
     private final AtomicReference<Object> result = new AtomicReference<Object>();
 
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public IoFuture<V> register(IoFutureListener<V> listener) {
 
         LOG.debug("registering listener {}", listener);
@@ -133,14 +135,15 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public V get() throws InterruptedException, ExecutionException {
 
         LOG.trace("Entering wait");
         latch.await();
         LOG.trace("Wait completed");
 
-        if (isCancelled()) throw new CancellationException();
+        if (isCancelled())
+            throw new CancellationException();
 
         Object object = result.get();
         if (object instanceof ExecutionException) {
@@ -153,14 +156,16 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 
         LOG.trace("Entering wait");
-        if (!latch.await(timeout, unit)) throw new TimeoutException();
+        if (!latch.await(timeout, unit))
+            throw new TimeoutException();
         LOG.trace("Wait completed");
 
-        if (isCancelled()) throw new CancellationException();
+        if (isCancelled())
+            throw new CancellationException();
 
         Object object = result.get();
         if (object instanceof ExecutionException) {
@@ -228,7 +233,6 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
             LOG.warn("Listener threw an exception", t);
         }
     }
-
 
     /**
      * Set the future result of the executing task.  Any {@link IoFutureListener}s

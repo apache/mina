@@ -24,7 +24,6 @@ import java.net.SocketAddress;
 
 import org.apache.mina.api.IoSession;
 
-
 /**
  * Strategy for balancing server socket and client socket to different selecting/polling threads.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -37,7 +36,7 @@ public interface SelectorStrategy {
      * @return a processor for processing the new session
      */
     SelectorProcessor getSelectorForNewSession(SelectorProcessor acceptingProcessor);
-    
+
     /**
      * Provide a {@link SelectorProcessor} for a {@link IoSession} which need to write data.
      * This processor will be in charge of selecting the socket for write ready events.
@@ -46,14 +45,14 @@ public interface SelectorStrategy {
      * @return the selector processor for handling this session write events
      */
     SelectorProcessor getSelectorForWrite(IoSession session);
-    
+
     /**
      * Provide a {@link SelectorProcessor} for processing a newly bound address.
      * The processor will accept the incoming connections.
      * @return a {@link SelectorProcessor} for processing a newly bound address
      */
     SelectorProcessor getSelectorForBindNewAddress();
-    
+
     /**
      * Unbind an address and remove it from its {@link SelectorProcessor} 
      * @param address the address to be unbound and removed
