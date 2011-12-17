@@ -32,6 +32,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 
+import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
@@ -84,16 +85,15 @@ public abstract class AbstractIoSession implements IoSession {
 
     /** The session's state : one of CREATED, CONNECTED, CLOSING, CLOSED, SECURING, CONNECTED_SECURED */
     protected volatile SessionState state;
-    
+
     /** A lock to protect the access to the session's state */
     private final ReadWriteLock stateLock = new ReentrantReadWriteLock();
-    
+
     /** A Read lock on the reentrant session's state lock */
     private final Lock stateReadLock = stateLock.readLock();
 
     /** A Write lock on the reentrant session's state lock */
     private final Lock stateWriteLock = stateLock.writeLock();
-
 
     /** Tells if the session is secured or not */
     protected volatile boolean secured;
@@ -106,15 +106,16 @@ public abstract class AbstractIoSession implements IoSession {
 
     /** A lock to protect the access to the write queue */
     private final ReadWriteLock writeQueueLock = new ReentrantReadWriteLock();
-    
+
     /** A Read lock on the reentrant writeQueue lock */
     private final Lock writeQueueReadLock = writeQueueLock.readLock();
 
     /** A Write lock on the reentrant writeQueue lock */
     private final Lock writeQueueWriteLock = writeQueueLock.writeLock();
 
+    /** The controller for the {@link IoFilter} chain of this session */
     private IoFilterController filterProcessor;
-    
+
     /**
      * Create an {@link org.apache.mina.api.IoSession} with a unique identifier (
      * {@link org.apache.mina.api.IoSession#getId()}) and an associated {@link IoService}
@@ -145,7 +146,7 @@ public abstract class AbstractIoSession implements IoSession {
     public boolean isClosed() {
         try {
             stateReadLock.lock();
-            
+
             return state == SessionState.CLOSED;
         } finally {
             stateReadLock.unlock();
@@ -159,13 +160,13 @@ public abstract class AbstractIoSession implements IoSession {
     public boolean isClosing() {
         try {
             stateReadLock.lock();
-            
+
             return state == SessionState.CLOSING;
         } finally {
             stateReadLock.unlock();
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -173,13 +174,13 @@ public abstract class AbstractIoSession implements IoSession {
     public boolean isConnected() {
         try {
             stateReadLock.lock();
-            
+
             return state == SessionState.CONNECTED;
         } finally {
             stateReadLock.unlock();
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -187,7 +188,7 @@ public abstract class AbstractIoSession implements IoSession {
     public boolean isCreated() {
         try {
             stateReadLock.lock();
-            
+
             return state == SessionState.CREATED;
         } finally {
             stateReadLock.unlock();
@@ -201,7 +202,7 @@ public abstract class AbstractIoSession implements IoSession {
     public boolean isSecuring() {
         try {
             stateReadLock.lock();
-            
+
             return state == SessionState.SECURING;
         } finally {
             stateReadLock.unlock();
@@ -215,86 +216,85 @@ public abstract class AbstractIoSession implements IoSession {
     public boolean isConnectedSecured() {
         try {
             stateReadLock.lock();
-            
+
             return state == SessionState.SECURED;
         } finally {
             stateReadLock.unlock();
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void changeState(SessionState to) throws IllegalStateException {
         try {
             stateWriteLock.lock();
-            
-            switch (state) {
-                case CREATED :
-                    switch (to) {
-                        case CONNECTED :
-                        case SECURING :
-                        case CLOSING :
-                            state = to;
-                            break;
-                            
-                        default :
-                            throw new IllegalStateException("Cannot transit from " + state + " to " + to );
-                    }
-                    
-                    break;
-                    
-                case CONNECTED :
-                    switch (to) {
-                        case SECURING :
-                        case CLOSING :
-                            state = to;
-                            break;
-                            
-                        default :
-                            throw new IllegalStateException("Cannot transit from " + state + " to " + to );
-                    }
-                    
-                    break;
-                    
-                case SECURING :
-                    switch (to) {
-                        case SECURED :
-                        case CLOSING :
-                            state = to;
-                            break;
-                            
-                        default :
-                            throw new IllegalStateException("Cannot transit from " + state + " to " + to );
-                    }
-                    
-                    break;
-                    
-                    
-                case SECURED :
-                    switch (to) {
-                        case CONNECTED :
-                        case SECURING :
-                        case CLOSING :
-                            state = to;
-                            break;
-                            
-                        default :
-                            throw new IllegalStateException("Cannot transit from " + state + " to " + to );
-                    }
-                    
-                    break;
-                case CLOSING :
-                    if (to != SessionState.CLOSED) {
-                        throw new IllegalStateException("Cannot transit from " + state + " to " + to );
-                    }
 
+            switch (state) {
+            case CREATED:
+                switch (to) {
+                case CONNECTED:
+                case SECURING:
+                case CLOSING:
                     state = to;
-                    
                     break;
-                    
-                case CLOSED :
-                    throw new IllegalStateException("The session is already closed. cannot switch to " + to );
+
+                default:
+                    throw new IllegalStateException("Cannot transit from " + state + " to " + to);
+                }
+
+                break;
+
+            case CONNECTED:
+                switch (to) {
+                case SECURING:
+                case CLOSING:
+                    state = to;
+                    break;
+
+                default:
+                    throw new IllegalStateException("Cannot transit from " + state + " to " + to);
+                }
+
+                break;
+
+            case SECURING:
+                switch (to) {
+                case SECURED:
+                case CLOSING:
+                    state = to;
+                    break;
+
+                default:
+                    throw new IllegalStateException("Cannot transit from " + state + " to " + to);
+                }
+
+                break;
+
+            case SECURED:
+                switch (to) {
+                case CONNECTED:
+                case SECURING:
+                case CLOSING:
+                    state = to;
+                    break;
+
+                default:
+                    throw new IllegalStateException("Cannot transit from " + state + " to " + to);
+                }
+
+                break;
+            case CLOSING:
+                if (to != SessionState.CLOSED) {
+                    throw new IllegalStateException("Cannot transit from " + state + " to " + to);
+                }
+
+                state = to;
+
+                break;
+
+            case CLOSED:
+                throw new IllegalStateException("The session is already closed. cannot switch to " + to);
             }
         } finally {
             stateWriteLock.unlock();
@@ -311,25 +311,24 @@ public abstract class AbstractIoSession implements IoSession {
     public boolean isSecured() {
         return secured;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void setSecured(boolean secured) {
         this.secured = secured;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void initSecure(SSLContext sslContext) throws SSLException {
         SslHelper sslHelper = new SslHelper(this, sslContext);
         sslHelper.init();
-        
+
         attributes.put(SSL_HELPER, sslHelper);
         setSecured(true);
     }
-
 
     /**
      * {@inheritDoc}
@@ -457,7 +456,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     private void doWriteWithFuture(Object message, IoFuture<Void> future) {
         LOG.debug("writing message {} to session {}", message, this);
-        
+
         if ((state == SessionState.CLOSED) || (state == SessionState.CLOSING)) {
             LOG.error("writing to closed or closing session, the message is discarded");
             return;
@@ -473,24 +472,24 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public WriteRequest enqueueWriteRequest(Object message) {
         WriteRequest request = null;
-        
+
         try {
             // Lock the queue while the message is written into it
             writeQueueReadLock.lock();
-            
-            if ( isConnectedSecured()) {
+
+            if (isConnectedSecured()) {
                 // SSL/TLS : we have to encrypt the message
-                SslHelper sslHelper = getAttribute( IoSession.SSL_HELPER );
-                
+                SslHelper sslHelper = getAttribute(IoSession.SSL_HELPER);
+
                 if (sslHelper == null) {
                     throw new IllegalStateException();
                 }
-                
+
                 request = sslHelper.processWrite(this, message, writeQueue);
             } else {
                 // Plain message
                 request = new DefaultWriteRequest(message);
-                
+
                 writeQueue.add(request);
             }
         } finally {
@@ -518,7 +517,7 @@ public abstract class AbstractIoSession implements IoSession {
         writeQueueWriteLock.lock();
         return writeQueue;
     }
-    
+
     /**
      * {@inheritDoc}
      */
