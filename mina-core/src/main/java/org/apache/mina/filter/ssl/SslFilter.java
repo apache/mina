@@ -464,7 +464,7 @@ public class SslFilter extends IoFilterAdapter {
         
         synchronized (handler) {
             if (!isSslStarted(session) && handler.isInboundDone()) {
-                // The SSL session must be established first before we 
+                // The SSL session must be established first before we
                 // can push data to the application. Store the incoming
                 // data into a queue for a later processing
                 handler.scheduleMessageReceived(nextFilter, message);
@@ -568,10 +568,13 @@ public class SslFilter extends IoFilterAdapter {
         
         IoBuffer buf = (IoBuffer) message;
         int offset = buf.position();
-        return buf.remaining() == 23 &&
-               buf.get(offset + 0) == 0x15 && buf.get(offset + 1) == 0x03 &&
-               buf.get(offset + 2) == 0x01 && buf.get(offset + 3) == 0x00 &&
-               buf.get(offset + 4) == 0x12;
+        return (buf.get(offset + 0) == 0x15)         /* Alert */
+               && (buf.get(offset + 1) == 0x03)      /* TLS/SSL */
+               && ((buf.get(offset + 2) == 0x00)    /* SSL 3.0 */
+                   || (buf.get(offset + 2) == 0x01)  /* TLS 1.0 */
+                   || (buf.get(offset + 2) == 0x02)  /* TLS 1.1 */
+                   || (buf.get(offset + 2) == 0x03)) /* TLS 1.2 */
+               && (buf.get(offset + 3) == 0x00);     /* close_notify */
     }
 
     @Override
