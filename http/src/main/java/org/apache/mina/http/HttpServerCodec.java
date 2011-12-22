@@ -19,10 +19,13 @@
  */
 package org.apache.mina.http;
 
+import static org.apache.mina.session.AttributeKey.createKey;
+
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
+import org.apache.mina.session.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +34,10 @@ public class HttpServerCodec extends ProtocolCodecFilter {
     private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
 
     /** Key for decoder current state */
-    private static final String DECODER_STATE_ATT = "http.ds";
+    private static final AttributeKey<String> DECODER_STATE_ATT = createKey(String.class, "internal_http.ds");
 
     /** Key for the partial HTTP requests head */
-    private static final String PARTIAL_HEAD_ATT = "http.ph";
+    private static final AttributeKey<String> PARTIAL_HEAD_ATT = createKey(String.class, "internal_http.ph");
 
     private static ProtocolEncoder encoder = new HttpServerEncoder();
 

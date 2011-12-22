@@ -26,7 +26,7 @@ import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
-import org.apache.mina.util.IoBuffer;
+import org.apache.mina.session.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +44,12 @@ public class ProtocolCodecFilter extends DefaultIoFilter {
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
     /** key for session attribute holding the encoder */
-    private final String ENCODER = ProtocolCodecFilter.class.getSimpleName() + "encoder";
+    private final AttributeKey<ProtocolEncoder> ENCODER = new AttributeKey<ProtocolEncoder>(ProtocolEncoder.class,
+            "internal_encoder");
 
     /** key for session attribute holding the decoder */
-    private final String DECODER = ProtocolCodecFilter.class.getSimpleName() + "decoder";
+    private final AttributeKey<ProtocolDecoder> DECODER = new AttributeKey<ProtocolDecoder>(ProtocolDecoder.class,
+            "internal_decoder");
 
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
@@ -224,7 +226,7 @@ public class ProtocolCodecFilter extends DefaultIoFilter {
     public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_WRITTING for session {}", session);
 
-        ProtocolEncoder encoder = session.getAttribute(ENCODER);
+        ProtocolEncoder encoder = session.getAttribute(ENCODER, null);
 
         encoder.encode(session, message, controller);
     }

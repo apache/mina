@@ -19,6 +19,8 @@
  */
 package org.apache.mina.session;
 
+import static org.apache.mina.session.AttributeKey.createKey;
+
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Queue;
@@ -68,11 +70,12 @@ public class SslHelper {
      *
      * @see SSLContext#createSSLEngine(String, int)
      */
-    public static final String PEER_ADDRESS = "internal_peerAddress";
+    public static final AttributeKey<InetSocketAddress> PEER_ADDRESS = createKey(InetSocketAddress.class,
+            "internal_peerAddress");
 
-    public static final String WANT_CLIENT_AUTH = "internal_wantClientAuth";
+    public static final AttributeKey<Boolean> WANT_CLIENT_AUTH = createKey(Boolean.class, "internal_wantClientAuth");
 
-    public static final String NEED_CLIENT_AUTH = "internal_needClientAuth";
+    public static final AttributeKey<Boolean> NEED_CLIENT_AUTH = createKey(Boolean.class, "internal_needClientAuth");
 
     /** Incoming buffer accumulating bytes read from the channel */
     private ByteBuffer accBuffer;
@@ -120,7 +123,7 @@ public class SslHelper {
 
         LOGGER.debug("{} Initializing the SSL Helper", session);
 
-        InetSocketAddress peer = (InetSocketAddress) session.getAttribute(PEER_ADDRESS);
+        InetSocketAddress peer = session.getAttribute(PEER_ADDRESS, null);
 
         // Create the SSL engine here
         if (peer == null) {
@@ -135,15 +138,15 @@ public class SslHelper {
         // Initialize the different SslEngine modes
         if (!sslEngine.getUseClientMode()) {
             // Those parameters are only valid when in server mode
-            Boolean needClientAuth = session.<Boolean> getAttribute(NEED_CLIENT_AUTH);
-            Boolean wantClientAuth = session.<Boolean> getAttribute(WANT_CLIENT_AUTH);
+            boolean needClientAuth = session.getAttribute(NEED_CLIENT_AUTH, false);
+            boolean wantClientAuth = session.getAttribute(WANT_CLIENT_AUTH, false);
 
             // The WantClientAuth supersede the NeedClientAuth, if set.
-            if ((needClientAuth != null) && (needClientAuth)) {
+            if (needClientAuth) {
                 sslEngine.setNeedClientAuth(true);
             }
 
-            if ((wantClientAuth != null) && (wantClientAuth)) {
+            if (wantClientAuth) {
                 sslEngine.setWantClientAuth(true);
             }
         }

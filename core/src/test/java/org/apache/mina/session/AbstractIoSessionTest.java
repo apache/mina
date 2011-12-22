@@ -18,7 +18,11 @@
  */
 package org.apache.mina.session;
 
-import static org.mockito.Mockito.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.net.SocketAddress;
 
@@ -31,6 +35,11 @@ import org.apache.mina.api.IoSessionConfig;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * A test class for IoSession
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class AbstractIoSessionTest {
 
     private static final class DummySession extends AbstractIoSession {
@@ -134,20 +143,18 @@ public class AbstractIoSessionTest {
     public void testAttachment() {
         AbstractIoSession aio = new DummySession(service);
         String value = "value";
-        Assert.assertNull(aio.getAttribute("test"));
-        Assert.assertEquals(null, aio.setAttribute("test", value));
-        Assert.assertTrue(aio.containsAttribute("test"));
-        Assert.assertEquals(aio.getAttributeNames().size(), 1);
-        Assert.assertEquals(value, aio.setAttribute("test", value));
-        Assert.assertEquals(aio.getAttributeNames().size(), 1);
-        Assert.assertTrue(aio.containsAttribute("test"));
-        Assert.assertEquals(value, aio.getAttribute("test"));
-        Assert.assertEquals(value, aio.removeAttribute("test"));
-        Assert.assertEquals(aio.getAttributeNames().size(), 0);
-        Assert.assertFalse(aio.containsAttribute("test"));
+        AttributeKey<String> key = new AttributeKey<String>(String.class, "test");
+        assertNull(aio.getAttribute(key, null));
+        assertEquals(null, aio.setAttribute(key, value));
 
-        Assert.assertEquals(null, aio.getAttribute("test"));
-        Assert.assertNotNull(aio.getService());
+        assertEquals(aio.getAttributeKeys().size(), 1);
+        assertEquals(value, aio.setAttribute(key, value));
+        assertEquals(aio.getAttributeKeys().size(), 1);
+        assertEquals(value, aio.getAttribute(key, null));
+        assertEquals(value, aio.removeAttribute(key));
+        assertEquals(aio.getAttributeKeys().size(), 0);
+
+        assertEquals(null, aio.getAttribute(key, null));
+        assertNotNull(aio.getService());
     }
-
 }

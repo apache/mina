@@ -19,6 +19,8 @@
  */
 package org.apache.mina.http;
 
+import static org.apache.mina.session.AttributeKey.createKey;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpMethod;
 import org.apache.mina.http.api.HttpVersion;
+import org.apache.mina.session.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +41,14 @@ public class HttpServerDecoder implements ProtocolDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
 
     /** Key for decoder current state */
-    private static final String DECODER_STATE_ATT = "http.ds";
+    private static final AttributeKey<DecoderState> DECODER_STATE_ATT = createKey(DecoderState.class,
+            "internal_http.ds");
 
     /** Key for the partial HTTP requests head */
-    private static final String PARTIAL_HEAD_ATT = "http.ph";
+    private static final AttributeKey<ByteBuffer> PARTIAL_HEAD_ATT = createKey(ByteBuffer.class, "internal_http.ph");
 
     /** Key for the number of bytes remaining to read for completing the body */
-    private static final String BODY_REMAINING_BYTES = "http.brb";
+    private static final AttributeKey<Integer> BODY_REMAINING_BYTES = createKey(Integer.class, "internal_http.brb");
 
     /** Regex to parse HttpRequest Request Line */
     public static final Pattern REQUEST_LINE_PATTERN = Pattern.compile(" ");
@@ -72,13 +76,13 @@ public class HttpServerDecoder implements ProtocolDecoder {
 
     @Override
     public Object decode(IoSession session, ByteBuffer msg, ReadFilterChainController controller) {
-        DecoderState state = session.getAttribute(DECODER_STATE_ATT);
+        DecoderState state = session.getAttribute(DECODER_STATE_ATT, null);
 
         switch (state) {
         case HEAD:
             LOG.debug("decoding HEAD");
             // grab the stored a partial HEAD request
-            ByteBuffer oldBuffer = session.getAttribute(PARTIAL_HEAD_ATT);
+            ByteBuffer oldBuffer = session.getAttribute(PARTIAL_HEAD_ATT, null);
             // concat the old buffer and the new incoming one
             msg = ByteBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg);
             msg.flip();
@@ -127,7 +131,7 @@ public class HttpServerDecoder implements ProtocolDecoder {
             // send the chunk of body
             controller.callReadNextFilter(session, msg);
             // do we have reach end of body ?
-            int remaining = (Integer) session.getAttribute(BODY_REMAINING_BYTES);
+            int remaining = session.getAttribute(BODY_REMAINING_BYTES, null);
             remaining -= chunkSize;
 
             if (remaining <= 0) {

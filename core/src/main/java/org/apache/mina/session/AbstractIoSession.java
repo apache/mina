@@ -19,10 +19,9 @@
  */
 package org.apache.mina.session;
 
-import java.util.Map;
+import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
@@ -76,7 +75,7 @@ public abstract class AbstractIoSession implements IoSession {
     private volatile long lastWriteTime;
 
     /** attributes map */
-    private final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>(4);
+    private final AttributeContainer attributes = new DefaultAttributeContainer();
 
     /** unique identifier generator */
     private static final AtomicLong NEXT_ID = new AtomicLong(0);
@@ -326,7 +325,7 @@ public abstract class AbstractIoSession implements IoSession {
         SslHelper sslHelper = new SslHelper(this, sslContext);
         sslHelper.init();
 
-        attributes.put(SSL_HELPER, sslHelper);
+        attributes.setAttribute(SSL_HELPER, sslHelper);
         setSecured(true);
     }
 
@@ -396,44 +395,56 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * {@inheritDoc}
+     * 
+     * @exception IllegalArgumentException if <code>key==null</code>
+     * @see #setAttribute(AttributeKey, Object)
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> T getAttribute(String name) {
-        return (T) attributes.get(name);
+    public final <T> T getAttribute(AttributeKey<T> key, T defaultValue) {
+        return attributes.getAttribute(key, defaultValue);
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @exception IllegalArgumentException
+     * <ul>
+     *   <li>
+     *     if <code>key==null</code>
+     *   </li>
+     *   <li>
+     *     if <code>value</code> is not <code>null</code> and not
+     *     an instance of type that is specified in by the given
+     *     <code>key</code> (see {@link AttributeKey#getType()})
+     *   </li>
+     *  </ul>
+     * 
+     * @see #getAttribute(AttributeKey)
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> T setAttribute(String name, T value) {
-        return (T) attributes.put(name, value);
+    public final <T> T setAttribute(AttributeKey<? extends T> key, T value) {
+        return attributes.setAttribute(key, value);
+    };
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Collections#unmodifiableSet(Set)
+     */
+    @Override
+    public Set<AttributeKey<?>> getAttributeKeys() {
+        return attributes.getAttributeKeys();
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @exception IllegalArgumentException
+     *                if <code>key==null</code>
      */
     @Override
-    public boolean containsAttribute(String name) {
-        return attributes.containsKey(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object removeAttribute(String name) {
-        return attributes.remove(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> getAttributeNames() {
-        return attributes.keySet();
+    public <T> T removeAttribute(AttributeKey<T> key) {
+        return attributes.removeAttribute(key);
     }
 
     /**
@@ -479,7 +490,7 @@ public abstract class AbstractIoSession implements IoSession {
 
             if (isConnectedSecured()) {
                 // SSL/TLS : we have to encrypt the message
-                SslHelper sslHelper = getAttribute(IoSession.SSL_HELPER);
+                SslHelper sslHelper = getAttribute(SSL_HELPER, null);
 
                 if (sslHelper == null) {
                     throw new IllegalStateException();

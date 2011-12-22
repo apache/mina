@@ -20,6 +20,8 @@
 
 package org.apache.mina.transport.tcp;
 
+import static org.apache.mina.api.IoSession.SSL_HELPER;
+
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -56,7 +58,6 @@ import org.slf4j.LoggerFactory;
  * A {@link SelectorProcessor} for processing NIO based {@link IoSession}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public class NioSelectorProcessor implements SelectorProcessor {
     /** A logger for this class */
@@ -472,7 +473,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 if (session.isSecured()) {
                     // We are reading data over a SSL/TLS encrypted connection. Redirect
                     // the processing to the SslHelper class.
-                    SslHelper sslHelper = session.getAttribute(IoSession.SSL_HELPER);
+                    SslHelper sslHelper = session.getAttribute(SSL_HELPER, null);
 
                     if (sslHelper == null) {
                         throw new IllegalStateException();

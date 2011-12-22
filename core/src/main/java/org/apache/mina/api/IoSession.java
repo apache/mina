@@ -20,6 +20,7 @@
 package org.apache.mina.api;
 
 import java.net.SocketAddress;
+import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
 
@@ -28,6 +29,8 @@ import javax.net.ssl.SSLException;
 
 import org.apache.mina.filterchain.IoFilterController;
 import org.apache.mina.service.SelectorProcessor;
+import org.apache.mina.session.AttributeKey;
+import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
 
 /**
@@ -54,7 +57,7 @@ import org.apache.mina.session.WriteRequest;
  */
 public interface IoSession {
     /** The SslHelper instance name, stored in the session's attributes */
-    static final String SSL_HELPER = "internal_sslHelper";
+    static final AttributeKey<SslHelper> SSL_HELPER = new AttributeKey<SslHelper>(SslHelper.class, "internal_sslHelper");
 
     /**
      * The unique identifier of this session.
@@ -265,43 +268,66 @@ public interface IoSession {
 
     /* Session context management */
     /**
-     * Returns the value of the user-defined attribute for this session.
+     * Returns the value of the user-defined attribute for the given
+     * <code>key</code>.If the there is no attribute with the specified key the <tt>defaultValue</tt> will be returned.
      * 
-     * @param name the attribute's name
-     * @return <tt>null</tt> if there is no attribute with the specified name
+     * @param key
+     *            the attribute's key, must not be <code>null</code>
+     * @return <tt>defaultValue</tt> if there is no attribute with the specified key
+     * @exception IllegalArgumentException
+     *                if <code>key==null</code>
+     * @see #setAttribute(AttributeKey, Object)
      */
-    <T> T getAttribute(String name);
+    <T> T getAttribute(AttributeKey<T> key, T defaultValue);
 
     /**
-     * Sets a user-defined attribute.
+     * Sets a user-defined attribute. If the <code>value</code> is
+     * <code>null</code> the attribute will be removed from this
+     * {@link IoSession}.
      * 
-     * @param name the attribute's name
-     * @param value the attribute's value
-     * @return The old attribute's value. <tt>null</tt> if there is no previous value or if the value is null
+     * @param key
+     *            the attribute's key, must not be <code>null</code>
+     * @param value
+     *            the attribute's value, <code>null</code> to remove the
+     *            attribute
+     * @return the old attribute's value or <code>null</code> if there is no
+     *         previous value
+     * @exception IllegalArgumentException
+     *                <ul>
+     *                <li>if <code>key==null</code>
+     *                <li>if <code>value</code> is not <code>null</code> and not
+     *                an instance of type that is specified in by the given
+     *                <code>key</code> (see {@link AttributeKey#getType()})
+     * 
+     *                </ul>
+     * 
+     * @see #getAttribute(AttributeKey)
      */
-    <T> T setAttribute(String name, T value);
+    <T> T setAttribute(AttributeKey<? extends T> key, T value);
 
     /**
-     * Removes a user-defined attribute with the specified name.
+     * Returns an unmodifiable {@link Set} of all Keys of this {@link IoSession}. If
+     * this {@link IoSession} contains no attributes an empty {@link Set} will be returned.
      * 
-     * @param name the attribute's name
-     * @return The old attribute's value. <tt>null</tt> if not found or if the attribute had no value
+     * @return all Keys, never <code>null</code>
+     * @see Collections#unmodifiableSet(Set)
      */
-    <T> T removeAttribute(String name);
+    Set<AttributeKey<?>> getAttributeKeys();
 
     /**
-     * Tells if the session has an attached attribute.
+     * Removes the specified Attribute from this container. The old value will
+     * be returned, <code>null</code> will be rutrnen if there is no such
+     * attribute in this container.<br>
+     * <br>
+     * This method is equivalent to <code>setAttribute(key,null)</code>.
      * 
-     * @return <tt>true</tt> if this session contains the attribute with the specified <tt>name</tt>.
+     * @param key
+     *            of the attribute to be removed,must not be <code>null</code>
+     * @return the removed value, <code>null</code> if this container doesn't
+     *         contain the specified attribute
+     * @exception IllegalArgumentException if <code>key==null</code>
      */
-    boolean containsAttribute(String name);
-
-    /**
-     * Gets the set of attributes stored within the session.
-     * 
-     * @return the set of names of all user-defined attributes.
-     */
-    Set<String> getAttributeNames();
+    public <T> T removeAttribute(AttributeKey<T> key);
 
     /**
      * State of a {@link IoSession}
