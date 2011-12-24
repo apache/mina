@@ -195,7 +195,7 @@ public class LoggingFilter implements IoFilter {
             log(messageReceivedLevel, "RECEIVED: {}", message);
         }
 
-        controller.callReadNextFilter(session, message);
+        controller.callReadNextFilter(message);
     }
 
     /**
@@ -208,7 +208,7 @@ public class LoggingFilter implements IoFilter {
         } else {
             log(messageReceivedLevel, "WRITTING: {}", message);
         }
-        controller.callWriteNextFilter(session, message);
+        controller.callWriteNextFilter(message);
     }
 
     //=========================

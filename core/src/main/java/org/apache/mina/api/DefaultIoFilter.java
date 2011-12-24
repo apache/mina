@@ -47,12 +47,12 @@ public abstract class DefaultIoFilter implements IoFilter {
 
     @Override
     public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
-        controller.callReadNextFilter(session, message);
+        controller.callReadNextFilter(message);
     }
 
     @Override
     public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
-        controller.callWriteNextFilter(session, message);
+        controller.callWriteNextFilter(message);
     }
 
 }

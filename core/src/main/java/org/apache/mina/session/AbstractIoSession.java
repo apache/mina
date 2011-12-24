@@ -19,6 +19,7 @@
  */
 package org.apache.mina.session;
 
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
@@ -35,8 +36,8 @@ import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.filterchain.DefaultIoFilterController;
-import org.apache.mina.filterchain.IoFilterController;
+import org.apache.mina.filterchain.ReadFilterChainController;
+import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.service.SelectorProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +47,12 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractIoSession implements IoSession {
+public abstract class AbstractIoSession implements IoSession, ReadFilterChainController, WriteFilterChainController {
     /** The logger for this class */
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIoSession.class);
+
+    /** unique identifier generator */
+    private static final AtomicLong NEXT_ID = new AtomicLong(0);
 
     /** The session's unique identifier */
     private final long id;
@@ -59,8 +63,15 @@ public abstract class AbstractIoSession implements IoSession {
     /** The service this session is associated with */
     private final IoService service;
 
+    /** attributes map */
+    private final AttributeContainer attributes = new DefaultAttributeContainer();
+
     /** The {@link SelectorProcessor} used for handling this session writing */
     protected SelectorProcessor writeProcessor;
+
+    //------------------------------------------------------------------------
+    // Basic statistics
+    //------------------------------------------------------------------------
 
     /** The number of bytes read since this session has been created */
     private volatile long readBytes;
@@ -74,13 +85,9 @@ public abstract class AbstractIoSession implements IoSession {
     /** Last time something was written for this session */
     private volatile long lastWriteTime;
 
-    /** attributes map */
-    private final AttributeContainer attributes = new DefaultAttributeContainer();
-
-    /** unique identifier generator */
-    private static final AtomicLong NEXT_ID = new AtomicLong(0);
-
-    protected final Object stateMonitor = new Object();
+    //------------------------------------------------------------------------
+    // Session state
+    //------------------------------------------------------------------------
 
     /** The session's state : one of CREATED, CONNECTED, CLOSING, CLOSED, SECURING, CONNECTED_SECURED */
     protected volatile SessionState state;
@@ -100,6 +107,10 @@ public abstract class AbstractIoSession implements IoSession {
     /** is this session registered for being polled for write ready events */
     private AtomicBoolean registeredForWrite = new AtomicBoolean();
 
+    //------------------------------------------------------------------------
+    // Write queue
+    //------------------------------------------------------------------------
+
     /** the queue of pending writes for the session, to be dequeued by the {@link SelectorProcessor} */
     private Queue<WriteRequest> writeQueue = new DefaultWriteQueue();
 
@@ -112,8 +123,21 @@ public abstract class AbstractIoSession implements IoSession {
     /** A Write lock on the reentrant writeQueue lock */
     private final Lock writeQueueWriteLock = writeQueueLock.writeLock();
 
-    /** The controller for the {@link IoFilter} chain of this session */
-    private IoFilterController filterProcessor;
+    //------------------------------------------------------------------------
+    // Filter chain
+    //------------------------------------------------------------------------
+
+    /** The list of {@link IoFilter} implementing this chain. */
+    private final IoFilter[] chain;
+
+    /** the current position in the write chain for this thread */
+    private int writeChainPosition;
+
+    /** the current position in the read chain for this thread */
+    private int readChainPosition;
+
+    /** hold the last WriteRequest created for the high level message currently written (can be null) */
+    private WriteRequest lastWriteRequest;
 
     /**
      * Create an {@link org.apache.mina.api.IoSession} with a unique identifier (
@@ -128,7 +152,7 @@ public abstract class AbstractIoSession implements IoSession {
         creationTime = System.currentTimeMillis();
         this.service = service;
         this.writeProcessor = writeProcessor;
-        this.filterProcessor = new DefaultIoFilterController(service.getFilters());
+        this.chain = service.getFilters();
 
         LOG.debug("Created new session with id : {}", id);
 
@@ -474,8 +498,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         // process the queue
-        IoFilterController chain = getFilterChain();
-        chain.processMessageWriting(this, message, future);
+        processMessageWriting(message, future);
     }
 
     /**
@@ -537,11 +560,130 @@ public abstract class AbstractIoSession implements IoSession {
         writeQueueWriteLock.unlock();
     }
 
+    //------------------------------------------------------------------------
+    // Event processing using the filter chain
+    //------------------------------------------------------------------------
+
+    /**
+     * process session create event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     */
+    public void processSessionCreated() {
+        LOG.debug("processing session created event for session {}", this);
+
+        for (IoFilter filter : chain) {
+            filter.sessionCreated(this);
+        }
+    }
+
+    /**
+     * process session opened event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     */
+    public void processSessionOpened() {
+        LOG.debug("processing session open event");
+
+        for (IoFilter filter : chain) {
+            filter.sessionOpened(this);
+        }
+    }
+
+    /**
+     * process session closed event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     */
+    public void processSessionClosed() {
+        LOG.debug("processing session closed event");
+
+        for (IoFilter filter : chain) {
+            filter.sessionClosed(this);
+        }
+    }
+
+    /**
+     * process session message received event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     * @param message the received message 
+     */
+    public void processMessageReceived(ByteBuffer message) {
+        LOG.debug("processing message '{}' received event for session {}", message, this);
+
+        if (chain.length < 1) {
+            LOG.debug("Nothing to do, the chain is empty");
+        } else {
+            readChainPosition = 0;
+            // we call the first filter, it's supposed to call the next ones using the filter chain controller
+            chain[readChainPosition].messageReceived(this, message, this);
+        }
+    }
+
+    /**
+     * process session message writing event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     * @param message the wrote message, should be transformed into ByteBuffer at the end of the filter chain 
+     */
+    public void processMessageWriting(Object message, IoFuture<Void> future) {
+        LOG.debug("processing message '{}' writing event for session {}", message, this);
+
+        lastWriteRequest = null;
+
+        if (chain.length < 1) {
+            enqueueFinalWriteMessage(message);
+        } else {
+            writeChainPosition = chain.length - 1;
+            // we call the first filter, it's supposed to call the next ones using the filter chain controller
+            int position = writeChainPosition;
+            IoFilter nextFilter = chain[position];
+            nextFilter.messageWriting(this, message, this);
+        }
+
+        // put the future in the last write request
+        if (future != null) {
+            WriteRequest request = lastWriteRequest;
+
+            if (request != null) {
+                ((DefaultWriteRequest) request).setFuture(future);
+            }
+        }
+    }
+
+    /**
+     * process session message received event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     * @param message the received message 
+     */
+    public void callWriteNextFilter(Object message) {
+        LOG.debug("calling next filter for writing for message '{}' position : {}", message, writeChainPosition);
+
+        writeChainPosition--;
+
+        if (writeChainPosition < 0 || chain.length == 0) {
+            // end of chain processing
+            enqueueFinalWriteMessage(message);
+        } else {
+            chain[writeChainPosition].messageWriting(this, message, this);
+        }
+
+        writeChainPosition++;
+        ;
+    }
+
+    /**
+     * At the end of write chain processing, enqueue final encoded {@link ByteBuffer} message in the session
+     */
+    private void enqueueFinalWriteMessage(Object message) {
+        LOG.debug("end of write chan we enqueue the message in the session : {}", message);
+        lastWriteRequest = enqueueWriteRequest(message);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public IoFilterController getFilterChain() {
-        return filterProcessor;
+    public void callReadNextFilter(Object message) {
+        readChainPosition++;
+
+        if (readChainPosition >= chain.length) {
+            // end of chain processing
+        } else {
+            chain[readChainPosition].messageReceived(this, message, this);
+        }
+
+        readChainPosition--;
     }
+
 }

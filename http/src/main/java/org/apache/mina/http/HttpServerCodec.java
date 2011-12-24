@@ -34,7 +34,8 @@ public class HttpServerCodec extends ProtocolCodecFilter {
     private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
 
     /** Key for decoder current state */
-    private static final AttributeKey<String> DECODER_STATE_ATT = createKey(String.class, "internal_http.ds");
+    private static final AttributeKey<DecoderState> DECODER_STATE_ATT = createKey(DecoderState.class,
+            "internal_http.ds");
 
     /** Key for the partial HTTP requests head */
     private static final AttributeKey<String> PARTIAL_HEAD_ATT = createKey(String.class, "internal_http.ph");

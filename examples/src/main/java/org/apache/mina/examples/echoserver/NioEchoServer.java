@@ -83,7 +83,7 @@ public class NioEchoServer {
             @Override
             public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
                 // we just push the message in the chain
-                controller.callWriteNextFilter(session, message);
+                controller.callWriteNextFilter(message);
             }
 
             @Override

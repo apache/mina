@@ -26,6 +26,7 @@ import java.net.SocketAddress;
 import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.session.AbstractIoSession;
 
 /**
  * A processor in charge of a group of client session and server sockets.
@@ -60,6 +61,6 @@ public interface SelectorProcessor {
      * Schedule a session for flushing, will be called after a {@link IoSession#write(Object)}.
      * @param session the session to flush
      */
-    void flush(IoSession session);
+    void flush(AbstractIoSession session);
 
 }

@@ -101,7 +101,7 @@ public class HttpServerDecoder implements ProtocolDecoder {
                 session.setAttribute(PARTIAL_HEAD_ATT, partial);
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
             } else {
-                controller.callReadNextFilter(session, rq);
+                controller.callReadNextFilter(rq);
 
                 // is it a request with some body content ?
                 if (rq.getMethod() == HttpMethod.POST || rq.getMethod() == HttpMethod.PUT) {
@@ -129,14 +129,14 @@ public class HttpServerDecoder implements ProtocolDecoder {
             LOG.debug("decoding BODY");
             int chunkSize = msg.remaining();
             // send the chunk of body
-            controller.callReadNextFilter(session, msg);
+            controller.callReadNextFilter(msg);
             // do we have reach end of body ?
             int remaining = session.getAttribute(BODY_REMAINING_BYTES, null);
             remaining -= chunkSize;
 
             if (remaining <= 0) {
                 LOG.debug("end of HTTP body");
-                controller.callReadNextFilter(session, new HttpEndOfContent());
+                controller.callReadNextFilter(new HttpEndOfContent());
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
                 session.removeAttribute(BODY_REMAINING_BYTES);
             } else {

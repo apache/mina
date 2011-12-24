@@ -47,6 +47,7 @@ import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.AbstractIoService;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.service.SelectorStrategy;
+import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.DefaultWriteFuture;
 import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
@@ -240,7 +241,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
         }
 
         // event session created
-        session.getFilterChain().processSessionCreated(session);
+        session.processSessionCreated();
 
         // add the session to the queue for being added to the selector
         sessionsToConnect.add(session);
@@ -251,7 +252,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
      * {@inheritDoc}
      */
     @Override
-    public void flush(IoSession session) {
+    public void flush(AbstractIoSession session) {
         LOGGER.debug("scheduling session {} for writing", session);
         // add the session to the list of session to be registered for writing
         flushingSessions.add((NioTcpSession) session);
@@ -412,7 +413,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
                     // fire the event
                     ((AbstractIoService) session.getService()).fireSessionCreated(session);
-                    session.getFilterChain().processSessionOpened(session);
+                    session.processSessionOpened();
                 }
             }
         }
@@ -430,7 +431,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                 // closing underlying socket
                 session.getSocketChannel().close();
                 // fire the event
-                session.getFilterChain().processSessionClosed(session);
+                session.processSessionClosed();
                 ((AbstractIoService) session.getService()).fireSessionDestroyed(session);
             }
         }
@@ -482,7 +483,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     sslHelper.processRead(session, readBuffer);
                 } else {
                     // Plain message, not encrypted : go directly to the chain
-                    session.getFilterChain().processMessageReceived(session, readBuffer);
+                    session.processMessageReceived(readBuffer);
                 }
             }
         }

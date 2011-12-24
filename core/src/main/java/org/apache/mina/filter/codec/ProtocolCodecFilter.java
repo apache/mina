@@ -202,7 +202,7 @@ public class ProtocolCodecFilter extends DefaultIoFilter {
         LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session);
 
         if (!(message instanceof ByteBuffer)) {
-            controller.callReadNextFilter(session, message);
+            controller.callReadNextFilter(message);
             return;
         }
 

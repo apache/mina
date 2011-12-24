@@ -53,7 +53,7 @@ public class LdapProtocolEncoder implements ProtocolEncoder {
         try {
             ByteBuffer buffer = encoder.encodeMessage((Message) message);
 
-            controller.callWriteNextFilter(session, buffer);
+            controller.callWriteNextFilter(buffer);
         } catch (Exception e) {
             return null;
         }

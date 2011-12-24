@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filterchain;
 
-import org.apache.mina.api.IoSession;
 
 /**
  * Chain controller used by a filter for calling the next filter in read order.
@@ -29,5 +28,5 @@ import org.apache.mina.api.IoSession;
  */
 public interface ReadFilterChainController {
 
-    void callReadNextFilter(IoSession session, Object message);
+    void callReadNextFilter(Object message);
 }

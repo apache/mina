@@ -44,9 +44,9 @@ public class HttpServerEncoder implements ProtocolEncoder {
             }
             sb.append("\r\n");
             byte[] bytes = sb.toString().getBytes(Charset.forName("UTF-8"));
-            controller.callWriteNextFilter(session, ByteBuffer.wrap(bytes));
+            controller.callWriteNextFilter(ByteBuffer.wrap(bytes));
         } else if (message instanceof ByteBuffer) {
-            controller.callWriteNextFilter(session, message);
+            controller.callWriteNextFilter(message);
         } else if (message instanceof HttpEndOfContent) {
             // end of HTTP content
             // keep alive ?

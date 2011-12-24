@@ -19,7 +19,6 @@
  */
 package org.apache.mina.ldap;
 
-
 import static org.apache.mina.session.AttributeKey.createKey;
 
 import java.nio.ByteBuffer;
@@ -50,15 +49,13 @@ import org.apache.mina.session.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * A LDAP message codec.
  * 
  * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  */
-public class LdapCodec extends ProtocolCodecFilter
-{
-    private static final Logger LOG = LoggerFactory.getLogger( LdapCodec.class );
+public class LdapCodec extends ProtocolCodecFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(LdapCodec.class);
 
     /** The LDAP decoder instance */
     private static ProtocolDecoder ldapDecoder = new LdapProtocolDecoder();
@@ -70,95 +67,60 @@ public class LdapCodec extends ProtocolCodecFilter
     private static LdapApiService codec = LdapApiServiceFactory.getSingleton();
 
     /** The Message Container attribute */
-    public static final AttributeKey<LdapMessageContainer> MESSAGE_CONTAINER_AT = createKey(
-        LdapMessageContainer.class, "internal_messageContainer" );
+    public static final AttributeKey<LdapMessageContainer> MESSAGE_CONTAINER_AT = createKey(LdapMessageContainer.class,
+            "internal_messageContainer");
 
-
-    public LdapCodec()
-    {
-        super( ldapEncoder, ldapDecoder );
+    public LdapCodec() {
+        super(ldapEncoder, ldapDecoder);
     }
 
-
     @Override
-    public void sessionCreated( IoSession session )
-    {
+    public void sessionCreated(IoSession session) {
         LdapMessageContainer<MessageDecorator<? extends Message>> container = new LdapMessageContainer<MessageDecorator<? extends Message>>(
-            codec );
-        session.setAttribute( MESSAGE_CONTAINER_AT, container );
+                codec);
+        session.setAttribute(MESSAGE_CONTAINER_AT, container);
     }
 
-
     @Override
-    public void sessionOpened( IoSession session )
-    {
+    public void sessionOpened(IoSession session) {
     }
 
-
     @Override
-    public void sessionClosed( IoSession session )
-    {
-        session.removeAttribute( MESSAGE_CONTAINER_AT );
+    public void sessionClosed(IoSession session) {
+        session.removeAttribute(MESSAGE_CONTAINER_AT);
     }
 
-
     @Override
-    public void sessionIdle( IoSession session, IdleStatus status )
-    {
+    public void sessionIdle(IoSession session, IdleStatus status) {
         // TODO Auto-generated method stub
     }
 
-
     @Override
-    public void messageWriting( IoSession session, Object message, WriteFilterChainController controller )
-    {
-        if ( message instanceof AddResponse )
-        {
-            ldapEncoder.encode( session, ( AddResponse ) message, controller );
-        }
-        else if ( message instanceof BindResponse )
-        {
-            ldapEncoder.encode( session, ( BindResponse ) message, controller );
-        }
-        else if ( message instanceof DeleteResponse )
-        {
-            ldapEncoder.encode( session, ( DeleteResponse ) message, controller );
-        }
-        else if ( message instanceof CompareResponse )
-        {
-            ldapEncoder.encode( session, ( CompareResponse ) message, controller );
-        }
-        else if ( message instanceof ExtendedResponse )
-        {
-            ldapEncoder.encode( session, ( ExtendedResponse ) message, controller );
-        }
-        else if ( message instanceof IntermediateResponse )
-        {
-            ldapEncoder.encode( session, ( IntermediateResponse ) message, controller );
-        }
-        else if ( message instanceof ModifyResponse )
-        {
-            ldapEncoder.encode( session, ( ModifyResponse ) message, controller );
-        }
-        else if ( message instanceof ModifyDnResponse )
-        {
-            ldapEncoder.encode( session, ( ModifyDnResponse ) message, controller );
-        }
-        else if ( message instanceof SearchResultDone )
-        {
-            ldapEncoder.encode( session, ( SearchResultDone ) message, controller );
-        }
-        else if ( message instanceof SearchResultEntry )
-        {
-            ldapEncoder.encode( session, ( SearchResultEntry ) message, controller );
-        }
-        else if ( message instanceof SearchResultReference )
-        {
-            ldapEncoder.encode( session, ( SearchResultReference ) message, controller );
-        }
-        else if ( message instanceof ByteBuffer )
-        {
-            controller.callWriteNextFilter( session, message );
+    public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
+        if (message instanceof AddResponse) {
+            ldapEncoder.encode(session, (AddResponse) message, controller);
+        } else if (message instanceof BindResponse) {
+            ldapEncoder.encode(session, (BindResponse) message, controller);
+        } else if (message instanceof DeleteResponse) {
+            ldapEncoder.encode(session, (DeleteResponse) message, controller);
+        } else if (message instanceof CompareResponse) {
+            ldapEncoder.encode(session, (CompareResponse) message, controller);
+        } else if (message instanceof ExtendedResponse) {
+            ldapEncoder.encode(session, (ExtendedResponse) message, controller);
+        } else if (message instanceof IntermediateResponse) {
+            ldapEncoder.encode(session, (IntermediateResponse) message, controller);
+        } else if (message instanceof ModifyResponse) {
+            ldapEncoder.encode(session, (ModifyResponse) message, controller);
+        } else if (message instanceof ModifyDnResponse) {
+            ldapEncoder.encode(session, (ModifyDnResponse) message, controller);
+        } else if (message instanceof SearchResultDone) {
+            ldapEncoder.encode(session, (SearchResultDone) message, controller);
+        } else if (message instanceof SearchResultEntry) {
+            ldapEncoder.encode(session, (SearchResultEntry) message, controller);
+        } else if (message instanceof SearchResultReference) {
+            ldapEncoder.encode(session, (SearchResultReference) message, controller);
+        } else if (message instanceof ByteBuffer) {
+            controller.callWriteNextFilter(message);
         }
     }
 }

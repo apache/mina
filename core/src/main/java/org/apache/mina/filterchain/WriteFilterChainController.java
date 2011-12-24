@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filterchain;
 
-import org.apache.mina.api.IoSession;
 
 /**
  * Chain controller used by a filter for calling the next filter in write order.
@@ -28,5 +27,6 @@ import org.apache.mina.api.IoSession;
  *
  */
 public interface WriteFilterChainController {
-    void callWriteNextFilter(IoSession session, Object message);
+
+    void callWriteNextFilter(Object message);
 }

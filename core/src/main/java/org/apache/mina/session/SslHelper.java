@@ -267,7 +267,7 @@ public class SslHelper {
      * @param readBuffer The data we get from the channel
      * @throws SSLException If the unwrapping or handshaking failed
      */
-    public void processRead(IoSession session, ByteBuffer readBuffer) throws SSLException {
+    public void processRead(AbstractIoSession session, ByteBuffer readBuffer) throws SSLException {
         if (session.isConnectedSecured()) {
             // Unwrap the incoming data
             processUnwrap(session, readBuffer);
@@ -281,7 +281,7 @@ public class SslHelper {
      * Unwrap a SSL/TLS message. The message might not be encrypted (if we are processing
      * a Handshake message or an Alert message).
      */
-    private void processUnwrap(IoSession session, ByteBuffer inBuffer) throws SSLException {
+    private void processUnwrap(AbstractIoSession session, ByteBuffer inBuffer) throws SSLException {
         // Blind guess : once uncompressed, the resulting buffer will be 3 times bigger
         ByteBuffer appBuffer = ByteBuffer.allocate(inBuffer.limit() * 3);
         SSLEngineResult result = unwrap(inBuffer, appBuffer);
@@ -290,7 +290,7 @@ public class SslHelper {
         case OK:
             // Ok, go through the chain now
             appBuffer.flip();
-            session.getFilterChain().processMessageReceived(session, appBuffer);
+            session.processMessageReceived(appBuffer);
             break;
 
         case CLOSED:

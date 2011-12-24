@@ -18,20 +18,23 @@
  */
 package org.apache.mina.session;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static junit.framework.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 
 import junit.framework.Assert;
 
+import org.apache.mina.api.DefaultIoFilter;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
+import org.apache.mina.filterchain.ReadFilterChainController;
+import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.service.SelectorProcessor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,9 +45,11 @@ import org.junit.Test;
  */
 public class AbstractIoSessionTest {
 
-    private static final class DummySession extends AbstractIoSession {
+    private SelectorProcessor processor = mock(SelectorProcessor.class);
+
+    private class DummySession extends AbstractIoSession {
         private DummySession(IoService service) {
-            super(service, null);
+            super(service, processor);
         }
 
         @Override
@@ -117,10 +122,17 @@ public class AbstractIoSessionTest {
 
     private IoService service = null;
 
+    private IoFilter filter1 = spy(new PassthruFilter());
+
+    private IoFilter filter2 = spy(new PassthruFilter());
+
+    private IoFilter filter3 = spy(new PassthruFilter());
+
     @Before
     public void setup() {
         service = mock(IoService.class);
-        when(service.getFilters()).thenReturn(new IoFilter[] {});
+
+        when(service.getFilters()).thenReturn(new IoFilter[] { filter1, filter2, filter3 });
     }
 
     @Test
@@ -156,5 +168,57 @@ public class AbstractIoSessionTest {
 
         assertEquals(null, aio.getAttribute(key, null));
         assertNotNull(aio.getService());
+    }
+
+    @Test
+    public void chain_reads() {
+        DummySession session = new DummySession(service);
+        ByteBuffer buffer = mock(ByteBuffer.class);
+        session.processMessageReceived(buffer);
+        verify(filter1).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
+        verify(filter2).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
+        verify(filter3).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
+    }
+
+    @Test
+    public void chain_writes() {
+        DummySession session = new DummySession(service);
+        ByteBuffer buffer = mock(ByteBuffer.class);
+        session.processMessageWriting(buffer, null);
+        verify(filter1).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
+        verify(filter2).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
+        verify(filter3).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
+        verify(processor).flush(eq(session));
+    }
+
+    @Test
+    public void chain_created() {
+        DummySession session = new DummySession(service);
+        session.processSessionCreated();
+        verify(filter1).sessionCreated(eq(session));
+        verify(filter2).sessionCreated(eq(session));
+        verify(filter3).sessionCreated(eq(session));
+    }
+
+    @Test
+    public void chain_open() {
+        DummySession session = new DummySession(service);
+        session.processSessionOpened();
+        verify(filter1).sessionOpened(eq(session));
+        verify(filter2).sessionOpened(eq(session));
+        verify(filter3).sessionOpened(eq(session));
+    }
+
+    @Test
+    public void chain_close() {
+        DummySession session = new DummySession(service);
+        session.processSessionClosed();
+        verify(filter1).sessionClosed(eq(session));
+        verify(filter2).sessionClosed(eq(session));
+        verify(filter3).sessionClosed(eq(session));
+    }
+
+    private class PassthruFilter extends DefaultIoFilter {
+
     }
 }
