@@ -164,9 +164,9 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             for (SelectionKey key : keys) {
                 SelectableChannel channel = key.channel();
 
-                if ((((channel instanceof DatagramChannel) && ((DatagramChannel) channel)
+                if ((((channel instanceof DatagramChannel) && !((DatagramChannel) channel)
                         .isConnected()))
-                        || ((channel instanceof SocketChannel) && ((SocketChannel) channel)
+                        || ((channel instanceof SocketChannel) && !((SocketChannel) channel)
                                 .isConnected())) {
                     // The channel is not connected anymore. Cancel
                     // the associated key then.
