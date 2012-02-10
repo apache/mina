@@ -83,12 +83,12 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
     /** A flag set when the acceptor has been created and initialized */
     private volatile boolean selectable;
 
-    /** The thread responsible of accepting incoming requests */ 
+    /** The thread responsible of accepting incoming requests */
     private AtomicReference<Acceptor> acceptorRef = new AtomicReference<Acceptor>();
 
     protected boolean reuseAddress = false;
 
-    /** 
+    /**
      * Define the number of socket that can wait to be accepted. Default
      * to 50 (as in the SocketServer default).
      */
@@ -142,8 +142,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
-     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter} 
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering
+     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
             IoProcessor<S> processor) {
@@ -163,8 +163,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * @param executor
      *            the {@link Executor} used for handling asynchronous execution of I/O
      *            events. Can be <code>null</code>.
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering 
-     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter} 
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering
+     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
             Executor executor, IoProcessor<S> processor) {
@@ -184,11 +184,11 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * @param executor
      *            the {@link Executor} used for handling asynchronous execution of I/O
      *            events. Can be <code>null</code>.
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of 
-     * this transport, triggering events to the bound {@link IoHandler} and processing 
+     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of
+     * this transport, triggering events to the bound {@link IoHandler} and processing
      * the chains of {@link IoFilter}
-     * @param createdProcessor tagging the processor as automatically created, so it 
-     * will be automatically disposed 
+     * @param createdProcessor tagging the processor as automatically created, so it
+     * will be automatically disposed
      */
     private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
             Executor executor, IoProcessor<S> processor,
@@ -226,13 +226,13 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
 
     /**
      * Initialize the polling system, will be called at construction time.
-     * @throws Exception any exception thrown by the underlying system calls  
+     * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract void init() throws Exception;
 
     /**
      * Destroy the polling system, will be called when this {@link IoAcceptor}
-     * implementation will be disposed.  
+     * implementation will be disposed.
      * @throws Exception any exception thrown by the underlying systems calls
      */
     protected abstract void destroy() throws Exception;
@@ -276,7 +276,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
     /**
      * Accept a client connection for a server socket and return a new {@link IoSession}
      * associated with the given {@link IoProcessor}
-     * @param processor the {@link IoProcessor} to associate with the {@link IoSession}  
+     * @param processor the {@link IoProcessor} to associate with the {@link IoSession}
      * @param handle the server handle
      * @return the created {@link IoSession}
      * @throws Exception any exception thrown by the underlying systems calls
@@ -322,7 +322,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         startupAcceptor();
         
         // As we just started the acceptor, we have to unblock the select()
-        // in order to process the bind request we just have added to the 
+        // in order to process the bind request we just have added to the
         // registerQueue.
         wakeup();
         
@@ -437,8 +437,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
                     }
 
                     if (selected > 0) {
-                        // We have some connection request, let's process 
-                        // them here. 
+                        // We have some connection request, let's process
+                        // them here.
                         processHandles(selectedHandles());
                     }
 
@@ -501,7 +501,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
                 S session = accept(processor, handle);
                 
                 if (session == null) {
-                    break;
+                    continue;
                 }
 
                 initSession(session, null, null);
