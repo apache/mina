@@ -173,11 +173,16 @@ public class AbstractIoSessionTest {
     @Test
     public void chain_reads() {
         DummySession session = new DummySession(service);
-        ByteBuffer buffer = mock(ByteBuffer.class);
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+        long before = System.currentTimeMillis();
         session.processMessageReceived(buffer);
         verify(filter1).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
         verify(filter2).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
         verify(filter3).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
+        assertEquals(1024L, session.getReadBytes());
+        long lastRead = session.getLastReadTime();
+        assertTrue(lastRead - before < 100);
     }
 
     @Test

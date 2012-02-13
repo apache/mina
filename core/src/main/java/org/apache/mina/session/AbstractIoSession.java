@@ -604,6 +604,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void processMessageReceived(ByteBuffer message) {
         LOG.debug("processing message '{}' received event for session {}", message, this);
 
+        // save basic statistics 
+        readBytes += message.remaining();
+        lastReadTime = System.currentTimeMillis();
+
         if (chain.length < 1) {
             LOG.debug("Nothing to do, the chain is empty");
         } else {
