@@ -20,12 +20,33 @@ package org.apache.mina.service.idlechecker;
 
 import org.apache.mina.session.AbstractIoSession;
 
+/**
+ * Utility for checking detecting idle sessions. 
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public interface IdleChecker {
 
+    /**
+     * Inform the IdleCheker a session have a write event
+     * @param session the session with the write event
+     * @param time the data in ms (unix time) of the event
+     */
     void sessionWritten(AbstractIoSession session, long time);
 
+    /**
+     * Inform the IdleCheker a session have a read event
+     * @param session the session with the read event
+     * @param time the data in ms (unix time) of the event
+     */
     void sessionRead(AbstractIoSession session, long time);
 
+    /**
+     * Find idle session, to be called for each select() call.
+     * 
+     * @param time current unix time in ms
+     * @return the number of idle event detected
+     */
     int processIdleSession(long time);
 
 }

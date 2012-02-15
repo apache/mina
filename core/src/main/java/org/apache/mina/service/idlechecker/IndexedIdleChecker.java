@@ -27,6 +27,32 @@ import org.apache.mina.session.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An session idle detector using an index in place of polling every session every seconds.<br>
+ * 
+ * For each session read/write event :<br>
+ * <ul>
+ * <li>we calculate what is the supposed future idle date</li>
+ * <li>we round it at the next second</li>
+ * <li>we store a reference to this session in a circular buffer like :</li>
+ * </ul>
+ * <pre>
+ * 
+ *               +--- Current time
+ *               |
+ *               v
+ * +---+---+...+---+---+...+---+
+ * | 0 | 1 |   | T |T+1|   |599|
+ * +---+---+...+---+---+...+---+
+ *               |   |
+ *               |   +--> { S2, S7, S12...} (sessions that will TO in one second)
+ *               +------> { S5, S6, S8...} (sessions that are idle for the maximum delay of 1 hour )
+ * </pre>
+ *
+ *The maximum idle itme is one hour.
+ *
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class IndexedIdleChecker implements IdleChecker {
 
     private static int MAX_IDLE_TIME_IN_SEC = 60 * 60; // 1 hour max idle
@@ -68,7 +94,7 @@ public class IndexedIdleChecker implements IdleChecker {
         if (idleTimeInMs <= 0L) {
             LOG.debug("no read idle configuration");
         } else {
-            int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L);
+            int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L) + 1;
             int index = nextIdleTimeInSeconds % MAX_IDLE_TIME_IN_SEC;
             if (readIdleSessionIndex[index] == null) {
                 readIdleSessionIndex[index] = new HashSet<AbstractIoSession>();
@@ -98,7 +124,7 @@ public class IndexedIdleChecker implements IdleChecker {
         if (idleTimeInMs <= 0L) {
             LOG.debug("no write idle configuration");
         } else {
-            int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L);
+            int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L) + 1;
             int index = nextIdleTimeInSeconds % MAX_IDLE_TIME_IN_SEC;
             if (writeIdleSessionIndex[index] == null) {
                 writeIdleSessionIndex[index] = new HashSet<AbstractIoSession>();
