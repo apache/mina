@@ -40,6 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLException;
 
+import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
@@ -47,6 +48,8 @@ import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.AbstractIoService;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.service.SelectorStrategy;
+import org.apache.mina.service.idlechecker.IdleChecker;
+import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.DefaultWriteFuture;
 import org.apache.mina.session.SslHelper;
@@ -79,6 +82,9 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
     /** the thread polling and processing the I/O events */
     private SelectorWorker worker = null;
+
+    /** helper for detecting idleing sessions */
+    private IdleChecker idleChecker = new IndexedIdleChecker();
 
     /** A queue containing the servers to bind to this selector */
     private final Queue<Object[]> serversToAdd = new ConcurrentLinkedQueue<Object[]>();
@@ -185,6 +191,11 @@ public class NioSelectorProcessor implements SelectorProcessor {
             LOGGER.error("Unexpected exception, while configuring socket as non blocking", e);
             throw new RuntimeIoException("cannot configure socket as non-blocking", e);
         }
+        // apply idle configuration
+        session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE,
+                defaultConfig.getIdleTimeInMillis(IdleStatus.READ_IDLE));
+        session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE,
+                defaultConfig.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
 
         // apply the default service socket configuration
         Boolean keepAlive = defaultConfig.isKeepAlive();
@@ -360,6 +371,9 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     } finally {
                         workerLock.unlock();
                     }
+
+                    // check for idle events
+                    idleChecker.processIdleSession(System.currentTimeMillis());
                 }
             } catch (Exception e) {
                 LOGGER.error("Unexpected exception : ", e);
@@ -414,6 +428,9 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     // fire the event
                     ((AbstractIoService) session.getService()).fireSessionCreated(session);
                     session.processSessionOpened();
+                    long time = System.currentTimeMillis();
+                    idleChecker.sessionRead(session, time);
+                    idleChecker.sessionWritten(session, time);
                 }
             }
         }
@@ -485,6 +502,8 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     // Plain message, not encrypted : go directly to the chain
                     session.processMessageReceived(readBuffer);
                 }
+
+                idleChecker.sessionRead(session, System.currentTimeMillis());
             }
         }
 
@@ -517,10 +536,10 @@ public class NioSelectorProcessor implements SelectorProcessor {
                     // Note that if the connection is secured, the buffer already
                     // contains encrypted data.
                     int wrote = session.getSocketChannel().write(buf);
+                    session.incrementWrittenBytes(wrote);
+                    LOGGER.debug("wrote {} bytes to {}", wrote, session);
 
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("wrote {} bytes to {}", wrote, session);
-                    }
+                    idleChecker.sessionWritten(session, System.currentTimeMillis());
 
                     if (buf.remaining() == 0) {
                         // completed write request, let's remove it

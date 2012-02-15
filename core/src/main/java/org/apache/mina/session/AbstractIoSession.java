@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -32,6 +32,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 
+import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
@@ -52,7 +53,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIoSession.class);
 
     /** unique identifier generator */
-    private static final AtomicLong NEXT_ID = new AtomicLong(0);
+    private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
 
     /** The session's unique identifier */
     private final long id;
@@ -378,6 +379,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
+     * To be called by the internal plumber when some bytes are written on the socket
+     * @param bytesCount number of extra bytes written
+     */
+    public void incrementWrittenBytes(int bytesCount) {
+        writtenBytes += bytesCount;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -426,6 +435,17 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     @Override
     public final <T> T getAttribute(AttributeKey<T> key, T defaultValue) {
         return attributes.getAttribute(key, defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @exception IllegalArgumentException if <code>key==null</code>
+     * @see #setAttribute(AttributeKey, Object)
+     */
+    @Override
+    public final <T> T getAttribute(AttributeKey<T> key) {
+        return attributes.getAttribute(key);
     }
 
     /**
@@ -594,6 +614,17 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
         for (IoFilter filter : chain) {
             filter.sessionClosed(this);
+        }
+    }
+
+    /**
+     * process session idle event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     */
+    public void processSessionIdle(IdleStatus status) {
+        LOG.debug("processing session idle {} event for session {}", status, this);
+
+        for (IoFilter filter : chain) {
+            filter.sessionIdle(this, status);
         }
     }
 

@@ -223,6 +223,14 @@ public class AbstractIoSessionTest {
         verify(filter3).sessionClosed(eq(session));
     }
 
+    @Test
+    public void increment_written_bytes() {
+        DummySession session = new DummySession(service);
+        assertEquals(0, session.getWrittenBytes());
+        session.incrementWrittenBytes(1024);
+        assertEquals(1024, session.getWrittenBytes());
+    }
+
     private class PassthruFilter extends DefaultIoFilter {
 
     }

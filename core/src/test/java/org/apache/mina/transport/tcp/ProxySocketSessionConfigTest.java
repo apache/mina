@@ -51,22 +51,17 @@ public class ProxySocketSessionConfigTest {
     @Test
     public void idle() {
         assertEquals(-1, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
-        assertEquals(-1, config.getIdleTimeInMillis(IdleStatus.READ_WRITE_IDLE));
         assertEquals(-1, config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
 
         config.setIdleTimeInMillis(IdleStatus.READ_IDLE, 1);
         assertEquals(1, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
-        assertEquals(-1, config.getIdleTimeInMillis(IdleStatus.READ_WRITE_IDLE));
         assertEquals(-1, config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
 
-        config.setIdleTimeInMillis(IdleStatus.READ_WRITE_IDLE, 2);
         assertEquals(1, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
-        assertEquals(2, config.getIdleTimeInMillis(IdleStatus.READ_WRITE_IDLE));
         assertEquals(-1, config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
 
         config.setIdleTimeInMillis(IdleStatus.WRITE_IDLE, 3);
         assertEquals(1, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
-        assertEquals(2, config.getIdleTimeInMillis(IdleStatus.READ_WRITE_IDLE));
         assertEquals(3, config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
     }
 

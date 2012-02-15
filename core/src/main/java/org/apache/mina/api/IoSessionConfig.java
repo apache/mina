@@ -28,8 +28,8 @@ public interface IoSessionConfig {
 
     /**
      * Returns idle time for the specified type of idleness in milli-seconds.
-     *
      * @see IdleStatus
+     * @return the idle time in ms or <code>-1</code> if no idle time configured for this status
      */
     long getIdleTimeInMillis(IdleStatus status);
 
@@ -38,7 +38,7 @@ public interface IoSessionConfig {
      * operation type (read/write/both) @see IdleStatus
      *
      * @param status          the type of idle (read/write/both) timeout to set
-     * @param ildeTimeInMilli the timeout in milliseconds
+     * @param ildeTimeInMilli the timeout in milliseconds (<code>-1</code> for no idle detection on this status)
      */
     void setIdleTimeInMillis(IdleStatus status, long ildeTimeInMilli);
 

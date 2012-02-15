@@ -266,6 +266,7 @@ public interface IoSession {
     long getLastWriteTime();
 
     /* Session context management */
+
     /**
      * Returns the value of the user-defined attribute for the given
      * <code>key</code>.If the there is no attribute with the specified key the <tt>defaultValue</tt> will be returned.
@@ -278,6 +279,19 @@ public interface IoSession {
      * @see #setAttribute(AttributeKey, Object)
      */
     <T> T getAttribute(AttributeKey<T> key, T defaultValue);
+
+    /**
+     * Returns the value of the user-defined attribute for the given
+     * <code>key</code>.If the there is no attribute with the specified key <code>null</code> will be returned.
+     * 
+     * @param key
+     *            the attribute's key, must not be <code>null</code>
+     * @return <code>null</code> if there is no attribute with the specified key
+     * @exception IllegalArgumentException
+     *                if <code>key==null</code>
+     * @see #setAttribute(AttributeKey, Object)
+     */
+    <T> T getAttribute(AttributeKey<T> key);
 
     /**
      * Sets a user-defined attribute. If the <code>value</code> is

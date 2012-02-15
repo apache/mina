@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.mina.service.SelectorStrategy;
+import org.apache.mina.service.idlechecker.IdleChecker;
+import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
 import org.apache.mina.transport.tcp.DefaultSocketSessionConfig;
 import org.apache.mina.transport.tcp.NioSelectorProcessor;
@@ -40,6 +42,9 @@ import org.slf4j.LoggerFactory;
  */
 public class NioTcpServer extends AbstractTcpServer {
     static final Logger LOG = LoggerFactory.getLogger(NioTcpServer.class);
+
+    // the idle checker is used for detecting read or write idle session 
+    private IdleChecker idleChecker = new IndexedIdleChecker();
 
     // list of bound addresses
     private Set<SocketAddress> addresses = Collections.synchronizedSet(new HashSet<SocketAddress>());

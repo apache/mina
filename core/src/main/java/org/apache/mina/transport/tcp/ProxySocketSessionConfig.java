@@ -45,23 +45,24 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
 
     private long idleTimeWrite = -1;
 
-    private long idleTimeReadWrite = -1;
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getIdleTimeInMillis(IdleStatus status) {
         switch (status) {
         case READ_IDLE:
             return idleTimeRead;
-
         case WRITE_IDLE:
             return idleTimeWrite;
-        case READ_WRITE_IDLE:
-            return idleTimeReadWrite;
         default:
             throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setIdleTimeInMillis(IdleStatus status, long ildeTimeInMilli) {
         switch (status) {
@@ -71,14 +72,14 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         case WRITE_IDLE:
             this.idleTimeWrite = ildeTimeInMilli;
             break;
-        case READ_WRITE_IDLE:
-            this.idleTimeReadWrite = ildeTimeInMilli;
-            break;
         default:
             throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean isTcpNoDelay() {
         try {
@@ -88,6 +89,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTcpNoDelay(boolean tcpNoDelay) {
         LOG.debug("set TCP no delay '{}' for session '{}'", tcpNoDelay, this);
@@ -98,6 +102,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean isReuseAddress() {
         try {
@@ -107,6 +114,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setReuseAddress(boolean reuseAddress) {
         LOG.debug("set reuse address '{}' for session '{}'", reuseAddress, this);
@@ -117,6 +127,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getReceiveBufferSize() {
         try {
@@ -126,6 +139,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setReceiveBufferSize(int receiveBufferSize) {
         LOG.debug("set receive buffer size '{}' for session '{}'", receiveBufferSize, this);
@@ -136,6 +152,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getSendBufferSize() {
         try {
@@ -145,6 +164,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSendBufferSize(int sendBufferSize) {
         LOG.debug("set send buffer size '{}' for session '{}'", sendBufferSize, this);
@@ -155,6 +177,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getTrafficClass() {
         try {
@@ -164,6 +189,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTrafficClass(int trafficClass) {
         LOG.debug("set traffic class '{}' for session '{}'", trafficClass, this);
@@ -174,6 +202,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean isKeepAlive() {
         try {
@@ -183,6 +214,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setKeepAlive(boolean keepAlive) {
         LOG.debug("set keep alive '{}' for session '{}'", keepAlive, this);
@@ -193,6 +227,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean isOobInline() {
         try {
@@ -202,6 +239,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setOobInline(boolean oobInline) {
         LOG.debug("set oob inline '{}' for session '{}'", oobInline, this);
@@ -212,6 +252,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getSoLinger() {
         try {
@@ -221,6 +264,9 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSoLinger(int soLinger) {
         LOG.debug("set so linger '{}' for session '{}'", soLinger, this);

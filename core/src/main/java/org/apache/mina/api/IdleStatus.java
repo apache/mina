@@ -25,13 +25,12 @@ package org.apache.mina.api;
  * <ul>
  * <li>{@link #READ_IDLE} - No data is coming from the remote peer.</li>
  * <li>{@link #WRITE_IDLE} - Session is not writing any data.</li>
- * <li>{@link #READ_WRITE_IDLE} - Both {@link #READ_IDLE} and {@link #WRITE_IDLE}.</li>
  * </ul>
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum IdleStatus {
-    READ_IDLE("read idle"), WRITE_IDLE("write idle"), READ_WRITE_IDLE("both idle");
+    READ_IDLE("read idle"), WRITE_IDLE("write idle");
 
     private final String description;
 

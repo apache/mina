@@ -37,8 +37,9 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private long idleTimeWrite = -1;
 
-    private long idleTimeReadWrite = -1;
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getIdleTimeInMillis(IdleStatus status) {
         switch (status) {
@@ -46,13 +47,14 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
             return idleTimeRead;
         case WRITE_IDLE:
             return idleTimeWrite;
-        case READ_WRITE_IDLE:
-            return idleTimeReadWrite;
         default:
             throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setIdleTimeInMillis(IdleStatus status, long ildeTimeInMilli) {
         switch (status) {
@@ -61,9 +63,6 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
             break;
         case WRITE_IDLE:
             this.idleTimeWrite = ildeTimeInMilli;
-            break;
-        case READ_WRITE_IDLE:
-            this.idleTimeReadWrite = ildeTimeInMilli;
             break;
         default:
             throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
@@ -76,11 +75,17 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private Integer receiveBufferSize = null;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getReceiveBufferSize() {
         return receiveBufferSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
@@ -88,11 +93,17 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private Integer sendBufferSize = null;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getSendBufferSize() {
         return sendBufferSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSendBufferSize(int sendBufferSize) {
         this.sendBufferSize = sendBufferSize;
@@ -104,11 +115,17 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private Boolean tcpNoDelay = null;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean isTcpNoDelay() {
         return tcpNoDelay;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTcpNoDelay(boolean tcpNoDelay) {
         this.tcpNoDelay = tcpNoDelay;
@@ -116,11 +133,17 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private Boolean reuseAddress = null;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean isReuseAddress() {
         return reuseAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
@@ -128,11 +151,17 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private Integer trafficClass;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getTrafficClass() {
         return trafficClass;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTrafficClass(int trafficClass) {
         this.trafficClass = trafficClass;
@@ -140,11 +169,17 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private Boolean keepAlive = null;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean isKeepAlive() {
         return keepAlive;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setKeepAlive(boolean keepAlive) {
         this.keepAlive = keepAlive;
@@ -152,11 +187,17 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private Boolean oobInline = null;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean isOobInline() {
         return oobInline;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setOobInline(boolean oobInline) {
         this.oobInline = oobInline;
@@ -165,11 +206,17 @@ public class DefaultSocketSessionConfig implements SocketSessionConfig {
 
     private Integer soLinger;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getSoLinger() {
         return soLinger;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSoLinger(int soLinger) {
         this.soLinger = soLinger;
