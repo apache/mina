@@ -100,6 +100,7 @@ public class IndexedIdleChecker implements IdleChecker {
                 readIdleSessionIndex[index] = new HashSet<AbstractIoSession>();
             }
 
+            LOG.debug("marking session {} idle for index {}", session, index);
             readIdleSessionIndex[index].add(session);
             session.setAttribute(READ_IDLE_INDEX, index);
         }
@@ -153,15 +154,21 @@ public class IndexedIdleChecker implements IdleChecker {
             return 0;
         }
 
-        int startIdx = ((int) (Math.max(lastCheckTime, time - MAX_IDLE_TIME_IN_MS) / 1000L)) % MAX_IDLE_TIME_IN_SEC;
+        int startIdx = ((int) (Math.max(lastCheckTime, time - MAX_IDLE_TIME_IN_MS + 1) / 1000L)) % MAX_IDLE_TIME_IN_SEC;
         int endIdx = ((int) (time / 1000L)) % MAX_IDLE_TIME_IN_SEC;
 
-        for (int index = startIdx; index != endIdx; index = (index + 1) % MAX_IDLE_TIME_IN_SEC) {
+        LOG.debug("scaning from index {} to index {}", startIdx, endIdx);
+
+        int index = startIdx;
+        do {
+            LOG.debug("scanning index {}", index);
             // look at the read idle index
             counter += processIndex(readIdleSessionIndex, index, IdleStatus.READ_IDLE);
             counter += processIndex(writeIdleSessionIndex, index, IdleStatus.WRITE_IDLE);
 
-        }
+            index = (index + 1) % MAX_IDLE_TIME_IN_SEC;
+        } while (index != endIdx);
+
         // save last check time for next call
         lastCheckTime = time;
         LOG.debug("detected {} idleing sessions", counter);

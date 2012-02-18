@@ -18,7 +18,7 @@
  */
 package org.apache.mina.transport.tcp;
 
-import org.apache.mina.api.IdleStatus;
+import org.apache.mina.session.AbstractIoSessionConfig;
 
 /**
  * Implementation for the socket session configuration.
@@ -27,47 +27,7 @@ import org.apache.mina.api.IdleStatus;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DefaultSocketSessionConfig implements SocketSessionConfig {
-
-    //=====================
-    // idle management
-    //=====================    
-
-    private long idleTimeRead = -1;
-
-    private long idleTimeWrite = -1;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getIdleTimeInMillis(IdleStatus status) {
-        switch (status) {
-        case READ_IDLE:
-            return idleTimeRead;
-        case WRITE_IDLE:
-            return idleTimeWrite;
-        default:
-            throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setIdleTimeInMillis(IdleStatus status, long ildeTimeInMilli) {
-        switch (status) {
-        case READ_IDLE:
-            this.idleTimeRead = ildeTimeInMilli;
-            break;
-        case WRITE_IDLE:
-            this.idleTimeWrite = ildeTimeInMilli;
-            break;
-        default:
-            throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
-        }
-    }
+public class DefaultSocketSessionConfig extends AbstractIoSessionConfig implements SocketSessionConfig {
 
     //=====================
     // buffers
