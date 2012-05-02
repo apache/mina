@@ -28,7 +28,7 @@
   </parent>
 
   <artifactId>mina-http</artifactId>
-  <name>Apache MINA HTTP</name>
+  <name>Apache MINA HTTP ${project.version}</name>
   <packaging>bundle</packaging>
   <description>Low level HTTP codec for building simple &amp; fast HTTP server and clients</description>
 

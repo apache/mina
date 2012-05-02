@@ -35,7 +35,7 @@
   <groupId>org.apache.mina</groupId>
   <version>3.0.0-M1-SNAPSHOT</version>
   <artifactId>mina-parent</artifactId>
-  <name>Apache MINA</name>
+  <name>Apache MINA ${project.version}</name>
   <packaging>pom</packaging>
 
   <url>http://mina.apache.org/</url>

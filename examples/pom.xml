@@ -28,7 +28,7 @@
   </parent>
 
   <artifactId>mina-examples</artifactId>
-  <name>Apache MINA examples</name>
+  <name>Apache MINA examples ${project.version}</name>
   <packaging>jar</packaging>
   <description>Apache MINA server and client examples</description>
 
