@@ -248,7 +248,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
         // Set the secured flag if the service is to be used over SSL/TLS
         if (service.isSecured()) {
-            session.initSecure(service.getSslContext());
+            service.initSecured(session);
         }
 
         // event session created

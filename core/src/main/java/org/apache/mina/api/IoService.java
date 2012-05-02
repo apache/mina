@@ -21,7 +21,7 @@ package org.apache.mina.api;
 
 import java.util.Map;
 
-import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 
 import org.apache.mina.service.IoHandler;
 
@@ -32,7 +32,6 @@ import org.apache.mina.service.IoHandler;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoService {
-
     /**
      * Returns the map of all sessions which are currently managed by this service. The key of map is the
      * {@link IoSession#getId() ID} of the session.
@@ -66,7 +65,7 @@ public interface IoService {
     /**
      * Get the list of filters installed on this service
      * 
-     * @return
+     * @return The list of installed filters
      */
     IoFilter[] getFilters();
 
@@ -88,23 +87,8 @@ public interface IoService {
     boolean isSecured();
 
     /**
-     * Set the mode to use, either secured or not secured
-     * @param secured The mode to use
+     * Initialize the service in secured mode for the given session
+     * @param session The {@link IoSession} to secure
      */
-    void setSecured(boolean secured);
-
-    /**
-     * Inject a {@link SSLContex} valid for the service. This {@link SSLContex} will be used
-     * by the SSLEngine to handle secured connections.<br/>
-     * The {@link SSLContex} must have been created and initialized before being injected in
-     * the service.<br/>
-     * By setting a {@link SSLContext}, the service switch to secured.
-     * @param sslContext The configured {@link SSLContex}.
-     */
-    void setSslContext(SSLContext sslContext);
-
-    /**
-     * @return The {@link SSLContext} instance stored in the service.
-     */
-    SSLContext getSslContext();
+    void initSecured(IoSession session) throws SSLException;
 }

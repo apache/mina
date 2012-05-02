@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Set;
 
+import javax.net.ssl.SSLException;
+
+import org.apache.mina.api.IoSession;
 import org.apache.mina.service.server.AbstractIoServer;
 
 /**
@@ -62,4 +65,10 @@ public abstract class AbstractUdpServer extends AbstractIoServer {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void initSecured(IoSession session) throws SSLException {
+        // Do nothing : UDP does not support SSL
+    }
 }
