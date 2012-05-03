@@ -26,8 +26,8 @@ import javax.net.ssl.SSLException;
 import org.apache.mina.service.IoHandler;
 
 /**
- * Base interface for all {@link IoServer}s and {@link IoClient}s that provide I/O service and manage {@link IoSession}
- * s.
+ * Base interface for all {@link IoServer}s and {@link IoClient}s that provide I/O service 
+ * and manage {@link IoSession}s.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -41,24 +41,31 @@ public interface IoService {
     Map<Long, IoSession> getManagedSessions();
 
     /**
-     * Adds an {@link IoServiceListener} that listens any events related with this service.
+     * Adds some {@link IoServiceListener} that listens any events related with this service.
+     * 
+     * @param listeners The {@link IoServiceListener} to add
      */
-    void addListener(IoServiceListener listener);
+    void addListeners(IoServiceListener... listeners);
 
     /**
-     * Removed an existing {@link IoServiceListener} that listens any events related with this service.
+     * Removed some existing {@link IoServiceListener} that listens any events related with this service.
+     * 
+     * @param listeners The {@link IoServiceListener} to rmove
      */
-    void removeListener(IoServiceListener listener);
+    void removeListeners(IoServiceListener... listeners);
 
     /**
      * Returns the handler which will handle all the connections managed by this service.
+     * 
+     * @return The {@link IoService} {@link IoHandler}
      */
-
     IoHandler getHandler();
 
     /**
-     * Sets the handler which will handle all connections managed by this service. The handler can only be set before
-     * the service is started.
+     * Sets the handler which will handle all connections managed by this service. The handler can 
+     * only be set before the service is started. We can have only one {@link IoHandler} per service.
+     * 
+     * @param handler The {@link IoHandler} associated with this service
      */
     void setHandler(IoHandler handler);
 
@@ -71,23 +78,29 @@ public interface IoService {
 
     /**
      * Set the list of filters for this service. Must be called before the service is bound/connected
+     * 
+     * @param The list of filters to inject in the filters chain
      */
     void setFilters(IoFilter... filters);
 
     /**
      * Returns the default configuration of the new {@link IoSession}s
      * created by this service.
+     * 
+     * @return The default configuration for this {@link IoService}
      */
     IoSessionConfig getSessionConfig();
 
     /**
      * Tells if the service provide some encryption (SSL/TLS)
+     * 
      * @return <code>true</code> if the service is secured
      */
     boolean isSecured();
 
     /**
-     * Initialize the service in secured mode for the given session
+     * Initialize the service in secured mode for the given session.
+     * 
      * @param session The {@link IoSession} to secure
      */
     void initSecured(IoSession session) throws SSLException;

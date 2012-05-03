@@ -96,7 +96,7 @@ public class NioEchoServer {
             }
         });
 
-        acceptor.addListener(new IoServiceListener() {
+        acceptor.addListeners(new IoServiceListener() {
 
             @Override
             public void sessionDestroyed(IoSession session) {

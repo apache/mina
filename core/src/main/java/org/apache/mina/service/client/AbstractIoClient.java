@@ -47,11 +47,11 @@ public abstract class AbstractIoClient extends AbstractIoService implements IoCl
     }
 
     @Override
-    public void addListener(IoServiceListener listener) {
+    public void addListeners(IoServiceListener... listeners) {
     }
 
     @Override
-    public void removeListener(IoServiceListener listener) {
+    public void removeListeners(IoServiceListener... listeners) {
     }
 
     @Override

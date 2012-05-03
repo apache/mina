@@ -106,9 +106,15 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     @Override
-    public void addListener(IoServiceListener listener) {
-        if (listener != null) {
-            listeners.add(listener);
+    public void addListeners(IoServiceListener... listeners) {
+        if (listeners != null) {
+            for (IoServiceListener listener : listeners) {
+                // Don't add an existing listener into the list
+                if (!this.listeners.contains(listener)) {
+                    this.listeners.add(listener);
+                }
+            }
+
             return;
         }
 
@@ -120,10 +126,16 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     @Override
-    public void removeListener(IoServiceListener listener) {
-        if (listener != null) {
-            listeners.remove(listener);
+    public void removeListeners(IoServiceListener... listeners) {
+        if (listeners != null) {
+            for (IoServiceListener listener : listeners) {
+                this.listeners.remove(listener);
+            }
+
+            return;
         }
+
+        LOG.warn("Trying to remove Null Listener");
     }
 
     /**
