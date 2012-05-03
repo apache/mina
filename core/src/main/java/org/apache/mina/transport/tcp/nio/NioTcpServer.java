@@ -26,8 +26,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.mina.service.SelectorStrategy;
-import org.apache.mina.service.idlechecker.IdleChecker;
-import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
 import org.apache.mina.transport.tcp.DefaultSocketSessionConfig;
 import org.apache.mina.transport.tcp.NioSelectorProcessor;
@@ -43,20 +41,17 @@ import org.slf4j.LoggerFactory;
 public class NioTcpServer extends AbstractTcpServer {
     static final Logger LOG = LoggerFactory.getLogger(NioTcpServer.class);
 
-    // the idle checker is used for detecting read or write idle session 
-    private IdleChecker idleChecker = new IndexedIdleChecker();
-
     // list of bound addresses
-    private Set<SocketAddress> addresses = Collections.synchronizedSet(new HashSet<SocketAddress>());
+    private final Set<SocketAddress> addresses = Collections.synchronizedSet(new HashSet<SocketAddress>());
 
     // the strategy for dispatching servers and client to selector threads.
-    private SelectorStrategy strategy;
+    private final SelectorStrategy strategy;
 
     private SocketSessionConfig config;
 
     private boolean reuseAddress = false;
 
-    public NioTcpServer(SelectorStrategy strategy) {
+    public NioTcpServer(final SelectorStrategy strategy) {
         super();
         this.strategy = strategy;
         this.config = new DefaultSocketSessionConfig();
@@ -64,25 +59,25 @@ public class NioTcpServer extends AbstractTcpServer {
 
     @Override
     public SocketSessionConfig getSessionConfig() {
-        return config;
+        return this.config;
     }
 
-    public void setSessionConfig(SocketSessionConfig config) {
+    public void setSessionConfig(final SocketSessionConfig config) {
         this.config = config;
     }
 
     @Override
-    public void setReuseAddress(boolean reuseAddress) {
+    public void setReuseAddress(final boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
     }
 
     @Override
     public boolean isReuseAddress() {
-        return reuseAddress;
+        return this.reuseAddress;
     }
 
     @Override
-    public void bind(SocketAddress... localAddress) throws IOException {
+    public void bind(final SocketAddress... localAddress) throws IOException {
         if (localAddress == null) {
             // We should at least have one address to bind on
             throw new IllegalStateException("LocalAdress cannot be null");
@@ -91,18 +86,18 @@ public class NioTcpServer extends AbstractTcpServer {
         for (SocketAddress address : localAddress) {
             // check if the address is already bound
             synchronized (this) {
-                if (addresses.contains(address)) {
+                if (this.addresses.contains(address)) {
                     throw new IOException("address " + address + " already bound");
                 }
 
                 LOG.debug("binding address {}", address);
 
-                addresses.add(address);
-                NioSelectorProcessor processor = (NioSelectorProcessor) strategy.getSelectorForBindNewAddress();
+                this.addresses.add(address);
+                NioSelectorProcessor processor = (NioSelectorProcessor) this.strategy.getSelectorForBindNewAddress();
                 processor.bindAndAcceptAddress(this, address);
-                if (addresses.size() == 1) {
+                if (this.addresses.size() == 1) {
                     // it's the first address bound, let's fire the event
-                    fireServiceActivated();
+                    this.fireServiceActivated();
                 }
             }
         }
@@ -110,18 +105,18 @@ public class NioTcpServer extends AbstractTcpServer {
 
     @Override
     public Set<SocketAddress> getLocalAddresses() {
-        return addresses;
+        return this.addresses;
     }
 
     @Override
-    public void unbind(SocketAddress... localAddresses) throws IOException {
+    public void unbind(final SocketAddress... localAddresses) throws IOException {
         for (SocketAddress socketAddress : localAddresses) {
             LOG.debug("unbinding {}", socketAddress);
             synchronized (this) {
-                strategy.unbind(socketAddress);
-                addresses.remove(socketAddress);
-                if (addresses.isEmpty()) {
-                    fireServiceInactivated();
+                this.strategy.unbind(socketAddress);
+                this.addresses.remove(socketAddress);
+                if (this.addresses.isEmpty()) {
+                    this.fireServiceInactivated();
                 }
             }
         }
@@ -129,8 +124,8 @@ public class NioTcpServer extends AbstractTcpServer {
 
     @Override
     public void unbindAll() throws IOException {
-        for (SocketAddress socketAddress : addresses) {
-            unbind(socketAddress);
+        for (SocketAddress socketAddress : this.addresses) {
+            this.unbind(socketAddress);
         }
     }
 

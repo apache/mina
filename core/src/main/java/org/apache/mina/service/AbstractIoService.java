@@ -43,6 +43,7 @@ public abstract class AbstractIoService implements IoService {
     /** The service state */
     private ServiceState state;
 
+    /** The placeholder of managed open sessions */
     private final Map<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
 
     /**
@@ -77,12 +78,15 @@ public abstract class AbstractIoService implements IoService {
      * Create an AbstractIoService
      */
     protected AbstractIoService() {
-        state = ServiceState.NONE;
+        this.state = ServiceState.NONE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<Long, IoSession> getManagedSessions() {
-        return managedSessions;
+        return this.managedSessions;
     }
 
     /**
@@ -90,7 +94,7 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     @Override
-    public void addListeners(IoServiceListener... listeners) {
+    public void addListeners(final IoServiceListener... listeners) {
         if (listeners != null) {
             for (IoServiceListener listener : listeners) {
                 // Don't add an existing listener into the list
@@ -110,7 +114,7 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     @Override
-    public void removeListeners(IoServiceListener... listeners) {
+    public void removeListeners(final IoServiceListener... listeners) {
         if (listeners != null) {
             for (IoServiceListener listener : listeners) {
                 this.listeners.remove(listener);
@@ -125,14 +129,16 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final IoHandler getHandler() {
-        return handler;
+        return this.handler;
     }
 
     /**
      * {@inheritDoc}
      */
-    public final void setHandler(IoHandler handler) {
+    @Override
+    public final void setHandler(final IoHandler handler) {
         if (handler == null) {
             throw new IllegalArgumentException("handler cannot be null");
         }
@@ -150,84 +156,84 @@ public abstract class AbstractIoService implements IoService {
      * @return true if the IoService is active
      */
     public boolean isActive() {
-        return state == ServiceState.ACTIVE;
+        return this.state == ServiceState.ACTIVE;
     }
 
     /**
      * @return true if the IoService is being disposed
      */
     public boolean isDisposing() {
-        return state == ServiceState.DISPOSING;
+        return this.state == ServiceState.DISPOSING;
     }
 
     /**
      * @return true if the IoService is disposed
      */
     public boolean isDisposed() {
-        return state == ServiceState.DISPOSED;
+        return this.state == ServiceState.DISPOSED;
     }
 
     /**
      * @return true if the IoService is suspended
      */
     public boolean isSuspended() {
-        return state == ServiceState.SUSPENDED;
+        return this.state == ServiceState.SUSPENDED;
     }
 
     /**
      * @return true if the IoService is created
      */
     public boolean isCreated() {
-        return state == ServiceState.CREATED;
+        return this.state == ServiceState.CREATED;
     }
 
     /**
      * Sets the IoService state to CREATED.
      */
     protected void setCreated() {
-        state = ServiceState.CREATED;
+        this.state = ServiceState.CREATED;
     }
 
     /**
      * Sets the IoService state to ACTIVE.
      */
     protected void setActive() {
-        state = ServiceState.ACTIVE;
+        this.state = ServiceState.ACTIVE;
     }
 
     /**
      * Sets the IoService state to DISPOSED.
      */
     protected void setDisposed() {
-        state = ServiceState.DISPOSED;
+        this.state = ServiceState.DISPOSED;
     }
 
     /**
      * Sets the IoService state to DISPOSING.
      */
     protected void setDisposing() {
-        state = ServiceState.DISPOSING;
+        this.state = ServiceState.DISPOSING;
     }
 
     /**
      * Sets the IoService state to SUSPENDED.
      */
     protected void setSuspended() {
-        state = ServiceState.SUSPENDED;
+        this.state = ServiceState.SUSPENDED;
     }
 
     /**
      * Initialize the IoService state
      */
     protected void initState() {
-        state = ServiceState.NONE;
+        this.state = ServiceState.NONE;
     }
 
     /**
      * Inform all current the listeners of the service activation.
      */
     protected void fireServiceActivated() {
-        for (IoServiceListener listener : listeners) {
+        for (IoServiceListener listener : this.listeners) {
             listener.serviceActivated(this);
         }
     }
@@ -236,21 +242,23 @@ public abstract class AbstractIoService implements IoService {
      * Inform all current the listeners of the service desactivation.
      */
     protected void fireServiceInactivated() {
-        for (IoServiceListener listener : listeners) {
+        for (IoServiceListener listener : this.listeners) {
             listener.serviceInactivated(this);
         }
     }
 
-    public void fireSessionCreated(IoSession session) {
-        for (IoServiceListener listener : listeners) {
+    public void fireSessionCreated(final IoSession session) {
+        for (IoServiceListener listener : this.listeners) {
             listener.sessionCreated(session);
         }
+        this.managedSessions.put(session.getId(), session);
     }
 
-    public void fireSessionDestroyed(IoSession session) {
-        for (IoServiceListener listener : listeners) {
+    public void fireSessionDestroyed(final IoSession session) {
+        for (IoServiceListener listener : this.listeners) {
             listener.sessionDestroyed(session);
         }
+        this.managedSessions.remove(session.getId());
     }
 
     private IoFilter[] filters;
@@ -260,14 +268,14 @@ public abstract class AbstractIoService implements IoService {
      */
     @Override
     public IoFilter[] getFilters() {
-        return filters;
+        return this.filters;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setFilters(IoFilter... filters) {
+    public void setFilters(final IoFilter... filters) {
         this.filters = filters;
     }
 }
