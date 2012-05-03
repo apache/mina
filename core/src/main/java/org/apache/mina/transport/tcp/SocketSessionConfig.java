@@ -20,6 +20,8 @@ package org.apache.mina.transport.tcp;
 
 import java.net.Socket;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.mina.api.IoSessionConfig;
 
 /**
@@ -28,7 +30,6 @@ import org.apache.mina.api.IoSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SocketSessionConfig extends IoSessionConfig {
-
     /**
      * @see Socket#getTcpNoDelay()
      */
@@ -126,4 +127,20 @@ public interface SocketSessionConfig extends IoSessionConfig {
      */
     void setSoLinger(int soLinger);
 
+    /**
+     * Tells if the session provides some encryption (SSL/TLS)
+     * 
+     * @return <code>true</code> if the session is secured
+     */
+    boolean isSecured();
+
+    /**
+     * @return The {@link SSLContext} instance stored in the configuration.
+     */
+    SSLContext getSslContext();
+
+    /**
+     * @return The {@link SSLContext} instance stored in the configuration.
+     */
+    void setSslContext(SSLContext sslContext);
 }

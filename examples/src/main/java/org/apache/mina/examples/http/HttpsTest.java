@@ -55,13 +55,13 @@ public class HttpsTest {
                 NioSelectorProcessor.class));
         NioTcpServer acceptor = new NioTcpServer(strategy);
 
-        // Make it use https, injecting a default SSLContext instance
-        acceptor.setSslContext(BogusSslContextFactory.getInstance(true));
-
         acceptor.setFilters(new LoggingFilter("INCOMING"), new HttpServerCodec(), new LoggingFilter("DECODED"),
                 new DummyHttpSever());
 
         acceptor.getSessionConfig().setTcpNoDelay(true);
+
+        // Make it use https, injecting a default SSLContext instance
+        acceptor.getSessionConfig().setSslContext(BogusSslContextFactory.getInstance(true));
 
         acceptor.bind(new InetSocketAddress(8080));
 

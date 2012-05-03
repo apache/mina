@@ -19,10 +19,6 @@
  */
 package org.apache.mina.transport.tcp;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-
-import org.apache.mina.api.IoSession;
 import org.apache.mina.service.client.AbstractIoClient;
 
 /**
@@ -31,42 +27,10 @@ import org.apache.mina.service.client.AbstractIoClient;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractTcpClient extends AbstractIoClient {
-    /** The SSLContext instance */
-    private SSLContext sslContext;
-
     /**
      * Create an new AbsractTcpClient instance
      */
     protected AbstractTcpClient() {
         super();
-    }
-
-    /**
-     * Inject a {@link SSLContex} valid for the service. This {@link SSLContex} will be used
-     * by the SSLEngine to handle secured connections.<br/>
-     * The {@link SSLContex} must have been created and initialized before being injected in
-     * the service.<br/>
-     * By setting a {@link SSLContext}, the service switch to secured.
-     * @param sslContext The configured {@link SSLContex}.
-     */
-    public void setSslContext(SSLContext sslContext) {
-        this.sslContext = sslContext;
-        mode = ServiceMode.SECURED;
-    }
-
-    /**
-     * @return The {@link SSLContext} instance stored in the service.
-     */
-    public SSLContext getSslContext() {
-        return sslContext;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void initSecured(IoSession session) throws SSLException {
-        if (mode == ServiceMode.SECURED) {
-            session.initSecure(sslContext);
-        }
     }
 }

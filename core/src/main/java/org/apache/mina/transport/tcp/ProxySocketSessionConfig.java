@@ -21,6 +21,8 @@ package org.apache.mina.transport.tcp;
 import java.net.Socket;
 import java.net.SocketException;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.mina.api.ConfigurationException;
 import org.apache.mina.api.IdleStatus;
 import org.slf4j.Logger;
@@ -277,4 +279,20 @@ public class ProxySocketSessionConfig implements SocketSessionConfig {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecured() {
+        return false;
+    }
+
+    @Override
+    public SSLContext getSslContext() {
+        return null;
+    }
+
+    @Override
+    public void setSslContext(SSLContext sslContext) {
+    }
 }

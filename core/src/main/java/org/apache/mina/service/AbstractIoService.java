@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.net.ssl.SSLException;
-
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoServiceListener;
@@ -44,9 +42,6 @@ public abstract class AbstractIoService implements IoService {
 
     /** The service state */
     private ServiceState state;
-
-    /** The service mode : secured or not */
-    protected ServiceMode mode;
 
     private final Map<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
 
@@ -79,21 +74,10 @@ public abstract class AbstractIoService implements IoService {
     }
 
     /**
-     * The Service secured mode
-     */
-    protected enum ServiceMode {
-        /** SSL/TLS activated */
-        SECURED,
-        /** SSL/TLS not activated */
-        NOT_SECURED
-    }
-
-    /**
      * Create an AbstractIoService
      */
     protected AbstractIoService() {
         state = ServiceState.NONE;
-        mode = ServiceMode.NOT_SECURED;
     }
 
     @Override
@@ -285,29 +269,5 @@ public abstract class AbstractIoService implements IoService {
     @Override
     public void setFilters(IoFilter... filters) {
         this.filters = filters;
-    }
-
-    /**
-     * Tells if the service provide some encryption (SSL/TLS)
-     * @return <code>true</code> if the service is secured
-     */
-    public boolean isSecured() {
-        return mode == ServiceMode.SECURED;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public abstract void initSecured(IoSession session) throws SSLException;
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setSecured(boolean secured) {
-        if (secured) {
-            mode = ServiceMode.SECURED;
-        } else {
-            mode = ServiceMode.NOT_SECURED;
-        }
     }
 }

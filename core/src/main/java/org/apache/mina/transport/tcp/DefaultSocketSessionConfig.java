@@ -18,6 +18,8 @@
  */
 package org.apache.mina.transport.tcp;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.mina.session.AbstractIoSessionConfig;
 
 /**
@@ -28,11 +30,12 @@ import org.apache.mina.session.AbstractIoSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultSocketSessionConfig extends AbstractIoSessionConfig implements SocketSessionConfig {
+    /** The SSLContext instance */
+    private SSLContext sslContext;
 
     //=====================
     // buffers
     //=====================
-
     private Integer receiveBufferSize = null;
 
     /**
@@ -180,5 +183,32 @@ public class DefaultSocketSessionConfig extends AbstractIoSessionConfig implemen
     @Override
     public void setSoLinger(int soLinger) {
         this.soLinger = soLinger;
+    }
+
+    /**
+     * Inject a {@link SSLContex} valid for the session. This {@link SSLContex} will be used
+     * by the SSLEngine to handle secured connections.<br/>
+     * The {@link SSLContex} must have been created and initialized before being injected in
+     * the configuration.<br/>
+     * By setting a {@link SSLContext}, the session switch to secured.
+     * @param sslContext The configured {@link SSLContex}.
+     */
+    public void setSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SSLContext getSslContext() {
+        return sslContext;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecured() {
+        return sslContext != null;
     }
 }

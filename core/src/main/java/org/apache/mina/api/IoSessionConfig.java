@@ -41,5 +41,4 @@ public interface IoSessionConfig {
      * @param ildeTimeInMilli the timeout in milliseconds (<code>-1</code> for no idle detection on this status)
      */
     void setIdleTimeInMillis(IdleStatus status, long ildeTimeInMilli);
-
 }

@@ -182,7 +182,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
     public void createSession(IoService service, Object clientSocket) throws SSLException {
         LOGGER.debug("create session");
         final SocketChannel socketChannel = (SocketChannel) clientSocket;
-        final SocketSessionConfig defaultConfig = (SocketSessionConfig) service.getSessionConfig();
+        final SocketSessionConfig config = (SocketSessionConfig) service.getSessionConfig();
         final NioTcpSession session = new NioTcpSession(service, socketChannel, strategy.getSelectorForNewSession(this));
 
         try {
@@ -192,63 +192,62 @@ public class NioSelectorProcessor implements SelectorProcessor {
             throw new RuntimeIoException("cannot configure socket as non-blocking", e);
         }
         // apply idle configuration
-        session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE,
-                defaultConfig.getIdleTimeInMillis(IdleStatus.READ_IDLE));
+        session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
         session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE,
-                defaultConfig.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
+                config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
 
         // apply the default service socket configuration
-        Boolean keepAlive = defaultConfig.isKeepAlive();
+        Boolean keepAlive = config.isKeepAlive();
 
         if (keepAlive != null) {
             session.getConfig().setKeepAlive(keepAlive);
         }
 
-        Boolean oobInline = defaultConfig.isOobInline();
+        Boolean oobInline = config.isOobInline();
 
         if (oobInline != null) {
             session.getConfig().setOobInline(oobInline);
         }
 
-        Boolean reuseAddress = defaultConfig.isReuseAddress();
+        Boolean reuseAddress = config.isReuseAddress();
 
         if (reuseAddress != null) {
             session.getConfig().setReuseAddress(reuseAddress);
         }
 
-        Boolean tcpNoDelay = defaultConfig.isTcpNoDelay();
+        Boolean tcpNoDelay = config.isTcpNoDelay();
 
         if (tcpNoDelay != null) {
             session.getConfig().setTcpNoDelay(tcpNoDelay);
         }
 
-        Integer receiveBufferSize = defaultConfig.getReceiveBufferSize();
+        Integer receiveBufferSize = config.getReceiveBufferSize();
 
         if (receiveBufferSize != null) {
             session.getConfig().setReceiveBufferSize(receiveBufferSize);
         }
 
-        Integer sendBufferSize = defaultConfig.getSendBufferSize();
+        Integer sendBufferSize = config.getSendBufferSize();
 
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
         }
 
-        Integer trafficClass = defaultConfig.getTrafficClass();
+        Integer trafficClass = config.getTrafficClass();
 
         if (trafficClass != null) {
             session.getConfig().setTrafficClass(trafficClass);
         }
 
-        Integer soLinger = defaultConfig.getSoLinger();
+        Integer soLinger = config.getSoLinger();
 
         if (soLinger != null) {
             session.getConfig().setSoLinger(soLinger);
         }
 
         // Set the secured flag if the service is to be used over SSL/TLS
-        if (service.isSecured()) {
-            service.initSecured(session);
+        if (config.isSecured()) {
+            session.initSecure(config.getSslContext());
         }
 
         // event session created

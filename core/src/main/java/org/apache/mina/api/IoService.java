@@ -21,8 +21,6 @@ package org.apache.mina.api;
 
 import java.util.Map;
 
-import javax.net.ssl.SSLException;
-
 import org.apache.mina.service.IoHandler;
 
 /**
@@ -90,18 +88,4 @@ public interface IoService {
      * @return The default configuration for this {@link IoService}
      */
     IoSessionConfig getSessionConfig();
-
-    /**
-     * Tells if the service provide some encryption (SSL/TLS)
-     * 
-     * @return <code>true</code> if the service is secured
-     */
-    boolean isSecured();
-
-    /**
-     * Initialize the service in secured mode for the given session.
-     * 
-     * @param session The {@link IoSession} to secure
-     */
-    void initSecured(IoSession session) throws SSLException;
 }
