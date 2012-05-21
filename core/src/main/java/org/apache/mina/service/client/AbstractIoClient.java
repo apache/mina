@@ -20,11 +20,9 @@
 package org.apache.mina.service.client;
 
 import java.net.SocketAddress;
-import java.util.Map;
 
 import org.apache.mina.api.IoClient;
 import org.apache.mina.api.IoFuture;
-import org.apache.mina.api.IoServiceListener;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.service.AbstractIoService;
 
@@ -39,19 +37,6 @@ public abstract class AbstractIoClient extends AbstractIoService implements IoCl
      */
     protected AbstractIoClient() {
         super();
-    }
-
-    @Override
-    public Map<Long, IoSession> getManagedSessions() {
-        return null;
-    }
-
-    @Override
-    public void addListeners(IoServiceListener... listeners) {
-    }
-
-    @Override
-    public void removeListeners(IoServiceListener... listeners) {
     }
 
     @Override
