@@ -47,11 +47,6 @@ public abstract class AbstractIoService implements IoService {
     private final Map<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
 
     /**
-     * The handler, the interface with the application part.
-     */
-    private IoHandler handler;
-
-    /**
      * Placeholder for storing all the listeners added
      */
     private final List<IoServiceListener> listeners = new CopyOnWriteArrayList<IoServiceListener>();
@@ -124,32 +119,6 @@ public abstract class AbstractIoService implements IoService {
         }
 
         LOG.warn("Trying to remove Null Listener");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final IoHandler getHandler() {
-        return this.handler;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void setHandler(final IoHandler handler) {
-        if (handler == null) {
-            throw new IllegalArgumentException("handler cannot be null");
-        }
-
-        // TODO: check the service state, we should not be able to set the handler
-        // if the service is already started
-        /*
-         * if (isActive()) { throw new IllegalStateException( "handler cannot be set while the service is active."); }
-         */
-
-        this.handler = handler;
     }
 
     /**

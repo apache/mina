@@ -21,8 +21,6 @@ package org.apache.mina.api;
 
 import java.util.Map;
 
-import org.apache.mina.service.IoHandler;
-
 /**
  * Base interface for all {@link IoServer}s and {@link IoClient}s that provide I/O service 
  * and manage {@link IoSession}s.
@@ -51,21 +49,6 @@ public interface IoService {
      * @param listeners The {@link IoServiceListener} to rmove
      */
     void removeListeners(IoServiceListener... listeners);
-
-    /**
-     * Returns the handler which will handle all the connections managed by this service.
-     * 
-     * @return The {@link IoService} {@link IoHandler}
-     */
-    IoHandler getHandler();
-
-    /**
-     * Sets the handler which will handle all connections managed by this service. The handler can 
-     * only be set before the service is started. We can have only one {@link IoHandler} per service.
-     * 
-     * @param handler The {@link IoHandler} associated with this service
-     */
-    void setHandler(IoHandler handler);
 
     /**
      * Get the list of filters installed on this service

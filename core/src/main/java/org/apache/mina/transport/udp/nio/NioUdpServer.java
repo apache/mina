@@ -19,22 +19,43 @@
  */
 package org.apache.mina.transport.udp.nio;
 
+import java.net.SocketAddress;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.mina.api.IoSessionConfig;
+import org.apache.mina.service.SelectorStrategy;
 import org.apache.mina.transport.udp.AbstractUdpServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * TODO
+ * This class implements a UDP NIO based server.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NioUdpServer extends AbstractUdpServer {
+	
+	static final Logger LOG = LoggerFactory.getLogger(NioUdpServer.class);
+
+    // list of bound addresses
+    private final Set<SocketAddress> addresses = Collections.synchronizedSet(new HashSet<SocketAddress>());
+
+    // the strategy for dispatching servers and client to selector threads.
+    private final SelectorStrategy strategy;
+
     /**
      * Create a new instance of NioUdpServer
      */
-    public NioUdpServer() {
+    public NioUdpServer(final SelectorStrategy strategy) {
         super();
+        this.strategy = strategy;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IoSessionConfig getSessionConfig() {
         // TODO Auto-generated method stub
