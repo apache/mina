@@ -25,11 +25,11 @@ import javax.net.ssl.SSLContext;
 import org.apache.mina.api.IoSessionConfig;
 
 /**
- *  A {@link IoSessionConfig} for socket based transports.
+ *  A {@link IoSessionConfig} for socket based sessions.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface SocketSessionConfig extends IoSessionConfig {
+public interface TcpSessionConfig extends IoSessionConfig {
     /**
      * @see Socket#getTcpNoDelay()
      */

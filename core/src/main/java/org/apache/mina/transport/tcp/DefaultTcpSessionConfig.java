@@ -29,7 +29,7 @@ import org.apache.mina.session.AbstractIoSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DefaultSocketSessionConfig extends AbstractIoSessionConfig implements SocketSessionConfig {
+public class DefaultTcpSessionConfig extends AbstractIoSessionConfig implements TcpSessionConfig {
     /** The SSLContext instance */
     private SSLContext sslContext;
 

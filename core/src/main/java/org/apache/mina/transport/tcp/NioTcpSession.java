@@ -50,7 +50,7 @@ public class NioTcpSession extends AbstractIoSession {
     private SocketChannel channel;
 
     /** the socket configuration */
-    private final SocketSessionConfig configuration;
+    private final TcpSessionConfig configuration;
 
     // this session requested to close
     private volatile boolean closeRequested = false;
@@ -71,7 +71,7 @@ public class NioTcpSession extends AbstractIoSession {
     NioTcpSession(IoService service, SocketChannel channel, SelectorProcessor writeProcessor) {
         super(service, writeProcessor);
         this.channel = channel;
-        this.configuration = new ProxySocketSessionConfig(channel.socket());
+        this.configuration = new ProxyTcpSessionConfig(channel.socket());
     }
 
     /**
@@ -212,7 +212,7 @@ public class NioTcpSession extends AbstractIoSession {
      * {@inheritDoc}
      */
     @Override
-    public SocketSessionConfig getConfig() {
+    public TcpSessionConfig getConfig() {
         return configuration;
     }
 

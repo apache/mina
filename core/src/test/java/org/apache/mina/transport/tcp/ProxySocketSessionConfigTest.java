@@ -32,20 +32,20 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * Unit test for {@link ProxySocketSessionConfig}
+ * Unit test for {@link ProxyTcpSessionConfig}
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProxySocketSessionConfigTest {
 
-    private ProxySocketSessionConfig config;
+    private ProxyTcpSessionConfig config;
 
     private Socket socket;
 
     @Before
     public void setup() throws Exception {
         socket = Mockito.mock(Socket.class);
-        config = new ProxySocketSessionConfig(socket);
+        config = new ProxyTcpSessionConfig(socket);
     }
 
     @Test

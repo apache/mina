@@ -182,7 +182,7 @@ public class NioSelectorProcessor implements SelectorProcessor {
     public void createSession(final IoService service, final Object clientSocket) throws SSLException {
         LOGGER.debug("create session");
         final SocketChannel socketChannel = (SocketChannel) clientSocket;
-        final SocketSessionConfig config = (SocketSessionConfig) service.getSessionConfig();
+        final TcpSessionConfig config = (TcpSessionConfig) service.getSessionConfig();
         final NioTcpSession session = new NioTcpSession(service, socketChannel,
                 this.strategy.getSelectorForNewSession(this));
 

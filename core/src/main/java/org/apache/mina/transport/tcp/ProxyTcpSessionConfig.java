@@ -33,13 +33,13 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProxySocketSessionConfig implements SocketSessionConfig {
+public class ProxyTcpSessionConfig implements TcpSessionConfig {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProxySocketSessionConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProxyTcpSessionConfig.class);
 
     private final Socket socket;
 
-    public ProxySocketSessionConfig(Socket socket) {
+    public ProxyTcpSessionConfig(Socket socket) {
         this.socket = socket;
     }
 
