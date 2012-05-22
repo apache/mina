@@ -39,7 +39,6 @@ import org.apache.mina.http.api.HttpRequest;
 import org.apache.mina.http.api.HttpStatus;
 import org.apache.mina.http.api.HttpVersion;
 import org.apache.mina.service.OneThreadSelectorStrategy;
-import org.apache.mina.service.SelectorFactory;
 import org.apache.mina.transport.tcp.NioSelectorProcessor;
 import org.apache.mina.transport.tcp.nio.NioTcpServer;
 import org.slf4j.Logger;
@@ -51,8 +50,8 @@ public class HttpTest {
 
     public static void main(String[] args) throws Exception {
 
-        OneThreadSelectorStrategy strategy = new OneThreadSelectorStrategy(new SelectorFactory(
-                NioSelectorProcessor.class));
+        OneThreadSelectorStrategy<NioSelectorProcessor> strategy = new OneThreadSelectorStrategy<NioSelectorProcessor>(new NioSelectorProcessor());
+
         NioTcpServer acceptor = new NioTcpServer(strategy);
         acceptor.setFilters(new LoggingFilter("INCOMING"), new HttpServerCodec(), new LoggingFilter("DECODED"),
                 new DummyHttpSever());

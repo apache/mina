@@ -19,9 +19,6 @@
  */
 package org.apache.mina.service;
 
-import java.io.IOException;
-import java.net.SocketAddress;
-
 import org.apache.mina.api.IoSession;
 
 /**
@@ -31,36 +28,28 @@ import org.apache.mina.api.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  */
-public class OneThreadSelectorStrategy implements SelectorStrategy {
+public class OneThreadSelectorStrategy<PROCESSOR extends SelectorProcessor> implements SelectorStrategy<PROCESSOR> {
     /** The processor in charge of the messages processing */
-    private SelectorProcessor processor;
+    private final PROCESSOR processor;
 
-    /**
-     * Creates an instance of the OneThreadSelectorStrategy class
-     * @param selectorFactory The Selector factory to use to create the processor
-     */
-    public OneThreadSelectorStrategy(SelectorFactory selectorFactory) {
-        this.processor = selectorFactory.getNewSelector("uniqueSelector", this);
+    public OneThreadSelectorStrategy(PROCESSOR processor) {
+    	processor.setStrategy(this);
+    	this.processor = processor;
     }
 
     @Override
-    public SelectorProcessor getSelectorForBindNewAddress() {
+    public PROCESSOR getSelectorForBindNewAddress() {
         return processor;
     }
 
     @Override
-    public SelectorProcessor getSelectorForNewSession(SelectorProcessor acceptingProcessor) {
+    public PROCESSOR getSelectorForNewSession(SelectorProcessor acceptingProcessor) {
         return processor;
     }
 
     @Override
-    public SelectorProcessor getSelectorForWrite(IoSession session) {
+    public PROCESSOR getSelectorForWrite(IoSession session) {
         return processor;
-    }
-
-    @Override
-    public void unbind(SocketAddress address) throws IOException {
-        processor.unbind(address);
     }
 
 }

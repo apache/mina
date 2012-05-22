@@ -23,10 +23,11 @@ package org.apache.mina.service;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.session.AbstractIoSession;
+import org.apache.mina.transport.tcp.AbstractTcpServer;
+import org.apache.mina.transport.udp.AbstractUdpServer;
 
 /**
  * A processor in charge of a group of client session and server sockets.
@@ -36,6 +37,9 @@ import org.apache.mina.session.AbstractIoSession;
  */
 public interface SelectorProcessor {
 
+	
+	void setStrategy(SelectorStrategy<?> strategy);
+	
     /**
      * create a session for a freshly accepted client socket
      * @param service
@@ -44,11 +48,20 @@ public interface SelectorProcessor {
     void createSession(IoService service, Object clientSocket) throws IOException;
 
     /**
-     * Bind and start processing this new server address
+     * Bind and start processing this new server TCP address
+     * @param server the server for the new address
      * @param address local address to bind
      * @throws IOException exception thrown if any problem occurs while binding
      */
-    void bindAndAcceptAddress(IoServer server, SocketAddress address) throws IOException;
+    void bindTcpServer(AbstractTcpServer server, SocketAddress address) throws IOException;
+
+    /**
+     * Bind and start processing this new server UDP address
+     * @param server the server for the new address
+     * @param address local address to bind
+     * @throws IOException exception thrown if any problem occurs while binding
+     */
+    void bindUdpServer(AbstractUdpServer server, SocketAddress address) throws IOException;
 
     /**
      * Stop processing and unbind this server address

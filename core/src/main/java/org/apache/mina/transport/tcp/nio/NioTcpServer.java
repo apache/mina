@@ -21,8 +21,9 @@ package org.apache.mina.transport.tcp.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.service.SelectorStrategy;
@@ -42,16 +43,17 @@ public class NioTcpServer extends AbstractTcpServer {
     static final Logger LOG = LoggerFactory.getLogger(NioTcpServer.class);
 
     // list of bound addresses
-    private final Set<SocketAddress> addresses = Collections.synchronizedSet(new HashSet<SocketAddress>());
-
+    private final Map<SocketAddress /* bound address */,NioSelectorProcessor /* used processor */> addresses = new HashMap<SocketAddress, NioSelectorProcessor>();
+    
     // the strategy for dispatching servers and client to selector threads.
-    private final SelectorStrategy strategy;
+    private final SelectorStrategy<NioSelectorProcessor> strategy;
 
+    // the default session confinguration
     private TcpSessionConfig config;
 
     private boolean reuseAddress = false;
 
-    public NioTcpServer(final SelectorStrategy strategy) {
+    public NioTcpServer(final SelectorStrategy<NioSelectorProcessor> strategy) {
         super();
         this.strategy = strategy;
         this.config = new DefaultTcpSessionConfig();
@@ -89,24 +91,26 @@ public class NioTcpServer extends AbstractTcpServer {
      * {@inheritDoc}
      */
     @Override
-    public void bind(final SocketAddress... localAddress) throws IOException {
+    public synchronized void bind(final SocketAddress... localAddress) throws IOException {
         if (localAddress == null) {
             // We should at least have one address to bind on
-            throw new IllegalStateException("LocalAdress cannot be null");
+            throw new IllegalArgumentException("LocalAdress cannot be null");
         }
 
         for (SocketAddress address : localAddress) {
             // check if the address is already bound
             synchronized (this) {
-                if (this.addresses.contains(address)) {
+                if (this.addresses.containsKey(address)) {
                     throw new IOException("address " + address + " already bound");
                 }
 
-                LOG.debug("binding address {}", address);
-
-                this.addresses.add(address);
-                NioSelectorProcessor processor = (NioSelectorProcessor) this.strategy.getSelectorForBindNewAddress();
-                processor.bindAndAcceptAddress(this, address);
+                LOG.info("binding address {}", address);
+                NioSelectorProcessor processor = this.strategy.getSelectorForBindNewAddress();
+                
+                this.addresses.put(address,processor);
+                
+                processor.bindTcpServer(this, address);
+                
                 if (this.addresses.size() == 1) {
                     // it's the first address bound, let's fire the event
                     this.fireServiceActivated();
@@ -119,23 +123,21 @@ public class NioTcpServer extends AbstractTcpServer {
      * {@inheritDoc}
      */
     @Override
-    public Set<SocketAddress> getLocalAddresses() {
-        return this.addresses;
+    public synchronized Set<SocketAddress> getLocalAddresses() {
+        return new HashSet<SocketAddress>(addresses.keySet());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void unbind(final SocketAddress... localAddresses) throws IOException {
+    public synchronized void unbind(final SocketAddress... localAddresses) throws IOException {
         for (SocketAddress socketAddress : localAddresses) {
-            LOG.debug("unbinding {}", socketAddress);
-            synchronized (this) {
-                this.strategy.unbind(socketAddress);
-                this.addresses.remove(socketAddress);
-                if (this.addresses.isEmpty()) {
-                    this.fireServiceInactivated();
-                }
+            LOG.info("unbinding {}", socketAddress);
+            addresses.get(socketAddress).unbind(socketAddress);
+            this.addresses.remove(socketAddress);
+            if (this.addresses.isEmpty()) {
+                this.fireServiceInactivated();
             }
         }
     }
@@ -144,10 +146,12 @@ public class NioTcpServer extends AbstractTcpServer {
      * {@inheritDoc}
      */
     @Override
-    public void unbindAll() throws IOException {
-        for (SocketAddress socketAddress : this.addresses) {
-            this.unbind(socketAddress);
-        }
+    public synchronized void unbindAll() throws IOException {
+    	LOG.info("unbinding all");
+    	for(SocketAddress address : addresses.keySet()) {
+			LOG.debug("unbinding {}", address);
+    		addresses.remove(address).unbind(address);
+    	}
     }
 
 }

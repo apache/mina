@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.udp.nio;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import java.util.Set;
 
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.SelectorStrategy;
+import org.apache.mina.transport.tcp.NioSelectorProcessor;
 import org.apache.mina.transport.udp.AbstractUdpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,8 @@ public class NioUdpServer extends AbstractUdpServer {
 
     // the strategy for dispatching servers and client to selector threads.
     private final SelectorStrategy strategy;
+    
+    private boolean reuseAddress = false;
 
     /**
      * Create a new instance of NioUdpServer
@@ -61,4 +65,77 @@ public class NioUdpServer extends AbstractUdpServer {
         // TODO Auto-generated method stub
         return null;
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<SocketAddress> getLocalAddresses() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void bind(final SocketAddress... localAddress) throws IOException {
+        if (localAddress == null) {
+            // We should at least have one address to bind on
+            throw new IllegalArgumentException("LocalAdress cannot be null");
+        }
+
+        for (SocketAddress address : localAddress) {
+            // check if the address is already bound
+            synchronized (this) {
+                if (this.addresses.contains(address)) {
+                    throw new IOException("address " + address + " already bound");
+                }
+
+                LOG.debug("binding address {}", address);
+
+                this.addresses.add(address);
+                NioSelectorProcessor processor = (NioSelectorProcessor) this.strategy.getSelectorForBindNewAddress();
+                processor.bindUdpServer(this, address);
+                if (this.addresses.size() == 1) {
+                    // it's the first address bound, let's fire the event
+                    this.fireServiceActivated();
+                }
+            }
+        }
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void unbindAll() throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void unbind(SocketAddress... localAddresses) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setReuseAddress(boolean reuseAddress) {
+		this.reuseAddress = reuseAddress;		
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isReuseAddress() {
+		return this.reuseAddress;
+	}
 }

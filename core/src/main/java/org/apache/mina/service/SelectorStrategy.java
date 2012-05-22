@@ -19,23 +19,20 @@
  */
 package org.apache.mina.service;
 
-import java.io.IOException;
-import java.net.SocketAddress;
-
 import org.apache.mina.api.IoSession;
 
 /**
  * Strategy for balancing server socket and client socket to different selecting/polling threads.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface SelectorStrategy {
+public interface SelectorStrategy<PROCESSOR extends SelectorProcessor> {
 
     /**
      * Provide a {@link SelectorProcessor} for a newly accepted {@link IoSession}.
      * @param acceptingProcessor the selector which accepted the {@link IoSession}
      * @return a processor for processing the new session
      */
-    SelectorProcessor getSelectorForNewSession(SelectorProcessor acceptingProcessor);
+    PROCESSOR getSelectorForNewSession(SelectorProcessor acceptingProcessor);
 
     /**
      * Provide a {@link SelectorProcessor} for a {@link IoSession} which need to write data.
@@ -44,19 +41,13 @@ public interface SelectorStrategy {
      * @param session the session in need of writing
      * @return the selector processor for handling this session write events
      */
-    SelectorProcessor getSelectorForWrite(IoSession session);
+    PROCESSOR getSelectorForWrite(IoSession session);
 
     /**
      * Provide a {@link SelectorProcessor} for processing a newly bound address.
      * The processor will accept the incoming connections.
      * @return a {@link SelectorProcessor} for processing a newly bound address
      */
-    SelectorProcessor getSelectorForBindNewAddress();
+    PROCESSOR getSelectorForBindNewAddress();
 
-    /**
-     * Unbind an address and remove it from its {@link SelectorProcessor} 
-     * @param address the address to be unbound and removed
-     * @throws IOException thrown if any problem occurs while unbinding
-     */
-    void unbind(SocketAddress address) throws IOException;
 }

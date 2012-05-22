@@ -19,10 +19,6 @@
  */
 package org.apache.mina.transport.udp;
 
-import java.io.IOException;
-import java.net.SocketAddress;
-import java.util.Set;
-
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.api.IoSession;
@@ -41,34 +37,22 @@ public abstract class AbstractUdpServer extends AbstractIoServer {
         super();
     }
 
-    @Override
-    public Set<SocketAddress> getLocalAddresses() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void bind(SocketAddress... localAddress) throws IOException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void unbindAll() throws IOException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void unbind(SocketAddress... localAddresses) throws IOException {
-        // TODO Auto-generated method stub
-
-    }
-
     /**
      * {@inheritDoc}
      */
     public void initSecured(IoSession session) throws SSLException {
-        // Do nothing : UDP does not support SSL
+        throw new RuntimeException("SSL is not supported for UDP");
     }
+    
+    /**
+     * Set the reuse address flag on the server socket
+     * @param reuseAddress <code>true</code> to enable
+     */
+    public abstract void setReuseAddress(boolean reuseAddress);
+
+    /**
+     * Is the reuse address enabled for this server.
+     * @return
+     */
+    public abstract boolean isReuseAddress();
 }

@@ -34,7 +34,6 @@ import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.service.OneThreadSelectorStrategy;
-import org.apache.mina.service.SelectorFactory;
 import org.apache.mina.transport.tcp.NioSelectorProcessor;
 import org.apache.mina.transport.tcp.nio.NioTcpServer;
 import org.slf4j.Logger;
@@ -53,8 +52,8 @@ public class NioEchoServer {
     public static void main(String[] args) {
         LOG.info("starting echo server");
 
-        OneThreadSelectorStrategy strategy = new OneThreadSelectorStrategy(new SelectorFactory(
-                NioSelectorProcessor.class));
+        OneThreadSelectorStrategy<NioSelectorProcessor> strategy = new OneThreadSelectorStrategy<NioSelectorProcessor>(new NioSelectorProcessor());
+        
         NioTcpServer acceptor = new NioTcpServer(strategy);
 
         // create the fitler chain for this service
