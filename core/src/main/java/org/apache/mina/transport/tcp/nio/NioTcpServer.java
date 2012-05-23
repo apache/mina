@@ -21,16 +21,12 @@ package org.apache.mina.transport.tcp.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.ServerSocketChannel;
 
 import org.apache.mina.service.SelectorStrategy;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
-import org.apache.mina.transport.tcp.DefaultTcpSessionConfig;
 import org.apache.mina.transport.tcp.NioSelectorProcessor;
-import org.apache.mina.transport.tcp.TcpSessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,117 +37,105 @@ import org.slf4j.LoggerFactory;
  */
 public class NioTcpServer extends AbstractTcpServer {
     static final Logger LOG = LoggerFactory.getLogger(NioTcpServer.class);
-
-    // list of bound addresses
-    private final Map<SocketAddress /* bound address */,NioSelectorProcessor /* used processor */> addresses = new HashMap<SocketAddress, NioSelectorProcessor>();
     
     // the strategy for dispatching servers and client to selector threads.
     private final SelectorStrategy<NioSelectorProcessor> strategy;
 
-    // the default session confinguration
-    private TcpSessionConfig config;
-
-    private boolean reuseAddress = false;
-
+    // the bound local address
+    private SocketAddress address = null;
+    
+    private NioSelectorProcessor acceptProcessor = null;
+    
+    // the key used for selecting accept event
+    private SelectionKey acceptKey = null;
+    
+    // the server socket for accepting clients
+    private ServerSocketChannel serverChannel = null;  
+    
     public NioTcpServer(final SelectorStrategy<NioSelectorProcessor> strategy) {
         super();
         this.strategy = strategy;
-        this.config = new DefaultTcpSessionConfig();
+    }
+    
+    /**
+     * Get the inner Server socket for accepting new client connections
+     * @return
+     */
+    public ServerSocketChannel getServerSocketChannel() {
+    	return this.serverChannel;
     }
 
+    public void setServerSocketChannel(ServerSocketChannel serverChannel) {
+    	this.serverChannel = serverChannel;
+    }
     /**
      * {@inheritDoc}
      */
     @Override
-    public TcpSessionConfig getSessionConfig() {
-        return this.config;
-    }
-
-    public void setSessionConfig(final TcpSessionConfig config) {
-        this.config = config;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setReuseAddress(final boolean reuseAddress) {
-        this.reuseAddress = reuseAddress;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isReuseAddress() {
-        return this.reuseAddress;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public synchronized void bind(final SocketAddress... localAddress) throws IOException {
+    public synchronized void bind(final SocketAddress localAddress) throws IOException {
         if (localAddress == null) {
             // We should at least have one address to bind on
             throw new IllegalArgumentException("LocalAdress cannot be null");
         }
 
-        for (SocketAddress address : localAddress) {
-            // check if the address is already bound
-            synchronized (this) {
-                if (this.addresses.containsKey(address)) {
-                    throw new IOException("address " + address + " already bound");
-                }
-
-                LOG.info("binding address {}", address);
-                NioSelectorProcessor processor = this.strategy.getSelectorForBindNewAddress();
-                
-                this.addresses.put(address,processor);
-                
-                processor.bindTcpServer(this, address);
-                
-                if (this.addresses.size() == 1) {
-                    // it's the first address bound, let's fire the event
-                    this.fireServiceActivated();
-                }
-            }
+        // check if the address is already bound
+        if (this.address != null) {
+            throw new IOException("address " + address + " already bound");
         }
+
+        LOG.info("binding address {}", localAddress);
+        this.address = localAddress;
+        
+        serverChannel = ServerSocketChannel.open();
+        serverChannel.socket().setReuseAddress(isReuseAddress());
+        serverChannel.socket().bind(address);
+        serverChannel.configureBlocking(false);
+
+        acceptProcessor = this.strategy.getSelectorForBindNewAddress();
+            
+        acceptProcessor.addServer(this);
+                
+        // it's the first address bound, let's fire the event
+        this.fireServiceActivated();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized Set<SocketAddress> getLocalAddresses() {
-        return new HashSet<SocketAddress>(addresses.keySet());
+    public SocketAddress getBoundAddress() {
+    	return address;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized void unbind(final SocketAddress... localAddresses) throws IOException {
-        for (SocketAddress socketAddress : localAddresses) {
-            LOG.info("unbinding {}", socketAddress);
-            addresses.get(socketAddress).unbind(socketAddress);
-            this.addresses.remove(socketAddress);
-            if (this.addresses.isEmpty()) {
-                this.fireServiceInactivated();
-            }
+    public synchronized void unbind() throws IOException {
+    	LOG.info("unbinding {}", address);
+    	if( this.address == null) { 
+    		throw new IllegalStateException("server not bound");
         }
+        serverChannel.socket().close();
+        serverChannel.close();
+    	acceptProcessor.removeServer(this);
+        
+        this.address = null;
+        this.fireServiceInactivated();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public synchronized void unbindAll() throws IOException {
-    	LOG.info("unbinding all");
-    	for(SocketAddress address : addresses.keySet()) {
-			LOG.debug("unbinding {}", address);
-    		addresses.remove(address).unbind(address);
-    	}
-    }
+	/**
+	 * @return the acceptKey
+	 */
+	public SelectionKey getAcceptKey() {
+		return acceptKey;
+	}
 
+	/**
+	 * @param acceptKey the acceptKey to set
+	 */
+	public void setAcceptKey(SelectionKey acceptKey) {
+		this.acceptKey = acceptKey;
+	}
+    
 }

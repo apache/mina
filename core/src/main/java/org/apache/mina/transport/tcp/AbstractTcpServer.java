@@ -27,22 +27,32 @@ import org.apache.mina.service.server.AbstractIoServer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractTcpServer extends AbstractIoServer {
+	
+    // the default session configuration
+    private TcpSessionConfig config;
+    
     /**
      * Create an new AbsractTcpServer instance
      */
     protected AbstractTcpServer() {
         super();
+        this.config = new DefaultTcpSessionConfig();
     }
 
     /**
-     * Set the reuse address flag on the server socket
-     * @param reuseAddress <code>true</code> to enable
+     * {@inheritDoc}
      */
-    public abstract void setReuseAddress(boolean reuseAddress);
+    @Override
+    public TcpSessionConfig getSessionConfig() {
+        return this.config;
+    }
 
     /**
-     * Is the reuse address enabled for this server.
-     * @return
+     * Set the default configuration for created TCP sessions
+     * @param config
      */
-    public abstract boolean isReuseAddress();
+    public void setSessionConfig(final TcpSessionConfig config) {
+        this.config = config;
+    }
+
 }

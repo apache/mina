@@ -21,19 +21,19 @@ package org.apache.mina.api;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Set;
 
 /**
  *
+ * A network serer bound to a local addresse
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  */
 public interface IoServer extends IoService {
 
     /**
-     * Returns a {@link Set} of the local addresses which are bound currently.
+     * Returns the local addresses which are bound currently.
      */
-    Set<SocketAddress> getLocalAddresses();
+    SocketAddress getBoundAddress();
 
     /**
      * Binds to the specified local addresses and start to accept incoming
@@ -42,23 +42,15 @@ public interface IoServer extends IoService {
      * @throws IOException
      *             if failed to bind
      */
-    void bind(SocketAddress... localAddress) throws IOException;
+    void bind(SocketAddress localAddress) throws IOException;
 
     /**
-     * Unbinds from all local addresses that this service is bound to and stops
+     * Unbinds from the local addresses that this service is bound to and stops
      * to accept incoming connections. This method returns silently if no local
      * address is bound yet.
      * @throws IOException
      *             if failed to unbind
      */
-    void unbindAll() throws IOException;
+    void unbind() throws IOException;
 
-    /**
-     * Unbinds from the specified local addresses and stop to accept incoming
-     * connections. This method returns silently if the default local addresses
-     * are not bound yet.
-     * @throws IOException
-     *             if failed to unbind
-     */
-    void unbind(SocketAddress... localAddresses) throws IOException;
 }

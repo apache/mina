@@ -28,10 +28,31 @@ import org.apache.mina.service.AbstractIoService;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoServer extends AbstractIoService implements IoServer {
+	
     /**
      * Create an new AbstractIoServer instance
      */
     protected AbstractIoServer() {
         super();
     }
+    
+    // does the reuse address flag should be positioned
+    private boolean reuseAddress = false;
+    
+    /**
+     * Set the reuse address flag on the server socket
+     * @param reuseAddress <code>true</code> to enable
+     */
+    public void setReuseAddress(final boolean reuseAddress) {
+        this.reuseAddress = reuseAddress;
+    }
+
+    /**
+     * Is the reuse address enabled for this server.
+     * @return
+     */
+    public boolean isReuseAddress() {
+        return this.reuseAddress;
+    }
+
 }

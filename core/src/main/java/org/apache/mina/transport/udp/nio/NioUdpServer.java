@@ -21,9 +21,8 @@ package org.apache.mina.transport.udp.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
 
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.SelectorStrategy;
@@ -41,22 +40,39 @@ public class NioUdpServer extends AbstractUdpServer {
 	
 	static final Logger LOG = LoggerFactory.getLogger(NioUdpServer.class);
 
-    // list of bound addresses
-    private final Set<SocketAddress> addresses = Collections.synchronizedSet(new HashSet<SocketAddress>());
-
+    // the bound local address
+    private SocketAddress address = null; 
+	
     // the strategy for dispatching servers and client to selector threads.
-    private final SelectorStrategy strategy;
-    
-    private boolean reuseAddress = false;
+    private final SelectorStrategy<NioSelectorProcessor> strategy;
 
+    // the processor used for read and write this server
+    private NioSelectorProcessor processor;
+    
+    // the inner channel for read/write UDP datagrams
+    private DatagramChannel datagramChannel = null;
+    
+    // the key used for selecting read event
+    private SelectionKey readKey = null;
+    
     /**
      * Create a new instance of NioUdpServer
      */
-    public NioUdpServer(final SelectorStrategy strategy) {
+    public NioUdpServer(final SelectorStrategy<NioSelectorProcessor> strategy) {
         super();
         this.strategy = strategy;
     }
 
+    /**
+     * Get the inner datagram channel for read and write operations.
+     * To be called by the {@link NioSelectorProcessor}
+     * 
+     * @return the datagram channel bound to this {@link NioUdpServer}.
+     */
+    public DatagramChannel getDatagramChannel() {
+    	return datagramChannel;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -66,76 +82,77 @@ public class NioUdpServer extends AbstractUdpServer {
         return null;
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Set<SocketAddress> getLocalAddresses() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void bind(final SocketAddress... localAddress) throws IOException {
+    public SocketAddress getBoundAddress() {
+    	return address;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void bind(SocketAddress localAddress) throws IOException {
         if (localAddress == null) {
             // We should at least have one address to bind on
             throw new IllegalArgumentException("LocalAdress cannot be null");
         }
 
-        for (SocketAddress address : localAddress) {
-            // check if the address is already bound
-            synchronized (this) {
-                if (this.addresses.contains(address)) {
-                    throw new IOException("address " + address + " already bound");
-                }
-
-                LOG.debug("binding address {}", address);
-
-                this.addresses.add(address);
-                NioSelectorProcessor processor = (NioSelectorProcessor) this.strategy.getSelectorForBindNewAddress();
-                processor.bindUdpServer(this, address);
-                if (this.addresses.size() == 1) {
-                    // it's the first address bound, let's fire the event
-                    this.fireServiceActivated();
-                }
-            }
+        // check if the address is already bound
+        if (this.address != null) {
+            throw new IOException("address " + address + " already bound");
         }
+        address = localAddress;
+        
+        LOG.info("binding address {}", localAddress);
+        
+        datagramChannel = DatagramChannel.open();
+        
+        datagramChannel.socket().setReuseAddress(isReuseAddress());
+        datagramChannel.socket().bind(address);
+        datagramChannel.configureBlocking(false);
+
+        processor = this.strategy.getSelectorForBindNewAddress();
+            
+        processor.addServer(this);
+                
+        // it's the first address bound, let's fire the event
+        this.fireServiceActivated();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unbind() throws IOException {
+    	LOG.info("unbinding {}", address);
+    	if( this.address == null) { 
+    		throw new IllegalStateException("server not bound");
+        }
+        datagramChannel.socket().close();
+        datagramChannel.close();
+        
+    	processor.removeServer(this);
+        
+        this.address = null;
+        this.fireServiceInactivated();
     }
 
 	/**
-	 * {@inheritDoc}
+	 * @return the readKey
 	 */
-	@Override
-	public void unbindAll() throws IOException {
-		// TODO Auto-generated method stub
-		
+	public SelectionKey getReadKey() {
+		return readKey;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @param readKey the readKey to set
 	 */
-	@Override
-	public void unbind(SocketAddress... localAddresses) throws IOException {
-		// TODO Auto-generated method stub
-		
+	public void setReadKey(SelectionKey readKey) {
+		this.readKey = readKey;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setReuseAddress(boolean reuseAddress) {
-		this.reuseAddress = reuseAddress;		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isReuseAddress() {
-		return this.reuseAddress;
-	}
+    
 }

@@ -43,16 +43,4 @@ public abstract class AbstractUdpServer extends AbstractIoServer {
     public void initSecured(IoSession session) throws SSLException {
         throw new RuntimeException("SSL is not supported for UDP");
     }
-    
-    /**
-     * Set the reuse address flag on the server socket
-     * @param reuseAddress <code>true</code> to enable
-     */
-    public abstract void setReuseAddress(boolean reuseAddress);
-
-    /**
-     * Is the reuse address enabled for this server.
-     * @return
-     */
-    public abstract boolean isReuseAddress();
 }

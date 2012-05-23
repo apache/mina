@@ -65,7 +65,7 @@ public class HttpsTest {
 
         // run for 20 seconds
         Thread.sleep(20000);
-        acceptor.unbindAll();
+        acceptor.unbind();
 
     }
 

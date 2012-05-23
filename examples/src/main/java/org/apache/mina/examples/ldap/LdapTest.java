@@ -62,7 +62,7 @@ public class LdapTest {
 
         // run for 20 seconds
         Thread.sleep(200000);
-        acceptor.unbindAll();
+        acceptor.unbind();
 
     }
 

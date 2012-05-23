@@ -21,7 +21,6 @@
 package org.apache.mina.service;
 
 import java.io.IOException;
-import java.net.SocketAddress;
 
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
@@ -35,9 +34,12 @@ import org.apache.mina.transport.udp.AbstractUdpServer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  */
-public interface SelectorProcessor {
+public interface SelectorProcessor<TCP_SERVER extends AbstractTcpServer,UDP_SERVER extends AbstractUdpServer> {
 
-	
+	/**
+	 * The strategy to use for assigning selectors to newly created sessions 
+	 * @param strategy
+	 */
 	void setStrategy(SelectorStrategy<?> strategy);
 	
     /**
@@ -48,28 +50,29 @@ public interface SelectorProcessor {
     void createSession(IoService service, Object clientSocket) throws IOException;
 
     /**
-     * Bind and start processing this new server TCP address
-     * @param server the server for the new address
-     * @param address local address to bind
-     * @throws IOException exception thrown if any problem occurs while binding
+     * Bind and start processing this newly bound TCP server
+     * @param server the server to be processed
      */
-    void bindTcpServer(AbstractTcpServer server, SocketAddress address) throws IOException;
+    void addServer(TCP_SERVER server);
 
     /**
-     * Bind and start processing this new server UDP address
-     * @param server the server for the new address
-     * @param address local address to bind
-     * @throws IOException exception thrown if any problem occurs while binding
+     * Start processing this newly bound UDP
+     * @param server the server to be processed
      */
-    void bindUdpServer(AbstractUdpServer server, SocketAddress address) throws IOException;
+    void addServer(UDP_SERVER server);
 
     /**
-     * Stop processing and unbind this server address
-     * @param address the local server address to unbind
-     * @throws IOException exception thrown if any problem occurs while unbinding
+     * Stop processing this TCP server
+     * @param server the server to be removed of processing
      */
-    void unbind(SocketAddress address) throws IOException;
-
+    void removeServer(TCP_SERVER server);
+    
+    /**
+     * Stop processing this UDP server
+     * @param server the server to be processed
+     */
+    void removeServer(UDP_SERVER server);
+    
     /**
      * Schedule a session for flushing, will be called after a {@link IoSession#write(Object)}.
      * @param session the session to flush

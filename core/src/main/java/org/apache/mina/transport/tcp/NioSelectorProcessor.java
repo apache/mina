@@ -25,7 +25,6 @@ import static org.apache.mina.api.IoSession.SSL_HELPER;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -42,7 +41,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.api.RuntimeIoException;
@@ -55,7 +53,8 @@ import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.DefaultWriteFuture;
 import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.udp.AbstractUdpServer;
+import org.apache.mina.transport.tcp.nio.NioTcpServer;
+import org.apache.mina.transport.udp.nio.NioUdpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +64,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioSelectorProcessor implements SelectorProcessor {
+public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer,NioUdpServer> {
+	
 	/** A logger for this class */
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(NioSelectorProcessor.class);
@@ -80,8 +80,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
 
 	private final Map<SocketAddress, ServerSocketChannel> serverSocketChannels = new ConcurrentHashMap<SocketAddress, ServerSocketChannel>();
 
-	private final Map<SocketAddress, DatagramChannel> datagramChannels = new ConcurrentHashMap<SocketAddress, DatagramChannel>();
-
 	/** Read buffer for all the incoming bytes (default to 64Kb) */
 	private final ByteBuffer readBuffer = ByteBuffer.allocate(64 * 1024);
 
@@ -91,11 +89,18 @@ public class NioSelectorProcessor implements SelectorProcessor {
 	/** helper for detecting idleing sessions */
 	private final IdleChecker idleChecker = new IndexedIdleChecker();
 
+	
 	/** A queue containing the servers to bind to this selector */
-	private final Queue<Object[]> serversToAdd = new ConcurrentLinkedQueue<Object[]>();
+	private final Queue<NioTcpServer> tcpServersToadd = new ConcurrentLinkedQueue<NioTcpServer>();
+
+	/** A queue containing the servers to bind to this selector */
+	private final Queue<NioUdpServer> udpServersToadd = new ConcurrentLinkedQueue<NioUdpServer>();
 
 	/** server to remove of the selector */
-	private final Queue<ServerSocketChannel> serversToRemove = new ConcurrentLinkedQueue<ServerSocketChannel>();
+	private final Queue<NioTcpServer> tcpServersToRemove = new ConcurrentLinkedQueue<NioTcpServer>();
+
+	/** server to remove of the selector */
+	private final Queue<NioUdpServer> udpServersToRemove = new ConcurrentLinkedQueue<NioUdpServer>();
 
 	/**
 	 * new session freshly accepted, placed here for being added to the selector
@@ -123,19 +128,43 @@ public class NioSelectorProcessor implements SelectorProcessor {
 		this.strategy = (SelectorStrategy<NioSelectorProcessor>)strategy;
 	}
 
+	
 	/**
-	 * Add a bound server channel for starting accepting new client connections.
-	 * 
-	 * @param serverChannel
+	 * {@inheritDoc}
 	 */
-	private void add(final ServerSocketChannel serverChannel,
-			final IoServer server) {
-		LOGGER.debug("adding a server channel {} for server {}", serverChannel,
-				server);
-		this.serversToAdd.add(new Object[] { serverChannel, server });
+	@Override
+	public void addServer(NioTcpServer server) {
+		tcpServersToadd.add(server);
 		this.wakeupWorker();
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addServer(NioUdpServer server) {
+		udpServersToadd.add(server);
+		this.wakeupWorker();
+	}	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void removeServer(NioTcpServer server) {
+		tcpServersToRemove.add(server);
+		this.wakeupWorker();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void removeServer(NioUdpServer server) {
+		udpServersToRemove.add(server);		
+		this.wakeupWorker();
+	}
+	
 	/**
 	 * Wake the I/O worker thread and if none exists, create a new one FIXME :
 	 * too much locking there ?
@@ -154,51 +183,6 @@ public class NioSelectorProcessor implements SelectorProcessor {
 		if (this.selector != null) {
 			this.selector.wakeup();
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void bindTcpServer(final AbstractTcpServer server,
-			final SocketAddress address) throws IOException {
-		ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-		serverSocketChannel.socket().setReuseAddress(server.isReuseAddress());
-		serverSocketChannel.socket().bind(address);
-		serverSocketChannel.configureBlocking(false);
-		this.serverSocketChannels.put(address, serverSocketChannel);
-		this.add(serverSocketChannel, server);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void bindUdpServer(AbstractUdpServer server, SocketAddress address)
-			throws IOException {
-		DatagramChannel datagramChannel = DatagramChannel.open();
-		datagramChannel.socket().setReuseAddress(server.isReuseAddress());
-		datagramChannel.socket().bind(address);
-		datagramChannel.configureBlocking(false);
-		this.datagramChannels.put(address, datagramChannel);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void unbind(final SocketAddress address) throws IOException {
-		ServerSocketChannel channel = this.serverSocketChannels.get(address);
-		channel.socket().close();
-		channel.close();
-		if (this.serverSocketChannels.remove(address) == null) {
-			LOGGER.warn(
-					"The server channel for address {} was already unbound",
-					address);
-		}
-		LOGGER.debug("Removing a server channel {}", channel);
-		this.serversToRemove.add(channel);
-		this.wakeupWorker();
 	}
 
 	/**
@@ -331,12 +315,12 @@ public class NioSelectorProcessor implements SelectorProcessor {
 				for (;;) {
 					try {
 						// pop server sockets for removing
-						if (NioSelectorProcessor.this.serversToRemove.size() > 0) {
+						if (NioSelectorProcessor.this.tcpServersToRemove.size() > 0 || NioSelectorProcessor.this.udpServersToRemove.size() > 0) {
 							this.processServerRemove();
 						}
 
 						// pop new server sockets for accepting
-						if (NioSelectorProcessor.this.serversToAdd.size() > 0) {
+						if (NioSelectorProcessor.this.tcpServersToadd.size() > 0 || NioSelectorProcessor.this.udpServersToadd.size() > 0) {
 							this.processServerAdd();
 						}
 
@@ -419,37 +403,54 @@ public class NioSelectorProcessor implements SelectorProcessor {
 			}
 		}
 
-		/**
-		 * Handles the servers removal
-		 */
-		private void processServerRemove() {
-			while (!NioSelectorProcessor.this.serversToRemove.isEmpty()) {
-				ServerSocketChannel channel = NioSelectorProcessor.this.serversToRemove
-						.poll();
-				SelectionKey key = this.serverKey.remove(channel);
-
-				if (key == null) {
-					LOGGER.error("The server socket was already removed of the selector");
-				} else {
-					LOGGER.debug("Removing the server from this selector : {}",
-							key);
-					key.cancel();
-				}
-			}
-		}
 
 		/**
 		 * Handles the servers addition
 		 */
 		private void processServerAdd() throws IOException {
-			while (!NioSelectorProcessor.this.serversToAdd.isEmpty()) {
-				Object[] tmp = NioSelectorProcessor.this.serversToAdd.poll();
-				ServerSocketChannel channel = (ServerSocketChannel) tmp[0];
-				SelectionKey key = channel.register(
+			
+			NioTcpServer tcpServer;
+			while ( ( tcpServer = tcpServersToadd.poll() ) != null ) {
+				// register for accept
+				SelectionKey key = tcpServer.getServerSocketChannel().register(
 						NioSelectorProcessor.this.selector,
 						SelectionKey.OP_ACCEPT);
-				key.attach(tmp);
-				LOGGER.debug("Accepted the server on this selector : {}", key);
+				key.attach(tcpServer);
+				tcpServer.setAcceptKey(key);
+				LOGGER.debug("registered for accept : {}",tcpServer);
+			}
+			
+			NioUdpServer udpServer;
+			while ( ( udpServer = udpServersToadd.poll() ) != null ) {
+				// register for read
+				SelectionKey key = udpServer.getDatagramChannel().register(
+						NioSelectorProcessor.this.selector,
+						SelectionKey.OP_READ);
+				key.attach(udpServer);
+				udpServer.setReadKey(key);
+				LOGGER.debug("registered for accept : {}",udpServer);
+			}
+		}
+
+		/**
+		 * Handles the servers removal
+		 */
+		private void processServerRemove() {
+			NioTcpServer tcpServer;
+			while ( ( tcpServer = tcpServersToRemove.poll() ) != null ) {
+				// find the server key and cancel it
+				SelectionKey key = tcpServer.getAcceptKey();
+				key.cancel();
+				tcpServer.setAcceptKey(null);
+				key.attach(null);
+			}
+			NioUdpServer udpServer;
+			while ( ( udpServer = udpServersToRemove.poll() ) != null ) {
+				// find the server key and cancel it
+				SelectionKey key = udpServer.getReadKey();
+				key.cancel();
+				udpServer.setReadKey(null);
+				key.attach(null);
 			}
 		}
 
@@ -510,11 +511,10 @@ public class NioSelectorProcessor implements SelectorProcessor {
 		 */
 		private void processAccept(final SelectionKey key) throws IOException {
 			LOGGER.debug("acceptable new client {}", key);
-			ServerSocketChannel serverSocket = (ServerSocketChannel) ((Object[]) key
-					.attachment())[0];
-			IoServer server = (IoServer) (((Object[]) key.attachment())[1]);
+			NioTcpServer server = (NioTcpServer) key.attachment();
+			
 			// accepted connection
-			SocketChannel newClientChannel = serverSocket.accept();
+			SocketChannel newClientChannel = server.getServerSocketChannel().accept();
 			LOGGER.debug("client accepted");
 			// and give it's to the strategy
 			NioSelectorProcessor.this.strategy.getSelectorForNewSession(

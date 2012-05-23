@@ -131,7 +131,7 @@ public class NioEchoServer {
             LOG.debug("Running the server for 25 sec");
             Thread.sleep(25000);
             LOG.debug("Unbinding the TCP port");
-            acceptor.unbind(address);
+            acceptor.unbind();
         } catch (IOException e) {
             LOG.error("I/O exception", e);
         } catch (InterruptedException e) {
