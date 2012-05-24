@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 
 import junit.framework.Assert;
 
-import org.apache.mina.api.DefaultIoFilter;
+import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
@@ -231,7 +231,7 @@ public class AbstractIoSessionTest {
         assertEquals(1024, session.getWrittenBytes());
     }
 
-    private class PassthruFilter extends DefaultIoFilter {
+    private class PassthruFilter extends AbstractIoFilter {
 
     }
 }

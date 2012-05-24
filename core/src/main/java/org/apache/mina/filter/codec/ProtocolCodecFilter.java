@@ -21,7 +21,7 @@ package org.apache.mina.filter.codec;
 
 import java.nio.ByteBuffer;
 
-import org.apache.mina.api.DefaultIoFilter;
+import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProtocolCodecFilter extends DefaultIoFilter {
+public class ProtocolCodecFilter extends AbstractIoFilter {
     /** A logger for this class */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolCodecFilter.class);
 

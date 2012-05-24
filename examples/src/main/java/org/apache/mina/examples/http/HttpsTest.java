@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.api.DefaultIoFilter;
+import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
@@ -69,7 +69,7 @@ public class HttpsTest {
 
     }
 
-    private static class DummyHttpSever extends DefaultIoFilter {
+    private static class DummyHttpSever extends AbstractIoFilter {
 
         private HttpRequest incomingRequest;
 

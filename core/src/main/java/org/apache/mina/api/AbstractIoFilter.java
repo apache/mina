@@ -26,7 +26,7 @@ import org.apache.mina.filterchain.WriteFilterChainController;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class DefaultIoFilter implements IoFilter {
+public abstract class AbstractIoFilter implements IoFilter {
 
     @Override
     public void sessionCreated(IoSession session) {

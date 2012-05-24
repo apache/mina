@@ -34,7 +34,7 @@ import org.apache.directory.shared.ldap.model.message.ModifyRequest;
 import org.apache.directory.shared.ldap.model.message.ResultCodeEnum;
 import org.apache.directory.shared.ldap.model.message.SearchRequest;
 import org.apache.directory.shared.ldap.model.message.UnbindRequest;
-import org.apache.mina.api.DefaultIoFilter;
+import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
@@ -66,7 +66,7 @@ public class LdapTest {
 
     }
 
-    private class DummyLdapServer extends DefaultIoFilter {
+    private class DummyLdapServer extends AbstractIoFilter {
         @Override
         public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
             if (message instanceof AbandonRequest) {
