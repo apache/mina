@@ -56,7 +56,7 @@ public class LdapTest {
         OneThreadSelectorStrategy<NioSelectorProcessor> strategy = new OneThreadSelectorStrategy<NioSelectorProcessor>(new NioSelectorProcessor());
         NioTcpServer acceptor = new NioTcpServer(strategy);
         acceptor.setFilters(new LoggingFilter("INCOMING"), new LdapCodec(), new LoggingFilter("DECODED"),
-                ldapServer.new DummyLdapSever());
+                ldapServer.new DummyLdapServer());
 
         acceptor.bind(new InetSocketAddress(10389));
 
@@ -66,7 +66,7 @@ public class LdapTest {
 
     }
 
-    private class DummyLdapSever extends DefaultIoFilter {
+    private class DummyLdapServer extends DefaultIoFilter {
         @Override
         public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
             if (message instanceof AbandonRequest) {
