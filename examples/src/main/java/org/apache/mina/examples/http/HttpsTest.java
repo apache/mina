@@ -39,8 +39,8 @@ import org.apache.mina.http.api.HttpRequest;
 import org.apache.mina.http.api.HttpStatus;
 import org.apache.mina.http.api.HttpVersion;
 import org.apache.mina.service.OneThreadSelectorStrategy;
-import org.apache.mina.transport.tcp.NioSelectorProcessor;
-import org.apache.mina.transport.tcp.nio.NioTcpServer;
+import org.apache.mina.transport.nio.NioSelectorProcessor;
+import org.apache.mina.transport.nio.NioTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

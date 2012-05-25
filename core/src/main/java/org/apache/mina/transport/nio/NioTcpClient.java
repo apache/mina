@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.tcp.nio;
+package org.apache.mina.transport.nio;
 
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.transport.tcp.AbstractTcpClient;

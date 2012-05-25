@@ -40,6 +40,7 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.service.SelectorProcessor;
+import org.apache.mina.service.idlechecker.IdleChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
     /** The {@link SelectorProcessor} used for handling this session writing */
     protected SelectorProcessor writeProcessor;
+
+    /** the {@link IdleChecker} in charge of detecting idle event for this session */
+    protected final IdleChecker idleChecker;
 
     //------------------------------------------------------------------------
     // Basic statistics
@@ -106,14 +110,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     protected volatile boolean secured;
 
     /** is this session registered for being polled for write ready events */
-    private AtomicBoolean registeredForWrite = new AtomicBoolean();
+    private final AtomicBoolean registeredForWrite = new AtomicBoolean();
 
     //------------------------------------------------------------------------
     // Write queue
     //------------------------------------------------------------------------
 
     /** the queue of pending writes for the session, to be dequeued by the {@link SelectorProcessor} */
-    private Queue<WriteRequest> writeQueue = new DefaultWriteQueue();
+    private final Queue<WriteRequest> writeQueue = new DefaultWriteQueue();
 
     /** A lock to protect the access to the write queue */
     private final ReadWriteLock writeQueueLock = new ReentrantReadWriteLock();
@@ -147,13 +151,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @param service the service this session is associated with
      * @param writeProcessor the processor in charge of processing this session write queue
      */
-    public AbstractIoSession(IoService service, SelectorProcessor writeProcessor) {
+    public AbstractIoSession(IoService service, SelectorProcessor writeProcessor, IdleChecker idleChecker) {
         // generated a unique id
         id = NEXT_ID.getAndIncrement();
         creationTime = System.currentTimeMillis();
         this.service = service;
         this.writeProcessor = writeProcessor;
         this.chain = service.getFilters();
+        this.idleChecker = idleChecker;
 
         LOG.debug("Created new session with id : {}", id);
 
@@ -250,6 +255,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public void changeState(SessionState to) throws IllegalStateException {
         try {
             stateWriteLock.lock();
@@ -346,6 +352,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public void initSecure(SSLContext sslContext) throws SSLException {
         SslHelper sslHelper = new SslHelper(this, sslContext);
         sslHelper.init();
@@ -524,6 +531,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public WriteRequest enqueueWriteRequest(Object message) {
         WriteRequest request = null;
 
@@ -681,6 +689,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * process session message received event using the filter chain. To be called by the session {@link SelectorProcessor} .
      * @param message the received message 
      */
+    @Override
     public void callWriteNextFilter(Object message) {
         LOG.debug("calling next filter for writing for message '{}' position : {}", message, writeChainPosition);
 

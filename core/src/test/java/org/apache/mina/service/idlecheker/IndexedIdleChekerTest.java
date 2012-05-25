@@ -31,6 +31,7 @@ import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.SelectorProcessor;
+import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.AbstractIoSessionConfig;
@@ -43,9 +44,9 @@ import org.junit.Test;
  */
 public class IndexedIdleChekerTest {
 
-    private IndexedIdleChecker idleChecker = new IndexedIdleChecker();
+    private final IndexedIdleChecker idleChecker = new IndexedIdleChecker();
 
-    private long now = System.currentTimeMillis();
+    private final long now = System.currentTimeMillis();
 
     @Test
     public void process_on_empty_index() {
@@ -55,7 +56,7 @@ public class IndexedIdleChekerTest {
     @Test
     public void read_event() {
         IoService service = mock(IoService.class);
-        DummySession session = new DummySession(service);
+        DummySession session = new DummySession(service, idleChecker);
 
         session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 1000L);
 
@@ -72,7 +73,7 @@ public class IndexedIdleChekerTest {
     @Test
     public void write_event() {
         IoService service = mock(IoService.class);
-        DummySession session = new DummySession(service);
+        DummySession session = new DummySession(service, idleChecker);
 
         session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE, 1000L);
 
@@ -84,7 +85,7 @@ public class IndexedIdleChekerTest {
         assertEquals(1, session.writeIdleCount);
     }
 
-    private SelectorProcessor processor = mock(SelectorProcessor.class);
+    private final SelectorProcessor processor = mock(SelectorProcessor.class);
 
     private class DummySession extends AbstractIoSession {
 
@@ -92,8 +93,8 @@ public class IndexedIdleChekerTest {
 
         int writeIdleCount = 0;
 
-        private DummySession(IoService service) {
-            super(service, processor);
+        private DummySession(IoService service, IdleChecker checker) {
+            super(service, processor, checker);
         }
 
         @Override

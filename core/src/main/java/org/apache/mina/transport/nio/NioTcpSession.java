@@ -17,20 +17,25 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.tcp;
+package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Queue;
 
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.RuntimeIoException;
-import org.apache.mina.service.SelectorProcessor;
+import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.session.AbstractIoSession;
-import org.apache.mina.transport.tcp.nio.NioTcpClient;
-import org.apache.mina.transport.tcp.nio.NioTcpServer;
+import org.apache.mina.session.DefaultWriteFuture;
+import org.apache.mina.session.SslHelper;
+import org.apache.mina.session.WriteRequest;
+import org.apache.mina.transport.tcp.ProxyTcpSessionConfig;
+import org.apache.mina.transport.tcp.TcpSessionConfig;
 import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,18 +47,15 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  */
-public class NioTcpSession extends AbstractIoSession {
+public class NioTcpSession extends AbstractIoSession implements SelectorEventListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpSession.class);
 
     /** the NIO socket channel for this TCP session */
-    private SocketChannel channel;
+    private final SocketChannel channel;
 
     /** the socket configuration */
     private final TcpSessionConfig configuration;
-
-    // this session requested to close
-    private volatile boolean closeRequested = false;
 
     /** we pre-allocate a close future for lock-less {@link #close(boolean)} */
     private final IoFuture<Void> closeFuture = new AbstractIoFuture<Void>() {
@@ -68,8 +70,8 @@ public class NioTcpSession extends AbstractIoSession {
         }
     };
 
-    NioTcpSession(IoService service, SocketChannel channel, SelectorProcessor writeProcessor) {
-        super(service, writeProcessor);
+    NioTcpSession(IoService service, SocketChannel channel, NioSelectorProcessor writeProcessor, IdleChecker idleChecker) {
+        super(service, writeProcessor, idleChecker);
         this.channel = channel;
         this.configuration = new ProxyTcpSessionConfig(channel.socket());
     }
@@ -127,7 +129,6 @@ public class NioTcpSession extends AbstractIoSession {
             LOG.error("Session {} not opened", this);
             throw new RuntimeIoException("cannot close an not opened session");
         case CONNECTED:
-            closeRequested = true;
             state = SessionState.CLOSING;
             if (immediately) {
                 try {
@@ -225,5 +226,126 @@ public class NioTcpSession extends AbstractIoSession {
         }
 
         state = SessionState.CONNECTED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void acceptReady(NioSelectorProcessor processor) {
+        // should never happen
+        throw new IllegalStateException("accept event should never occur on NioTcpSession");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readReady(NioSelectorProcessor processor, ByteBuffer readBuffer) throws IOException {
+        LOG.debug("readable session : {}", this);
+        readBuffer.clear();
+        int readCount = channel.read(readBuffer);
+
+        LOG.debug("read {} bytes", readCount);
+
+        if (readCount < 0) {
+            // session closed by the remote peer
+            LOG.debug("session closed by the remote peer");
+            processor.addSessionToClose(this);
+        } else {
+            // we have read some data
+            // limit at the current position & rewind buffer back to start &
+            // push to the chain
+            readBuffer.flip();
+
+            if (isSecured()) {
+                // We are reading data over a SSL/TLS encrypted connection.
+                // Redirect
+                // the processing to the SslHelper class.
+                SslHelper sslHelper = getAttribute(SSL_HELPER, null);
+
+                if (sslHelper == null) {
+                    throw new IllegalStateException();
+                }
+
+                sslHelper.processRead(this, readBuffer);
+            } else {
+                // Plain message, not encrypted : go directly to the chain
+                processMessageReceived(readBuffer);
+            }
+
+            idleChecker.sessionRead(this, System.currentTimeMillis());
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeReady(NioSelectorProcessor processor) throws IOException {
+        LOG.debug("writable session : {}", this);
+
+        setNotRegisteredForWrite();
+
+        // write from the session write queue
+        boolean isEmpty = false;
+
+        try {
+            Queue<WriteRequest> queue = acquireWriteQueue();
+
+            do {
+                // get a write request from the queue
+                WriteRequest wreq = queue.peek();
+
+                if (wreq == null) {
+                    break;
+                }
+
+                ByteBuffer buf = (ByteBuffer) wreq.getMessage();
+
+                // Note that if the connection is secured, the buffer
+                // already
+                // contains encrypted data.
+                int wrote = getSocketChannel().write(buf);
+                incrementWrittenBytes(wrote);
+                LOG.debug("wrote {} bytes to {}", wrote, this);
+
+                idleChecker.sessionWritten(this, System.currentTimeMillis());
+
+                if (buf.remaining() == 0) {
+                    // completed write request, let's remove it
+                    queue.remove();
+                    // complete the future
+                    DefaultWriteFuture future = (DefaultWriteFuture) wreq.getFuture();
+
+                    if (future != null) {
+                        future.complete();
+                    }
+                } else {
+                    // output socket buffer is full, we need
+                    // to give up until next selection for
+                    // writing
+                    break;
+                }
+            } while (!queue.isEmpty());
+
+            isEmpty = queue.isEmpty();
+        } finally {
+            this.releaseWriteQueue();
+        }
+
+        // if the session is no more interested in writing, we need
+        // to stop listening for OP_WRITE events
+        if (isEmpty) {
+            if (isClosing()) {
+                LOG.debug("closing session {} have empty write queue, so we close it", this);
+                // we was flushing writes, now we to the close
+                getSocketChannel().close();
+            } else {
+                // no more write event needed
+                processor.cancelKeyForWritting(this);
+            }
+        }
     }
 }

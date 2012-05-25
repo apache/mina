@@ -18,9 +18,16 @@
  */
 package org.apache.mina.session;
 
-import static junit.framework.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -45,11 +52,11 @@ import org.junit.Test;
  */
 public class AbstractIoSessionTest {
 
-    private SelectorProcessor processor = mock(SelectorProcessor.class);
+    private final SelectorProcessor processor = mock(SelectorProcessor.class);
 
     private class DummySession extends AbstractIoSession {
         private DummySession(IoService service) {
-            super(service, processor);
+            super(service, processor, null);
         }
 
         @Override
@@ -122,11 +129,11 @@ public class AbstractIoSessionTest {
 
     private IoService service = null;
 
-    private IoFilter filter1 = spy(new PassthruFilter());
+    private final IoFilter filter1 = spy(new PassthruFilter());
 
-    private IoFilter filter2 = spy(new PassthruFilter());
+    private final IoFilter filter2 = spy(new PassthruFilter());
 
-    private IoFilter filter3 = spy(new PassthruFilter());
+    private final IoFilter filter3 = spy(new PassthruFilter());
 
     @Before
     public void setup() {

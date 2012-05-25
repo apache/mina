@@ -17,16 +17,17 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.tcp.nio;
+package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 import org.apache.mina.service.SelectorStrategy;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
-import org.apache.mina.transport.tcp.NioSelectorProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,39 +36,40 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioTcpServer extends AbstractTcpServer {
+public class NioTcpServer extends AbstractTcpServer implements SelectorEventListener {
     static final Logger LOG = LoggerFactory.getLogger(NioTcpServer.class);
-    
+
     // the strategy for dispatching servers and client to selector threads.
     private final SelectorStrategy<NioSelectorProcessor> strategy;
 
     // the bound local address
     private SocketAddress address = null;
-    
+
     private NioSelectorProcessor acceptProcessor = null;
-    
+
     // the key used for selecting accept event
     private SelectionKey acceptKey = null;
-    
+
     // the server socket for accepting clients
-    private ServerSocketChannel serverChannel = null;  
-    
+    private ServerSocketChannel serverChannel = null;
+
     public NioTcpServer(final SelectorStrategy<NioSelectorProcessor> strategy) {
         super();
         this.strategy = strategy;
     }
-    
+
     /**
      * Get the inner Server socket for accepting new client connections
      * @return
      */
     public ServerSocketChannel getServerSocketChannel() {
-    	return this.serverChannel;
+        return this.serverChannel;
     }
 
     public void setServerSocketChannel(ServerSocketChannel serverChannel) {
-    	this.serverChannel = serverChannel;
+        this.serverChannel = serverChannel;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -85,16 +87,16 @@ public class NioTcpServer extends AbstractTcpServer {
 
         LOG.info("binding address {}", localAddress);
         this.address = localAddress;
-        
+
         serverChannel = ServerSocketChannel.open();
         serverChannel.socket().setReuseAddress(isReuseAddress());
         serverChannel.socket().bind(address);
         serverChannel.configureBlocking(false);
 
         acceptProcessor = this.strategy.getSelectorForBindNewAddress();
-            
+
         acceptProcessor.addServer(this);
-                
+
         // it's the first address bound, let's fire the event
         this.fireServiceActivated();
     }
@@ -104,7 +106,7 @@ public class NioTcpServer extends AbstractTcpServer {
      */
     @Override
     public SocketAddress getBoundAddress() {
-    	return address;
+        return address;
     }
 
     /**
@@ -112,30 +114,60 @@ public class NioTcpServer extends AbstractTcpServer {
      */
     @Override
     public synchronized void unbind() throws IOException {
-    	LOG.info("unbinding {}", address);
-    	if( this.address == null) { 
-    		throw new IllegalStateException("server not bound");
+        LOG.info("unbinding {}", address);
+        if (this.address == null) {
+            throw new IllegalStateException("server not bound");
         }
         serverChannel.socket().close();
         serverChannel.close();
-    	acceptProcessor.removeServer(this);
-        
+        acceptProcessor.removeServer(this);
+
         this.address = null;
         this.fireServiceInactivated();
     }
 
-	/**
-	 * @return the acceptKey
-	 */
-	public SelectionKey getAcceptKey() {
-		return acceptKey;
-	}
+    /**
+     * @return the acceptKey
+     */
+    public SelectionKey getAcceptKey() {
+        return acceptKey;
+    }
 
-	/**
-	 * @param acceptKey the acceptKey to set
-	 */
-	public void setAcceptKey(SelectionKey acceptKey) {
-		this.acceptKey = acceptKey;
-	}
-    
+    /**
+     * @param acceptKey the acceptKey to set
+     */
+    public void setAcceptKey(SelectionKey acceptKey) {
+        this.acceptKey = acceptKey;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void acceptReady(NioSelectorProcessor processor) throws IOException {
+        LOG.debug("acceptable new client");
+
+        // accepted connection
+        SocketChannel newClientChannel = getServerSocketChannel().accept();
+        LOG.debug("client accepted");
+
+        // and give it's to the strategy
+        strategy.getSelectorForNewSession(processor).createSession(this, newClientChannel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readReady(NioSelectorProcessor processor, ByteBuffer readBuffer) {
+        throw new IllegalStateException("read event should never occur on NioTcpServer");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeReady(NioSelectorProcessor processor) {
+        throw new IllegalStateException("write event should never occur on NioTcpServer");
+    }
 }
