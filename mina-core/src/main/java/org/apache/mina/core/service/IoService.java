@@ -75,15 +75,15 @@ public interface IoService {
      */
     void dispose();
 
-  /**
-   * Releases any resources allocated by this service.  Please note that
-   * this method might block as long as there are any sessions managed by this service.
-   *
-   * Warning : calling this method from a IoFutureListener with <code>awaitTermination</code> = true
-   * will probably lead to a deadlock.
-   *
-   * @param awaitTermination When true this method will block until the underlying ExecutorService is terminated
-   */
+    /**
+     * Releases any resources allocated by this service.  Please note that
+     * this method might block as long as there are any sessions managed by this service.
+     *
+     * Warning : calling this method from a IoFutureListener with <code>awaitTermination</code> = true
+     * will probably lead to a deadlock.
+     *
+     * @param awaitTermination When true this method will block until the underlying ExecutorService is terminated
+     */
     void dispose(boolean awaitTermination);
 
     /**
