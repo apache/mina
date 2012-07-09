@@ -440,7 +440,7 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public WriteFuture write(Object message, SocketAddress remoteAddress) {
         if (message == null) {
-            throw new IllegalArgumentException("message");
+            throw new IllegalArgumentException("Trying to write a null message : not allowed");
         }
 
         // We can't send a message to a connected session if we don't have
