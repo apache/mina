@@ -21,7 +21,6 @@ package org.apache.mina.core.session;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,7 +51,7 @@ public class DefaultIoSessionDataStructureFactory implements
     }
 
     private static class DefaultIoSessionAttributeMap implements IoSessionAttributeMap {
-        private final Map<Object, Object> attributes =
+        private final ConcurrentHashMap<Object, Object> attributes =
             new ConcurrentHashMap<Object, Object>(4);
 
         /**
@@ -96,14 +95,7 @@ public class DefaultIoSessionDataStructureFactory implements
                 return null;
             }
 
-            Object oldValue;
-            synchronized (attributes) {
-                oldValue = attributes.get(key);
-                if (oldValue == null) {
-                    attributes.put(key, value);
-                }
-            }
-            return oldValue;
+            return attributes.putIfAbsent(key, value);
         }
 
         public Object removeAttribute(IoSession session, Object key) {
@@ -123,30 +115,20 @@ public class DefaultIoSessionDataStructureFactory implements
                 return false;
             }
 
-            synchronized (attributes) {
-                if (value.equals(attributes.get(key))) {
-                    attributes.remove(key);
-                    return true;
-                }
+            try {
+                return attributes.remove(key, value);
+            } catch(NullPointerException e) {
+                return false;
             }
-
-            return false;
         }
 
         public boolean replaceAttribute(IoSession session, Object key, Object oldValue, Object newValue) {
-            synchronized (attributes) {
-                Object actualOldValue = attributes.get(key);
-                if (actualOldValue == null) {
-                    return false;
-                }
-
-                if (actualOldValue.equals(oldValue)) {
-                    attributes.put(key, newValue);
-                    return true;
-                }
-                
-                return false;
+            try {
+                return attributes.replace(key, oldValue, newValue);
+            } catch(NullPointerException e) {
             }
+            
+            return false;
         }
 
         public boolean containsAttribute(IoSession session, Object key) {

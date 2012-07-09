@@ -49,7 +49,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     
     private final AttributeKey STATE = new AttributeKey(getClass(), "state");
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private final Map<Class<?>, MessageEncoderFactory> type2encoderFactory = new CopyOnWriteMap<Class<?>, MessageEncoderFactory>();
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
@@ -58,7 +58,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         // Do nothing
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void addMessageEncoder(Class<?> messageType, Class<? extends MessageEncoder> encoderClass) {
         if (encoderClass == null) {
             throw new IllegalArgumentException("encoderClass");
@@ -83,7 +83,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T> void addMessageEncoder(Class<T> messageType, MessageEncoder<? super T> encoder) {
         addMessageEncoder(messageType, new SingletonMessageEncoderFactory(encoder));
     }
@@ -107,7 +107,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public void addMessageEncoder(Iterable<Class<?>> messageTypes, Class<? extends MessageEncoder> encoderClass) {
         for (Class<?> messageType : messageTypes) {
             addMessageEncoder(messageType, encoderClass);
@@ -147,7 +147,8 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
 
     @SuppressWarnings("unchecked")
     private MessageEncoder<Object> findEncoder(
-            State state, Class type, Set<Class> triedClasses) {
+            State state, Class<?> type, Set<Class<?>> triedClasses) {
+        @SuppressWarnings("rawtypes")
         MessageEncoder encoder = null;
 
         if (triedClasses != null && triedClasses.contains(type)) {
@@ -158,6 +159,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
          * Try the cache first.
          */
         encoder = state.findEncoderCache.get(type);
+        
         if (encoder != null) {
             return encoder;
         }
@@ -173,13 +175,16 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
              */
 
             if (triedClasses == null) {
-                triedClasses = new IdentityHashSet<Class>();
+                triedClasses = new IdentityHashSet<Class<?>>();
             }
+            
             triedClasses.add(type);
 
-            Class[] interfaces = type.getInterfaces();
-            for (Class element : interfaces) {
+            Class<?>[] interfaces = type.getInterfaces();
+            
+            for (Class<?> element : interfaces) {
                 encoder = findEncoder(state, element, triedClasses);
+                
                 if (encoder != null) {
                     break;
                 }
@@ -192,7 +197,8 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
              * superclass.
              */
 
-            Class superclass = type.getSuperclass();
+            Class<?> superclass = type.getSuperclass();
+            
             if (superclass != null) {
                 encoder = findEncoder(state, superclass);
             }
@@ -205,6 +211,11 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
          */
         if (encoder != null) {
             state.findEncoderCache.put(type, encoder);
+            MessageEncoder<Object> tmpEncoder = state.findEncoderCache.putIfAbsent(type, encoder);
+            
+            if (tmpEncoder != null) {
+                encoder = tmpEncoder;
+            }
         }
 
         return encoder;
@@ -230,13 +241,13 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     }
     
     private class State {
-        @SuppressWarnings("unchecked")
-        private final Map<Class<?>, MessageEncoder> findEncoderCache = new ConcurrentHashMap<Class<?>, MessageEncoder>();
+        @SuppressWarnings("rawtypes")
+        private final ConcurrentHashMap<Class<?>, MessageEncoder> findEncoderCache = new ConcurrentHashMap<Class<?>, MessageEncoder>();
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("rawtypes")
         private final Map<Class<?>, MessageEncoder> type2encoder = new ConcurrentHashMap<Class<?>, MessageEncoder>();
         
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("rawtypes")
         private State() throws Exception {
             for (Map.Entry<Class<?>, MessageEncoderFactory> e: type2encoderFactory.entrySet()) {
                 type2encoder.put(e.getKey(), e.getValue().getEncoder());

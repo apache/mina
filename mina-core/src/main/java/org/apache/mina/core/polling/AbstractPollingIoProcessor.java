@@ -25,7 +25,6 @@ import java.nio.channels.ClosedSelectorException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -84,7 +83,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     private static final long SELECT_TIMEOUT = 1000L;
 
     /** A map containing the last Thread ID for each class */
-    private static final Map<Class<?>, AtomicInteger> threadIds = new ConcurrentHashMap<Class<?>, AtomicInteger>();
+    private static final ConcurrentHashMap<Class<?>, AtomicInteger> threadIds = new ConcurrentHashMap<Class<?>, AtomicInteger>();
 
     /** This IoProcessor instance name */
     private final String threadName;
@@ -150,23 +149,13 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
         Class<?> cls = getClass();
         int newThreadId;
 
-        // We synchronize this block to avoid a concurrent access to
-        // the actomicInteger (it can be modified by another thread, while
-        // being seen as null by another thread)
-        synchronized (threadIds) {
-            // Get the current ID associated to this class' name
-            AtomicInteger threadId = threadIds.get(cls);
-
-            if (threadId == null) {
-                // We never have seen this class before, just create a
-                // new ID starting at 1 for it, and associate this ID
-                // with the class name in the map.
-                newThreadId = 1;
-                threadIds.put(cls, new AtomicInteger(newThreadId));
-            } else {
-                // Just increment the lat ID, and get it.
-                newThreadId = threadId.incrementAndGet();
-            }
+        AtomicInteger threadId = threadIds.putIfAbsent(cls, new AtomicInteger(1));
+        
+        if (threadId == null) {
+            newThreadId = 1;
+        } else {
+            // Just increment the last ID, and get it.
+            newThreadId = threadId.incrementAndGet();
         }
 
         // Now we can compute the name for this thread

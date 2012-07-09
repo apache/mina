@@ -44,11 +44,11 @@ import org.apache.mina.core.write.WriteRequest;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
-    /** A map containing the estimated size of each Java objects we know for */ 
+    /** A map containing the estimated size of each Java objects we know for */
     private final ConcurrentMap<Class<?>, Integer> class2size = new ConcurrentHashMap<Class<?>, Integer>();
 
     /**
-     * Create a new instance of this class, injecting the known size of 
+     * Create a new instance of this class, injecting the known size of
      * basic java types.
      */
     public DefaultIoEventSizeEstimator() {
@@ -132,7 +132,12 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         answer = align(answer);
 
         // Put the final answer.
-        class2size.putIfAbsent(clazz, answer);
+        Integer tmpAnswer = class2size.putIfAbsent(clazz, answer);
+        
+        if (tmpAnswer != null) {
+            answer = tmpAnswer;
+        }
+
         return answer;
     }
 
