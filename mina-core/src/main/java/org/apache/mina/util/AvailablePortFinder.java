@@ -67,7 +67,12 @@ public class AvailablePortFinder {
      * @throws NoSuchElementException if there are no ports available
      */
     public static int getNextAvailable() {
-        return getNextAvailable(MIN_PORT_NUMBER);
+        try {
+            // Here, we simply return an available port found by the system
+            return new ServerSocket( 0 ).getLocalPort();
+        } catch (IOException ioe) {
+            throw new NoSuchElementException(ioe.getMessage());
+        }
     }
 
     /**
