@@ -222,5 +222,12 @@ public class DefaultIoSessionDataStructureFactory implements
         public String toString() {
             return q.toString();
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int size() {
+            return q.size();
+        }
     }
 }

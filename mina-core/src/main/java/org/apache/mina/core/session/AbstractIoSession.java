@@ -1381,5 +1381,12 @@ public abstract class AbstractIoSession implements IoSession {
         public void dispose(IoSession session) {
             queue.dispose(session);
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int size() {
+            return queue.size();
+        }
     }
 }

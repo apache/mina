@@ -31,8 +31,8 @@ public interface WriteRequestQueue {
 
     /**
      * Get the first request available in the queue for a session.
-     * @param session The session 
-     * @return The first available request, if any. 
+     * @param session The session
+     * @return The first available request, if any.
      */
     WriteRequest poll(IoSession session);
     
@@ -62,4 +62,11 @@ public interface WriteRequestQueue {
      * @param session The associated session
      */
     void dispose(IoSession session);
+    
+    
+    /**
+     * Returns the number of objects currently stored in the queue.
+     * @return
+     */
+    int size();
 }
