@@ -284,11 +284,15 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     public final CloseFuture close(boolean rightNow) {
-        if (rightNow) {
-            return close();
+        if ( !isClosing() ) {
+            if (rightNow) {
+                return close();
+            }
+    
+            return closeOnFlush();
+        } else {
+            return closeFuture;
         }
-
-        return closeOnFlush();
     }
 
     /**
