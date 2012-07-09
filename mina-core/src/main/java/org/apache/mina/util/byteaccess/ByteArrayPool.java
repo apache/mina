@@ -85,7 +85,7 @@ public class ByteArrayPool implements ByteArrayFactory
         int bits = bits( size );
         synchronized ( this )
         {
-            if ( !freeBuffers.isEmpty() )
+            if ( !freeBuffers.get(bits).isEmpty() )
             {
                 DirectBufferByteArray ba = freeBuffers.get( bits ).pop();
                 ba.setFreed( false );
