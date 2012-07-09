@@ -27,6 +27,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.statemachine.event.Event;
+import org.apache.mina.statemachine.transition.SelfTransition;
 import org.apache.mina.statemachine.transition.Transition;
 
 /**
@@ -48,10 +49,17 @@ import org.apache.mina.statemachine.transition.Transition;
  */
 public class State {
     private final String id;
+
     private final State parent;
+
     private List<TransitionHolder> transitionHolders = new ArrayList<TransitionHolder>();
+
     private List<Transition> transitions = Collections.emptyList();
-    
+
+    private List<SelfTransition> onEntries = new ArrayList<SelfTransition>();
+
+    private List<SelfTransition> onExits = new ArrayList<SelfTransition>();
+
     /**
      * Creates a new {@link State} with the specified id.
      * 
@@ -101,13 +109,59 @@ public class State {
         return Collections.unmodifiableList(transitions);
     }
 
+    /**
+     * Returns an unmodifiable {@link List} of entry {@link SelfTransition}s  
+     * 
+     * @return the {@link SelfTransition}s.
+     */
+    public List<SelfTransition> getOnEntrySelfTransitions() {
+        return Collections.unmodifiableList(onEntries);
+    }
+
+    /**
+     * Returns an unmodifiable {@link List} of exit {@link SelfTransition}s  
+     * 
+     * @return the {@link SelfTransition}s.
+     */
+    public List<SelfTransition> getOnExitSelfTransitions() {
+        return Collections.unmodifiableList(onExits);
+    }
+
+    /**
+     * Adds an entry {@link SelfTransition} to this {@link State} 
+     * 
+     * @param selfTransition the {@link SelfTransition} to add.
+     * @return this {@link State}.
+     */
+    State addOnEntrySelfTransaction(SelfTransition onEntrySelfTransaction) {
+        if (onEntrySelfTransaction == null) {
+            throw new IllegalArgumentException("transition");
+        }
+        onEntries.add(onEntrySelfTransaction);
+        return this;
+    }
+
+    /**
+     * Adds an exit {@link SelfTransition} to this {@link State} 
+     * 
+     * @param selfTransition the {@link SelfTransition} to add.
+     * @return this {@link State}.
+     */
+    State addOnExitSelfTransaction(SelfTransition onExitSelfTransaction) {
+        if (onExitSelfTransaction == null) {
+            throw new IllegalArgumentException("transition");
+        }
+        onExits.add(onExitSelfTransaction);
+        return this;
+    }
+
     private void updateTransitions() {
         transitions = new ArrayList<Transition>(transitionHolders.size());
         for (TransitionHolder holder : transitionHolders) {
             transitions.add(holder.transition);
         }
     }
-    
+
     /**
      * Adds an outgoing {@link Transition} to this {@link State} with weight 0.
      * 
@@ -139,7 +193,7 @@ public class State {
         updateTransitions();
         return this;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof State)) {

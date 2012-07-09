@@ -32,16 +32,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.statemachine.annotation.OnEntry;
+import org.apache.mina.statemachine.annotation.OnExit;
 import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.annotation.TransitionAnnotation;
 import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.event.Event;
+import org.apache.mina.statemachine.transition.MethodSelfTransition;
 import org.apache.mina.statemachine.transition.MethodTransition;
-
+import org.apache.mina.statemachine.transition.SelfTransition;
 
 /**
  * Creates {@link StateMachine}s by reading {@link org.apache.mina.statemachine.annotation.State},
- * {@link Transition} and {@link Transitions} (or equivalent) annotations from one or more arbitrary 
+ * {@link Transition} and {@link Transitions} (or equivalent) and {@link SelfTransition} annotations from one or more arbitrary
  * objects.
  * 
  *
@@ -49,16 +52,25 @@ import org.apache.mina.statemachine.transition.MethodTransition;
  */
 public class StateMachineFactory {
     private final Class<? extends Annotation> transitionAnnotation;
+
     private final Class<? extends Annotation> transitionsAnnotation;
 
-    protected StateMachineFactory(Class<? extends Annotation> transitionAnnotation, 
-                Class<? extends Annotation> transitionsAnnotation) {
+    private final Class<? extends Annotation> entrySelfTransitionsAnnotation;
+
+    private final Class<? extends Annotation> exitSelfTransitionsAnnotation;
+
+    protected StateMachineFactory(Class<? extends Annotation> transitionAnnotation,
+            Class<? extends Annotation> transitionsAnnotation,
+            Class<? extends Annotation> entrySelfTransitionsAnnotation,
+            Class<? extends Annotation> exitSelfTransitionsAnnotation) {
         this.transitionAnnotation = transitionAnnotation;
         this.transitionsAnnotation = transitionsAnnotation;
+        this.entrySelfTransitionsAnnotation = entrySelfTransitionsAnnotation;
+        this.exitSelfTransitionsAnnotation = exitSelfTransitionsAnnotation;
     }
-    
+
     /**
-     * Returns a new {@link StateMachineFactory} instance which creates 
+     * Returns a new {@link StateMachineFactory} instance which creates
      * {@link StateMachine}s by reading the specified {@link Transition}
      * equivalent annotation.
      * 
@@ -68,18 +80,18 @@ public class StateMachineFactory {
     public static StateMachineFactory getInstance(Class<? extends Annotation> transitionAnnotation) {
         TransitionAnnotation a = transitionAnnotation.getAnnotation(TransitionAnnotation.class);
         if (a == null) {
-            throw new IllegalArgumentException("The annotation class " 
-                    + transitionAnnotation + " has not been annotated with the " 
-                    + TransitionAnnotation.class.getName() + " annotation");
+            throw new IllegalArgumentException("The annotation class " + transitionAnnotation
+                    + " has not been annotated with the " + TransitionAnnotation.class.getName() + " annotation");
         }
-        return new StateMachineFactory(transitionAnnotation, a.value());
+        return new StateMachineFactory(transitionAnnotation, a.value(), OnEntry.class, OnExit.class);
+
     }
-    
+
     /**
      * Creates a new {@link StateMachine} from the specified handler object and
      * using a start state with id <code>start</code>.
      * 
-     * @param handler the object containing the annotations describing the 
+     * @param handler the object containing the annotations describing the
      *        state machine.
      * @return the {@link StateMachine} object.
      */
@@ -92,7 +104,7 @@ public class StateMachineFactory {
      * using the {@link State} with the specified id as start state.
      * 
      * @param start the id of the start {@link State} to use.
-     * @param handler the object containing the annotations describing the 
+     * @param handler the object containing the annotations describing the
      *        state machine.
      * @return the {@link StateMachine} object.
      */
@@ -104,34 +116,34 @@ public class StateMachineFactory {
      * Creates a new {@link StateMachine} from the specified handler objects and
      * using a start state with id <code>start</code>.
      * 
-     * @param handler the first object containing the annotations describing the 
+     * @param handler the first object containing the annotations describing the
      *        state machine.
-     * @param handlers zero or more additional objects containing the 
+     * @param handlers zero or more additional objects containing the
      *        annotations describing the state machine.
      * @return the {@link StateMachine} object.
      */
     public StateMachine create(Object handler, Object... handlers) {
         return create("start", handler, handlers);
     }
-    
+
     /**
      * Creates a new {@link StateMachine} from the specified handler objects and
      * using the {@link State} with the specified id as start state.
      * 
      * @param start the id of the start {@link State} to use.
-     * @param handler the first object containing the annotations describing the 
+     * @param handler the first object containing the annotations describing the
      *        state machine.
-     * @param handlers zero or more additional objects containing the 
+     * @param handlers zero or more additional objects containing the
      *        annotations describing the state machine.
      * @return the {@link StateMachine} object.
      */
     public StateMachine create(String start, Object handler, Object... handlers) {
-        
+
         Map<String, State> states = new HashMap<String, State>();
         List<Object> handlersList = new ArrayList<Object>(1 + handlers.length);
         handlersList.add(handler);
         handlersList.addAll(Arrays.asList(handlers));
-        
+
         LinkedList<Field> fields = new LinkedList<Field>();
         for (Object h : handlersList) {
             fields.addAll(getFields(h instanceof Class ? (Class<?>) h : h.getClass()));
@@ -144,65 +156,99 @@ public class StateMachineFactory {
             throw new StateMachineCreationException("Start state '" + start + "' not found.");
         }
 
-        setupTransitions(transitionAnnotation, transitionsAnnotation, states, handlersList);
+        setupTransitions(transitionAnnotation, transitionsAnnotation, entrySelfTransitionsAnnotation,
+                exitSelfTransitionsAnnotation, states, handlersList);
 
         return new StateMachine(states.values(), start);
     }
 
-    private static void setupTransitions(Class<? extends Annotation> transitionAnnotation, 
-            Class<? extends Annotation> transitionsAnnotation, Map<String, State> states, List<Object> handlers) {
+    private static void setupTransitions(Class<? extends Annotation> transitionAnnotation,
+            Class<? extends Annotation> transitionsAnnotation,
+            Class<? extends Annotation> onEntrySelfTransitionAnnotation,
+            Class<? extends Annotation> onExitSelfTransitionAnnotation, Map<String, State> states, List<Object> handlers) {
         for (Object handler : handlers) {
-            setupTransitions(transitionAnnotation, transitionsAnnotation, states, handler);
+            setupTransitions(transitionAnnotation, transitionsAnnotation, onEntrySelfTransitionAnnotation,
+                    onExitSelfTransitionAnnotation, states, handler);
         }
     }
-    
-    private static void setupTransitions(Class<? extends Annotation> transitionAnnotation, 
-            Class<? extends Annotation> transitionsAnnotation, Map<String, State> states, Object handler) {
-        
+
+    private static void setupSelfTransitions(Method m, Class<? extends Annotation> onEntrySelfTransitionAnnotation,
+            Class<? extends Annotation> onExitSelfTransitionAnnotation, Map<String, State> states, Object handler) {
+        if (m.isAnnotationPresent(OnEntry.class)) {
+            OnEntry onEntryAnnotation = (OnEntry) m.getAnnotation(onEntrySelfTransitionAnnotation);
+            State state = states.get(onEntryAnnotation.value());
+            if (state == null) {
+                throw new StateMachineCreationException("Error encountered "
+                        + "when processing onEntry annotation in method " + m + ". state " + onEntryAnnotation.value()
+                        + " not Found.");
+
+            }
+            state.addOnEntrySelfTransaction(new MethodSelfTransition(m, handler));
+        }
+
+        if (m.isAnnotationPresent(OnExit.class)) {
+            OnExit onExitAnnotation = (OnExit) m.getAnnotation(onExitSelfTransitionAnnotation);
+            State state = states.get(onExitAnnotation.value());
+            if (state == null) {
+                throw new StateMachineCreationException("Error encountered "
+                        + "when processing onExit annotation in method " + m + ". state " + onExitAnnotation.value()
+                        + " not Found.");
+
+            }
+            state.addOnExitSelfTransaction(new MethodSelfTransition(m, handler));
+        }
+
+    }
+
+    private static void setupTransitions(Class<? extends Annotation> transitionAnnotation,
+            Class<? extends Annotation> transitionsAnnotation,
+            Class<? extends Annotation> onEntrySelfTransitionAnnotation,
+            Class<? extends Annotation> onExitSelfTransitionAnnotation, Map<String, State> states, Object handler) {
+
         Method[] methods = handler.getClass().getDeclaredMethods();
         Arrays.sort(methods, new Comparator<Method>() {
             public int compare(Method m1, Method m2) {
                 return m1.toString().compareTo(m2.toString());
             }
         });
-        
+
         for (Method m : methods) {
+            setupSelfTransitions(m, onEntrySelfTransitionAnnotation, onExitSelfTransitionAnnotation, states, handler);
+
             List<TransitionWrapper> transitionAnnotations = new ArrayList<TransitionWrapper>();
             if (m.isAnnotationPresent(transitionAnnotation)) {
-                transitionAnnotations.add(new TransitionWrapper(transitionAnnotation, m.getAnnotation(transitionAnnotation)));
+                transitionAnnotations.add(new TransitionWrapper(transitionAnnotation, m
+                        .getAnnotation(transitionAnnotation)));
             }
             if (m.isAnnotationPresent(transitionsAnnotation)) {
-                transitionAnnotations.addAll(Arrays.asList(new TransitionsWrapper(transitionAnnotation, 
+                transitionAnnotations.addAll(Arrays.asList(new TransitionsWrapper(transitionAnnotation,
                         transitionsAnnotation, m.getAnnotation(transitionsAnnotation)).value()));
             }
-            
+
             if (transitionAnnotations.isEmpty()) {
                 continue;
             }
-            
+
             for (TransitionWrapper annotation : transitionAnnotations) {
                 Object[] eventIds = annotation.on();
                 if (eventIds.length == 0) {
-                    throw new StateMachineCreationException("Error encountered " 
-                            + "when processing method " + m
+                    throw new StateMachineCreationException("Error encountered " + "when processing method " + m
                             + ". No event ids specified.");
                 }
                 if (annotation.in().length == 0) {
-                    throw new StateMachineCreationException("Error encountered " 
-                            + "when processing method " + m
+                    throw new StateMachineCreationException("Error encountered " + "when processing method " + m
                             + ". No states specified.");
                 }
-                
+
                 State next = null;
                 if (!annotation.next().equals(Transition.SELF)) {
                     next = states.get(annotation.next());
                     if (next == null) {
-                        throw new StateMachineCreationException("Error encountered " 
-                                + "when processing method " + m
+                        throw new StateMachineCreationException("Error encountered " + "when processing method " + m
                                 + ". Unknown next state: " + annotation.next() + ".");
                     }
                 }
-                
+
                 for (Object event : eventIds) {
                     if (event == null) {
                         event = Event.WILDCARD_EVENT_ID;
@@ -213,8 +259,7 @@ public class StateMachineFactory {
                     for (String in : annotation.in()) {
                         State state = states.get(in);
                         if (state == null) {
-                            throw new StateMachineCreationException("Error encountered " 
-                                    + "when processing method "
+                            throw new StateMachineCreationException("Error encountered " + "when processing method "
                                     + m + ". Unknown state: " + in + ".");
                         }
 
@@ -233,14 +278,10 @@ public class StateMachineFactory {
                 continue;
             }
 
-            if ((f.getModifiers() & Modifier.STATIC) == 0 
-                    || (f.getModifiers() & Modifier.FINAL) == 0
+            if ((f.getModifiers() & Modifier.STATIC) == 0 || (f.getModifiers() & Modifier.FINAL) == 0
                     || !f.getType().equals(String.class)) {
-                throw new StateMachineCreationException("Error encountered when " 
-                        + "processing field " + f
-                        + ". Only static final " 
-                        + "String fields can be used with the @State " 
-                        + "annotation.");
+                throw new StateMachineCreationException("Error encountered when " + "processing field " + f
+                        + ". Only static final " + "String fields can be used with the @State " + "annotation.");
             }
 
             if (!f.isAccessible()) {
@@ -252,7 +293,7 @@ public class StateMachineFactory {
 
         return fields;
     }
-        
+
     static State[] createStates(List<Field> fields) {
         LinkedHashMap<String, State> states = new LinkedHashMap<String, State>();
 
@@ -266,8 +307,8 @@ public class StateMachineFactory {
                 try {
                     value = (String) f.get(null);
                 } catch (IllegalAccessException iae) {
-                    throw new StateMachineCreationException("Error encountered when " 
-                            + "processing field " + f + ".", iae);
+                    throw new StateMachineCreationException("Error encountered when " + "processing field " + f + ".",
+                            iae);
                 }
 
                 org.apache.mina.statemachine.annotation.State stateAnnotation = f
@@ -284,38 +325,44 @@ public class StateMachineFactory {
             }
 
             /*
-             * If no new states were added to states during this iteration it 
+             * If no new states were added to states during this iteration it
              * means that all fields in fields specify non-existent parents.
              */
             if (states.size() == numStates) {
                 throw new StateMachineCreationException("Error encountered while creating "
-                        + "FSM. The following fields specify non-existing " 
-                        + "parent states: " + fields);
+                        + "FSM. The following fields specify non-existing " + "parent states: " + fields);
             }
         }
 
         return states.values().toArray(new State[0]);
     }
-    
+
     private static class TransitionWrapper {
         private final Class<? extends Annotation> transitionClazz;
+
         private final Annotation annotation;
+
         public TransitionWrapper(Class<? extends Annotation> transitionClazz, Annotation annotation) {
             this.transitionClazz = transitionClazz;
             this.annotation = annotation;
         }
+
         Object[] on() {
             return getParameter("on", Object[].class);
         }
+
         String[] in() {
             return getParameter("in", String[].class);
         }
+
         String next() {
             return getParameter("next", String.class);
         }
+
         int weight() {
             return getParameter("weight", Integer.TYPE);
         }
+
         @SuppressWarnings("unchecked")
         private <T> T getParameter(String name, Class<T> returnType) {
             try {
@@ -325,22 +372,26 @@ public class StateMachineFactory {
                 }
                 return (T) m.invoke(annotation);
             } catch (Throwable t) {
-                throw new StateMachineCreationException("Could not get parameter '" 
-                        + name + "' from Transition annotation " + transitionClazz);
+                throw new StateMachineCreationException("Could not get parameter '" + name
+                        + "' from Transition annotation " + transitionClazz);
             }
         }
     }
-    
+
     private static class TransitionsWrapper {
         private final Class<? extends Annotation> transitionsclazz;
+
         private final Class<? extends Annotation> transitionClazz;
+
         private final Annotation annotation;
-        public TransitionsWrapper(Class<? extends Annotation> transitionClazz, 
+
+        public TransitionsWrapper(Class<? extends Annotation> transitionClazz,
                 Class<? extends Annotation> transitionsclazz, Annotation annotation) {
             this.transitionClazz = transitionClazz;
             this.transitionsclazz = transitionsclazz;
             this.annotation = annotation;
         }
+
         TransitionWrapper[] value() {
             Annotation[] annos = getParameter("value", Annotation[].class);
             TransitionWrapper[] wrappers = new TransitionWrapper[annos.length];
@@ -349,6 +400,7 @@ public class StateMachineFactory {
             }
             return wrappers;
         }
+
         @SuppressWarnings("unchecked")
         private <T> T getParameter(String name, Class<T> returnType) {
             try {
@@ -358,8 +410,8 @@ public class StateMachineFactory {
                 }
                 return (T) m.invoke(annotation);
             } catch (Throwable t) {
-                throw new StateMachineCreationException("Could not get parameter '" 
-                        + name + "' from Transitions annotation " + transitionsclazz);
+                throw new StateMachineCreationException("Could not get parameter '" + name
+                        + "' from Transitions annotation " + transitionsclazz);
             }
         }
     }

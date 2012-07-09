@@ -17,23 +17,38 @@
  *  under the License.
  *
  */
-package org.apache.mina.statemachine.annotation;
+package org.apache.mina.statemachine.transition;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.mina.statemachine.context.StateContext;
+import org.apache.mina.statemachine.State;
 
 /**
- * Annotation used to mark other annotations as being transition annotations.
- * The annotation used to group transition annotations must be given as
- * parameter.
+ * Abstract {@link SelfTransition} implementation.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.ANNOTATION_TYPE)
-public @interface TransitionAnnotation {
-    Class<? extends Annotation> value();
+
+public abstract class AbstractSelfTransition implements SelfTransition {
+
+    /**
+     * Creates a new instance
+     * 
+     */
+    public AbstractSelfTransition() {
+
+    }
+
+    /**
+     * Executes this {@link SelfTransition}.
+     * 
+     * @return <code>true</code> if the {@link SelfTransition} has been executed
+     *         successfully
+     */
+    protected abstract boolean doExecute(StateContext stateContext, State state);
+
+    public boolean execute(StateContext stateContext, State state) {
+
+        return doExecute(stateContext, state);
+    }
+
 }

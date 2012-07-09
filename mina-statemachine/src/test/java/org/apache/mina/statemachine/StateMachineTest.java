@@ -25,6 +25,7 @@ import static org.junit.Assert.assertSame;
 import org.apache.mina.statemachine.context.DefaultStateContext;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.event.Event;
+import org.apache.mina.statemachine.transition.AbstractSelfTransition;
 import org.apache.mina.statemachine.transition.AbstractTransition;
 import org.junit.Test;
 
@@ -146,4 +147,40 @@ public class StateMachineTest {
             return true;
         }
     }
+
+    private static class SampleSelfTransition extends AbstractSelfTransition {
+        @SuppressWarnings("unused")
+        public SampleSelfTransition() {
+            super();
+        }
+
+
+        @Override
+        protected boolean doExecute(StateContext stateContext, State state) {
+            stateContext.setAttribute("SelfSuccess" + state.getId(), true);
+            return true;
+        }
+
+    }
+
+    
+    @Test
+    public void testOnEntry() throws Exception {
+        State s1 = new State("s1");
+        State s2 = new State("s2");
+
+        s1.addTransition(new SuccessTransition("foo", s2));        
+        s1.addOnExitSelfTransaction(new SampleSelfTransition());
+        s2.addOnEntrySelfTransaction(new SampleSelfTransition());
+
+        StateContext context = new DefaultStateContext();
+        StateMachine sm = new StateMachine(new State[] { s1, s2 }, "s1");
+        sm.handle(new Event("foo", context));
+        assertEquals(true, context.getAttribute("success"));
+        assertEquals(true, context.getAttribute("SelfSuccess" + s1.getId()));
+        assertEquals(true, context.getAttribute("SelfSuccess" + s2.getId()));
+
+    }
+    
+
 }

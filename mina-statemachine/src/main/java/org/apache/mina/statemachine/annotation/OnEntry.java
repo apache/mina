@@ -19,21 +19,22 @@
  */
 package org.apache.mina.statemachine.annotation;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to mark other annotations as being transition annotations.
- * The annotation used to group transition annotations must be given as
- * parameter.
+ * Annotation used on methods to indicate that the method will be executed
+ * before entering a certain state
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.ANNOTATION_TYPE)
-public @interface TransitionAnnotation {
-    Class<? extends Annotation> value();
+@Target(ElementType.METHOD)
+public @interface OnEntry {
+    /**
+     * Sets the id of related state.
+     */
+    String value();
 }
