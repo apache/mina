@@ -174,6 +174,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
                     synchronized (wakeupLock) {
                         Poll.remove(pollset, wakeupSocket);
                         toBeWakenUp = false;
+                        wakeupCalled.set(true);
                     }
                     continue;
                 }
