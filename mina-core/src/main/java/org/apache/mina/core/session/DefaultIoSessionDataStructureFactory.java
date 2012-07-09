@@ -61,19 +61,24 @@ public class DefaultIoSessionDataStructureFactory implements
             super();
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public Object getAttribute(IoSession session, Object key, Object defaultValue) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
             }
 
-            Object answer = attributes.get(key);
-            if (answer == null) {
-                return defaultValue;
+            if ( defaultValue == null ) {
+                return attributes.get(key);
             }
-            
-            return answer;
+                
+            return attributes.putIfAbsent(key, defaultValue);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Object setAttribute(IoSession session, Object key, Object value) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -86,6 +91,9 @@ public class DefaultIoSessionDataStructureFactory implements
             return attributes.put(key, value);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Object setAttributeIfAbsent(IoSession session, Object key, Object value) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -98,6 +106,9 @@ public class DefaultIoSessionDataStructureFactory implements
             return attributes.putIfAbsent(key, value);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Object removeAttribute(IoSession session, Object key) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -106,6 +117,9 @@ public class DefaultIoSessionDataStructureFactory implements
             return attributes.remove(key);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean removeAttribute(IoSession session, Object key, Object value) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -122,6 +136,9 @@ public class DefaultIoSessionDataStructureFactory implements
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean replaceAttribute(IoSession session, Object key, Object oldValue, Object newValue) {
             try {
                 return attributes.replace(key, oldValue, newValue);
@@ -131,16 +148,25 @@ public class DefaultIoSessionDataStructureFactory implements
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean containsAttribute(IoSession session, Object key) {
             return attributes.containsKey(key);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Set<Object> getAttributeKeys(IoSession session) {
             synchronized (attributes) {
                 return new HashSet<Object>(attributes.keySet());
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void dispose(IoSession session) throws Exception {
             // Do nothing
         }
