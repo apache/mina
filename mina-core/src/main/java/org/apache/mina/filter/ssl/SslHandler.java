@@ -97,10 +97,10 @@ import org.slf4j.LoggerFactory;
 
     private SSLEngineResult.HandshakeStatus handshakeStatus;
     
-    /** 
+    /**
      * A flag set to true when the first SSL handshake has been completed
      * This is used to avoid sending a notification to the application handler
-     * when we switch to a SECURE or UNSECURE session. 
+     * when we switch to a SECURE or UNSECURE session.
      */
     private boolean firstSSLNegociation;
     
@@ -323,7 +323,7 @@ import org.slf4j.LoggerFactory;
 
     /**
      * Call when data are read from net. It will perform the initial hanshake or decrypt
-     * the data if SSL has been initialiaed. 
+     * the data if SSL has been initialiaed.
      * 
      * @param buf buffer to decrypt
      * @param nextFilter Next filter in chain
@@ -489,11 +489,11 @@ import org.slf4j.LoggerFactory;
         SSLEngineResult.Status status = res.getStatus();
 
         /*
-         * The status may be: 
-         * OK - Normal operation 
+         * The status may be:
+         * OK - Normal operation
          * OVERFLOW - Should never happen since the application buffer is sized to hold the maximum
-         * packet size. 
-         * UNDERFLOW - Need to read more data from the socket. It's normal. 
+         * packet size.
+         * UNDERFLOW - Need to read more data from the socket. It's normal.
          * CLOSED - The other peer closed the socket. Also normal.
          */
         if (status == SSLEngineResult.Status.BUFFER_OVERFLOW) {
@@ -509,6 +509,7 @@ import org.slf4j.LoggerFactory;
         for (;;) {
             switch (handshakeStatus) {
                 case FINISHED:
+                case NOT_HANDSHAKING:
                     if ( LOGGER.isDebugEnabled()) {
                         LOGGER.debug("{} processing the FINISHED state", sslFilter.getSessionInfo(session));
                     }
@@ -587,7 +588,7 @@ import org.slf4j.LoggerFactory;
                     break;
     
                 default:
-                    String msg = "Invalid Handshaking State" + handshakeStatus + 
+                    String msg = "Invalid Handshaking State" + handshakeStatus +
                         " while processing the Handshake for session " + session.getId();
                     LOGGER.error(msg);
                     throw new IllegalStateException(msg);
@@ -692,7 +693,7 @@ import org.slf4j.LoggerFactory;
     }
 
     private void renegotiateIfNeeded(NextFilter nextFilter, SSLEngineResult res) throws SSLException {
-        if ( ( res.getStatus() != SSLEngineResult.Status.CLOSED ) && 
+        if ( ( res.getStatus() != SSLEngineResult.Status.CLOSED ) &&
              ( res.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW ) &&
              ( res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING ) ) {
             // Renegotiation required.
@@ -704,7 +705,7 @@ import org.slf4j.LoggerFactory;
 
     /**
      * Decrypt the incoming buffer and move the decrypted data to an
-     * application buffer. 
+     * application buffer.
      */
     private SSLEngineResult unwrap() throws SSLException {
         // We first have to create the application buffer if it does not exist
@@ -737,14 +738,14 @@ import org.slf4j.LoggerFactory;
             }
         } while (
                     (
-                        (status == SSLEngineResult.Status.OK) 
-                        || 
+                        (status == SSLEngineResult.Status.OK)
+                        ||
                         (status == SSLEngineResult.Status.BUFFER_OVERFLOW)
                     )
                     &&
                     (
                         (handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING)
-                        || 
+                        ||
                         (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)
                     )
                 );
