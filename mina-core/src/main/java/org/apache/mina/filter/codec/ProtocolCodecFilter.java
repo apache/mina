@@ -80,7 +80,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     /**
      * Creates a new instance of ProtocolCodecFilter, without any factory.
      * The encoder/decoder factory will be created as an inner class, using
-     * the two parameters (encoder and decoder). 
+     * the two parameters (encoder and decoder).
      * 
      * @param encoder The class responsible for encoding the message
      * @param decoder The class responsible for decoding the message
@@ -208,11 +208,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      * throws an exception.
      * 
      *  while ( buffer not empty )
-     *    try 
+     *    try
      *      decode ( buffer )
      *    catch
      *      break;
-     *    
+     * 
      */
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session,
@@ -229,8 +229,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         ProtocolDecoderOutput decoderOut = getDecoderOut(session, nextFilter);
         
         // Loop until we don't have anymore byte in the buffer,
-        // or until the decoder throws an unrecoverable exception or 
-        // can't decoder a message, because there are not enough 
+        // or until the decoder throws an unrecoverable exception or
+        // can't decoder a message, because there are not enough
         // data in the buffer
         while (in.hasRemaining()) {
             int oldPos = in.position();
@@ -284,11 +284,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         if (writeRequest instanceof MessageWriteRequest) {
             MessageWriteRequest wrappedRequest = (MessageWriteRequest) writeRequest;
-            nextFilter.messageSent(session, wrappedRequest.getParentRequest());            
+            nextFilter.messageSent(session, wrappedRequest.getParentRequest());
         }
         else {
             nextFilter.messageSent(session, writeRequest);
-        }        
+        }
     }
 
     @Override
@@ -335,7 +335,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 // Flush only when the buffer has remaining.
                 if (!(encodedMessage instanceof IoBuffer) || ((IoBuffer) encodedMessage).hasRemaining()) {
                     SocketAddress destination = writeRequest.getDestination();
-                    WriteRequest encodedWriteRequest = new EncodedWriteRequest(encodedMessage, null, destination); 
+                    WriteRequest encodedWriteRequest = new EncodedWriteRequest(encodedMessage, null, destination);
 
                     nextFilter.filterWrite(session, encodedWriteRequest);
                 }
@@ -435,13 +435,16 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         private final NextFilter nextFilter;
 
-        private final WriteRequest writeRequest;
+        /** The WriteRequest destination */
+        private final SocketAddress destination;
 
         public ProtocolEncoderOutputImpl(IoSession session,
                 NextFilter nextFilter, WriteRequest writeRequest) {
             this.session = session;
             this.nextFilter = nextFilter;
-            this.writeRequest = writeRequest;
+            
+            // Only store the destination, not the full WriteRequest.
+            destination = writeRequest.getDestination();
         }
 
         public WriteFuture flush() {
@@ -459,11 +462,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 if (!(encodedMessage instanceof IoBuffer) || ((IoBuffer) encodedMessage).hasRemaining()) {
                     future = new DefaultWriteFuture(session);
                     nextFilter.filterWrite(session, new EncodedWriteRequest(encodedMessage,
-                            future, writeRequest.getDestination()));
+                            future, destination));
                 }
             }
 
             if (future == null) {
+                // Creates an empty writeRequest containing the destination
+                WriteRequest writeRequest = new DefaultWriteRequest(null, null, destination);
                 future = DefaultWriteFuture.newNotWrittenFuture(
                         session, new NothingWrittenException(writeRequest));
             }
@@ -483,7 +488,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         disposeEncoder(session);
         disposeDecoder(session);
         
-        // We also remove the callback  
+        // We also remove the callback
         disposeDecoderOut(session);
     }
     
