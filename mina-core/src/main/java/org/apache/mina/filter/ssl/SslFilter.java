@@ -421,9 +421,6 @@ public class SslFilter extends IoFilterAdapter {
     @Override
     public void onPostAdd(IoFilterChain parent, String name,
             NextFilter nextFilter) throws SSLException {
-        if (autoStart == START_HANDSHAKE) {
-            initiateHandshake(nextFilter, parent.getSession());
-        }
     }
 
     @Override
@@ -435,6 +432,15 @@ public class SslFilter extends IoFilterAdapter {
         session.removeAttribute(SSL_HANDLER);
     }
 
+    @Override
+    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
+        super.sessionCreated(nextFilter, session);
+        
+        if (autoStart) {
+            initiateHandshake(nextFilter, session);
+        }
+    }
+    
     // IoFilter impl.
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session)
