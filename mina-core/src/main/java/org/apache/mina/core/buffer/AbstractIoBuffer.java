@@ -823,7 +823,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(byte value) {
         autoExpand(4);
-        buf().putInt( (int)((short)value&0x00ff) );
+        buf().putInt( (value&0x00ff) );
         return this;
     }
 
@@ -833,7 +833,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, byte value) {
         autoExpand(index, 4);
-        buf().putInt( index, (int)((short)value&0x00ff) );
+        buf().putInt( index, (value&0x00ff) );
         return this;
     }
 
@@ -843,7 +843,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(short value) {
         autoExpand(4);
-        buf().putInt( (int)((int)value&0x0000ffff) );
+        buf().putInt( (value&0x0000ffff) );
         return this;
     }
 
@@ -853,7 +853,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, short value) {
         autoExpand(index, 4);
-        buf().putInt( index, (int)((int)value&0x0000ffff) );
+        buf().putInt( index, (value&0x0000ffff) );
         return this;
     }
 
@@ -903,7 +903,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(byte value) {
         autoExpand(2);
-        buf().putShort( (short)((short)value&0x00ff) );
+        buf().putShort( (short)(value&0x00ff) );
         return this;
     }
 
@@ -913,7 +913,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, byte value) {
         autoExpand(index, 2);
-        buf().putShort( index, (short)((short)value&0x00ff) );
+        buf().putShort( index, (short)(value&0x00ff) );
         return this;
     }
 
@@ -1183,6 +1183,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             throw new IllegalArgumentException("length: " + length);
         }
         
+        int pos = position();
         int limit = limit();
         
         if (index > limit) {
@@ -1191,9 +1192,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         
         int endIndex = index + length;
 
-        if (capacity() < endIndex) {
+        if (endIndex > limit) {
             throw new IndexOutOfBoundsException("index + length (" + endIndex
-                    + ") is greater " + "than capacity (" + capacity() + ").");
+                    + ") is greater " + "than limit (" + limit + ").");
         }
 
         clear();
@@ -1201,8 +1202,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         limit(endIndex);
 
         IoBuffer slice = slice();
-        position(index);
+        position(pos);
         limit(limit);
+        
         return slice;
     }
 
