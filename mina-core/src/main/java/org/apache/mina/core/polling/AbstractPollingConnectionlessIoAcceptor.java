@@ -35,7 +35,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-
+import java.util.concurrent.Semaphore;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.AbstractIoAcceptor;
@@ -69,7 +69,8 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
      */
     private static final long SELECT_TIMEOUT = 1000L;
 
-    private final Object lock = new Object();
+    /** A lock used to protect the selector to be waked up before it's created */
+    private final Semaphore lock = new Semaphore(1);
 
     private final IoProcessor<S> processor = new ConnectionlessAcceptorProcessor();
     private final Queue<AcceptorOperationFuture> registerQueue =
@@ -199,7 +200,15 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         // As we just started the acceptor, we have to unblock the select()
         // in order to process the bind request we just have added to the
         // registerQueue.
-        wakeup();
+        try
+        {
+            lock.acquire();
+            wakeup();
+        }
+        finally
+        {
+            lock.release();
+        }
 
         // Now, we wait until this request is completed.
         request.awaitUninterruptibly();
@@ -358,18 +367,24 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     /**
      * Starts the inner Acceptor thread.
      */
-    private void startupAcceptor() {
+    private void startupAcceptor() throws InterruptedException {
         if (!selectable) {
             registerQueue.clear();
             cancelQueue.clear();
             flushingSessions.clear();
         }
 
-        synchronized (lock) {
+        try {
+            lock.acquire();
+
             if (acceptor == null) {
                 acceptor = new Acceptor();
                 executeWorker(acceptor);
             }
+        }
+        finally
+        {
+            lock.release();
         }
     }
 
@@ -402,11 +417,17 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                     nHandles += registerHandles();
 
                     if (nHandles == 0) {
-                        synchronized (lock) {
+                        try {
+                            lock.acquire();
+                            
                             if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
                                 acceptor = null;
                                 break;
                             }
+                        }
+                        finally
+                        {
+                            lock.release();
                         }
                     }
 

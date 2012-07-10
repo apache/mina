@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.mina.core.RuntimeIoException;
@@ -66,6 +67,8 @@ import org.apache.mina.util.ExceptionMonitor;
  */
 public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         extends AbstractIoAcceptor {
+    /** A lock used to protect the selector to be waked up before it's created */
+    private final Semaphore lock = new Semaphore(1);
 
     private final IoProcessor<S> processor;
 
@@ -324,7 +327,14 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         // As we just started the acceptor, we have to unblock the select()
         // in order to process the bind request we just have added to the
         // registerQueue.
-        wakeup();
+        try {
+            lock.acquire();
+            wakeup();
+        }
+        finally
+        {
+            lock.release();
+        }
         
         // Now, we wait until this request is completed.
         request.awaitUninterruptibly();
@@ -353,7 +363,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * is now working, then nothing will happen and the method
      * will just return.
      */
-    private void startupAcceptor() {
+    private void startupAcceptor() throws InterruptedException {
         // If the acceptor is not ready, clear the queues
         // TODO : they should already be clean : do we have to do that ?
         if (!selectable) {
@@ -365,10 +375,17 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         Acceptor acceptor = acceptorRef.get();
 
         if (acceptor == null) {
-            acceptor = new Acceptor();
-
-            if (acceptorRef.compareAndSet(null, acceptor)) {
-                executeWorker(acceptor);
+            try {
+                lock.acquire();
+                acceptor = new Acceptor();
+    
+                if (acceptorRef.compareAndSet(null, acceptor)) {
+                    executeWorker(acceptor);
+                }
+            }
+            finally
+            {
+                lock.release();
             }
         }
     }
