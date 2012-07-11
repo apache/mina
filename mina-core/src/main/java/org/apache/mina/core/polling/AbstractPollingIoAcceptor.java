@@ -329,6 +329,9 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         // registerQueue.
         try {
             lock.acquire();
+            
+            // Wait a bit to give a chance to the Acceptor thread to do the select()
+            Thread.sleep( 10 );
             wakeup();
         }
         finally
@@ -375,16 +378,12 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         Acceptor acceptor = acceptorRef.get();
 
         if (acceptor == null) {
-            try {
-                lock.acquire();
-                acceptor = new Acceptor();
-    
-                if (acceptorRef.compareAndSet(null, acceptor)) {
-                    executeWorker(acceptor);
-                }
-            }
-            finally
-            {
+            lock.acquire();
+            acceptor = new Acceptor();
+
+            if (acceptorRef.compareAndSet(null, acceptor)) {
+                executeWorker(acceptor);
+            } else {
                 lock.release();
             }
         }
@@ -420,6 +419,9 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
             assert (acceptorRef.get() == this);
 
             int nHandles = 0;
+
+            // Release the lock
+            lock.release();
 
             while (selectable) {
                 try {

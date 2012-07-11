@@ -203,6 +203,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         try
         {
             lock.acquire();
+
+            // Wait a bit to give a chance to the Acceptor thread to do the select()
+            Thread.sleep( 10 );
             wakeup();
         }
         finally
@@ -374,16 +377,12 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
             flushingSessions.clear();
         }
 
-        try {
-            lock.acquire();
+        lock.acquire();
 
-            if (acceptor == null) {
-                acceptor = new Acceptor();
-                executeWorker(acceptor);
-            }
-        }
-        finally
-        {
+        if (acceptor == null) {
+            acceptor = new Acceptor();
+            executeWorker(acceptor);
+        } else {
             lock.release();
         }
     }
@@ -410,6 +409,9 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
             int nHandles = 0;
             lastIdleCheckTime = System.currentTimeMillis();
 
+            // Release the lock
+            lock.release();
+            
             while (selectable) {
                 try {
                     int selected = select(SELECT_TIMEOUT);
