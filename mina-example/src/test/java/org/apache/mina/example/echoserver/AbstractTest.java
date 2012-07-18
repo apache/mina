@@ -139,6 +139,9 @@ public abstract class AbstractTest {
                     }
 
                     IoBuffer buf = (IoBuffer) message;
+                    
+                    buf.mark();
+
                     if (session.getFilterChain().contains("SSL")
                             && buf.remaining() == 1 && buf.get() == (byte) '.') {
                         LOGGER.info("TLS Reentrance");
@@ -152,7 +155,8 @@ public abstract class AbstractTest {
                         session.setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE);
                         session.write(buf);
                     } else {
-                        super.messageReceived(session, message);
+                        buf.reset();
+                        super.messageReceived(session, buf);
                     }
                 }
             });
