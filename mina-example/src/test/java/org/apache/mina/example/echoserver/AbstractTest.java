@@ -149,8 +149,7 @@ public abstract class AbstractTest {
                                 .startSsl(session);
 
                         // Send a response
-                        buf = IoBuffer.allocate(1);
-                        buf.put((byte) '.');
+                        buf.capacity(1);
                         buf.flip();
                         session.setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE);
                         session.write(buf);
