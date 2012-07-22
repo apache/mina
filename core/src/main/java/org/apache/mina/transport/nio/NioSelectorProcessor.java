@@ -37,6 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.api.IdleStatus;
+import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.api.RuntimeIoException;
@@ -79,16 +80,10 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
     private final IdleChecker idleChecker = new IndexedIdleChecker();
 
     /** A queue containing the servers to bind to this selector */
-    private final Queue<NioTcpServer> tcpServersToadd = new ConcurrentLinkedQueue<NioTcpServer>();
-
-    /** A queue containing the servers to bind to this selector */
-    private final Queue<NioUdpServer> udpServersToadd = new ConcurrentLinkedQueue<NioUdpServer>();
+    private final Queue<IoServer> serversToAdd = new ConcurrentLinkedQueue<IoServer>();
 
     /** server to remove of the selector */
-    private final Queue<NioTcpServer> tcpServersToRemove = new ConcurrentLinkedQueue<NioTcpServer>();
-
-    /** server to remove of the selector */
-    private final Queue<NioUdpServer> udpServersToRemove = new ConcurrentLinkedQueue<NioUdpServer>();
+    private final Queue<IoServer> serversToRemove = new ConcurrentLinkedQueue<IoServer>();
 
     /**
      * new session freshly accepted, placed here for being added to the selector
@@ -121,8 +116,8 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
      */
     @Override
     public void addServer(NioTcpServer server) {
-        tcpServersToadd.add(server);
-        this.wakeupWorker();
+        serversToAdd.add(server);
+        wakeupWorker();
     }
 
     /**
@@ -130,8 +125,8 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
      */
     @Override
     public void addServer(NioUdpServer server) {
-        udpServersToadd.add(server);
-        this.wakeupWorker();
+        serversToAdd.add(server);
+        wakeupWorker();
     }
 
     /**
@@ -139,8 +134,8 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
      */
     @Override
     public void removeServer(NioTcpServer server) {
-        tcpServersToRemove.add(server);
-        this.wakeupWorker();
+        serversToRemove.add(server);
+        wakeupWorker();
     }
 
     /**
@@ -148,8 +143,8 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
      */
     @Override
     public void removeServer(NioUdpServer server) {
-        udpServersToRemove.add(server);
-        this.wakeupWorker();
+        serversToRemove.add(server);
+        wakeupWorker();
     }
 
     /**
@@ -157,18 +152,18 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
      * too much locking there ?
      */
     private void wakeupWorker() {
-        this.workerLock.lock();
+        workerLock.lock();
         try {
-            if (this.worker == null) {
-                this.worker = new SelectorWorker();
-                this.worker.start();
+            if (worker == null) {
+                worker = new SelectorWorker();
+                worker.start();
             }
         } finally {
-            this.workerLock.unlock();
+            workerLock.unlock();
         }
 
-        if (this.selector != null) {
-            this.selector.wakeup();
+        if (selector != null) {
+            selector.wakeup();
         }
     }
 
@@ -181,7 +176,7 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
         final SocketChannel socketChannel = (SocketChannel) clientSocket;
         final TcpSessionConfig config = (TcpSessionConfig) service.getSessionConfig();
         final NioTcpSession session = new NioTcpSession(service, socketChannel,
-                this.strategy.getSelectorForNewSession(this), idleChecker);
+                strategy.getSelectorForNewSession(this), idleChecker);
 
         try {
             socketChannel.configureBlocking(false);
@@ -252,8 +247,8 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
         session.processSessionCreated();
 
         // add the session to the queue for being added to the selector
-        this.sessionsToConnect.add(session);
-        this.wakeupWorker();
+        sessionsToConnect.add(session);
+        wakeupWorker();
     }
 
     public IdleChecker getIdleChecker() {
@@ -267,9 +262,9 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
     public void flush(final AbstractIoSession session) {
         LOGGER.debug("scheduling session {} for writing", session);
         // add the session to the list of session to be registered for writing
-        this.flushingSessions.add((NioTcpSession) session);
+        flushingSessions.add((NioTcpSession) session);
         // wake the selector for unlocking the I/O thread
-        this.wakeupWorker();
+        wakeupWorker();
     }
 
     /** 
@@ -284,20 +279,20 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
 
         // a key registered for read ? (because we can have a
         // Selector for reads and another for the writes
-        SelectionKey readKey = this.sessionReadKey.get(session);
+        SelectionKey readKey = sessionReadKey.get(session);
 
         if (readKey != null) {
             LOGGER.debug("registering key for only reading");
             SelectionKey mykey;
             try {
                 mykey = session.getSocketChannel().register(selector, SelectionKey.OP_READ, session);
-                this.sessionReadKey.put(session, mykey);
+                sessionReadKey.put(session, mykey);
             } catch (ClosedChannelException e) {
                 LOGGER.error("already closed session", e);
             }
         } else {
             LOGGER.debug("cancel key for writing");
-            session.getSocketChannel().keyFor(NioSelectorProcessor.this.selector).cancel();
+            session.getSocketChannel().keyFor(selector).cancel();
         }
     }
 
@@ -317,11 +312,11 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
         @Override
         public void run() {
             try {
-                if (NioSelectorProcessor.this.selector == null) {
+                if (selector == null) {
                     LOGGER.debug("opening a new selector");
 
                     try {
-                        NioSelectorProcessor.this.selector = Selector.open();
+                        selector = Selector.open();
                     } catch (IOException e) {
                         LOGGER.error("IOException while opening a new Selector", e);
                     }
@@ -330,35 +325,32 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
                 for (;;) {
                     try {
                         // pop server sockets for removing
-                        if (NioSelectorProcessor.this.tcpServersToRemove.size() > 0
-                                || NioSelectorProcessor.this.udpServersToRemove.size() > 0) {
-                            this.processServerRemove();
+                        if (serversToRemove.size() > 0) {
+                            processServerRemove();
                         }
 
                         // pop new server sockets for accepting
-                        if (NioSelectorProcessor.this.tcpServersToadd.size() > 0
-                                || NioSelectorProcessor.this.udpServersToadd.size() > 0) {
-                            this.processServerAdd();
+                        if (serversToAdd.size() > 0) {
+                            processServerAdd();
                         }
 
                         // pop new session for starting read/write
-                        if (NioSelectorProcessor.this.sessionsToConnect.size() > 0) {
-                            this.processConnectSessions();
+                        if (sessionsToConnect.size() > 0) {
+                            processConnectSessions();
                         }
 
                         // pop session for close, if any
-                        if (NioSelectorProcessor.this.sessionsToClose.size() > 0) {
-                            this.processCloseSessions();
+                        if (sessionsToClose.size() > 0) {
+                            processCloseSessions();
                         }
 
                         LOGGER.debug("selecting...");
-                        int readyCount = NioSelectorProcessor.this.selector.select(SELECT_TIMEOUT);
+                        int readyCount = selector.select(SELECT_TIMEOUT);
                         LOGGER.debug("... done selecting : {}", readyCount);
 
                         if (readyCount > 0) {
                             // process selected keys
-                            Iterator<SelectionKey> selectedKeys = NioSelectorProcessor.this.selector.selectedKeys()
-                                    .iterator();
+                            Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
 
                             // Loop on each SelectionKey and process any valid
                             // action
@@ -370,7 +362,7 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
                                     continue;
                                 }
 
-                                NioSelectorProcessor.this.selector.selectedKeys().remove(key);
+                                selector.selectedKeys().remove(key);
 
                                 if (key.isAcceptable()) {
                                     ((SelectorEventListener) key.attachment()).acceptReady(NioSelectorProcessor.this);
@@ -390,27 +382,27 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
 
                         // registering session with data in the write queue for
                         // writing
-                        while (!NioSelectorProcessor.this.flushingSessions.isEmpty()) {
-                            this.processFlushSessions();
+                        while (!flushingSessions.isEmpty()) {
+                            processFlushSessions();
                         }
                     } catch (IOException e) {
                         LOGGER.error("IOException while selecting selector", e);
                     }
 
                     // stop the worker if needed
-                    NioSelectorProcessor.this.workerLock.lock();
+                    workerLock.lock();
 
                     try {
-                        if (NioSelectorProcessor.this.selector.keys().isEmpty()) {
-                            NioSelectorProcessor.this.worker = null;
+                        if (selector.keys().isEmpty()) {
+                            worker = null;
                             break;
                         }
                     } finally {
-                        NioSelectorProcessor.this.workerLock.unlock();
+                        workerLock.unlock();
                     }
 
                     // check for idle events
-                    NioSelectorProcessor.this.idleChecker.processIdleSession(System.currentTimeMillis());
+                    idleChecker.processIdleSession(System.currentTimeMillis());
                 }
             } catch (Exception e) {
                 LOGGER.error("Unexpected exception : ", e);
@@ -421,25 +413,24 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
          * Handles the servers addition
          */
         private void processServerAdd() throws IOException {
+            IoServer server;
 
-            NioTcpServer tcpServer;
-            while ((tcpServer = tcpServersToadd.poll()) != null) {
-                // register for accept
-                SelectionKey key = tcpServer.getServerSocketChannel().register(NioSelectorProcessor.this.selector,
-                        SelectionKey.OP_ACCEPT);
-                key.attach(tcpServer);
-                tcpServer.setAcceptKey(key);
-                LOGGER.debug("registered for accept : {}", tcpServer);
-            }
+            while ((server = serversToAdd.poll()) != null) {
+                if (server instanceof NioTcpServer) {
+                    NioTcpServer tcpServer = (NioTcpServer) server;
+                    // register for accept
+                    SelectionKey key = tcpServer.getServerSocketChannel().register(selector, SelectionKey.OP_ACCEPT);
+                    key.attach(tcpServer);
+                    tcpServer.setAcceptKey(key);
+                } else {
+                    NioUdpServer udpServer = (NioUdpServer) server;
+                    // register for read
+                    SelectionKey key = udpServer.getDatagramChannel().register(selector, SelectionKey.OP_READ);
+                    key.attach(udpServer);
+                    udpServer.setReadKey(key);
+                }
 
-            NioUdpServer udpServer;
-            while ((udpServer = udpServersToadd.poll()) != null) {
-                // register for read
-                SelectionKey key = udpServer.getDatagramChannel().register(NioSelectorProcessor.this.selector,
-                        SelectionKey.OP_READ);
-                key.attach(udpServer);
-                udpServer.setReadKey(key);
-                LOGGER.debug("registered for accept : {}", udpServer);
+                LOGGER.debug("registered for accept : {}", server);
             }
         }
 
@@ -447,21 +438,24 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
          * Handles the servers removal
          */
         private void processServerRemove() {
-            NioTcpServer tcpServer;
-            while ((tcpServer = tcpServersToRemove.poll()) != null) {
-                // find the server key and cancel it
-                SelectionKey key = tcpServer.getAcceptKey();
-                key.cancel();
-                tcpServer.setAcceptKey(null);
-                key.attach(null);
-            }
-            NioUdpServer udpServer;
-            while ((udpServer = udpServersToRemove.poll()) != null) {
-                // find the server key and cancel it
-                SelectionKey key = udpServer.getReadKey();
-                key.cancel();
-                udpServer.setReadKey(null);
-                key.attach(null);
+            IoServer server;
+
+            while ((server = serversToRemove.poll()) != null) {
+                if (server instanceof NioTcpServer) {
+                    NioTcpServer tcpServer = (NioTcpServer) server;
+                    // find the server key and cancel it
+                    SelectionKey key = tcpServer.getAcceptKey();
+                    key.cancel();
+                    tcpServer.setAcceptKey(null);
+                    key.attach(null);
+                } else {
+                    NioUdpServer udpServer = (NioUdpServer) server;
+                    // find the server key and cancel it
+                    SelectionKey key = udpServer.getReadKey();
+                    key.cancel();
+                    udpServer.setReadKey(null);
+                    key.attach(null);
+                }
             }
         }
 
@@ -469,10 +463,9 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
          * Handles all the sessions that must be connected
          */
         private void processConnectSessions() throws IOException {
-            while (!NioSelectorProcessor.this.sessionsToConnect.isEmpty()) {
-                NioTcpSession session = NioSelectorProcessor.this.sessionsToConnect.poll();
-                SelectionKey key = session.getSocketChannel().register(NioSelectorProcessor.this.selector,
-                        SelectionKey.OP_READ);
+            while (!sessionsToConnect.isEmpty()) {
+                NioTcpSession session = sessionsToConnect.poll();
+                SelectionKey key = session.getSocketChannel().register(selector, SelectionKey.OP_READ);
                 key.attach(session);
 
                 sessionReadKey.put(session, key);
@@ -487,8 +480,8 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
                     ((AbstractIoService) session.getService()).fireSessionCreated(session);
                     session.processSessionOpened();
                     long time = System.currentTimeMillis();
-                    NioSelectorProcessor.this.idleChecker.sessionRead(session, time);
-                    NioSelectorProcessor.this.idleChecker.sessionWritten(session, time);
+                    idleChecker.sessionRead(session, time);
+                    idleChecker.sessionWritten(session, time);
                 }
             }
         }
@@ -497,8 +490,8 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
          * Handles all the sessions that must be closed
          */
         private void processCloseSessions() throws IOException {
-            while (!NioSelectorProcessor.this.sessionsToClose.isEmpty()) {
-                NioTcpSession session = NioSelectorProcessor.this.sessionsToClose.poll();
+            while (!sessionsToClose.isEmpty()) {
+                NioTcpSession session = sessionsToClose.poll();
 
                 SelectionKey key = sessionReadKey.remove(session);
                 key.cancel();
@@ -515,19 +508,19 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
          * Flushes the sessions
          */
         private void processFlushSessions() throws IOException {
-            NioTcpSession session = NioSelectorProcessor.this.flushingSessions.poll();
+            NioTcpSession session = flushingSessions.poll();
             // a key registered for read ? (because we can have a
             // Selector for reads and another for the writes
             SelectionKey readKey = sessionReadKey.get(session);
 
             if (readKey != null) {
                 // register for read/write
-                SelectionKey key = session.getSocketChannel().register(NioSelectorProcessor.this.selector,
+                SelectionKey key = session.getSocketChannel().register(selector,
                         SelectionKey.OP_READ | SelectionKey.OP_WRITE, session);
 
                 sessionReadKey.put(session, key);
             } else {
-                session.getSocketChannel().register(NioSelectorProcessor.this.selector, SelectionKey.OP_WRITE, session);
+                session.getSocketChannel().register(selector, SelectionKey.OP_WRITE, session);
             }
         }
     }
