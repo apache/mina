@@ -34,14 +34,13 @@ import org.apache.mina.transport.udp.AbstractUdpServer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  */
-public interface SelectorProcessor<TCP_SERVER extends AbstractTcpServer,UDP_SERVER extends AbstractUdpServer> {
+public interface SelectorProcessor<TCP_SERVER extends AbstractTcpServer, UDP_SERVER extends AbstractUdpServer> {
+    /**
+     * The strategy to use for assigning selectors to newly created sessions 
+     * @param strategy
+     */
+    void setStrategy(SelectorStrategy<?> strategy);
 
-	/**
-	 * The strategy to use for assigning selectors to newly created sessions 
-	 * @param strategy
-	 */
-	void setStrategy(SelectorStrategy<?> strategy);
-	
     /**
      * create a session for a freshly accepted client socket
      * @param service
@@ -66,13 +65,13 @@ public interface SelectorProcessor<TCP_SERVER extends AbstractTcpServer,UDP_SERV
      * @param server the server to be removed of processing
      */
     void removeServer(TCP_SERVER server);
-    
+
     /**
      * Stop processing this UDP server
      * @param server the server to be processed
      */
     void removeServer(UDP_SERVER server);
-    
+
     /**
      * Schedule a session for flushing, will be called after a {@link IoSession#write(Object)}.
      * @param session the session to flush

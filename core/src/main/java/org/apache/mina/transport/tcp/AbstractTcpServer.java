@@ -27,10 +27,9 @@ import org.apache.mina.service.server.AbstractIoServer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractTcpServer extends AbstractIoServer {
-	
     // the default session configuration
     private TcpSessionConfig config;
-    
+
     /**
      * Create an new AbsractTcpServer instance
      */

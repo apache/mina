@@ -44,14 +44,14 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NioUdpEchoServer {
-	
-	static final Logger LOG = LoggerFactory.getLogger(NioUdpEchoServer.class);
-	
+    static final Logger LOG = LoggerFactory.getLogger(NioUdpEchoServer.class);
+
     public static void main(String[] args) {
         LOG.info("starting echo server");
 
-        OneThreadSelectorStrategy<NioSelectorProcessor> strategy = new OneThreadSelectorStrategy<NioSelectorProcessor>(new NioSelectorProcessor());
-        
+        OneThreadSelectorStrategy<NioSelectorProcessor> strategy = new OneThreadSelectorStrategy<NioSelectorProcessor>(
+                new NioSelectorProcessor());
+
         NioUdpServer server = new NioUdpServer(strategy);
 
         // create the fitler chain for this service

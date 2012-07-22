@@ -33,8 +33,8 @@ public class OneThreadSelectorStrategy<PROCESSOR extends SelectorProcessor> impl
     private final PROCESSOR processor;
 
     public OneThreadSelectorStrategy(PROCESSOR processor) {
-    	processor.setStrategy(this);
-    	this.processor = processor;
+        processor.setStrategy(this);
+        this.processor = processor;
     }
 
     @Override
