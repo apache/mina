@@ -27,7 +27,6 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.idlechecker.IdleChecker;
-import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * A UDP session based on NIO
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioUdpSession extends AbstractIoSession {
+public class NioUdpSession extends AbstractNioSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioUdpSession.class);
 

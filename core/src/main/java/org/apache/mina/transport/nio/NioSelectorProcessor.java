@@ -26,9 +26,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
@@ -279,14 +277,14 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
 
         // a key registered for read ? (because we can have a
         // Selector for reads and another for the writes
-        SelectionKey readKey = sessionReadKey.get(session);
+        SelectionKey readKey = session.getSelectionKey();
 
         if (readKey != null) {
             LOGGER.debug("registering key for only reading");
-            SelectionKey mykey;
+
             try {
-                mykey = session.getSocketChannel().register(selector, SelectionKey.OP_READ, session);
-                sessionReadKey.put(session, mykey);
+                SelectionKey key = session.getSocketChannel().register(selector, SelectionKey.OP_READ, session);
+                session.setSelectionKey(key);
             } catch (ClosedChannelException e) {
                 LOGGER.error("already closed session", e);
             }
@@ -296,9 +294,6 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
         }
     }
 
-    // map for finding read keys associated with a given session
-    private Map<NioTcpSession, SelectionKey> sessionReadKey;
-
     /**
      * The worker processing incoming session creation, session destruction
      * requests, session write and reads. It will also bind new servers.
@@ -306,7 +301,6 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
     private class SelectorWorker extends Thread {
 
         public SelectorWorker() {
-            sessionReadKey = new HashMap<NioTcpSession, SelectionKey>();
         }
 
         @Override
@@ -468,7 +462,7 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
                 SelectionKey key = session.getSocketChannel().register(selector, SelectionKey.OP_READ);
                 key.attach(session);
 
-                sessionReadKey.put(session, key);
+                session.setSelectionKey(key);
 
                 // Switch to CONNECTED, only if the session is not secured, as
                 // the SSL Handshake
@@ -493,7 +487,7 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
             while (!sessionsToClose.isEmpty()) {
                 NioTcpSession session = sessionsToClose.poll();
 
-                SelectionKey key = sessionReadKey.remove(session);
+                SelectionKey key = session.getSelectionKey();
                 key.cancel();
 
                 // closing underlying socket
@@ -508,19 +502,22 @@ public class NioSelectorProcessor implements SelectorProcessor<NioTcpServer, Nio
          * Flushes the sessions
          */
         private void processFlushSessions() throws IOException {
-            NioTcpSession session = flushingSessions.poll();
-            // a key registered for read ? (because we can have a
-            // Selector for reads and another for the writes
-            SelectionKey readKey = sessionReadKey.get(session);
+            NioTcpSession session = null;
 
-            if (readKey != null) {
-                // register for read/write
-                SelectionKey key = session.getSocketChannel().register(selector,
-                        SelectionKey.OP_READ | SelectionKey.OP_WRITE, session);
+            while ((session = flushingSessions.poll()) != null) {
+                // a key registered for read ? (because we can have a
+                // Selector for reads and another for the writes
+                SelectionKey readKey = session.getSelectionKey();
 
-                sessionReadKey.put(session, key);
-            } else {
-                session.getSocketChannel().register(selector, SelectionKey.OP_WRITE, session);
+                if (readKey != null) {
+                    // register for read/write
+                    SelectionKey key = session.getSocketChannel().register(selector,
+                            SelectionKey.OP_READ | SelectionKey.OP_WRITE, session);
+
+                    session.setSelectionKey(key);
+                } else {
+                    session.getSocketChannel().register(selector, SelectionKey.OP_WRITE, session);
+                }
             }
         }
     }

@@ -30,7 +30,6 @@ import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.idlechecker.IdleChecker;
-import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.DefaultWriteFuture;
 import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
@@ -47,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  */
-public class NioTcpSession extends AbstractIoSession implements SelectorEventListener {
+public class NioTcpSession extends AbstractNioSession implements SelectorEventListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpSession.class);
 
