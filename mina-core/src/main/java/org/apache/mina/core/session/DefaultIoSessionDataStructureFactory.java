@@ -37,22 +37,18 @@ import org.apache.mina.core.write.WriteRequestQueue;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DefaultIoSessionDataStructureFactory implements
-        IoSessionDataStructureFactory {
+public class DefaultIoSessionDataStructureFactory implements IoSessionDataStructureFactory {
 
-    public IoSessionAttributeMap getAttributeMap(IoSession session)
-            throws Exception {
+    public IoSessionAttributeMap getAttributeMap(IoSession session) throws Exception {
         return new DefaultIoSessionAttributeMap();
     }
-    
-    public WriteRequestQueue getWriteRequestQueue(IoSession session)
-            throws Exception {
+
+    public WriteRequestQueue getWriteRequestQueue(IoSession session) throws Exception {
         return new DefaultWriteRequestQueue();
     }
 
     private static class DefaultIoSessionAttributeMap implements IoSessionAttributeMap {
-        private final ConcurrentHashMap<Object, Object> attributes =
-            new ConcurrentHashMap<Object, Object>(4);
+        private final ConcurrentHashMap<Object, Object> attributes = new ConcurrentHashMap<Object, Object>(4);
 
         /**
          * Default constructor
@@ -60,7 +56,7 @@ public class DefaultIoSessionDataStructureFactory implements
         public DefaultIoSessionAttributeMap() {
             super();
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -69,11 +65,17 @@ public class DefaultIoSessionDataStructureFactory implements
                 throw new IllegalArgumentException("key");
             }
 
-            if ( defaultValue == null ) {
+            if (defaultValue == null) {
                 return attributes.get(key);
             }
-                
-            return attributes.putIfAbsent(key, defaultValue);
+
+            Object object = attributes.putIfAbsent(key, defaultValue);
+
+            if (object == null) {
+                return defaultValue;
+            } else {
+                return object;
+            }
         }
 
         /**
@@ -87,7 +89,7 @@ public class DefaultIoSessionDataStructureFactory implements
             if (value == null) {
                 return attributes.remove(key);
             }
-            
+
             return attributes.put(key, value);
         }
 
@@ -131,7 +133,7 @@ public class DefaultIoSessionDataStructureFactory implements
 
             try {
                 return attributes.remove(key, value);
-            } catch(NullPointerException e) {
+            } catch (NullPointerException e) {
                 return false;
             }
         }
@@ -142,9 +144,9 @@ public class DefaultIoSessionDataStructureFactory implements
         public boolean replaceAttribute(IoSession session, Object key, Object oldValue, Object newValue) {
             try {
                 return attributes.replace(key, oldValue, newValue);
-            } catch(NullPointerException e) {
+            } catch (NullPointerException e) {
             }
-            
+
             return false;
         }
 
@@ -171,7 +173,7 @@ public class DefaultIoSessionDataStructureFactory implements
             // Do nothing
         }
     }
-    
+
     private static class DefaultWriteRequestQueue implements WriteRequestQueue {
         /** A queue to store incoming write requests */
         private final Queue<WriteRequest> q = new ConcurrentLinkedQueue<WriteRequest>();
@@ -182,14 +184,14 @@ public class DefaultIoSessionDataStructureFactory implements
         public DefaultWriteRequestQueue() {
             super();
         }
-        
+
         /**
          * {@inheritDoc}
          */
         public void dispose(IoSession session) {
             // Do nothing
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -217,7 +219,7 @@ public class DefaultIoSessionDataStructureFactory implements
         public synchronized WriteRequest poll(IoSession session) {
             return q.poll();
         }
-        
+
         @Override
         public String toString() {
             return q.toString();
