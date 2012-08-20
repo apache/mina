@@ -31,10 +31,6 @@
     <maven>3.0.0</maven>
   </prerequisites>
 
-  <properties>
-    <arguments/>
-  </properties>
-
   <organization>
     <name>Apache MINA Project</name>
     <url>http://mina.apache.org/</url>
@@ -88,6 +84,8 @@
 
   <!-- Define the version for each of the used jar and maven plugins -->
   <properties>
+    <arguments/>
+
     <!-- Maven Plugins -->
     <version.apache.rat.plugin>0.8</version.apache.rat.plugin>
     <version.api.plugin>3.0.4</version.api.plugin>
