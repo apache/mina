@@ -50,7 +50,7 @@ public interface IoAcceptor extends IoService {
      * necessarily the firstly bound address.
      */
     SocketAddress getLocalAddress();
-    
+
     /**
      * Returns a {@link Set} of the local addresses which are bound currently.
      */
@@ -65,7 +65,7 @@ public interface IoAcceptor extends IoService {
      * 
      */
     SocketAddress getDefaultLocalAddress();
-    
+
     /**
      * Returns a {@link List} of the default local addresses to bind when no
      * argument is specified in {@link #bind()} method.  Please note that the
@@ -79,14 +79,14 @@ public interface IoAcceptor extends IoService {
      * if any local address is specified.
      */
     void setDefaultLocalAddress(SocketAddress localAddress);
-    
+
     /**
      * Sets the default local addresses to bind when no argument is specified
      * in {@link #bind()} method.  Please note that the default will not be
      * used if any local address is specified.
      */
     void setDefaultLocalAddresses(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses);
-    
+
     /**
      * Sets the default local addresses to bind when no argument is specified
      * in {@link #bind()} method.  Please note that the default will not be
@@ -101,11 +101,11 @@ public interface IoAcceptor extends IoService {
      */
     void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses);
 
-        /**
-     * Returns <tt>true</tt> if and only if all clients are closed when this
-     * acceptor unbinds from all the related local address (i.e. when the
-     * service is deactivated).
-     */
+    /**
+    * Returns <tt>true</tt> if and only if all clients are closed when this
+    * acceptor unbinds from all the related local address (i.e. when the
+    * service is deactivated).
+    */
     boolean isCloseOnDeactivation();
 
     /**
@@ -122,23 +122,17 @@ public interface IoAcceptor extends IoService {
      * @throws IOException if failed to bind
      */
     void bind() throws IOException;
-    
-    /**
-     * Binds to the specified local address and start to accept incoming
-     * connections.
-     *
-     * @throws IOException if failed to bind
-     */
-    void bind(SocketAddress localAddress) throws IOException;
-    
+
     /**
      * Binds to the specified local addresses and start to accept incoming
      * connections. If no address is given, bind on the default local address.
+     * 
+     * @param addresses The SocketAddresses to bind to 
      *
      * @throws IOException if failed to bind
      */
-    void bind(SocketAddress firstLocalAddress, SocketAddress... addresses) throws IOException;
-    
+    void bind(SocketAddress... addresses) throws IOException;
+
     /**
      * Binds to the specified local addresses and start to accept incoming
      * connections.
@@ -146,7 +140,7 @@ public interface IoAcceptor extends IoService {
      * @throws IOException if failed to bind
      */
     void bind(Iterable<? extends SocketAddress> localAddresses) throws IOException;
-    
+
     /**
      * Unbinds from all local addresses that this service is bound to and stops
      * to accept incoming connections.  All managed connections will be closed
@@ -155,7 +149,7 @@ public interface IoAcceptor extends IoService {
      * bound yet.
      */
     void unbind();
-    
+
     /**
      * Unbinds from the specified local address and stop to accept incoming
      * connections.  All managed connections will be closed if
@@ -164,7 +158,7 @@ public interface IoAcceptor extends IoService {
      * address is not bound yet.
      */
     void unbind(SocketAddress localAddress);
-    
+
     /**
      * Unbinds from the specified local addresses and stop to accept incoming
      * connections.  All managed connections will be closed if
@@ -173,7 +167,7 @@ public interface IoAcceptor extends IoService {
      * addresses are not bound yet.
      */
     void unbind(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses);
-    
+
     /**
      * Unbinds from the specified local addresses and stop to accept incoming
      * connections.  All managed connections will be closed if
@@ -182,7 +176,7 @@ public interface IoAcceptor extends IoService {
      * addresses are not bound yet.
      */
     void unbind(Iterable<? extends SocketAddress> localAddresses);
-    
+
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified
      * <tt>localAddress</tt> and the specified <tt>remoteAddress</tt> which
