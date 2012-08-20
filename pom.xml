@@ -31,13 +31,17 @@
     <maven>3.0.0</maven>
   </prerequisites>
 
+  <properties>
+    <arguments/>
+  </properties>
+
   <organization>
     <name>Apache MINA Project</name>
     <url>http://mina.apache.org/</url>
   </organization>
 
   <groupId>org.apache.mina</groupId>
-  <version>2.0.5-SNAPSHOT</version>
+  <version>2.0.5</version>
   <artifactId>mina-parent</artifactId>
   <name>Apache MINA</name>
   <packaging>pom</packaging>
@@ -51,9 +55,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/tags/2.0.4</connection>
-    <url>http://svn.apache.org/viewvc/directory/mina/tags/2.0.4</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/2.0.4</developerConnection>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/tags/2.0.5</connection>
+    <url>http://svn.apache.org/viewvc/directory/mina/tags/2.0.5</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/tags/2.0.5</developerConnection>
   </scm>
 
   <distributionManagement>
