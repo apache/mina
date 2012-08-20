@@ -102,24 +102,24 @@ public class TextLineDecoder implements ProtocolDecoder {
         if (charset == null) {
             throw new IllegalArgumentException("charset parameter shuld not be null");
         }
-        
+
         if (delimiter == null) {
             throw new IllegalArgumentException("delimiter parameter should not be null");
         }
 
         this.charset = charset;
         this.delimiter = delimiter;
-        
+
         // Convert delimiter to ByteBuffer if not done yet.
         if (delimBuf == null) {
             IoBuffer tmp = IoBuffer.allocate(2).setAutoExpand(true);
-            
-            try{
+
+            try {
                 tmp.putString(delimiter.getValue(), charset.newEncoder());
             } catch (CharacterCodingException cce) {
-                
+
             }
-            
+
             tmp.flip();
             delimBuf = tmp;
         }
@@ -143,13 +143,12 @@ public class TextLineDecoder implements ProtocolDecoder {
      */
     public void setMaxLineLength(int maxLineLength) {
         if (maxLineLength <= 0) {
-            throw new IllegalArgumentException("maxLineLength ("
-                    + maxLineLength + ") should be a positive value");
+            throw new IllegalArgumentException("maxLineLength (" + maxLineLength + ") should be a positive value");
         }
 
         this.maxLineLength = maxLineLength;
     }
-    
+
     /**
      * Sets the default buffer size. This buffer is used in the Context
      * to store the decoded line.
@@ -157,15 +156,14 @@ public class TextLineDecoder implements ProtocolDecoder {
      * @param bufferLength The default bufer size
      */
     public void setBufferLength(int bufferLength) {
-        if ( bufferLength <= 0) {
-            throw new IllegalArgumentException("bufferLength ("
-                + maxLineLength + ") should be a positive value");
-            
+        if (bufferLength <= 0) {
+            throw new IllegalArgumentException("bufferLength (" + maxLineLength + ") should be a positive value");
+
         }
-        
+
         this.bufferLength = bufferLength;
     }
-    
+
     /**
      * Returns the allowed buffer size used to store the decoded line
      * in the Context instance.
@@ -174,12 +172,10 @@ public class TextLineDecoder implements ProtocolDecoder {
         return bufferLength;
     }
 
-
     /**
      * {@inheritDoc}
      */
-    public void decode(IoSession session, IoBuffer in,
-            ProtocolDecoderOutput out) throws Exception {
+    public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         Context ctx = getContext(session);
 
         if (LineDelimiter.AUTO.equals(delimiter)) {
@@ -195,20 +191,19 @@ public class TextLineDecoder implements ProtocolDecoder {
     private Context getContext(IoSession session) {
         Context ctx;
         ctx = (Context) session.getAttribute(CONTEXT);
-        
+
         if (ctx == null) {
             ctx = new Context(bufferLength);
             session.setAttribute(CONTEXT, ctx);
         }
-        
+
         return ctx;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
-            throws Exception {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         // Do nothing
     }
 
@@ -217,7 +212,7 @@ public class TextLineDecoder implements ProtocolDecoder {
      */
     public void dispose(IoSession session) throws Exception {
         Context ctx = (Context) session.getAttribute(CONTEXT);
-        
+
         if (ctx != null) {
             session.removeAttribute(CONTEXT);
         }
@@ -237,22 +232,22 @@ public class TextLineDecoder implements ProtocolDecoder {
         while (in.hasRemaining()) {
             byte b = in.get();
             boolean matched = false;
-            
+
             switch (b) {
-                case '\r':
-                    // Might be Mac, but we don't auto-detect Mac EOL
-                    // to avoid confusion.
-                    matchCount++;
-                    break;
-                    
-                case '\n':
-                    // UNIX
-                    matchCount++;
-                    matched = true;
-                    break;
-                    
-                default:
-                    matchCount = 0;
+            case '\r':
+                // Might be Mac, but we don't auto-detect Mac EOL
+                // to avoid confusion.
+                matchCount++;
+                break;
+
+            case '\n':
+                // UNIX
+                matchCount++;
+                matched = true;
+                break;
+
+            default:
+                matchCount = 0;
             }
 
             if (matched) {
@@ -270,17 +265,18 @@ public class TextLineDecoder implements ProtocolDecoder {
                     IoBuffer buf = ctx.getBuffer();
                     buf.flip();
                     buf.limit(buf.limit() - matchCount);
-                    
+
                     try {
-                        writeText(session, buf.getString(ctx.getDecoder()), out);
+                        byte[] data = new byte[buf.limit()];
+                        buf.get(data);
+                        writeText(session, new String(data, ctx.getDecoder().charset()), out);
                     } finally {
                         buf.clear();
                     }
                 } else {
                     int overflowPosition = ctx.getOverflowPosition();
                     ctx.reset();
-                    throw new RecoverableProtocolDecoderException(
-                            "Line is too long: " + overflowPosition);
+                    throw new RecoverableProtocolDecoderException("Line is too long: " + overflowPosition);
                 }
 
                 oldPos = pos;
@@ -305,13 +301,13 @@ public class TextLineDecoder implements ProtocolDecoder {
         // Try to find a match
         int oldPos = in.position();
         int oldLimit = in.limit();
-        
+
         while (in.hasRemaining()) {
             byte b = in.get();
-            
+
             if (delimBuf.get(matchCount) == b) {
                 matchCount++;
-                
+
                 if (matchCount == delimBuf.limit()) {
                     // Found a match.
                     int pos = in.position();
@@ -322,12 +318,12 @@ public class TextLineDecoder implements ProtocolDecoder {
 
                     in.limit(oldLimit);
                     in.position(pos);
-                    
+
                     if (ctx.getOverflowPosition() == 0) {
                         IoBuffer buf = ctx.getBuffer();
                         buf.flip();
                         buf.limit(buf.limit() - matchCount);
-                        
+
                         try {
                             writeText(session, buf.getString(ctx.getDecoder()), out);
                         } finally {
@@ -336,8 +332,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                     } else {
                         int overflowPosition = ctx.getOverflowPosition();
                         ctx.reset();
-                        throw new RecoverableProtocolDecoderException(
-                                "Line is too long: " + overflowPosition);
+                        throw new RecoverableProtocolDecoderException("Line is too long: " + overflowPosition);
                     }
 
                     oldPos = pos;
@@ -380,13 +375,13 @@ public class TextLineDecoder implements ProtocolDecoder {
     private class Context {
         /** The decoder */
         private final CharsetDecoder decoder;
-        
+
         /** The temporary buffer containing the decoded line */
         private final IoBuffer buf;
-        
+
         /** The number of lines found so far */
         private int matchCount = 0;
-        
+
         /** A counter to signal that the line is too long */
         private int overflowPosition = 0;
 
@@ -426,9 +421,9 @@ public class TextLineDecoder implements ProtocolDecoder {
             if (overflowPosition != 0) {
                 discard(in);
             } else if (buf.position() > maxLineLength - in.remaining()) {
-                    overflowPosition = buf.position();
-                    buf.clear();
-                    discard(in);
+                overflowPosition = buf.position();
+                buf.clear();
+                discard(in);
             } else {
                 getBuffer().put(in);
             }
@@ -440,7 +435,7 @@ public class TextLineDecoder implements ProtocolDecoder {
             } else {
                 overflowPosition += in.remaining();
             }
-            
+
             in.position(in.limit());
         }
     }
