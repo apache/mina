@@ -32,7 +32,6 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
 import org.junit.Test;
 
-
 /**
  * Tests {@link TextLineDecoder}.
  *
@@ -41,8 +40,7 @@ import org.junit.Test;
 public class TextLineDecoderTest {
     @Test
     public void testNormalDecode() throws Exception {
-        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"),
-                LineDelimiter.WINDOWS);
+        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"), LineDelimiter.WINDOWS);
 
         CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
         ProtocolCodecSession session = new ProtocolCodecSession();
@@ -87,8 +85,7 @@ public class TextLineDecoderTest {
         assertEquals("ABC\r", session.getDecoderOutputQueue().poll());
 
         // Test splitted long delimiter
-        decoder = new TextLineDecoder(Charset.forName("UTF-8"),
-                new LineDelimiter("\n\n\n"));
+        decoder = new TextLineDecoder(Charset.forName("UTF-8"), new LineDelimiter("\n\n\n"));
         in.clear();
         in.putString("PQR\n", encoder);
         in.flip();
@@ -107,8 +104,7 @@ public class TextLineDecoderTest {
         assertEquals("PQR", session.getDecoderOutputQueue().poll());
 
         // Test splitted long delimiter which produces two output
-        decoder = new TextLineDecoder(Charset.forName("UTF-8"),
-                new LineDelimiter("\n\n\n"));
+        decoder = new TextLineDecoder(Charset.forName("UTF-8"), new LineDelimiter("\n\n\n"));
         in.clear();
         in.putString("PQR\n", encoder);
         in.flip();
@@ -123,13 +119,12 @@ public class TextLineDecoderTest {
         in.putString("\nSTU\n\n\n", encoder);
         in.flip();
         decoder.decode(session, in, out);
-        assertEquals(2,session.getDecoderOutputQueue().size());
+        assertEquals(2, session.getDecoderOutputQueue().size());
         assertEquals("PQR", session.getDecoderOutputQueue().poll());
         assertEquals("STU", session.getDecoderOutputQueue().poll());
 
         // Test splitted long delimiter mixed with partial non-delimiter.
-        decoder = new TextLineDecoder(Charset.forName("UTF-8"),
-                new LineDelimiter("\n\n\n"));
+        decoder = new TextLineDecoder(Charset.forName("UTF-8"), new LineDelimiter("\n\n\n"));
         in.clear();
         in.putString("PQR\n", encoder);
         in.flip();
@@ -150,8 +145,7 @@ public class TextLineDecoderTest {
     }
 
     public void testAutoDecode() throws Exception {
-        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"),
-                LineDelimiter.AUTO);
+        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"), LineDelimiter.AUTO);
 
         CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
         ProtocolCodecSession session = new ProtocolCodecSession();
@@ -252,11 +246,18 @@ public class TextLineDecoderTest {
         assertEquals(2, session.getDecoderOutputQueue().size());
         assertEquals("PQR\rX", session.getDecoderOutputQueue().poll());
         assertEquals("STU", session.getDecoderOutputQueue().poll());
+
+        in.clear();
+        String s = new String(new byte[] { 0, 77, 105, 110, 97 });
+        in.putString(s, encoder);
+        in.flip();
+        decoder.decode(session, in, out);
+        assertEquals(1, session.getDecoderOutputQueue().size());
+        assertEquals(s, session.getDecoderOutputQueue().poll());
     }
 
     public void testOverflow() throws Exception {
-        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"),
-                LineDelimiter.AUTO);
+        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"), LineDelimiter.AUTO);
         decoder.setMaxLineLength(3);
 
         CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
@@ -277,7 +278,7 @@ public class TextLineDecoderTest {
         assertEquals(0, session.getDecoderOutputQueue().size());
 
         in.clear().putString("A\r\nB\r\n", encoder).flip();
-        
+
         try {
             decoder.decode(session, in, out);
             fail();
@@ -295,7 +296,7 @@ public class TextLineDecoderTest {
         long oldFreeMemory = Runtime.getRuntime().freeMemory();
         in = IoBuffer.allocate(1048576 * 16).sweep((byte) ' ').mark();
 
-        for (int i = 0; i < 10; i ++) {
+        for (int i = 0; i < 10; i++) {
             decoder.decode(session, in.reset().mark(), out);
             assertEquals(0, session.getDecoderOutputQueue().size());
 
@@ -319,10 +320,9 @@ public class TextLineDecoderTest {
         // Memory consumption should be minimal.
         assertTrue(Runtime.getRuntime().freeMemory() - oldFreeMemory < 1048576);
     }
-    
+
     public void testSMTPDataBounds() throws Exception {
-        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("ISO-8859-1"),
-                new LineDelimiter("\r\n.\r\n"));
+        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("ISO-8859-1"), new LineDelimiter("\r\n.\r\n"));
 
         CharsetEncoder encoder = Charset.forName("ISO-8859-1").newEncoder();
         ProtocolCodecSession session = new ProtocolCodecSession();
