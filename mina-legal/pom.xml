@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>1.4.4</version>
+            <version>${version.plexus.utils}</version>
             <optional>true</optional>
         </dependency>
 
