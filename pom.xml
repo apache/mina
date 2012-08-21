@@ -655,6 +655,7 @@
               <exclude>**/.project</exclude>
               <exclude>**/.settings/**</exclude>
               <exclude>**/LICENSE.*</exclude>
+              <exclude>**/resources/**</exclude>
             </excludes>
           </configuration>
           <executions>
