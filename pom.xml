@@ -643,14 +643,28 @@
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <version>${version.apache.rat.plugin}</version>
+          <inherited>true</inherited>
           <configuration>
             <excludeSubProjects>false</excludeSubProjects>
             <excludes>
               <!-- project excludes -->
               <exclude>**/resources/svn_ignore.txt</exclude>
               <exclude>**/resources/Reveal in Finder.launch</exclude>
+              <exclude>**/target/**</exclude>
+              <exclude>**/.classpath</exclude>
+              <exclude>**/.project</exclude>
+              <exclude>**/.settings/**</exclude>
+              <exclude>**/LICENSE.*</exclude>
             </excludes>
           </configuration>
+          <executions>
+            <execution>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
 
         <plugin>
