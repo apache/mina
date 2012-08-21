@@ -34,7 +34,6 @@
       <includes>
         <include>README*</include>
         <include>LICENSE*</include>
-        <include>NOTICE*</include>
       </includes>
     </fileSet>
     
@@ -50,6 +49,14 @@
       
   </fileSets>
   
+  <files>
+    <file>
+      <source>../NOTICE-bin.txt</source>
+      <outputDirectory></outputDirectory>
+      <destName>NOTICE.txt</destName>
+    </file>
+  </files>
+
   <dependencySets>
     <!-- Copy Mina modules into '/dist' -->
     <dependencySet>
