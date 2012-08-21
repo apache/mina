@@ -42,21 +42,20 @@
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/bin.xml</descriptor>
+            <descriptor>src/main/assembly/src.xml</descriptor>
+          </descriptors>
+          <tarLongFileMode>gnu</tarLongFileMode>
+        </configuration>
+
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
-
-            <configuration>
-              <descriptors>
-                <descriptor>src/main/assembly/bin.xml</descriptor>
-                <descriptor>src/main/assembly/src.xml</descriptor>
-              </descriptors>
-              <tarLongFileMode>gnu</tarLongFileMode>
-            </configuration>
-
           </execution>
         </executions>
       </plugin>
