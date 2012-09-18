@@ -19,6 +19,8 @@
  */
 package org.apache.mina.filter.codec.textline;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
@@ -269,7 +271,11 @@ public class TextLineDecoder implements ProtocolDecoder {
                     try {
                         byte[] data = new byte[buf.limit()];
                         buf.get(data);
-                        writeText(session, new String(data, ctx.getDecoder().charset()), out);
+                        CharsetDecoder decoder = ctx.getDecoder();
+
+                        CharBuffer buffer = decoder.decode(ByteBuffer.wrap(data));
+                        String str = new String(buffer.array());
+                        writeText(session, str, out);
                     } finally {
                         buf.clear();
                     }
