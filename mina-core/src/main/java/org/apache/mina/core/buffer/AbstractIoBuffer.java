@@ -148,8 +148,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer minimumCapacity(int minimumCapacity) {
         if (minimumCapacity < 0) {
-            throw new IllegalArgumentException("minimumCapacity: "
-                    + minimumCapacity);
+            throw new IllegalArgumentException("minimumCapacity: " + minimumCapacity);
         }
         this.minimumCapacity = minimumCapacity;
         return this;
@@ -169,8 +168,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer capacity(int newCapacity) {
         if (!recapacityAllowed) {
-            throw new IllegalStateException(
-                    "Derived buffers and their parent can't be expanded.");
+            throw new IllegalStateException("Derived buffers and their parent can't be expanded.");
         }
 
         // Allocate a new buffer and transfer all settings to it.
@@ -183,8 +181,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
             //// Reallocate.
             ByteBuffer oldBuf = buf();
-            ByteBuffer newBuf = getAllocator().allocateNioBuffer(newCapacity,
-                    isDirect());
+            ByteBuffer newBuf = getAllocator().allocateNioBuffer(newCapacity, isDirect());
             oldBuf.clear();
             newBuf.put(oldBuf);
             buf(newBuf);
@@ -232,8 +229,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer setAutoExpand(boolean autoExpand) {
         if (!recapacityAllowed) {
-            throw new IllegalStateException(
-                    "Derived buffers and their parent can't be expanded.");
+            throw new IllegalStateException("Derived buffers and their parent can't be expanded.");
         }
         this.autoExpand = autoExpand;
         return this;
@@ -245,8 +241,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer setAutoShrink(boolean autoShrink) {
         if (!recapacityAllowed) {
-            throw new IllegalStateException(
-                    "Derived buffers and their parent can't be shrinked.");
+            throw new IllegalStateException("Derived buffers and their parent can't be shrinked.");
         }
         this.autoShrink = autoShrink;
         return this;
@@ -274,8 +269,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     private IoBuffer expand(int pos, int expectedRemaining, boolean autoExpand) {
         if (!recapacityAllowed) {
-            throw new IllegalStateException(
-                    "Derived buffers and their parent can't be expanded.");
+            throw new IllegalStateException("Derived buffers and their parent can't be expanded.");
         }
 
         int end = pos + expectedRemaining;
@@ -304,8 +298,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public final IoBuffer shrink() {
 
         if (!recapacityAllowed) {
-            throw new IllegalStateException(
-                    "Derived buffers and their parent can't be expanded.");
+            throw new IllegalStateException("Derived buffers and their parent can't be expanded.");
         }
 
         int position = position();
@@ -336,8 +329,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
         //// Reallocate.
         ByteBuffer oldBuf = buf();
-        ByteBuffer newBuf = getAllocator()
-                .allocateNioBuffer(newCapacity, isDirect());
+        ByteBuffer newBuf = getAllocator().allocateNioBuffer(newCapacity, isDirect());
         oldBuf.position(0);
         oldBuf.limit(limit);
         newBuf.put(oldBuf);
@@ -474,7 +466,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     @Override
     public final int remaining() {
-        return limit() - position();
+        ByteBuffer byteBuffer = buf();
+
+        return byteBuffer.limit() - byteBuffer.position();
     }
 
     /**
@@ -482,7 +476,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     @Override
     public final boolean hasRemaining() {
-        return limit() > position();
+        ByteBuffer byteBuffer = buf();
+
+        return byteBuffer.limit() > byteBuffer.position();
     }
 
     /**
@@ -516,73 +512,73 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     public IoBuffer putUnsigned(byte value) {
         autoExpand(1);
-        buf().put( (byte)(value & 0xff) );
+        buf().put((byte) (value & 0xff));
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public IoBuffer putUnsigned(int index, byte value) {
         autoExpand(index, 1);
-        buf().put( index, (byte)(value & 0xff) );
+        buf().put(index, (byte) (value & 0xff));
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public IoBuffer putUnsigned(short value) {
         autoExpand(1);
-        buf().put( (byte)(value & 0x00ff) );
+        buf().put((byte) (value & 0x00ff));
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public IoBuffer putUnsigned(int index, short value) {
         autoExpand(index, 1);
-        buf().put( index, (byte)(value & 0x00ff) );
+        buf().put(index, (byte) (value & 0x00ff));
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public IoBuffer putUnsigned(int value) {
         autoExpand(1);
-        buf().put( (byte)(value & 0x000000ff) );
+        buf().put((byte) (value & 0x000000ff));
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public IoBuffer putUnsigned(int index, int value) {
         autoExpand(index, 1);
-        buf().put( index, (byte)(value & 0x000000ff) );
+        buf().put(index, (byte) (value & 0x000000ff));
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public IoBuffer putUnsigned(long value) {
         autoExpand(1);
-        buf().put( (byte)(value & 0x00000000000000ffL) );
+        buf().put((byte) (value & 0x00000000000000ffL));
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public IoBuffer putUnsigned(int index, long value) {
         autoExpand(index, 1);
-        buf().put( index, (byte)(value & 0x00000000000000ffL) );
+        buf().put(index, (byte) (value & 0x00000000000000ffL));
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -650,8 +646,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             return this;
         }
 
-        if (isAutoShrink() && remaining <= capacity >>> 2
-                && capacity > minimumCapacity) {
+        if (isAutoShrink() && remaining <= capacity >>> 2 && capacity > minimumCapacity) {
             int newCapacity = capacity;
             int minCapacity = Math.max(minimumCapacity, remaining << 1);
             for (;;) {
@@ -673,15 +668,13 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
             //// Sanity check.
             if (remaining > newCapacity) {
-                throw new IllegalStateException(
-                        "The amount of the remaining bytes is greater than "
-                                + "the new capacity.");
+                throw new IllegalStateException("The amount of the remaining bytes is greater than "
+                        + "the new capacity.");
             }
 
             //// Reallocate.
             ByteBuffer oldBuf = buf();
-            ByteBuffer newBuf = getAllocator().allocateNioBuffer(newCapacity,
-                    isDirect());
+            ByteBuffer newBuf = getAllocator().allocateNioBuffer(newCapacity, isDirect());
             newBuf.put(oldBuf);
             buf(newBuf);
 
@@ -823,7 +816,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(byte value) {
         autoExpand(4);
-        buf().putInt( (value&0x00ff) );
+        buf().putInt((value & 0x00ff));
         return this;
     }
 
@@ -833,7 +826,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, byte value) {
         autoExpand(index, 4);
-        buf().putInt( index, (value&0x00ff) );
+        buf().putInt(index, (value & 0x00ff));
         return this;
     }
 
@@ -843,7 +836,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(short value) {
         autoExpand(4);
-        buf().putInt( (value&0x0000ffff) );
+        buf().putInt((value & 0x0000ffff));
         return this;
     }
 
@@ -853,7 +846,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, short value) {
         autoExpand(index, 4);
-        buf().putInt( index, (value&0x0000ffff) );
+        buf().putInt(index, (value & 0x0000ffff));
         return this;
     }
 
@@ -863,7 +856,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int value) {
         autoExpand(4);
-        buf().putInt( value );
+        buf().putInt(value);
         return this;
     }
 
@@ -873,7 +866,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, int value) {
         autoExpand(index, 4);
-        buf().putInt( index, value );
+        buf().putInt(index, value);
         return this;
     }
 
@@ -883,7 +876,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(long value) {
         autoExpand(4);
-        buf().putInt( (int)(value&0x00000000ffffffff) );
+        buf().putInt((int) (value & 0x00000000ffffffff));
         return this;
     }
 
@@ -893,7 +886,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, long value) {
         autoExpand(index, 4);
-        buf().putInt( index, (int)(value&0x00000000ffffffffL) );
+        buf().putInt(index, (int) (value & 0x00000000ffffffffL));
         return this;
     }
 
@@ -903,7 +896,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(byte value) {
         autoExpand(2);
-        buf().putShort( (short)(value&0x00ff) );
+        buf().putShort((short) (value & 0x00ff));
         return this;
     }
 
@@ -913,7 +906,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, byte value) {
         autoExpand(index, 2);
-        buf().putShort( index, (short)(value&0x00ff) );
+        buf().putShort(index, (short) (value & 0x00ff));
         return this;
     }
 
@@ -923,7 +916,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(short value) {
         autoExpand(2);
-        buf().putShort( value );
+        buf().putShort(value);
         return this;
     }
 
@@ -933,7 +926,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, short value) {
         autoExpand(index, 2);
-        buf().putShort( index, value );
+        buf().putShort(index, value);
         return this;
     }
 
@@ -943,7 +936,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int value) {
         autoExpand(2);
-        buf().putShort( (short)value );
+        buf().putShort((short) value);
         return this;
     }
 
@@ -953,7 +946,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, int value) {
         autoExpand(index, 2);
-        buf().putShort( index, (short)value );
+        buf().putShort(index, (short) value);
         return this;
     }
 
@@ -963,7 +956,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(long value) {
         autoExpand(2);
-        buf().putShort( (short)(value) );
+        buf().putShort((short) (value));
         return this;
     }
 
@@ -973,7 +966,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedShort(int index, long value) {
         autoExpand(index, 2);
-        buf().putShort( index, (short)(value) );
+        buf().putShort(index, (short) (value));
         return this;
     }
 
@@ -1182,19 +1175,19 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         if (length < 0) {
             throw new IllegalArgumentException("length: " + length);
         }
-        
+
         int pos = position();
         int limit = limit();
-        
+
         if (index > limit) {
             throw new IllegalArgumentException("index: " + index);
         }
-        
+
         int endIndex = index + length;
 
         if (endIndex > limit) {
-            throw new IndexOutOfBoundsException("index + length (" + endIndex
-                    + ") is greater " + "than limit (" + limit + ").");
+            throw new IndexOutOfBoundsException("index + length (" + endIndex + ") is greater " + "than limit ("
+                    + limit + ").");
         }
 
         clear();
@@ -1204,7 +1197,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         IoBuffer slice = slice();
         position(pos);
         limit(limit);
-        
+
         return slice;
     }
 
@@ -1220,8 +1213,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         int limit = limit();
         int nextPos = pos + length;
         if (limit < nextPos) {
-            throw new IndexOutOfBoundsException("position + length (" + nextPos
-                    + ") is greater " + "than limit (" + limit + ").");
+            throw new IndexOutOfBoundsException("position + length (" + nextPos + ") is greater " + "than limit ("
+                    + limit + ").");
         }
 
         limit(pos + length);
@@ -1536,8 +1529,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 if (n > Integer.MAX_VALUE) {
                     bytes = AbstractIoBuffer.this.remaining();
                 } else {
-                    bytes = Math
-                            .min(AbstractIoBuffer.this.remaining(), (int) n);
+                    bytes = Math.min(AbstractIoBuffer.this.remaining(), (int) n);
                 }
                 AbstractIoBuffer.this.skip(bytes);
                 return bytes;
@@ -1583,8 +1575,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public String getString(CharsetDecoder decoder)
-            throws CharacterCodingException {
+    public String getString(CharsetDecoder decoder) throws CharacterCodingException {
         if (!hasRemaining()) {
             return "";
         }
@@ -1662,8 +1653,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             }
 
             if (cr.isOverflow()) {
-                CharBuffer o = CharBuffer.allocate(out.capacity()
-                        + expectedLength);
+                CharBuffer o = CharBuffer.allocate(out.capacity() + expectedLength);
                 out.flip();
                 o.put(out);
                 out = o;
@@ -1687,8 +1677,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public String getString(int fieldSize, CharsetDecoder decoder)
-            throws CharacterCodingException {
+    public String getString(int fieldSize, CharsetDecoder decoder) throws CharacterCodingException {
         checkFieldSize(fieldSize);
 
         if (fieldSize == 0) {
@@ -1763,8 +1752,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             }
 
             if (cr.isOverflow()) {
-                CharBuffer o = CharBuffer.allocate(out.capacity()
-                        + expectedLength);
+                CharBuffer o = CharBuffer.allocate(out.capacity() + expectedLength);
                 out.flip();
                 o.put(out);
                 out = o;
@@ -1788,8 +1776,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public IoBuffer putString(CharSequence val, CharsetEncoder encoder)
-            throws CharacterCodingException {
+    public IoBuffer putString(CharSequence val, CharsetEncoder encoder) throws CharacterCodingException {
         if (val.length() == 0) {
             return this;
         }
@@ -1814,19 +1801,16 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 if (isAutoExpand()) {
                     switch (expandedState) {
                     case 0:
-                        autoExpand((int) Math.ceil(in.remaining()
-                                * encoder.averageBytesPerChar()));
+                        autoExpand((int) Math.ceil(in.remaining() * encoder.averageBytesPerChar()));
                         expandedState++;
                         break;
                     case 1:
-                        autoExpand((int) Math.ceil(in.remaining()
-                                * encoder.maxBytesPerChar()));
+                        autoExpand((int) Math.ceil(in.remaining() * encoder.maxBytesPerChar()));
                         expandedState++;
                         break;
                     default:
                         throw new RuntimeException("Expanded by "
-                                + (int) Math.ceil(in.remaining()
-                                        * encoder.maxBytesPerChar())
+                                + (int) Math.ceil(in.remaining() * encoder.maxBytesPerChar())
                                 + " but that wasn't enough for '" + val + "'");
                     }
                     continue;
@@ -1843,8 +1827,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public IoBuffer putString(CharSequence val, int fieldSize,
-            CharsetEncoder encoder) throws CharacterCodingException {
+    public IoBuffer putString(CharSequence val, int fieldSize, CharsetEncoder encoder) throws CharacterCodingException {
         checkFieldSize(fieldSize);
 
         if (fieldSize == 0) {
@@ -1914,8 +1897,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public String getPrefixedString(CharsetDecoder decoder)
-            throws CharacterCodingException {
+    public String getPrefixedString(CharsetDecoder decoder) throws CharacterCodingException {
         return getPrefixedString(2, decoder);
     }
 
@@ -1930,8 +1912,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * @throws BufferUnderflowException when there is not enough data available
      */
     @Override
-    public String getPrefixedString(int prefixLength, CharsetDecoder decoder)
-            throws CharacterCodingException {
+    public String getPrefixedString(int prefixLength, CharsetDecoder decoder) throws CharacterCodingException {
         if (!prefixedDataAvailable(prefixLength)) {
             throw new BufferUnderflowException();
         }
@@ -1957,8 +1938,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         boolean utf16 = decoder.charset().name().startsWith("UTF-16");
 
         if (utf16 && (fieldSize & 1) != 0) {
-            throw new BufferDataException(
-                    "fieldSize is not even for a UTF-16 string.");
+            throw new BufferDataException("fieldSize is not even for a UTF-16 string.");
         }
 
         int oldLimit = limit();
@@ -1986,8 +1966,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             }
 
             if (cr.isOverflow()) {
-                CharBuffer o = CharBuffer.allocate(out.capacity()
-                        + expectedLength);
+                CharBuffer o = CharBuffer.allocate(out.capacity() + expectedLength);
                 out.flip();
                 o.put(out);
                 out = o;
@@ -2006,8 +1985,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public IoBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder)
-            throws CharacterCodingException {
+    public IoBuffer putPrefixedString(CharSequence in, CharsetEncoder encoder) throws CharacterCodingException {
         return putPrefixedString(in, 2, 0, encoder);
     }
 
@@ -2015,8 +1993,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
-            CharsetEncoder encoder) throws CharacterCodingException {
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength, CharsetEncoder encoder)
+            throws CharacterCodingException {
         return putPrefixedString(in, prefixLength, 0, encoder);
     }
 
@@ -2024,8 +2002,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public IoBuffer putPrefixedString(CharSequence in, int prefixLength,
-            int padding, CharsetEncoder encoder)
+    public IoBuffer putPrefixedString(CharSequence in, int prefixLength, int padding, CharsetEncoder encoder)
             throws CharacterCodingException {
         return putPrefixedString(in, prefixLength, padding, (byte) 0, encoder);
     }
@@ -2034,9 +2011,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public IoBuffer putPrefixedString(CharSequence val, int prefixLength,
-            int padding, byte padValue, CharsetEncoder encoder)
-            throws CharacterCodingException {
+    public IoBuffer putPrefixedString(CharSequence val, int prefixLength, int padding, byte padValue,
+            CharsetEncoder encoder) throws CharacterCodingException {
         int maxLength;
         switch (prefixLength) {
         case 1:
@@ -2053,8 +2029,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         }
 
         if (val.length() > maxLength) {
-            throw new IllegalArgumentException(
-                    "The specified string is too long.");
+            throw new IllegalArgumentException("The specified string is too long.");
         }
         if (val.length() == 0) {
             switch (prefixLength) {
@@ -2103,8 +2078,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             }
 
             if (position() - oldPos > maxLength) {
-                throw new IllegalArgumentException(
-                        "The specified string is too long.");
+                throw new IllegalArgumentException("The specified string is too long.");
             }
 
             if (cr.isUnderflow()) {
@@ -2114,19 +2088,16 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 if (isAutoExpand()) {
                     switch (expandedState) {
                     case 0:
-                        autoExpand((int) Math.ceil(in.remaining()
-                                * encoder.averageBytesPerChar()));
+                        autoExpand((int) Math.ceil(in.remaining() * encoder.averageBytesPerChar()));
                         expandedState++;
                         break;
                     case 1:
-                        autoExpand((int) Math.ceil(in.remaining()
-                                * encoder.maxBytesPerChar()));
+                        autoExpand((int) Math.ceil(in.remaining() * encoder.maxBytesPerChar()));
                         expandedState++;
                         break;
                     default:
                         throw new RuntimeException("Expanded by "
-                                + (int) Math.ceil(in.remaining()
-                                        * encoder.maxBytesPerChar())
+                                + (int) Math.ceil(in.remaining() * encoder.maxBytesPerChar())
                                 + " but that wasn't enough for '" + val + "'");
                     }
                     continue;
@@ -2166,16 +2137,14 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public Object getObject(final ClassLoader classLoader)
-            throws ClassNotFoundException {
+    public Object getObject(final ClassLoader classLoader) throws ClassNotFoundException {
         if (!prefixedDataAvailable(4)) {
             throw new BufferUnderflowException();
         }
 
         int length = getInt();
         if (length <= 4) {
-            throw new BufferDataException(
-                    "Object length should be greater than 4: " + length);
+            throw new BufferDataException("Object length should be greater than 4: " + length);
         }
 
         int oldLimit = limit();
@@ -2183,8 +2152,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         try {
             ObjectInputStream in = new ObjectInputStream(asInputStream()) {
                 @Override
-                protected ObjectStreamClass readClassDescriptor()
-                        throws IOException, ClassNotFoundException {
+                protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
                     int type = read();
                     if (type < 0) {
                         throw new EOFException();
@@ -2194,18 +2162,15 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         return super.readClassDescriptor();
                     case 1: // Serializable class
                         String className = readUTF();
-                        Class<?> clazz = Class.forName(className, true,
-                                classLoader);
+                        Class<?> clazz = Class.forName(className, true, classLoader);
                         return ObjectStreamClass.lookup(clazz);
                     default:
-                        throw new StreamCorruptedException(
-                                "Unexpected class descriptor type: " + type);
+                        throw new StreamCorruptedException("Unexpected class descriptor type: " + type);
                     }
                 }
 
                 @Override
-                protected Class<?> resolveClass(ObjectStreamClass desc)
-                        throws IOException, ClassNotFoundException {
+                protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
                     String name = desc.getName();
                     try {
                         return Class.forName(name, false, classLoader);
@@ -2232,22 +2197,20 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         try {
             ObjectOutputStream out = new ObjectOutputStream(asOutputStream()) {
                 @Override
-                protected void writeClassDescriptor(ObjectStreamClass desc)
-                        throws IOException {
+                protected void writeClassDescriptor(ObjectStreamClass desc) throws IOException {
                     try {
                         Class<?> clz = Class.forName(desc.getName());
                         if (!Serializable.class.isAssignableFrom(clz)) { // NON-Serializable class
-                          write(0);
-                          super.writeClassDescriptor(desc);
+                            write(0);
+                            super.writeClassDescriptor(desc);
                         } else { // Serializable class
-                          write(1);
-                          writeUTF(desc.getName());
+                            write(1);
+                            writeUTF(desc.getName());
                         }
-                      }
-                      catch (ClassNotFoundException ex) { // Primitive types
+                    } catch (ClassNotFoundException ex) { // Primitive types
                         write(0);
                         super.writeClassDescriptor(desc);
-                      }
+                    }
                 }
             };
             out.writeObject(o);
@@ -2503,8 +2466,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public IoBuffer putEnum(Enum<?> e) {
         if (e.ordinal() > BYTE_MASK) {
-            throw new IllegalArgumentException(enumConversionErrorMessage(e,
-                    "byte"));
+            throw new IllegalArgumentException(enumConversionErrorMessage(e, "byte"));
         }
         return put((byte) e.ordinal());
     }
@@ -2515,8 +2477,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public IoBuffer putEnum(int index, Enum<?> e) {
         if (e.ordinal() > BYTE_MASK) {
-            throw new IllegalArgumentException(enumConversionErrorMessage(e,
-                    "byte"));
+            throw new IllegalArgumentException(enumConversionErrorMessage(e, "byte"));
         }
         return put(index, (byte) e.ordinal());
     }
@@ -2527,8 +2488,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public IoBuffer putEnumShort(Enum<?> e) {
         if (e.ordinal() > SHORT_MASK) {
-            throw new IllegalArgumentException(enumConversionErrorMessage(e,
-                    "short"));
+            throw new IllegalArgumentException(enumConversionErrorMessage(e, "short"));
         }
         return putShort((short) e.ordinal());
     }
@@ -2539,8 +2499,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public IoBuffer putEnumShort(int index, Enum<?> e) {
         if (e.ordinal() > SHORT_MASK) {
-            throw new IllegalArgumentException(enumConversionErrorMessage(e,
-                    "short"));
+            throw new IllegalArgumentException(enumConversionErrorMessage(e, "short"));
         }
         return putShort(index, (short) e.ordinal());
     }
@@ -2565,15 +2524,13 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         E[] enumConstants = enumClass.getEnumConstants();
         if (i > enumConstants.length) {
             throw new IndexOutOfBoundsException(String.format(
-                    "%d is too large of an ordinal to convert to the enum %s",
-                    i, enumClass.getName()));
+                    "%d is too large of an ordinal to convert to the enum %s", i, enumClass.getName()));
         }
         return enumConstants[i];
     }
 
     private String enumConversionErrorMessage(Enum<?> e, String type) {
-        return String.format("%s.%s has an ordinal value too large for a %s", e
-                .getClass().getName(), e.name(), type);
+        return String.format("%s.%s has an ordinal value too large for a %s", e.getClass().getName(), e.name(), type);
     }
 
     /**
@@ -2588,8 +2545,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSet(int index,
-            Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSet(int index, Class<E> enumClass) {
         return toEnumSet(enumClass, get(index) & BYTE_MASK);
     }
 
@@ -2605,8 +2561,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index,
-            Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index, Class<E> enumClass) {
         return toEnumSet(enumClass, getShort(index) & SHORT_MASK);
     }
 
@@ -2622,8 +2577,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index,
-            Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index, Class<E> enumClass) {
         return toEnumSet(enumClass, getInt(index) & INT_MASK);
     }
 
@@ -2639,8 +2593,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index,
-            Class<E> enumClass) {
+    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index, Class<E> enumClass) {
         return toEnumSet(enumClass, getLong(index));
     }
 
@@ -2663,8 +2616,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public <E extends Enum<E>> IoBuffer putEnumSet(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~BYTE_MASK) != 0) {
-            throw new IllegalArgumentException(
-                    "The enum set is too large to fit in a byte: " + set);
+            throw new IllegalArgumentException("The enum set is too large to fit in a byte: " + set);
         }
         return put((byte) vector);
     }
@@ -2676,8 +2628,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public <E extends Enum<E>> IoBuffer putEnumSet(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~BYTE_MASK) != 0) {
-            throw new IllegalArgumentException(
-                    "The enum set is too large to fit in a byte: " + set);
+            throw new IllegalArgumentException("The enum set is too large to fit in a byte: " + set);
         }
         return put(index, (byte) vector);
     }
@@ -2689,8 +2640,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public <E extends Enum<E>> IoBuffer putEnumSetShort(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~SHORT_MASK) != 0) {
-            throw new IllegalArgumentException(
-                    "The enum set is too large to fit in a short: " + set);
+            throw new IllegalArgumentException("The enum set is too large to fit in a short: " + set);
         }
         return putShort((short) vector);
     }
@@ -2702,8 +2652,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public <E extends Enum<E>> IoBuffer putEnumSetShort(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~SHORT_MASK) != 0) {
-            throw new IllegalArgumentException(
-                    "The enum set is too large to fit in a short: " + set);
+            throw new IllegalArgumentException("The enum set is too large to fit in a short: " + set);
         }
         return putShort(index, (short) vector);
     }
@@ -2715,8 +2664,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public <E extends Enum<E>> IoBuffer putEnumSetInt(Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~INT_MASK) != 0) {
-            throw new IllegalArgumentException(
-                    "The enum set is too large to fit in an int: " + set);
+            throw new IllegalArgumentException("The enum set is too large to fit in an int: " + set);
         }
         return putInt((int) vector);
     }
@@ -2728,8 +2676,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public <E extends Enum<E>> IoBuffer putEnumSetInt(int index, Set<E> set) {
         long vector = toLong(set);
         if ((vector & ~INT_MASK) != 0) {
-            throw new IllegalArgumentException(
-                    "The enum set is too large to fit in an int: " + set);
+            throw new IllegalArgumentException("The enum set is too large to fit in an int: " + set);
         }
         return putInt(index, (int) vector);
     }
@@ -2754,9 +2701,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         long vector = 0;
         for (E e : set) {
             if (e.ordinal() >= Long.SIZE) {
-                throw new IllegalArgumentException(
-                        "The enum set is too large to fit in a bit vector: "
-                                + set);
+                throw new IllegalArgumentException("The enum set is too large to fit in a bit vector: " + set);
             }
             vector |= 1L << e.ordinal();
         }
@@ -2787,8 +2732,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     private static void checkFieldSize(int fieldSize) {
         if (fieldSize < 0) {
-            throw new IllegalArgumentException("fieldSize cannot be negative: "
-                    + fieldSize);
+            throw new IllegalArgumentException("fieldSize cannot be negative: " + fieldSize);
         }
     }
 }
