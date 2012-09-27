@@ -20,8 +20,6 @@
 package org.apache.mina.core.session;
 
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.mina.util.ExpirationListener;
 import org.apache.mina.util.ExpiringMap;
@@ -35,9 +33,9 @@ import org.apache.mina.util.ExpiringMap;
  * @org.apache.xbean.XBean
  */
 public class ExpiringSessionRecycler implements IoSessionRecycler {
-    private ExpiringMap<Object, IoSession> sessionMap;
+    private ExpiringMap<SocketAddress, IoSession> sessionMap;
 
-    private ExpiringMap<Object, IoSession>.Expirer mapExpirer;
+    private ExpiringMap<SocketAddress, IoSession>.Expirer mapExpirer;
 
     public ExpiringSessionRecycler() {
         this(ExpiringMap.DEFAULT_TIME_TO_LIVE);
@@ -48,8 +46,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
     }
 
     public ExpiringSessionRecycler(int timeToLive, int expirationInterval) {
-        sessionMap = new ExpiringMap<Object, IoSession>(timeToLive,
-                expirationInterval);
+        sessionMap = new ExpiringMap<SocketAddress, IoSession>(timeToLive, expirationInterval);
         mapExpirer = sessionMap.getExpirer();
         sessionMap.addExpirationListener(new DefaultExpirationListener());
     }
@@ -57,20 +54,19 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
     public void put(IoSession session) {
         mapExpirer.startExpiringIfNotStarted();
 
-        Object key = generateKey(session);
+        SocketAddress key = session.getRemoteAddress();
 
         if (!sessionMap.containsKey(key)) {
             sessionMap.put(key, session);
         }
     }
 
-    public IoSession recycle(SocketAddress localAddress,
-            SocketAddress remoteAddress) {
-        return sessionMap.get(generateKey(localAddress, remoteAddress));
+    public IoSession recycle(SocketAddress remoteAddress) {
+        return sessionMap.get(remoteAddress);
     }
 
     public void remove(IoSession session) {
-        sessionMap.remove(generateKey(session));
+        sessionMap.remove(session.getRemoteAddress());
     }
 
     public void stopExpiring() {
@@ -93,21 +89,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
         sessionMap.setTimeToLive(timeToLive);
     }
 
-    private Object generateKey(IoSession session) {
-        return generateKey(session.getLocalAddress(), session
-                .getRemoteAddress());
-    }
-
-    private Object generateKey(SocketAddress localAddress,
-            SocketAddress remoteAddress) {
-        List<SocketAddress> key = new ArrayList<SocketAddress>(2);
-        key.add(remoteAddress);
-        key.add(localAddress);
-        return key;
-    }
-
-    private class DefaultExpirationListener implements
-            ExpirationListener<IoSession> {
+    private class DefaultExpirationListener implements ExpirationListener<IoSession> {
         public void expired(IoSession expiredSession) {
             expiredSession.close(true);
         }

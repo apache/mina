@@ -41,8 +41,7 @@ public interface IoSessionRecycler {
             // Do nothing
         }
 
-        public IoSession recycle(SocketAddress localAddress,
-                SocketAddress remoteAddress) {
+        public IoSession recycle(SocketAddress remoteAddress) {
             return null;
         }
 
@@ -62,15 +61,12 @@ public interface IoSessionRecycler {
     /**
      * Attempts to retrieve a recycled {@link IoSession}.
      *
-     * @param localAddress
-     *            the local socket address of the {@link IoSession} the
-     *            transport wants to recycle.
      * @param remoteAddress
      *            the remote socket address of the {@link IoSession} the
      *            transport wants to recycle.
      * @return a recycled {@link IoSession}, or null if one cannot be found.
      */
-    IoSession recycle(SocketAddress localAddress, SocketAddress remoteAddress);
+    IoSession recycle(SocketAddress remoteAddress);
 
     /**
      * Called when an {@link IoSession} is explicitly closed.
