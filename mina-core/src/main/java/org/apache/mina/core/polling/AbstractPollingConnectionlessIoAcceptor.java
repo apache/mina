@@ -21,6 +21,7 @@ package org.apache.mina.core.polling;
 
 import java.net.SocketAddress;
 import java.nio.channels.ClosedSelectorException;
+import java.nio.channels.SelectionKey;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,7 +57,7 @@ import org.apache.mina.util.ExceptionMonitor;
   * @param <S> the type of the {@link IoSession} this processor can handle
 */
 public abstract class AbstractPollingConnectionlessIoAcceptor<S extends AbstractIoSession, H> extends
-        AbstractIoAcceptor {
+        AbstractIoAcceptor implements IoProcessor<S> {
 
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
 
@@ -68,8 +69,6 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
     /** A lock used to protect the selector to be waked up before it's created */
     private final Semaphore lock = new Semaphore(1);
-
-    private final IoProcessor<S> processor = new ConnectionlessAcceptorProcessor();
 
     private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
 
@@ -131,7 +130,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
     protected abstract void wakeup();
 
-    protected abstract Iterator<H> selectedHandles();
+    protected abstract Set<SelectionKey> selectedHandles();
 
     protected abstract H open(SocketAddress localAddress) throws Exception;
 
@@ -265,17 +264,16 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         }
 
         IoSession session;
-        IoSessionRecycler sessionRecycler = getSessionRecycler();
 
         synchronized (sessionRecycler) {
-            session = sessionRecycler.recycle(localAddress, remoteAddress);
+            session = sessionRecycler.recycle(remoteAddress);
 
             if (session != null) {
                 return session;
             }
 
             // If a new session needs to be created.
-            S newSession = newSession(processor, handle, remoteAddress);
+            S newSession = newSession(this, handle, remoteAddress);
             getSessionRecycler().put(newSession);
             session = newSession;
         }
@@ -310,36 +308,35 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         }
     }
 
-    private class ConnectionlessAcceptorProcessor implements IoProcessor<S> {
+    /**
+     * {@inheritDoc}
+     */
+    public void add(S session) {
+        // Nothing to do for UDP
+    }
 
-        public void add(S session) {
+    /**
+     * {@inheritDoc}
+     */
+    public void flush(S session) {
+        if (scheduleFlush(session)) {
+            wakeup();
         }
+    }
 
-        public void flush(S session) {
-            if (scheduleFlush(session)) {
-                wakeup();
-            }
-        }
+    /**
+     * {@inheritDoc}
+     */
+    public void remove(S session) {
+        getSessionRecycler().remove(session);
+        getListeners().fireSessionDestroyed(session);
+    }
 
-        public void remove(S session) {
-            getSessionRecycler().remove(session);
-            getListeners().fireSessionDestroyed(session);
-        }
-
-        public void updateTrafficControl(S session) {
-            throw new UnsupportedOperationException();
-        }
-
-        public void dispose() {
-        }
-
-        public boolean isDisposed() {
-            return false;
-        }
-
-        public boolean isDisposing() {
-            return false;
-        }
+    /**
+     * {@inheritDoc}
+     */
+    public void updateTrafficControl(S session) {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -442,17 +439,20 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     }
 
     @SuppressWarnings("unchecked")
-    private void processReadySessions(Iterator<H> handles) {
-        while (handles.hasNext()) {
-            H h = handles.next();
-            handles.remove();
+    private void processReadySessions(Set<SelectionKey> handles) {
+        Iterator<SelectionKey> iterator = handles.iterator();
+
+        while (iterator.hasNext()) {
+            SelectionKey key = iterator.next();
+            H handle = (H) key.channel();
+            iterator.remove();
 
             try {
-                if (isReadable(h)) {
-                    readHandle(h);
+                if ((key != null) && key.isValid() && key.isReadable()) {
+                    readHandle(handle);
                 }
 
-                if (isWritable(h)) {
+                if ((key != null) && key.isValid() && key.isWritable()) {
                     for (IoSession session : getManagedSessions().values()) {
                         scheduleFlush((S) session);
                     }
