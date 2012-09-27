@@ -24,8 +24,7 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -43,8 +42,7 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
-public final class NioDatagramAcceptor
-        extends AbstractPollingConnectionlessIoAcceptor<NioSession, DatagramChannel>
+public final class NioDatagramAcceptor extends AbstractPollingConnectionlessIoAcceptor<NioSession, DatagramChannel>
         implements DatagramAcceptor {
 
     private volatile Selector selector;
@@ -62,7 +60,7 @@ public final class NioDatagramAcceptor
     public NioDatagramAcceptor(Executor executor) {
         super(new DefaultDatagramSessionConfig(), executor);
     }
-    
+
     @Override
     protected void init() throws Exception {
         this.selector = Selector.open();
@@ -88,7 +86,7 @@ public final class NioDatagramAcceptor
     public InetSocketAddress getLocalAddress() {
         return (InetSocketAddress) super.getLocalAddress();
     }
-    
+
     @Override
     public InetSocketAddress getDefaultLocalAddress() {
         return (InetSocketAddress) super.getDefaultLocalAddress();
@@ -140,31 +138,27 @@ public final class NioDatagramAcceptor
     }
 
     @Override
-    protected SocketAddress localAddress(DatagramChannel handle)
-            throws Exception {
+    protected SocketAddress localAddress(DatagramChannel handle) throws Exception {
         return handle.socket().getLocalSocketAddress();
     }
 
     @Override
-    protected NioSession newSession(
-            IoProcessor<NioSession> processor, DatagramChannel handle,
+    protected NioSession newSession(IoProcessor<NioSession> processor, DatagramChannel handle,
             SocketAddress remoteAddress) {
         SelectionKey key = handle.keyFor(selector);
-        
+
         if ((key == null) || (!key.isValid())) {
             return null;
         }
-        
-        NioDatagramSession newSession = new NioDatagramSession(
-                this, handle, processor, remoteAddress);
+
+        NioDatagramSession newSession = new NioDatagramSession(this, handle, processor, remoteAddress);
         newSession.setSelectionKey(key);
-        
+
         return newSession;
     }
 
     @Override
-    protected SocketAddress receive(DatagramChannel handle, IoBuffer buffer)
-            throws Exception {
+    protected SocketAddress receive(DatagramChannel handle, IoBuffer buffer) throws Exception {
         return handle.receive(buffer.buf());
     }
 
@@ -179,26 +173,23 @@ public final class NioDatagramAcceptor
     }
 
     @Override
-    protected Iterator<DatagramChannel> selectedHandles() {
-        return new DatagramChannelIterator(selector.selectedKeys());
+    protected Set<SelectionKey> selectedHandles() {
+        return selector.selectedKeys();
     }
 
     @Override
-    protected int send(NioSession session, IoBuffer buffer,
-            SocketAddress remoteAddress) throws Exception {
-        return ((DatagramChannel) session.getChannel()).send(
-                buffer.buf(), remoteAddress);
+    protected int send(NioSession session, IoBuffer buffer, SocketAddress remoteAddress) throws Exception {
+        return ((DatagramChannel) session.getChannel()).send(buffer.buf(), remoteAddress);
     }
 
     @Override
-    protected void setInterestedInWrite(NioSession session, boolean isInterested)
-            throws Exception {
+    protected void setInterestedInWrite(NioSession session, boolean isInterested) throws Exception {
         SelectionKey key = session.getSelectionKey();
 
         if (key == null) {
             return;
         }
-        
+
         int newInterestOps = key.interestOps();
 
         if (isInterested) {
@@ -219,7 +210,7 @@ public final class NioDatagramAcceptor
         if (key != null) {
             key.cancel();
         }
-        
+
         handle.disconnect();
         handle.close();
     }
@@ -227,27 +218,5 @@ public final class NioDatagramAcceptor
     @Override
     protected void wakeup() {
         selector.wakeup();
-    }
-    
-    private static class DatagramChannelIterator implements Iterator<DatagramChannel> {
-        
-        private final Iterator<SelectionKey> i;
-        
-        private DatagramChannelIterator(Collection<SelectionKey> keys) {
-            this.i = keys.iterator();
-        }
-        
-        public boolean hasNext() {
-            return i.hasNext();
-        }
-
-        public DatagramChannel next() {
-            return (DatagramChannel) i.next().channel();
-        }
-
-        public void remove() {
-            i.remove();
-        }
-        
     }
 }
