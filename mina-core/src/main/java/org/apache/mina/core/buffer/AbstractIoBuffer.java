@@ -391,8 +391,10 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     @Override
     public final IoBuffer mark() {
-        buf().mark();
-        mark = position();
+        ByteBuffer byteBuffer = buf();
+        byteBuffer.mark();
+        mark = byteBuffer.position();
+
         return this;
     }
 
