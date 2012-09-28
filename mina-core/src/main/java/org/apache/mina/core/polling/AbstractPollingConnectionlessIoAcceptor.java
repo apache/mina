@@ -501,9 +501,6 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     }
 
     private boolean flush(S session, long currentTime) throws Exception {
-        // Clear OP_WRITE
-        //setInterestedInWrite(session, false);
-
         final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
         final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize()
                 + (session.getConfig().getMaxReadBufferSize() >>> 1);
