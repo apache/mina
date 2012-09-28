@@ -242,6 +242,29 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    public final void bind(SocketAddress firstLocalAddress, SocketAddress... addresses) throws IOException {
+        if (firstLocalAddress == null) {
+            bind(getDefaultLocalAddresses());
+        }
+
+        if ((addresses == null) || (addresses.length == 0)) {
+            bind(getDefaultLocalAddresses());
+            return;
+        }
+
+        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(2);
+        localAddresses.add(firstLocalAddress);
+
+        for (SocketAddress address : addresses) {
+            localAddresses.add(address);
+        }
+
+        bind(localAddresses);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public final void bind(Iterable<? extends SocketAddress> localAddresses) throws IOException {
         if (isDisposing()) {
             throw new IllegalStateException("Already disposed.");

@@ -124,6 +124,27 @@ public interface IoAcceptor extends IoService {
     void bind() throws IOException;
 
     /**
+     * Binds to the specified local address and start to accept incoming
+     * connections.
+     *
+     * @param localAddress The SocketAddress to bind to
+     *  
+     * @throws IOException if failed to bind
+     */
+    void bind(SocketAddress localAddress) throws IOException;
+
+    /**
+     * Binds to the specified local addresses and start to accept incoming
+     * connections. If no address is given, bind on the default local address.
+     * 
+     * @param firstLocalAddresses The first address to bind to 
+     * @param addresses The SocketAddresses to bind to 
+     *
+     * @throws IOException if failed to bind
+     */
+    void bind(SocketAddress firstLocalAddress, SocketAddress... addresses) throws IOException;
+
+    /**
      * Binds to the specified local addresses and start to accept incoming
      * connections. If no address is given, bind on the default local address.
      * 
