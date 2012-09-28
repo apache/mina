@@ -20,6 +20,7 @@
 package org.apache.mina.core.service;
 
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
  * An internal interface to represent an 'I/O processor' that performs
@@ -39,13 +40,13 @@ public interface IoProcessor<S extends IoSession> {
      * even after all the related resources are released.
      */
     boolean isDisposing();
-    
+
     /**
      * Returns <tt>true</tt> if and if only all resources of this processor
      * have been disposed.
      */
     boolean isDisposed();
-    
+
     /**
      * Releases any resources allocated by this processor.  Please note that 
      * the resources might not be released as long as there are any sessions
@@ -53,19 +54,31 @@ public interface IoProcessor<S extends IoSession> {
      * immediately and release the related resources.
      */
     void dispose();
-    
+
     /**
      * Adds the specified {@code session} to the I/O processor so that
      * the I/O processor starts to perform any I/O operations related
      * with the {@code session}.
+     * 
+     * @param session The added session
      */
     void add(S session);
 
     /**
      * Flushes the internal write request queue of the specified
      * {@code session}.
+     * 
+     * @param session The session we want the message to be written
      */
     void flush(S session);
+
+    /**
+     * Writes the WriteRequest for the specified {@code session}.
+     * 
+     * @param session The session we want the message to be written
+     * @param writeRequest the WriteRequest to write
+     */
+    void write(S session, WriteRequest writeRequest);
 
     /**
      * Controls the traffic of the specified {@code session} depending of the

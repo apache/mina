@@ -37,6 +37,7 @@ import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.core.write.WriteRequestQueue;
 
 /**
  * A dummy {@link IoSession} for unit-testing or non-network-use of
@@ -52,10 +53,8 @@ import org.apache.mina.core.write.WriteRequest;
  */
 public class DummySession extends AbstractIoSession {
 
-    private static final TransportMetadata TRANSPORT_METADATA =
-            new DefaultTransportMetadata(
-                    "mina", "dummy", false, false,
-                    SocketAddress.class, IoSessionConfig.class, Object.class);
+    private static final TransportMetadata TRANSPORT_METADATA = new DefaultTransportMetadata("mina", "dummy", false,
+            false, SocketAddress.class, IoSessionConfig.class, Object.class);
 
     private static final SocketAddress ANONYMOUS_ADDRESS = new SocketAddress() {
         private static final long serialVersionUID = -496112902353454179L;
@@ -76,11 +75,15 @@ public class DummySession extends AbstractIoSession {
     };
 
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
+
     private final IoProcessor<AbstractIoSession> processor;
 
     private volatile IoHandler handler = new IoHandlerAdapter();
+
     private volatile SocketAddress localAddress = ANONYMOUS_ADDRESS;
+
     private volatile SocketAddress remoteAddress = ANONYMOUS_ADDRESS;
+
     private volatile TransportMetadata transportMetadata = TRANSPORT_METADATA;
 
     /**
@@ -90,41 +93,40 @@ public class DummySession extends AbstractIoSession {
         super(
 
         // Initialize dummy service.
-            new AbstractIoAcceptor(
-                new AbstractIoSessionConfig() {
+                new AbstractIoAcceptor(new AbstractIoSessionConfig() {
                     @Override
                     protected void doSetAll(IoSessionConfig config) {
                         // Do nothing
                     }
-                },
-                new Executor() {
+                }, new Executor() {
                     public void execute(Runnable command) {
                         // Do nothing
                     }
                 }) {
 
-            @Override
-            protected Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses) throws Exception {
-                throw new UnsupportedOperationException();
-            }
+                    @Override
+                    protected Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses)
+                            throws Exception {
+                        throw new UnsupportedOperationException();
+                    }
 
-            @Override
-            protected void unbind0(List<? extends SocketAddress> localAddresses) throws Exception {
-                throw new UnsupportedOperationException();
-            }
+                    @Override
+                    protected void unbind0(List<? extends SocketAddress> localAddresses) throws Exception {
+                        throw new UnsupportedOperationException();
+                    }
 
-            public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
-                throw new UnsupportedOperationException();
-            }
+                    public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
+                        throw new UnsupportedOperationException();
+                    }
 
-            public TransportMetadata getTransportMetadata() {
-                return TRANSPORT_METADATA;
-            }
+                    public TransportMetadata getTransportMetadata() {
+                        return TRANSPORT_METADATA;
+                    }
 
-            @Override
-            protected void dispose0() throws Exception {
-            }
-            } );
+                    @Override
+                    protected void dispose0() throws Exception {
+                    }
+                });
 
         processor = new IoProcessor<AbstractIoSession>() {
             public void add(AbstractIoSession session) {
@@ -134,7 +136,7 @@ public class DummySession extends AbstractIoSession {
             public void flush(AbstractIoSession session) {
                 DummySession s = (DummySession) session;
                 WriteRequest req = s.getWriteRequestQueue().poll(session);
-                
+
                 // Chek that the request is not null. If the session has been closed,
                 // we may not have any pending requests.
                 if (req != null) {
@@ -149,6 +151,19 @@ public class DummySession extends AbstractIoSession {
                         }
                     }
                     getFilterChain().fireMessageSent(req);
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            public void write(AbstractIoSession session, WriteRequest writeRequest) {
+                WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+
+                writeRequestQueue.offer(session, writeRequest);
+
+                if (!session.isWriteSuspended()) {
+                    this.flush(session);
                 }
             }
 
@@ -288,7 +303,7 @@ public class DummySession extends AbstractIoSession {
     }
 
     @Override
-    public void setScheduledWriteBytes(int byteCount){
+    public void setScheduledWriteBytes(int byteCount) {
         super.setScheduledWriteBytes(byteCount);
     }
 

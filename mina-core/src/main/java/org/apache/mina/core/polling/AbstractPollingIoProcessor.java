@@ -409,6 +409,19 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     /**
      * {@inheritDoc}
      */
+    public void write(S session, WriteRequest writeRequest) {
+        WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+
+        writeRequestQueue.offer(session, writeRequest);
+
+        if (!session.isWriteSuspended()) {
+            this.flush(session);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public final void flush(S session) {
         // add the session to the queue if it's not already
         // in the queue, then wake up the select()

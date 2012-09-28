@@ -43,9 +43,11 @@ import org.apache.mina.core.write.WriteToClosedSessionException;
 class VmPipeFilterChain extends DefaultIoFilterChain {
 
     private final Queue<IoEvent> eventQueue = new ConcurrentLinkedQueue<IoEvent>();
+
     private final IoProcessor<VmPipeSession> processor = new VmPipeIoProcessor();
 
     private volatile boolean flushEnabled;
+
     private volatile boolean sessionOpened;
 
     VmPipeFilterChain(AbstractIoSession session) {
@@ -86,7 +88,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
         Object data = e.getParameter();
 
         if (type == IoEventType.MESSAGE_RECEIVED) {
-            if (sessionOpened && (! session.isReadSuspended() ) && session.getLock().tryLock()) {
+            if (sessionOpened && (!session.isReadSuspended()) && session.getLock().tryLock()) {
                 try {
                     if (session.isReadSuspended()) {
                         session.receivedMessageQueue.add(data);
@@ -189,11 +191,9 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                     while ((req = queue.poll(session)) != null) {
                         Object m = req.getMessage();
                         pushEvent(new IoEvent(IoEventType.MESSAGE_SENT, session, req), false);
-                        session.getRemoteSession().getFilterChain().fireMessageReceived(
-                                getMessageCopy(m));
+                        session.getRemoteSession().getFilterChain().fireMessageReceived(getMessageCopy(m));
                         if (m instanceof IoBuffer) {
-                            session.increaseWrittenBytes0(
-                                    ((IoBuffer) m).remaining(), currentTime);
+                            session.increaseWrittenBytes0(((IoBuffer) m).remaining(), currentTime);
                         }
                     }
                 } finally {
@@ -213,11 +213,24 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
 
                 if (!failedRequests.isEmpty()) {
                     WriteToClosedSessionException cause = new WriteToClosedSessionException(failedRequests);
-                    for (WriteRequest r: failedRequests) {
+                    for (WriteRequest r : failedRequests) {
                         r.getFuture().setException(cause);
                     }
                     session.getFilterChain().fireExceptionCaught(cause);
                 }
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void write(VmPipeSession session, WriteRequest writeRequest) {
+            WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+
+            writeRequestQueue.offer(session, writeRequest);
+
+            if (!session.isWriteSuspended()) {
+                this.flush(session);
             }
         }
 
@@ -252,7 +265,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
         }
 
         public void updateTrafficControl(VmPipeSession session) {
-            if ( ! session.isReadSuspended()) {
+            if (!session.isReadSuspended()) {
                 List<Object> data = new ArrayList<Object>();
                 session.receivedMessageQueue.drainTo(data);
                 for (Object aData : data) {
@@ -260,7 +273,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 }
             }
 
-            if ( ! session.isWriteSuspended()) {
+            if (!session.isWriteSuspended()) {
                 flush(session);
             }
         }

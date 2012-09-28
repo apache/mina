@@ -284,11 +284,11 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     public final CloseFuture close(boolean rightNow) {
-        if ( !isClosing() ) {
+        if (!isClosing()) {
             if (rightNow) {
                 return close();
             }
-    
+
             return closeOnFlush();
         } else {
             return closeFuture;
@@ -449,7 +449,7 @@ public abstract class AbstractIoSession implements IoSession {
 
         // We can't send a message to a connected session if we don't have
         // the remote address
-        if (!getTransportMetadata().isConnectionless() && ( remoteAddress != null )) {
+        if (!getTransportMetadata().isConnectionless() && (remoteAddress != null)) {
             throw new UnsupportedOperationException();
         }
 
@@ -469,7 +469,7 @@ public abstract class AbstractIoSession implements IoSession {
         // TODO: remove this code as soon as we use InputStream
         // instead of Object for the message.
         try {
-            if (( message instanceof IoBuffer ) && !((IoBuffer) message).hasRemaining()) {
+            if ((message instanceof IoBuffer) && !((IoBuffer) message).hasRemaining()) {
                 // Nothing to write : probably an error in the user code
                 throw new IllegalArgumentException("message is empty. Forgot to call flip()?");
             } else if (message instanceof FileChannel) {
@@ -753,7 +753,7 @@ public abstract class AbstractIoSession implements IoSession {
         int interval = (int) (currentTime - lastThroughputCalculationTime);
 
         long minInterval = getConfig().getThroughputCalculationIntervalInMillis();
-        if (( minInterval == 0 ) || ( interval < minInterval )) {
+        if ((minInterval == 0) || (interval < minInterval)) {
             if (!force) {
                 return;
             }
@@ -1205,19 +1205,18 @@ public abstract class AbstractIoSession implements IoSession {
 
             try {
                 remote = String.valueOf(getRemoteAddress());
-            } catch ( Throwable t ) {
+            } catch (Throwable t) {
                 remote = "Cannot get the remote address informations: " + t.getMessage();
             }
 
             try {
                 local = String.valueOf(getLocalAddress());
-            } catch ( Throwable t ) {
+            } catch (Throwable t) {
                 local = "Cannot get the local address informations: " + t.getMessage();
             }
 
             if (getService() instanceof IoAcceptor) {
-                return "(" + getIdAsString() + ": " + getServiceName() + ", server, " + remote + " => " + local
-                        + ')';
+                return "(" + getIdAsString() + ": " + getServiceName() + ", server, " + remote + " => " + local + ')';
             }
 
             return "(" + getIdAsString() + ": " + getServiceName() + ", client, " + local + " => " + remote + ')';
@@ -1288,19 +1287,19 @@ public abstract class AbstractIoSession implements IoSession {
                 IdleStatus.BOTH_IDLE, Math.max(session.getLastIoTime(), session.getLastIdleTime(IdleStatus.BOTH_IDLE)));
 
         notifyIdleSession0(session, currentTime, session.getConfig().getIdleTimeInMillis(IdleStatus.READER_IDLE),
-                IdleStatus.READER_IDLE, Math.max(session.getLastReadTime(), session
-                        .getLastIdleTime(IdleStatus.READER_IDLE)));
+                IdleStatus.READER_IDLE,
+                Math.max(session.getLastReadTime(), session.getLastIdleTime(IdleStatus.READER_IDLE)));
 
         notifyIdleSession0(session, currentTime, session.getConfig().getIdleTimeInMillis(IdleStatus.WRITER_IDLE),
-                IdleStatus.WRITER_IDLE, Math.max(session.getLastWriteTime(), session
-                        .getLastIdleTime(IdleStatus.WRITER_IDLE)));
+                IdleStatus.WRITER_IDLE,
+                Math.max(session.getLastWriteTime(), session.getLastIdleTime(IdleStatus.WRITER_IDLE)));
 
         notifyWriteTimeout(session, currentTime);
     }
 
     private static void notifyIdleSession0(IoSession session, long currentTime, long idleTime, IdleStatus status,
             long lastIoTime) {
-        if (( idleTime > 0 ) && ( lastIoTime != 0 ) && ( currentTime - lastIoTime >= idleTime )) {
+        if ((idleTime > 0) && (lastIoTime != 0) && (currentTime - lastIoTime >= idleTime)) {
             session.getFilterChain().fireSessionIdle(status);
         }
     }
@@ -1308,7 +1307,7 @@ public abstract class AbstractIoSession implements IoSession {
     private static void notifyWriteTimeout(IoSession session, long currentTime) {
 
         long writeTimeout = session.getConfig().getWriteTimeoutInMillis();
-        if (( writeTimeout > 0 ) && ( currentTime - session.getLastWriteTime() >= writeTimeout )
+        if ((writeTimeout > 0) && (currentTime - session.getLastWriteTime() >= writeTimeout)
                 && !session.getWriteRequestQueue().isEmpty(session)) {
             WriteRequest request = session.getCurrentWriteRequest();
             if (request != null) {

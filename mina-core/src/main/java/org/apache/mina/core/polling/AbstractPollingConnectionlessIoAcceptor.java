@@ -327,6 +327,74 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     /**
      * {@inheritDoc}
      */
+    public void write(S session, WriteRequest writeRequest) {
+        // We will try to write the message directly
+        long currentTime = System.currentTimeMillis();
+        final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+        final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize()
+                + (session.getConfig().getMaxReadBufferSize() >>> 1);
+
+        int writtenBytes = 0;
+
+        try {
+            for (;;) {
+                if (writeRequest == null) {
+                    writeRequest = writeRequestQueue.poll(session);
+
+                    if (writeRequest == null) {
+                        setInterestedInWrite(session, false);
+                        break;
+                    }
+
+                    session.setCurrentWriteRequest(writeRequest);
+                }
+
+                IoBuffer buf = (IoBuffer) writeRequest.getMessage();
+
+                if (buf.remaining() == 0) {
+                    // Clear and fire event
+                    session.setCurrentWriteRequest(null);
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(writeRequest);
+                    continue;
+                }
+
+                SocketAddress destination = writeRequest.getDestination();
+
+                if (destination == null) {
+                    destination = session.getRemoteAddress();
+                }
+
+                int localWrittenBytes = send(session, buf, destination);
+
+                if ((localWrittenBytes == 0) || (writtenBytes >= maxWrittenBytes)) {
+                    // Kernel buffer is full or wrote too much
+                    setInterestedInWrite(session, true);
+
+                    session.getWriteRequestQueue().offer(session, writeRequest);
+                    scheduleFlush(session);
+                } else {
+                    setInterestedInWrite(session, false);
+
+                    // Clear and fire event
+                    session.setCurrentWriteRequest(null);
+                    writtenBytes += localWrittenBytes;
+                    buf.reset();
+                    session.getFilterChain().fireMessageSent(writeRequest);
+
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            session.getFilterChain().fireExceptionCaught(e);
+        } finally {
+            session.increaseWrittenBytes(writtenBytes, currentTime);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void remove(S session) {
         getSessionRecycler().remove(session);
         getListeners().fireSessionDestroyed(session);

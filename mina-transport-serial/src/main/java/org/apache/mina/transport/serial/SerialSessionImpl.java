@@ -38,6 +38,7 @@ import org.apache.mina.core.service.IoServiceListenerSupport;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.util.ExceptionMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,6 +257,22 @@ class SerialSessionImpl extends AbstractIoSession implements SerialSession, Seri
             // It's already added when the session is constructed.
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        public void write(SerialSessionImpl session, WriteRequest writeRequest) {
+            WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
+
+            writeRequestQueue.offer(session, writeRequest);
+
+            if (!session.isWriteSuspended()) {
+                session.getProcessor().flush(session);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         public void flush(SerialSessionImpl session) {
             if (writeWorker == null) {
                 writeWorker = new WriteWorker();

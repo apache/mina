@@ -33,6 +33,7 @@ import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.core.write.WriteRequestQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +51,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
      * attribute and notifies the future when {@link #fireSessionCreated()}
      * or {@link #fireExceptionCaught(Throwable)} is invoked.
      */
-    public static final AttributeKey SESSION_CREATED_FUTURE = new AttributeKey(
-            DefaultIoFilterChain.class, "connectFuture");
+    public static final AttributeKey SESSION_CREATED_FUTURE = new AttributeKey(DefaultIoFilterChain.class,
+            "connectFuture");
 
     /** The associated session */
     private final AbstractIoSession session;
@@ -66,7 +67,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
     /** The logger for this class */
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultIoFilterChain.class);
-
 
     /**
      * Create a new default chain, associated with a session. It will only contain a
@@ -174,15 +174,13 @@ public class DefaultIoFilterChain implements IoFilterChain {
         register(tail.prevEntry, name, filter);
     }
 
-    public synchronized void addBefore(String baseName, String name,
-            IoFilter filter) {
+    public synchronized void addBefore(String baseName, String name, IoFilter filter) {
         EntryImpl baseEntry = checkOldName(baseName);
         checkAddable(name);
         register(baseEntry.prevEntry, name, filter);
     }
 
-    public synchronized void addAfter(String baseName, String name,
-            IoFilter filter) {
+    public synchronized void addAfter(String baseName, String name, IoFilter filter) {
         EntryImpl baseEntry = checkOldName(baseName);
         checkAddable(name);
         register(baseEntry, name, filter);
@@ -203,8 +201,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             }
             e = e.nextEntry;
         }
-        throw new IllegalArgumentException("Filter not found: "
-                + filter.getClass().getName());
+        throw new IllegalArgumentException("Filter not found: " + filter.getClass().getName());
     }
 
     public synchronized IoFilter remove(Class<? extends IoFilter> filterType) {
@@ -217,8 +214,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             }
             e = e.nextEntry;
         }
-        throw new IllegalArgumentException("Filter not found: "
-                + filterType.getName());
+        throw new IllegalArgumentException("Filter not found: " + filterType.getName());
     }
 
     public synchronized IoFilter replace(String name, IoFilter newFilter) {
@@ -237,12 +233,10 @@ public class DefaultIoFilterChain implements IoFilterChain {
             }
             e = e.nextEntry;
         }
-        throw new IllegalArgumentException("Filter not found: "
-                + oldFilter.getClass().getName());
+        throw new IllegalArgumentException("Filter not found: " + oldFilter.getClass().getName());
     }
 
-    public synchronized IoFilter replace(
-            Class<? extends IoFilter> oldFilterType, IoFilter newFilter) {
+    public synchronized IoFilter replace(Class<? extends IoFilter> oldFilterType, IoFilter newFilter) {
         EntryImpl e = head.nextEntry;
         while (e != tail) {
             if (oldFilterType.isAssignableFrom(e.getFilter().getClass())) {
@@ -252,32 +246,27 @@ public class DefaultIoFilterChain implements IoFilterChain {
             }
             e = e.nextEntry;
         }
-        throw new IllegalArgumentException("Filter not found: "
-                + oldFilterType.getName());
+        throw new IllegalArgumentException("Filter not found: " + oldFilterType.getName());
     }
 
     public synchronized void clear() throws Exception {
-        List<IoFilterChain.Entry> l = new ArrayList<IoFilterChain.Entry>(
-                name2entry.values());
+        List<IoFilterChain.Entry> l = new ArrayList<IoFilterChain.Entry>(name2entry.values());
         for (IoFilterChain.Entry entry : l) {
             try {
                 deregister((EntryImpl) entry);
             } catch (Exception e) {
-                throw new IoFilterLifeCycleException("clear(): "
-                        + entry.getName() + " in " + getSession(), e);
+                throw new IoFilterLifeCycleException("clear(): " + entry.getName() + " in " + getSession(), e);
             }
         }
     }
 
     private void register(EntryImpl prevEntry, String name, IoFilter filter) {
-        EntryImpl newEntry = new EntryImpl(prevEntry, prevEntry.nextEntry,
-                name, filter);
+        EntryImpl newEntry = new EntryImpl(prevEntry, prevEntry.nextEntry, name, filter);
 
         try {
             filter.onPreAdd(this, name, newEntry.getNextFilter());
         } catch (Exception e) {
-            throw new IoFilterLifeCycleException("onPreAdd(): " + name + ':'
-                    + filter + " in " + getSession(), e);
+            throw new IoFilterLifeCycleException("onPreAdd(): " + name + ':' + filter + " in " + getSession(), e);
         }
 
         prevEntry.nextEntry.prevEntry = newEntry;
@@ -288,8 +277,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             filter.onPostAdd(this, name, newEntry.getNextFilter());
         } catch (Exception e) {
             deregister0(newEntry);
-            throw new IoFilterLifeCycleException("onPostAdd(): " + name + ':'
-                    + filter + " in " + getSession(), e);
+            throw new IoFilterLifeCycleException("onPostAdd(): " + name + ':' + filter + " in " + getSession(), e);
         }
     }
 
@@ -299,8 +287,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
         try {
             filter.onPreRemove(this, entry.getName(), entry.getNextFilter());
         } catch (Exception e) {
-            throw new IoFilterLifeCycleException("onPreRemove(): "
-                    + entry.getName() + ':' + filter + " in " + getSession(), e);
+            throw new IoFilterLifeCycleException("onPreRemove(): " + entry.getName() + ':' + filter + " in "
+                    + getSession(), e);
         }
 
         deregister0(entry);
@@ -308,8 +296,8 @@ public class DefaultIoFilterChain implements IoFilterChain {
         try {
             filter.onPostRemove(this, entry.getName(), entry.getNextFilter());
         } catch (Exception e) {
-            throw new IoFilterLifeCycleException("onPostRemove(): "
-                    + entry.getName() + ':' + filter + " in " + getSession(), e);
+            throw new IoFilterLifeCycleException("onPostRemove(): " + entry.getName() + ':' + filter + " in "
+                    + getSession(), e);
         }
     }
 
@@ -340,8 +328,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
      */
     private void checkAddable(String name) {
         if (name2entry.containsKey(name)) {
-            throw new IllegalArgumentException(
-                    "Other filter is using the same name '" + name + "'");
+            throw new IllegalArgumentException("Other filter is using the same name '" + name + "'");
         }
     }
 
@@ -404,13 +391,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         callNextSessionIdle(head, session, status);
     }
 
-    private void callNextSessionIdle(Entry entry, IoSession session,
-            IdleStatus status) {
+    private void callNextSessionIdle(Entry entry, IoSession session, IdleStatus status) {
         try {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
-            filter.sessionIdle(nextFilter, session,
-                    status);
+            filter.sessionIdle(nextFilter, session, status);
         } catch (Throwable e) {
             fireExceptionCaught(e);
         }
@@ -418,21 +403,18 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
     public void fireMessageReceived(Object message) {
         if (message instanceof IoBuffer) {
-            session.increaseReadBytes(((IoBuffer) message).remaining(), System
-                    .currentTimeMillis());
+            session.increaseReadBytes(((IoBuffer) message).remaining(), System.currentTimeMillis());
         }
 
         Entry head = this.head;
         callNextMessageReceived(head, session, message);
     }
 
-    private void callNextMessageReceived(Entry entry, IoSession session,
-            Object message) {
+    private void callNextMessageReceived(Entry entry, IoSession session, Object message) {
         try {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
-            filter.messageReceived(nextFilter, session,
-                    message);
+            filter.messageReceived(nextFilter, session, message);
         } catch (Throwable e) {
             fireExceptionCaught(e);
         }
@@ -448,19 +430,17 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
 
         Entry head = this.head;
-        
+
         if (!request.isEncoded()) {
             callNextMessageSent(head, session, request);
         }
     }
 
-    private void callNextMessageSent(Entry entry, IoSession session,
-            WriteRequest writeRequest) {
+    private void callNextMessageSent(Entry entry, IoSession session, WriteRequest writeRequest) {
         try {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
-            filter.messageSent(nextFilter, session,
-                    writeRequest);
+            filter.messageSent(nextFilter, session, writeRequest);
         } catch (Throwable e) {
             fireExceptionCaught(e);
         }
@@ -471,22 +451,16 @@ public class DefaultIoFilterChain implements IoFilterChain {
         callNextExceptionCaught(head, session, cause);
     }
 
-    private void callNextExceptionCaught(Entry entry, IoSession session,
-            Throwable cause) {
+    private void callNextExceptionCaught(Entry entry, IoSession session, Throwable cause) {
         // Notify the related future.
-        ConnectFuture future = (ConnectFuture) session
-                .removeAttribute(SESSION_CREATED_FUTURE);
+        ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
         if (future == null) {
             try {
                 IoFilter filter = entry.getFilter();
                 NextFilter nextFilter = entry.getNextFilter();
-                filter.exceptionCaught(nextFilter,
-                        session, cause);
+                filter.exceptionCaught(nextFilter, session, cause);
             } catch (Throwable e) {
-                LOGGER
-                        .warn(
-                                "Unexpected exception from exceptionCaught handler.",
-                                e);
+                LOGGER.warn("Unexpected exception from exceptionCaught handler.", e);
             }
         } else {
             // Please note that this place is not the only place that
@@ -501,8 +475,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         callPreviousFilterWrite(tail, session, writeRequest);
     }
 
-    private void callPreviousFilterWrite(Entry entry, IoSession session,
-            WriteRequest writeRequest) {
+    private void callPreviousFilterWrite(Entry entry, IoSession session, WriteRequest writeRequest) {
         try {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
@@ -597,8 +570,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
     private class HeadFilter extends IoFilterAdapter {
         @SuppressWarnings("unchecked")
         @Override
-        public void filterWrite(NextFilter nextFilter, IoSession session,
-                WriteRequest writeRequest) throws Exception {
+        public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
 
             AbstractIoSession s = (AbstractIoSession) session;
 
@@ -610,6 +582,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 // the buffer will be specified with messageSent event.
                 buffer.mark();
                 int remaining = buffer.remaining();
+
                 if (remaining == 0) {
                     // Zero-sized buffer means the internal message
                     // delimiter.
@@ -621,30 +594,36 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 s.increaseScheduledWriteMessages();
             }
 
-            s.getWriteRequestQueue().offer(s, writeRequest);
+            WriteRequestQueue writeRequestQueue = s.getWriteRequestQueue();
+
             if (!s.isWriteSuspended()) {
-                s.getProcessor().flush(s);
+                if (writeRequestQueue.size() == 0) {
+                    // We can write directly the message
+                    s.getProcessor().write(s, writeRequest);
+                } else {
+                    s.getWriteRequestQueue().offer(s, writeRequest);
+                    s.getProcessor().flush(s);
+                }
+            } else {
+                s.getWriteRequestQueue().offer(s, writeRequest);
             }
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        public void filterClose(NextFilter nextFilter, IoSession session)
-                throws Exception {
-            ((AbstractIoSession) session).getProcessor().remove(((AbstractIoSession) session));
+        public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
+            ((AbstractIoSession) session).getProcessor().remove(session);
         }
     }
 
     private static class TailFilter extends IoFilterAdapter {
         @Override
-        public void sessionCreated(NextFilter nextFilter, IoSession session)
-                throws Exception {
+        public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
             try {
                 session.getHandler().sessionCreated(session);
             } finally {
                 // Notify the related future.
-                ConnectFuture future = (ConnectFuture) session
-                        .removeAttribute(SESSION_CREATED_FUTURE);
+                ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
                 if (future != null) {
                     future.setSession(session);
                 }
@@ -652,14 +631,12 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
 
         @Override
-        public void sessionOpened(NextFilter nextFilter, IoSession session)
-                throws Exception {
+        public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
             session.getHandler().sessionOpened(session);
         }
 
         @Override
-        public void sessionClosed(NextFilter nextFilter, IoSession session)
-                throws Exception {
+        public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
             try {
                 s.getHandler().sessionClosed(session);
@@ -684,14 +661,12 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
 
         @Override
-        public void sessionIdle(NextFilter nextFilter, IoSession session,
-                IdleStatus status) throws Exception {
+        public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
             session.getHandler().sessionIdle(session, status);
         }
 
         @Override
-        public void exceptionCaught(NextFilter nextFilter, IoSession session,
-                Throwable cause) throws Exception {
+        public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
             try {
                 s.getHandler().exceptionCaught(s, cause);
@@ -703,8 +678,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
 
         @Override
-        public void messageReceived(NextFilter nextFilter, IoSession session,
-                Object message) throws Exception {
+        public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
             if (!(message instanceof IoBuffer)) {
                 s.increaseReadMessages(System.currentTimeMillis());
@@ -722,21 +696,17 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
 
         @Override
-        public void messageSent(NextFilter nextFilter, IoSession session,
-                WriteRequest writeRequest) throws Exception {
-            session.getHandler()
-                    .messageSent(session, writeRequest.getMessage());
+        public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+            session.getHandler().messageSent(session, writeRequest.getMessage());
         }
 
         @Override
-        public void filterWrite(NextFilter nextFilter, IoSession session,
-                WriteRequest writeRequest) throws Exception {
+        public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
             nextFilter.filterWrite(session, writeRequest);
         }
 
         @Override
-        public void filterClose(NextFilter nextFilter, IoSession session)
-                throws Exception {
+        public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
             nextFilter.filterClose(session);
         }
     }
@@ -752,8 +722,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
         private final NextFilter nextFilter;
 
-        private EntryImpl(EntryImpl prevEntry, EntryImpl nextEntry,
-                String name, IoFilter filter) {
+        private EntryImpl(EntryImpl prevEntry, EntryImpl nextEntry, String name, IoFilter filter) {
             if (filter == null) {
                 throw new IllegalArgumentException("filter");
             }
@@ -796,14 +765,12 @@ public class DefaultIoFilterChain implements IoFilterChain {
                     callNextMessageReceived(nextEntry, session, message);
                 }
 
-                public void messageSent(IoSession session,
-                        WriteRequest writeRequest) {
+                public void messageSent(IoSession session, WriteRequest writeRequest) {
                     Entry nextEntry = EntryImpl.this.nextEntry;
                     callNextMessageSent(nextEntry, session, writeRequest);
                 }
 
-                public void filterWrite(IoSession session,
-                        WriteRequest writeRequest) {
+                public void filterWrite(IoSession session, WriteRequest writeRequest) {
                     Entry nextEntry = EntryImpl.this.prevEntry;
                     callPreviousFilterWrite(nextEntry, session, writeRequest);
                 }
