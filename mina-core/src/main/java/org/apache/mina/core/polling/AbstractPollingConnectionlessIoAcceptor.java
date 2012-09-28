@@ -502,7 +502,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
     private boolean flush(S session, long currentTime) throws Exception {
         // Clear OP_WRITE
-        setInterestedInWrite(session, false);
+        //setInterestedInWrite(session, false);
 
         final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
         final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize()
@@ -516,9 +516,12 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
                 if (req == null) {
                     req = writeRequestQueue.poll(session);
+
                     if (req == null) {
+                        setInterestedInWrite(session, false);
                         break;
                     }
+
                     session.setCurrentWriteRequest(req);
                 }
 
@@ -543,6 +546,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
                 if ((localWrittenBytes == 0) || (writtenBytes >= maxWrittenBytes)) {
                     // Kernel buffer is full or wrote too much
                     setInterestedInWrite(session, true);
+
                     return false;
                 } else {
                     setInterestedInWrite(session, false);
