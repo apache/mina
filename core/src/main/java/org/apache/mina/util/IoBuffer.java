@@ -167,7 +167,7 @@ public class IoBuffer {
 
             return new IoBuffer(byteBuffer);
         } else {
-            return new IoBuffer(BufferType.HEAP);
+            throw new IllegalArgumentException("Cannot allocate an IoBuffer with a negative value : " + capacity);
         }
     }
 
@@ -182,13 +182,16 @@ public class IoBuffer {
 
             return new IoBuffer(byteBuffer);
         } else {
-            return new IoBuffer(BufferType.DIRECT);
+            throw new IllegalArgumentException("Cannot allocate an IoBuffer with a negative value : " + capacity);
         }
     }
 
     /**
      * @see ByteBuffer#array()
-     * Returns the byte array which this IoBuffer is based on, if there is one.
+     * Returns the byte array which this IoBuffer is based on, up to the sum of each 
+     * contained ByteBuffer's limit().<br/>
+     * This array can be modified, but this won't modify the content of the underlying
+     * ByteBuffer instances, contrary to the ByteBuffer.array() method.
      * 
      * @return the byte array which this IoBuffer is based on.
      * @exception ReadOnlyBufferException if this IoBuffer is based on a read-only array.

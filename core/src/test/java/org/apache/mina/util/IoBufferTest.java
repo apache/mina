@@ -124,6 +124,20 @@ public class IoBufferTest {
         ioBuffer.add(bb1, bb2);
     }
 
+    //-------------------------------------------------------------------------
+    // Test the allocate(int) method
+    // 1) allocation with a negative value
+    // 2) allocation with a 0 length
+    // 3) allocation with a 1024 value
+    //-------------------------------------------------------------------------
+    /**
+     * Test the allocation of a new heap IoBuffer with a negative value
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testAllocateNegative() {
+        IoBuffer.allocate(-1);
+    }
+
     /**
      * Test the allocation of a new heap IoBuffer with no byte in it
      */
@@ -150,6 +164,20 @@ public class IoBufferTest {
         assertEquals(1024, ioBuffer.limit());
         assertEquals(0, ioBuffer.position());
         assertTrue(ioBuffer.hasRemaining());
+    }
+
+    //-------------------------------------------------------------------------
+    // Test the allocateDirect(int) method. We check :
+    // 1) allocation with a negative value
+    // 2) allocation with a 0 length
+    // 3) allocation with a 1024 value
+    //-------------------------------------------------------------------------
+    /**
+     * Test the allocation of a new heap IoBuffer with a negative value
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testAllocateDirectNegative() {
+        IoBuffer.allocate(-1);
     }
 
     /**
@@ -272,23 +300,13 @@ public class IoBufferTest {
         }
     }
 
-    /**
-     * Test the array method for a IoBuffer containing one ByteBuffer
-     */
-    @Test
-    public void testArrayOneByteBuffer() {
-        ByteBuffer bb1 = ByteBuffer.allocate(5);
-        bb1.put("012".getBytes());
-        bb1.flip();
-
-        IoBuffer ioBuffer = new IoBuffer(bb1);
-
-        byte[] array = ioBuffer.array();
-        assertNotNull(array);
-        assertEquals(3, array.length);
-        assertTrue(Arrays.equals(new byte[] { '0', '1', '2' }, array));
-    }
-
+    //-------------------------------------------------------------------------
+    // Test the array() method. We will check those cases :
+    // 1) array over an empty buffer: we should get an empty byte array
+    // 2) array over a buffer with one single empty ByteBuffer 
+    // 3) array over a buffer with one single ByteBuffer with data
+    // 4) array over a buffer containing many ByteBuffers 
+    //-------------------------------------------------------------------------
     /**
      * Test the array method for a IoBuffer containing one empty ByteBuffer
      */
@@ -300,6 +318,32 @@ public class IoBufferTest {
         assertNotNull(array);
         assertEquals(0, array.length);
         assertTrue(Arrays.equals(new byte[] {}, array));
+    }
+
+    /**
+     * Test the array method for a IoBuffer containing one ByteBuffer (cases 2 and 3)
+     */
+    @Test
+    public void testArrayOneByteBuffer() {
+        ByteBuffer bb1 = ByteBuffer.allocate(5);
+        IoBuffer ioBuffer = new IoBuffer(bb1);
+
+        // Empty buffer first
+        byte[] array = ioBuffer.array();
+        assertNotNull(array);
+        assertEquals(5, array.length);
+        assertTrue(Arrays.equals(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00 }, array));
+
+        // Buffer with data
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ioBuffer = new IoBuffer(bb1);
+
+        array = ioBuffer.array();
+        assertNotNull(array);
+        assertEquals(3, array.length);
+        assertTrue(Arrays.equals(new byte[] { '0', '1', '2' }, array));
     }
 
     /**
@@ -548,6 +592,50 @@ public class IoBufferTest {
     }
 
     //-------------------------------------------------------------------------
+    // Test the position() method
+    // We will test that the position() metho returns the correct result in 
+    // those cases :
+    // 1) the buffer is empty : must return 0
+    // 2) must return a value between 0 and limit()
+    //-------------------------------------------------------------------------
+    /**
+     * Test the position method over an emptyIoBuffer
+     */
+    @Test
+    public void testPositionEmptyBuffer() {
+        IoBuffer ioBuffer = new IoBuffer();
+
+        assertEquals(0, ioBuffer.position());
+    }
+
+    /**
+     * Test the position method over a buffer
+     */
+    @Test
+    public void testPositionBuffer() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("3456".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(4);
+        bb3.put("789".getBytes());
+        bb3.flip();
+
+        // The resulting buffer will be seen as "0123456789"
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2, bb3);
+
+        // Iterate and check the position
+        for (int i = 0; i < ioBuffer.limit(); i++) {
+            assertEquals(i, ioBuffer.position());
+            ioBuffer.get();
+        }
+    }
+
+    //-------------------------------------------------------------------------
     // Test the position(int) method
     // We will test many different cases
     // 1) a position() in an empty buffer
@@ -564,7 +652,7 @@ public class IoBufferTest {
      * Test the position method over an emptyIoBuffer
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testPositionEmptyBuffer() {
+    public void testPositionIntEmptyBuffer() {
         IoBuffer ioBuffer = new IoBuffer();
 
         ioBuffer.position(0);
