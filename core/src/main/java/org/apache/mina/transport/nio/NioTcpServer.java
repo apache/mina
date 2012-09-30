@@ -26,8 +26,11 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-import org.apache.mina.service.SelectorStrategy;
+import org.apache.mina.api.IdleStatus;
+import org.apache.mina.service.idlechecker.IdleChecker;
+import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
+import org.apache.mina.transport.tcp.TcpSessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +39,15 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioTcpServer extends AbstractTcpServer implements SelectorEventListener {
+public class NioTcpServer extends AbstractTcpServer implements SelectorListener {
     static final Logger LOG = LoggerFactory.getLogger(NioTcpServer.class);
-
-    // the strategy for dispatching servers and client to selector threads.
-    private final SelectorStrategy<NioSelectorProcessor> strategy;
 
     // the bound local address
     private SocketAddress address = null;
 
-    private NioSelectorProcessor acceptProcessor = null;
+    private final SelectorLoop acceptSelectorLoop;
+
+    private final SelectorLoop readWriteSelectorLoop;
 
     // the key used for selecting accept event
     private SelectionKey acceptKey = null;
@@ -53,9 +55,12 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorEventList
     // the server socket for accepting clients
     private ServerSocketChannel serverChannel = null;
 
-    public NioTcpServer(final SelectorStrategy<NioSelectorProcessor> strategy) {
+    private final IdleChecker idleChecker = new IndexedIdleChecker();
+
+    public NioTcpServer(final SelectorLoop acceptSelectorLoop, SelectorLoop readWriteSelectorLoop) {
         super();
-        this.strategy = strategy;
+        this.acceptSelectorLoop = acceptSelectorLoop;
+        this.readWriteSelectorLoop = readWriteSelectorLoop;
     }
 
     /**
@@ -93,12 +98,13 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorEventList
         serverChannel.socket().bind(address);
         serverChannel.configureBlocking(false);
 
-        acceptProcessor = this.strategy.getSelectorForBindNewAddress();
-
-        acceptProcessor.addServer(this);
+        acceptSelectorLoop.register(true, false, false, this, serverChannel);
 
         // it's the first address bound, let's fire the event
         this.fireServiceActivated();
+
+        // will start the selector processor if we are the first service
+        acceptSelectorLoop.incrementServiceCount();
     }
 
     /**
@@ -120,10 +126,13 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorEventList
         }
         serverChannel.socket().close();
         serverChannel.close();
-        acceptProcessor.removeServer(this);
+        acceptSelectorLoop.unregister(this, serverChannel);
 
         this.address = null;
         this.fireServiceInactivated();
+
+        // will stop the acceptor processor if we are the last service
+        acceptSelectorLoop.decrementServiceCount();
     }
 
     /**
@@ -144,30 +153,99 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorEventList
      * {@inheritDoc}
      */
     @Override
-    public void acceptReady(NioSelectorProcessor processor) throws IOException {
-        LOG.debug("acceptable new client");
+    public void ready(boolean accept, boolean read, ByteBuffer readBuffer, boolean write) {
+        if (accept) {
+            LOG.debug("acceptable new client");
 
-        // accepted connection
-        SocketChannel newClientChannel = getServerSocketChannel().accept();
-        LOG.debug("client accepted");
+            // accepted connection
+            try {
+                LOG.debug("new client accepted");
+                createSession(getServerSocketChannel().accept());
 
-        // and give it's to the strategy
-        strategy.getSelectorForNewSession(processor).createSession(this, newClientChannel);
+            } catch (IOException e) {
+                LOG.error("error while accepting new client", e);
+            }
+        }
+        if (read || write) {
+            throw new IllegalStateException("should not receive read or write events");
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void readReady(NioSelectorProcessor processor, ByteBuffer readBuffer) {
-        throw new IllegalStateException("read event should never occur on NioTcpServer");
+    private void createSession(final SocketChannel clientSocket) throws IOException {
+        LOG.debug("create session");
+        final SocketChannel socketChannel = clientSocket;
+        final TcpSessionConfig config = getSessionConfig();
+        final NioTcpSession session = new NioTcpSession(this, socketChannel, readWriteSelectorLoop, idleChecker);
+
+        socketChannel.configureBlocking(false);
+
+        // apply idle configuration
+        session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
+        session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE,
+                config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
+
+        // apply the default service socket configuration
+        Boolean keepAlive = config.isKeepAlive();
+
+        if (keepAlive != null) {
+            session.getConfig().setKeepAlive(keepAlive);
+        }
+
+        Boolean oobInline = config.isOobInline();
+
+        if (oobInline != null) {
+            session.getConfig().setOobInline(oobInline);
+        }
+
+        Boolean reuseAddress = config.isReuseAddress();
+
+        if (reuseAddress != null) {
+            session.getConfig().setReuseAddress(reuseAddress);
+        }
+
+        Boolean tcpNoDelay = config.isTcpNoDelay();
+
+        if (tcpNoDelay != null) {
+            session.getConfig().setTcpNoDelay(tcpNoDelay);
+        }
+
+        Integer receiveBufferSize = config.getReceiveBufferSize();
+
+        if (receiveBufferSize != null) {
+            session.getConfig().setReceiveBufferSize(receiveBufferSize);
+        }
+
+        Integer sendBufferSize = config.getSendBufferSize();
+
+        if (sendBufferSize != null) {
+            session.getConfig().setSendBufferSize(sendBufferSize);
+        }
+
+        Integer trafficClass = config.getTrafficClass();
+
+        if (trafficClass != null) {
+            session.getConfig().setTrafficClass(trafficClass);
+        }
+
+        Integer soLinger = config.getSoLinger();
+
+        if (soLinger != null) {
+            session.getConfig().setSoLinger(soLinger);
+        }
+
+        // Set the secured flag if the service is to be used over SSL/TLS
+        if (config.isSecured()) {
+            session.initSecure(config.getSslContext());
+        }
+
+        // event session created
+        session.processSessionCreated();
+
+        // add the session to the queue for being added to the selector
+        readWriteSelectorLoop.register(false, true, false, session, socketChannel);
+        readWriteSelectorLoop.incrementServiceCount();
+        session.processSessionOpened();
+        session.setConnected();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void writeReady(NioSelectorProcessor processor) {
-        throw new IllegalStateException("write event should never occur on NioTcpServer");
-    }
 }

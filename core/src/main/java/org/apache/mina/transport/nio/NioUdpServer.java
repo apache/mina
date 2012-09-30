@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.api.IoSessionConfig;
-import org.apache.mina.service.SelectorStrategy;
+import org.apache.mina.service.idlechecker.IdleChecker;
+import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.udp.AbstractUdpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,18 +39,18 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioUdpServer extends AbstractUdpServer implements SelectorEventListener {
+public class NioUdpServer extends AbstractUdpServer implements SelectorListener {
 
     static final Logger LOG = LoggerFactory.getLogger(NioUdpServer.class);
 
     // the bound local address
     private SocketAddress address = null;
 
-    // the strategy for dispatching servers and client to selector threads.
-    private final SelectorStrategy<NioSelectorProcessor> strategy;
-
     // the processor used for read and write this server
-    private NioSelectorProcessor processor;
+    private final NioSelectorLoop selectorLoop;
+
+    // used for detecting idle sessions
+    private final IdleChecker idleChecker = new IndexedIdleChecker();
 
     // the inner channel for read/write UDP datagrams
     private DatagramChannel datagramChannel = null;
@@ -63,9 +64,9 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorEventList
     /**
      * Create a new instance of NioUdpServer
      */
-    public NioUdpServer(final SelectorStrategy<NioSelectorProcessor> strategy) {
+    public NioUdpServer(final NioSelectorLoop selectorLoop) {
         super();
-        this.strategy = strategy;
+        this.selectorLoop = selectorLoop;
     }
 
     /**
@@ -119,9 +120,8 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorEventList
         datagramChannel.socket().bind(address);
         datagramChannel.configureBlocking(false);
 
-        processor = this.strategy.getSelectorForBindNewAddress();
-
-        processor.addServer(this);
+        selectorLoop.register(false, true, false, this, datagramChannel);
+        selectorLoop.incrementServiceCount();
 
         // it's the first address bound, let's fire the event
         this.fireServiceActivated();
@@ -136,10 +136,12 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorEventList
         if (this.address == null) {
             throw new IllegalStateException("server not bound");
         }
+
+        selectorLoop.unregister(this, datagramChannel);
+        selectorLoop.decrementServiceCount();
+
         datagramChannel.socket().close();
         datagramChannel.close();
-
-        processor.removeServer(this);
 
         this.address = null;
         this.fireServiceInactivated();
@@ -160,44 +162,35 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorEventList
     }
 
     /**
-    * {@inheritDoc}
-    */
+     * {@inheritDoc}
+     */
     @Override
-    public void acceptReady(NioSelectorProcessor processor) {
-        throw new IllegalStateException("accept event should never occur on NioUdpServer");
-    }
+    public void ready(boolean accept, boolean read, ByteBuffer readBuffer, boolean write) {
+        if (read) {
+            try {
+                LOG.debug("readable datagram for UDP service : {}", this);
+                readBuffer.clear();
 
-    /**
-    * {@inheritDoc}
-    */
-    @Override
-    public void readReady(NioSelectorProcessor processor, ByteBuffer readBuffer) throws IOException {
-        LOG.debug("readable datagram for UDP service : {}", this);
-        readBuffer.clear();
+                SocketAddress source = datagramChannel.receive(readBuffer);
+                readBuffer.flip();
 
-        SocketAddress source = datagramChannel.receive(readBuffer);
-        readBuffer.flip();
+                LOG.debug("read {} bytes form {}", readBuffer.remaining(), source);
 
-        LOG.debug("read {} bytes form {}", readBuffer.remaining(), source);
+                // let's find the corresponding session
 
-        // let's find the corresponding session
+                NioUdpSession session = sessions.get(source);
+                if (session == null) {
+                    session = new NioUdpSession(this, idleChecker, address, source);
+                }
 
-        NioUdpSession session = sessions.get(source);
-        if (session == null) {
-            session = new NioUdpSession(this, strategy.getSelectorForNewSession(processor), processor.getIdleChecker(),
-                    address, source);
+                session.receivedDatagram(readBuffer);
+            } catch (IOException ex) {
+                LOG.error("IOException while reading the socket", ex);
+            }
         }
-
-        session.receivedDatagram(readBuffer);
-    }
-
-    /**
-    * {@inheritDoc}
-    */
-    @Override
-    public void writeReady(NioSelectorProcessor processor) throws IOException {
-        // TODO : flush the sessions
-
+        if (write) {
+            // TODO : flush session
+        }
     }
 
 }

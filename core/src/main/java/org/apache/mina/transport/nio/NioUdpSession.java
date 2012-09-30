@@ -27,6 +27,7 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.idlechecker.IdleChecker;
+import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * A UDP session based on NIO
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioUdpSession extends AbstractNioSession {
+public class NioUdpSession extends AbstractIoSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioUdpSession.class);
 
@@ -61,11 +62,27 @@ public class NioUdpSession extends AbstractNioSession {
      * @param writeProcessor
      * @param idleChecker
      */
-    public NioUdpSession(IoService service, NioSelectorProcessor writeProcessor, IdleChecker idleChecker,
-            SocketAddress localAddress, SocketAddress remoteAddress) {
-        super(service, writeProcessor, idleChecker);
+    public NioUdpSession(IoService service, IdleChecker idleChecker, SocketAddress localAddress,
+            SocketAddress remoteAddress) {
+        super(service, idleChecker);
         this.localAddress = localAddress;
         this.remoteAddress = remoteAddress;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void channelClose() {
+        // No inner socket to close for UDP
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void flushWriteQueue() {
+        // TODO flush queue
     }
 
     /**

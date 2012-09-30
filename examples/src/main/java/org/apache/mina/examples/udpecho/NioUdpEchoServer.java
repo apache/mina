@@ -32,8 +32,7 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
-import org.apache.mina.service.OneThreadSelectorStrategy;
-import org.apache.mina.transport.nio.NioSelectorProcessor;
+import org.apache.mina.transport.nio.NioSelectorLoop;
 import org.apache.mina.transport.nio.NioUdpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +48,7 @@ public class NioUdpEchoServer {
     public static void main(String[] args) {
         LOG.info("starting echo server");
 
-        OneThreadSelectorStrategy<NioSelectorProcessor> strategy = new OneThreadSelectorStrategy<NioSelectorProcessor>(
-                new NioSelectorProcessor());
-
-        NioUdpServer server = new NioUdpServer(strategy);
+        NioUdpServer server = new NioUdpServer(new NioSelectorLoop());
 
         // create the fitler chain for this service
         server.setFilters(new LoggingFilter("LoggingFilter1"), new IoFilter() {

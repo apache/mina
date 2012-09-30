@@ -21,8 +21,8 @@
  */
 package org.apache.mina.service.idlecheker;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.net.SocketAddress;
 
@@ -30,7 +30,6 @@ import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
-import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.session.AbstractIoSession;
@@ -85,8 +84,6 @@ public class IndexedIdleChekerTest {
         assertEquals(1, session.writeIdleCount);
     }
 
-    private final SelectorProcessor processor = mock(SelectorProcessor.class);
-
     private class DummySession extends AbstractIoSession {
 
         int readIdleCount = 0;
@@ -94,7 +91,7 @@ public class IndexedIdleChekerTest {
         int writeIdleCount = 0;
 
         private DummySession(IoService service, IdleChecker checker) {
-            super(service, processor, checker);
+            super(service, checker);
         }
 
         @Override
@@ -178,6 +175,22 @@ public class IndexedIdleChekerTest {
         public boolean isClosed() {
             // TODO Auto-generated method stub
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void channelClose() {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void flushWriteQueue() {
+
         }
     }
 }

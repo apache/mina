@@ -18,16 +18,9 @@
  */
 package org.apache.mina.session;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static junit.framework.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -41,7 +34,6 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
-import org.apache.mina.service.SelectorProcessor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,11 +44,9 @@ import org.junit.Test;
  */
 public class AbstractIoSessionTest {
 
-    private final SelectorProcessor processor = mock(SelectorProcessor.class);
-
     private class DummySession extends AbstractIoSession {
         private DummySession(IoService service) {
-            super(service, processor, null);
+            super(service, null);
         }
 
         @Override
@@ -122,8 +112,22 @@ public class AbstractIoSessionTest {
 
         @Override
         public boolean isClosed() {
-            // TODO Auto-generated method stub
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void channelClose() {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void flushWriteQueue() {
         }
     }
 
@@ -200,7 +204,6 @@ public class AbstractIoSessionTest {
         verify(filter1).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
         verify(filter2).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
         verify(filter3).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
-        verify(processor).flush(eq(session));
     }
 
     @Test

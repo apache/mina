@@ -37,10 +37,12 @@ import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.service.idlechecker.IdleChecker;
+import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +69,6 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
     /** attributes map */
     private final AttributeContainer attributes = new DefaultAttributeContainer();
-
-    /** The {@link SelectorProcessor} used for handling this session writing */
-    protected SelectorProcessor writeProcessor;
 
     /** the {@link IdleChecker} in charge of detecting idle event for this session */
     protected final IdleChecker idleChecker;
@@ -149,14 +148,13 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@link org.apache.mina.api.IoSession#getId()}) and an associated {@link IoService}
      * 
      * @param service the service this session is associated with
-     * @param writeProcessor the processor in charge of processing this session write queue
+     * @param selectorLoop the selector loop in charge of processing this session read/write events
      */
-    public AbstractIoSession(IoService service, SelectorProcessor writeProcessor, IdleChecker idleChecker) {
+    public AbstractIoSession(IoService service, IdleChecker idleChecker) {
         // generated a unique id
         id = NEXT_ID.getAndIncrement();
         creationTime = System.currentTimeMillis();
         this.service = service;
-        this.writeProcessor = writeProcessor;
         this.chain = service.getFilters();
         this.idleChecker = idleChecker;
 
@@ -498,6 +496,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         return attributes.removeAttribute(key);
     }
 
+    //----------------------------------------------------
+    // Write management
+    //----------------------------------------------------
+
     /**
      * {@inheritDoc}
      */
@@ -561,11 +563,13 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         // If it wasn't, we register this session as interested to write.
         // It's done in atomic fashion for avoiding two concurrent registering.
         if (!registeredForWrite.getAndSet(true)) {
-            writeProcessor.flush(this);
+            flushWriteQueue();
         }
 
         return request;
     }
+
+    public abstract void flushWriteQueue();
 
     public void setNotRegisteredForWrite() {
         registeredForWrite.set(false);
@@ -587,6 +591,60 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void releaseWriteQueue() {
         writeQueueWriteLock.unlock();
     }
+
+    //------------------------------------------------------------------------
+    // Close session management
+    //------------------------------------------------------------------------
+
+    /** we pre-allocate a close future for lock-less {@link #close(boolean)} */
+    private final IoFuture<Void> closeFuture = new AbstractIoFuture<Void>() {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected boolean cancelOwner(boolean mayInterruptIfRunning) {
+            // we don't cancel close
+            return false;
+        }
+    };
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoFuture<Void> close(boolean immediately) {
+        switch (state) {
+        case CREATED:
+            LOG.error("Session {} not opened", this);
+            throw new RuntimeIoException("cannot close an not opened session");
+        case CONNECTED:
+            state = SessionState.CLOSING;
+            if (immediately) {
+                channelClose();
+            } else {
+                // flush this session the flushing code will close the session
+                flushWriteQueue();
+            }
+            break;
+        case CLOSING:
+            // return the same future
+            LOG.warn("Already closing session {}", this);
+            break;
+        case CLOSED:
+            LOG.warn("Already closed session {}", this);
+            break;
+        default:
+            throw new RuntimeIoException("not implemented session state : " + state);
+        }
+
+        return closeFuture;
+    }
+
+    /**
+     * Close the inner socket channel
+     */
+    protected abstract void channelClose();
 
     //------------------------------------------------------------------------
     // Event processing using the filter chain
