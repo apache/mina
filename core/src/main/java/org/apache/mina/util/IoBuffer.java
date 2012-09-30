@@ -22,8 +22,8 @@ import java.nio.Buffer;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.InvalidMarkException;
 import java.nio.ReadOnlyBufferException;
-import java.lang.UnsupportedOperationException;
 
 /**
  * A proxy class used to manage ByteBuffers as if they were just a big ByteBuffer. We can
@@ -339,6 +339,7 @@ public class IoBuffer {
         // find the byte from the current buffer now
         BufferNode currentNode = buffers.getCurrent();
 
+        // If the position is within the current buffer, then get the data from it
         int bufferPosition = position - currentNode.offset;
 
         if (bufferPosition < currentNode.buffer.limit()) {
@@ -354,6 +355,7 @@ public class IoBuffer {
                 throw new BufferUnderflowException();
             } else {
                 position++;
+                currentNode.buffer.position(0);
 
                 return currentNode.buffer.get();
             }
@@ -683,7 +685,45 @@ public class IoBuffer {
      * @exception IllegalArgumentException if <code>newPosition</code> is invalid.
      */
     public IoBuffer position(int newPosition) {
+        if (newPosition < 0) {
+            throw new IllegalArgumentException("The new position(" + newPosition + ") is negative");
+        }
+
+        if (newPosition >= limit) {
+            throw new IllegalArgumentException("The new position(" + newPosition
+                    + ") is larger than this buffer limit (" + limit());
+        }
+
+        if (buffers.head == null) {
+            throw new IllegalArgumentException("Cannot set a position over an empty buffer");
+        }
+
+        // Find the right current buffer
+        BufferNode currentNode = buffers.getCurrent();
+
+        // The new position might not be on the current buffer.
+        if ((newPosition < currentNode.offset) || (newPosition >= currentNode.offset + currentNode.buffer.limit())) {
+            // Ok, we aren't on the current buffer. Find the new current buffer
+            BufferNode node = buffers.head;
+            int counter = 0;
+
+            while (node != null) {
+                int limit = node.buffer.limit();
+                counter += limit;
+
+                if (counter >= newPosition) {
+                    // Found
+                    currentNode = node;
+                    break;
+                } else {
+                    node = node.next;
+                }
+            }
+        }
+
         position = newPosition;
+        currentNode.buffer.position(position - currentNode.offset);
+        buffers.current = currentNode;
 
         return this;
     }
@@ -780,6 +820,10 @@ public class IoBuffer {
          */
         private BufferNode(ByteBuffer byteBuffer) {
             this.buffer = byteBuffer;
+        }
+
+        public String toString() {
+            return buffer.toString() + ", Offset:" + offset + (next != null ? " --> \n  " : "");
         }
     }
 
@@ -921,6 +965,23 @@ public class IoBuffer {
             }
 
             return current;
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+
+            BufferNode node = head;
+
+            while (node != null) {
+                if (node == current) {
+                    sb.append("**");
+                }
+
+                sb.append(node);
+                node = node.next;
+            }
+
+            return sb.toString();
         }
     }
 }

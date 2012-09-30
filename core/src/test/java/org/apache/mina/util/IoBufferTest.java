@@ -546,4 +546,129 @@ public class IoBufferTest {
         assertEquals(0, ioBuffer.position());
         assertEquals(8, ioBuffer.limit());
     }
+
+    //-------------------------------------------------------------------------
+    // Test the position(int) method
+    // We will test many different cases
+    // 1) a position() in an empty buffer
+    // 2) a position() with a negative value
+    // 3) a position() with a value above the limit
+    // 4) a position() within the current buffer
+    //  4-1) at the beginning of the current buffer
+    //  4-2) at the end of the current buffer
+    //  4-3) in the middle of the current buffer
+    // 5) a position() before the current buffer
+    // 6) a position() after the current buffer
+    //-------------------------------------------------------------------------
+    /**
+     * Test the position method over an emptyIoBuffer
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testPositionEmptyBuffer() {
+        IoBuffer ioBuffer = new IoBuffer();
+
+        ioBuffer.position(0);
+    }
+
+    /**
+     * Test the position method with a negative value
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testPositionNegativeValue() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("0123".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("4567".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(4);
+        bb3.put("89".getBytes());
+        bb3.flip();
+
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2, bb3);
+
+        ioBuffer.position(-1);
+    }
+
+    /**
+     * Test the position method with a value above the buffer size
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testPositionAboveValue() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("3456".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(4);
+        bb3.put("789".getBytes());
+        bb3.flip();
+
+        // The resulting buffer will be seen as "0123456789"
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2, bb3);
+
+        ioBuffer.position(10);
+    }
+
+    /**
+     * Test the position method in the current buffer
+     */
+    @Test
+    public void testPositionCurrentBuffer() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("3456".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(4);
+        bb3.put("789".getBytes());
+        bb3.flip();
+
+        // The resulting buffer will be seen as "0123456789"
+        IoBuffer ioBuffer = new IoBuffer(bb1, bb2, bb3);
+
+        // Set the position in the middle of bb2 (4-3)
+        ioBuffer.position(5);
+
+        assertEquals('5', ioBuffer.get());
+
+        // Set the position at the beginning of bb2 (4-1)
+        ioBuffer.position(3);
+
+        assertEquals('3', ioBuffer.get());
+
+        // Set the position at the end of bb2 (4-2)
+        ioBuffer.position(6);
+
+        assertEquals('6', ioBuffer.get());
+
+        // Set a position before the current buffer (5)
+        ioBuffer.position(2);
+        assertEquals('2', ioBuffer.get());
+
+        // Set a position after the current buffer (6)
+        ioBuffer.position(7);
+        assertEquals('7', ioBuffer.get());
+
+        // Now, let's see if we can get all the elements correctly
+        // if we set the position from 0 to end
+        for (int i = 0; i < ioBuffer.limit(); i++) {
+            ioBuffer.position(i);
+            assertEquals('0' + i, ioBuffer.get());
+        }
+
+        // Same, in revert order
+        for (int i = ioBuffer.limit() - 1; i >= 0; i--) {
+            ioBuffer.position(i);
+            assertEquals('0' + i, ioBuffer.get());
+        }
+    }
 }
