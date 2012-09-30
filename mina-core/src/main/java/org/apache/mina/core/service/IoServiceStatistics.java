@@ -22,7 +22,6 @@ package org.apache.mina.core.service;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-
 /**
  * Provides usage statistics for an {@link AbstractIoService} instance.
  * 
@@ -30,42 +29,59 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 2.0.0-M3
  */
 public class IoServiceStatistics {
-    
+
     private AbstractIoService service;
-    
+
     private double readBytesThroughput;
+
     private double writtenBytesThroughput;
+
     private double readMessagesThroughput;
+
     private double writtenMessagesThroughput;
+
     private double largestReadBytesThroughput;
+
     private double largestWrittenBytesThroughput;
+
     private double largestReadMessagesThroughput;
-    private double largestWrittenMessagesThroughput;    
-    
+
+    private double largestWrittenMessagesThroughput;
+
     private final AtomicLong readBytes = new AtomicLong();
+
     private final AtomicLong writtenBytes = new AtomicLong();
+
     private final AtomicLong readMessages = new AtomicLong();
-    private final AtomicLong writtenMessages = new AtomicLong();    
+
+    private final AtomicLong writtenMessages = new AtomicLong();
+
     private long lastReadTime;
+
     private long lastWriteTime;
-    
+
     private long lastReadBytes;
+
     private long lastWrittenBytes;
+
     private long lastReadMessages;
+
     private long lastWrittenMessages;
+
     private long lastThroughputCalculationTime;
 
     private final AtomicInteger scheduledWriteBytes = new AtomicInteger();
+
     private final AtomicInteger scheduledWriteMessages = new AtomicInteger();
-    
+
     private int throughputCalculationInterval = 3;
-    
+
     private final Object throughputCalculationLock = new Object();
-    
+
     public IoServiceStatistics(AbstractIoService service) {
         this.service = service;
     }
-    
+
     /**
      * Returns the maximum number of sessions which were being managed at the
      * same time.
@@ -82,7 +98,7 @@ public class IoServiceStatistics {
     public final long getCumulativeManagedSessionCount() {
         return service.getListeners().getCumulativeManagedSessionCount();
     }
-    
+
     /**
      * Returns the time in millis when I/O occurred lastly.
      */
@@ -103,7 +119,7 @@ public class IoServiceStatistics {
     public final long getLastWriteTime() {
         return lastWriteTime;
     }
-    
+
     /**
      * Returns the number of bytes read by this service
      *
@@ -224,12 +240,9 @@ public class IoServiceStatistics {
      * Sets the interval (seconds) between each throughput calculation.  The
      * default value is <tt>3</tt> seconds.
      */
-    public final void setThroughputCalculationInterval(
-            int throughputCalculationInterval) {
+    public final void setThroughputCalculationInterval(int throughputCalculationInterval) {
         if (throughputCalculationInterval < 0) {
-            throw new IllegalArgumentException(
-                    "throughputCalculationInterval: "
-                            + throughputCalculationInterval);
+            throw new IllegalArgumentException("throughputCalculationInterval: " + throughputCalculationInterval);
         }
 
         this.throughputCalculationInterval = throughputCalculationInterval;
@@ -248,7 +261,7 @@ public class IoServiceStatistics {
     protected final void setLastWriteTime(long lastWriteTime) {
         this.lastWriteTime = lastWriteTime;
     }
-    
+
     /**
      * Resets the throughput counters of the service if none session 
      * is currently managed. 
@@ -264,7 +277,7 @@ public class IoServiceStatistics {
 
     /**
      * Updates the throughput counters.
-     */    
+     */
     public void updateThroughput(long currentTime) {
         synchronized (throughputCalculationLock) {
             int interval = (int) (currentTime - lastThroughputCalculationTime);
@@ -278,14 +291,10 @@ public class IoServiceStatistics {
             long readMessages = this.readMessages.get();
             long writtenMessages = this.writtenMessages.get();
 
-            readBytesThroughput = (readBytes - lastReadBytes) * 1000.0
-                    / interval;
-            writtenBytesThroughput = (writtenBytes - lastWrittenBytes) * 1000.0
-                    / interval;
-            readMessagesThroughput = (readMessages - lastReadMessages) * 1000.0
-                    / interval;
-            writtenMessagesThroughput = (writtenMessages - lastWrittenMessages)
-                    * 1000.0 / interval;
+            readBytesThroughput = (readBytes - lastReadBytes) * 1000.0 / interval;
+            writtenBytesThroughput = (writtenBytes - lastWrittenBytes) * 1000.0 / interval;
+            readMessagesThroughput = (readMessages - lastReadMessages) * 1000.0 / interval;
+            writtenMessagesThroughput = (writtenMessages - lastWrittenMessages) * 1000.0 / interval;
 
             if (readBytesThroughput > largestReadBytesThroughput) {
                 largestReadBytesThroughput = readBytesThroughput;
@@ -308,11 +317,11 @@ public class IoServiceStatistics {
             lastThroughputCalculationTime = currentTime;
         }
     }
-    
+
     /**
      * Increases the count of read bytes by <code>increment</code> and sets 
      * the last read time to <code>currentTime</code>.
-     */ 
+     */
     public final void increaseReadBytes(long increment, long currentTime) {
         readBytes.addAndGet(increment);
         lastReadTime = currentTime;
@@ -321,16 +330,16 @@ public class IoServiceStatistics {
     /**
      * Increases the count of read messages by 1 and sets the last read time to 
      * <code>currentTime</code>.
-     */ 
+     */
     public final void increaseReadMessages(long currentTime) {
         readMessages.incrementAndGet();
         lastReadTime = currentTime;
     }
-    
+
     /**
      * Increases the count of written bytes by <code>increment</code> and sets 
      * the last write time to <code>currentTime</code>.
-     */ 
+     */
     public final void increaseWrittenBytes(int increment, long currentTime) {
         writtenBytes.addAndGet(increment);
         lastWriteTime = currentTime;
@@ -339,12 +348,12 @@ public class IoServiceStatistics {
     /**
      * Increases the count of written messages by 1 and sets the last write time to 
      * <code>currentTime</code>.
-     */   
+     */
     public final void increaseWrittenMessages(long currentTime) {
         writtenMessages.incrementAndGet();
         lastWriteTime = currentTime;
     }
-    
+
     /**
      * Returns the count of bytes scheduled for write.
      */
@@ -368,23 +377,22 @@ public class IoServiceStatistics {
 
     /**
      * Increments by 1 the count of messages scheduled for write.
-     */    
+     */
     public final void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
     }
 
     /**
      * Decrements by 1 the count of messages scheduled for write.
-     */    
+     */
     public final void decreaseScheduledWriteMessages() {
         scheduledWriteMessages.decrementAndGet();
     }
 
     /**
      * Sets the time at which throughtput counters where updated.
-     */        
-    protected void setLastThroughputCalculationTime(
-            long lastThroughputCalculationTime) {
+     */
+    protected void setLastThroughputCalculationTime(long lastThroughputCalculationTime) {
         this.lastThroughputCalculationTime = lastThroughputCalculationTime;
-    }    
+    }
 }

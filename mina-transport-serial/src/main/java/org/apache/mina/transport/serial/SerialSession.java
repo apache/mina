@@ -34,7 +34,7 @@ public interface SerialSession extends IoSession {
     SerialAddress getLocalAddress();
 
     SerialAddress getServiceAddress();
-    
+
     /**
      * Sets or clears the RTS (Request To Send) bit in the UART, if supported by the underlying implementation.
      * @param rts true for set RTS, false for clearing

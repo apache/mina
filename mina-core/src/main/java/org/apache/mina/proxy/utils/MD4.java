@@ -123,8 +123,7 @@ public class MD4 extends MessageDigestSpi {
         if (len >= nbOfCharsToFillBuf) {
             System.arraycopy(b, offset, buffer, pos, nbOfCharsToFillBuf);
             process(buffer, 0);
-            for (blkStart = nbOfCharsToFillBuf; blkStart + BYTE_BLOCK_LENGTH
-                    - 1 < len; blkStart += BYTE_BLOCK_LENGTH) {
+            for (blkStart = nbOfCharsToFillBuf; blkStart + BYTE_BLOCK_LENGTH - 1 < len; blkStart += BYTE_BLOCK_LENGTH) {
                 process(b, offset + blkStart);
             }
             pos = 0;
@@ -142,12 +141,9 @@ public class MD4 extends MessageDigestSpi {
     protected byte[] engineDigest() {
         byte[] p = pad();
         engineUpdate(p, 0, p.length);
-        byte[] digest = { (byte) a, (byte) (a >>> 8), (byte) (a >>> 16),
-                (byte) (a >>> 24), (byte) b, (byte) (b >>> 8),
-                (byte) (b >>> 16), (byte) (b >>> 24), (byte) c,
-                (byte) (c >>> 8), (byte) (c >>> 16), (byte) (c >>> 24),
-                (byte) d, (byte) (d >>> 8), (byte) (d >>> 16),
-                (byte) (d >>> 24) };
+        byte[] digest = { (byte) a, (byte) (a >>> 8), (byte) (a >>> 16), (byte) (a >>> 24), (byte) b, (byte) (b >>> 8),
+                (byte) (b >>> 16), (byte) (b >>> 24), (byte) c, (byte) (c >>> 8), (byte) (c >>> 16), (byte) (c >>> 24),
+                (byte) d, (byte) (d >>> 8), (byte) (d >>> 16), (byte) (d >>> 24) };
 
         engineReset();
 
@@ -157,11 +153,9 @@ public class MD4 extends MessageDigestSpi {
     /**
      * {@inheritDoc}
      */
-    protected int engineDigest(byte[] buf, int offset, int len)
-            throws DigestException {
+    protected int engineDigest(byte[] buf, int offset, int len) throws DigestException {
         if (offset < 0 || offset + len >= buf.length) {
-            throw new DigestException(
-                    "Wrong offset or not enough space to store the digest");
+            throw new DigestException("Wrong offset or not enough space to store the digest");
         }
         int destLength = Math.min(len, BYTE_DIGEST_LENGTH);
         System.arraycopy(engineDigest(), 0, buf, offset, destLength);
@@ -224,8 +218,8 @@ public class MD4 extends MessageDigestSpi {
         // Copy the block to process into X array
         int[] X = new int[16];
         for (int i = 0; i < 16; i++) {
-            X[i] = (in[offset++] & 0xff) | (in[offset++] & 0xff) << 8
-                    | (in[offset++] & 0xff) << 16 | (in[offset++] & 0xff) << 24;
+            X[i] = (in[offset++] & 0xff) | (in[offset++] & 0xff) << 8 | (in[offset++] & 0xff) << 16
+                    | (in[offset++] & 0xff) << 24;
         }
 
         // Round 1

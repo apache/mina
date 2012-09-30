@@ -65,8 +65,7 @@ import org.apache.mina.util.ExceptionMonitor;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
-        extends AbstractIoAcceptor {
+public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> extends AbstractIoAcceptor {
     /** A lock used to protect the selector to be waked up before it's created */
     private final Semaphore lock = new Semaphore(1);
 
@@ -78,8 +77,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
 
     private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
 
-    private final Map<SocketAddress, H> boundHandles = Collections
-            .synchronizedMap(new HashMap<SocketAddress, H>());
+    private final Map<SocketAddress, H> boundHandles = Collections.synchronizedMap(new HashMap<SocketAddress, H>());
 
     private final ServiceOperationFuture disposalFuture = new ServiceOperationFuture();
 
@@ -110,10 +108,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * @param processorClass a {@link Class} of {@link IoProcessor} for the associated {@link IoSession}
      *            type.
      */
-    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            Class<? extends IoProcessor<S>> processorClass) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass),
-                true);
+    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass) {
+        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass), true);
     }
 
     /**
@@ -130,10 +126,9 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      *            type.
      * @param processorCount the amount of processor to instantiate for the pool
      */
-    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            Class<? extends IoProcessor<S>> processorClass, int processorCount) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass,
-                processorCount), true);
+    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass,
+            int processorCount) {
+        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass, processorCount), true);
     }
 
     /**
@@ -148,8 +143,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering
      *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
      */
-    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            IoProcessor<S> processor) {
+    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, IoProcessor<S> processor) {
         this(sessionConfig, null, processor, false);
     }
 
@@ -169,8 +163,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering
      *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
      */
-    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            Executor executor, IoProcessor<S> processor) {
+    protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Executor executor, IoProcessor<S> processor) {
         this(sessionConfig, executor, processor, false);
     }
 
@@ -193,8 +186,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * @param createdProcessor tagging the processor as automatically created, so it
      * will be automatically disposed
      */
-    private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig,
-            Executor executor, IoProcessor<S> processor,
+    private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Executor executor, IoProcessor<S> processor,
             boolean createdProcessor) {
         super(sessionConfig, executor);
 
@@ -208,7 +200,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         try {
             // Initialize the selector
             init();
-            
+
             // The selector is now ready, we can switch the
             // flag to true so that incoming connection can be accepted
             selectable = true;
@@ -284,8 +276,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * @return the created {@link IoSession}
      * @throws Exception any exception thrown by the underlying systems calls
      */
-    protected abstract S accept(IoProcessor<S> processor, H handle)
-            throws Exception;
+    protected abstract S accept(IoProcessor<S> processor, H handle) throws Exception;
 
     /**
      * Close a server socket.
@@ -309,12 +300,10 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * {@inheritDoc}
      */
     @Override
-    protected final Set<SocketAddress> bindInternal(
-            List<? extends SocketAddress> localAddresses) throws Exception {
+    protected final Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses) throws Exception {
         // Create a bind request as a Future operation. When the selector
         // have handled the registration, it will signal this future.
-        AcceptorOperationFuture request = new AcceptorOperationFuture(
-                localAddresses);
+        AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
 
         // adds the Registration request to the queue for the Workers
         // to handle
@@ -323,22 +312,20 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         // creates the Acceptor instance and has the local
         // executor kick it off.
         startupAcceptor();
-        
+
         // As we just started the acceptor, we have to unblock the select()
         // in order to process the bind request we just have added to the
         // registerQueue.
         try {
             lock.acquire();
-            
+
             // Wait a bit to give a chance to the Acceptor thread to do the select()
-            Thread.sleep( 10 );
+            Thread.sleep(10);
             wakeup();
-        }
-        finally
-        {
+        } finally {
             lock.release();
         }
-        
+
         // Now, we wait until this request is completed.
         request.awaitUninterruptibly();
 
@@ -350,8 +337,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
         // setLocalAddresses() shouldn't be called from the worker thread
         // because of deadlock.
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
-        
-        for (H handle:boundHandles.values()) {
+
+        for (H handle : boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
         }
 
@@ -393,10 +380,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
      * {@inheritDoc}
      */
     @Override
-    protected final void unbind0(List<? extends SocketAddress> localAddresses)
-            throws Exception {
-        AcceptorOperationFuture future = new AcceptorOperationFuture(
-                localAddresses);
+    protected final void unbind0(List<? extends SocketAddress> localAddresses) throws Exception {
+        AcceptorOperationFuture future = new AcceptorOperationFuture(localAddresses);
 
         cancelQueue.add(future);
         startupAcceptor();
@@ -446,12 +431,12 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
                             assert (acceptorRef.get() != this);
                             break;
                         }
-                        
+
                         if (!acceptorRef.compareAndSet(null, this)) {
                             assert (acceptorRef.get() != this);
                             break;
                         }
-                        
+
                         assert (acceptorRef.get() == this);
                     }
 
@@ -518,7 +503,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
                 // Associates a new created connection to a processor,
                 // and get back a session
                 S session = accept(processor, handle);
-                
+
                 if (session == null) {
                     continue;
                 }
@@ -545,7 +530,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
             // The register queue contains the list of services to manage
             // in this acceptor.
             AcceptorOperationFuture future = registerQueue.poll();
-            
+
             if (future == null) {
                 return 0;
             }
@@ -583,7 +568,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
                             ExceptionMonitor.getInstance().exceptionCaught(e);
                         }
                     }
-                    
+
                     // TODO : add some comment : what is the wakeup() waking up ?
                     wakeup();
                 }
@@ -608,7 +593,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
             // close the channels
             for (SocketAddress a : future.getLocalAddresses()) {
                 H handle = boundHandles.remove(a);
-                
+
                 if (handle == null) {
                     continue;
                 }
@@ -632,8 +617,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
     /**
      * {@inheritDoc}
      */
-    public final IoSession newSession(SocketAddress remoteAddress,
-            SocketAddress localAddress) {
+    public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         throw new UnsupportedOperationException();
     }
 
@@ -650,8 +634,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
     public void setBacklog(int backlog) {
         synchronized (bindLock) {
             if (isActive()) {
-                throw new IllegalStateException(
-                        "backlog can't be set while the acceptor is bound.");
+                throw new IllegalStateException("backlog can't be set while the acceptor is bound.");
             }
 
             this.backlog = backlog;
@@ -671,8 +654,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H>
     public void setReuseAddress(boolean reuseAddress) {
         synchronized (bindLock) {
             if (isActive()) {
-                throw new IllegalStateException(
-                        "backlog can't be set while the acceptor is bound.");
+                throw new IllegalStateException("backlog can't be set while the acceptor is bound.");
             }
 
             this.reuseAddress = reuseAddress;

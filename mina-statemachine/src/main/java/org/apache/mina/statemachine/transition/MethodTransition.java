@@ -58,10 +58,12 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MethodTransition extends AbstractTransition {
-    private static final Logger LOGGER = LoggerFactory.getLogger( MethodTransition.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodTransition.class);
+
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
-    
+
     private final Method method;
+
     private final Object target;
 
     /**
@@ -90,7 +92,7 @@ public class MethodTransition extends AbstractTransition {
     public MethodTransition(Object eventId, Method method, Object target) {
         this(eventId, null, method, target);
     }
-    
+
     /**
      * Creates a new instance with the specified {@link State} as next state 
      * and for the specified {@link Event} id. The target {@link Method} will
@@ -108,7 +110,7 @@ public class MethodTransition extends AbstractTransition {
     public MethodTransition(Object eventId, State nextState, Object target) {
         this(eventId, nextState, eventId.toString(), target);
     }
-    
+
     /**
      * Creates a new instance which will loopback to the same {@link State} 
      * for the specified {@link Event} id. The target {@link Method} will
@@ -140,7 +142,7 @@ public class MethodTransition extends AbstractTransition {
     public MethodTransition(Object eventId, String methodName, Object target) {
         this(eventId, null, methodName, target);
     }
-    
+
     /**
      * Creates a new instance with the specified {@link State} as next state 
      * and for the specified {@link Event} id.
@@ -157,7 +159,7 @@ public class MethodTransition extends AbstractTransition {
         super(eventId, nextState);
 
         this.target = target;
-        
+
         Method[] candidates = target.getClass().getMethods();
         Method result = null;
         for (int i = 0; i < candidates.length; i++) {
@@ -168,14 +170,14 @@ public class MethodTransition extends AbstractTransition {
                 result = candidates[i];
             }
         }
-        
+
         if (result == null) {
             throw new NoSuchMethodException(methodName);
         }
-        
+
         this.method = result;
     }
-    
+
     /**
      * Returns the target {@link Method}.
      * 
@@ -196,18 +198,18 @@ public class MethodTransition extends AbstractTransition {
 
     public boolean doExecute(Event event) {
         Class<?>[] types = method.getParameterTypes();
-        
+
         if (types.length == 0) {
             invokeMethod(EMPTY_ARGUMENTS);
             return true;
         }
-        
+
         if (types.length > 2 + event.getArguments().length) {
             return false;
         }
-        
+
         Object[] args = new Object[types.length];
-        
+
         int i = 0;
         if (match(types[i], event, Event.class)) {
             args[i++] = event;
@@ -221,16 +223,16 @@ public class MethodTransition extends AbstractTransition {
                 args[i++] = eventArgs[j];
             }
         }
-        
+
         if (args.length > i) {
             return false;
         }
-        
+
         invokeMethod(args);
-        
+
         return true;
     }
-    
+
     @SuppressWarnings("unchecked")
     private boolean match(Class<?> paramType, Object arg, Class argType) {
         if (paramType.isPrimitive()) {
@@ -259,15 +261,13 @@ public class MethodTransition extends AbstractTransition {
                 return arg instanceof Character;
             }
         }
-        return argType.isAssignableFrom(paramType) 
-                && paramType.isAssignableFrom(arg.getClass());
+        return argType.isAssignableFrom(paramType) && paramType.isAssignableFrom(arg.getClass());
     }
 
     private void invokeMethod(Object[] arguments) {
         try {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Executing method " + method 
-                        + " with arguments " + Arrays.asList(arguments));
+                LOGGER.debug("Executing method " + method + " with arguments " + Arrays.asList(arguments));
             }
             method.invoke(target, arguments);
         } catch (InvocationTargetException ite) {
@@ -279,7 +279,7 @@ public class MethodTransition extends AbstractTransition {
             throw new MethodInvocationException(method, iae);
         }
     }
-    
+
     public boolean equals(Object o) {
         if (!(o instanceof MethodTransition)) {
             return false;
@@ -288,11 +288,8 @@ public class MethodTransition extends AbstractTransition {
             return true;
         }
         MethodTransition that = (MethodTransition) o;
-        return new EqualsBuilder()
-            .appendSuper(super.equals(that))
-            .append(method, that.method)
-            .append(target, that.target)
-            .isEquals();
+        return new EqualsBuilder().appendSuper(super.equals(that)).append(method, that.method)
+                .append(target, that.target).isEquals();
     }
 
     public int hashCode() {
@@ -300,10 +297,7 @@ public class MethodTransition extends AbstractTransition {
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .appendSuper(super.toString())
-            .append("method", method)
-            .append("target", target)
-            .toString();
+        return new ToStringBuilder(this).appendSuper(super.toString()).append("method", method)
+                .append("target", target).toString();
     }
 }

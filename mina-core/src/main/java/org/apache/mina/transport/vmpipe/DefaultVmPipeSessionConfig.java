@@ -27,8 +27,7 @@ import org.apache.mina.core.session.IoSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements
-        VmPipeSessionConfig {
+class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements VmPipeSessionConfig {
     DefaultVmPipeSessionConfig() {
         // Do nothing
     }

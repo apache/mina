@@ -19,8 +19,6 @@
  */
 package org.apache.mina.util;
 
-
-
 /**
  * Monitors uncaught exceptions.  {@link #exceptionCaught(Throwable)} is
  * invoked when there are any uncaught exceptions.
@@ -55,7 +53,7 @@ public abstract class ExceptionMonitor {
         if (monitor == null) {
             monitor = new DefaultExceptionMonitor();
         }
-        
+
         instance = monitor;
     }
 

@@ -90,7 +90,7 @@ public class Response {
 
     @Override
     public String toString() {
-        return "response: { requestId=" + getRequest().getId() + ", type="
-                + getType() + ", message=" + getMessage() + " }";
+        return "response: { requestId=" + getRequest().getId() + ", type=" + getType() + ", message=" + getMessage()
+                + " }";
     }
 }

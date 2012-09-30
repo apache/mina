@@ -36,11 +36,13 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
 
     /** The event size estimator instance */
     private final IoEventSizeEstimator eventSizeEstimator;
-    
+
     private volatile int threshold;
 
     private final Object lock = new Object();
+
     private final AtomicInteger counter = new AtomicInteger();
+
     private int waiters;
 
     public IoEventQueueThrottle() {
@@ -107,9 +109,8 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
     private int estimateSize(IoEvent event) {
         int size = getEventSizeEstimator().estimateSize(event);
         if (size < 0) {
-            throw new IllegalStateException(
-                    IoEventSizeEstimator.class.getSimpleName() + " returned " +
-                    "a negative value (" + size + "): " + event);
+            throw new IllegalStateException(IoEventSizeEstimator.class.getSimpleName() + " returned "
+                    + "a negative value (" + size + "): " + event);
         }
         return size;
     }
@@ -127,13 +128,13 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
 
         synchronized (lock) {
             while (counter.get() >= threshold) {
-                waiters ++;
+                waiters++;
                 try {
                     lock.wait();
                 } catch (InterruptedException e) {
                     // Wait uninterruptably.
                 } finally {
-                    waiters --;
+                    waiters--;
                 }
             }
         }

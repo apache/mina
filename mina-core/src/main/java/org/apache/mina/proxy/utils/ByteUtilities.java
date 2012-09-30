@@ -39,8 +39,7 @@ public class ByteUtilities {
      */
     public static int networkByteOrderToInt(byte[] buf, int start, int count) {
         if (count > 4) {
-            throw new IllegalArgumentException(
-                    "Cannot handle more than 4 bytes");
+            throw new IllegalArgumentException("Cannot handle more than 4 bytes");
         }
 
         int result = 0;
@@ -63,10 +62,10 @@ public class ByteUtilities {
     public static byte[] intToNetworkByteOrder(int num, int count) {
         byte[] buf = new byte[count];
         intToNetworkByteOrder(num, buf, 0, count);
-        
+
         return buf;
     }
-    
+
     /**
      * Encodes an integer into up to 4 bytes in network byte order in the 
      * supplied buffer starting at <code>start</code> offset and writing
@@ -77,11 +76,9 @@ public class ByteUtilities {
      * @param start the offset from beginning for the write operation
      * @param count the number of reserved bytes for the write operation
      */
-    public static void intToNetworkByteOrder(int num, byte[] buf, int start,
-            int count) {
+    public static void intToNetworkByteOrder(int num, byte[] buf, int start, int count) {
         if (count > 4) {
-            throw new IllegalArgumentException(
-                    "Cannot handle more than 4 bytes");
+            throw new IllegalArgumentException("Cannot handle more than 4 bytes");
         }
 
         for (int i = count - 1; i >= 0; i--) {
@@ -150,8 +147,7 @@ public class ByteUtilities {
      * @param length the number of bytes on which to operate 
      * (should be a multiple of 4)
      */
-    public final static void changeWordEndianess(byte[] b, int offset,
-            int length) {
+    public final static void changeWordEndianess(byte[] b, int offset, int length) {
         byte tmp;
 
         for (int i = offset; i < offset + length; i += 4) {
@@ -174,8 +170,7 @@ public class ByteUtilities {
      * @param length the number of bytes on which to operate 
      * (should be a multiple of 2)
      */
-    public final static void changeByteEndianess(byte[] b, int offset,
-            int length) {
+    public final static void changeByteEndianess(byte[] b, int offset, int length) {
         byte tmp;
 
         for (int i = offset; i < offset + length; i += 2) {
@@ -193,8 +188,7 @@ public class ByteUtilities {
      * @return the result byte array
      * @throws UnsupportedEncodingException if the string is not an OEM string
      */
-    public final static byte[] getOEMStringAsByteArray(String s)
-            throws UnsupportedEncodingException {
+    public final static byte[] getOEMStringAsByteArray(String s) throws UnsupportedEncodingException {
         return s.getBytes("ASCII");
     }
 
@@ -204,9 +198,8 @@ public class ByteUtilities {
      * @param s the string to convert
      * @return the result byte array
      * @throws UnsupportedEncodingException if the string is not an UTF-16LE string
-     */    
-    public final static byte[] getUTFStringAsByteArray(String s)
-            throws UnsupportedEncodingException {
+     */
+    public final static byte[] getUTFStringAsByteArray(String s) throws UnsupportedEncodingException {
         return s.getBytes("UTF-16LE");
     }
 
@@ -220,8 +213,7 @@ public class ByteUtilities {
      * @return the encoded string as a byte array
      * @throws UnsupportedEncodingException if encoding fails
      */
-    public final static byte[] encodeString(String s, boolean useUnicode)
-            throws UnsupportedEncodingException {
+    public final static byte[] encodeString(String s, boolean useUnicode) throws UnsupportedEncodingException {
         if (useUnicode) {
             return getUTFStringAsByteArray(s);
         }
@@ -274,8 +266,7 @@ public class ByteUtilities {
     public static byte[] asByteArray(String hex) {
         byte[] bts = new byte[hex.length() / 2];
         for (int i = 0; i < bts.length; i++) {
-            bts[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2),
-                    16);
+            bts[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
         }
 
         return bts;
@@ -300,8 +291,7 @@ public class ByteUtilities {
      * @return the int value
      */
     public static final int makeIntFromByte4(byte[] b, int offset) {
-        return b[offset] << 24 | (b[offset + 1] & 0xff) << 16
-                | (b[offset + 2] & 0xff) << 8 | (b[offset + 3] & 0xff);
+        return b[offset] << 24 | (b[offset + 1] & 0xff) << 16 | (b[offset + 2] & 0xff) << 8 | (b[offset + 3] & 0xff);
     }
 
     /**

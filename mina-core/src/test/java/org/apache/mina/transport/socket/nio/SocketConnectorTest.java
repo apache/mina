@@ -33,7 +33,7 @@ public class SocketConnectorTest extends AbstractConnectorTest {
     @Override
     protected IoAcceptor createAcceptor() {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
-        
+
         acceptor.setReuseAddress(true);
         return acceptor;
     }

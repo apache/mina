@@ -39,8 +39,7 @@ public class VmPipeTrafficControlTest extends AbstractTrafficControlTest {
     }
 
     @Override
-    protected ConnectFuture connect(int port, IoHandler handler)
-            throws Exception {
+    protected ConnectFuture connect(int port, IoHandler handler) throws Exception {
         IoConnector connector = new VmPipeConnector();
         connector.setHandler(handler);
         return connector.connect(new VmPipeAddress(port));

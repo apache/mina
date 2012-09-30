@@ -58,8 +58,7 @@ public class StreamWriteFilter extends AbstractStreamWriteFilter<InputStream> {
 
         int off = 0;
         int n = 0;
-        while (off < bytes.length
-                && (n = is.read(bytes, off, bytes.length - off)) != -1) {
+        while (off < bytes.length && (n = is.read(bytes, off, bytes.length - off)) != -1) {
             off += n;
         }
 
@@ -71,7 +70,7 @@ public class StreamWriteFilter extends AbstractStreamWriteFilter<InputStream> {
 
         return buffer;
     }
-    
+
     @Override
     protected Class<InputStream> getMessageClass() {
         return InputStream.class;

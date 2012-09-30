@@ -35,28 +35,29 @@ public class AbstractStateContextLookupTest {
     @Test
     public void testLookup() throws Exception {
         Map<String, StateContext> map = new HashMap<String, StateContext>();
-        AbstractStateContextLookup lookup = new AbstractStateContextLookup(
-                                             new DefaultStateContextFactory()) {
+        AbstractStateContextLookup lookup = new AbstractStateContextLookup(new DefaultStateContextFactory()) {
             protected boolean supports(Class<?> c) {
                 return Map.class.isAssignableFrom(c);
             }
+
             @SuppressWarnings("unchecked")
             protected StateContext lookup(Object eventArg) {
                 Map<String, StateContext> map = (Map<String, StateContext>) eventArg;
                 return map.get("context");
             }
+
             @SuppressWarnings("unchecked")
             protected void store(Object eventArg, StateContext context) {
                 Map<String, StateContext> map = (Map<String, StateContext>) eventArg;
                 map.put("context", context);
             }
         };
-        Object[] args1 = new Object[] {new Object(), map, new Object()};
-        Object[] args2 = new Object[] {map, new Object()};
+        Object[] args1 = new Object[] { new Object(), map, new Object() };
+        Object[] args2 = new Object[] { map, new Object() };
         StateContext sc = lookup.lookup(args1);
         assertSame(map.get("context"), sc);
         assertSame(map.get("context"), lookup.lookup(args1));
         assertSame(map.get("context"), lookup.lookup(args2));
     }
-    
+
 }

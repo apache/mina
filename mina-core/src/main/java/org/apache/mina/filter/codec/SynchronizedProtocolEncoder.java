@@ -51,8 +51,7 @@ public class SynchronizedProtocolEncoder implements ProtocolEncoder {
         return encoder;
     }
 
-    public void encode(IoSession session, Object message,
-            ProtocolEncoderOutput out) throws Exception {
+    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         synchronized (encoder) {
             encoder.encode(session, message, out);
         }

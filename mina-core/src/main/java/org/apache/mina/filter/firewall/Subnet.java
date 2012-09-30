@@ -32,11 +32,15 @@ import java.net.InetAddress;
 public class Subnet {
 
     private static final int IP_MASK = 0x80000000;
+
     private static final int BYTE_MASK = 0xFF;
 
     private InetAddress subnet;
+
     private int subnetInt;
+
     private int subnetMask;
+
     private int suffix;
 
     /**
@@ -47,28 +51,28 @@ public class Subnet {
      * @param mask The mask
      */
     public Subnet(InetAddress subnet, int mask) {
-        if(subnet == null) {
+        if (subnet == null) {
             throw new IllegalArgumentException("Subnet address can not be null");
         }
-        if(!(subnet instanceof Inet4Address)) {
+        if (!(subnet instanceof Inet4Address)) {
             throw new IllegalArgumentException("Only IPv4 supported");
         }
 
-        if(mask < 0 || mask > 32) {
+        if (mask < 0 || mask > 32) {
             throw new IllegalArgumentException("Mask has to be an integer between 0 and 32");
         }
-        
+
         this.subnet = subnet;
         this.subnetInt = toInt(subnet);
         this.suffix = mask;
-        
+
         // binary mask for this subnet
         this.subnetMask = IP_MASK >> (mask - 1);
     }
 
     /** 
      * Converts an IP address into an integer
-     */ 
+     */
     private int toInt(InetAddress inetAddress) {
         byte[] address = inetAddress.getAddress();
         int result = 0;
@@ -88,7 +92,7 @@ public class Subnet {
     private int toSubnet(InetAddress address) {
         return toInt(address) & subnetMask;
     }
-    
+
     /**
      * Checks if the {@link InetAddress} is within this subnet
      * @param address The {@link InetAddress} to check
@@ -108,14 +112,13 @@ public class Subnet {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof Subnet)) {
+        if (!(obj instanceof Subnet)) {
             return false;
         }
-        
+
         Subnet other = (Subnet) obj;
-        
+
         return other.subnetInt == subnetInt && other.suffix == suffix;
     }
 
-    
 }

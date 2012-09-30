@@ -108,7 +108,6 @@ public class PrefixedStringEncoder extends ProtocolEncoderAdapter {
         return maxDataLength;
     }
 
-
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         String value = (String) message;
         IoBuffer buffer = IoBuffer.allocate(value.length()).setAutoExpand(true);

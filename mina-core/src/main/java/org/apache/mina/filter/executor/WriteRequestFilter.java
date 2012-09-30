@@ -90,9 +90,7 @@ public class WriteRequestFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void filterWrite(
-            NextFilter nextFilter,
-            IoSession session, WriteRequest writeRequest) throws Exception {
+    public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
 
         final IoEvent e = new IoEvent(IoEventType.WRITE, session, writeRequest);
 

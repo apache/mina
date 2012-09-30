@@ -22,8 +22,6 @@ package org.apache.mina.core.buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-
-
 /**
  * A simplistic {@link IoBufferAllocator} which simply allocates a new
  * buffer every time.
@@ -35,7 +33,7 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
     public IoBuffer allocate(int capacity, boolean direct) {
         return wrap(allocateNioBuffer(capacity, direct));
     }
-    
+
     public ByteBuffer allocateNioBuffer(int capacity, boolean direct) {
         ByteBuffer nioBuffer;
         if (direct) {
@@ -72,7 +70,7 @@ public class SimpleBufferAllocator implements IoBufferAllocator {
         public ByteBuffer buf() {
             return buf;
         }
-        
+
         @Override
         protected void buf(ByteBuffer buf) {
             this.buf = buf;

@@ -32,8 +32,9 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 public abstract class ConsumeToEndOfSessionDecodingState implements DecodingState {
 
     private IoBuffer buffer;
+
     private final int maxLength;
-    
+
     /**
      * Creates a new instance using the specified maximum length.
      * 
@@ -48,8 +49,7 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
     /**
      * {@inheritDoc}
      */
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (buffer == null) {
             buffer = IoBuffer.allocate(256).setAutoExpand(true);
         }
@@ -64,8 +64,7 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         try {
             if (buffer == null) {
                 buffer = IoBuffer.allocate(0);
@@ -89,6 +88,5 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(IoBuffer product,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(IoBuffer product, ProtocolDecoderOutput out) throws Exception;
 }

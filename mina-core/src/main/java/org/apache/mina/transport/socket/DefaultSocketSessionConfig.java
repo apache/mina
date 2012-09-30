@@ -28,27 +28,37 @@ import org.apache.mina.core.service.IoService;
  */
 public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
     private static boolean DEFAULT_REUSE_ADDRESS = false;
+
     private static int DEFAULT_TRAFFIC_CLASS = 0;
+
     private static boolean DEFAULT_KEEP_ALIVE = false;
+
     private static boolean DEFAULT_OOB_INLINE = false;
+
     private static int DEFAULT_SO_LINGER = -1;
+
     private static boolean DEFAULT_TCP_NO_DELAY = false;
 
     protected IoService parent;
+
     private boolean defaultReuseAddress;
 
     private boolean reuseAddress;
-    
+
     /* The SO_RCVBUF parameter. Set to -1 (ie, will default to OS default) */
     private int receiveBufferSize = -1;
 
     /* The SO_SNDBUF parameter. Set to -1 (ie, will default to OS default) */
     private int sendBufferSize = -1;
-    
+
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
+
     private boolean keepAlive = DEFAULT_KEEP_ALIVE;
+
     private boolean oobInline = DEFAULT_OOB_INLINE;
+
     private int soLinger = DEFAULT_SO_LINGER;
+
     private boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
 
     /**
@@ -60,13 +70,13 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     public void init(IoService parent) {
         this.parent = parent;
-        
+
         if (parent instanceof SocketAcceptor) {
             defaultReuseAddress = true;
         } else {
             defaultReuseAddress = DEFAULT_REUSE_ADDRESS;
         }
-        
+
         reuseAddress = defaultReuseAddress;
     }
 

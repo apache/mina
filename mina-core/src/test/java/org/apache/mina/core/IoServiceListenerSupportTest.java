@@ -49,8 +49,7 @@ public class IoServiceListenerSupportTest {
 
     @Test
     public void testServiceLifecycle() throws Exception {
-        IoServiceListenerSupport support = new IoServiceListenerSupport(
-                mockService);
+        IoServiceListenerSupport support = new IoServiceListenerSupport(mockService);
 
         IoServiceListener listener = EasyMock.createStrictMock(IoServiceListener.class);
 
@@ -81,14 +80,13 @@ public class IoServiceListenerSupportTest {
 
     @Test
     public void testSessionLifecycle() throws Exception {
-        IoServiceListenerSupport support = new IoServiceListenerSupport(
-                mockService);
+        IoServiceListenerSupport support = new IoServiceListenerSupport(mockService);
 
         DummySession session = new DummySession();
         session.setService(mockService);
         session.setLocalAddress(ADDRESS);
 
-        IoHandler handler = EasyMock.createStrictMock( IoHandler.class );
+        IoHandler handler = EasyMock.createStrictMock(IoHandler.class);
         session.setHandler(handler);
 
         IoServiceListener listener = EasyMock.createStrictMock(IoServiceListener.class);
@@ -135,8 +133,7 @@ public class IoServiceListenerSupportTest {
     public void testDisconnectOnUnbind() throws Exception {
         IoAcceptor acceptor = EasyMock.createStrictMock(IoAcceptor.class);
 
-        final IoServiceListenerSupport support = new IoServiceListenerSupport(
-                acceptor);
+        final IoServiceListenerSupport support = new IoServiceListenerSupport(acceptor);
 
         final DummySession session = new DummySession();
         session.setService(acceptor);
@@ -210,8 +207,7 @@ public class IoServiceListenerSupportTest {
     public void testConnectorActivation() throws Exception {
         IoConnector connector = EasyMock.createStrictMock(IoConnector.class);
 
-        IoServiceListenerSupport support = new IoServiceListenerSupport(
-                connector);
+        IoServiceListenerSupport support = new IoServiceListenerSupport(connector);
 
         final DummySession session = new DummySession();
         session.setService(connector);

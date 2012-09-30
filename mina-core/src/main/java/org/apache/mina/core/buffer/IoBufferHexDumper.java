@@ -40,8 +40,7 @@ class IoBufferHexDumper {
      * Initialize lookup tables.
      */
     static {
-        final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8',
-                '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+        final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
         int i;
         byte[] high = new byte[256];
@@ -65,8 +64,7 @@ class IoBufferHexDumper {
      */
     public static String getHexdump(IoBuffer in, int lengthLimit) {
         if (lengthLimit == 0) {
-            throw new IllegalArgumentException("lengthLimit: " + lengthLimit
-                    + " (expected: 1+)");
+            throw new IllegalArgumentException("lengthLimit: " + lengthLimit + " (expected: 1+)");
         }
 
         boolean truncate = in.remaining() > lengthLimit;

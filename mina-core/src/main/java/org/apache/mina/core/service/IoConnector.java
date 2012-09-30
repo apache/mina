@@ -64,7 +64,7 @@ public interface IoConnector extends IoService {
      * @see setConnectTimeoutMillis()
      */
     void setConnectTimeout(int connectTimeout);
-    
+
     /**
      * Sets the connect timeout in milliseconds.  The default value is 1 minute.
      */
@@ -75,7 +75,7 @@ public interface IoConnector extends IoService {
      * is specified in {@link #connect()} method.
      */
     SocketAddress getDefaultRemoteAddress();
-    
+
     /**
      * Sets the default remote address to connect to when no argument is
      * specified in {@link #connect()} method.
@@ -88,7 +88,7 @@ public interface IoConnector extends IoService {
      * @throws IllegalStateException if no default remoted address is set.
      */
     ConnectFuture connect();
-    
+
     /**
      * Connects to the {@link #setDefaultRemoteAddress(SocketAddress) default
      * remote address} and invokes the <code>ioSessionInitializer</code> when
@@ -101,7 +101,7 @@ public interface IoConnector extends IoService {
      * @throws IllegalStateException if no default remote address is set.
      */
     ConnectFuture connect(IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
-    
+
     /**
      * Connects to the specified remote address.
      *
@@ -132,7 +132,7 @@ public interface IoConnector extends IoService {
      *         connection attempt initiated by this call succeeds or fails.
      */
     ConnectFuture connect(SocketAddress remoteAddress, SocketAddress localAddress);
-    
+
     /**
      * Connects to the specified remote address binding to the specified local
      * address and and invokes the <code>ioSessionInitializer</code> when the
@@ -147,6 +147,6 @@ public interface IoConnector extends IoService {
      * @return the {@link ConnectFuture} instance which is completed when the
      *         connection attempt initiated by this call succeeds or fails.
      */
-    ConnectFuture connect(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
+    ConnectFuture connect(SocketAddress remoteAddress, SocketAddress localAddress,
+            IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
 }

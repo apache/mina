@@ -55,20 +55,22 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private static final Runnable EXIT_SIGNAL = new Runnable() {
         public void run() {
-            throw new Error(
-                    "This method shouldn't be called. " +
-                    "Please file a bug report.");
+            throw new Error("This method shouldn't be called. " + "Please file a bug report.");
         }
     };
 
     private final Set<Worker> workers = new HashSet<Worker>();
 
     private volatile int corePoolSize;
+
     private volatile int maximumPoolSize;
+
     private volatile int largestPoolSize;
+
     private final AtomicInteger idleWorkers = new AtomicInteger();
 
     private long completedTaskCount;
+
     private volatile boolean shutdown;
 
     private final IoEventQueueHandler queueHandler;
@@ -85,28 +87,21 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS);
     }
 
-    public UnorderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
+    public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory());
     }
 
-    public UnorderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize,
-            long keepAliveTime, TimeUnit unit,
+    public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             IoEventQueueHandler queueHandler) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler);
     }
 
-    public UnorderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize,
-            long keepAliveTime, TimeUnit unit,
+    public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, null);
     }
 
-    public UnorderedThreadPoolExecutor(
-            int corePoolSize, int maximumPoolSize,
-            long keepAliveTime, TimeUnit unit,
+    public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
         super(0, 1, keepAliveTime, unit, new LinkedBlockingQueue<Runnable>(), threadFactory, new AbortPolicy());
         if (corePoolSize < 0) {
@@ -180,8 +175,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     public void setMaximumPoolSize(int maximumPoolSize) {
         if (maximumPoolSize <= 0 || maximumPoolSize < corePoolSize) {
-            throw new IllegalArgumentException("maximumPoolSize: "
-                    + maximumPoolSize);
+            throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
         }
 
         synchronized (workers) {
@@ -195,8 +189,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     @Override
-    public boolean awaitTermination(long timeout, TimeUnit unit)
-            throws InterruptedException {
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
 
         long deadline = System.currentTimeMillis() + unit.toMillis(timeout);
 
@@ -238,7 +231,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         shutdown = true;
 
         synchronized (workers) {
-            for (int i = workers.size(); i > 0; i --) {
+            for (int i = workers.size(); i > 0; i--) {
                 getQueue().offer(EXIT_SIGNAL);
             }
         }
@@ -306,7 +299,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
     public long getCompletedTaskCount() {
         synchronized (workers) {
             long answer = completedTaskCount;
-            for (Worker w: workers) {
+            for (Worker w : workers) {
                 answer += w.completedTaskCount;
             }
 
@@ -342,9 +335,9 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
     public int prestartAllCoreThreads() {
         int answer = 0;
         synchronized (workers) {
-            for (int i = corePoolSize - workers.size() ; i > 0; i --) {
+            for (int i = corePoolSize - workers.size(); i > 0; i--) {
                 addWorker();
-                answer ++;
+                answer++;
             }
         }
         return answer;
@@ -357,7 +350,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                 addWorker();
                 return true;
             }
-            
+
             return false;
         }
     }
@@ -392,7 +385,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
         synchronized (workers) {
             if (this.corePoolSize > corePoolSize) {
-                for (int i = this.corePoolSize - corePoolSize; i > 0; i --) {
+                for (int i = this.corePoolSize - corePoolSize; i > 0; i--) {
                     removeWorker();
                 }
             }
@@ -403,6 +396,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
     private class Worker implements Runnable {
 
         private volatile long completedTaskCount;
+
         private Thread thread;
 
         public void run() {
@@ -480,7 +474,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                 task.run();
                 ran = true;
                 afterExecute(task, null);
-                completedTaskCount ++;
+                completedTaskCount++;
             } catch (RuntimeException e) {
                 if (!ran) {
                     afterExecute(task, e);

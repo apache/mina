@@ -45,7 +45,9 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractTrafficControlTest {
 
     protected int port;
+
     protected IoAcceptor acceptor;
+
     protected TransportMetadata transportType;
 
     public AbstractTrafficControlTest(IoAcceptor acceptor) {
@@ -65,10 +67,10 @@ public abstract class AbstractTrafficControlTest {
         acceptor.dispose();
     }
 
-    protected abstract ConnectFuture connect(int port, IoHandler handler)
-            throws Exception;
+    protected abstract ConnectFuture connect(int port, IoHandler handler) throws Exception;
 
     protected abstract SocketAddress createServerSocketAddress(int port);
+
     protected abstract int getPort(SocketAddress address);
 
     @Test
@@ -82,7 +84,7 @@ public abstract class AbstractTrafficControlTest {
         while (session.getAttribute("lock") == null) {
             Thread.yield();
         }
-        
+
         Object lock = session.getAttribute("lock");
         synchronized (lock) {
 
@@ -203,7 +205,7 @@ public abstract class AbstractTrafficControlTest {
         public ClientIoHandler() {
             super();
         }
-        
+
         @Override
         public void sessionCreated(IoSession session) throws Exception {
             super.sessionCreated(session);
@@ -214,23 +216,20 @@ public abstract class AbstractTrafficControlTest {
         }
 
         @Override
-        public void messageReceived(IoSession session, Object message)
-                throws Exception {
+        public void messageReceived(IoSession session, Object message) throws Exception {
             IoBuffer buffer = (IoBuffer) message;
             byte[] data = new byte[buffer.remaining()];
             buffer.get(data);
             Object lock = session.getAttribute("lock");
             synchronized (lock) {
-                StringBuffer sb = (StringBuffer) session
-                        .getAttribute("received");
+                StringBuffer sb = (StringBuffer) session.getAttribute("received");
                 sb.append(new String(data, "ASCII"));
                 lock.notifyAll();
             }
         }
 
         @Override
-        public void messageSent(IoSession session, Object message)
-                throws Exception {
+        public void messageSent(IoSession session, Object message) throws Exception {
             IoBuffer buffer = (IoBuffer) message;
             buffer.rewind();
             byte[] data = new byte[buffer.remaining()];
@@ -248,10 +247,9 @@ public abstract class AbstractTrafficControlTest {
         public ServerIoHandler() {
             super();
         }
-        
+
         @Override
-        public void messageReceived(IoSession session, Object message)
-                throws Exception {
+        public void messageReceived(IoSession session, Object message) throws Exception {
             // Just echo the received bytes.
             IoBuffer rb = (IoBuffer) message;
             IoBuffer wb = IoBuffer.allocate(rb.remaining());

@@ -19,7 +19,6 @@
  */
 package org.apache.mina.core.session;
 
-
 /**
  * An exception that is thrown when the type of the message cannot be determined.
  *

@@ -83,8 +83,7 @@ class IoSessionOutputStream extends OutputStream {
 
         lastWriteFuture.awaitUninterruptibly();
         if (!lastWriteFuture.isWritten()) {
-            throw new IOException(
-                    "The bytes could not be written to the session");
+            throw new IOException("The bytes could not be written to the session");
         }
     }
 }

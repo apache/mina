@@ -38,5 +38,5 @@ public interface EventArgumentsInterceptor {
      *         modification is needed.
      */
     Object[] modify(Object[] arguments);
-    
+
 }

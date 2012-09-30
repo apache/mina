@@ -53,7 +53,7 @@ public class IoBufferDecoder {
          * The currently matched bytes of the delimiter. 
          */
         private int matchCount = 0;
-        
+
         /**
          * Holds the current content length of decoded data if in
          * content-length mode.
@@ -137,8 +137,7 @@ public class IoBufferDecoder {
      */
     public void setContentLength(int contentLength, boolean resetMatchCount) {
         if (contentLength <= 0) {
-            throw new IllegalArgumentException("contentLength: "
-                    + contentLength);
+            throw new IllegalArgumentException("contentLength: " + contentLength);
         }
 
         ctx.setContentLength(contentLength);
@@ -192,8 +191,7 @@ public class IoBufferDecoder {
         // Retrieve fixed length content
         if (contentLength > -1) {
             if (decodedBuffer == null) {
-                decodedBuffer = IoBuffer.allocate(contentLength).setAutoExpand(
-                        true);
+                decodedBuffer = IoBuffer.allocate(contentLength).setAutoExpand(true);
             }
 
             // If not enough data to complete the decoding
@@ -233,8 +231,7 @@ public class IoBufferDecoder {
                     in.limit(pos);
 
                     if (decodedBuffer == null) {
-                        decodedBuffer = IoBuffer.allocate(in.remaining())
-                                .setAutoExpand(true);
+                        decodedBuffer = IoBuffer.allocate(in.remaining()).setAutoExpand(true);
                     }
 
                     decodedBuffer.put(in);

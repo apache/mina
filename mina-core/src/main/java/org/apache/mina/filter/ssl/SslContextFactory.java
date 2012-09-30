@@ -52,25 +52,43 @@ import javax.net.ssl.TrustManagerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SslContextFactory {
-    
+
     private String provider = null;
+
     private String protocol = "TLS";
+
     private SecureRandom secureRandom = null;
+
     private KeyStore keyManagerFactoryKeyStore = null;
+
     private char[] keyManagerFactoryKeyStorePassword = null;
+
     private KeyManagerFactory keyManagerFactory = null;
+
     private String keyManagerFactoryAlgorithm = null;
+
     private String keyManagerFactoryProvider = null;
+
     private boolean keyManagerFactoryAlgorithmUseDefault = true;
+
     private KeyStore trustManagerFactoryKeyStore = null;
+
     private TrustManagerFactory trustManagerFactory = null;
+
     private String trustManagerFactoryAlgorithm = null;
+
     private String trustManagerFactoryProvider = null;
+
     private boolean trustManagerFactoryAlgorithmUseDefault = true;
+
     private ManagerFactoryParameters trustManagerFactoryParameters = null;
+
     private int clientSessionCacheSize = -1;
+
     private int clientSessionTimeout = -1;
+
     private int serverSessionCacheSize = -1;
+
     private int serverSessionTimeout = -1;
 
     public SSLContext newInstance() throws Exception {
@@ -86,8 +104,7 @@ public class SslContextFactory {
                 if (keyManagerFactoryProvider == null) {
                     kmf = KeyManagerFactory.getInstance(algorithm);
                 } else {
-                    kmf = KeyManagerFactory.getInstance(algorithm,
-                            keyManagerFactoryProvider);
+                    kmf = KeyManagerFactory.getInstance(algorithm, keyManagerFactoryProvider);
                 }
             }
         }
@@ -101,16 +118,14 @@ public class SslContextFactory {
                 if (trustManagerFactoryProvider == null) {
                     tmf = TrustManagerFactory.getInstance(algorithm);
                 } else {
-                    tmf = TrustManagerFactory.getInstance(algorithm,
-                            trustManagerFactoryProvider);
+                    tmf = TrustManagerFactory.getInstance(algorithm, trustManagerFactoryProvider);
                 }
             }
         }
 
         KeyManager[] keyManagers = null;
         if (kmf != null) {
-            kmf.init(keyManagerFactoryKeyStore,
-                    keyManagerFactoryKeyStorePassword);
+            kmf.init(keyManagerFactoryKeyStore, keyManagerFactoryKeyStorePassword);
             keyManagers = kmf.getKeyManagers();
         }
         TrustManager[] trustManagers = null;
@@ -133,23 +148,19 @@ public class SslContextFactory {
         context.init(keyManagers, trustManagers, secureRandom);
 
         if (clientSessionCacheSize >= 0) {
-            context.getClientSessionContext().setSessionCacheSize(
-                    clientSessionCacheSize);
+            context.getClientSessionContext().setSessionCacheSize(clientSessionCacheSize);
         }
 
         if (clientSessionTimeout >= 0) {
-            context.getClientSessionContext().setSessionTimeout(
-                    clientSessionTimeout);
+            context.getClientSessionContext().setSessionTimeout(clientSessionTimeout);
         }
 
         if (serverSessionCacheSize >= 0) {
-            context.getServerSessionContext().setSessionCacheSize(
-                    serverSessionCacheSize);
+            context.getServerSessionContext().setSessionCacheSize(serverSessionCacheSize);
         }
 
         if (serverSessionTimeout >= 0) {
-            context.getServerSessionContext().setSessionTimeout(
-                    serverSessionTimeout);
+            context.getServerSessionContext().setSessionTimeout(serverSessionTimeout);
         }
 
         return context;
@@ -343,8 +354,7 @@ public class SslContextFactory {
      *
      * @param parameters describing provider-specific trust material.
      */
-    public void setTrustManagerFactoryParameters(
-            ManagerFactoryParameters parameters) {
+    public void setTrustManagerFactoryParameters(ManagerFactoryParameters parameters) {
         this.trustManagerFactoryParameters = parameters;
     }
 

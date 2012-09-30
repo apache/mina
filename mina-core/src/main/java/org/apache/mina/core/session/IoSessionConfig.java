@@ -21,7 +21,6 @@ package org.apache.mina.core.session;
 
 import java.util.concurrent.BlockingQueue;
 
-
 /**
  * The configuration of {@link IoSession}.
  *
@@ -70,19 +69,19 @@ public interface IoSessionConfig {
      * read buffer size to the greater value than this property value.
      */
     void setMaxReadBufferSize(int maxReadBufferSize);
-    
+
     /**
      * Returns the interval (seconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */
     int getThroughputCalculationInterval();
-    
+
     /**
      * Returns the interval (milliseconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */
     long getThroughputCalculationIntervalInMillis();
-    
+
     /**
      * Sets the interval (seconds) between each throughput calculation.  The
      * default value is <tt>3</tt> seconds.
@@ -108,47 +107,47 @@ public interface IoSessionConfig {
      * Returns idle time for {@link IdleStatus#READER_IDLE} in seconds.
      */
     int getReaderIdleTime();
-    
+
     /**
      * Returns idle time for {@link IdleStatus#READER_IDLE} in milliseconds.
      */
     long getReaderIdleTimeInMillis();
-    
+
     /**
      * Sets idle time for {@link IdleStatus#READER_IDLE} in seconds.
      */
     void setReaderIdleTime(int idleTime);
-    
+
     /**
      * Returns idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
      */
     int getWriterIdleTime();
-    
+
     /**
      * Returns idle time for {@link IdleStatus#WRITER_IDLE} in milliseconds.
      */
     long getWriterIdleTimeInMillis();
-    
+
     /**
      * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
      */
     void setWriterIdleTime(int idleTime);
-    
+
     /**
      * Returns idle time for {@link IdleStatus#BOTH_IDLE} in seconds.
      */
     int getBothIdleTime();
-    
+
     /**
      * Returns idle time for {@link IdleStatus#BOTH_IDLE} in milliseconds.
      */
     long getBothIdleTimeInMillis();
-    
+
     /**
      * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
      */
     void setBothIdleTime(int idleTime);
-    
+
     /**
      * Returns write timeout in seconds.
      */
@@ -163,7 +162,7 @@ public interface IoSessionConfig {
      * Sets write timeout in seconds.
      */
     void setWriteTimeout(int writeTimeout);
-    
+
     /**
      * Returns <tt>true</tt> if and only if {@link IoSession#read()} operation
      * is enabled.  If enabled, all received messages are stored in an internal
@@ -173,7 +172,7 @@ public interface IoSessionConfig {
      * therefore it's disabled by default.
      */
     boolean isUseReadOperation();
-    
+
     /**
      * Enables or disabled {@link IoSession#read()} operation.  If enabled, all
      * received messages are stored in an internal {@link BlockingQueue} so you

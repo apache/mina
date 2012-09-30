@@ -47,8 +47,11 @@ import org.slf4j.LoggerFactory;
  */
 public class StateMachine {
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachine.class);
+
     private static final String CALL_STACK = StateMachine.class.getName() + ".callStack";
+
     private final State startState;
+
     private final Map<String, State> states;
 
     private final ThreadLocal<Boolean> processingThreadLocal = new ThreadLocal<Boolean>() {

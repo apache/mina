@@ -30,16 +30,16 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class ShortIntegerDecodingState implements DecodingState {
-    
+
     private int highByte;
+
     private int counter;
 
     /**
      * {@inheritDoc}
      */
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
-        
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+
         while (in.hasRemaining()) {
             switch (counter) {
             case 0:
@@ -52,7 +52,7 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
                 throw new InternalError();
             }
 
-            counter ++;
+            counter++;
         }
         return this;
     }
@@ -60,10 +60,8 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
-        throw new ProtocolDecoderException(
-                "Unexpected end of session while waiting for a short integer.");
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
+        throw new ProtocolDecoderException("Unexpected end of session while waiting for a short integer.");
     }
 
     /**
@@ -77,6 +75,5 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(short value,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(short value, ProtocolDecoderOutput out) throws Exception;
 }

@@ -27,7 +27,7 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface KeepAliveMessageFactory {
-    
+
     /**
      * Returns <tt>true</tt> if and only if the specified message is a
      * keep-alive request message.
@@ -39,13 +39,13 @@ public interface KeepAliveMessageFactory {
      * keep-alive response message;
      */
     boolean isResponse(IoSession session, Object message);
-    
+
     /**
      * Returns a (new) keep-alive request message.
      * Returns <tt>null</tt> if no request is required.
      */
     Object getRequest(IoSession session);
-    
+
     /**
      * Returns a (new) response message for the specified keep-alive request.
      * Returns <tt>null</tt> if no response is required.

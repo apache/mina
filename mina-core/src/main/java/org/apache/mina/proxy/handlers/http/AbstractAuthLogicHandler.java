@@ -38,8 +38,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractAuthLogicHandler {
-    private final static Logger logger = LoggerFactory
-            .getLogger(AbstractAuthLogicHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(AbstractAuthLogicHandler.class);
 
     /**
      * The request to be handled by the proxy.
@@ -62,14 +61,12 @@ public abstract class AbstractAuthLogicHandler {
      * @param proxyIoSession the proxy session object
      * @throws ProxyAuthException
      */
-    protected AbstractAuthLogicHandler(final ProxyIoSession proxyIoSession)
-            throws ProxyAuthException {
+    protected AbstractAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         this.proxyIoSession = proxyIoSession;
         this.request = proxyIoSession.getRequest();
 
         if (this.request == null || !(this.request instanceof HttpProxyRequest)) {
-            throw new IllegalArgumentException(
-                    "request parameter should be a non null HttpProxyRequest instance");
+            throw new IllegalArgumentException("request parameter should be a non null HttpProxyRequest instance");
         }
     }
 
@@ -79,8 +76,7 @@ public abstract class AbstractAuthLogicHandler {
      * @param nextFilter the next filter
      * @throws ProxyAuthException
      */
-    public abstract void doHandshake(final NextFilter nextFilter)
-            throws ProxyAuthException;
+    public abstract void doHandshake(final NextFilter nextFilter) throws ProxyAuthException;
 
     /**
      * Handles a HTTP response from the proxy server.
@@ -88,8 +84,7 @@ public abstract class AbstractAuthLogicHandler {
      * @param response The HTTP response.
      * @throws ProxyAuthException
      */
-    public abstract void handleResponse(final HttpProxyResponse response)
-            throws ProxyAuthException;
+    public abstract void handleResponse(final HttpProxyResponse response) throws ProxyAuthException;
 
     /**
      * Sends an HTTP request.
@@ -98,24 +93,20 @@ public abstract class AbstractAuthLogicHandler {
      * @param request the request to write
      * @throws ProxyAuthException
      */
-    protected void writeRequest(final NextFilter nextFilter,
-            final HttpProxyRequest request) throws ProxyAuthException {
+    protected void writeRequest(final NextFilter nextFilter, final HttpProxyRequest request) throws ProxyAuthException {
         logger.debug("  sending HTTP request");
 
-        ((AbstractHttpLogicHandler) proxyIoSession.getHandler()).writeRequest(
-                nextFilter, request);
+        ((AbstractHttpLogicHandler) proxyIoSession.getHandler()).writeRequest(nextFilter, request);
     }
-    
+
     /**
      * Try to force proxy connection to be kept alive.
      * 
      * @param headers the request headers
      */
     public static void addKeepAliveHeaders(Map<String, List<String>> headers) {
-        StringUtilities.addValueToHeader(headers, "Keep-Alive",
-                HttpProxyConstants.DEFAULT_KEEP_ALIVE_TIME, true);
-        StringUtilities.addValueToHeader(headers, "Proxy-Connection",
-                "keep-Alive", true);
+        StringUtilities.addValueToHeader(headers, "Keep-Alive", HttpProxyConstants.DEFAULT_KEEP_ALIVE_TIME, true);
+        StringUtilities.addValueToHeader(headers, "Proxy-Connection", "keep-Alive", true);
     }
-    
+
 }

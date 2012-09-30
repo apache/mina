@@ -18,52 +18,38 @@
  */
 package org.apache.mina.integration.xbean;
 
-
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * @org.apache.xbean.XBean
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class StandardThreadPool implements Executor
-{
+public class StandardThreadPool implements Executor {
     private final ExecutorService delegate;
 
-
-    public StandardThreadPool( int maxThreads )
-    {
-        delegate = Executors.newFixedThreadPool( maxThreads );
+    public StandardThreadPool(int maxThreads) {
+        delegate = Executors.newFixedThreadPool(maxThreads);
     }
 
-    
-    public void execute( Runnable command )
-    {
-        delegate.execute( command );
+    public void execute(Runnable command) {
+        delegate.execute(command);
     }
 
-    
     /**
      * TODO wont this hang if some tasks are sufficiently badly behaved?
      * @org.apache.xbean.DestroyMethod
      */
-    public void stop()
-    {
+    public void stop() {
         delegate.shutdown();
-        for ( ; ; )
-        {
-            try
-            {
-                if ( delegate.awaitTermination( Integer.MAX_VALUE, TimeUnit.SECONDS ) )
-                {
+        for (;;) {
+            try {
+                if (delegate.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS)) {
                     break;
                 }
-            }
-            catch ( InterruptedException e )
-            {
+            } catch (InterruptedException e) {
                 //ignore
             }
         }

@@ -46,8 +46,7 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState 
     /**
      * {@inheritDoc}
      */
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         int terminatorPos = in.indexOf(terminator);
 
         if (terminatorPos >= 0) {
@@ -83,7 +82,7 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState 
             buffer = IoBuffer.allocate(in.remaining());
             buffer.setAutoExpand(true);
         }
-        
+
         buffer.put(in);
         return this;
     }
@@ -91,8 +90,7 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState 
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         IoBuffer product;
         // When input contained only terminator rather than actual data...
         if (buffer == null) {
@@ -115,6 +113,5 @@ public abstract class ConsumeToTerminatorDecodingState implements DecodingState 
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(IoBuffer product,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(IoBuffer product, ProtocolDecoderOutput out) throws Exception;
 }

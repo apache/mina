@@ -51,13 +51,19 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     private final Map<Long, AprSession> allSessions = new HashMap<Long, AprSession>(POLLSET_SIZE);
 
     private final Object wakeupLock = new Object();
+
     private final long wakeupSocket;
+
     private volatile boolean toBeWakenUp;
 
     private final long pool;
+
     private final long bufferPool; // memory pool
+
     private final long pollset; // socket poller
+
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
+
     private final Queue<AprSession> polledSessions = new ConcurrentLinkedQueue<AprSession>();
 
     /**
@@ -446,12 +452,8 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
             throw new UnsupportedOperationException();
         }
 
-        long fd = File.open(region.getFilename(),
-                            File.APR_FOPEN_READ
-                                | File.APR_FOPEN_SENDFILE_ENABLED
-                                | File.APR_FOPEN_BINARY,
-                            0,
-                            Socket.pool(session.getDescriptor()));
+        long fd = File.open(region.getFilename(), File.APR_FOPEN_READ | File.APR_FOPEN_SENDFILE_ENABLED
+                | File.APR_FOPEN_BINARY, 0, Socket.pool(session.getDescriptor()));
         long numWritten = Socket.sendfilen(session.getDescriptor(), fd, region.getPosition(), length, 0);
         File.close(fd);
 
@@ -459,7 +461,8 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
             if (numWritten == -Status.EAGAIN) {
                 return 0;
             }
-            throw new IOException(org.apache.tomcat.jni.Error.strerror((int) -numWritten) + " (code: " + numWritten + ")");
+            throw new IOException(org.apache.tomcat.jni.Error.strerror((int) -numWritten) + " (code: " + numWritten
+                    + ")");
         }
         return (int) numWritten;
     }

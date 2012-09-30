@@ -19,7 +19,6 @@
  */
 package org.apache.mina.core.session;
 
-
 /**
  * Represents the type of idleness of {@link IoSession} or
  * {@link IoSession}.  There are three types of idleness:

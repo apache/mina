@@ -35,8 +35,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ObjectSerializationInputStream extends InputStream implements
-        ObjectInput {
+public class ObjectSerializationInputStream extends InputStream implements ObjectInput {
 
     private final DataInputStream in;
 
@@ -48,8 +47,7 @@ public class ObjectSerializationInputStream extends InputStream implements
         this(in, null);
     }
 
-    public ObjectSerializationInputStream(InputStream in,
-            ClassLoader classLoader) {
+    public ObjectSerializationInputStream(InputStream in, ClassLoader classLoader) {
         if (in == null) {
             throw new IllegalArgumentException("in");
         }
@@ -84,8 +82,7 @@ public class ObjectSerializationInputStream extends InputStream implements
      */
     public void setMaxObjectSize(int maxObjectSize) {
         if (maxObjectSize <= 0) {
-            throw new IllegalArgumentException("maxObjectSize: "
-                    + maxObjectSize);
+            throw new IllegalArgumentException("maxObjectSize: " + maxObjectSize);
         }
 
         this.maxObjectSize = maxObjectSize;
@@ -99,12 +96,11 @@ public class ObjectSerializationInputStream extends InputStream implements
     public Object readObject() throws ClassNotFoundException, IOException {
         int objectSize = in.readInt();
         if (objectSize <= 0) {
-            throw new StreamCorruptedException("Invalid objectSize: "
-                    + objectSize);
+            throw new StreamCorruptedException("Invalid objectSize: " + objectSize);
         }
         if (objectSize > maxObjectSize) {
-            throw new StreamCorruptedException("ObjectSize too big: "
-                    + objectSize + " (expected: <= " + maxObjectSize + ')');
+            throw new StreamCorruptedException("ObjectSize too big: " + objectSize + " (expected: <= " + maxObjectSize
+                    + ')');
         }
 
         IoBuffer buf = IoBuffer.allocate(objectSize + 4, false);

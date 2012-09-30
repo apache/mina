@@ -59,8 +59,7 @@ public class ZlibTest {
         for (int i = 0; i < 5; i++) {
             IoBuffer byteCompressed = deflater.deflate(byteInput);
             IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
-            String strOutput = byteUncompressed.getString(Charset.forName(
-                    "UTF8").newDecoder());
+            String strOutput = byteUncompressed.getString(Charset.forName("UTF8").newDecoder());
             assertTrue(strOutput.equals(strInput));
         }
     }
@@ -75,8 +74,7 @@ public class ZlibTest {
         // for integrity, it wont throw an exception
         byteCompressed.put(5, (byte) 0xa);
         IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
-        String strOutput = byteUncompressed.getString(Charset.forName("UTF8")
-                .newDecoder());
+        String strOutput = byteUncompressed.getString(Charset.forName("UTF8").newDecoder());
         assertFalse(strOutput.equals(strInput));
     }
 
@@ -114,16 +112,14 @@ public class ZlibTest {
                 // the zlib header, which will not be generated for further
                 // compressions done with the same instance
                 IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
-                String strOutput = byteUncompressed.getString(Charset.forName(
-                        "UTF8").newDecoder());
+                String strOutput = byteUncompressed.getString(Charset.forName("UTF8").newDecoder());
                 assertTrue(strOutput.equals(strInput));
             }
         }
         // check if the last compressed data block can be decompressed
         // successfully.
         IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
-        String strOutput = byteUncompressed.getString(Charset.forName("UTF8")
-                .newDecoder());
+        String strOutput = byteUncompressed.getString(Charset.forName("UTF8").newDecoder());
         assertTrue(strOutput.equals(strInput));
     }
 }

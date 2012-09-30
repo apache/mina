@@ -46,8 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
 
-    private final static Logger LOGGER = LoggerFactory
-            .getLogger(AbstractProxyLogicHandler.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(AbstractProxyLogicHandler.class);
 
     /**
      * Object that contains all the proxy authentication session informations.
@@ -100,16 +99,14 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
      * @param nextFilter the next filter
      * @param data Data buffer to be written.
      */
-    protected WriteFuture writeData(final NextFilter nextFilter,
-            final IoBuffer data) {
+    protected WriteFuture writeData(final NextFilter nextFilter, final IoBuffer data) {
         // write net data
         ProxyHandshakeIoBuffer writeBuffer = new ProxyHandshakeIoBuffer(data);
 
         LOGGER.debug("   session write: {}", writeBuffer);
 
         WriteFuture writeFuture = new DefaultWriteFuture(getSession());
-        getProxyFilter().writeData(nextFilter, getSession(),
-                new DefaultWriteRequest(writeBuffer, writeFuture), true);
+        getProxyFilter().writeData(nextFilter, getSession(), new DefaultWriteRequest(writeBuffer, writeFuture), true);
 
         return writeFuture;
     }
@@ -133,9 +130,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
         }
 
         ProxyIoSession proxyIoSession = getProxyIoSession();
-        proxyIoSession.getConnector()
-                .fireConnected(proxyIoSession.getSession())
-                .awaitUninterruptibly();
+        proxyIoSession.getConnector().fireConnected(proxyIoSession.getSession()).awaitUninterruptibly();
 
         LOGGER.debug("  handshake completed");
 
@@ -160,11 +155,9 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
 
         Event scheduledWrite;
         while ((scheduledWrite = writeRequestQueue.poll()) != null) {
-            LOGGER.debug(" Flushing buffered write request: {}",
-                    scheduledWrite.data);
+            LOGGER.debug(" Flushing buffered write request: {}", scheduledWrite.data);
 
-            getProxyFilter().filterWrite(scheduledWrite.nextFilter,
-                    getSession(), (WriteRequest) scheduledWrite.data);
+            getProxyFilter().filterWrite(scheduledWrite.nextFilter, getSession(), (WriteRequest) scheduledWrite.data);
         }
 
         // Free queue
@@ -174,8 +167,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
     /**
      * Enqueue a message to be written once handshaking is complete.
      */
-    public synchronized void enqueueWriteRequest(final NextFilter nextFilter,
-            final WriteRequest writeRequest) {
+    public synchronized void enqueueWriteRequest(final NextFilter nextFilter, final WriteRequest writeRequest) {
         if (writeRequestQueue == null) {
             writeRequestQueue = new LinkedList<Event>();
         }

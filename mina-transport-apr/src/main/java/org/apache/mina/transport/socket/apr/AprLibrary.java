@@ -22,7 +22,6 @@ package org.apache.mina.transport.socket.apr;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 
-
 /**
  * Internal singleton used for initializing correctly the APR native library
  * and the associated root memory pool.
@@ -78,8 +77,7 @@ class AprLibrary {
         try {
             Library.initialize(null);
         } catch (Exception e) {
-            throw new RuntimeException(
-                    "Error loading Apache Portable Runtime (APR).", e);
+            throw new RuntimeException("Error loading Apache Portable Runtime (APR).", e);
         }
         pool = Pool.create(0);
     }

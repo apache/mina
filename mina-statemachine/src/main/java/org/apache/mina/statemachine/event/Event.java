@@ -31,11 +31,13 @@ import org.apache.mina.statemachine.context.StateContext;
  */
 public class Event {
     public static final String WILDCARD_EVENT_ID = "*";
-    
+
     private final Object id;
+
     private final StateContext context;
+
     private final Object[] arguments;
-    
+
     /**
      * Creates a new {@link Event} with the specified id and no arguments.
      * 
@@ -95,12 +97,9 @@ public class Event {
     public Object[] getArguments() {
         return arguments;
     }
-    
+
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("id", id)
-            .append("context", context)
-            .append("arguments", arguments)
-            .toString();
+        return new ToStringBuilder(this).append("id", id).append("context", context).append("arguments", arguments)
+                .toString();
     }
 }

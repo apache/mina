@@ -33,6 +33,7 @@ import org.apache.mina.statemachine.State;
  */
 public abstract class AbstractStateContext implements StateContext {
     private State currentState = null;
+
     private Map<Object, Object> attributes = null;
 
     public Object getAttribute(Object key) {
@@ -59,9 +60,7 @@ public abstract class AbstractStateContext implements StateContext {
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("currentState", currentState)
-            .append("attributes", attributes)
-            .toString();
-    }    
+        return new ToStringBuilder(this).append("currentState", currentState).append("attributes", attributes)
+                .toString();
+    }
 }

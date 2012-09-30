@@ -27,8 +27,7 @@ import org.apache.mina.core.session.IoSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements
-        SerialSessionConfig {
+class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements SerialSessionConfig {
 
     private int receiveThreshold = -1;
 

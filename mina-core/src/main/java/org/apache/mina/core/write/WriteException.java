@@ -37,7 +37,7 @@ import org.apache.mina.util.MapBackedSet;
 public class WriteException extends IOException {
 
     private static final long serialVersionUID = -4174407422754524197L;
-    
+
     private final List<WriteRequest> requests;
 
     /**
@@ -119,7 +119,7 @@ public class WriteException extends IOException {
     public WriteRequest getRequest() {
         return requests.get(0);
     }
-    
+
     private static List<WriteRequest> asRequestList(Collection<WriteRequest> requests) {
         if (requests == null) {
             throw new IllegalArgumentException("requests");
@@ -130,10 +130,10 @@ public class WriteException extends IOException {
 
         // Create a list of requests removing duplicates.
         Set<WriteRequest> newRequests = new MapBackedSet<WriteRequest>(new LinkedHashMap<WriteRequest, Boolean>());
-        for (WriteRequest r: requests) {
+        for (WriteRequest r : requests) {
             newRequests.add(r.getOriginalRequest());
         }
-        
+
         return Collections.unmodifiableList(new ArrayList<WriteRequest>(newRequests));
     }
 
@@ -141,7 +141,7 @@ public class WriteException extends IOException {
         if (request == null) {
             throw new IllegalArgumentException("request");
         }
-        
+
         List<WriteRequest> requests = new ArrayList<WriteRequest>(1);
         requests.add(request.getOriginalRequest());
         return Collections.unmodifiableList(requests);

@@ -41,7 +41,7 @@ public interface WriteRequest {
      * Returns {@link WriteFuture} that is associated with this write request.
      */
     WriteFuture getFuture();
-    
+
     /**
      * Returns a message object to be written.
      */
@@ -53,7 +53,7 @@ public interface WriteRequest {
      * @return <tt>null</tt> for the default destination
      */
     SocketAddress getDestination();
-    
+
     /**
      * Tells if the current message has been encoded
      *

@@ -42,7 +42,7 @@ public class LoadTestMdcInjectionFilter {
         TestRunner runner = new TestRunner();
 
         try {
-            for (int i=0; i<50000; i++) {
+            for (int i = 0; i < 50000; i++) {
                 Test test = new JUnit4TestAdapter(MdcInjectionFilterTest.class);
                 runner.doRun(test);
                 System.out.println("i = " + i + " " + new Date());

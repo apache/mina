@@ -21,7 +21,6 @@ package org.apache.mina.core.write;
 
 import java.util.Collection;
 
-
 /**
  * An exception which is thrown when one or more write requests resulted
  * in no actual write operation.
@@ -32,8 +31,7 @@ public class NothingWrittenException extends WriteException {
 
     private static final long serialVersionUID = -6331979307737691005L;
 
-    public NothingWrittenException(Collection<WriteRequest> requests,
-            String message, Throwable cause) {
+    public NothingWrittenException(Collection<WriteRequest> requests, String message, Throwable cause) {
         super(requests, message, cause);
     }
 
@@ -41,8 +39,7 @@ public class NothingWrittenException extends WriteException {
         super(requests, s);
     }
 
-    public NothingWrittenException(Collection<WriteRequest> requests,
-            Throwable cause) {
+    public NothingWrittenException(Collection<WriteRequest> requests, Throwable cause) {
         super(requests, cause);
     }
 
@@ -50,8 +47,7 @@ public class NothingWrittenException extends WriteException {
         super(requests);
     }
 
-    public NothingWrittenException(WriteRequest request, String message,
-            Throwable cause) {
+    public NothingWrittenException(WriteRequest request, String message, Throwable cause) {
         super(request, message, cause);
     }
 

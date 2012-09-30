@@ -61,14 +61,13 @@ public class HttpProxyResponse {
      * @param statusLine the response status line
      * @param headers the response headers
      */
-    protected HttpProxyResponse(final String httpVersion,
-            final String statusLine, final Map<String, List<String>> headers) {
+    protected HttpProxyResponse(final String httpVersion, final String statusLine,
+            final Map<String, List<String>> headers) {
         this.httpVersion = httpVersion;
         this.statusLine = statusLine;
 
         // parses the status code from the status line
-        this.statusCode = statusLine.charAt(0) == ' ' ? Integer
-                .parseInt(statusLine.substring(1, 4)) : Integer
+        this.statusCode = statusLine.charAt(0) == ' ' ? Integer.parseInt(statusLine.substring(1, 4)) : Integer
                 .parseInt(statusLine.substring(0, 3));
 
         this.headers = headers;

@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class SerialConnector extends AbstractIoConnector {
     private final Logger log;
-    
+
     private IdleStatusChecker idleChecker;
 
     public SerialConnector() {
@@ -57,17 +57,16 @@ public final class SerialConnector extends AbstractIoConnector {
     public SerialConnector(Executor executor) {
         super(new DefaultSerialSessionConfig(), executor);
         log = LoggerFactory.getLogger(SerialConnector.class);
-        
+
         idleChecker = new IdleStatusChecker();
         // we schedule the idle status checking task in this service exceutor
         // it will be woke up every seconds
         executeWorker(idleChecker.getNotifyingTask(), "idleStatusChecker");
-        
+
     }
 
     @Override
-    protected synchronized ConnectFuture connect0(
-            SocketAddress remoteAddress, SocketAddress localAddress,
+    protected synchronized ConnectFuture connect0(SocketAddress remoteAddress, SocketAddress localAddress,
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
 
         CommPortIdentifier portId;
@@ -85,17 +84,13 @@ public final class SerialConnector extends AbstractIoConnector {
                 if (portId.getName().equals(portAddress.getName())) {
                     try {
                         if (log.isDebugEnabled()) {
-                            log
-                                    .debug("Serial port found : "
-                                            + portId.getName());
+                            log.debug("Serial port found : " + portId.getName());
                         }
 
-                        SerialPort serialPort = initializePort("Apache MINA",
-                                portId, portAddress);
+                        SerialPort serialPort = initializePort("Apache MINA", portId, portAddress);
 
                         ConnectFuture future = new DefaultConnectFuture();
-                        SerialSessionImpl session = new SerialSessionImpl(
-                                this, getListeners(), portAddress, serialPort);
+                        SerialSessionImpl session = new SerialSessionImpl(this, getListeners(), portAddress, serialPort);
                         initSession(session, future, sessionInitializer);
                         session.start();
                         return future;
@@ -124,9 +119,7 @@ public final class SerialConnector extends AbstractIoConnector {
             }
         }
 
-        return DefaultConnectFuture
-                .newFailedFuture(new SerialPortUnavailableException(
-                        "Serial port not found"));
+        return DefaultConnectFuture.newFailedFuture(new SerialPortUnavailableException("Serial port not found"));
     }
 
     @Override
@@ -139,8 +132,7 @@ public final class SerialConnector extends AbstractIoConnector {
         return SerialSessionImpl.METADATA;
     }
 
-    private SerialPort initializePort(String user, CommPortIdentifier portId,
-            SerialAddress portAddress)
+    private SerialPort initializePort(String user, CommPortIdentifier portId, SerialAddress portAddress)
             throws UnsupportedCommOperationException, PortInUseException {
 
         SerialSessionConfig config = (SerialSessionConfig) getSessionConfig();
@@ -150,12 +142,10 @@ public final class SerialConnector extends AbstractIoConnector {
             connectTimeout = Integer.MAX_VALUE;
         }
 
-        SerialPort serialPort = (SerialPort) portId.open(
-                user, (int) connectTimeout);
+        SerialPort serialPort = (SerialPort) portId.open(user, (int) connectTimeout);
 
-        serialPort.setSerialPortParams(portAddress.getBauds(), portAddress
-                .getDataBitsForRXTX(), portAddress.getStopBitsForRXTX(),
-                portAddress.getParityForRXTX());
+        serialPort.setSerialPortParams(portAddress.getBauds(), portAddress.getDataBitsForRXTX(),
+                portAddress.getStopBitsForRXTX(), portAddress.getParityForRXTX());
 
         serialPort.setFlowControlMode(portAddress.getFLowControlForRXTX());
 

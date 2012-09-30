@@ -44,6 +44,7 @@ import org.junit.Test;
  */
 public class DatagramRecyclerTest {
     private NioDatagramAcceptor acceptor;
+
     private NioDatagramConnector connector;
 
     public DatagramRecyclerTest() {
@@ -76,13 +77,11 @@ public class DatagramRecyclerTest {
 
         try {
             connector.setHandler(connectorHandler);
-            ConnectFuture future = connector.connect(new InetSocketAddress(
-                    "localhost", port));
+            ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
             future.awaitUninterruptibly();
 
             // Write whatever to trigger the acceptor.
-            future.getSession().write(IoBuffer.allocate(1))
-                    .awaitUninterruptibly();
+            future.getSession().write(IoBuffer.allocate(1)).awaitUninterruptibly();
 
             // Close the client-side connection.
             // This doesn't mean that the acceptor-side connection is also closed.
@@ -98,8 +97,7 @@ public class DatagramRecyclerTest {
             acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000);
 
             // Is it closed?
-            assertTrue(acceptorHandler.session.getCloseFuture()
-                    .isClosed());
+            assertTrue(acceptorHandler.session.getCloseFuture().isClosed());
 
             Thread.sleep(1000);
 
@@ -109,7 +107,7 @@ public class DatagramRecyclerTest {
             acceptor.unbind();
         }
     }
-    
+
     @Test
     public void testCloseRequest() throws Exception {
         int port = AvailablePortFinder.getNextAvailable(1024);
@@ -125,10 +123,9 @@ public class DatagramRecyclerTest {
 
         try {
             connector.setHandler(connectorHandler);
-            ConnectFuture future = connector.connect(new InetSocketAddress(
-                    "localhost", port));
+            ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
             future.awaitUninterruptibly();
-            
+
             // Write whatever to trigger the acceptor.
             future.getSession().write(IoBuffer.allocate(1)).awaitUninterruptibly();
 
@@ -137,9 +134,8 @@ public class DatagramRecyclerTest {
                 Thread.yield();
             }
             acceptorHandler.session.close(true);
-            assertTrue(
-                    acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
-            
+            assertTrue(acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
+
             IoSession oldSession = acceptorHandler.session;
 
             // Wait until all events are processed and clear the state.
@@ -152,22 +148,20 @@ public class DatagramRecyclerTest {
             }
             acceptorHandler.result.setLength(0);
             acceptorHandler.session = null;
-            
+
             // Write whatever to trigger the acceptor again.
-            WriteFuture wf = future.getSession().write(
-                    IoBuffer.allocate(1)).awaitUninterruptibly();
+            WriteFuture wf = future.getSession().write(IoBuffer.allocate(1)).awaitUninterruptibly();
             assertTrue(wf.isWritten());
-            
+
             // Make sure the connection is closed before recycler closes it.
             while (acceptorHandler.session == null) {
                 Thread.yield();
             }
             acceptorHandler.session.close(true);
-            assertTrue(
-                    acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
+            assertTrue(acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
 
             future.getSession().close(true).awaitUninterruptibly();
-            
+
             assertNotSame(oldSession, acceptorHandler.session);
         } finally {
             acceptor.unbind();
@@ -176,6 +170,7 @@ public class DatagramRecyclerTest {
 
     private class MockHandler extends IoHandlerAdapter {
         public volatile IoSession session;
+
         public final StringBuffer result = new StringBuffer();
 
         /**
@@ -184,24 +179,21 @@ public class DatagramRecyclerTest {
         public MockHandler() {
             super();
         }
-        
+
         @Override
-        public void exceptionCaught(IoSession session, Throwable cause)
-                throws Exception {
+        public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
             this.session = session;
             result.append("CA");
         }
 
         @Override
-        public void messageReceived(IoSession session, Object message)
-                throws Exception {
+        public void messageReceived(IoSession session, Object message) throws Exception {
             this.session = session;
             result.append("RE");
         }
 
         @Override
-        public void messageSent(IoSession session, Object message)
-                throws Exception {
+        public void messageSent(IoSession session, Object message) throws Exception {
             this.session = session;
             result.append("SE");
         }
@@ -219,8 +211,7 @@ public class DatagramRecyclerTest {
         }
 
         @Override
-        public void sessionIdle(IoSession session, IdleStatus status)
-                throws Exception {
+        public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
             this.session = session;
             result.append("ID");
         }

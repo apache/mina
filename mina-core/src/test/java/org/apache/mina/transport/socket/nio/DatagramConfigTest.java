@@ -46,7 +46,9 @@ import org.junit.Test;
  */
 public class DatagramConfigTest {
     private IoAcceptor acceptor;
+
     private IoConnector connector;
+
     String result;
 
     public DatagramConfigTest() {
@@ -59,7 +61,7 @@ public class DatagramConfigTest {
         acceptor = new NioDatagramAcceptor();
         connector = new NioDatagramConnector();
     }
-    
+
     @After
     public void tearDown() throws Exception {
         acceptor.dispose();
@@ -78,12 +80,10 @@ public class DatagramConfigTest {
 
         try {
             connector.setHandler(new IoHandlerAdapter());
-            ConnectFuture future = connector.connect(
-                    new InetSocketAddress("127.0.0.1", port));
+            ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port));
             future.awaitUninterruptibly();
 
-            WriteFuture writeFuture = future.getSession().write(
-                    IoBuffer.allocate(16).putInt(0).flip());
+            WriteFuture writeFuture = future.getSession().write(IoBuffer.allocate(16).putInt(0).flip());
             writeFuture.awaitUninterruptibly();
             assertTrue(writeFuture.isWritten());
 
@@ -109,10 +109,9 @@ public class DatagramConfigTest {
         public MockFilter() {
             super();
         }
-        
+
         @Override
-        public void messageReceived(NextFilter nextFilter, IoSession session,
-                Object message) throws Exception {
+        public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
             result += "F";
             nextFilter.messageReceived(session, message);
         }
@@ -126,10 +125,9 @@ public class DatagramConfigTest {
         public MockHandler() {
             super();
         }
-        
+
         @Override
-        public void messageReceived(IoSession session, Object message)
-                throws Exception {
+        public void messageReceived(IoSession session, Object message) throws Exception {
             result += "H";
         }
     }

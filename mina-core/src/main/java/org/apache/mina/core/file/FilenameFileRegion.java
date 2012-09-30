@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-
 /**
  * TODO Add documentation
  * 
@@ -38,10 +37,10 @@ public class FilenameFileRegion extends DefaultFileRegion {
     public FilenameFileRegion(File file, FileChannel channel) throws IOException {
         this(file, channel, 0, file.length());
     }
-    
+
     public FilenameFileRegion(File file, FileChannel channel, long position, long remainingBytes) {
-    	super(channel, position, remainingBytes);
-    	
+        super(channel, position, remainingBytes);
+
         if (file == null) {
             throw new IllegalArgumentException("file can not be null");
         }
@@ -49,6 +48,6 @@ public class FilenameFileRegion extends DefaultFileRegion {
     }
 
     public String getFilename() {
-    	return file.getAbsolutePath();
+        return file.getAbsolutePath();
     }
 }

@@ -39,15 +39,20 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
 
     /** The initial capacity of the list */
     private final int initialCapacity;
-    
+
     // XXX: This volatile keyword here is a workaround for SUN Java Compiler bug,
     //      which produces buggy byte code.  I don't event know why adding a volatile
     //      fixes the problem.  Eclipse Java Compiler seems to produce correct byte code.
     private volatile Object[] items;
+
     private int mask;
+
     private int first = 0;
+
     private int last = 0;
+
     private boolean full;
+
     private int shrinkThreshold;
 
     /**
@@ -56,7 +61,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
     public CircularQueue() {
         this(DEFAULT_CAPACITY);
     }
-    
+
     public CircularQueue(int initialCapacity) {
         int actualCapacity = normalizeCapacity(initialCapacity);
         items = new Object[actualCapacity];
@@ -70,7 +75,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
      */
     private static int normalizeCapacity(int initialCapacity) {
         int actualCapacity = 1;
-        
+
         while (actualCapacity < initialCapacity) {
             actualCapacity <<= 1;
             if (actualCapacity < 0) {
@@ -108,7 +113,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         Object ret = items[first];
         items[first] = null;
         decreaseSize();
-        
+
         if (first == last) {
             first = last = 0;
         }
@@ -121,7 +126,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         if (item == null) {
             throw new IllegalArgumentException("item");
         }
-        
+
         expandIfNeeded();
         items[last] = item;
         increaseSize();
@@ -154,18 +159,17 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         if (full) {
             return capacity();
         }
-        
+
         if (last >= first) {
             return last - first;
         }
 
         return last - first + capacity();
     }
-    
+
     @Override
     public String toString() {
-        return "first=" + first + ", last=" + last + ", size=" + size()
-                + ", mask = " + mask;
+        return "first=" + first + ", last=" + last + ", size=" + size() + ", mask = " + mask;
     }
 
     private void checkIndex(int idx) {
@@ -194,14 +198,14 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
             final int oldLen = items.length;
             final int newLen = oldLen << 1;
             Object[] tmp = new Object[newLen];
-    
+
             if (first < last) {
                 System.arraycopy(items, first, tmp, 0, last - first);
             } else {
                 System.arraycopy(items, first, tmp, 0, oldLen - first);
                 System.arraycopy(items, 0, tmp, oldLen - first, last);
             }
-    
+
             first = 0;
             last = oldLen;
             items = tmp;
@@ -211,7 +215,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
             }
         }
     }
-    
+
     private void shrinkIfNeeded() {
         int size = size();
         if (size <= shrinkThreshold) {
@@ -221,11 +225,11 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
             if (size == newLen) {
                 newLen <<= 1;
             }
-            
+
             if (newLen >= oldLen) {
                 return;
             }
-            
+
             if (newLen < initialCapacity) {
                 if (oldLen == initialCapacity) {
                     return;
@@ -233,9 +237,9 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
 
                 newLen = initialCapacity;
             }
-            
+
             Object[] tmp = new Object[newLen];
-    
+
             // Copy only when there's something to copy.
             if (size > 0) {
                 if (first < last) {
@@ -245,7 +249,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
                     System.arraycopy(items, 0, tmp, oldLen - first, last);
                 }
             }
-    
+
             first = 0;
             last = size;
             items = tmp;
@@ -284,18 +288,14 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
 
         // Make a room for a new element.
         if (first < last) {
-            System
-                    .arraycopy(items, realIdx, items, realIdx + 1, last
-                            - realIdx);
+            System.arraycopy(items, realIdx, items, realIdx + 1, last - realIdx);
         } else {
             if (realIdx >= first) {
                 System.arraycopy(items, 0, items, 1, last);
                 items[0] = items[items.length - 1];
-                System.arraycopy(items, realIdx, items, realIdx + 1,
-                        items.length - realIdx - 1);
+                System.arraycopy(items, realIdx, items, realIdx + 1, items.length - realIdx - 1);
             } else {
-                System.arraycopy(items, realIdx, items, realIdx + 1, last
-                        - realIdx);
+                System.arraycopy(items, realIdx, items, realIdx + 1, last - realIdx);
             }
         }
 
@@ -320,13 +320,11 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
             System.arraycopy(items, first, items, first + 1, realIdx - first);
         } else {
             if (realIdx >= first) {
-                System.arraycopy(items, first, items, first + 1, realIdx
-                        - first);
+                System.arraycopy(items, first, items, first + 1, realIdx - first);
             } else {
                 System.arraycopy(items, 0, items, 1, realIdx);
                 items[0] = items[items.length - 1];
-                System.arraycopy(items, first, items, first + 1, items.length
-                        - first - 1);
+                System.arraycopy(items, first, items, first + 1, items.length - first - 1);
             }
         }
 

@@ -42,10 +42,10 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class VmPipeAcceptor extends AbstractIoAcceptor {
-    
+
     // object used for checking session idle
     private IdleStatusChecker idleChecker;
-    
+
     static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
 
     /**
@@ -54,7 +54,7 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     public VmPipeAcceptor() {
         this(null);
     }
-    
+
     /**
      * Creates a new instance.
      */
@@ -104,19 +104,18 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
 
         synchronized (boundHandlers) {
-            for (SocketAddress a: localAddresses) {
+            for (SocketAddress a : localAddresses) {
                 VmPipeAddress localAddress = (VmPipeAddress) a;
                 if (localAddress == null || localAddress.getPort() == 0) {
                     localAddress = null;
                     for (int i = 10000; i < Integer.MAX_VALUE; i++) {
                         VmPipeAddress newLocalAddress = new VmPipeAddress(i);
-                        if (!boundHandlers.containsKey(newLocalAddress) &&
-                            !newLocalAddresses.contains(newLocalAddress)) {
+                        if (!boundHandlers.containsKey(newLocalAddress) && !newLocalAddresses.contains(newLocalAddress)) {
                             localAddress = newLocalAddress;
                             break;
                         }
                     }
-    
+
                     if (localAddress == null) {
                         throw new IOException("No port available.");
                     }
@@ -125,17 +124,16 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
                 } else if (boundHandlers.containsKey(localAddress)) {
                     throw new IOException("Address already bound: " + localAddress);
                 }
-                
+
                 newLocalAddresses.add(localAddress);
             }
 
-            for (SocketAddress a: newLocalAddresses) {
+            for (SocketAddress a : newLocalAddresses) {
                 VmPipeAddress localAddress = (VmPipeAddress) a;
                 if (!boundHandlers.containsKey(localAddress)) {
-                    boundHandlers.put(localAddress, new VmPipe(this, localAddress,
-                            getHandler(), getListeners()));
+                    boundHandlers.put(localAddress, new VmPipe(this, localAddress, getHandler(), getListeners()));
                 } else {
-                    for (SocketAddress a2: newLocalAddresses) {
+                    for (SocketAddress a2 : newLocalAddresses) {
                         boundHandlers.remove(a2);
                     }
                     throw new IOException("Duplicate local address: " + a);
@@ -149,7 +147,7 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     @Override
     protected void unbind0(List<? extends SocketAddress> localAddresses) {
         synchronized (boundHandlers) {
-            for (SocketAddress a: localAddresses) {
+            for (SocketAddress a : localAddresses) {
                 boundHandlers.remove(a);
             }
         }

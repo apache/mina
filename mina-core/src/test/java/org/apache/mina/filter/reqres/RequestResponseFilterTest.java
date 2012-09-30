@@ -91,13 +91,11 @@ public class RequestResponseFilterTest {
     @Test
     public void testWholeResponse() throws Exception {
         Request req = new Request(1, new Object(), Long.MAX_VALUE);
-        Response res = new Response(req, new Message(1, ResponseType.WHOLE),
-                ResponseType.WHOLE);
+        Response res = new Response(req, new Message(1, ResponseType.WHOLE), ResponseType.WHOLE);
         WriteRequest rwr = new DefaultWriteRequest(req);
 
         // Record
-        nextFilter.filterWrite(session, new DefaultWriteRequest(req
-                .getMessage()));
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req.getMessage()));
         nextFilterControl.setMatcher(matcher);
         nextFilter.messageSent(session, rwr);
         nextFilter.messageReceived(session, res);
@@ -115,8 +113,7 @@ public class RequestResponseFilterTest {
         assertNoSuchElementException(req);
     }
 
-    private void assertNoSuchElementException(Request req)
-            throws InterruptedException {
+    private void assertNoSuchElementException(Request req) throws InterruptedException {
         // Make sure if an exception is thrown if a user waits one more time.
         try {
             req.awaitResponse();
@@ -130,15 +127,12 @@ public class RequestResponseFilterTest {
     @Test
     public void testPartialResponse() throws Exception {
         Request req = new Request(1, new Object(), Long.MAX_VALUE);
-        Response res1 = new Response(req, new Message(1, ResponseType.PARTIAL),
-                ResponseType.PARTIAL);
-        Response res2 = new Response(req, new Message(1,
-                ResponseType.PARTIAL_LAST), ResponseType.PARTIAL_LAST);
+        Response res1 = new Response(req, new Message(1, ResponseType.PARTIAL), ResponseType.PARTIAL);
+        Response res2 = new Response(req, new Message(1, ResponseType.PARTIAL_LAST), ResponseType.PARTIAL_LAST);
         WriteRequest rwr = new DefaultWriteRequest(req);
 
         // Record
-        nextFilter.filterWrite(session, new DefaultWriteRequest(req
-                .getMessage()));
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req.getMessage()));
         nextFilterControl.setMatcher(matcher);
         nextFilter.messageSent(session, rwr);
         nextFilter.messageReceived(session, res1);
@@ -163,13 +157,11 @@ public class RequestResponseFilterTest {
     @Test
     public void testWholeResponseTimeout() throws Exception {
         Request req = new Request(1, new Object(), 10); // 10ms timeout
-        Response res = new Response(req, new Message(1, ResponseType.WHOLE),
-                ResponseType.WHOLE);
+        Response res = new Response(req, new Message(1, ResponseType.WHOLE), ResponseType.WHOLE);
         WriteRequest rwr = new DefaultWriteRequest(req);
 
         // Record
-        nextFilter.filterWrite(session, new DefaultWriteRequest(req
-                .getMessage()));
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req.getMessage()));
         nextFilterControl.setMatcher(matcher);
         nextFilter.messageSent(session, rwr);
         nextFilter.exceptionCaught(session, new RequestTimeoutException(req));
@@ -188,8 +180,7 @@ public class RequestResponseFilterTest {
         assertNoSuchElementException(req);
     }
 
-    private void assertRequestTimeoutException(Request req)
-            throws InterruptedException {
+    private void assertRequestTimeoutException(Request req) throws InterruptedException {
         try {
             req.awaitResponse();
             fail();
@@ -202,15 +193,12 @@ public class RequestResponseFilterTest {
     @Test
     public void testPartialResponseTimeout() throws Exception {
         Request req = new Request(1, new Object(), 10); // 10ms timeout
-        Response res1 = new Response(req, new Message(1, ResponseType.PARTIAL),
-                ResponseType.PARTIAL);
-        Response res2 = new Response(req, new Message(1,
-                ResponseType.PARTIAL_LAST), ResponseType.PARTIAL_LAST);
+        Response res1 = new Response(req, new Message(1, ResponseType.PARTIAL), ResponseType.PARTIAL);
+        Response res2 = new Response(req, new Message(1, ResponseType.PARTIAL_LAST), ResponseType.PARTIAL_LAST);
         WriteRequest rwr = new DefaultWriteRequest(req);
 
         // Record
-        nextFilter.filterWrite(session, new DefaultWriteRequest(req
-                .getMessage()));
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req.getMessage()));
         nextFilterControl.setMatcher(matcher);
         nextFilter.messageSent(session, rwr);
         nextFilter.messageReceived(session, res1);
@@ -246,12 +234,10 @@ public class RequestResponseFilterTest {
         WriteRequest rwr2 = new DefaultWriteRequest(req2);
 
         // Record
-        nextFilter.filterWrite(session, new DefaultWriteRequest(req1
-                .getMessage()));
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req1.getMessage()));
         nextFilterControl.setMatcher(matcher);
         nextFilter.messageSent(session, rwr1);
-        nextFilter.filterWrite(session, new DefaultWriteRequest(req2
-                .getMessage()));
+        nextFilter.filterWrite(session, new DefaultWriteRequest(req2.getMessage()));
         nextFilter.messageSent(session, rwr2);
         nextFilter.exceptionCaught(session, new RequestTimeoutException(req1));
         nextFilterControl.setMatcher(new ExceptionMatcher());
@@ -298,7 +284,7 @@ public class RequestResponseFilterTest {
         public MessageInspector() {
             super();
         }
-        
+
         public Object getRequestId(Object message) {
             if (!(message instanceof Message)) {
                 return null;
@@ -325,17 +311,15 @@ public class RequestResponseFilterTest {
         public WriteRequestMatcher() {
             super();
         }
-        
+
         public WriteRequest getLastWriteRequest() {
             return lastWriteRequest;
         }
 
         @Override
         protected boolean argumentMatches(Object expected, Object actual) {
-            if (actual instanceof WriteRequest
-                    && expected instanceof WriteRequest) {
-                boolean answer = ((WriteRequest) expected).getMessage().equals(
-                        ((WriteRequest) actual).getMessage());
+            if (actual instanceof WriteRequest && expected instanceof WriteRequest) {
+                boolean answer = ((WriteRequest) expected).getMessage().equals(((WriteRequest) actual).getMessage());
                 lastWriteRequest = (WriteRequest) actual;
                 return answer;
             }
@@ -346,11 +330,9 @@ public class RequestResponseFilterTest {
     static class ExceptionMatcher extends AbstractMatcher {
         @Override
         protected boolean argumentMatches(Object expected, Object actual) {
-            if (actual instanceof RequestTimeoutException
-                    && expected instanceof RequestTimeoutException) {
-                return ((RequestTimeoutException) expected)
-                        .getRequest()
-                        .equals(((RequestTimeoutException) actual).getRequest());
+            if (actual instanceof RequestTimeoutException && expected instanceof RequestTimeoutException) {
+                return ((RequestTimeoutException) expected).getRequest().equals(
+                        ((RequestTimeoutException) actual).getRequest());
             }
             return super.argumentMatches(expected, actual);
         }

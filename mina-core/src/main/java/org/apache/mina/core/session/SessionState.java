@@ -29,9 +29,6 @@ package org.apache.mina.core.session;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public enum SessionState
-{
-    OPENING,
-    OPENED, 
-    CLOSING 
+public enum SessionState {
+    OPENING, OPENED, CLOSING
 }

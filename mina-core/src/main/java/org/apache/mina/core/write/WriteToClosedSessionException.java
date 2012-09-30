@@ -21,7 +21,6 @@ package org.apache.mina.core.write;
 
 import java.util.Collection;
 
-
 /**
  * An exception which is thrown when one or more write operations were
  * attempted on a closed session.
@@ -32,18 +31,15 @@ public class WriteToClosedSessionException extends WriteException {
 
     private static final long serialVersionUID = 5550204573739301393L;
 
-    public WriteToClosedSessionException(Collection<WriteRequest> requests,
-            String message, Throwable cause) {
+    public WriteToClosedSessionException(Collection<WriteRequest> requests, String message, Throwable cause) {
         super(requests, message, cause);
     }
 
-    public WriteToClosedSessionException(Collection<WriteRequest> requests,
-            String s) {
+    public WriteToClosedSessionException(Collection<WriteRequest> requests, String s) {
         super(requests, s);
     }
 
-    public WriteToClosedSessionException(Collection<WriteRequest> requests,
-            Throwable cause) {
+    public WriteToClosedSessionException(Collection<WriteRequest> requests, Throwable cause) {
         super(requests, cause);
     }
 
@@ -51,8 +47,7 @@ public class WriteToClosedSessionException extends WriteException {
         super(requests);
     }
 
-    public WriteToClosedSessionException(WriteRequest request, String message,
-            Throwable cause) {
+    public WriteToClosedSessionException(WriteRequest request, String message, Throwable cause) {
         super(request, message, cause);
     }
 

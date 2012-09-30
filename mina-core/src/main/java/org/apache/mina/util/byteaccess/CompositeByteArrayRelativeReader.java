@@ -19,9 +19,7 @@
  */
 package org.apache.mina.util.byteaccess;
 
-
 import org.apache.mina.core.buffer.IoBuffer;
-
 
 /**
  * Provides restricted, relative, read-only access to the bytes in a
@@ -33,8 +31,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelativeBase implements IoRelativeReader
-{
+public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelativeBase implements IoRelativeReader {
 
     /**
      * Whether or not to free component <code>CompositeByteArray</code>s when
@@ -51,46 +48,37 @@ public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelative
      * @param autoFree
      *  If data should be freed once it has been passed in the list
      */
-    public CompositeByteArrayRelativeReader( CompositeByteArray cba, boolean autoFree )
-    {
-        super( cba );
+    public CompositeByteArrayRelativeReader(CompositeByteArray cba, boolean autoFree) {
+        super(cba);
         this.autoFree = autoFree;
     }
 
-
     @Override
-    protected void cursorPassedFirstComponent()
-    {
-        if ( autoFree )
-        {
+    protected void cursorPassedFirstComponent() {
+        if (autoFree) {
             cba.removeFirst().free();
         }
     }
 
-
     /**
      * @inheritDoc
      */
-    public void skip( int length )
-    {
-        cursor.skip( length );
+    public void skip(int length) {
+        cursor.skip(length);
     }
 
-
     /**
      * @inheritDoc
      */
-    public ByteArray slice( int length )
-    {
-        return cursor.slice( length );
+    public ByteArray slice(int length) {
+        return cursor.slice(length);
     }
 
     /**
      * Returns the byte at the current position in the buffer
      * 
      */
-    public byte get()
-    {
+    public byte get() {
         return cursor.get();
     }
 
@@ -98,62 +86,49 @@ public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelative
      * places the data starting at current position into the
      * supplied {@link IoBuffer}
      */
-    public void get( IoBuffer bb )
-    {
-        cursor.get( bb );
+    public void get(IoBuffer bb) {
+        cursor.get(bb);
     }
-
 
     /**
      * @inheritDoc
      */
-    public short getShort()
-    {
+    public short getShort() {
         return cursor.getShort();
     }
 
-
     /**
      * @inheritDoc
      */
-    public int getInt()
-    {
+    public int getInt() {
         return cursor.getInt();
     }
 
-
     /**
      * @inheritDoc
      */
-    public long getLong()
-    {
+    public long getLong() {
         return cursor.getLong();
     }
 
-
     /**
      * @inheritDoc
      */
-    public float getFloat()
-    {
+    public float getFloat() {
         return cursor.getFloat();
     }
 
-
     /**
      * @inheritDoc
      */
-    public double getDouble()
-    {
+    public double getDouble() {
         return cursor.getDouble();
     }
 
-
     /**
      * @inheritDoc
      */
-    public char getChar()
-    {
+    public char getChar() {
         return cursor.getChar();
     }
 

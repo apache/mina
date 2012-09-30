@@ -35,7 +35,7 @@ public class SingletonStateContextLookup implements StateContextLookup {
     public SingletonStateContextLookup() {
         context = new DefaultStateContext();
     }
-    
+
     /**
      * Creates a new instance which uses the specified {@link StateContextFactory}
      * to create the single instance.
@@ -49,7 +49,7 @@ public class SingletonStateContextLookup implements StateContextLookup {
         }
         context = contextFactory.create();
     }
-    
+
     public StateContext lookup(Object[] eventArgs) {
         return context;
     }

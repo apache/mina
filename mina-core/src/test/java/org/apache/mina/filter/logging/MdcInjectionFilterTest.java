@@ -72,14 +72,19 @@ import org.slf4j.LoggerFactory;
 public class MdcInjectionFilterTest {
 
     static Logger LOGGER = LoggerFactory.getLogger(MdcInjectionFilterTest.class);
+
     private static final int TIMEOUT = 5000;
 
     private final MyAppender appender = new MyAppender();
+
     private int port;
+
     private NioSocketAcceptor acceptor;
 
     private Level previousLevelRootLogger;
+
     private ExecutorFilter executorFilter1;
+
     private ExecutorFilter executorFilter2;
 
     @Before
@@ -91,7 +96,6 @@ public class MdcInjectionFilterTest {
         org.apache.log4j.Logger.getRootLogger().addAppender(appender);
         acceptor = new NioSocketAcceptor();
     }
-
 
     @After
     public void tearDown() throws Exception {
@@ -118,10 +122,10 @@ public class MdcInjectionFilterTest {
             after = getThreadNames();
         }
 
-      while (contains(after, "pool") && count++ < 10) {
-          Thread.sleep(50);
-          after = getThreadNames();
-      }
+        while (contains(after, "pool") && count++ < 10) {
+            Thread.sleep(50);
+            after = getThreadNames();
+        }
 
         // The problem is that we clear the events of the appender here, but it's possible that a thread from
         // a previous test still generates events during the execution of the next test
@@ -156,7 +160,7 @@ public class MdcInjectionFilterTest {
         chain.addFirst("mdc-injector1", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
-        chain.addLast("executor" , executorFilter1);
+        chain.addLast("executor", executorFilter1);
         chain.addLast("mdc-injector2", mdcInjectionFilter);
         test(chain);
     }
@@ -166,7 +170,7 @@ public class MdcInjectionFilterTest {
         executorFilter1 = new ExecutorFilter();
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , executorFilter1);
+        chain.addLast("executor", executorFilter1);
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
@@ -178,7 +182,7 @@ public class MdcInjectionFilterTest {
         executorFilter1 = new ExecutorFilter();
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , executorFilter1);
+        chain.addLast("executor", executorFilter1);
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
@@ -190,7 +194,7 @@ public class MdcInjectionFilterTest {
         executorFilter1 = new ExecutorFilter();
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
-        chain.addLast("executor" , executorFilter1);
+        chain.addLast("executor", executorFilter1);
         chain.addLast("mdc-injector", mdcInjectionFilter);
         chain.addLast("profiler", new ProfilerTimerFilter());
         chain.addLast("dummy", new DummyIoFilter());
@@ -205,22 +209,21 @@ public class MdcInjectionFilterTest {
         MdcInjectionFilter mdcInjectionFilter = new MdcInjectionFilter();
         executorFilter1 = new ExecutorFilter();
         executorFilter2 = new ExecutorFilter();
-        chain.addLast("executorFilter1" , executorFilter1);
+        chain.addLast("executorFilter1", executorFilter1);
         chain.addLast("mdc-injector1", mdcInjectionFilter);
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         chain.addLast("dummy", new DummyIoFilter());
-        chain.addLast("executorFilter2" , executorFilter2);
+        chain.addLast("executorFilter2", executorFilter2);
         // add the MdcInjectionFilter instance after every ExecutorFilter
         // it's important to use the same MdcInjectionFilter instance
-        chain.addLast("mdc-injector2",  mdcInjectionFilter);
+        chain.addLast("mdc-injector2", mdcInjectionFilter);
         test(chain);
     }
 
     @Test
     public void testOnlyRemoteAddress() throws IOException, InterruptedException {
         DefaultIoFilterChainBuilder chain = new DefaultIoFilterChainBuilder();
-        chain.addFirst("mdc-injector", new MdcInjectionFilter(
-            MdcInjectionFilter.MdcKey.remoteAddress));
+        chain.addFirst("mdc-injector", new MdcInjectionFilter(MdcInjectionFilter.MdcKey.remoteAddress));
         chain.addLast("dummy", new DummyIoFilter());
         chain.addLast("protocol", new ProtocolCodecFilter(new DummyProtocolCodecFactory()));
         SimpleIoHandler simpleIoHandler = new SimpleIoHandler();
@@ -231,8 +234,8 @@ public class MdcInjectionFilterTest {
         // create some clients
         NioSocketConnector connector = new NioSocketConnector();
         connector.setHandler(new IoHandlerAdapter());
-        connectAndWrite(connector,0);
-        connectAndWrite(connector,1);
+        connectAndWrite(connector, 0);
+        connectAndWrite(connector, 1);
         // wait until Iohandler has received all events
         simpleIoHandler.messageSentLatch.await();
         simpleIoHandler.sessionIdleLatch.await();
@@ -244,17 +247,16 @@ public class MdcInjectionFilterTest {
         // verify that all logging events have correct MDC
         for (LoggingEvent event : events) {
             if (event.getLoggerName().startsWith("org.apache.mina.core.service.AbstractIoService")) {
-              continue;
+                continue;
             }
             for (MdcInjectionFilter.MdcKey mdcKey : MdcInjectionFilter.MdcKey.values()) {
-              String key = mdcKey.name();
-              Object value = event.getMDC(key);
-              if (mdcKey == MdcInjectionFilter.MdcKey.remoteAddress) {
-                  assertNotNull(
-                      "MDC[remoteAddress] not set for [" + event.getMessage() + "]", value);
-              } else {
-                  assertNull("MDC[" + key + "] set for [" + event.getMessage() + "]", value);
-              }
+                String key = mdcKey.name();
+                Object value = event.getMDC(key);
+                if (mdcKey == MdcInjectionFilter.MdcKey.remoteAddress) {
+                    assertNotNull("MDC[remoteAddress] not set for [" + event.getMessage() + "]", value);
+                } else {
+                    assertNull("MDC[" + key + "] set for [" + event.getMessage() + "]", value);
+                }
             }
         }
     }
@@ -270,8 +272,8 @@ public class MdcInjectionFilterTest {
         NioSocketConnector connector = new NioSocketConnector();
         connector.setHandler(new IoHandlerAdapter());
         SocketAddress remoteAddressClients[] = new SocketAddress[2];
-        remoteAddressClients[0] = connectAndWrite(connector,0);
-        remoteAddressClients[1] = connectAndWrite(connector,1);
+        remoteAddressClients[0] = connectAndWrite(connector, 0);
+        remoteAddressClients[1] = connectAndWrite(connector, 1);
         // wait until Iohandler has received all events
         simpleIoHandler.messageSentLatch.await();
         simpleIoHandler.sessionIdleLatch.await();
@@ -293,10 +295,8 @@ public class MdcInjectionFilterTest {
                 Object remoteAddress = event.getMDC("remoteAddress");
                 assertNotNull("MDC[remoteAddress] not set for [" + event.getMessage() + "]", remoteAddress);
                 assertNotNull("MDC[remotePort] not set for [" + event.getMessage() + "]", event.getMDC("remotePort"));
-                assertEquals(
-                    "every event should have MDC[handlerClass]",
-                    SimpleIoHandler.class.getName(),
-                    event.getMDC("handlerClass") );
+                assertEquals("every event should have MDC[handlerClass]", SimpleIoHandler.class.getName(),
+                        event.getMDC("handlerClass"));
             }
         }
         // assert we have received all expected logging events for each client
@@ -327,16 +327,12 @@ public class MdcInjectionFilterTest {
         return session.getLocalAddress();
     }
 
-    private void assertEventExists(List<LoggingEvent> events,
-                                   String message,
-                                   SocketAddress address,
-                                   String user) {
+    private void assertEventExists(List<LoggingEvent> events, String message, SocketAddress address, String user) {
         InetSocketAddress remoteAddress = (InetSocketAddress) address;
         for (LoggingEvent event : events) {
-            if (event.getMessage().equals(message) &&
-                event.getMDC("remoteAddress").equals(remoteAddress.toString()) &&
-                event.getMDC("remoteIp").equals(remoteAddress.getAddress().getHostAddress()) &&
-                event.getMDC("remotePort").equals(remoteAddress.getPort()+"") ) {
+            if (event.getMessage().equals(message) && event.getMDC("remoteAddress").equals(remoteAddress.toString())
+                    && event.getMDC("remoteIp").equals(remoteAddress.getAddress().getHostAddress())
+                    && event.getMDC("remotePort").equals(remoteAddress.getPort() + "")) {
                 if (user == null && event.getMDC("user") == null) {
                     return;
                 }
@@ -346,12 +342,14 @@ public class MdcInjectionFilterTest {
                 return;
             }
         }
-        fail("No LoggingEvent found from [" + remoteAddress +"] with message [" + message + "]");
+        fail("No LoggingEvent found from [" + remoteAddress + "] with message [" + message + "]");
     }
 
     private static class SimpleIoHandler extends IoHandlerAdapter {
         CountDownLatch sessionIdleLatch = new CountDownLatch(2);
+
         CountDownLatch sessionClosedLatch = new CountDownLatch(2);
+
         CountDownLatch messageSentLatch = new CountDownLatch(2);
 
         /**
@@ -477,7 +475,6 @@ public class MdcInjectionFilterTest {
             nextFilter.sessionOpened(session);
         }
     }
-
 
     private List<String> getThreadNames() {
         List<String> list = new ArrayList<String>();

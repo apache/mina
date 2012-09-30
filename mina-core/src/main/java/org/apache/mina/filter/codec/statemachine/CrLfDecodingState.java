@@ -39,7 +39,7 @@ public abstract class CrLfDecodingState implements DecodingState {
      * Carriage return character
      */
     private static final byte CR = 13;
-    
+
     /**
      * Line feed character
      */
@@ -50,8 +50,7 @@ public abstract class CrLfDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         boolean found = false;
         boolean finished = false;
         while (in.hasRemaining()) {
@@ -75,9 +74,8 @@ public abstract class CrLfDecodingState implements DecodingState {
                     finished = true;
                     break;
                 }
-                
-                throw new ProtocolDecoderException(
-                        "Expected LF after CR but was: " + (b & 0xff));
+
+                throw new ProtocolDecoderException("Expected LF after CR but was: " + (b & 0xff));
             }
         }
 
@@ -85,15 +83,14 @@ public abstract class CrLfDecodingState implements DecodingState {
             hasCR = false;
             return finishDecode(found, out);
         }
-        
+
         return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         return finishDecode(false, out);
     }
 
@@ -108,6 +105,5 @@ public abstract class CrLfDecodingState implements DecodingState {
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(boolean foundCRLF,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(boolean foundCRLF, ProtocolDecoderOutput out) throws Exception;
 }

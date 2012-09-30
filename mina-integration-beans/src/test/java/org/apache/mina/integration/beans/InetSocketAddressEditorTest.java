@@ -51,14 +51,12 @@ public class InetSocketAddressEditorTest {
     @Test
     public void testSetAsTextWithHostName() throws Exception {
         editor.setAsText("www.google.com:80");
-        assertEquals(new InetSocketAddress("www.google.com", 80), editor
-                .getValue());
+        assertEquals(new InetSocketAddress("www.google.com", 80), editor.getValue());
     }
 
     public void testSetAsTextWithIpAddress() throws Exception {
         editor.setAsText("192.168.0.1:1000");
-        assertEquals(new InetSocketAddress("192.168.0.1", 1000), editor
-                .getValue());
+        assertEquals(new InetSocketAddress("192.168.0.1", 1000), editor.getValue());
     }
 
     @Test

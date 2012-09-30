@@ -39,7 +39,7 @@ public class FileRegionWriteFilterTest extends AbstractStreamWriteFilterTest<Fil
     protected FileRegionWriteFilter createFilter() {
         return new FileRegionWriteFilter();
     }
-    
+
     @Override
     protected FileRegion createMessage(byte[] data) throws IOException {
         File file = File.createTempFile("mina", "unittest");

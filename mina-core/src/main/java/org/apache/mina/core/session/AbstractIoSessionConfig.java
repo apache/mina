@@ -19,8 +19,6 @@
  */
 package org.apache.mina.core.session;
 
-
-
 /**
  * A base implementation of {@link IoSessionConfig}.
  *
@@ -29,13 +27,21 @@ package org.apache.mina.core.session;
 public abstract class AbstractIoSessionConfig implements IoSessionConfig {
 
     private int minReadBufferSize = 64;
+
     private int readBufferSize = 2048;
+
     private int maxReadBufferSize = 65536;
+
     private int idleTimeForRead;
+
     private int idleTimeForWrite;
+
     private int idleTimeForBoth;
+
     private int writeTimeout = 60;
+
     private boolean useReadOperation;
+
     private int throughputCalculationInterval = 3;
 
     protected AbstractIoSessionConfig() {
@@ -100,8 +106,9 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
         if (minReadBufferSize <= 0) {
             throw new IllegalArgumentException("minReadBufferSize: " + minReadBufferSize + " (expected: 1+)");
         }
-        if (minReadBufferSize > maxReadBufferSize ) {
-            throw new IllegalArgumentException("minReadBufferSize: " + minReadBufferSize + " (expected: smaller than " + maxReadBufferSize + ')');
+        if (minReadBufferSize > maxReadBufferSize) {
+            throw new IllegalArgumentException("minReadBufferSize: " + minReadBufferSize + " (expected: smaller than "
+                    + maxReadBufferSize + ')');
 
         }
         this.minReadBufferSize = minReadBufferSize;
@@ -123,7 +130,8 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
         }
 
         if (maxReadBufferSize < minReadBufferSize) {
-            throw new IllegalArgumentException("maxReadBufferSize: " + maxReadBufferSize + " (expected: greater than " + minReadBufferSize + ')');
+            throw new IllegalArgumentException("maxReadBufferSize: " + maxReadBufferSize + " (expected: greater than "
+                    + minReadBufferSize + ')');
 
         }
         this.maxReadBufferSize = maxReadBufferSize;
@@ -173,7 +181,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
             throw new IllegalArgumentException("Unknown idle status: " + status);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -215,7 +223,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     public final long getWriterIdleTimeInMillis() {
         return getIdleTimeInMillis(IdleStatus.WRITER_IDLE);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -256,8 +264,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
      */
     public void setWriteTimeout(int writeTimeout) {
         if (writeTimeout < 0) {
-            throw new IllegalArgumentException("Illegal write timeout: "
-                    + writeTimeout);
+            throw new IllegalArgumentException("Illegal write timeout: " + writeTimeout);
         }
         this.writeTimeout = writeTimeout;
     }
@@ -288,13 +295,12 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
      */
     public void setThroughputCalculationInterval(int throughputCalculationInterval) {
         if (throughputCalculationInterval < 0) {
-            throw new IllegalArgumentException(
-                    "throughputCalculationInterval: " + throughputCalculationInterval);
+            throw new IllegalArgumentException("throughputCalculationInterval: " + throughputCalculationInterval);
         }
 
         this.throughputCalculationInterval = throughputCalculationInterval;
     }
-    
+
     /**
      * {@inheritDoc}
      */

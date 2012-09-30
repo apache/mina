@@ -30,26 +30,22 @@ import org.apache.mina.core.filterchain.IoFilter;
  */
 public class IoFilterPropertyAccessor extends AbstractPropertyAccessor {
     @Override
-    protected Object getProperty0(OgnlContext context, Object target,
-            String name) throws OgnlException {
+    protected Object getProperty0(OgnlContext context, Object target, String name) throws OgnlException {
         return OgnlRuntime.NotFound;
     }
 
     @Override
-    protected boolean hasGetProperty0(OgnlContext context, Object target,
-            String name) throws OgnlException {
+    protected boolean hasGetProperty0(OgnlContext context, Object target, String name) throws OgnlException {
         return false;
     }
 
     @Override
-    protected boolean hasSetProperty0(OgnlContext context, Object target,
-            String name) throws OgnlException {
+    protected boolean hasSetProperty0(OgnlContext context, Object target, String name) throws OgnlException {
         return false;
     }
 
     @Override
-    protected Object setProperty0(OgnlContext context, Object target,
-            String name, Object value) throws OgnlException {
+    protected Object setProperty0(OgnlContext context, Object target, String name, Object value) throws OgnlException {
         return OgnlRuntime.NotFound;
     }
 }

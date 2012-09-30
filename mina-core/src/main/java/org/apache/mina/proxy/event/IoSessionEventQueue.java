@@ -35,8 +35,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class IoSessionEventQueue {
-    private final static Logger logger = LoggerFactory
-            .getLogger(IoSessionEventQueue.class);
+    private final static Logger logger = LoggerFactory.getLogger(IoSessionEventQueue.class);
 
     /**
      * The proxy session object.
@@ -113,9 +112,9 @@ public class IoSessionEventQueue {
     public void flushPendingSessionEvents() throws Exception {
         synchronized (sessionEventsQueue) {
             IoSessionEvent evt;
-            
+
             while ((evt = sessionEventsQueue.poll()) != null) {
-                logger.debug(" Flushing buffered event: {}", evt);    
+                logger.debug(" Flushing buffered event: {}", evt);
                 evt.deliverEvent();
             }
         }
@@ -130,6 +129,6 @@ public class IoSessionEventQueue {
         synchronized (sessionEventsQueue) {
             logger.debug("Enqueuing event: {}", evt);
             sessionEventsQueue.offer(evt);
-        }    
+        }
     }
 }

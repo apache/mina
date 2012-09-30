@@ -29,8 +29,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractProtocolEncoderOutput implements
-        ProtocolEncoderOutput {
+public abstract class AbstractProtocolEncoderOutput implements ProtocolEncoderOutput {
     private final Queue<Object> messageQueue = new ConcurrentLinkedQueue<Object>();
 
     private boolean buffersOnly = true;
@@ -49,8 +48,7 @@ public abstract class AbstractProtocolEncoderOutput implements
             if (buf.hasRemaining()) {
                 messageQueue.offer(buf);
             } else {
-                throw new IllegalArgumentException(
-                        "buf is empty. Forgot to call flip()?");
+                throw new IllegalArgumentException("buf is empty. Forgot to call flip()?");
             }
         } else {
             messageQueue.offer(encodedMessage);
@@ -60,10 +58,9 @@ public abstract class AbstractProtocolEncoderOutput implements
 
     public void mergeAll() {
         if (!buffersOnly) {
-            throw new IllegalStateException(
-                    "the encoded message list contains a non-buffer.");
+            throw new IllegalStateException("the encoded message list contains a non-buffer.");
         }
-        
+
         final int size = messageQueue.size();
 
         if (size < 2) {
@@ -81,7 +78,7 @@ public abstract class AbstractProtocolEncoderOutput implements
         IoBuffer newBuf = IoBuffer.allocate(sum);
 
         // and merge all.
-        for (; ;) {
+        for (;;) {
             IoBuffer buf = (IoBuffer) messageQueue.poll();
             if (buf == null) {
                 break;

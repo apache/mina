@@ -32,11 +32,13 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoSessionFinder {
-    
+
     private final String query;
+
     private final TypeConverter typeConverter = new PropertyTypeConverter();
+
     private final Object expression;
-    
+
     /**
      * Creates a new instance with the specified OGNL expression that returns
      * a boolean value (e.g. <tt>"id == 0x12345678"</tt>).
@@ -45,12 +47,12 @@ public class IoSessionFinder {
         if (query == null) {
             throw new IllegalArgumentException("query");
         }
-        
+
         query = query.trim();
         if (query.length() == 0) {
             throw new IllegalArgumentException("query is empty.");
         }
-        
+
         this.query = query;
         try {
             expression = Ognl.parseExpression(query);
@@ -58,7 +60,7 @@ public class IoSessionFinder {
             throw new IllegalArgumentException("query: " + query);
         }
     }
-    
+
     /**
      * Finds a {@link Set} of {@link IoSession}s that matches the query
      * from the specified sessions and returns the matches.
@@ -68,9 +70,9 @@ public class IoSessionFinder {
         if (sessions == null) {
             throw new IllegalArgumentException("sessions");
         }
-        
+
         Set<IoSession> answer = new LinkedHashSet<IoSession>();
-        for (IoSession s: sessions) {
+        for (IoSession s : sessions) {
             OgnlContext context = (OgnlContext) Ognl.createDefaultContext(s);
             context.setTypeConverter(typeConverter);
             context.put(AbstractPropertyAccessor.READ_ONLY_MODE, true);
@@ -81,11 +83,10 @@ public class IoSessionFinder {
                     answer.add(s);
                 }
             } else {
-                throw new OgnlException(
-                        "Query didn't return a boolean value: " + query);
+                throw new OgnlException("Query didn't return a boolean value: " + query);
             }
         }
-        
+
         return answer;
     }
 }

@@ -37,7 +37,7 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoUtil {
-    
+
     private static final IoSession[] EMPTY_SESSIONS = new IoSession[0];
 
     /**
@@ -61,7 +61,7 @@ public class IoUtil {
         broadcast(message, sessions.iterator(), answer);
         return answer;
     }
-    
+
     /**
      * Writes the specified {@code message} to the specified {@code sessions}.
      * If the specified {@code message} is an {@link IoBuffer}, the buffer is
@@ -72,7 +72,7 @@ public class IoUtil {
         broadcast(message, sessions, answer);
         return answer;
     }
-    
+
     /**
      * Writes the specified {@code message} to the specified {@code sessions}.
      * If the specified {@code message} is an {@link IoBuffer}, the buffer is
@@ -82,20 +82,20 @@ public class IoUtil {
         if (sessions == null) {
             sessions = EMPTY_SESSIONS;
         }
-        
+
         List<WriteFuture> answer = new ArrayList<WriteFuture>(sessions.length);
         if (message instanceof IoBuffer) {
-            for (IoSession s: sessions) {
+            for (IoSession s : sessions) {
                 answer.add(s.write(((IoBuffer) message).duplicate()));
             }
         } else {
-            for (IoSession s: sessions) {
+            for (IoSession s : sessions) {
                 answer.add(s.write(message));
             }
         }
         return answer;
     }
-    
+
     private static void broadcast(Object message, Iterator<IoSession> sessions, Collection<WriteFuture> answer) {
         if (message instanceof IoBuffer) {
             while (sessions.hasNext()) {
@@ -109,20 +109,21 @@ public class IoUtil {
             }
         }
     }
-    
+
     public static void await(Iterable<? extends IoFuture> futures) throws InterruptedException {
-        for (IoFuture f: futures) {
+        for (IoFuture f : futures) {
             f.await();
         }
     }
-    
+
     public static void awaitUninterruptably(Iterable<? extends IoFuture> futures) {
-        for (IoFuture f: futures) {
+        for (IoFuture f : futures) {
             f.awaitUninterruptibly();
         }
     }
-    
-    public static boolean await(Iterable<? extends IoFuture> futures, long timeout, TimeUnit unit) throws InterruptedException {
+
+    public static boolean await(Iterable<? extends IoFuture> futures, long timeout, TimeUnit unit)
+            throws InterruptedException {
         return await(futures, unit.toMillis(timeout));
     }
 
@@ -142,10 +143,11 @@ public class IoUtil {
         }
     }
 
-    private static boolean await0(Iterable<? extends IoFuture> futures, long timeoutMillis, boolean interruptable) throws InterruptedException {
+    private static boolean await0(Iterable<? extends IoFuture> futures, long timeoutMillis, boolean interruptable)
+            throws InterruptedException {
         long startTime = timeoutMillis <= 0 ? 0 : System.currentTimeMillis();
         long waitTime = timeoutMillis;
-        
+
         boolean lastComplete = true;
         Iterator<? extends IoFuture> i = futures.iterator();
         while (i.hasNext()) {
@@ -156,19 +158,19 @@ public class IoUtil {
                 } else {
                     lastComplete = f.awaitUninterruptibly(waitTime);
                 }
-                
+
                 waitTime = timeoutMillis - (System.currentTimeMillis() - startTime);
 
                 if (lastComplete || waitTime <= 0) {
                     break;
                 }
             } while (!lastComplete);
-            
+
             if (waitTime <= 0) {
                 break;
             }
         }
-        
+
         return lastComplete && !i.hasNext();
     }
 

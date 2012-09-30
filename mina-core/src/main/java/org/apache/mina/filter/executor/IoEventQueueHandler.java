@@ -38,9 +38,11 @@ public interface IoEventQueueHandler extends EventListener {
         public boolean accept(Object source, IoEvent event) {
             return true;
         }
+
         public void offered(Object source, IoEvent event) {
             // NOOP
         }
+
         public void polled(Object source, IoEvent event) {
             // NOOP
         }

@@ -32,19 +32,18 @@ import java.util.regex.Pattern;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CollectionEditor extends AbstractPropertyEditor {
-    static final Pattern ELEMENT = Pattern.compile(
-            "([,\\s]+)|" + // Delimiter
-            "(?<=\")((?:\\\\\"|\\\\'|\\\\\\\\|\\\\ |[^\"])*)(?=\")|" +
-            "(?<=')((?:\\\\\"|\\\\'|\\\\\\\\|\\\\ |[^'])*)(?=')|" +
-            "((?:[^\\\\\\s'\",]|\\\\ |\\\\\"|\\\\')+)");
-    
+    static final Pattern ELEMENT = Pattern.compile("([,\\s]+)|"
+            + // Delimiter
+            "(?<=\")((?:\\\\\"|\\\\'|\\\\\\\\|\\\\ |[^\"])*)(?=\")|"
+            + "(?<=')((?:\\\\\"|\\\\'|\\\\\\\\|\\\\ |[^'])*)(?=')|" + "((?:[^\\\\\\s'\",]|\\\\ |\\\\\"|\\\\')+)");
+
     private final Class<?> elementType;
-    
+
     public CollectionEditor(Class<?> elementType) {
         if (elementType == null) {
             throw new IllegalArgumentException("elementType");
         }
-        
+
         this.elementType = elementType;
         getElementEditor();
         setTrimText(false);
@@ -53,9 +52,8 @@ public class CollectionEditor extends AbstractPropertyEditor {
     private PropertyEditor getElementEditor() {
         PropertyEditor e = PropertyEditorFactory.getInstance(elementType);
         if (e == null) {
-            throw new IllegalArgumentException(
-                    "No " + PropertyEditor.class.getSimpleName() + 
-                    " found for " + elementType.getSimpleName() + '.');
+            throw new IllegalArgumentException("No " + PropertyEditor.class.getSimpleName() + " found for "
+                    + elementType.getSimpleName() + '.');
         }
         return e;
     }
@@ -64,24 +62,23 @@ public class CollectionEditor extends AbstractPropertyEditor {
     @SuppressWarnings("unchecked")
     protected final String toText(Object value) {
         StringBuilder buf = new StringBuilder();
-        for (Object v: (Collection) value) {
+        for (Object v : (Collection) value) {
             if (v == null) {
                 v = defaultElement();
             }
-            
+
             PropertyEditor e = PropertyEditorFactory.getInstance(v);
             if (e == null) {
-                throw new IllegalArgumentException(
-                        "No " + PropertyEditor.class.getSimpleName() + 
-                        " found for " + v.getClass().getSimpleName() + '.');
-            }            
+                throw new IllegalArgumentException("No " + PropertyEditor.class.getSimpleName() + " found for "
+                        + v.getClass().getSimpleName() + '.');
+            }
             e.setValue(v);
             // TODO normalize.
             String s = e.getAsText();
             buf.append(s);
             buf.append(", ");
         }
-        
+
         // Remove the last delimiter.
         if (buf.length() >= 2) {
             buf.setLength(buf.length() - 2);
@@ -101,7 +98,7 @@ public class CollectionEditor extends AbstractPropertyEditor {
                 matchedDelimiter = true;
                 continue;
             }
-            
+
             if (!matchedDelimiter) {
                 throw new IllegalArgumentException("No delimiter between elements: " + text);
             }
@@ -109,27 +106,27 @@ public class CollectionEditor extends AbstractPropertyEditor {
             // TODO escape here.
             e.setAsText(m.group());
             answer.add(e.getValue());
-            
+
             matchedDelimiter = false;
             if (m.group(2) != null || m.group(3) != null) {
                 // Skip the last '"'.
                 m.region(m.end() + 1, m.regionEnd());
             }
         }
-        
+
         return answer;
     }
-    
+
     protected Collection<Object> newCollection() {
         return new ArrayList<Object>();
     }
-    
+
     protected Object defaultElement() {
         PropertyEditor e = PropertyEditorFactory.getInstance(elementType);
         if (e == null) {
             return null;
         }
-        
+
         if (e instanceof AbstractPropertyEditor) {
             return ((AbstractPropertyEditor) e).defaultValue();
         }

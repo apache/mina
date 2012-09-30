@@ -73,29 +73,25 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     private Random rng = new Random();
 
-    final private Logger logger = LoggerFactory
-            .getLogger(ErrorGeneratingFilter.class);
+    final private Logger logger = LoggerFactory.getLogger(ErrorGeneratingFilter.class);
 
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         if (manipulateWrites) {
             // manipulate bytes
             if (writeRequest.getMessage() instanceof IoBuffer) {
-                manipulateIoBuffer(session, (IoBuffer) writeRequest
-                        .getMessage());
-                IoBuffer buffer = insertBytesToNewIoBuffer(session,
-                        (IoBuffer) writeRequest.getMessage());
+                manipulateIoBuffer(session, (IoBuffer) writeRequest.getMessage());
+                IoBuffer buffer = insertBytesToNewIoBuffer(session, (IoBuffer) writeRequest.getMessage());
                 if (buffer != null) {
-                    writeRequest = new DefaultWriteRequest(buffer, writeRequest
-                            .getFuture(), writeRequest.getDestination());
+                    writeRequest = new DefaultWriteRequest(buffer, writeRequest.getFuture(),
+                            writeRequest.getDestination());
                 }
                 // manipulate PDU
             } else {
                 if (duplicatePduProbability > rng.nextInt()) {
                     nextFilter.filterWrite(session, writeRequest);
                 }
-                
+
                 if (resendPduLasterProbability > rng.nextInt()) {
                     // store it somewhere and trigger a write execution for
                     // later
@@ -110,14 +106,12 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
+    public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         if (manipulateReads) {
             if (message instanceof IoBuffer) {
                 // manipulate bytes
                 manipulateIoBuffer(session, (IoBuffer) message);
-                IoBuffer buffer = insertBytesToNewIoBuffer(session,
-                        (IoBuffer) message);
+                IoBuffer buffer = insertBytesToNewIoBuffer(session, (IoBuffer) message);
                 if (buffer != null) {
                     message = buffer;
                 }
@@ -136,7 +130,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
             int pos = rng.nextInt(buffer.remaining()) - 1;
 
             // how many byte to insert ?
-            int count = rng.nextInt(maxInsertByte-1)+1;
+            int count = rng.nextInt(maxInsertByte - 1) + 1;
 
             IoBuffer newBuff = IoBuffer.allocate(buffer.remaining() + count);
             for (int i = 0; i < pos; i++)
@@ -200,7 +194,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
     public int getChangeByteProbability() {
         return changeByteProbability;
     }
-    
+
     /**
      * Set the probability for the change byte error.
      * If this probability is > 0 the filter will modify a random number of byte
@@ -214,7 +208,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
     public int getDuplicatePduProbability() {
         return duplicatePduProbability;
     }
-    
+
     /**
      * not functional ATM
      * @param duplicatePduProbability
@@ -290,6 +284,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
     public int getResendPduLasterProbability() {
         return resendPduLasterProbability;
     }
+
     /**
      * not functional ATM
      * @param resendPduLasterProbability

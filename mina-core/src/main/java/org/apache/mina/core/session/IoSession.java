@@ -97,7 +97,6 @@ public interface IoSession {
      */
     IoFilterChain getFilterChain();
 
-    
     /**
      * TODO Add method documentation
      */
@@ -171,14 +170,15 @@ public interface IoSession {
      *                    write requests are flushed (i.e. {@link #closeOnFlush()}).
      */
     CloseFuture close(boolean immediately);
-    
+
     /**
      * Closes this session after all queued write requests
      * are flushed. This operation is asynchronous.  Wait for the returned
      * {@link CloseFuture} if you want to wait for the session actually closed.
      * @deprecated use {@link IoSession#close(boolean)}
      */
-    @Deprecated CloseFuture close();
+    @Deprecated
+    CloseFuture close();
 
     /**
      * Returns an attachment of this session.
@@ -186,7 +186,8 @@ public interface IoSession {
      *
      * @deprecated Use {@link #getAttribute(Object)} instead.
      */
-    @Deprecated Object getAttachment();
+    @Deprecated
+    Object getAttachment();
 
     /**
      * Sets an attachment of this session.
@@ -195,7 +196,8 @@ public interface IoSession {
      * @return Old attachment.  <tt>null</tt> if it is new.
      * @deprecated Use {@link #setAttribute(Object, Object)} instead.
      */
-    @Deprecated Object setAttachment(Object attachment);
+    @Deprecated
+    Object setAttachment(Object attachment);
 
     /**
      * Returns the value of the user-defined attribute of this session.
@@ -366,7 +368,7 @@ public interface IoSession {
      * @param writeRequestQueue
      */
     void setCurrentWriteRequest(WriteRequest currentWriteRequest);
-    
+
     /**
      * Suspends read operations for this session.
      */
@@ -386,19 +388,19 @@ public interface IoSession {
      * Resumes write operations for this session.
      */
     void resumeWrite();
-    
+
     /**
      * Is read operation is suspended for this session. 
      * @return <code>true</code> if suspended
      */
     boolean isReadSuspended();
-    
+
     /**
      * Is write operation is suspended for this session.
      * @return <code>true</code> if suspended
      */
     boolean isWriteSuspended();
-    
+
     /**
      * Update all statistical properties related with throughput assuming
      * the specified time is the current time.  By default this method returns
@@ -411,7 +413,7 @@ public interface IoSession {
      * @param currentTime the current time in milliseconds
      */
     void updateThroughput(long currentTime, boolean force);
-    
+
     /**
      * Returns the total number of bytes which were read from this session.
      */
@@ -559,7 +561,6 @@ public interface IoSession {
      * is fired for the specified {@link IdleStatus}.
      */
     long getLastIdleTime(IdleStatus status);
-
 
     /**
      * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event

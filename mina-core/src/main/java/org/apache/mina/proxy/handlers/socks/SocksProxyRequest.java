@@ -74,8 +74,7 @@ public class SocksProxyRequest extends ProxyRequest {
      * @param endpointAddress the endpoint address
      * @param userName the user name
      */
-    public SocksProxyRequest(byte protocolVersion, byte commandCode,
-            InetSocketAddress endpointAddress, String userName) {
+    public SocksProxyRequest(byte protocolVersion, byte commandCode, InetSocketAddress endpointAddress, String userName) {
         super(endpointAddress);
         this.protocolVersion = protocolVersion;
         this.commandCode = commandCode;
@@ -90,8 +89,7 @@ public class SocksProxyRequest extends ProxyRequest {
      * @param port the server port
      * @param userName the user name
      */
-    public SocksProxyRequest(byte commandCode, String host, int port,
-            String userName) {
+    public SocksProxyRequest(byte commandCode, String host, int port, String userName) {
         this.protocolVersion = SocksProxyConstants.SOCKS_VERSION_4;
         this.commandCode = commandCode;
         this.userName = userName;
@@ -110,7 +108,7 @@ public class SocksProxyRequest extends ProxyRequest {
         if (getEndpointAddress() == null) {
             return SocksProxyConstants.FAKE_IP;
         }
-        
+
         return getEndpointAddress().getAddress().getAddress();
     }
 
@@ -121,8 +119,7 @@ public class SocksProxyRequest extends ProxyRequest {
      */
     public byte[] getPort() {
         byte[] port = new byte[2];
-        int p = (getEndpointAddress() == null ? this.port
-                : getEndpointAddress().getPort());
+        int p = (getEndpointAddress() == null ? this.port : getEndpointAddress().getPort());
         port[1] = (byte) p;
         port[0] = (byte) (p >> 8);
         return port;
@@ -163,8 +160,8 @@ public class SocksProxyRequest extends ProxyRequest {
     public synchronized final String getHost() {
         if (host == null) {
             InetSocketAddress adr = getEndpointAddress();
-            
-            if ( adr != null && !adr.isUnresolved()) {
+
+            if (adr != null && !adr.isUnresolved()) {
                 host = getEndpointAddress().getHostName();
             }
         }

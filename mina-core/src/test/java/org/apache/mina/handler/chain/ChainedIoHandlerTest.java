@@ -53,8 +53,7 @@ public class ChainedIoHandlerTest {
             this.ch = ch;
         }
 
-        public void execute(NextCommand next, IoSession session, Object message)
-                throws Exception {
+        public void execute(NextCommand next, IoSession session, Object message) throws Exception {
             buf.append(ch);
             next.execute(session, message);
         }

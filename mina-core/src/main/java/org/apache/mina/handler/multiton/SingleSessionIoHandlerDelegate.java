@@ -92,8 +92,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * assigned to this session.
      */
     public void sessionOpened(IoSession session) throws Exception {
-        SingleSessionIoHandler handler = (SingleSessionIoHandler) session
-                .getAttribute(HANDLER);
+        SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.sessionOpened();
     }
 
@@ -103,8 +102,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * assigned to this session.
      */
     public void sessionClosed(IoSession session) throws Exception {
-        SingleSessionIoHandler handler = (SingleSessionIoHandler) session
-                .getAttribute(HANDLER);
+        SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.sessionClosed();
     }
 
@@ -113,10 +111,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * {@link SingleSessionIoHandler#sessionIdle(IdleStatus)} method of the
      * handler assigned to this session.
      */
-    public void sessionIdle(IoSession session, IdleStatus status)
-            throws Exception {
-        SingleSessionIoHandler handler = (SingleSessionIoHandler) session
-                .getAttribute(HANDLER);
+    public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
+        SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.sessionIdle(status);
     }
 
@@ -125,10 +121,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * {@link SingleSessionIoHandler#exceptionCaught(Throwable)} method of the
      * handler assigned to this session.
      */
-    public void exceptionCaught(IoSession session, Throwable cause)
-            throws Exception {
-        SingleSessionIoHandler handler = (SingleSessionIoHandler) session
-                .getAttribute(HANDLER);
+    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+        SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.exceptionCaught(cause);
     }
 
@@ -137,10 +131,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * {@link SingleSessionIoHandler#messageReceived(Object)} method of the
      * handler assigned to this session.
      */
-    public void messageReceived(IoSession session, Object message)
-            throws Exception {
-        SingleSessionIoHandler handler = (SingleSessionIoHandler) session
-                .getAttribute(HANDLER);
+    public void messageReceived(IoSession session, Object message) throws Exception {
+        SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.messageReceived(message);
     }
 
@@ -150,8 +142,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * assigned to this session.
      */
     public void messageSent(IoSession session, Object message) throws Exception {
-        SingleSessionIoHandler handler = (SingleSessionIoHandler) session
-                .getAttribute(HANDLER);
+        SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.messageSent(message);
     }
 }

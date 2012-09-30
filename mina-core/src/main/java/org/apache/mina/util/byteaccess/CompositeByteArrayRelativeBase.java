@@ -19,12 +19,10 @@
  */
 package org.apache.mina.util.byteaccess;
 
-
 import java.nio.ByteOrder;
 
 import org.apache.mina.util.byteaccess.ByteArray.Cursor;
 import org.apache.mina.util.byteaccess.CompositeByteArray.CursorListener;
-
 
 /**
  * Provides common functionality between the
@@ -33,8 +31,7 @@ import org.apache.mina.util.byteaccess.CompositeByteArray.CursorListener;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-abstract class CompositeByteArrayRelativeBase
-{
+abstract class CompositeByteArrayRelativeBase {
 
     /**
      * The underlying <code>CompositeByteArray</code>.
@@ -55,101 +52,77 @@ abstract class CompositeByteArrayRelativeBase
      * @param cba
      *  The {@link CompositeByteArray} that will be the base for this class
      */
-    public CompositeByteArrayRelativeBase( CompositeByteArray cba )
-    {
+    public CompositeByteArrayRelativeBase(CompositeByteArray cba) {
         this.cba = cba;
-        cursor = cba.cursor( cba.first(), new CursorListener()
-        {
+        cursor = cba.cursor(cba.first(), new CursorListener() {
 
-            public void enteredFirstComponent( int componentIndex, ByteArray component )
-            {
+            public void enteredFirstComponent(int componentIndex, ByteArray component) {
                 // Do nothing.
             }
 
-
-            public void enteredLastComponent( int componentIndex, ByteArray component )
-            {
+            public void enteredLastComponent(int componentIndex, ByteArray component) {
                 assert false;
             }
 
-
-            public void enteredNextComponent( int componentIndex, ByteArray component )
-            {
+            public void enteredNextComponent(int componentIndex, ByteArray component) {
                 cursorPassedFirstComponent();
             }
 
-
-            public void enteredPreviousComponent( int componentIndex, ByteArray component )
-            {
+            public void enteredPreviousComponent(int componentIndex, ByteArray component) {
                 assert false;
             }
 
-        } );
+        });
     }
-
 
     /**
      * @inheritDoc
      */
-    public final int getRemaining()
-    {
+    public final int getRemaining() {
         return cursor.getRemaining();
     }
 
-
     /**
      * @inheritDoc
      */
-    public final boolean hasRemaining()
-    {
+    public final boolean hasRemaining() {
         return cursor.hasRemaining();
     }
 
-
     /**
      * @inheritDoc
      */
-    public ByteOrder order()
-    {
+    public ByteOrder order() {
         return cba.order();
     }
-
 
     /**
      * Make a <code>ByteArray</code> available for access at the end of this object.
      */
-    public final void append( ByteArray ba )
-    {
-        cba.addLast( ba );
+    public final void append(ByteArray ba) {
+        cba.addLast(ba);
     }
-
 
     /**
      * Free all resources associated with this object.
      */
-    public final void free()
-    {
+    public final void free() {
         cba.free();
     }
-
 
     /**
      * Get the index that will be used for the next access.
      */
-    public final int getIndex()
-    {
+    public final int getIndex() {
         return cursor.getIndex();
     }
-
 
     /**
      * Get the index after the last byte that can be accessed.
      */
-    public final int last()
-    {
+    public final int last() {
         return cba.last();
     }
-
 
     /**
      * Called whenever the cursor has passed from the <code>cba</code>'s

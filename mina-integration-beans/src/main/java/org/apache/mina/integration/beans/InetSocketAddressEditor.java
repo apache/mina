@@ -44,12 +44,12 @@ public class InetSocketAddressEditor extends AbstractPropertyEditor {
         } else {
             hostname = addr.getHostName();
         }
-        
-        if (hostname.equals("0:0:0:0:0:0:0:0") || hostname.equals("0.0.0.0") ||
-            hostname.equals("00:00:00:00:00:00:00:00")) {
+
+        if (hostname.equals("0:0:0:0:0:0:0:0") || hostname.equals("0.0.0.0")
+                || hostname.equals("00:00:00:00:00:00:00:00")) {
             hostname = "*";
         }
-        
+
         return hostname + ':' + addr.getPort();
     }
 

@@ -40,7 +40,7 @@ import java.io.Serializable;
 public final class AttributeKey implements Serializable {
     /** The serial version UID */
     private static final long serialVersionUID = -583377473376683096L;
-    
+
     /** The attribute's name */
     private final String name;
 
@@ -66,7 +66,7 @@ public final class AttributeKey implements Serializable {
     public String toString() {
         return name;
     }
-    
+
     @Override
     public int hashCode() {
         int h = 17 * 37 + ((name == null) ? 0 : name.hashCode());
@@ -78,13 +78,13 @@ public final class AttributeKey implements Serializable {
         if (this == obj) {
             return true;
         }
- 
+
         if (!(obj instanceof AttributeKey)) {
             return false;
         }
 
         AttributeKey other = (AttributeKey) obj;
-        
+
         return name.equals(other.name);
     }
 }

@@ -54,8 +54,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * set the additional attributes by calling methods such as
      * {@link #setAttribute(String, Object)} and {@link #setAttributes(Map)}.
      */
-    public SessionAttributeInitializingFilter(
-            Map<String, ? extends Object> attributes) {
+    public SessionAttributeInitializingFilter(Map<String, ? extends Object> attributes) {
         setAttributes(attributes);
     }
 
@@ -139,8 +138,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * map and forward the event to the next filter.
      */
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         for (Map.Entry<String, Object> e : attributes.entrySet()) {
             session.setAttribute(e.getKey(), e.getValue());
         }

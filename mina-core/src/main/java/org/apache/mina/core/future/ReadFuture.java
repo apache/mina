@@ -43,7 +43,7 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface ReadFuture extends IoFuture {
-    
+
     /**
      * Returns the received message.  It returns <tt>null</tt> if this
      * future is not ready or the associated {@link IoSession} has been closed. 
@@ -51,18 +51,18 @@ public interface ReadFuture extends IoFuture {
      * @throws RuntimeException if read or any relevant operation has failed.
      */
     Object getMessage();
-    
+
     /**
      * Returns <tt>true</tt> if a message was received successfully.
      */
     boolean isRead();
-    
+
     /**
      * Returns <tt>true</tt> if the {@link IoSession} associated with this
      * future has been closed.
      */
     boolean isClosed();
-    
+
     /**
      * Returns the cause of the read failure if and only if the read
      * operation has failed due to an {@link Exception}.  Otherwise,
@@ -76,13 +76,13 @@ public interface ReadFuture extends IoFuture {
      * not call this method directly.
      */
     void setRead(Object message);
-    
+
     /**
      * Sets the associated {@link IoSession} is closed.  This method is invoked
      * by MINA internally.  Please do not call this method directly.
      */
     void setClosed();
-    
+
     /**
      * Sets the cause of the read failure, and notifies all threads waiting
      * for this future.  This method is invoked by MINA internally.  Please

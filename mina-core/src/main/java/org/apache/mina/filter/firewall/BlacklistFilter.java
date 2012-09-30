@@ -44,6 +44,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     private final List<Subnet> blacklist = new CopyOnWriteArrayList<Subnet>();
 
     private final static Logger LOGGER = LoggerFactory.getLogger(BlacklistFilter.class);
+
     /**
      * Sets the addresses to be blacklisted.
      *
@@ -78,7 +79,7 @@ public class BlacklistFilter extends IoFilterAdapter {
             block(subnet);
         }
     }
-    
+
     /**
      * Sets the addresses to be blacklisted.
      *
@@ -95,8 +96,8 @@ public class BlacklistFilter extends IoFilterAdapter {
         }
 
         blacklist.clear();
-        
-        for( InetAddress address : addresses ){
+
+        for (InetAddress address : addresses) {
             block(address);
         }
     }
@@ -133,13 +134,13 @@ public class BlacklistFilter extends IoFilterAdapter {
      * Blocks the specified subnet.
      */
     public void block(Subnet subnet) {
-        if(subnet == null) {
+        if (subnet == null) {
             throw new IllegalArgumentException("Subnet can not be null");
         }
-        
+
         blacklist.add(subnet);
     }
-    
+
     /**
      * Unblocks the specified endpoint.
      */
@@ -147,7 +148,7 @@ public class BlacklistFilter extends IoFilterAdapter {
         if (address == null) {
             throw new IllegalArgumentException("Adress to unblock can not be null");
         }
-        
+
         unblock(new Subnet(address, 32));
     }
 
@@ -172,8 +173,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
             nextFilter.sessionOpened(session);
@@ -183,8 +183,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
             nextFilter.sessionClosed(session);
@@ -194,8 +193,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) throws Exception {
+    public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
             nextFilter.sessionIdle(session, status);
@@ -205,8 +203,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) {
+    public void messageReceived(NextFilter nextFilter, IoSession session, Object message) {
         if (!isBlocked(session)) {
             // forward if not blocked
             nextFilter.messageReceived(session, message);
@@ -216,8 +213,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         if (!isBlocked(session)) {
             // forward if not blocked
             nextFilter.messageSent(session, writeRequest);
@@ -234,11 +230,11 @@ public class BlacklistFilter extends IoFilterAdapter {
     private boolean isBlocked(IoSession session) {
         SocketAddress remoteAddress = session.getRemoteAddress();
         if (remoteAddress instanceof InetSocketAddress) {
-            InetAddress address = ((InetSocketAddress) remoteAddress).getAddress(); 
-            
+            InetAddress address = ((InetSocketAddress) remoteAddress).getAddress();
+
             // check all subnets
-            for(Subnet subnet : blacklist) {
-                if(subnet.inSubnet(address)) {
+            for (Subnet subnet : blacklist) {
+                if (subnet.inSubnet(address)) {
                     return true;
                 }
             }

@@ -33,57 +33,56 @@ import static testcase.MinaRegressionTest.OPEN;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MyRequestDecoder extends CumulativeProtocolDecoder {
-  private static final Logger logger = LoggerFactory.getLogger(MyRequestDecoder.class);
+    private static final Logger logger = LoggerFactory.getLogger(MyRequestDecoder.class);
 
-  @Override
-  protected boolean doDecode(final IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-    if (!session.containsAttribute(OPEN)) {
-      logger.error("!decoding for closed session {}", session.getId());
+    @Override
+    protected boolean doDecode(final IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+        if (!session.containsAttribute(OPEN)) {
+            logger.error("!decoding for closed session {}", session.getId());
+        }
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    logger.debug("Sleep for 500 ms for session {}", session.getId());
+                    Thread.sleep(500);
+                    logger.debug("Wake up now from a 500 ms sleep for session {}", session.getId());
+                } catch (InterruptedException ignore) {
+                }
+                session.close(true);
+            }
+        }).start();
+
+        // sleep so that session.close(true) is already called when decoding continues
+        logger.debug("Sleep for 1000 ms for session {}", session.getId());
+        Thread.sleep(1000);
+        logger.debug("Wake up now from a 1000 ms sleep for session {}", session.getId());
+
+        if (!session.containsAttribute(OPEN)) {
+            logger.error("!session {} closed before decoding completes!", session.getId());
+            int i = 0;
+
+            try {
+                int j = 2 / i;
+            } catch (Exception e) {
+                //e.printStackTrace();
+            }
+        }
+
+        // no full message
+        if (in.remaining() < MSG_SIZE)
+            return false;
+
+        logger.info("Done decoding for session {}", session.getId());
+
+        if (in.hasRemaining() && !session.isClosing() && session.isConnected()) {
+            IoBuffer tmp = IoBuffer.allocate(in.remaining());
+            tmp.put(in);
+            tmp.flip();
+            out.write(tmp);
+            return true;
+        }
+
+        return false;
     }
-
-    new Thread(new Runnable() {
-      public void run() {
-        try {
-            logger.debug( "Sleep for 500 ms for session {}", session.getId() );
-            Thread.sleep(500);
-            logger.debug( "Wake up now from a 500 ms sleep for session {}", session.getId() );
-        } catch (InterruptedException ignore) {}
-        session.close(true);
-      }
-    }).start();
-
-    // sleep so that session.close(true) is already called when decoding continues
-    logger.debug( "Sleep for 1000 ms for session {}", session.getId() );
-    Thread.sleep(1000);
-    logger.debug( "Wake up now from a 1000 ms sleep for session {}", session.getId() );
-
-    if (!session.containsAttribute(OPEN)) {
-      logger.error("!session {} closed before decoding completes!", session.getId());
-      int i = 0;
-      
-      try
-      {
-          int j = 2 / i;
-      } 
-      catch ( Exception e )
-      {
-          //e.printStackTrace();
-      }
-    }
-
-    // no full message
-    if (in.remaining() < MSG_SIZE) return false;
-
-    logger.info("Done decoding for session {}", session.getId());
-
-    if (in.hasRemaining() && !session.isClosing() && session.isConnected()) {
-      IoBuffer tmp = IoBuffer.allocate(in.remaining());
-      tmp.put(in);
-      tmp.flip();
-      out.write(tmp);
-      return true;
-    }
-
-    return false;
-  }
 }

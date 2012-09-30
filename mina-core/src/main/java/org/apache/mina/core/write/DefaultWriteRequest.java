@@ -58,21 +58,18 @@ public class DefaultWriteRequest implements WriteRequest {
         }
 
         public WriteFuture addListener(IoFutureListener<?> listener) {
-            throw new IllegalStateException(
-                    "You can't add a listener to a dummy future.");
+            throw new IllegalStateException("You can't add a listener to a dummy future.");
         }
 
         public WriteFuture removeListener(IoFutureListener<?> listener) {
-            throw new IllegalStateException(
-                    "You can't add a listener to a dummy future.");
+            throw new IllegalStateException("You can't add a listener to a dummy future.");
         }
 
         public WriteFuture await() throws InterruptedException {
             return this;
         }
 
-        public boolean await(long timeout, TimeUnit unit)
-                throws InterruptedException {
+        public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
             return true;
         }
 
@@ -102,7 +99,9 @@ public class DefaultWriteRequest implements WriteRequest {
     };
 
     private final Object message;
+
     private final WriteFuture future;
+
     private final SocketAddress destination;
 
     /**
@@ -129,8 +128,7 @@ public class DefaultWriteRequest implements WriteRequest {
      * @param destination the destination of the message.  This property will be
      *                    ignored unless the transport supports it.
      */
-    public DefaultWriteRequest(Object message, WriteFuture future,
-            SocketAddress destination) {
+    public DefaultWriteRequest(Object message, WriteFuture future, SocketAddress destination) {
         if (message == null) {
             throw new IllegalArgumentException("message");
         }
@@ -163,12 +161,12 @@ public class DefaultWriteRequest implements WriteRequest {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("WriteRequest: ");
 
         // Special case for the CLOSE_REQUEST writeRequest : it just
         // carries a native Object instance
-        if (message.getClass().getName().equals(Object.class.getName()) ) {
+        if (message.getClass().getName().equals(Object.class.getName())) {
             sb.append("CLOSE_REQUEST");
         } else {
             if (getDestination() == null) {
@@ -183,8 +181,7 @@ public class DefaultWriteRequest implements WriteRequest {
         return sb.toString();
     }
 
-    public boolean isEncoded()
-    {
+    public boolean isEncoded() {
         return false;
     }
 }

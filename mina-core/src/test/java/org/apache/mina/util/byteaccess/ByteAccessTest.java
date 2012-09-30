@@ -144,7 +144,6 @@ public class ByteAccessTest {
         ByteArray ba2 = getByteArrayFactory().create(10);
         ByteArray ba3 = getByteArrayFactory().create(10);
 
-
         CompositeByteArray cba = new CompositeByteArray();
         cba.addLast(ba1);
         cba.addLast(ba2);
@@ -230,7 +229,8 @@ public class ByteAccessTest {
     public void testCompositeByteArrayRelativeReaderAndWriter() throws Exception {
         CompositeByteArray cba = new CompositeByteArray();
         CompositeByteArrayRelativeReader cbarr = new CompositeByteArrayRelativeReader(cba, true);
-        CompositeByteArrayRelativeWriter cbarw = new CompositeByteArrayRelativeWriter(cba, getExpander(100), getFlusher(), false);
+        CompositeByteArrayRelativeWriter cbarw = new CompositeByteArrayRelativeWriter(cba, getExpander(100),
+                getFlusher(), false);
         resetOperations();
         testRelativeReaderAndWriter(10, cbarr, cbarw);
         assertOperationCountEquals(2);
@@ -252,7 +252,8 @@ public class ByteAccessTest {
     public void testCompositeByteArrayRelativeReaderAndWriterWithFlush() throws Exception {
         CompositeByteArray cba = new CompositeByteArray();
         CompositeByteArrayRelativeReader cbarr = new CompositeByteArrayRelativeReader(cba, true);
-        CompositeByteArrayRelativeWriter cbarw = new CompositeByteArrayRelativeWriter(cba, getExpander(100), getFlusher(), true);
+        CompositeByteArrayRelativeWriter cbarw = new CompositeByteArrayRelativeWriter(cba, getExpander(100),
+                getFlusher(), true);
         resetOperations();
         testRelativeReaderAndWriter(10, cbarr, cbarw);
         assertOperationCountEquals(2);
@@ -364,7 +365,7 @@ public class ByteAccessTest {
             assertOperationCountEquals(1); // Frees ByteArray behind both buffers.
         }
     }
-    
+
     @Test
     public void testCompositeByteArraySlicing() {
         CompositeByteArray cba = new CompositeByteArray();
@@ -377,7 +378,7 @@ public class ByteAccessTest {
         testByteArraySlicing(cba, 1, 28);
         testByteArraySlicing(cba, 19, 2);
     }
-    
+
     @Test
     public void testBufferByteArraySlicing() {
         ByteArray bba = getByteArrayFactory().create(30);
@@ -386,9 +387,9 @@ public class ByteAccessTest {
         testByteArraySlicing(bba, 10, 20);
         testByteArraySlicing(bba, 1, 28);
         testByteArraySlicing(bba, 19, 2);
-        
+
     }
-    
+
     private void testByteArraySlicing(ByteArray ba, int start, int length) {
         ByteArray slice = ba.slice(start, length);
         for (int i = 0; i < length; i++) {
@@ -431,8 +432,7 @@ public class ByteAccessTest {
             @Override
             public ByteArray create(final int size) {
                 if (size < 0) {
-                    throw new IllegalArgumentException(
-                            "Buffer size must not be negative:" + size);
+                    throw new IllegalArgumentException("Buffer size must not be negative:" + size);
                 }
                 IoBuffer bb = IoBuffer.allocate(size);
                 ByteArray ba = new BufferByteArray(bb) {
@@ -482,7 +482,7 @@ public class ByteAccessTest {
         ByteArray ba = getByteArrayFactory().create(1);
         ba.put(0, (byte) 99);
         IoBuffer bb = IoBuffer.allocate(2);
-        
+
         bb.clear();
         Cursor cursor = ba.cursor();
         assertEquals(0, cursor.getIndex());
@@ -495,7 +495,7 @@ public class ByteAccessTest {
         assertEquals(1, bb.position());
         assertEquals(1, bb.remaining());
     }
-    
+
     @Test
     public void testCompositeByteArrayPrimitiveAccess() {
         CompositeByteArray cbaBig = new CompositeByteArray();
@@ -526,7 +526,8 @@ public class ByteAccessTest {
             component.order(ByteOrder.BIG_ENDIAN);
             cbaBig.addLast(component);
         }
-        testPrimitiveAccess(new CompositeByteArrayRelativeWriter(cbaBig, getExpander(10), getFlusher(), false), new CompositeByteArrayRelativeReader(cbaBig, true));
+        testPrimitiveAccess(new CompositeByteArrayRelativeWriter(cbaBig, getExpander(10), getFlusher(), false),
+                new CompositeByteArrayRelativeReader(cbaBig, true));
 
         CompositeByteArray cbaLittle = new CompositeByteArray();
         cbaLittle.order(ByteOrder.LITTLE_ENDIAN);
@@ -535,7 +536,8 @@ public class ByteAccessTest {
             component.order(ByteOrder.LITTLE_ENDIAN);
             cbaLittle.addLast(component);
         }
-        testPrimitiveAccess(new CompositeByteArrayRelativeWriter(cbaLittle, getExpander(10), getFlusher(), false), new CompositeByteArrayRelativeReader(cbaLittle, true));
+        testPrimitiveAccess(new CompositeByteArrayRelativeWriter(cbaLittle, getExpander(10), getFlusher(), false),
+                new CompositeByteArrayRelativeReader(cbaLittle, true));
     }
 
     private void testPrimitiveAccess(IoRelativeWriter write, IoRelativeReader read) {

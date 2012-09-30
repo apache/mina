@@ -46,112 +46,112 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class MinaRegressionTest extends IoHandlerAdapter {
-  private static final Logger logger = LoggerFactory.getLogger(MinaRegressionTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(MinaRegressionTest.class);
 
-  public static final int MSG_SIZE = 5000;
-  public static final int MSG_COUNT = 10;
-  private static final int PORT = 23234;
-  private static final int BUFFER_SIZE = 8192;
-  private static final int TIMEOUT = 10000;
+    public static final int MSG_SIZE = 5000;
 
-  public static final String OPEN = "open";
+    public static final int MSG_COUNT = 10;
 
-  public SocketAcceptor acceptor;
-  public SocketConnector connector;
+    private static final int PORT = 23234;
 
-  private final Object LOCK = new Object();
+    private static final int BUFFER_SIZE = 8192;
 
-  private static final ThreadFactory THREAD_FACTORY = new ThreadFactory() {
-    public Thread newThread(final Runnable r) {
-      return new Thread(null, r, "MinaThread", 64 * 1024);
-    }
-  };
+    private static final int TIMEOUT = 10000;
 
-  private OrderedThreadPoolExecutor executor;
+    public static final String OPEN = "open";
 
-  public static AtomicInteger sent = new AtomicInteger(0);
+    public SocketAcceptor acceptor;
 
+    public SocketConnector connector;
 
-  public MinaRegressionTest() throws IOException {
-    executor = new OrderedThreadPoolExecutor(
-      0,
-      1000,
-      60,
-      TimeUnit.SECONDS,
-      THREAD_FACTORY);
+    private final Object LOCK = new Object();
 
-    acceptor = new NioSocketAcceptor(Runtime.getRuntime().availableProcessors() + 1);
-    acceptor.setReuseAddress( true );
-    acceptor.getSessionConfig().setReceiveBufferSize(BUFFER_SIZE);
-
-    acceptor.getFilterChain().addLast("threadPool", new ExecutorFilter(executor));
-    acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MyProtocolCodecFactory()));
-
-    connector = new NioSocketConnector(Runtime.getRuntime().availableProcessors() + 1);
-
-    connector.setConnectTimeoutMillis(TIMEOUT);
-    connector.getSessionConfig().setSendBufferSize(BUFFER_SIZE);
-    connector.getSessionConfig().setReuseAddress( true );
-  }
-
-  public void connect() throws Exception {
-    final InetSocketAddress socketAddress = new InetSocketAddress("0.0.0.0", PORT);
-
-    acceptor.setHandler(new MyIoHandler(LOCK));
-
-    acceptor.bind(socketAddress);
-    connector.setHandler(this);
-
-    final IoFutureListener<ConnectFuture> listener = new IoFutureListener<ConnectFuture>() {
-      public void operationComplete(ConnectFuture future) {
-        try {logger.info( "Write message to session " + future.getSession().getId() );
-          final IoSession s = future.getSession();
-          IoBuffer wb = IoBuffer.allocate(MSG_SIZE);
-          wb.put(new byte[MSG_SIZE]);
-          wb.flip();
-          s.write(wb);
-        } catch (Exception e) {
-          logger.error("Can't send message: {}", e.getMessage());
+    private static final ThreadFactory THREAD_FACTORY = new ThreadFactory() {
+        public Thread newThread(final Runnable r) {
+            return new Thread(null, r, "MinaThread", 64 * 1024);
         }
-      }
     };
 
-    for (int i = 0; i < MSG_COUNT; i++) {
-      ConnectFuture future = connector.connect(socketAddress);
-      future.addListener(listener);
+    private OrderedThreadPoolExecutor executor;
+
+    public static AtomicInteger sent = new AtomicInteger(0);
+
+    public MinaRegressionTest() throws IOException {
+        executor = new OrderedThreadPoolExecutor(0, 1000, 60, TimeUnit.SECONDS, THREAD_FACTORY);
+
+        acceptor = new NioSocketAcceptor(Runtime.getRuntime().availableProcessors() + 1);
+        acceptor.setReuseAddress(true);
+        acceptor.getSessionConfig().setReceiveBufferSize(BUFFER_SIZE);
+
+        acceptor.getFilterChain().addLast("threadPool", new ExecutorFilter(executor));
+        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MyProtocolCodecFactory()));
+
+        connector = new NioSocketConnector(Runtime.getRuntime().availableProcessors() + 1);
+
+        connector.setConnectTimeoutMillis(TIMEOUT);
+        connector.getSessionConfig().setSendBufferSize(BUFFER_SIZE);
+        connector.getSessionConfig().setReuseAddress(true);
     }
 
-    synchronized (LOCK) {
-      LOCK.wait(50000);
+    public void connect() throws Exception {
+        final InetSocketAddress socketAddress = new InetSocketAddress("0.0.0.0", PORT);
+
+        acceptor.setHandler(new MyIoHandler(LOCK));
+
+        acceptor.bind(socketAddress);
+        connector.setHandler(this);
+
+        final IoFutureListener<ConnectFuture> listener = new IoFutureListener<ConnectFuture>() {
+            public void operationComplete(ConnectFuture future) {
+                try {
+                    logger.info("Write message to session " + future.getSession().getId());
+                    final IoSession s = future.getSession();
+                    IoBuffer wb = IoBuffer.allocate(MSG_SIZE);
+                    wb.put(new byte[MSG_SIZE]);
+                    wb.flip();
+                    s.write(wb);
+                } catch (Exception e) {
+                    logger.error("Can't send message: {}", e.getMessage());
+                }
+            }
+        };
+
+        for (int i = 0; i < MSG_COUNT; i++) {
+            ConnectFuture future = connector.connect(socketAddress);
+            future.addListener(listener);
+        }
+
+        synchronized (LOCK) {
+            LOCK.wait(50000);
+        }
+
+        connector.dispose();
+        acceptor.unbind();
+        acceptor.dispose();
+        executor.shutdownNow();
+
+        logger.info("Received: " + MyIoHandler.received.intValue());
+        logger.info("Sent: " + sent.intValue());
+        logger.info("FINISH");
     }
 
-    connector.dispose();
-    acceptor.unbind();
-    acceptor.dispose();
-    executor.shutdownNow();
-
-    logger.info("Received: " + MyIoHandler.received.intValue());
-    logger.info("Sent: " + sent.intValue());
-    logger.info("FINISH");
-  }
-
-  @Override
-  public void exceptionCaught(IoSession session, Throwable cause) {
-    if (!(cause instanceof IOException)) {
-      logger.error("Exception: ", cause);
-    } else {
-      logger.info("I/O error: " + cause.getMessage());
+    @Override
+    public void exceptionCaught(IoSession session, Throwable cause) {
+        if (!(cause instanceof IOException)) {
+            logger.error("Exception: ", cause);
+        } else {
+            logger.info("I/O error: " + cause.getMessage());
+        }
+        session.close(true);
     }
-    session.close(true);
-  }
 
-  @Override
-  public void messageSent(IoSession session, Object message) throws Exception {
-    sent.incrementAndGet();
-  }
+    @Override
+    public void messageSent(IoSession session, Object message) throws Exception {
+        sent.incrementAndGet();
+    }
 
-  public static void main(String[] args) throws Exception {
-    logger.info("START");
-    new MinaRegressionTest().connect();
-  }
+    public static void main(String[] args) throws Exception {
+        logger.info("START");
+        new MinaRegressionTest().connect();
+    }
 }

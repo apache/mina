@@ -73,8 +73,7 @@ public interface IoHandlerCommand {
      * @exception Exception general purpose exception return
      *                      to indicate abnormal termination
      */
-    void execute(NextCommand next, IoSession session, Object message)
-            throws Exception;
+    void execute(NextCommand next, IoSession session, Object message) throws Exception;
 
     /**
      * Represents an indirect reference to the next {@link IoHandlerCommand} of

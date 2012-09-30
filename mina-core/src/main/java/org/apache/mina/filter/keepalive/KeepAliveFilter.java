@@ -139,16 +139,20 @@ import org.apache.mina.core.write.WriteRequest;
  */
 public class KeepAliveFilter extends IoFilterAdapter {
 
-    private final AttributeKey WAITING_FOR_RESPONSE = new AttributeKey(
-            getClass(), "waitingForResponse");
-    private final AttributeKey IGNORE_READER_IDLE_ONCE = new AttributeKey(
-            getClass(), "ignoreReaderIdleOnce");
+    private final AttributeKey WAITING_FOR_RESPONSE = new AttributeKey(getClass(), "waitingForResponse");
+
+    private final AttributeKey IGNORE_READER_IDLE_ONCE = new AttributeKey(getClass(), "ignoreReaderIdleOnce");
 
     private final KeepAliveMessageFactory messageFactory;
+
     private final IdleStatus interestedIdleStatus;
+
     private volatile KeepAliveRequestTimeoutHandler requestTimeoutHandler;
+
     private volatile int requestInterval;
+
     private volatile int requestTimeout;
+
     private volatile boolean forwardEvent;
 
     /**
@@ -174,9 +178,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
      */
-    public KeepAliveFilter(
-            KeepAliveMessageFactory messageFactory,
-            IdleStatus interestedIdleStatus) {
+    public KeepAliveFilter(KeepAliveMessageFactory messageFactory, IdleStatus interestedIdleStatus) {
         this(messageFactory, interestedIdleStatus, KeepAliveRequestTimeoutHandler.CLOSE, 60, 30);
     }
 
@@ -189,8 +191,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
      */
-    public KeepAliveFilter(
-            KeepAliveMessageFactory messageFactory, KeepAliveRequestTimeoutHandler policy) {
+    public KeepAliveFilter(KeepAliveMessageFactory messageFactory, KeepAliveRequestTimeoutHandler policy) {
         this(messageFactory, IdleStatus.READER_IDLE, policy, 60, 30);
     }
 
@@ -202,19 +203,16 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
      */
-    public KeepAliveFilter(
-            KeepAliveMessageFactory messageFactory,
-            IdleStatus interestedIdleStatus, KeepAliveRequestTimeoutHandler policy) {
+    public KeepAliveFilter(KeepAliveMessageFactory messageFactory, IdleStatus interestedIdleStatus,
+            KeepAliveRequestTimeoutHandler policy) {
         this(messageFactory, interestedIdleStatus, policy, 60, 30);
     }
 
     /**
      * Creates a new instance.
      */
-    public KeepAliveFilter(
-            KeepAliveMessageFactory messageFactory,
-            IdleStatus interestedIdleStatus, KeepAliveRequestTimeoutHandler policy,
-            int keepAliveRequestInterval, int keepAliveRequestTimeout) {
+    public KeepAliveFilter(KeepAliveMessageFactory messageFactory, IdleStatus interestedIdleStatus,
+            KeepAliveRequestTimeoutHandler policy, int keepAliveRequestInterval, int keepAliveRequestTimeout) {
         if (messageFactory == null) {
             throw new IllegalArgumentException("messageFactory");
         }
@@ -254,9 +252,8 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
     public void setRequestInterval(int keepAliveRequestInterval) {
         if (keepAliveRequestInterval <= 0) {
-            throw new IllegalArgumentException(
-                    "keepAliveRequestInterval must be a positive integer: " +
-                    keepAliveRequestInterval);
+            throw new IllegalArgumentException("keepAliveRequestInterval must be a positive integer: "
+                    + keepAliveRequestInterval);
         }
         requestInterval = keepAliveRequestInterval;
     }
@@ -267,9 +264,8 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
     public void setRequestTimeout(int keepAliveRequestTimeout) {
         if (keepAliveRequestTimeout <= 0) {
-            throw new IllegalArgumentException(
-                    "keepAliveRequestTimeout must be a positive integer: " +
-                    keepAliveRequestTimeout);
+            throw new IllegalArgumentException("keepAliveRequestTimeout must be a positive integer: "
+                    + keepAliveRequestTimeout);
         }
         requestTimeout = keepAliveRequestTimeout;
     }
@@ -297,38 +293,31 @@ public class KeepAliveFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         if (parent.contains(this)) {
-            throw new IllegalArgumentException(
-                    "You can't add the same filter instance more than once. " +
-            "Create another instance and add it.");
+            throw new IllegalArgumentException("You can't add the same filter instance more than once. "
+                    + "Create another instance and add it.");
         }
     }
 
     @Override
-    public void onPostAdd(
-            IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
+    public void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         resetStatus(parent.getSession());
     }
 
     @Override
-    public void onPostRemove(
-            IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
+    public void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         resetStatus(parent.getSession());
     }
 
     @Override
-    public void messageReceived(
-            NextFilter nextFilter, IoSession session, Object message) throws Exception {
+    public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         try {
             if (messageFactory.isRequest(session, message)) {
-                Object pongMessage =
-                    messageFactory.getResponse(session, message);
+                Object pongMessage = messageFactory.getResponse(session, message);
 
                 if (pongMessage != null) {
-                    nextFilter.filterWrite(
-                            session, new DefaultWriteRequest(pongMessage));
+                    nextFilter.filterWrite(session, new DefaultWriteRequest(pongMessage));
                 }
             }
 
@@ -343,8 +332,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void messageSent(
-            NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+    public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
         if (!isKeepAliveMessage(session, message)) {
             nextFilter.messageSent(session, writeRequest);
@@ -352,15 +340,12 @@ public class KeepAliveFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void sessionIdle(
-            NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
+    public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         if (status == interestedIdleStatus) {
             if (!session.containsAttribute(WAITING_FOR_RESPONSE)) {
                 Object pingMessage = messageFactory.getRequest(session);
                 if (pingMessage != null) {
-                    nextFilter.filterWrite(
-                            session,
-                            new DefaultWriteRequest(pingMessage));
+                    nextFilter.filterWrite(session, new DefaultWriteRequest(pingMessage));
 
                     // If policy is OFF, there's no need to wait for
                     // the response.
@@ -408,13 +393,11 @@ public class KeepAliveFilter extends IoFilterAdapter {
     private void resetStatus(IoSession session) {
         session.getConfig().setReaderIdleTime(0);
         session.getConfig().setWriterIdleTime(0);
-        session.getConfig().setIdleTime(
-                interestedIdleStatus, getRequestInterval());
+        session.getConfig().setIdleTime(interestedIdleStatus, getRequestInterval());
         session.removeAttribute(WAITING_FOR_RESPONSE);
     }
 
     private boolean isKeepAliveMessage(IoSession session, Object message) {
-        return messageFactory.isRequest(session, message) ||
-        messageFactory.isResponse(session, message);
+        return messageFactory.isRequest(session, message) || messageFactory.isResponse(session, message);
     }
 }

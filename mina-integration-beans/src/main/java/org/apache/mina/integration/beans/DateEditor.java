@@ -35,18 +35,16 @@ import java.util.regex.Pattern;
  */
 public class DateEditor extends AbstractPropertyEditor {
     private static final Pattern MILLIS = Pattern.compile("[0-9][0-9]*");
-    
+
     private final DateFormat[] formats = new DateFormat[] {
             new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH),
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.ENGLISH),
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH),
-            new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH),
-            new SimpleDateFormat("yyyy-MM", Locale.ENGLISH),
-            new SimpleDateFormat("yyyy", Locale.ENGLISH),
-    };
-            
+            new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH), new SimpleDateFormat("yyyy-MM", Locale.ENGLISH),
+            new SimpleDateFormat("yyyy", Locale.ENGLISH), };
+
     public DateEditor() {
-        for (DateFormat f: formats) {
+        for (DateFormat f : formats) {
             f.setLenient(true);
         }
     }
@@ -72,14 +70,14 @@ public class DateEditor extends AbstractPropertyEditor {
             }
             return new Date(time);
         }
-        
-        for (DateFormat f: formats) {
+
+        for (DateFormat f : formats) {
             try {
                 return f.parse(text);
             } catch (ParseException e) {
             }
         }
-        
+
         throw new IllegalArgumentException("Wrong date: " + text);
     }
 }

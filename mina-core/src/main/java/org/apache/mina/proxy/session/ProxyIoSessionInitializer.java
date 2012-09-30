@@ -31,14 +31,12 @@ import org.apache.mina.core.session.IoSessionInitializer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
-public class ProxyIoSessionInitializer<T extends ConnectFuture> implements
-        IoSessionInitializer<T> {
+public class ProxyIoSessionInitializer<T extends ConnectFuture> implements IoSessionInitializer<T> {
     private final IoSessionInitializer<T> wrappedSessionInitializer;
 
     private final ProxyIoSession proxyIoSession;
 
-    public ProxyIoSessionInitializer(
-            final IoSessionInitializer<T> wrappedSessionInitializer,
+    public ProxyIoSessionInitializer(final IoSessionInitializer<T> wrappedSessionInitializer,
             final ProxyIoSession proxyIoSession) {
         this.wrappedSessionInitializer = wrappedSessionInitializer;
         this.proxyIoSession = proxyIoSession;

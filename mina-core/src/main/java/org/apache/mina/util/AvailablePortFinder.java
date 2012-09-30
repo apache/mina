@@ -69,7 +69,7 @@ public class AvailablePortFinder {
     public static int getNextAvailable() {
         try {
             // Here, we simply return an available port found by the system
-            return new ServerSocket( 0 ).getLocalPort();
+            return new ServerSocket(0).getLocalPort();
         } catch (IOException ioe) {
             throw new NoSuchElementException(ioe.getMessage());
         }
@@ -83,8 +83,7 @@ public class AvailablePortFinder {
      */
     public static int getNextAvailable(int fromPort) {
         if (fromPort < MIN_PORT_NUMBER || fromPort > MAX_PORT_NUMBER) {
-            throw new IllegalArgumentException("Invalid start port: "
-                    + fromPort);
+            throw new IllegalArgumentException("Invalid start port: " + fromPort);
         }
 
         for (int i = fromPort; i <= MAX_PORT_NUMBER; i++) {
@@ -93,8 +92,7 @@ public class AvailablePortFinder {
             }
         }
 
-        throw new NoSuchElementException("Could not find an available port "
-                + "above " + fromPort);
+        throw new NoSuchElementException("Could not find an available port " + "above " + fromPort);
     }
 
     /**
@@ -143,10 +141,8 @@ public class AvailablePortFinder {
      * <code>fromPort</code> if greater than <code>toPort</code>.
      */
     public static Set<Integer> getAvailablePorts(int fromPort, int toPort) {
-        if (fromPort < MIN_PORT_NUMBER || toPort > MAX_PORT_NUMBER
-                || fromPort > toPort) {
-            throw new IllegalArgumentException("Invalid port range: "
-                    + fromPort + " ~ " + toPort);
+        if (fromPort < MIN_PORT_NUMBER || toPort > MAX_PORT_NUMBER || fromPort > toPort) {
+            throw new IllegalArgumentException("Invalid port range: " + fromPort + " ~ " + toPort);
         }
 
         Set<Integer> result = new TreeSet<Integer>();

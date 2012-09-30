@@ -81,7 +81,7 @@ public class UdpServer extends IoHandlerAdapter {
         }
 
         // If we want to test the write operation, uncomment this line
-        //session.write(message);
+        session.write(message);
     }
 
     /**

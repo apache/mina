@@ -48,9 +48,8 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class NioSocketAcceptor
-        extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel>
-        implements SocketAcceptor {
+public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel> implements
+        SocketAcceptor {
 
     private volatile Selector selector;
 
@@ -104,7 +103,7 @@ public final class NioSocketAcceptor
     protected void init() throws Exception {
         selector = Selector.open();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -157,18 +156,17 @@ public final class NioSocketAcceptor
      * {@inheritDoc}
      */
     @Override
-    protected NioSession accept(IoProcessor<NioSession> processor,
-            ServerSocketChannel handle) throws Exception {
+    protected NioSession accept(IoProcessor<NioSession> processor, ServerSocketChannel handle) throws Exception {
 
         SelectionKey key = handle.keyFor(selector);
-        
-        if ((key == null) || (!key.isValid()) || (!key.isAcceptable()) ) {
+
+        if ((key == null) || (!key.isValid()) || (!key.isAcceptable())) {
             return null;
         }
 
         // accept the connection from the client
         SocketChannel ch = handle.accept();
-        
+
         if (ch == null) {
             return null;
         }
@@ -180,26 +178,25 @@ public final class NioSocketAcceptor
      * {@inheritDoc}
      */
     @Override
-    protected ServerSocketChannel open(SocketAddress localAddress)
-            throws Exception {
+    protected ServerSocketChannel open(SocketAddress localAddress) throws Exception {
         // Creates the listening ServerSocket
         ServerSocketChannel channel = ServerSocketChannel.open();
-        
+
         boolean success = false;
-        
+
         try {
             // This is a non blocking socket channel
             channel.configureBlocking(false);
-        
+
             // Configure the server socket,
             ServerSocket socket = channel.socket();
-            
+
             // Set the reuseAddress flag accordingly with the setting
             socket.setReuseAddress(isReuseAddress());
-            
+
             // and bind.
             socket.bind(localAddress, getBacklog());
-            
+
             // Register the channel within the selector for ACCEPT event
             channel.register(selector, SelectionKey.OP_ACCEPT);
             success = true;
@@ -215,8 +212,7 @@ public final class NioSocketAcceptor
      * {@inheritDoc}
      */
     @Override
-    protected SocketAddress localAddress(ServerSocketChannel handle)
-            throws Exception {
+    protected SocketAddress localAddress(ServerSocketChannel handle) throws Exception {
         return handle.socket().getLocalSocketAddress();
     }
 
@@ -252,11 +248,11 @@ public final class NioSocketAcceptor
     @Override
     protected void close(ServerSocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
-        
+
         if (key != null) {
             key.cancel();
         }
-        
+
         handle.close();
     }
 
@@ -303,8 +299,8 @@ public final class NioSocketAcceptor
          */
         public ServerSocketChannel next() {
             SelectionKey key = iterator.next();
-            
-            if ( key.isValid() && key.isAcceptable() ) {
+
+            if (key.isValid() && key.isAcceptable()) {
                 return (ServerSocketChannel) key.channel();
             }
 

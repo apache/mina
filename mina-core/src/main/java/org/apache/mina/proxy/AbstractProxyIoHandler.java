@@ -34,8 +34,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
-    private final static Logger logger = LoggerFactory
-            .getLogger(AbstractProxyIoHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(AbstractProxyIoHandler.class);
 
     /**
      * Method called only when handshake has completed.
@@ -51,11 +50,9 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
      */
     @Override
     public final void sessionOpened(IoSession session) throws Exception {
-        ProxyIoSession proxyIoSession = (ProxyIoSession) session
-                .getAttribute(ProxyIoSession.PROXY_SESSION);
+        ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
 
-        if (proxyIoSession.getRequest() instanceof SocksProxyRequest
-                || proxyIoSession.isAuthenticationFailed()
+        if (proxyIoSession.getRequest() instanceof SocksProxyRequest || proxyIoSession.isAuthenticationFailed()
                 || proxyIoSession.getHandler().isHandshakeComplete()) {
             proxySessionOpened(session);
         } else {

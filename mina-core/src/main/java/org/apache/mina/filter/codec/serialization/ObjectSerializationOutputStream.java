@@ -32,8 +32,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ObjectSerializationOutputStream extends OutputStream implements
-        ObjectOutput {
+public class ObjectSerializationOutputStream extends OutputStream implements ObjectOutput {
 
     private final DataOutputStream out;
 
@@ -69,8 +68,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements
      */
     public void setMaxObjectSize(int maxObjectSize) {
         if (maxObjectSize <= 0) {
-            throw new IllegalArgumentException("maxObjectSize: "
-                    + maxObjectSize);
+            throw new IllegalArgumentException("maxObjectSize: " + maxObjectSize);
         }
 
         this.maxObjectSize = maxObjectSize;
@@ -108,9 +106,8 @@ public class ObjectSerializationOutputStream extends OutputStream implements
 
         int objectSize = buf.position() - 4;
         if (objectSize > maxObjectSize) {
-            throw new IllegalArgumentException(
-                    "The encoded object is too big: " + objectSize + " (> "
-                            + maxObjectSize + ')');
+            throw new IllegalArgumentException("The encoded object is too big: " + objectSize + " (> " + maxObjectSize
+                    + ')');
         }
 
         out.write(buf.array(), 0, buf.position());

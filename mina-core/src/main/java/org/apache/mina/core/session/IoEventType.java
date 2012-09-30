@@ -27,13 +27,5 @@ package org.apache.mina.core.session;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum IoEventType {
-    SESSION_CREATED,
-    SESSION_OPENED,
-    SESSION_CLOSED,
-    MESSAGE_RECEIVED,
-    MESSAGE_SENT,
-    SESSION_IDLE,
-    EXCEPTION_CAUGHT,
-    WRITE,
-    CLOSE,
+    SESSION_CREATED, SESSION_OPENED, SESSION_CLOSED, MESSAGE_RECEIVED, MESSAGE_SENT, SESSION_IDLE, EXCEPTION_CAUGHT, WRITE, CLOSE,
 }

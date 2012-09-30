@@ -41,7 +41,7 @@ public class MD4Provider extends Provider {
 
     /**
      * Provider version.
-     */    
+     */
     public final static double VERSION = 1.00;
 
     /**

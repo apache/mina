@@ -40,20 +40,16 @@ import org.apache.tomcat.jni.Socket;
  */
 class AprDatagramSession extends AprSession {
 
-    static final TransportMetadata METADATA =
-        new DefaultTransportMetadata(
-                "apr", "datagram", true, false,
-                InetSocketAddress.class,
-                DatagramSessionConfig.class, IoBuffer.class);
+    static final TransportMetadata METADATA = new DefaultTransportMetadata("apr", "datagram", true, false,
+            InetSocketAddress.class, DatagramSessionConfig.class, IoBuffer.class);
 
     /**
      * Create an instance of {@link AprDatagramSession}. 
      * 
      * {@inheritDoc} 
-     */    
-    AprDatagramSession(
-            IoService service, IoProcessor<AprSession> processor,
-            long descriptor, InetSocketAddress remoteAddress) throws Exception {
+     */
+    AprDatagramSession(IoService service, IoProcessor<AprSession> processor, long descriptor,
+            InetSocketAddress remoteAddress) throws Exception {
         super(service, processor, descriptor, remoteAddress);
         config = new SessionConfigImpl();
         this.config.setAll(service.getSessionConfig());
@@ -63,7 +59,7 @@ class AprDatagramSession extends AprSession {
      * {@inheritDoc}
      */
     public DatagramSessionConfig getConfig() {
-        return ( DatagramSessionConfig ) config;
+        return (DatagramSessionConfig) config;
     }
 
     /**

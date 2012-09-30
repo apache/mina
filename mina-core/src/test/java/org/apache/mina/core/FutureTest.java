@@ -254,7 +254,7 @@ public class FutureTest {
         public TestListener() {
             super();
         }
-        
+
         public void operationComplete(IoFuture future) {
             this.notifiedFuture = future;
         }

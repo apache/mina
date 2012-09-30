@@ -35,18 +35,15 @@ import org.junit.Test;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
-
 /**
  * Simple Unit Test showing that the DemuxingProtocolDecoder has
  * inconsistent behavior if used with a non fragmented transport.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
 */
-public class DemuxingProtocolDecoderBugTest
-{
+public class DemuxingProtocolDecoderBugTest {
 
-    private static void doTest(IoSession session) throws Exception
-    {
+    private static void doTest(IoSession session) throws Exception {
         ProtocolDecoderOutput mock = EasyMock.createMock(ProtocolDecoderOutput.class);
         mock.write(Character.valueOf('A'));
         mock.write(Character.valueOf('B'));
@@ -63,54 +60,37 @@ public class DemuxingProtocolDecoderBugTest
         decoder.addMessageDecoder(CharacterMessageDecoder.class);
         decoder.addMessageDecoder(IntegerMessageDecoder.class);
 
-        decoder.decode(session,buffer,mock);
+        decoder.decode(session, buffer, mock);
 
         EasyMock.verify(mock);
     }
 
-    public static class CharacterMessageDecoder extends MessageDecoderAdapter
-    {
-        public MessageDecoderResult decodable(IoSession session, IoBuffer in)
-        {
-            return Character.isDigit((char)in.get())
-                    ? MessageDecoderResult.NOT_OK
-                    : MessageDecoderResult.OK;
+    public static class CharacterMessageDecoder extends MessageDecoderAdapter {
+        public MessageDecoderResult decodable(IoSession session, IoBuffer in) {
+            return Character.isDigit((char) in.get()) ? MessageDecoderResult.NOT_OK : MessageDecoderResult.OK;
         }
 
-        public MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception
-        {
-            out.write(Character.valueOf((char)in.get()));
+        public MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+            out.write(Character.valueOf((char) in.get()));
             return MessageDecoderResult.OK;
         }
     }
 
-    public static class IntegerMessageDecoder extends MessageDecoderAdapter
-    {
-        public MessageDecoderResult decodable(IoSession session, IoBuffer in)
-        {
-            return Character.isDigit((char)in.get())
-                    ? MessageDecoderResult.OK
-                    : MessageDecoderResult.NOT_OK;
+    public static class IntegerMessageDecoder extends MessageDecoderAdapter {
+        public MessageDecoderResult decodable(IoSession session, IoBuffer in) {
+            return Character.isDigit((char) in.get()) ? MessageDecoderResult.OK : MessageDecoderResult.NOT_OK;
         }
 
-        public MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception
-        {
-            out.write(Integer.parseInt("" + (char)in.get()));
+        public MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+            out.write(Integer.parseInt("" + (char) in.get()));
             return MessageDecoderResult.OK;
         }
     }
 
-    private static class SessionStub extends DummySession
-    {
-        public SessionStub(boolean fragmented)
-        {
-            setTransportMetadata(
-                new DefaultTransportMetadata(
-                        "nio", "socket", false, fragmented,
-                        InetSocketAddress.class,
-                        SocketSessionConfig.class,
-                        IoBuffer.class, FileRegion.class)
-            );
+    private static class SessionStub extends DummySession {
+        public SessionStub(boolean fragmented) {
+            setTransportMetadata(new DefaultTransportMetadata("nio", "socket", false, fragmented,
+                    InetSocketAddress.class, SocketSessionConfig.class, IoBuffer.class, FileRegion.class));
         }
     }
 
@@ -118,8 +98,7 @@ public class DemuxingProtocolDecoderBugTest
      * Test a decoding with fragmentation
      */
     @Test
-    public void testFragmentedTransport() throws Exception
-    {
+    public void testFragmentedTransport() throws Exception {
         doTest(new SessionStub(true));
     }
 
@@ -127,8 +106,7 @@ public class DemuxingProtocolDecoderBugTest
      * Test a decoding without fragmentation
      */
     @Test
-    public void testNonFragmentedTransport() throws Exception
-    {
+    public void testNonFragmentedTransport() throws Exception {
         doTest(new SessionStub(false));
     }
 }

@@ -62,8 +62,7 @@ public class NTLMResponses {
      *
      * @return The LM Response.
      */
-    public static byte[] getLMResponse(String password, byte[] challenge)
-            throws Exception {
+    public static byte[] getLMResponse(String password, byte[] challenge) throws Exception {
         byte[] lmHash = lmHash(password);
         return lmResponse(lmHash, challenge);
     }
@@ -77,8 +76,7 @@ public class NTLMResponses {
      *
      * @return The NTLM Response.
      */
-    public static byte[] getNTLMResponse(String password, byte[] challenge)
-            throws Exception {
+    public static byte[] getNTLMResponse(String password, byte[] challenge) throws Exception {
         byte[] ntlmHash = ntlmHash(password);
         return lmResponse(ntlmHash, challenge);
     }
@@ -98,12 +96,11 @@ public class NTLMResponses {
      *
      * @return The NTLMv2 Response.
      */
-    public static byte[] getNTLMv2Response(String target, String user,
-            String password, byte[] targetInformation, byte[] challenge,
-            byte[] clientNonce) throws Exception {
+    public static byte[] getNTLMv2Response(String target, String user, String password, byte[] targetInformation,
+            byte[] challenge, byte[] clientNonce) throws Exception {
 
-        return getNTLMv2Response(target, user, password, targetInformation,
-                challenge, clientNonce, System.currentTimeMillis());
+        return getNTLMv2Response(target, user, password, targetInformation, challenge, clientNonce,
+                System.currentTimeMillis());
     }
 
     /**
@@ -122,9 +119,8 @@ public class NTLMResponses {
      *
      * @return The NTLMv2 Response.
      */
-    public static byte[] getNTLMv2Response(String target, String user,
-            String password, byte[] targetInformation, byte[] challenge,
-            byte[] clientNonce, long time) throws Exception {
+    public static byte[] getNTLMv2Response(String target, String user, String password, byte[] targetInformation,
+            byte[] challenge, byte[] clientNonce, long time) throws Exception {
         byte[] ntlmv2Hash = ntlmv2Hash(target, user, password);
         byte[] blob = createBlob(targetInformation, clientNonce, time);
         return lmv2Response(ntlmv2Hash, blob, challenge);
@@ -143,9 +139,8 @@ public class NTLMResponses {
      *
      * @return The LMv2 Response. 
      */
-    public static byte[] getLMv2Response(String target, String user,
-            String password, byte[] challenge, byte[] clientNonce)
-            throws Exception {
+    public static byte[] getLMv2Response(String target, String user, String password, byte[] challenge,
+            byte[] clientNonce) throws Exception {
         byte[] ntlmv2Hash = ntlmv2Hash(target, user, password);
         return lmv2Response(ntlmv2Hash, clientNonce, challenge);
     }
@@ -162,8 +157,8 @@ public class NTLMResponses {
      * response field of the Type 3 message; the LM response field contains
      * the client nonce, null-padded to 24 bytes.
      */
-    public static byte[] getNTLM2SessionResponse(String password,
-            byte[] challenge, byte[] clientNonce) throws Exception {
+    public static byte[] getNTLM2SessionResponse(String password, byte[] challenge, byte[] clientNonce)
+            throws Exception {
         byte[] ntlmHash = ntlmHash(password);
         MessageDigest md5 = MessageDigest.getInstance("MD5");
         md5.update(challenge);
@@ -223,8 +218,7 @@ public class NTLMResponses {
      * @return The NTLMv2 Hash, used in the calculation of the NTLMv2
      * and LMv2 Responses. 
      */
-    private static byte[] ntlmv2Hash(String target, String user, String password)
-            throws Exception {
+    private static byte[] ntlmv2Hash(String target, String user, String password) throws Exception {
         byte[] ntlmHash = ntlmHash(password);
         String identity = user.toUpperCase() + target;
         return hmacMD5(identity.getBytes("UnicodeLittleUnmarked"), ntlmHash);
@@ -239,8 +233,7 @@ public class NTLMResponses {
      * @return The response (either LM or NTLM, depending on the provided
      * hash).
      */
-    private static byte[] lmResponse(byte[] hash, byte[] challenge)
-            throws Exception {
+    private static byte[] lmResponse(byte[] hash, byte[] challenge) throws Exception {
         byte[] keyBytes = new byte[21];
         System.arraycopy(hash, 0, keyBytes, 0, 16);
         Key lowKey = createDESKey(keyBytes, 0);
@@ -271,17 +264,14 @@ public class NTLMResponses {
      * @return The response (either NTLMv2 or LMv2, depending on the
      * client data).
      */
-    private static byte[] lmv2Response(byte[] hash, byte[] clientData,
-            byte[] challenge) throws Exception {
+    private static byte[] lmv2Response(byte[] hash, byte[] clientData, byte[] challenge) throws Exception {
         byte[] data = new byte[challenge.length + clientData.length];
         System.arraycopy(challenge, 0, data, 0, challenge.length);
-        System.arraycopy(clientData, 0, data, challenge.length,
-                clientData.length);
+        System.arraycopy(clientData, 0, data, challenge.length, clientData.length);
         byte[] mac = hmacMD5(data, hash);
         byte[] lmv2Response = new byte[mac.length + clientData.length];
         System.arraycopy(mac, 0, lmv2Response, 0, mac.length);
-        System.arraycopy(clientData, 0, lmv2Response, mac.length,
-                clientData.length);
+        System.arraycopy(clientData, 0, lmv2Response, mac.length, clientData.length);
         return lmv2Response;
     }
 
@@ -296,16 +286,11 @@ public class NTLMResponses {
      *
      * @return The blob, used in the calculation of the NTLMv2 Response.
      */
-    private static byte[] createBlob(byte[] targetInformation,
-            byte[] clientNonce, long time) {
-        byte[] blobSignature = new byte[] { (byte) 0x01, (byte) 0x01,
-                (byte) 0x00, (byte) 0x00 };
-        byte[] reserved = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                (byte) 0x00 };
-        byte[] unknown1 = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                (byte) 0x00 };
-        byte[] unknown2 = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                (byte) 0x00 };
+    private static byte[] createBlob(byte[] targetInformation, byte[] clientNonce, long time) {
+        byte[] blobSignature = new byte[] { (byte) 0x01, (byte) 0x01, (byte) 0x00, (byte) 0x00 };
+        byte[] reserved = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
+        byte[] unknown1 = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
+        byte[] unknown2 = new byte[] { (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
         time += 11644473600000l; // milliseconds from January 1, 1601 -> epoch.
         time *= 10000; // tenths of a microsecond.
         // convert to little-endian byte array.
@@ -314,9 +299,8 @@ public class NTLMResponses {
             timestamp[i] = (byte) time;
             time >>>= 8;
         }
-        byte[] blob = new byte[blobSignature.length + reserved.length
-                + timestamp.length + clientNonce.length + unknown1.length
-                + targetInformation.length + unknown2.length];
+        byte[] blob = new byte[blobSignature.length + reserved.length + timestamp.length + clientNonce.length
+                + unknown1.length + targetInformation.length + unknown2.length];
         int offset = 0;
         System.arraycopy(blobSignature, 0, blob, offset, blobSignature.length);
         offset += blobSignature.length;
@@ -328,8 +312,7 @@ public class NTLMResponses {
         offset += clientNonce.length;
         System.arraycopy(unknown1, 0, blob, offset, unknown1.length);
         offset += unknown1.length;
-        System.arraycopy(targetInformation, 0, blob, offset,
-                targetInformation.length);
+        System.arraycopy(targetInformation, 0, blob, offset, targetInformation.length);
         offset += targetInformation.length;
         System.arraycopy(unknown2, 0, blob, offset, unknown2.length);
         return blob;
@@ -405,8 +388,7 @@ public class NTLMResponses {
     private static void oddParity(byte[] bytes) {
         for (int i = 0; i < bytes.length; i++) {
             byte b = bytes[i];
-            boolean needsParity = (((b >>> 7) ^ (b >>> 6) ^ (b >>> 5)
-                    ^ (b >>> 4) ^ (b >>> 3) ^ (b >>> 2) ^ (b >>> 1)) & 0x01) == 0;
+            boolean needsParity = (((b >>> 7) ^ (b >>> 6) ^ (b >>> 5) ^ (b >>> 4) ^ (b >>> 3) ^ (b >>> 2) ^ (b >>> 1)) & 0x01) == 0;
             if (needsParity) {
                 bytes[i] |= (byte) 0x01;
             } else {

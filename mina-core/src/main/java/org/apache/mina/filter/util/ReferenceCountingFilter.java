@@ -50,8 +50,7 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
         //no-op, will destroy on-demand in post-remove if count == 0
     }
 
-    public synchronized void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public synchronized void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         if (0 == count) {
             filter.init();
         }
@@ -61,8 +60,7 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
         filter.onPreAdd(parent, name, nextFilter);
     }
 
-    public synchronized void onPostRemove(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public synchronized void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         filter.onPostRemove(parent, name, nextFilter);
 
         --count;
@@ -72,58 +70,47 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
         }
     }
 
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) throws Exception {
+    public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
         filter.exceptionCaught(nextFilter, session, cause);
     }
 
-    public void filterClose(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
         filter.filterClose(nextFilter, session);
     }
 
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         filter.filterWrite(nextFilter, session, writeRequest);
     }
 
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
+    public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         filter.messageReceived(nextFilter, session, message);
     }
 
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
+    public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         filter.messageSent(nextFilter, session, writeRequest);
     }
 
-    public void onPostAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         filter.onPostAdd(parent, name, nextFilter);
     }
 
-    public void onPreRemove(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPreRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         filter.onPreRemove(parent, name, nextFilter);
     }
 
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         filter.sessionClosed(nextFilter, session);
     }
 
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         filter.sessionCreated(nextFilter, session);
     }
 
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) throws Exception {
+    public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         filter.sessionIdle(nextFilter, session, status);
     }
 
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
         filter.sessionOpened(nextFilter, session);
     }
 }

@@ -74,8 +74,7 @@ public class ProtocolDecoderException extends ProtocolCodecException {
         }
 
         if (hexdump != null) {
-            return message + (message.length() > 0 ? " " : "") + "(Hexdump: "
-                    + hexdump + ')';
+            return message + (message.length() > 0 ? " " : "") + "(Hexdump: " + hexdump + ')';
         }
 
         return message;
@@ -93,8 +92,7 @@ public class ProtocolDecoderException extends ProtocolCodecException {
      */
     public void setHexdump(String hexdump) {
         if (this.hexdump != null) {
-            throw new IllegalStateException(
-                    "Hexdump cannot be set more than once.");
+            throw new IllegalStateException("Hexdump cannot be set more than once.");
         }
         this.hexdump = hexdump;
     }

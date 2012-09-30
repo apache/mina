@@ -30,7 +30,7 @@ import java.util.Properties;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PropertiesEditor extends MapEditor {
-    
+
     public PropertiesEditor() {
         super(String.class, String.class);
         setTrimText(false);

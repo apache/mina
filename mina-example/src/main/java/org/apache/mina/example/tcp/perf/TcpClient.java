@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
@@ -44,6 +45,8 @@ public class TcpClient extends IoHandlerAdapter {
 
     /** The session */
     private static IoSession session;
+
+    private boolean received = false;
 
     /**
      * Create the UdpClient's instance
@@ -74,6 +77,7 @@ public class TcpClient extends IoHandlerAdapter {
      */
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
+        received = true;
     }
 
     /**
@@ -124,13 +128,19 @@ public class TcpClient extends IoHandlerAdapter {
 
         for (int i = 0; i <= TcpServer.MAX_RECEIVED; i++) {
             //if (i % 2 == 0) {
-            Thread.sleep(1);
+            //Thread.sleep(1);
             //}
 
             IoBuffer buffer = IoBuffer.allocate(4);
             buffer.putInt(i);
             buffer.flip();
-            session.write(buffer);
+            WriteFuture future = session.write(buffer);
+
+            while (client.received == false) {
+                Thread.sleep(1);
+            }
+
+            client.received = false;
 
             if (i % 10000 == 0) {
                 System.out.println("Sent " + i + " messages");

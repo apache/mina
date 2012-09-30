@@ -41,7 +41,7 @@ public interface Transition {
      *         <code>false</code> otherwise.
      */
     boolean execute(Event event);
-    
+
     /**
      * Returns the {@link State} which the {@link StateMachine} should move to 
      * if this {@link Transition} is taken and {@link #execute(Event)} returns

@@ -30,17 +30,19 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class IntegerDecodingState implements DecodingState {
-    
+
     private int firstByte;
+
     private int secondByte;
+
     private int thirdByte;
+
     private int counter;
 
     /**
      * {@inheritDoc}
      */
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         while (in.hasRemaining()) {
             switch (counter) {
             case 0:
@@ -54,13 +56,11 @@ public abstract class IntegerDecodingState implements DecodingState {
                 break;
             case 3:
                 counter = 0;
-                return finishDecode(
-                        (firstByte << 24) | (secondByte << 16) | (thirdByte << 8) | in.getUnsigned(),
-                        out);
+                return finishDecode((firstByte << 24) | (secondByte << 16) | (thirdByte << 8) | in.getUnsigned(), out);
             default:
                 throw new InternalError();
             }
-            counter ++;
+            counter++;
         }
 
         return this;
@@ -69,10 +69,8 @@ public abstract class IntegerDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
-        throw new ProtocolDecoderException(
-                "Unexpected end of session while waiting for an integer.");
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
+        throw new ProtocolDecoderException("Unexpected end of session while waiting for an integer.");
     }
 
     /**
@@ -86,6 +84,5 @@ public abstract class IntegerDecodingState implements DecodingState {
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(int value,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(int value, ProtocolDecoderOutput out) throws Exception;
 }

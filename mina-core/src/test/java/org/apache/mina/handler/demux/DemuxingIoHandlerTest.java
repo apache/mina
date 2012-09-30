@@ -64,7 +64,7 @@ public class DemuxingIoHandlerTest {
         handler2 = EasyMock.createMock(MessageHandler.class);
         handler3 = EasyMock.createMock(MessageHandler.class);
 
-        session = EasyMock.createMock( IoSession.class);
+        session = EasyMock.createMock(IoSession.class);
     }
 
     @Test

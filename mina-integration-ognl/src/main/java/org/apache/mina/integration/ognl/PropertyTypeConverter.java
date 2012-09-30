@@ -41,10 +41,9 @@ import org.apache.mina.integration.beans.PropertyEditorFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PropertyTypeConverter implements TypeConverter {
-    
+
     @SuppressWarnings("unchecked")
-    public Object convertValue(Map ctx, Object target, Member member,
-            String attrName, Object value, Class toType) {
+    public Object convertValue(Map ctx, Object target, Member member, String attrName, Object value, Class toType) {
         if (value == null) {
             return null;
         }
@@ -53,35 +52,30 @@ public class PropertyTypeConverter implements TypeConverter {
             // I don't know why but OGNL gives null attrName almost always.
             // Fortunately, we can get the actual attrName with a tiny hack.
             OgnlContext ognlCtx = (OgnlContext) ctx;
-            attrName = ognlCtx.getCurrentNode().toString().replaceAll(
-                    "[\" \']+", "");
+            attrName = ognlCtx.getCurrentNode().toString().replaceAll("[\" \']+", "");
         }
 
         if (toType.isAssignableFrom(value.getClass())) {
             return value;
         }
 
-        PropertyEditor e1 = getPropertyEditor(
-                target.getClass(), attrName, value.getClass());
+        PropertyEditor e1 = getPropertyEditor(target.getClass(), attrName, value.getClass());
         if (e1 == null) {
-            throw new IllegalArgumentException("Can't convert "
-                    + value.getClass().getSimpleName() + " to "
+            throw new IllegalArgumentException("Can't convert " + value.getClass().getSimpleName() + " to "
                     + String.class.getSimpleName());
         }
         e1.setValue(value);
 
-        PropertyEditor e2 = getPropertyEditor(
-                target.getClass(), attrName, toType);
+        PropertyEditor e2 = getPropertyEditor(target.getClass(), attrName, toType);
         if (e2 == null) {
-            throw new IllegalArgumentException("Can't convert "
-                    + String.class.getSimpleName() + " to "
+            throw new IllegalArgumentException("Can't convert " + String.class.getSimpleName() + " to "
                     + toType.getSimpleName());
         }
 
         e2.setAsText(e1.getAsText());
         return e2.getValue();
     }
-    
+
     protected PropertyEditor getPropertyEditor(Class<?> type, String attrName, Class<?> attrType) {
         return PropertyEditorFactory.getInstance(attrType);
     }

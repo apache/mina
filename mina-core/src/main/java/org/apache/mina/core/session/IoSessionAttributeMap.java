@@ -119,7 +119,7 @@ public interface IoSessionAttributeMap {
      * Returns the set of keys of all user-defined attributes.
      */
     Set<Object> getAttributeKeys(IoSession session);
-    
+
     /**
      * Disposes any releases associated with the specified session.
      * This method is invoked on disconnection.

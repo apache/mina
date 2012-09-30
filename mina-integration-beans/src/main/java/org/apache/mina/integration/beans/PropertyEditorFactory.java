@@ -38,33 +38,33 @@ public final class PropertyEditorFactory {
         if (object == null) {
             return new NullEditor();
         }
-        
+
         if (object instanceof Collection) {
             Class<?> elementType = null;
-            for (Object e: (Collection) object) {
+            for (Object e : (Collection) object) {
                 if (e != null) {
                     elementType = e.getClass();
                     break;
                 }
             }
-            
+
             if (elementType != null) {
                 if (object instanceof Set) {
                     return new SetEditor(elementType);
                 }
-                
+
                 if (object instanceof List) {
                     return new ListEditor(elementType);
                 }
-                
+
                 return new CollectionEditor(elementType);
             }
         }
-        
+
         if (object instanceof Map) {
             Class<?> keyType = null;
             Class<?> valueType = null;
-            for (Object entry: ((Map) object).entrySet()) {
+            for (Object entry : ((Map) object).entrySet()) {
                 Map.Entry e = (Map.Entry) entry;
                 if (e.getKey() != null && e.getValue() != null) {
                     keyType = e.getKey().getClass();
@@ -72,61 +72,62 @@ public final class PropertyEditorFactory {
                     break;
                 }
             }
-            
+
             if (keyType != null && valueType != null) {
                 return new MapEditor(keyType, valueType);
             }
         }
-        
+
         return getInstance(object.getClass());
     }
-    
+
     // parent type / property name / property type
     public static PropertyEditor getInstance(Class<?> type) {
         if (type == null) {
             throw new IllegalArgumentException("type");
         }
-        
+
         if (type.isEnum()) {
             return new EnumEditor(type);
         }
-        
+
         if (type.isArray()) {
             return new ArrayEditor(type.getComponentType());
         }
-        
+
         if (Collection.class.isAssignableFrom(type)) {
             if (Set.class.isAssignableFrom(type)) {
                 return new SetEditor(String.class);
             }
-            
+
             if (List.class.isAssignableFrom(type)) {
                 return new ListEditor(String.class);
             }
-            
+
             return new CollectionEditor(String.class);
         }
-        
+
         if (Map.class.isAssignableFrom(type)) {
             return new MapEditor(String.class, String.class);
         }
-        
+
         if (Properties.class.isAssignableFrom(type)) {
             return new PropertiesEditor();
         }
-        
+
         type = filterPrimitiveType(type);
 
         try {
-            return (PropertyEditor)
-                    PropertyEditorFactory.class.getClassLoader().loadClass(
-                            PropertyEditorFactory.class.getPackage().getName() +
-                            '.' + type.getSimpleName() + "Editor").newInstance();
+            return (PropertyEditor) PropertyEditorFactory.class
+                    .getClassLoader()
+                    .loadClass(
+                            PropertyEditorFactory.class.getPackage().getName() + '.' + type.getSimpleName() + "Editor")
+                    .newInstance();
         } catch (Exception e) {
             return null;
         }
     }
-    
+
     private static Class<?> filterPrimitiveType(Class<?> type) {
         if (type.isPrimitive()) {
             if (type == boolean.class) {
@@ -156,7 +157,7 @@ public final class PropertyEditorFactory {
         }
         return type;
     }
-    
+
     private PropertyEditorFactory() {
     }
 }

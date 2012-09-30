@@ -19,7 +19,6 @@
  */
 package org.apache.mina.core.future;
 
-
 /**
  * An {@link IoFuture} for asynchronous write requests.
  *
@@ -47,7 +46,7 @@ public interface WriteFuture extends IoFuture {
      * Returns <tt>true</tt> if the write operation is finished successfully.
      */
     boolean isWritten();
-    
+
     /**
      * Returns the cause of the write failure if and only if the write
      * operation has failed due to an {@link Exception}.  Otherwise,
@@ -61,7 +60,7 @@ public interface WriteFuture extends IoFuture {
      * not call this method directly.
      */
     void setWritten();
-    
+
     /**
      * Sets the cause of the write failure, and notifies all threads waiting
      * for this future.  This method is invoked by MINA internally.  Please

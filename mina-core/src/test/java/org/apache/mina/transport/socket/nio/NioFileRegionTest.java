@@ -28,7 +28,7 @@ import org.apache.mina.transport.AbstractFileRegionTest;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioFileRegionTest extends AbstractFileRegionTest{
+public class NioFileRegionTest extends AbstractFileRegionTest {
 
     @Override
     protected IoAcceptor createAcceptor() {

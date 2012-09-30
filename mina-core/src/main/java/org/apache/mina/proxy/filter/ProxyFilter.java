@@ -55,8 +55,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class ProxyFilter extends IoFilterAdapter {
-    private final static Logger LOGGER = LoggerFactory
-            .getLogger(ProxyFilter.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ProxyFilter.class);
 
     /**
      * Create a new {@link ProxyFilter}.
@@ -76,11 +75,9 @@ public class ProxyFilter extends IoFilterAdapter {
      * {@link ProxyFilter}
      */
     @Override
-    public void onPreAdd(final IoFilterChain chain, final String name,
-            final NextFilter nextFilter) {
+    public void onPreAdd(final IoFilterChain chain, final String name, final NextFilter nextFilter) {
         if (chain.contains(ProxyFilter.class)) {
-            throw new IllegalStateException(
-                    "A filter chain cannot contain more than one ProxyFilter.");
+            throw new IllegalStateException("A filter chain cannot contain more than one ProxyFilter.");
         }
     }
 
@@ -93,8 +90,7 @@ public class ProxyFilter extends IoFilterAdapter {
      * @param nextFilter the next filter
      */
     @Override
-    public void onPreRemove(final IoFilterChain chain, final String name,
-            final NextFilter nextFilter) {
+    public void onPreRemove(final IoFilterChain chain, final String name, final NextFilter nextFilter) {
         IoSession session = chain.getSession();
         session.removeAttribute(ProxyIoSession.PROXY_SESSION);
     }
@@ -109,10 +105,8 @@ public class ProxyFilter extends IoFilterAdapter {
      * @param nextFilter the next filter
      */
     @Override
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) throws Exception {
-        ProxyIoSession proxyIoSession = (ProxyIoSession) session
-                .getAttribute(ProxyIoSession.PROXY_SESSION);
+    public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
+        ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
         proxyIoSession.setAuthenticationFailed(true);
         super.exceptionCaught(nextFilter, session, cause);
     }
@@ -124,8 +118,7 @@ public class ProxyFilter extends IoFilterAdapter {
      * @return the handler which will handle handshaking with the proxy
      */
     private ProxyLogicHandler getProxyHandler(final IoSession session) {
-        ProxyLogicHandler handler = ((ProxyIoSession) session
-                .getAttribute(ProxyIoSession.PROXY_SESSION)).getHandler();
+        ProxyLogicHandler handler = ((ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION)).getHandler();
 
         if (handler == null) {
             throw new IllegalStateException();
@@ -148,8 +141,7 @@ public class ProxyFilter extends IoFilterAdapter {
      * @param message the object holding the received data
      */
     @Override
-    public void messageReceived(final NextFilter nextFilter,
-            final IoSession session, final Object message)
+    public void messageReceived(final NextFilter nextFilter, final IoSession session, final Object message)
             throws ProxyAuthException {
         ProxyLogicHandler handler = getProxyHandler(session);
 
@@ -196,8 +188,7 @@ public class ProxyFilter extends IoFilterAdapter {
      * @param writeRequest the data to write
      */
     @Override
-    public void filterWrite(final NextFilter nextFilter,
-            final IoSession session, final WriteRequest writeRequest) {
+    public void filterWrite(final NextFilter nextFilter, final IoSession session, final WriteRequest writeRequest) {
         writeData(nextFilter, session, writeRequest, false);
     }
 
@@ -210,8 +201,8 @@ public class ProxyFilter extends IoFilterAdapter {
      * @param writeRequest the data to write
      * @param isHandshakeData true if writeRequest is written by the proxy classes.
      */
-    public void writeData(final NextFilter nextFilter, final IoSession session,
-            final WriteRequest writeRequest, final boolean isHandshakeData) {
+    public void writeData(final NextFilter nextFilter, final IoSession session, final WriteRequest writeRequest,
+            final boolean isHandshakeData) {
         ProxyLogicHandler handler = getProxyHandler(session);
 
         synchronized (handler) {
@@ -220,7 +211,7 @@ public class ProxyFilter extends IoFilterAdapter {
                 nextFilter.filterWrite(session, writeRequest);
             } else if (isHandshakeData) {
                 LOGGER.debug("   handshake data: {}", writeRequest.getMessage());
-                
+
                 // Writing handshake data
                 nextFilter.filterWrite(session, writeRequest);
             } else {
@@ -246,11 +237,9 @@ public class ProxyFilter extends IoFilterAdapter {
      * @param writeRequest the data written
      */
     @Override
-    public void messageSent(final NextFilter nextFilter,
-            final IoSession session, final WriteRequest writeRequest)
+    public void messageSent(final NextFilter nextFilter, final IoSession session, final WriteRequest writeRequest)
             throws Exception {
-        if (writeRequest.getMessage() != null
-                && writeRequest.getMessage() instanceof ProxyHandshakeIoBuffer) {
+        if (writeRequest.getMessage() != null && writeRequest.getMessage() instanceof ProxyHandshakeIoBuffer) {
             // Ignore buffers used in handshaking
             return;
         }
@@ -273,11 +262,9 @@ public class ProxyFilter extends IoFilterAdapter {
      * @param session the session object
      */
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         LOGGER.debug("Session created: " + session);
-        ProxyIoSession proxyIoSession = (ProxyIoSession) session
-                .getAttribute(ProxyIoSession.PROXY_SESSION);
+        ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
         LOGGER.debug("  get proxyIoSession: " + proxyIoSession);
         proxyIoSession.setProxyFilter(this);
 
@@ -305,8 +292,7 @@ public class ProxyFilter extends IoFilterAdapter {
         }
 
         proxyIoSession.getEventQueue().enqueueEventIfNecessary(
-                new IoSessionEvent(nextFilter, session,
-                        IoSessionEventType.CREATED));
+                new IoSessionEvent(nextFilter, session, IoSessionEventType.CREATED));
     }
 
     /**
@@ -318,13 +304,10 @@ public class ProxyFilter extends IoFilterAdapter {
      * @param session the session object
      */
     @Override
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        ProxyIoSession proxyIoSession = (ProxyIoSession) session
-                .getAttribute(ProxyIoSession.PROXY_SESSION);
+    public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
+        ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
         proxyIoSession.getEventQueue().enqueueEventIfNecessary(
-                new IoSessionEvent(nextFilter, session,
-                        IoSessionEventType.OPENED));
+                new IoSessionEvent(nextFilter, session, IoSessionEventType.OPENED));
     }
 
     /**
@@ -334,14 +317,11 @@ public class ProxyFilter extends IoFilterAdapter {
      * 
      * @param nextFilter the next filter in filter chain
      * @param session the session object
-     */    
+     */
     @Override
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) throws Exception {
-        ProxyIoSession proxyIoSession = (ProxyIoSession) session
-                .getAttribute(ProxyIoSession.PROXY_SESSION);
-        proxyIoSession.getEventQueue().enqueueEventIfNecessary(
-                new IoSessionEvent(nextFilter, session, status));
+    public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
+        ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
+        proxyIoSession.getEventQueue().enqueueEventIfNecessary(new IoSessionEvent(nextFilter, session, status));
     }
 
     /**
@@ -351,14 +331,11 @@ public class ProxyFilter extends IoFilterAdapter {
      * 
      * @param nextFilter the next filter in filter chain
      * @param session the session object
-     */    
+     */
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
-        ProxyIoSession proxyIoSession = (ProxyIoSession) session
-                .getAttribute(ProxyIoSession.PROXY_SESSION);
+    public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
+        ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
         proxyIoSession.getEventQueue().enqueueEventIfNecessary(
-                new IoSessionEvent(nextFilter, session,
-                        IoSessionEventType.CLOSED));
+                new IoSessionEvent(nextFilter, session, IoSessionEventType.CLOSED));
     }
 }

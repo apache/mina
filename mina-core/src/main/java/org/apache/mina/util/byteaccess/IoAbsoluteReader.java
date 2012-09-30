@@ -19,94 +19,79 @@
  */
 package org.apache.mina.util.byteaccess;
 
-
 import java.nio.ByteOrder;
 
 import org.apache.mina.core.buffer.IoBuffer;
-
 
 /**
  * Provides absolute read access to a sequence of bytes.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface IoAbsoluteReader
-{
+public interface IoAbsoluteReader {
 
     /**
      * Get the index of the first byte that can be accessed.
      */
     int first();
 
-
     /**
      * Gets the index after the last byte that can be accessed.
      */
     int last();
-
 
     /**
      * Gets the total number of bytes that can be accessed.
      */
     int length();
 
-
     /**
      * Creates an array with a view of part of this array.
      */
-    ByteArray slice( int index, int length );
-
+    ByteArray slice(int index, int length);
 
     /**
      * Gets the order of the bytes.
      */
     ByteOrder order();
 
-
     /**
      * Gets a <code>byte</code> from the given index.
      */
-    byte get( int index );
-
+    byte get(int index);
 
     /**
      * Gets enough bytes to fill the <code>IoBuffer</code> from the given index.
      */
-    public void get( int index, IoBuffer bb );
-
+    public void get(int index, IoBuffer bb);
 
     /**
      * Gets a <code>short</code> from the given index.
      */
-    short getShort( int index );
-
+    short getShort(int index);
 
     /**
      * Gets an <code>int</code> from the given index.
      */
-    int getInt( int index );
-
+    int getInt(int index);
 
     /**
      * Gets a <code>long</code> from the given index.
      */
-    long getLong( int index );
-
+    long getLong(int index);
 
     /**
      * Gets a <code>float</code> from the given index.
      */
-    float getFloat( int index );
-
+    float getFloat(int index);
 
     /**
      * Gets a <code>double</code> from the given index.
      */
-    double getDouble( int index );
-
+    double getDouble(int index);
 
     /**
      * Gets a <code>char</code> from the given index.
      */
-    char getChar( int index );
+    char getChar(int index);
 }

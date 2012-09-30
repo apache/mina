@@ -34,8 +34,7 @@ public abstract class MessageDecoderAdapter implements MessageDecoder {
      * Override this method to deal with the closed connection.
      * The default implementation does nothing.
      */
-    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
-            throws Exception {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         // Do nothing
     }
 }

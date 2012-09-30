@@ -47,14 +47,14 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
     // object used for checking session idle
     private IdleStatusChecker idleChecker;
-    
+
     /**
      * Creates a new instance.
      */
     public VmPipeConnector() {
         this(null);
     }
-    
+
     /**
      * Creates a new instance.
      */
@@ -76,13 +76,11 @@ public final class VmPipeConnector extends AbstractIoConnector {
     }
 
     @Override
-    protected ConnectFuture connect0(SocketAddress remoteAddress,
-                                      SocketAddress localAddress,
-                                      IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
+    protected ConnectFuture connect0(SocketAddress remoteAddress, SocketAddress localAddress,
+            IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         VmPipe entry = VmPipeAcceptor.boundHandlers.get(remoteAddress);
         if (entry == null) {
-            return DefaultConnectFuture.newFailedFuture(new IOException(
-                    "Endpoint unavailable: " + remoteAddress));
+            return DefaultConnectFuture.newFailedFuture(new IOException("Endpoint unavailable: " + remoteAddress));
         }
 
         DefaultConnectFuture future = new DefaultConnectFuture();
@@ -95,8 +93,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
             return DefaultConnectFuture.newFailedFuture(e);
         }
 
-        VmPipeSession localSession = new VmPipeSession(this,
-                getListeners(), actualLocalAddress, getHandler(), entry);
+        VmPipeSession localSession = new VmPipeSession(this, getListeners(), actualLocalAddress, getHandler(), entry);
 
         initSession(localSession, future, sessionInitializer);
 
@@ -121,8 +118,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
         ((VmPipeAcceptor) remoteSession.getService()).doFinishSessionInitialization(remoteSession, null);
         try {
             IoFilterChain filterChain = remoteSession.getFilterChain();
-            entry.getAcceptor().getFilterChainBuilder().buildFilterChain(
-                    filterChain);
+            entry.getAcceptor().getFilterChainBuilder().buildFilterChain(filterChain);
 
             // The following sentences don't throw any exceptions.
             entry.getListeners().fireSessionCreated(remoteSession);
@@ -172,8 +168,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
     private static class LocalAddressReclaimer implements IoFutureListener<IoFuture> {
         public void operationComplete(IoFuture future) {
             synchronized (TAKEN_LOCAL_ADDRESSES) {
-                TAKEN_LOCAL_ADDRESSES.remove(future.getSession()
-                        .getLocalAddress());
+                TAKEN_LOCAL_ADDRESSES.remove(future.getSession().getLocalAddress());
             }
         }
     }

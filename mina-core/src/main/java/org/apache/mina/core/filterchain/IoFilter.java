@@ -104,8 +104,7 @@ public interface IoFilter {
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter)
-            throws Exception;
+    void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception;
 
     /**
      * Invoked after this filter is added to the specified <tt>parent</tt>.
@@ -118,8 +117,7 @@ public interface IoFilter {
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter)
-            throws Exception;
+    void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception;
 
     /**
      * Invoked before this filter is removed from the specified <tt>parent</tt>.
@@ -132,8 +130,7 @@ public interface IoFilter {
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPreRemove(IoFilterChain parent, String name, NextFilter nextFilter)
-            throws Exception;
+    void onPreRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception;
 
     /**
      * Invoked after this filter is removed from the specified <tt>parent</tt>.
@@ -146,54 +143,46 @@ public interface IoFilter {
      * @param nextFilter the {@link NextFilter} for this filter.  You can reuse
      *                   this object until this filter is removed from the chain.
      */
-    void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter)
-            throws Exception;
+    void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionCreated(IoSession)} event.
      */
-    void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception;
+    void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionOpened(IoSession)} event.
      */
-    void sessionOpened(NextFilter nextFilter, IoSession session)
-            throws Exception;
+    void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionClosed(IoSession)} event.
      */
-    void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception;
+    void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionIdle(IoSession,IdleStatus)}
      * event.
      */
-    void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status)
-            throws Exception;
+    void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception;
 
     /**
      * Filters {@link IoHandler#exceptionCaught(IoSession,Throwable)}
      * event.
      */
-    void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) throws Exception;
+    void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception;
 
     /**
      * Filters {@link IoHandler#messageReceived(IoSession,Object)}
      * event.
      */
-    void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception;
+    void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception;
 
     /**
      * Filters {@link IoHandler#messageSent(IoSession,Object)}
      * event.
      */
-    void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception;
+    void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception;
 
     /**
      * Filters {@link IoSession#close()} method invocation.
@@ -203,9 +192,8 @@ public interface IoFilter {
     /**
      * Filters {@link IoSession#write(Object)} method invocation.
      */
-    void filterWrite(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception;
-    
+    void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception;
+
     /**
      * Represents the next {@link IoFilter} in {@link IoFilterChain}.
      */
@@ -254,6 +242,6 @@ public interface IoFilter {
          * Forwards <tt>filterClose</tt> event to next filter.
          */
         void filterClose(IoSession session);
-        
+
     }
 }

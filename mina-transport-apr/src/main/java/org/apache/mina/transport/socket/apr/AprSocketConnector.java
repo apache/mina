@@ -58,23 +58,29 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     /** 
      * This constant is deduced from the APR code. It is used when the timeout
      * has expired while doing a poll() operation.
-     */ 
+     */
     private static final int APR_TIMEUP_ERROR = -120001;
 
     private static final int POLLSET_SIZE = 1024;
 
-    private final Map<Long, ConnectionRequest> requests =
-        new HashMap<Long, ConnectionRequest>(POLLSET_SIZE);
+    private final Map<Long, ConnectionRequest> requests = new HashMap<Long, ConnectionRequest>(POLLSET_SIZE);
 
     private final Object wakeupLock = new Object();
+
     private volatile long wakeupSocket;
+
     private volatile boolean toBeWakenUp;
 
     private volatile long pool;
+
     private volatile long pollset; // socket poller
+
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
+
     private final Queue<Long> polledHandles = new ConcurrentLinkedQueue<Long>();
+
     private final Set<Long> failedHandles = new HashSet<Long>(POLLSET_SIZE);
+
     private volatile ByteBuffer dummyBuffer;
 
     /**
@@ -127,29 +133,19 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         // initialize a memory pool for APR functions
         pool = Pool.create(AprLibrary.getInstance().getRootPool());
 
-        wakeupSocket = Socket.create(
-                Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
+        wakeupSocket = Socket.create(Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
 
         dummyBuffer = Pool.alloc(pool, 1);
 
-        pollset = Poll.create(
-                        POLLSET_SIZE,
-                        pool,
-                        Poll.APR_POLLSET_THREADSAFE,
-                        Long.MAX_VALUE);
+        pollset = Poll.create(POLLSET_SIZE, pool, Poll.APR_POLLSET_THREADSAFE, Long.MAX_VALUE);
 
         if (pollset <= 0) {
-            pollset = Poll.create(
-                    62,
-                    pool,
-                    Poll.APR_POLLSET_THREADSAFE,
-                    Long.MAX_VALUE);
+            pollset = Poll.create(62, pool, Poll.APR_POLLSET_THREADSAFE, Long.MAX_VALUE);
         }
 
         if (pollset <= 0) {
-            if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
-                throw new RuntimeIoException(
-                        "Thread-safe pollset is not supported in this platform.");
+            if (Status.APR_STATUS_IS_ENOTIMPL(-(int) pollset)) {
+                throw new RuntimeIoException("Thread-safe pollset is not supported in this platform.");
             }
         }
     }
@@ -182,8 +178,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      * {@inheritDoc}
      */
     @Override
-    protected boolean connect(Long handle, SocketAddress remoteAddress)
-            throws Exception {
+    protected boolean connect(Long handle, SocketAddress remoteAddress) throws Exception {
         InetSocketAddress ra = (InetSocketAddress) remoteAddress;
         long sa;
         if (ra != null) {
@@ -228,7 +223,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
             throwException(rv);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -249,8 +244,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      */
     @Override
     protected Long newHandle(SocketAddress localAddress) throws Exception {
-        long handle = Socket.create(
-                Socket.APR_INET, Socket.SOCK_STREAM, Socket.APR_PROTO_TCP, pool);
+        long handle = Socket.create(Socket.APR_INET, Socket.SOCK_STREAM, Socket.APR_PROTO_TCP, pool);
         boolean success = false;
         try {
             int result = Socket.optSet(handle, Socket.APR_SO_NONBLOCK, 1);
@@ -294,8 +288,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      * {@inheritDoc}
      */
     @Override
-    protected AprSession newSession(IoProcessor<AprSession> processor,
-            Long handle) throws Exception {
+    protected AprSession newSession(IoProcessor<AprSession> processor, Long handle) throws Exception {
         return new AprSocketSession(this, processor, handle);
     }
 
@@ -303,8 +296,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      * {@inheritDoc}
      */
     @Override
-    protected void register(Long handle, ConnectionRequest request)
-            throws Exception {
+    protected void register(Long handle, ConnectionRequest request) throws Exception {
         int rv = Poll.add(pollset, handle, Poll.APR_POLLOUT);
         if (rv != Status.APR_SUCCESS) {
             throwException(rv);
@@ -326,7 +318,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
 
             rv = Poll.maintain(pollset, polledSockets, true);
             if (rv > 0) {
-                for (int i = 0; i < rv; i ++) {
+                for (int i = 0; i < rv; i++) {
                     Poll.add(pollset, polledSockets[i], Poll.APR_POLLOUT);
                 }
             } else if (rv < 0) {
@@ -340,7 +332,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
                 polledHandles.clear();
             }
 
-            for (int i = 0; i < rv; i ++) {
+            for (int i = 0; i < rv; i++) {
                 long flag = polledSockets[i];
                 long socket = polledSockets[++i];
                 if (socket == wakeupSocket) {
@@ -366,7 +358,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     protected Iterator<Long> selectedHandles() {
         return polledHandles.iterator();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -419,8 +411,6 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
      * @throws IOException the produced exception for the given APR error number
      */
     private void throwException(int code) throws IOException {
-        throw new IOException(
-                org.apache.tomcat.jni.Error.strerror(-code) +
-                " (code: " + code + ")");
+        throw new IOException(org.apache.tomcat.jni.Error.strerror(-code) + " (code: " + code + ")");
     }
 }

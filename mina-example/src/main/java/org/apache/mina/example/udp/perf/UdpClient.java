@@ -123,9 +123,9 @@ public class UdpClient extends IoHandlerAdapter {
         long t0 = System.currentTimeMillis();
 
         for (int i = 0; i <= UdpServer.MAX_RECEIVED; i++) {
-            if (i % 10 == 0) {
-                Thread.sleep(1);
-            }
+            //if (i % 2 == 0) {
+            Thread.sleep(1);
+            //}
 
             String str = Integer.toString(i);
             byte[] data = str.getBytes();

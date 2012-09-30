@@ -81,7 +81,7 @@ public class WrappingFilterTest {
         nextFilter.sessionClosed(session);
 
         /* replay */
-        EasyMock.replay( nextFilter );
+        EasyMock.replay(nextFilter);
         wrappingFilter.sessionCreated(nextFilter, session);
         wrappingFilter.sessionOpened(nextFilter, session);
         wrappingFilter.sessionIdle(nextFilter, session, IdleStatus.READER_IDLE);
@@ -89,13 +89,13 @@ public class WrappingFilterTest {
         wrappingFilter.messageSent(nextFilter, session, writeRequest1);
         wrappingFilter.messageSent(nextFilter, session, writeRequest2);
         wrappingFilter.messageReceived(nextFilter, session, message2);
-        wrappingFilter.filterWrite(nextFilter,session, writeRequest1);
+        wrappingFilter.filterWrite(nextFilter, session, writeRequest1);
         wrappingFilter.filterClose(nextFilter, session);
         wrappingFilter.exceptionCaught(nextFilter, session, cause);
         wrappingFilter.sessionClosed(nextFilter, session);
 
         /* verify */
-        EasyMock.verify( nextFilter );
+        EasyMock.verify(nextFilter);
 
         /* check event lists */
         assertEquals(11, wrappingFilter.eventsBefore.size());
@@ -110,9 +110,8 @@ public class WrappingFilterTest {
         assertEquals(IoEventType.CLOSE, wrappingFilter.eventsBefore.get(8));
         assertEquals(IoEventType.EXCEPTION_CAUGHT, wrappingFilter.eventsBefore.get(9));
         assertEquals(IoEventType.SESSION_CLOSED, wrappingFilter.eventsBefore.get(10));
-        assertEquals(wrappingFilter.eventsBefore,  wrappingFilter.eventsAfter);
+        assertEquals(wrappingFilter.eventsBefore, wrappingFilter.eventsAfter);
     }
-
 
     private static class MyWrappingFilter extends CommonEventFilter {
         List<IoEventType> eventsBefore = new ArrayList<IoEventType>();
@@ -125,7 +124,7 @@ public class WrappingFilterTest {
         public MyWrappingFilter() {
             super();
         }
-        
+
         @Override
         protected void filter(IoFilterEvent event) {
             eventsBefore.add(event.getType());

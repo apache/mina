@@ -53,15 +53,13 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
         return decoder;
     }
 
-    public void decode(IoSession session, IoBuffer in,
-            ProtocolDecoderOutput out) throws Exception {
+    public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         synchronized (decoder) {
             decoder.decode(session, in, out);
         }
     }
 
-    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
-            throws Exception {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         synchronized (decoder) {
             decoder.finishDecode(session, out);
         }

@@ -45,17 +45,12 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
-public abstract class AbstractHttpLogicHandler extends
-        AbstractProxyLogicHandler {
-    private final static Logger LOGGER = LoggerFactory
-            .getLogger(AbstractHttpLogicHandler.class);
+public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler {
+    private final static Logger LOGGER = LoggerFactory.getLogger(AbstractHttpLogicHandler.class);
 
-    private final static String DECODER = AbstractHttpLogicHandler.class
-            .getName()
-            + ".Decoder";
+    private final static String DECODER = AbstractHttpLogicHandler.class.getName() + ".Decoder";
 
-    private final static byte[] HTTP_DELIMITER = new byte[] { '\r', '\n', '\r',
-            '\n' };
+    private final static byte[] HTTP_DELIMITER = new byte[] { '\r', '\n', '\r', '\n' };
 
     private final static byte[] CRLF_DELIMITER = new byte[] { '\r', '\n' };
 
@@ -120,12 +115,10 @@ public abstract class AbstractHttpLogicHandler extends
      * @param nextFilter the next filter
      * @param buf the buffer holding received data
      */
-    public synchronized void messageReceived(final NextFilter nextFilter,
-            final IoBuffer buf) throws ProxyAuthException {
+    public synchronized void messageReceived(final NextFilter nextFilter, final IoBuffer buf) throws ProxyAuthException {
         LOGGER.debug(" messageReceived()");
 
-        IoBufferDecoder decoder = (IoBufferDecoder) getSession().getAttribute(
-                DECODER);
+        IoBufferDecoder decoder = (IoBufferDecoder) getSession().getAttribute(DECODER);
         if (decoder == null) {
             decoder = new IoBufferDecoder(HTTP_DELIMITER);
             getSession().setAttribute(DECODER, decoder);
@@ -140,35 +133,30 @@ public abstract class AbstractHttpLogicHandler extends
                 }
 
                 // Handle the response                                
-                String responseHeader = responseData
-                        .getString(getProxyIoSession().getCharset()
-                                .newDecoder());
+                String responseHeader = responseData.getString(getProxyIoSession().getCharset().newDecoder());
                 entityBodyStartPosition = responseData.position();
 
-                LOGGER.debug("  response header received:\n{}", responseHeader
-                        .replace("\r", "\\r").replace("\n", "\\n\n"));
+                LOGGER.debug("  response header received:\n{}",
+                        responseHeader.replace("\r", "\\r").replace("\n", "\\n\n"));
 
                 // Parse the response
                 parsedResponse = decodeResponse(responseHeader);
 
                 // Is handshake complete ?
                 if (parsedResponse.getStatusCode() == 200
-                        || (parsedResponse.getStatusCode() >= 300 && parsedResponse
-                                .getStatusCode() <= 307)) {
+                        || (parsedResponse.getStatusCode() >= 300 && parsedResponse.getStatusCode() <= 307)) {
                     buf.position(0);
                     setHandshakeComplete();
                     return;
                 }
 
-                String contentLengthHeader = StringUtilities
-                        .getSingleValuedHeader(parsedResponse.getHeaders(),
-                                "Content-Length");
+                String contentLengthHeader = StringUtilities.getSingleValuedHeader(parsedResponse.getHeaders(),
+                        "Content-Length");
 
                 if (contentLengthHeader == null) {
                     contentLength = 0;
                 } else {
-                    contentLength = Integer
-                            .parseInt(contentLengthHeader.trim());
+                    contentLength = Integer.parseInt(contentLengthHeader.trim());
                     decoder.setContentLength(contentLength, true);
                 }
             }
@@ -184,9 +172,8 @@ public abstract class AbstractHttpLogicHandler extends
                     contentLength = 0;
                 }
 
-                if ("chunked".equalsIgnoreCase(StringUtilities
-                        .getSingleValuedHeader(parsedResponse.getHeaders(),
-                                "Transfer-Encoding"))) {
+                if ("chunked".equalsIgnoreCase(StringUtilities.getSingleValuedHeader(parsedResponse.getHeaders(),
+                        "Transfer-Encoding"))) {
                     // Handle Transfer-Encoding: Chunked
                     LOGGER.debug("Retrieving additional http response chunks");
                     hasChunkedData = true;
@@ -204,14 +191,12 @@ public abstract class AbstractHttpLogicHandler extends
                             return;
                         }
 
-                        String chunkSize = tmp.getString(getProxyIoSession()
-                                .getCharset().newDecoder());
+                        String chunkSize = tmp.getString(getProxyIoSession().getCharset().newDecoder());
                         int pos = chunkSize.indexOf(';');
                         if (pos >= 0) {
                             chunkSize = chunkSize.substring(0, pos);
                         } else {
-                            chunkSize = chunkSize.substring(0, chunkSize
-                                    .length() - 2);
+                            chunkSize = chunkSize.substring(0, chunkSize.length() - 2);
                         }
                         contentLength = Integer.decode("0x" + chunkSize);
                         if (contentLength > 0) {
@@ -250,11 +235,9 @@ public abstract class AbstractHttpLogicHandler extends
                     }
 
                     // add footer to headers                    
-                    String footer = tmp.getString(getProxyIoSession()
-                            .getCharset().newDecoder());
+                    String footer = tmp.getString(getProxyIoSession().getCharset().newDecoder());
                     String[] f = footer.split(":\\s?", 2);
-                    StringUtilities.addValueToHeader(parsedResponse
-                            .getHeaders(), f[0], f[1], false);
+                    StringUtilities.addValueToHeader(parsedResponse.getHeaders(), f[0], f[1], false);
                     responseData.put(tmp);
                     responseData.put(CRLF_DELIMITER);
                 }
@@ -263,14 +246,12 @@ public abstract class AbstractHttpLogicHandler extends
             responseData.flip();
 
             LOGGER.debug("  end of response received:\n{}",
-                    responseData.getString(getProxyIoSession().getCharset()
-                            .newDecoder()));
+                    responseData.getString(getProxyIoSession().getCharset().newDecoder()));
 
             // Retrieve entity body content
             responseData.position(entityBodyStartPosition);
             responseData.limit(entityBodyLimitPosition);
-            parsedResponse.setBody(responseData.getString(getProxyIoSession()
-                    .getCharset().newDecoder()));
+            parsedResponse.setBody(responseData.getString(getProxyIoSession().getCharset().newDecoder()));
 
             // Free the response buffer
             responseData.free();
@@ -300,8 +281,7 @@ public abstract class AbstractHttpLogicHandler extends
      * 
      * @param response The response.
      */
-    public abstract void handleResponse(final HttpProxyResponse response)
-            throws ProxyAuthException;
+    public abstract void handleResponse(final HttpProxyResponse response) throws ProxyAuthException;
 
     /**
      * Calls{@link #writeRequest0(NextFilter, HttpProxyRequest)} to write the request. 
@@ -310,8 +290,7 @@ public abstract class AbstractHttpLogicHandler extends
      * @param nextFilter the next filter
      * @param request the http request
      */
-    public void writeRequest(final NextFilter nextFilter,
-            final HttpProxyRequest request) {
+    public void writeRequest(final NextFilter nextFilter, final HttpProxyRequest request) {
         ProxyIoSession proxyIoSession = getProxyIoSession();
 
         if (proxyIoSession.isReconnectionNeeded()) {
@@ -327,15 +306,12 @@ public abstract class AbstractHttpLogicHandler extends
      * @param nextFilter the next filter
      * @param request the http request
      */
-    private void writeRequest0(final NextFilter nextFilter,
-            final HttpProxyRequest request) {
+    private void writeRequest0(final NextFilter nextFilter, final HttpProxyRequest request) {
         try {
             String data = request.toHttpString();
-            IoBuffer buf = IoBuffer.wrap(data.getBytes(getProxyIoSession()
-                    .getCharsetName()));
+            IoBuffer buf = IoBuffer.wrap(data.getBytes(getProxyIoSession().getCharsetName()));
 
-            LOGGER.debug("   write:\n{}", data.replace("\r", "\\r").replace(
-                    "\n", "\\n\n"));
+            LOGGER.debug("   write:\n{}", data.replace("\r", "\\r").replace("\n", "\\n\n"));
 
             writeData(nextFilter, buf);
 
@@ -351,35 +327,28 @@ public abstract class AbstractHttpLogicHandler extends
      * @param nextFilter the next filter
      * @param request the http request
      */
-    private void reconnect(final NextFilter nextFilter,
-            final HttpProxyRequest request) {
+    private void reconnect(final NextFilter nextFilter, final HttpProxyRequest request) {
         LOGGER.debug("Reconnecting to proxy ...");
 
         final ProxyIoSession proxyIoSession = getProxyIoSession();
 
         // Fires reconnection
-        proxyIoSession.getConnector().connect(
-                new IoSessionInitializer<ConnectFuture>() {
-                    public void initializeSession(final IoSession session,
-                            ConnectFuture future) {
-                        LOGGER.debug("Initializing new session: {}", session);
-                        session.setAttribute(ProxyIoSession.PROXY_SESSION,
-                                proxyIoSession);
-                        proxyIoSession.setSession(session);
-                        LOGGER.debug("  setting up proxyIoSession: {}", proxyIoSession);
-                        future
-                                .addListener(new IoFutureListener<ConnectFuture>() {
-                                    public void operationComplete(
-                                            ConnectFuture future) {
-                                        // Reconnection is done so we send the
-                                        // request to the proxy
-                                        proxyIoSession
-                                                .setReconnectionNeeded(false);
-                                        writeRequest0(nextFilter, request);
-                                    }
-                                });
+        proxyIoSession.getConnector().connect(new IoSessionInitializer<ConnectFuture>() {
+            public void initializeSession(final IoSession session, ConnectFuture future) {
+                LOGGER.debug("Initializing new session: {}", session);
+                session.setAttribute(ProxyIoSession.PROXY_SESSION, proxyIoSession);
+                proxyIoSession.setSession(session);
+                LOGGER.debug("  setting up proxyIoSession: {}", proxyIoSession);
+                future.addListener(new IoFutureListener<ConnectFuture>() {
+                    public void operationComplete(ConnectFuture future) {
+                        // Reconnection is done so we send the
+                        // request to the proxy
+                        proxyIoSession.setReconnectionNeeded(false);
+                        writeRequest0(nextFilter, request);
                     }
                 });
+            }
+        });
     }
 
     /**
@@ -387,8 +356,7 @@ public abstract class AbstractHttpLogicHandler extends
      * 
      * @param response The response string.
      */
-    protected HttpProxyResponse decodeResponse(final String response)
-            throws Exception {
+    protected HttpProxyResponse decodeResponse(final String response) throws Exception {
         LOGGER.debug("  parseResponse()");
 
         // Break response into lines
@@ -400,14 +368,12 @@ public abstract class AbstractHttpLogicHandler extends
         String[] statusLine = responseLines[0].trim().split(" ", 2);
 
         if (statusLine.length < 2) {
-            throw new Exception("Invalid response status line (" + statusLine
-                    + "). Response: " + response);
+            throw new Exception("Invalid response status line (" + statusLine + "). Response: " + response);
         }
 
         // Status code is 3 digits
         if (statusLine[1].matches("^\\d\\d\\d")) {
-            throw new Exception("Invalid response code (" + statusLine[1]
-                    + "). Response: " + response);
+            throw new Exception("Invalid response code (" + statusLine[1] + "). Response: " + response);
         }
 
         Map<String, List<String>> headers = new HashMap<String, List<String>>();

@@ -44,38 +44,38 @@ import org.slf4j.LoggerFactory;
 public class LoggingFilter extends IoFilterAdapter {
     /** The logger name */
     private final String name;
-    
+
     /** The logger */
     private final Logger logger;
-    
+
     /** The log level for the exceptionCaught event. Default to WARN. */
     private LogLevel exceptionCaughtLevel = LogLevel.WARN;
-    
+
     /** The log level for the messageSent event. Default to INFO. */
     private LogLevel messageSentLevel = LogLevel.INFO;
-    
+
     /** The log level for the messageReceived event. Default to INFO. */
     private LogLevel messageReceivedLevel = LogLevel.INFO;
-    
+
     /** The log level for the sessionCreated event. Default to INFO. */
     private LogLevel sessionCreatedLevel = LogLevel.INFO;
-    
+
     /** The log level for the sessionOpened event. Default to INFO. */
     private LogLevel sessionOpenedLevel = LogLevel.INFO;
-    
+
     /** The log level for the sessionIdle event. Default to INFO. */
     private LogLevel sessionIdleLevel = LogLevel.INFO;
-    
+
     /** The log level for the sessionClosed event. Default to INFO. */
     private LogLevel sessionClosedLevel = LogLevel.INFO;
-    
+
     /**
      * Default Constructor.
      */
     public LoggingFilter() {
         this(LoggingFilter.class.getName());
     }
-    
+
     /**
      * Create a new NoopFilter using a class name
      * 
@@ -96,7 +96,7 @@ public class LoggingFilter extends IoFilterAdapter {
         } else {
             this.name = name;
         }
-        
+
         logger = LoggerFactory.getLogger(this.name);
     }
 
@@ -106,7 +106,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public String getName() {
         return name;
     }
-    
+
     /**
      * Log if the logger and the current event log level are compatible. We log
      * a message and an exception.
@@ -117,12 +117,23 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     private void log(LogLevel eventLevel, String message, Throwable cause) {
         switch (eventLevel) {
-            case TRACE : logger.trace(message, cause); return;
-            case DEBUG : logger.debug(message, cause); return;
-            case INFO  : logger.info(message, cause); return;
-            case WARN  : logger.warn(message, cause); return;
-            case ERROR : logger.error(message, cause); return;
-            default    : return;
+        case TRACE:
+            logger.trace(message, cause);
+            return;
+        case DEBUG:
+            logger.debug(message, cause);
+            return;
+        case INFO:
+            logger.info(message, cause);
+            return;
+        case WARN:
+            logger.warn(message, cause);
+            return;
+        case ERROR:
+            logger.error(message, cause);
+            return;
+        default:
+            return;
         }
     }
 
@@ -136,12 +147,23 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     private void log(LogLevel eventLevel, String message, Object param) {
         switch (eventLevel) {
-            case TRACE : logger.trace(message, param); return;
-            case DEBUG : logger.debug(message, param); return;
-            case INFO  : logger.info(message, param); return;
-            case WARN  : logger.warn(message, param); return;
-            case ERROR : logger.error(message, param); return;
-            default    : return;
+        case TRACE:
+            logger.trace(message, param);
+            return;
+        case DEBUG:
+            logger.debug(message, param);
+            return;
+        case INFO:
+            logger.info(message, param);
+            return;
+        case WARN:
+            logger.warn(message, param);
+            return;
+        case ERROR:
+            logger.error(message, param);
+            return;
+        default:
+            return;
         }
     }
 
@@ -154,53 +176,58 @@ public class LoggingFilter extends IoFilterAdapter {
      */
     private void log(LogLevel eventLevel, String message) {
         switch (eventLevel) {
-            case TRACE : logger.trace(message); return;
-            case DEBUG : logger.debug(message); return;
-            case INFO  : logger.info(message); return;
-            case WARN  : logger.warn(message); return;
-            case ERROR : logger.error(message); return;
-            default    : return;
+        case TRACE:
+            logger.trace(message);
+            return;
+        case DEBUG:
+            logger.debug(message);
+            return;
+        case INFO:
+            logger.info(message);
+            return;
+        case WARN:
+            logger.warn(message);
+            return;
+        case ERROR:
+            logger.error(message);
+            return;
+        default:
+            return;
         }
     }
 
     @Override
-    public void exceptionCaught(NextFilter nextFilter, IoSession session,
-            Throwable cause) throws Exception {
+    public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
         log(exceptionCaughtLevel, "EXCEPTION :", cause);
         nextFilter.exceptionCaught(session, cause);
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
-        log(messageReceivedLevel, "RECEIVED: {}", message );
+    public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
+        log(messageReceivedLevel, "RECEIVED: {}", message);
         nextFilter.messageReceived(session, message);
     }
 
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws Exception {
-        log(messageSentLevel, "SENT: {}", writeRequest.getMessage() );
+    public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+        log(messageSentLevel, "SENT: {}", writeRequest.getMessage());
         nextFilter.messageSent(session, writeRequest);
     }
 
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         log(sessionCreatedLevel, "CREATED");
         nextFilter.sessionCreated(session);
     }
 
     @Override
-    public void sessionOpened(NextFilter nextFilter, IoSession session)
-    throws Exception {
+    public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
         log(sessionOpenedLevel, "OPENED");
         nextFilter.sessionOpened(session);
     }
 
     @Override
-    public void sessionIdle(NextFilter nextFilter, IoSession session,
-            IdleStatus status) throws Exception {
+    public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         log(sessionIdleLevel, "IDLE");
         nextFilter.sessionIdle(session, status);
     }
@@ -210,7 +237,7 @@ public class LoggingFilter extends IoFilterAdapter {
         log(sessionClosedLevel, "CLOSED");
         nextFilter.sessionClosed(session);
     }
-    
+
     /**
      * Set the LogLevel for the ExceptionCaught event.
      * 
@@ -219,7 +246,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void setExceptionCaughtLogLevel(LogLevel level) {
         exceptionCaughtLevel = level;
     }
-    
+
     /**
      * Get the LogLevel for the ExceptionCaught event.
      * 
@@ -228,7 +255,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public LogLevel getExceptionCaughtLogLevel() {
         return exceptionCaughtLevel;
     }
-    
+
     /**
      * Set the LogLevel for the MessageReceived event.
      * 
@@ -237,7 +264,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void setMessageReceivedLogLevel(LogLevel level) {
         messageReceivedLevel = level;
     }
-    
+
     /**
      * Get the LogLevel for the MessageReceived event.
      * 
@@ -246,7 +273,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public LogLevel getMessageReceivedLogLevel() {
         return messageReceivedLevel;
     }
-    
+
     /**
      * Set the LogLevel for the MessageSent event.
      * 
@@ -255,7 +282,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void setMessageSentLogLevel(LogLevel level) {
         messageSentLevel = level;
     }
-    
+
     /**
      * Get the LogLevel for the MessageSent event.
      * 
@@ -264,7 +291,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public LogLevel getMessageSentLogLevel() {
         return messageSentLevel;
     }
-    
+
     /**
      * Set the LogLevel for the SessionCreated event.
      * 
@@ -273,7 +300,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void setSessionCreatedLogLevel(LogLevel level) {
         sessionCreatedLevel = level;
     }
-    
+
     /**
      * Get the LogLevel for the SessionCreated event.
      * 
@@ -282,7 +309,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public LogLevel getSessionCreatedLogLevel() {
         return sessionCreatedLevel;
     }
-    
+
     /**
      * Set the LogLevel for the SessionOpened event.
      * 
@@ -291,7 +318,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void setSessionOpenedLogLevel(LogLevel level) {
         sessionOpenedLevel = level;
     }
-    
+
     /**
      * Get the LogLevel for the SessionOpened event.
      * 
@@ -300,7 +327,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public LogLevel getSessionOpenedLogLevel() {
         return sessionOpenedLevel;
     }
-    
+
     /**
      * Set the LogLevel for the SessionIdle event.
      * 
@@ -309,7 +336,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public void setSessionIdleLogLevel(LogLevel level) {
         sessionIdleLevel = level;
     }
-    
+
     /**
      * Get the LogLevel for the SessionIdle event.
      * 
@@ -318,7 +345,7 @@ public class LoggingFilter extends IoFilterAdapter {
     public LogLevel getSessionIdleLogLevel() {
         return sessionIdleLevel;
     }
-    
+
     /**
      * Set the LogLevel for the SessionClosed event.
      * 

@@ -103,8 +103,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     protected void init(NioSession session) throws Exception {
         SelectableChannel ch = (SelectableChannel) session.getChannel();
         ch.configureBlocking(false);
-        session.setSelectionKey(ch.register(selector, SelectionKey.OP_READ,
-                session));
+        session.setSelectionKey(ch.register(selector, SelectionKey.OP_READ, session));
     }
 
     @Override
@@ -116,7 +115,6 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         }
         ch.close();
     }
-
 
     /**
      * In the case we are using the java select() method, this method is used to
@@ -136,9 +134,9 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
                 SelectableChannel ch = key.channel();
 
                 // Don't forget to attache the session, and back !
-                NioSession session = (NioSession)key.attachment();
+                NioSession session = (NioSession) key.attachment();
                 SelectionKey newKey = ch.register(newSelector, key.interestOps(), session);
-                session.setSelectionKey( newKey );
+                session.setSelectionKey(newKey);
             }
 
             // Now we can close the old selector and switch it
@@ -164,10 +162,8 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             for (SelectionKey key : keys) {
                 SelectableChannel channel = key.channel();
 
-                if ((((channel instanceof DatagramChannel) && !((DatagramChannel) channel)
-                        .isConnected()))
-                        || ((channel instanceof SocketChannel) && !((SocketChannel) channel)
-                                .isConnected())) {
+                if ((((channel instanceof DatagramChannel) && !((DatagramChannel) channel).isConnected()))
+                        || ((channel instanceof SocketChannel) && !((SocketChannel) channel).isConnected())) {
                     // The channel is not connected anymore. Cancel
                     // the associated key then.
                     key.cancel();
@@ -217,22 +213,20 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     @Override
     protected boolean isInterestedInRead(NioSession session) {
         SelectionKey key = session.getSelectionKey();
-        return key.isValid() && ( (key.interestOps() & SelectionKey.OP_READ) != 0 );
+        return key.isValid() && ((key.interestOps() & SelectionKey.OP_READ) != 0);
     }
 
     @Override
     protected boolean isInterestedInWrite(NioSession session) {
         SelectionKey key = session.getSelectionKey();
-        return key.isValid()
-                && ( (key.interestOps() & SelectionKey.OP_WRITE) != 0 );
+        return key.isValid() && ((key.interestOps() & SelectionKey.OP_WRITE) != 0);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void setInterestedInRead(NioSession session, boolean isInterested)
-            throws Exception {
+    protected void setInterestedInRead(NioSession session, boolean isInterested) throws Exception {
         SelectionKey key = session.getSelectionKey();
         int oldInterestOps = key.interestOps();
         int newInterestOps = oldInterestOps;
@@ -252,8 +246,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
      * {@inheritDoc}
      */
     @Override
-    protected void setInterestedInWrite(NioSession session, boolean isInterested)
-            throws Exception {
+    protected void setInterestedInWrite(NioSession session, boolean isInterested) throws Exception {
         SelectionKey key = session.getSelectionKey();
 
         if (key == null) {
@@ -281,8 +274,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected int write(NioSession session, IoBuffer buf, int length)
-            throws Exception {
+    protected int write(NioSession session, IoBuffer buf, int length) throws Exception {
         if (buf.remaining() <= length) {
             return session.getChannel().write(buf.buf());
         }
@@ -297,16 +289,14 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected int transferFile(NioSession session, FileRegion region, int length)
-            throws Exception {
+    protected int transferFile(NioSession session, FileRegion region, int length) throws Exception {
         try {
-            return (int) region.getFileChannel().transferTo(
-                    region.getPosition(), length, session.getChannel());
+            return (int) region.getFileChannel().transferTo(region.getPosition(), length, session.getChannel());
         } catch (IOException e) {
             // Check to see if the IOException is being thrown due to
             // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5103988
             String message = e.getMessage();
-            if (( message != null ) && message.contains("temporarily unavailable")) {
+            if ((message != null) && message.contains("temporarily unavailable")) {
                 return 0;
             }
 
@@ -318,8 +308,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
      * An encapsulating iterator around the {@link Selector#selectedKeys()} or
      * the {@link Selector#keys()} iterator;
      */
-    protected static class IoSessionIterator<NioSession> implements
-            Iterator<NioSession> {
+    protected static class IoSessionIterator<NioSession> implements Iterator<NioSession> {
         private final Iterator<SelectionKey> iterator;
 
         /**

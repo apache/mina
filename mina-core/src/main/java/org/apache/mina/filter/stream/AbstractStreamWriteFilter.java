@@ -48,24 +48,21 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     protected final AttributeKey CURRENT_STREAM = new AttributeKey(getClass(), "stream");
 
     protected final AttributeKey WRITE_REQUEST_QUEUE = new AttributeKey(getClass(), "queue");
+
     protected final AttributeKey CURRENT_WRITE_REQUEST = new AttributeKey(getClass(), "writeRequest");
 
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
 
-
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         Class<? extends IoFilterAdapter> clazz = getClass();
         if (parent.contains(clazz)) {
-            throw new IllegalStateException(
-                    "Only one " + clazz.getName() + " is permitted.");
+            throw new IllegalStateException("Only one " + clazz.getName() + " is permitted.");
         }
     }
 
     @Override
-    public void filterWrite(NextFilter nextFilter, IoSession session,
-                            WriteRequest writeRequest) throws Exception {
+    public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         // If we're already processing a stream we need to queue the WriteRequest.
         if (session.getAttribute(CURRENT_STREAM) != null) {
             Queue<WriteRequest> queue = getWriteRequestQueue(session);
@@ -92,15 +89,14 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
                 session.setAttribute(CURRENT_STREAM, message);
                 session.setAttribute(CURRENT_WRITE_REQUEST, writeRequest);
 
-                nextFilter.filterWrite(session, new DefaultWriteRequest(
-                        buffer));
+                nextFilter.filterWrite(session, new DefaultWriteRequest(buffer));
             }
 
         } else {
             nextFilter.filterWrite(session, writeRequest);
         }
     }
-    
+
     abstract protected Class<T> getMessageClass();
 
     @SuppressWarnings("unchecked")
@@ -112,10 +108,9 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     private Queue<WriteRequest> removeWriteRequestQueue(IoSession session) {
         return (Queue<WriteRequest>) session.removeAttribute(WRITE_REQUEST_QUEUE);
     }
-    
+
     @Override
-    public void messageSent(NextFilter nextFilter, IoSession session,
-                            WriteRequest writeRequest) throws Exception {
+    public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         T stream = getMessageClass().cast(session.getAttribute(CURRENT_STREAM));
 
         if (stream == null) {
@@ -126,8 +121,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
             if (buffer == null) {
                 // End of stream reached.
                 session.removeAttribute(CURRENT_STREAM);
-                WriteRequest currentWriteRequest = (WriteRequest) session
-                        .removeAttribute(CURRENT_WRITE_REQUEST);
+                WriteRequest currentWriteRequest = (WriteRequest) session.removeAttribute(CURRENT_WRITE_REQUEST);
 
                 // Write queued WriteRequests.
                 Queue<WriteRequest> queue = removeWriteRequestQueue(session);
@@ -142,8 +136,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
                 currentWriteRequest.getFuture().setWritten();
                 nextFilter.messageSent(session, currentWriteRequest);
             } else {
-                nextFilter.filterWrite(session, new DefaultWriteRequest(
-                        buffer));
+                nextFilter.filterWrite(session, new DefaultWriteRequest(buffer));
             }
         }
     }
@@ -166,8 +159,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
      */
     public void setWriteBufferSize(int writeBufferSize) {
         if (writeBufferSize < 1) {
-            throw new IllegalArgumentException(
-                    "writeBufferSize must be at least 1");
+            throw new IllegalArgumentException("writeBufferSize must be at least 1");
         }
         this.writeBufferSize = writeBufferSize;
     }

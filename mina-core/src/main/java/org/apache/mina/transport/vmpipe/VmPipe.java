@@ -36,8 +36,7 @@ class VmPipe {
 
     private final IoServiceListenerSupport listeners;
 
-    VmPipe(VmPipeAcceptor acceptor, VmPipeAddress address,
-            IoHandler handler, IoServiceListenerSupport listeners) {
+    VmPipe(VmPipeAcceptor acceptor, VmPipeAddress address, IoHandler handler, IoServiceListenerSupport listeners) {
         this.acceptor = acceptor;
         this.address = address;
         this.handler = handler;

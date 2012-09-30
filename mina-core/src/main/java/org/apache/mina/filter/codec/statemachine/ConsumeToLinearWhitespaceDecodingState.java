@@ -25,8 +25,7 @@ package org.apache.mina.filter.codec.statemachine;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class ConsumeToLinearWhitespaceDecodingState extends
-        ConsumeToDynamicTerminatorDecodingState {
+public abstract class ConsumeToLinearWhitespaceDecodingState extends ConsumeToDynamicTerminatorDecodingState {
 
     /**
      * @return <code>true</code> if the given byte is a space or a tab

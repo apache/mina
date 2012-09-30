@@ -44,8 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
 
-    private final static Logger LOGGER = LoggerFactory
-            .getLogger(HttpNTLMAuthLogicHandler.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(HttpNTLMAuthLogicHandler.class);
 
     /**
      * The challenge provided by the server.
@@ -55,14 +54,11 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
     /**
      * {@inheritDoc}
      */
-    public HttpNTLMAuthLogicHandler(final ProxyIoSession proxyIoSession)
-            throws ProxyAuthException {
+    public HttpNTLMAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);
 
-        ((HttpProxyRequest) request).checkRequiredProperties(
-                HttpProxyConstants.USER_PROPERTY,
-                HttpProxyConstants.PWD_PROPERTY,
-                HttpProxyConstants.DOMAIN_PROPERTY,
+        ((HttpProxyRequest) request).checkRequiredProperties(HttpProxyConstants.USER_PROPERTY,
+                HttpProxyConstants.PWD_PROPERTY, HttpProxyConstants.DOMAIN_PROPERTY,
                 HttpProxyConstants.WORKSTATION_PROPERTY);
     }
 
@@ -76,55 +72,39 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
         if (step > 0 && challengePacket == null) {
             throw new IllegalStateException("NTLM Challenge packet not received");
         }
-        
-        HttpProxyRequest req = (HttpProxyRequest) request;
-        Map<String, List<String>> headers = req.getHeaders() != null ? req
-                .getHeaders() : new HashMap<String, List<String>>();
 
-        String domain = req.getProperties().get(
-                HttpProxyConstants.DOMAIN_PROPERTY);
-        String workstation = req.getProperties().get(
-                HttpProxyConstants.WORKSTATION_PROPERTY);
+        HttpProxyRequest req = (HttpProxyRequest) request;
+        Map<String, List<String>> headers = req.getHeaders() != null ? req.getHeaders()
+                : new HashMap<String, List<String>>();
+
+        String domain = req.getProperties().get(HttpProxyConstants.DOMAIN_PROPERTY);
+        String workstation = req.getProperties().get(HttpProxyConstants.WORKSTATION_PROPERTY);
 
         if (step > 0) {
             LOGGER.debug("  sending NTLM challenge response");
 
-            byte[] challenge = NTLMUtilities
-                    .extractChallengeFromType2Message(challengePacket);
-            int serverFlags = NTLMUtilities
-                    .extractFlagsFromType2Message(challengePacket);
+            byte[] challenge = NTLMUtilities.extractChallengeFromType2Message(challengePacket);
+            int serverFlags = NTLMUtilities.extractFlagsFromType2Message(challengePacket);
 
-            String username = req.getProperties().get(
-                    HttpProxyConstants.USER_PROPERTY);
-            String password = req.getProperties().get(
-                    HttpProxyConstants.PWD_PROPERTY);
+            String username = req.getProperties().get(HttpProxyConstants.USER_PROPERTY);
+            String password = req.getProperties().get(HttpProxyConstants.PWD_PROPERTY);
 
-            byte[] authenticationPacket = NTLMUtilities.createType3Message(
-                    username, password, challenge, domain, workstation,
-                    serverFlags, null);
+            byte[] authenticationPacket = NTLMUtilities.createType3Message(username, password, challenge, domain,
+                    workstation, serverFlags, null);
 
-                StringUtilities.addValueToHeader(headers,
-                        "Proxy-Authorization", 
-                        "NTLM "+ new String(Base64
-                                        .encodeBase64(authenticationPacket)),
-                        true);
+            StringUtilities.addValueToHeader(headers, "Proxy-Authorization",
+                    "NTLM " + new String(Base64.encodeBase64(authenticationPacket)), true);
 
-            } else {
-                LOGGER.debug("  sending NTLM negotiation packet");
+        } else {
+            LOGGER.debug("  sending NTLM negotiation packet");
 
-                byte[] negotiationPacket = NTLMUtilities.createType1Message(
-                        workstation, domain, null, null);
-                StringUtilities
-                        .addValueToHeader(
-                                headers,
-                                "Proxy-Authorization",
-                                "NTLM "+ new String(Base64
-                                          .encodeBase64(negotiationPacket)),
-                                true);
-            }
+            byte[] negotiationPacket = NTLMUtilities.createType1Message(workstation, domain, null, null);
+            StringUtilities.addValueToHeader(headers, "Proxy-Authorization",
+                    "NTLM " + new String(Base64.encodeBase64(negotiationPacket)), true);
+        }
 
-            addKeepAliveHeaders(headers);
-            req.setHeaders(headers);
+        addKeepAliveHeaders(headers);
+        req.setHeaders(headers);
 
         writeRequest(nextFilter, req);
         step++;
@@ -151,8 +131,7 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
      * {@inheritDoc}
      */
     @Override
-    public void handleResponse(final HttpProxyResponse response)
-            throws ProxyAuthException {
+    public void handleResponse(final HttpProxyResponse response) throws ProxyAuthException {
         if (step == 0) {
             String challengeResponse = getNTLMHeader(response);
             step = 1;
@@ -172,22 +151,18 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
             String challengeResponse = getNTLMHeader(response);
 
             if (challengeResponse == null || challengeResponse.length() < 5) {
-                throw new ProxyAuthException(
-                        "Unexpected error while reading server challenge !");
+                throw new ProxyAuthException("Unexpected error while reading server challenge !");
             }
 
             try {
-                challengePacket = Base64
-                        .decodeBase64(challengeResponse.substring(5).getBytes(
-                                proxyIoSession.getCharsetName()));
+                challengePacket = Base64.decodeBase64(challengeResponse.substring(5).getBytes(
+                        proxyIoSession.getCharsetName()));
             } catch (IOException e) {
-                throw new ProxyAuthException(
-                        "Unable to decode the base64 encoded NTLM challenge", e);
+                throw new ProxyAuthException("Unable to decode the base64 encoded NTLM challenge", e);
             }
             step = 2;
         } else {
-            throw new ProxyAuthException("Received unexpected response code ("
-                    + response.getStatusLine() + ").");
+            throw new ProxyAuthException("Received unexpected response code (" + response.getStatusLine() + ").");
         }
     }
 }

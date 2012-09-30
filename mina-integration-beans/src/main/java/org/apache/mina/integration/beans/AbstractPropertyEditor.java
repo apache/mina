@@ -30,9 +30,11 @@ import java.beans.PropertyEditorSupport;
 public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
 
     private String text;
+
     private Object value;
+
     private boolean trimText = true;
-    
+
     protected void setTrimText(boolean trimText) {
         this.trimText = trimText;
     }
@@ -53,7 +55,7 @@ public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
         if (text == null) {
             value = defaultValue();
         } else {
-            value = toValue(trimText? text.trim() : text);
+            value = toValue(trimText ? text.trim() : text);
         }
     }
 
@@ -66,16 +68,17 @@ public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
             text = toText(value);
         }
     }
-    
+
     protected String defaultText() {
         return null;
     }
-    
+
     protected Object defaultValue() {
         return null;
     }
 
     protected abstract String toText(Object value);
+
     protected abstract Object toValue(String text) throws IllegalArgumentException;
-    
+
 }

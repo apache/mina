@@ -34,8 +34,7 @@ public interface KeepAliveRequestTimeoutHandler {
      * Do nothing.
      */
     static KeepAliveRequestTimeoutHandler NOOP = new KeepAliveRequestTimeoutHandler() {
-        public void keepAliveRequestTimedOut(
-                KeepAliveFilter filter, IoSession session) throws Exception {
+        public void keepAliveRequestTimedOut(KeepAliveFilter filter, IoSession session) throws Exception {
             // Do nothing.
         }
     };
@@ -44,13 +43,11 @@ public interface KeepAliveRequestTimeoutHandler {
      * Logs a warning message, but doesn't do anything else.
      */
     static KeepAliveRequestTimeoutHandler LOG = new KeepAliveRequestTimeoutHandler() {
-        private final Logger LOGGER =
-            LoggerFactory.getLogger(KeepAliveFilter.class);
+        private final Logger LOGGER = LoggerFactory.getLogger(KeepAliveFilter.class);
 
-        public void keepAliveRequestTimedOut(
-                KeepAliveFilter filter, IoSession session) throws Exception {
-            LOGGER.warn("A keep-alive response message was not received within " +
-                    "{} second(s).", filter.getRequestTimeout());
+        public void keepAliveRequestTimedOut(KeepAliveFilter filter, IoSession session) throws Exception {
+            LOGGER.warn("A keep-alive response message was not received within " + "{} second(s).",
+                    filter.getRequestTimeout());
         }
     };
 
@@ -58,11 +55,9 @@ public interface KeepAliveRequestTimeoutHandler {
      * Throws a {@link KeepAliveRequestTimeoutException}.
      */
     static KeepAliveRequestTimeoutHandler EXCEPTION = new KeepAliveRequestTimeoutHandler() {
-        public void keepAliveRequestTimedOut(
-                KeepAliveFilter filter, IoSession session) throws Exception {
-            throw new KeepAliveRequestTimeoutException(
-                    "A keep-alive response message was not received within " +
-                    filter.getRequestTimeout() + " second(s).");
+        public void keepAliveRequestTimedOut(KeepAliveFilter filter, IoSession session) throws Exception {
+            throw new KeepAliveRequestTimeoutException("A keep-alive response message was not received within "
+                    + filter.getRequestTimeout() + " second(s).");
         }
     };
 
@@ -70,14 +65,11 @@ public interface KeepAliveRequestTimeoutHandler {
      * Closes the connection after logging.
      */
     static KeepAliveRequestTimeoutHandler CLOSE = new KeepAliveRequestTimeoutHandler() {
-        private final Logger LOGGER =
-            LoggerFactory.getLogger(KeepAliveFilter.class);
+        private final Logger LOGGER = LoggerFactory.getLogger(KeepAliveFilter.class);
 
-        public void keepAliveRequestTimedOut(
-                KeepAliveFilter filter, IoSession session) throws Exception {
-            LOGGER.warn("Closing the session because a keep-alive response " +
-                    "message was not received within {} second(s).",
-                    filter.getRequestTimeout());
+        public void keepAliveRequestTimedOut(KeepAliveFilter filter, IoSession session) throws Exception {
+            LOGGER.warn("Closing the session because a keep-alive response "
+                    + "message was not received within {} second(s).", filter.getRequestTimeout());
             session.close(true);
         }
     };
@@ -86,8 +78,7 @@ public interface KeepAliveRequestTimeoutHandler {
      * A special handler for the 'deaf speaker' mode.
      */
     static KeepAliveRequestTimeoutHandler DEAF_SPEAKER = new KeepAliveRequestTimeoutHandler() {
-        public void keepAliveRequestTimedOut(
-                KeepAliveFilter filter, IoSession session) throws Exception {
+        public void keepAliveRequestTimedOut(KeepAliveFilter filter, IoSession session) throws Exception {
             throw new Error("Shouldn't be invoked.  Please file a bug report.");
         }
     };

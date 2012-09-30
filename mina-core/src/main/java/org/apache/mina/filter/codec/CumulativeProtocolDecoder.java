@@ -120,8 +120,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      * @throws IllegalStateException if your <tt>doDecode()</tt> returned
      *                               <tt>true</tt> not consuming the cumulative buffer.
      */
-    public void decode(IoSession session, IoBuffer in,
-            ProtocolDecoderOutput out) throws Exception {
+    public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (!session.getTransportMetadata().hasFragmentation()) {
             while (in.hasRemaining()) {
                 if (!doDecode(session, in, out)) {
@@ -157,8 +156,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
                 // Reallocate the buffer if append operation failed due to
                 // derivation or disabled auto-expansion.
                 buf.flip();
-                IoBuffer newBuf = IoBuffer.allocate(
-                        buf.remaining() + in.remaining()).setAutoExpand(true);
+                IoBuffer newBuf = IoBuffer.allocate(buf.remaining() + in.remaining()).setAutoExpand(true);
                 newBuf.order(buf.order());
                 newBuf.put(buf);
                 newBuf.put(in);
@@ -178,8 +176,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
             boolean decoded = doDecode(session, buf, out);
             if (decoded) {
                 if (buf.position() == oldPos) {
-                    throw new IllegalStateException(
-                            "doDecode() can't return true when buffer is not consumed.");
+                    throw new IllegalStateException("doDecode() can't return true when buffer is not consumed.");
                 }
 
                 if (!buf.hasRemaining()) {
@@ -217,8 +214,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      *         then this method will be invoked again when more data is cumulated.
      * @throws Exception if cannot decode <tt>in</tt>.
      */
-    protected abstract boolean doDecode(IoSession session, IoBuffer in,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception;
 
     /**
      * Releases the cumulative buffer used by the specified <tt>session</tt>.

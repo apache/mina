@@ -19,9 +19,7 @@
  */
 package org.apache.mina.util.byteaccess;
 
-
 import org.apache.mina.core.buffer.IoBuffer;
-
 
 /**
  * Provides restricted, relative, write-only access to the bytes in a
@@ -39,25 +37,21 @@ import org.apache.mina.core.buffer.IoBuffer;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelativeBase implements IoRelativeWriter
-{
+public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelativeBase implements IoRelativeWriter {
 
     /**
      * An object that knows how to expand a <code>CompositeByteArray</code>.
      */
-    public interface Expander
-    {
-        void expand( CompositeByteArray cba, int minSize );
+    public interface Expander {
+        void expand(CompositeByteArray cba, int minSize);
     }
 
     /**
      * No-op expander.  The overridden method does nothing.
      * 
      */
-    public static class NopExpander implements Expander
-    {
-        public void expand( CompositeByteArray cba, int minSize )
-        {
+    public static class NopExpander implements Expander {
+        public void expand(CompositeByteArray cba, int minSize) {
             // Do nothing.
         }
     }
@@ -67,28 +61,22 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
      * bytes provided in the constructor
      * 
      */
-    public static class ChunkedExpander implements Expander
-    {
+    public static class ChunkedExpander implements Expander {
 
         private final ByteArrayFactory baf;
 
         private final int newComponentSize;
 
-
-        public ChunkedExpander( ByteArrayFactory baf, int newComponentSize )
-        {
+        public ChunkedExpander(ByteArrayFactory baf, int newComponentSize) {
             this.baf = baf;
             this.newComponentSize = newComponentSize;
         }
 
-
-        public void expand( CompositeByteArray cba, int minSize )
-        {
+        public void expand(CompositeByteArray cba, int minSize) {
             int remaining = minSize;
-            while ( remaining > 0 )
-            {
-                ByteArray component = baf.create( newComponentSize );
-                cba.addLast( component );
+            while (remaining > 0) {
+                ByteArray component = baf.create(newComponentSize);
+                cba.addLast(component);
                 remaining -= newComponentSize;
             }
         }
@@ -98,10 +86,9 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * An object that knows how to flush a <code>ByteArray</code>.
      */
-    public interface Flusher
-    {
+    public interface Flusher {
         // document free() behaviour
-        void flush( ByteArray ba );
+        void flush(ByteArray ba);
     }
 
     /**
@@ -120,7 +107,6 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
      */
     private final boolean autoFlush;
 
-
     /**
      * 
      * Creates a new instance of CompositeByteArrayRelativeWriter.
@@ -134,140 +120,111 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
      * @param autoFlush
      *  Should this class automatically flush?
      */
-    public CompositeByteArrayRelativeWriter( CompositeByteArray cba, Expander expander, Flusher flusher,
-        boolean autoFlush )
-    {
-        super( cba );
+    public CompositeByteArrayRelativeWriter(CompositeByteArray cba, Expander expander, Flusher flusher,
+            boolean autoFlush) {
+        super(cba);
         this.expander = expander;
         this.flusher = flusher;
         this.autoFlush = autoFlush;
     }
 
-
-    private void prepareForAccess( int size )
-    {
+    private void prepareForAccess(int size) {
         int underflow = cursor.getIndex() + size - last();
-        if ( underflow > 0 )
-        {
-            expander.expand( cba, underflow );
+        if (underflow > 0) {
+            expander.expand(cba, underflow);
         }
     }
-
 
     /**
      * Flush to the current index.
      */
-    public void flush()
-    {
-        flushTo( cursor.getIndex() );
+    public void flush() {
+        flushTo(cursor.getIndex());
     }
-
 
     /**
      * Flush to the given index.
      */
-    public void flushTo( int index )
-    {
-        ByteArray removed = cba.removeTo( index );
-        flusher.flush( removed );
+    public void flushTo(int index) {
+        ByteArray removed = cba.removeTo(index);
+        flusher.flush(removed);
     }
-
 
     /**
      * @inheritDoc
      */
-    public void skip( int length )
-    {
-        cursor.skip( length );
+    public void skip(int length) {
+        cursor.skip(length);
     }
 
-
     @Override
-    protected void cursorPassedFirstComponent()
-    {
-        if ( autoFlush )
-        {
-            flushTo( cba.first() + cba.getFirst().length() );
+    protected void cursorPassedFirstComponent() {
+        if (autoFlush) {
+            flushTo(cba.first() + cba.getFirst().length());
         }
     }
 
-
     /**
      * @inheritDoc
      */
-    public void put( byte b )
-    {
-        prepareForAccess( 1 );
-        cursor.put( b );
+    public void put(byte b) {
+        prepareForAccess(1);
+        cursor.put(b);
     }
 
-
     /**
      * @inheritDoc
      */
-    public void put( IoBuffer bb )
-    {
-        prepareForAccess( bb.remaining() );
-        cursor.put( bb );
+    public void put(IoBuffer bb) {
+        prepareForAccess(bb.remaining());
+        cursor.put(bb);
     }
 
-
     /**
      * @inheritDoc
      */
-    public void putShort( short s )
-    {
-        prepareForAccess( 2 );
-        cursor.putShort( s );
+    public void putShort(short s) {
+        prepareForAccess(2);
+        cursor.putShort(s);
     }
 
-
     /**
      * @inheritDoc
      */
-    public void putInt( int i )
-    {
-        prepareForAccess( 4 );
-        cursor.putInt( i );
+    public void putInt(int i) {
+        prepareForAccess(4);
+        cursor.putInt(i);
     }
 
-
     /**
      * @inheritDoc
      */
-    public void putLong( long l )
-    {
-        prepareForAccess( 8 );
-        cursor.putLong( l );
+    public void putLong(long l) {
+        prepareForAccess(8);
+        cursor.putLong(l);
     }
 
-
     /**
      * @inheritDoc
      */
-    public void putFloat( float f )
-    {
-        prepareForAccess( 4 );
-        cursor.putFloat( f );
+    public void putFloat(float f) {
+        prepareForAccess(4);
+        cursor.putFloat(f);
     }
 
-
     /**
      * @inheritDoc
      */
-    public void putDouble( double d )
-    {
-        prepareForAccess( 8 );
-        cursor.putDouble( d );
+    public void putDouble(double d) {
+        prepareForAccess(8);
+        cursor.putDouble(d);
     }
 
-
     /**
      * @inheritDoc
      */
-    public void putChar( char c )
-    {
-        prepareForAccess( 2 );
-        cursor.putChar( c );
+    public void putChar(char c) {
+        prepareForAccess(2);
+        cursor.putChar(c);
     }
 }

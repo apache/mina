@@ -30,14 +30,15 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
  *
  */
 public class MyProtocolCodecFactory implements ProtocolCodecFactory {
-  private ProtocolDecoder decoder = new MyRequestDecoder();
-  private ProtocolEncoder encoder = new MyResponseEncoder();
+    private ProtocolDecoder decoder = new MyRequestDecoder();
 
-  public ProtocolDecoder getDecoder(IoSession sessionIn) throws Exception {
-    return decoder;
-  }
+    private ProtocolEncoder encoder = new MyResponseEncoder();
 
-  public ProtocolEncoder getEncoder(IoSession sessionIn) throws Exception {
-    return encoder;
-  }
+    public ProtocolDecoder getDecoder(IoSession sessionIn) throws Exception {
+        return decoder;
+    }
+
+    public ProtocolEncoder getEncoder(IoSession sessionIn) throws Exception {
+        return encoder;
+    }
 }

@@ -36,8 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Socks4LogicHandler extends AbstractSocksLogicHandler {
 
-    private final static Logger logger = LoggerFactory
-            .getLogger(Socks4LogicHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(Socks4LogicHandler.class);
 
     /**
      * {@inheritDoc}
@@ -65,14 +64,11 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
      * @param nextFilter the next filter
      * @param request the request to send.
      */
-    protected void writeRequest(final NextFilter nextFilter,
-            final SocksProxyRequest request) {
+    protected void writeRequest(final NextFilter nextFilter, final SocksProxyRequest request) {
         try {
-            boolean isV4ARequest = Arrays.equals(request.getIpAddress(),
-                    SocksProxyConstants.FAKE_IP); 
+            boolean isV4ARequest = Arrays.equals(request.getIpAddress(), SocksProxyConstants.FAKE_IP);
             byte[] userID = request.getUserName().getBytes("ASCII");
-            byte[] host = isV4ARequest ? request.getHost().getBytes("ASCII")
-                    : null;
+            byte[] host = isV4ARequest ? request.getHost().getBytes("ASCII") : null;
 
             int len = 9 + userID.length;
 
@@ -114,8 +110,7 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
      * @param nextFilter the next filter
      * @param buf the server response data buffer
      */
-    public void messageReceived(final NextFilter nextFilter,
-            final IoBuffer buf) {
+    public void messageReceived(final NextFilter nextFilter, final IoBuffer buf) {
         try {
             if (buf.remaining() >= SocksProxyConstants.SOCKS_4_RESPONSE_SIZE) {
                 handleResponse(buf);
@@ -145,12 +140,11 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
 
         // Consumes all the response data from the buffer
         buf.position(buf.position() + SocksProxyConstants.SOCKS_4_RESPONSE_SIZE);
-        
+
         if (status == SocksProxyConstants.V4_REPLY_REQUEST_GRANTED) {
             setHandshakeComplete();
         } else {
-            throw new Exception("Proxy handshake failed - Code: 0x"
-                    + ByteUtilities.asHex(new byte[] { status }) + " ("
+            throw new Exception("Proxy handshake failed - Code: 0x" + ByteUtilities.asHex(new byte[] { status }) + " ("
                     + SocksProxyConstants.getReplyCodeAsString(status) + ")");
         }
     }

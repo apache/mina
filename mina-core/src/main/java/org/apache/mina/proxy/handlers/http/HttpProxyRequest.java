@@ -37,8 +37,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpProxyRequest extends ProxyRequest {
-    private final static Logger logger = LoggerFactory
-            .getLogger(HttpProxyRequest.class);
+    private final static Logger logger = LoggerFactory.getLogger(HttpProxyRequest.class);
 
     /**
      * The HTTP verb.
@@ -87,9 +86,8 @@ public class HttpProxyRequest extends ProxyRequest {
      *  
      * @param endpointAddress the endpoint to connect to
      * @param httpVersion the HTTP protocol version
-     */    
-    public HttpProxyRequest(final InetSocketAddress endpointAddress,
-            final String httpVersion) {
+     */
+    public HttpProxyRequest(final InetSocketAddress endpointAddress, final String httpVersion) {
         this(endpointAddress, httpVersion, null);
     }
 
@@ -100,18 +98,16 @@ public class HttpProxyRequest extends ProxyRequest {
      * @param endpointAddress the endpoint to connect to
      * @param httpVersion the HTTP protocol version
      * @param headers the additionnal http headers
-     */    
-    public HttpProxyRequest(final InetSocketAddress endpointAddress,
-            final String httpVersion, final Map<String, List<String>> headers) {
+     */
+    public HttpProxyRequest(final InetSocketAddress endpointAddress, final String httpVersion,
+            final Map<String, List<String>> headers) {
         this.httpVerb = HttpProxyConstants.CONNECT;
         if (!endpointAddress.isUnresolved()) {
-            this.httpURI = endpointAddress.getHostName() + ":"
-                            + endpointAddress.getPort();
+            this.httpURI = endpointAddress.getHostName() + ":" + endpointAddress.getPort();
         } else {
-            this.httpURI = endpointAddress.getAddress().getHostAddress() + ":"
-                            + endpointAddress.getPort();
+            this.httpURI = endpointAddress.getAddress().getHostAddress() + ":" + endpointAddress.getPort();
         }
-        
+
         this.httpVersion = httpVersion;
         this.headers = headers;
     }
@@ -121,7 +117,7 @@ public class HttpProxyRequest extends ProxyRequest {
      * http URI.
      *  
      * @param httpURI the target URI
-     */    
+     */
     public HttpProxyRequest(final String httpURI) {
         this(HttpProxyConstants.GET, httpURI, HttpProxyConstants.HTTP_1_0, null);
     }
@@ -132,7 +128,7 @@ public class HttpProxyRequest extends ProxyRequest {
      *  
      * @param httpURI the target URI
      * @param httpVersion the HTTP protocol version
-     */        
+     */
     public HttpProxyRequest(final String httpURI, final String httpVersion) {
         this(HttpProxyConstants.GET, httpURI, httpVersion, null);
     }
@@ -144,9 +140,8 @@ public class HttpProxyRequest extends ProxyRequest {
      * @param httpVerb the HTTP verb to use 
      * @param httpURI the target URI
      * @param httpVersion the HTTP protocol version
-     */        
-    public HttpProxyRequest(final String httpVerb, final String httpURI,
-            final String httpVersion) {
+     */
+    public HttpProxyRequest(final String httpVerb, final String httpURI, final String httpVersion) {
         this(httpVerb, httpURI, httpVersion, null);
     }
 
@@ -160,8 +155,8 @@ public class HttpProxyRequest extends ProxyRequest {
      * @param httpVersion the HTTP protocol version
      * @param headers the additional http headers
      */
-    public HttpProxyRequest(final String httpVerb, final String httpURI,
-            final String httpVersion, final Map<String, List<String>> headers) {
+    public HttpProxyRequest(final String httpVerb, final String httpURI, final String httpVersion,
+            final Map<String, List<String>> headers) {
         this.httpVerb = httpVerb;
         this.httpURI = httpURI;
         this.httpVersion = httpVersion;
@@ -196,8 +191,7 @@ public class HttpProxyRequest extends ProxyRequest {
      */
     public synchronized final String getHost() {
         if (host == null) {
-            if (getEndpointAddress() != null && 
-                    !getEndpointAddress().isUnresolved()) {
+            if (getEndpointAddress() != null && !getEndpointAddress().isUnresolved()) {
                 host = getEndpointAddress().getHostName();
             }
 
@@ -264,35 +258,31 @@ public class HttpProxyRequest extends ProxyRequest {
             throw new ProxyAuthException(sb.toString());
         }
     }
-    
+
     /**
      * Returns the string representation of the HTTP request .
      */
     public String toHttpString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(getHttpVerb()).append(' ').append(getHttpURI()).append(' ')
-                .append(getHttpVersion()).append(HttpProxyConstants.CRLF);
+        sb.append(getHttpVerb()).append(' ').append(getHttpURI()).append(' ').append(getHttpVersion())
+                .append(HttpProxyConstants.CRLF);
 
         boolean hostHeaderFound = false;
 
         if (getHeaders() != null) {
-            for (Map.Entry<String, List<String>> header : getHeaders()
-                    .entrySet()) {
+            for (Map.Entry<String, List<String>> header : getHeaders().entrySet()) {
                 if (!hostHeaderFound) {
                     hostHeaderFound = header.getKey().equalsIgnoreCase("host");
                 }
 
                 for (String value : header.getValue()) {
-                    sb.append(header.getKey()).append(": ").append(value)
-                            .append(HttpProxyConstants.CRLF);
+                    sb.append(header.getKey()).append(": ").append(value).append(HttpProxyConstants.CRLF);
                 }
             }
 
-            if (!hostHeaderFound
-                    && getHttpVersion() == HttpProxyConstants.HTTP_1_1) {
-                sb.append("Host: ").append(getHost()).append(
-                        HttpProxyConstants.CRLF);
+            if (!hostHeaderFound && getHttpVersion() == HttpProxyConstants.HTTP_1_1) {
+                sb.append("Host: ").append(getHost()).append(HttpProxyConstants.CRLF);
             }
         }
 

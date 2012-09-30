@@ -53,7 +53,9 @@ public class SslTest {
     private static final int port = AvailablePortFinder.getNextAvailable(5555);
 
     private static Exception clientError = null;
+
     private static InetAddress address;
+
     private static SSLSocketFactory factory;
 
     /** A JVM independant KEY_MANAGER_FACTORY algorithm */
@@ -82,7 +84,6 @@ public class SslTest {
         }
     }
 
-    
     /**
      * Starts a Server with the SSL Filter and a simple text line 
      * protocol codec filter
@@ -96,10 +97,10 @@ public class SslTest {
         // Inject the SSL filter
         SslFilter sslFilter = new SslFilter(createSSLContext());
         filters.addLast("sslFilter", sslFilter);
-        
+
         // Inject the TestLine codec filter
         filters.addLast("text", new ProtocolCodecFilter(new TextLineCodecFactory()));
-        
+
         acceptor.setHandler(new TestHandler());
         acceptor.bind(new InetSocketAddress(port));
     }
@@ -114,7 +115,7 @@ public class SslTest {
         factory = context.getSocketFactory();
 
         connectAndSend();
-        
+
         // This one will throw a SocketTimeoutException if DIRMINA-650 is not fixed
         connectAndSend();
     }

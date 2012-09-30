@@ -60,9 +60,9 @@ import org.slf4j.LoggerFactory;
  * @org.apache.xbean.XBean
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
-    
-    private final static Logger LOGGER = 
-        LoggerFactory.getLogger(DefaultIoFilterChainBuilder.class);
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(DefaultIoFilterChainBuilder.class);
+
     private final List<Entry> entries;
 
     /**
@@ -86,7 +86,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * @see IoFilterChain#getEntry(String)
      */
     public Entry getEntry(String name) {
-        for (Entry e: entries) {
+        for (Entry e : entries) {
             if (e.getName().equals(name)) {
                 return e;
             }
@@ -99,7 +99,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * @see IoFilterChain#getEntry(IoFilter)
      */
     public Entry getEntry(IoFilter filter) {
-        for (Entry e: entries) {
+        for (Entry e : entries) {
             if (e.getFilter() == filter) {
                 return e;
             }
@@ -112,7 +112,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * @see IoFilterChain#getEntry(Class)
      */
     public Entry getEntry(Class<? extends IoFilter> filterType) {
-        for (Entry e: entries) {
+        for (Entry e : entries) {
             if (filterType.isAssignableFrom(e.getFilter().getClass())) {
                 return e;
             }
@@ -199,8 +199,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     /**
      * @see IoFilterChain#addBefore(String, String, IoFilter)
      */
-    public synchronized void addBefore(String baseName, String name,
-            IoFilter filter) {
+    public synchronized void addBefore(String baseName, String name, IoFilter filter) {
         checkBaseName(baseName);
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
@@ -215,8 +214,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     /**
      * @see IoFilterChain#addAfter(String, String, IoFilter)
      */
-    public synchronized void addAfter(String baseName, String name,
-            IoFilter filter) {
+    public synchronized void addAfter(String baseName, String name, IoFilter filter) {
         checkBaseName(baseName);
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
@@ -287,7 +285,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     public synchronized IoFilter replace(String name, IoFilter newFilter) {
         checkBaseName(name);
-        EntryImpl e = (EntryImpl)getEntry(name);
+        EntryImpl e = (EntryImpl) getEntry(name);
         IoFilter oldFilter = e.getFilter();
         e.setFilter(newFilter);
         return oldFilter;
@@ -300,20 +298,17 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
                 return;
             }
         }
-        throw new IllegalArgumentException("Filter not found: "
-                + oldFilter.getClass().getName());
+        throw new IllegalArgumentException("Filter not found: " + oldFilter.getClass().getName());
     }
 
-    public synchronized void replace(Class<? extends IoFilter> oldFilterType,
-            IoFilter newFilter) {
+    public synchronized void replace(Class<? extends IoFilter> oldFilterType, IoFilter newFilter) {
         for (Entry e : entries) {
             if (oldFilterType.isAssignableFrom(e.getFilter().getClass())) {
                 ((EntryImpl) e).setFilter(newFilter);
                 return;
             }
         }
-        throw new IllegalArgumentException("Filter not found: "
-                + oldFilterType.getName());
+        throw new IllegalArgumentException("Filter not found: " + oldFilterType.getName());
     }
 
     /**
@@ -322,7 +317,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     public synchronized void clear() {
         entries.clear();
     }
-    
+
     /**
      * Clears the current list of filters and adds the specified
      * filter mapping to this builder.  Please note that you must specify
@@ -334,15 +329,14 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         if (filters == null) {
             throw new IllegalArgumentException("filters");
         }
-        
+
         if (!isOrderedMap(filters)) {
-            throw new IllegalArgumentException(
-                    "filters is not an ordered map. Please try " + 
-                    LinkedHashMap.class.getName() + ".");
+            throw new IllegalArgumentException("filters is not an ordered map. Please try "
+                    + LinkedHashMap.class.getName() + ".");
         }
 
         filters = new LinkedHashMap<String, IoFilter>(filters);
-        for (Map.Entry<String, ? extends IoFilter> e: filters.entrySet()) {
+        for (Map.Entry<String, ? extends IoFilter> e : filters.entrySet()) {
             if (e.getKey() == null) {
                 throw new IllegalArgumentException("filters contains a null key.");
             }
@@ -350,15 +344,15 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
                 throw new IllegalArgumentException("filters contains a null value.");
             }
         }
-        
+
         synchronized (this) {
             clear();
-            for (Map.Entry<String, ? extends IoFilter> e: filters.entrySet()) {
+            for (Map.Entry<String, ? extends IoFilter> e : filters.entrySet()) {
                 addLast(e.getKey(), e.getValue());
             }
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private boolean isOrderedMap(Map map) {
         Class<?> mapType = map.getClass();
@@ -368,7 +362,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             }
             return true;
         }
-        
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(mapType.getName() + " is not a " + LinkedHashMap.class.getSimpleName());
         }
@@ -376,73 +370,63 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         // Detect Jakarta Commons Collections OrderedMap implementations.
         Class<?> type = mapType;
         while (type != null) {
-            for (Class<?> i: type.getInterfaces()) {
+            for (Class<?> i : type.getInterfaces()) {
                 if (i.getName().endsWith("OrderedMap")) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(
-                                mapType.getSimpleName() +
-                                " is an ordered map (guessed from that it " +
-                                " implements OrderedMap interface.)");
+                        LOGGER.debug(mapType.getSimpleName() + " is an ordered map (guessed from that it "
+                                + " implements OrderedMap interface.)");
                     }
                     return true;
                 }
             }
             type = type.getSuperclass();
         }
-        
+
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(
-                    mapType.getName() +
-                    " doesn't implement OrderedMap interface.");
+            LOGGER.debug(mapType.getName() + " doesn't implement OrderedMap interface.");
         }
-        
+
         // Last resort: try to create a new instance and test if it maintains
         // the insertion order.
-        LOGGER.debug(
-                "Last resort; trying to create a new map instance with a " +
-                "default constructor and test if insertion order is " +
-                "maintained.");
-        
+        LOGGER.debug("Last resort; trying to create a new map instance with a "
+                + "default constructor and test if insertion order is " + "maintained.");
+
         Map newMap;
         try {
             newMap = (Map) mapType.newInstance();
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(
-                        "Failed to create a new map instance of '" + 
-                        mapType.getName() +"'.", e);
+                LOGGER.debug("Failed to create a new map instance of '" + mapType.getName() + "'.", e);
             }
             return false;
         }
-        
+
         Random rand = new Random();
         List<String> expectedNames = new ArrayList<String>();
         IoFilter dummyFilter = new IoFilterAdapter();
-        for (int i = 0; i < 65536; i ++) {
+        for (int i = 0; i < 65536; i++) {
             String filterName;
             do {
                 filterName = String.valueOf(rand.nextInt());
             } while (newMap.containsKey(filterName));
-            
+
             newMap.put(filterName, dummyFilter);
             expectedNames.add(filterName);
 
             Iterator<String> it = expectedNames.iterator();
-            for (Object key: newMap.keySet()) {
+            for (Object key : newMap.keySet()) {
                 if (!it.next().equals(key)) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(
-                                "The specified map didn't pass the insertion " +
-                                "order test after " + (i + 1) + " tries.");
+                        LOGGER.debug("The specified map didn't pass the insertion " + "order test after " + (i + 1)
+                                + " tries.");
                     }
                     return false;
                 }
             }
         }
-        
+
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(
-                    "The specified map passed the insertion order test.");
+            LOGGER.debug("The specified map passed the insertion order test.");
         }
         return true;
     }
@@ -489,15 +473,13 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         }
 
         if (!contains(baseName)) {
-            throw new IllegalArgumentException("Unknown filter name: "
-                    + baseName);
+            throw new IllegalArgumentException("Unknown filter name: " + baseName);
         }
     }
 
     private void register(int index, Entry e) {
         if (contains(e.getName())) {
-            throw new IllegalArgumentException(
-                    "Other filter is using the same name: " + e.getName());
+            throw new IllegalArgumentException("Other filter is using the same name: " + e.getName());
         }
 
         entries.add(index, e);
@@ -505,6 +487,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     private class EntryImpl implements Entry {
         private final String name;
+
         private volatile IoFilter filter;
 
         private EntryImpl(String name, IoFilter filter) {

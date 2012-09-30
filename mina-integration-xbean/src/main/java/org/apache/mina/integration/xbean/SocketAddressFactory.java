@@ -19,11 +19,9 @@
  */
 package org.apache.mina.integration.xbean;
 
-
 import java.net.SocketAddress;
 
 import org.apache.mina.integration.beans.InetSocketAddressEditor;
-
 
 /**
  * Workaround for dealing with inability to annotate java docs of JDK 
@@ -32,15 +30,13 @@ import org.apache.mina.integration.beans.InetSocketAddressEditor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean element="socketAddress" contentProperty="value"
  */
-public class SocketAddressFactory
-{
+public class SocketAddressFactory {
     /**
      * @org.apache.xbean.FactoryMethod
      */
-    public static SocketAddress create( String value ) 
-    {
+    public static SocketAddress create(String value) {
         InetSocketAddressEditor editor = new InetSocketAddressEditor();
-        editor.setAsText( value );
-        return ( SocketAddress ) editor.getValue();
+        editor.setAsText(value);
+        return (SocketAddress) editor.getValue();
     }
 }

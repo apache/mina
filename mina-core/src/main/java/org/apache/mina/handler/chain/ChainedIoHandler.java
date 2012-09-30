@@ -66,8 +66,7 @@ public class ChainedIoHandler extends IoHandlerAdapter {
      * in the constructor.
      */
     @Override
-    public void messageReceived(IoSession session, Object message)
-            throws Exception {
+    public void messageReceived(IoSession session, Object message) throws Exception {
         chain.execute(null, session, message);
     }
 }

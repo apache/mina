@@ -96,8 +96,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
             throw new IllegalArgumentException("delimiter");
         }
         if (LineDelimiter.AUTO.equals(delimiter)) {
-            throw new IllegalArgumentException(
-                    "AUTO delimiter is not allowed for encoder.");
+            throw new IllegalArgumentException("AUTO delimiter is not allowed for encoder.");
         }
 
         this.charset = charset;
@@ -122,15 +121,13 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
      */
     public void setMaxLineLength(int maxLineLength) {
         if (maxLineLength <= 0) {
-            throw new IllegalArgumentException("maxLineLength: "
-                    + maxLineLength);
+            throw new IllegalArgumentException("maxLineLength: " + maxLineLength);
         }
 
         this.maxLineLength = maxLineLength;
     }
 
-    public void encode(IoSession session, Object message,
-            ProtocolEncoderOutput out) throws Exception {
+    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         CharsetEncoder encoder = (CharsetEncoder) session.getAttribute(ENCODER);
 
         if (encoder == null) {
@@ -139,8 +136,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
         }
 
         String value = (message == null ? "" : message.toString());
-        IoBuffer buf = IoBuffer.allocate(value.length())
-                .setAutoExpand(true);
+        IoBuffer buf = IoBuffer.allocate(value.length()).setAutoExpand(true);
         buf.putString(value, encoder);
 
         if (buf.position() > maxLineLength) {

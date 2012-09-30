@@ -54,11 +54,11 @@ public class KeyStoreFactoryTest {
         InputStream in = getClass().getResourceAsStream("keystore.cert");
         OutputStream out = new FileOutputStream(file);
         int b;
-        
+
         while ((b = in.read()) != -1) {
             out.write(b);
         }
-        
+
         in.close();
         out.close();
 

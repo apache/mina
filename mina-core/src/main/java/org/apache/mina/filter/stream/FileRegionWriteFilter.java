@@ -52,8 +52,7 @@ import org.apache.mina.core.file.FileRegion;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
-public class FileRegionWriteFilter extends
-        AbstractStreamWriteFilter<FileRegion> {
+public class FileRegionWriteFilter extends AbstractStreamWriteFilter<FileRegion> {
 
     @Override
     protected Class<FileRegion> getMessageClass() {
@@ -66,14 +65,13 @@ public class FileRegionWriteFilter extends
         if (fileRegion.getRemainingBytes() <= 0) {
             return null;
         }
-        
+
         // Allocate the buffer for reading from the file
         final int bufferSize = (int) Math.min(getWriteBufferSize(), fileRegion.getRemainingBytes());
         IoBuffer buffer = IoBuffer.allocate(bufferSize);
 
         // Read from the file
-        int bytesRead = fileRegion.getFileChannel().read(buffer.buf(),
-                fileRegion.getPosition());
+        int bytesRead = fileRegion.getFileChannel().read(buffer.buf(), fileRegion.getPosition());
         fileRegion.update(bytesRead);
 
         // return the buffer

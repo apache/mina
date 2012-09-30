@@ -24,30 +24,29 @@ import java.io.IOException;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.session.IoSession;
 
-
 /**
  * A default implementation of {@link WriteFuture}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
-    
+
     private static final Object CLOSED = new Object();
-    
+
     /**
      * Creates a new instance.
      */
     public DefaultReadFuture(IoSession session) {
         super(session);
     }
-    
+
     public Object getMessage() {
         if (isDone()) {
             Object v = getValue();
             if (v == CLOSED) {
                 return null;
             }
-            
+
             if (v instanceof ExceptionHolder) {
                 v = ((ExceptionHolder) v).exception;
                 if (v instanceof RuntimeException) {
@@ -60,13 +59,12 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
                     throw new RuntimeIoException((Exception) v);
                 }
             }
-            
+
             return v;
         }
 
         return null;
     }
-
 
     public boolean isRead() {
         if (isDone()) {
@@ -75,7 +73,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
         }
         return false;
     }
-    
+
     public boolean isClosed() {
         if (isDone()) {
             return getValue() == CLOSED;
@@ -108,7 +106,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
         if (exception == null) {
             throw new IllegalArgumentException("exception");
         }
-        
+
         setValue(new ExceptionHolder(exception));
     }
 
@@ -131,10 +129,10 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     public ReadFuture removeListener(IoFutureListener<?> listener) {
         return (ReadFuture) super.removeListener(listener);
     }
-    
+
     private static class ExceptionHolder {
         private final Throwable exception;
-        
+
         private ExceptionHolder(Throwable exception) {
             this.exception = exception;
         }

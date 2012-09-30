@@ -19,9 +19,7 @@
  */
 package org.apache.mina.util.byteaccess;
 
-
 import org.apache.mina.core.buffer.IoBuffer;
-
 
 /**
  * Creates <code>ByteArray</code> backed by a heap-allocated
@@ -30,35 +28,28 @@ import org.apache.mina.core.buffer.IoBuffer;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SimpleByteArrayFactory implements ByteArrayFactory
-{
+public class SimpleByteArrayFactory implements ByteArrayFactory {
     /**
      * 
      * Creates a new instance of SimpleByteArrayFactory.
      *
      */
-    public SimpleByteArrayFactory()
-    {
+    public SimpleByteArrayFactory() {
         super();
     }
-
 
     /**
      * @inheritDoc
      */
-    public ByteArray create( int size )
-    {
-        if ( size < 0 )
-        {
-            throw new IllegalArgumentException( "Buffer size must not be negative:" + size );
+    public ByteArray create(int size) {
+        if (size < 0) {
+            throw new IllegalArgumentException("Buffer size must not be negative:" + size);
         }
-        IoBuffer bb = IoBuffer.allocate( size );
-        ByteArray ba = new BufferByteArray( bb )
-        {
+        IoBuffer bb = IoBuffer.allocate(size);
+        ByteArray ba = new BufferByteArray(bb) {
 
             @Override
-            public void free()
-            {
+            public void free() {
                 // Nothing to do.
             }
 

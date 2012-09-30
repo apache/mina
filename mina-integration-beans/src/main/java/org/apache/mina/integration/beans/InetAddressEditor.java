@@ -38,8 +38,8 @@ public class InetAddressEditor extends AbstractPropertyEditor {
     @Override
     protected String toText(Object value) {
         String hostname = ((InetAddress) value).getHostAddress();
-        if (hostname.equals("0:0:0:0:0:0:0:0") || hostname.equals("0.0.0.0") ||
-                hostname.equals("00:00:00:00:00:00:00:00")) {
+        if (hostname.equals("0:0:0:0:0:0:0:0") || hostname.equals("0.0.0.0")
+                || hostname.equals("00:00:00:00:00:00:00:00")) {
             hostname = "*";
         }
         return hostname;

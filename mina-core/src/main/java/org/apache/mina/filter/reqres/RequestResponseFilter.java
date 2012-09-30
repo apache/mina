@@ -48,16 +48,18 @@ import org.slf4j.LoggerFactory;
 public class RequestResponseFilter extends WriteRequestFilter {
 
     private final AttributeKey RESPONSE_INSPECTOR = new AttributeKey(getClass(), "responseInspector");
+
     private final AttributeKey REQUEST_STORE = new AttributeKey(getClass(), "requestStore");
+
     private final AttributeKey UNRESPONDED_REQUEST_STORE = new AttributeKey(getClass(), "unrespondedRequestStore");
 
     private final ResponseInspectorFactory responseInspectorFactory;
+
     private final ScheduledExecutorService timeoutScheduler;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RequestResponseFilter.class);
 
-    public RequestResponseFilter(final ResponseInspector responseInspector,
-            ScheduledExecutorService timeoutScheduler) {
+    public RequestResponseFilter(final ResponseInspector responseInspector, ScheduledExecutorService timeoutScheduler) {
         if (responseInspector == null) {
             throw new IllegalArgumentException("responseInspector");
         }
@@ -72,8 +74,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
         this.timeoutScheduler = timeoutScheduler;
     }
 
-    public RequestResponseFilter(
-            ResponseInspectorFactory responseInspectorFactory,
+    public RequestResponseFilter(ResponseInspectorFactory responseInspectorFactory,
             ScheduledExecutorService timeoutScheduler) {
         if (responseInspectorFactory == null) {
             throw new IllegalArgumentException("responseInspectorFactory");
@@ -86,23 +87,20 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         if (parent.contains(this)) {
             throw new IllegalArgumentException(
                     "You can't add the same filter instance more than once.  Create another instance and add it.");
         }
 
         IoSession session = parent.getSession();
-        session.setAttribute(RESPONSE_INSPECTOR, responseInspectorFactory
-                .getResponseInspector());
+        session.setAttribute(RESPONSE_INSPECTOR, responseInspectorFactory.getResponseInspector());
         session.setAttribute(REQUEST_STORE, createRequestStore(session));
         session.setAttribute(UNRESPONDED_REQUEST_STORE, createUnrespondedRequestStore(session));
     }
 
     @Override
-    public void onPostRemove(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         IoSession session = parent.getSession();
 
         destroyUnrespondedRequestStore(getUnrespondedRequestStore(session));
@@ -114,10 +112,8 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
-        ResponseInspector responseInspector = (ResponseInspector) session
-                .getAttribute(RESPONSE_INSPECTOR);
+    public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
+        ResponseInspector responseInspector = (ResponseInspector) session.getAttribute(RESPONSE_INSPECTOR);
         Object requestId = responseInspector.getRequestId(message);
         if (requestId == null) {
             // Not a response message.  Ignore.
@@ -128,9 +124,8 @@ public class RequestResponseFilter extends WriteRequestFilter {
         // Retrieve (or remove) the corresponding request.
         ResponseType type = responseInspector.getResponseType(message);
         if (type == null) {
-            nextFilter.exceptionCaught(session, new IllegalStateException(
-                    responseInspector.getClass().getName()
-                            + "#getResponseType() may not return null."));
+            nextFilter.exceptionCaught(session, new IllegalStateException(responseInspector.getClass().getName()
+                    + "#getResponseType() may not return null."));
         }
 
         Map<Object, Request> requestStore = getRequestStore(session);
@@ -156,8 +151,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
             // A response message without request. Swallow the event because
             // the response might have arrived too late.
             if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Unknown request ID '" + requestId
-                        + "' for the response message. Timed out already?: "
+                LOGGER.warn("Unknown request ID '" + requestId + "' for the response message. Timed out already?: "
                         + message);
             }
         } else {
@@ -182,8 +176,8 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    protected Object doFilterWrite(
-            final NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+    protected Object doFilterWrite(final NextFilter nextFilter, IoSession session, WriteRequest writeRequest)
+            throws Exception {
         Object message = writeRequest.getMessage();
         if (!(message instanceof Request)) {
             return null;
@@ -204,15 +198,12 @@ public class RequestResponseFilter extends WriteRequestFilter {
             }
         }
         if (oldValue != null) {
-            throw new IllegalStateException(
-                    "Duplicate request ID: " + request.getId());
+            throw new IllegalStateException("Duplicate request ID: " + request.getId());
         }
 
         // Schedule a task to be executed on timeout.
-        TimeoutTask timeoutTask = new TimeoutTask(
-                nextFilter, request, session);
-        ScheduledFuture<?> timeoutFuture = timeoutScheduler.schedule(
-                timeoutTask, request.getTimeoutMillis(),
+        TimeoutTask timeoutTask = new TimeoutTask(nextFilter, request, session);
+        ScheduledFuture<?> timeoutFuture = timeoutScheduler.schedule(timeoutTask, request.getTimeoutMillis(),
                 TimeUnit.MILLISECONDS);
         request.setTimeoutTask(timeoutTask);
         request.setTimeoutFuture(timeoutFuture);
@@ -227,15 +218,13 @@ public class RequestResponseFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void sessionClosed(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         // Copy the unfinished task set to avoid unnecessary lock acquisition.
         // Copying will be cheap because there won't be that many requests queued.
         Set<Request> unrespondedRequests = getUnrespondedRequestStore(session);
         List<Request> unrespondedRequestsCopy;
         synchronized (unrespondedRequests) {
-            unrespondedRequestsCopy = new ArrayList<Request>(
-                    unrespondedRequests);
+            unrespondedRequestsCopy = new ArrayList<Request>(unrespondedRequests);
             unrespondedRequests.clear();
         }
 
@@ -272,8 +261,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      * this method if you need to use other {@link Map} implementation
      * than the default one ({@link HashMap}).
      */
-    protected Map<Object, Request> createRequestStore(
-            IoSession session) {
+    protected Map<Object, Request> createRequestStore(IoSession session) {
         return new ConcurrentHashMap<Object, Request>();
     }
 
@@ -289,8 +277,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      * the order of thrown exceptions, any {@link Set} implementation
      * can be used.
      */
-    protected Set<Request> createUnrespondedRequestStore(
-            IoSession session) {
+    protected Set<Request> createUnrespondedRequestStore(IoSession session) {
         return new LinkedHashSet<Request>();
     }
 
@@ -301,8 +288,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      *
      * @param requestStore what you returned in {@link #createRequestStore(IoSession)}
      */
-    protected void destroyRequestStore(
-            Map<Object, Request> requestStore) {
+    protected void destroyRequestStore(Map<Object, Request> requestStore) {
         // Do nothing
     }
 
@@ -313,8 +299,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
      *
      * @param unrespondedRequestStore what you returned in {@link #createUnrespondedRequestStore(IoSession)}
      */
-    protected void destroyUnrespondedRequestStore(
-            Set<Request> unrespondedRequestStore) {
+    protected void destroyUnrespondedRequestStore(Set<Request> unrespondedRequestStore) {
         // Do nothing
     }
 
@@ -325,8 +310,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
 
         private final IoSession session;
 
-        private TimeoutTask(NextFilter filter, Request request,
-                IoSession session) {
+        private TimeoutTask(NextFilter filter, Request request, IoSession session) {
             this.filter = filter;
             this.request = request;
             this.session = session;

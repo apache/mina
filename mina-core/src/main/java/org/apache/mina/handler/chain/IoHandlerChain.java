@@ -37,8 +37,7 @@ public class IoHandlerChain implements IoHandlerCommand {
 
     private final int id = nextId++;
 
-    private final String NEXT_COMMAND = IoHandlerChain.class.getName() + '.'
-            + id + ".nextCommand";
+    private final String NEXT_COMMAND = IoHandlerChain.class.getName() + '.' + id + ".nextCommand";
 
     private final Map<String, Entry> name2entry = new ConcurrentHashMap<String, Entry>();
 
@@ -57,8 +56,7 @@ public class IoHandlerChain implements IoHandlerCommand {
 
     private IoHandlerCommand createHeadCommand() {
         return new IoHandlerCommand() {
-            public void execute(NextCommand next, IoSession session,
-                    Object message) throws Exception {
+            public void execute(NextCommand next, IoSession session, Object message) throws Exception {
                 next.execute(session, message);
             }
         };
@@ -66,8 +64,7 @@ public class IoHandlerChain implements IoHandlerCommand {
 
     private IoHandlerCommand createTailCommand() {
         return new IoHandlerCommand() {
-            public void execute(NextCommand next, IoSession session,
-                    Object message) throws Exception {
+            public void execute(NextCommand next, IoSession session, Object message) throws Exception {
                 next = (NextCommand) session.getAttribute(NEXT_COMMAND);
                 if (next != null) {
                     next.execute(session, message);
@@ -112,15 +109,13 @@ public class IoHandlerChain implements IoHandlerCommand {
         register(tail.prevEntry, name, command);
     }
 
-    public synchronized void addBefore(String baseName, String name,
-            IoHandlerCommand command) {
+    public synchronized void addBefore(String baseName, String name, IoHandlerCommand command) {
         Entry baseEntry = checkOldName(baseName);
         checkAddable(name);
         register(baseEntry.prevEntry, name, command);
     }
 
-    public synchronized void addAfter(String baseName, String name,
-            IoHandlerCommand command) {
+    public synchronized void addAfter(String baseName, String name, IoHandlerCommand command) {
         Entry baseEntry = checkOldName(baseName);
         checkAddable(name);
         register(baseEntry, name, command);
@@ -133,16 +128,14 @@ public class IoHandlerChain implements IoHandlerCommand {
     }
 
     public synchronized void clear() throws Exception {
-        Iterator<String> it = new ArrayList<String>(name2entry.keySet())
-                .iterator();
+        Iterator<String> it = new ArrayList<String>(name2entry.keySet()).iterator();
         while (it.hasNext()) {
             this.remove(it.next());
         }
     }
 
     private void register(Entry prevEntry, String name, IoHandlerCommand command) {
-        Entry newEntry = new Entry(prevEntry, prevEntry.nextEntry, name,
-                command);
+        Entry newEntry = new Entry(prevEntry, prevEntry.nextEntry, name, command);
         prevEntry.nextEntry.prevEntry = newEntry;
         prevEntry.nextEntry = newEntry;
 
@@ -166,8 +159,7 @@ public class IoHandlerChain implements IoHandlerCommand {
     private Entry checkOldName(String baseName) {
         Entry e = name2entry.get(baseName);
         if (e == null) {
-            throw new IllegalArgumentException("Unknown filter name:"
-                    + baseName);
+            throw new IllegalArgumentException("Unknown filter name:" + baseName);
         }
         return e;
     }
@@ -177,13 +169,11 @@ public class IoHandlerChain implements IoHandlerCommand {
      */
     private void checkAddable(String name) {
         if (name2entry.containsKey(name)) {
-            throw new IllegalArgumentException(
-                    "Other filter is using the same name '" + name + "'");
+            throw new IllegalArgumentException("Other filter is using the same name '" + name + "'");
         }
     }
 
-    public void execute(NextCommand next, IoSession session, Object message)
-            throws Exception {
+    public void execute(NextCommand next, IoSession session, Object message) throws Exception {
         if (next != null) {
             session.setAttribute(NEXT_COMMAND, next);
         }
@@ -195,8 +185,7 @@ public class IoHandlerChain implements IoHandlerCommand {
         }
     }
 
-    private void callNextCommand(Entry entry, IoSession session, Object message)
-            throws Exception {
+    private void callNextCommand(Entry entry, IoSession session, Object message) throws Exception {
         entry.getCommand().execute(entry.getNextCommand(), session, message);
     }
 
@@ -296,8 +285,7 @@ public class IoHandlerChain implements IoHandlerCommand {
 
         private final NextCommand nextCommand;
 
-        private Entry(Entry prevEntry, Entry nextEntry, String name,
-                IoHandlerCommand command) {
+        private Entry(Entry prevEntry, Entry nextEntry, String name, IoHandlerCommand command) {
             if (command == null) {
                 throw new IllegalArgumentException("command");
             }
@@ -310,8 +298,7 @@ public class IoHandlerChain implements IoHandlerCommand {
             this.name = name;
             this.command = command;
             this.nextCommand = new NextCommand() {
-                public void execute(IoSession session, Object message)
-                        throws Exception {
+                public void execute(IoSession session, Object message) throws Exception {
                     Entry nextEntry = Entry.this.nextEntry;
                     callNextCommand(nextEntry, session, message);
                 }

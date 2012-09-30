@@ -29,8 +29,7 @@ import org.apache.mina.proxy.session.ProxyIoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
  */
-public abstract class AbstractSocksLogicHandler extends
-        AbstractProxyLogicHandler {
+public abstract class AbstractSocksLogicHandler extends AbstractProxyLogicHandler {
 
     /**
      * The request sent to the proxy.

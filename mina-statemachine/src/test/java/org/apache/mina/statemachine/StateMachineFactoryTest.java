@@ -40,10 +40,15 @@ import org.junit.Test;
  */
 public class StateMachineFactoryTest {
     Method barInA;
+
     Method error;
+
     Method fooInA;
+
     Method fooInB;
+
     Method barInC;
+
     Method fooOrBarInCOrFooInD;
 
     @Before
@@ -82,7 +87,7 @@ public class StateMachineFactoryTest {
         assertEquals(new MethodTransition("bar", barInA, states), trans.get(0));
         assertEquals(new MethodTransition("*", error, states), trans.get(1));
         assertEquals(new MethodTransition("foo", b, fooInA, states), trans.get(2));
-        
+
         trans = b.getTransitions();
         assertEquals(1, trans.size());
         assertEquals(new MethodTransition("foo", c, fooInB, states), trans.get(0));
@@ -97,7 +102,7 @@ public class StateMachineFactoryTest {
         assertEquals(1, trans.size());
         assertEquals(new MethodTransition("foo", fooOrBarInCOrFooInD, states), trans.get(0));
     }
-    
+
     @Test
     public void testCreateStates() throws Exception {
         State[] states = StateMachineFactory.createStates(StateMachineFactory.getFields(States.class));
@@ -110,7 +115,7 @@ public class StateMachineFactoryTest {
         assertEquals(States.D, states[3].getId());
         assertEquals(states[0], states[3].getParent());
     }
-    
+
     @Test
     public void testCreateStatesMissingParents() throws Exception {
         try {
@@ -119,17 +124,20 @@ public class StateMachineFactoryTest {
         } catch (StateMachineCreationException fce) {
         }
     }
-    
+
     public static class States {
         @org.apache.mina.statemachine.annotation.State
         protected static final String A = "a";
+
         @org.apache.mina.statemachine.annotation.State(A)
         protected static final String B = "b";
+
         @org.apache.mina.statemachine.annotation.State(B)
         protected static final String C = "c";
+
         @org.apache.mina.statemachine.annotation.State(A)
         protected static final String D = "d";
-        
+
         @Transition(on = "bar", in = A)
         protected void barInA() {
         }
@@ -150,19 +158,22 @@ public class StateMachineFactoryTest {
         protected void fooInB() {
         }
 
-        @Transitions( { @Transition(on = { "foo", "bar" }, in = C, next = D), @Transition(on = "foo", in = D) })
+        @Transitions({ @Transition(on = { "foo", "bar" }, in = C, next = D), @Transition(on = "foo", in = D) })
         protected void fooOrBarInCOrFooInD() {
         }
-      
+
     }
-    
+
     public static class StatesWithMissingParents {
         @org.apache.mina.statemachine.annotation.State("b")
         public static final String A = "a";
+
         @org.apache.mina.statemachine.annotation.State("c")
         public static final String B = "b";
+
         @org.apache.mina.statemachine.annotation.State("d")
         public static final String C = "c";
+
         @org.apache.mina.statemachine.annotation.State("e")
         public static final String D = "d";
     }

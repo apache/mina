@@ -47,8 +47,7 @@ public interface ProxyLogicHandler {
      * @param buf the buffer holding the received data
      * @throws ProxyAuthException if authentication fails
      */
-    public abstract void messageReceived(NextFilter nextFilter, IoBuffer buf)
-            throws ProxyAuthException;
+    public abstract void messageReceived(NextFilter nextFilter, IoBuffer buf) throws ProxyAuthException;
 
     /**
      * Called at each step of the handshake procedure.
@@ -56,8 +55,7 @@ public interface ProxyLogicHandler {
      * @param nextFilter the next filter in filter chain
      * @throws ProxyAuthException if authentication fails
      */
-    public abstract void doHandshake(NextFilter nextFilter)
-            throws ProxyAuthException;
+    public abstract void doHandshake(NextFilter nextFilter) throws ProxyAuthException;
 
     /**
      * Returns the {@link ProxyIoSession}.
@@ -72,6 +70,5 @@ public interface ProxyLogicHandler {
      * @param nextFilter the next filter in filter chain
      * @param writeRequest the data to be written
      */
-    public abstract void enqueueWriteRequest(final NextFilter nextFilter,
-            final WriteRequest writeRequest);
+    public abstract void enqueueWriteRequest(final NextFilter nextFilter, final WriteRequest writeRequest);
 }

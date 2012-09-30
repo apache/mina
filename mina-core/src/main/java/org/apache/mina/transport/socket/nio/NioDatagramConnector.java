@@ -38,9 +38,8 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class NioDatagramConnector
-        extends AbstractPollingIoConnector<NioSession, DatagramChannel>
-        implements DatagramConnector {
+public final class NioDatagramConnector extends AbstractPollingIoConnector<NioSession, DatagramChannel> implements
+        DatagramConnector {
 
     /**
      * Creates a new instance.
@@ -62,7 +61,7 @@ public final class NioDatagramConnector
     public NioDatagramConnector(IoProcessor<NioSession> processor) {
         super(new DefaultDatagramSessionConfig(), processor);
     }
-    
+
     /**
      * Constructor for {@link NioDatagramConnector} with default configuration which will use a built-in 
      * thread pool executor to manage the given number of processor instances. The processor class must have 
@@ -74,8 +73,7 @@ public final class NioDatagramConnector
      * @see org.apache.mina.core.service.SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int)
      * @since 2.0.0-M4
      */
-    public NioDatagramConnector(Class<? extends IoProcessor<NioSession>> processorClass,
-            int processorCount) {
+    public NioDatagramConnector(Class<? extends IoProcessor<NioSession>> processorClass, int processorCount) {
         super(new DefaultDatagramSessionConfig(), processorClass, processorCount);
     }
 
@@ -98,17 +96,17 @@ public final class NioDatagramConnector
     public TransportMetadata getTransportMetadata() {
         return NioDatagramSession.METADATA;
     }
-    
+
     @Override
     public DatagramSessionConfig getSessionConfig() {
         return (DatagramSessionConfig) super.getSessionConfig();
     }
-    
+
     @Override
     public InetSocketAddress getDefaultRemoteAddress() {
         return (InetSocketAddress) super.getDefaultRemoteAddress();
     }
-    
+
     public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
         super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
@@ -119,15 +117,14 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected DatagramChannel newHandle(SocketAddress localAddress)
-            throws Exception {
+    protected DatagramChannel newHandle(SocketAddress localAddress) throws Exception {
         DatagramChannel ch = DatagramChannel.open();
 
         try {
             if (localAddress != null) {
                 ch.socket().bind(localAddress);
             }
-            
+
             return ch;
         } catch (Exception e) {
             // If we got an exception while binding the datagram,
@@ -138,15 +135,13 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected boolean connect(DatagramChannel handle,
-            SocketAddress remoteAddress) throws Exception {
+    protected boolean connect(DatagramChannel handle, SocketAddress remoteAddress) throws Exception {
         handle.connect(remoteAddress);
         return true;
     }
 
     @Override
-    protected NioSession newSession(IoProcessor<NioSession> processor,
-            DatagramChannel handle) {
+    protected NioSession newSession(IoProcessor<NioSession> processor, DatagramChannel handle) {
         NioSession session = new NioDatagramSession(this, handle, processor);
         session.getConfig().setAll(getSessionConfig());
         return session;
@@ -157,7 +152,7 @@ public final class NioDatagramConnector
         handle.disconnect();
         handle.close();
     }
-    
+
     // Unused extension points.
     @Override
     @SuppressWarnings("unchecked")
@@ -181,8 +176,7 @@ public final class NioDatagramConnector
     }
 
     @Override
-    protected void register(DatagramChannel handle, ConnectionRequest request)
-            throws Exception {
+    protected void register(DatagramChannel handle, ConnectionRequest request) throws Exception {
         throw new UnsupportedOperationException();
     }
 

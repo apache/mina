@@ -22,14 +22,12 @@ package org.apache.mina.core.future;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.session.IoSession;
 
-
 /**
  * A default implementation of {@link ConnectFuture}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DefaultConnectFuture extends DefaultIoFuture implements
-        ConnectFuture {
+public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFuture {
 
     private static final Object CANCELED = new Object();
 
@@ -57,8 +55,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements
         } else if (v instanceof Error) {
             throw (Error) v;
         } else if (v instanceof Throwable) {
-            throw (RuntimeIoException) new RuntimeIoException(
-                    "Failed to get the session.").initCause((Throwable) v);
+            throw (RuntimeIoException) new RuntimeIoException("Failed to get the session.").initCause((Throwable) v);
         } else if (v instanceof IoSession) {
             return (IoSession) v;
         } else {

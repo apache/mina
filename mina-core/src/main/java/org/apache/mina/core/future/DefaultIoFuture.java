@@ -28,7 +28,6 @@ import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.ExceptionMonitor;
 
-
 /**
  * A default implementation of {@link IoFuture} associated with
  * an {@link IoSession}.
@@ -42,13 +41,18 @@ public class DefaultIoFuture implements IoFuture {
 
     /** The associated session */
     private final IoSession session;
-    
+
     /** A lock used by the wait() method */
     private final Object lock;
+
     private IoFutureListener<?> firstListener;
+
     private List<IoFutureListener<?>> otherListeners;
+
     private Object result;
+
     private boolean ready;
+
     private int waiters;
 
     /**
@@ -110,8 +114,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
-    public boolean await(long timeout, TimeUnit unit)
-            throws InterruptedException {
+    public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
         return await(unit.toMillis(timeout));
     }
 
@@ -128,10 +131,10 @@ public class DefaultIoFuture implements IoFuture {
     public IoFuture awaitUninterruptibly() {
         try {
             await0(Long.MAX_VALUE, false);
-        } catch ( InterruptedException ie) {
+        } catch (InterruptedException ie) {
             // Do nothing : this catch is just mandatory by contract
         }
-        
+
         return this;
     }
 
@@ -168,7 +171,7 @@ public class DefaultIoFuture implements IoFuture {
      */
     private boolean await0(long timeoutMillis, boolean interruptable) throws InterruptedException {
         long endTime = System.currentTimeMillis() + timeoutMillis;
-        
+
         if (endTime < 0) {
             endTime = Long.MAX_VALUE;
         }
@@ -181,7 +184,7 @@ public class DefaultIoFuture implements IoFuture {
             }
 
             waiters++;
-            
+
             try {
                 for (;;) {
                     try {
@@ -196,7 +199,7 @@ public class DefaultIoFuture implements IoFuture {
                     if (ready) {
                         return true;
                     }
-                    
+
                     if (endTime < System.currentTimeMillis()) {
                         return ready;
                     }
@@ -210,7 +213,6 @@ public class DefaultIoFuture implements IoFuture {
         }
     }
 
-    
     /**
      * 
      * TODO checkDeadLock.
@@ -218,11 +220,10 @@ public class DefaultIoFuture implements IoFuture {
      */
     private void checkDeadLock() {
         // Only read / write / connect / write future can cause dead lock. 
-        if (!(this instanceof CloseFuture || this instanceof WriteFuture ||
-              this instanceof ReadFuture || this instanceof ConnectFuture)) {
+        if (!(this instanceof CloseFuture || this instanceof WriteFuture || this instanceof ReadFuture || this instanceof ConnectFuture)) {
             return;
         }
-        
+
         // Get the current thread stackTrace. 
         // Using Thread.currentThread().getStackTrace() is the best solution,
         // even if slightly less efficient than doing a new Exception().getStackTrace(),
@@ -232,28 +233,25 @@ public class DefaultIoFuture implements IoFuture {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
         // Simple and quick check.
-        for (StackTraceElement s: stackTrace) {
+        for (StackTraceElement s : stackTrace) {
             if (AbstractPollingIoProcessor.class.getName().equals(s.getClassName())) {
-                IllegalStateException e = new IllegalStateException( "t" );
+                IllegalStateException e = new IllegalStateException("t");
                 e.getStackTrace();
-                throw new IllegalStateException(
-                    "DEAD LOCK: " + IoFuture.class.getSimpleName() +
-                    ".await() was invoked from an I/O processor thread.  " +
-                    "Please use " + IoFutureListener.class.getSimpleName() +
-                    " or configure a proper thread model alternatively.");
+                throw new IllegalStateException("DEAD LOCK: " + IoFuture.class.getSimpleName()
+                        + ".await() was invoked from an I/O processor thread.  " + "Please use "
+                        + IoFutureListener.class.getSimpleName() + " or configure a proper thread model alternatively.");
             }
         }
 
         // And then more precisely.
-        for (StackTraceElement s: stackTrace) {
+        for (StackTraceElement s : stackTrace) {
             try {
                 Class<?> cls = DefaultIoFuture.class.getClassLoader().loadClass(s.getClassName());
                 if (IoProcessor.class.isAssignableFrom(cls)) {
-                    throw new IllegalStateException(
-                        "DEAD LOCK: " + IoFuture.class.getSimpleName() +
-                        ".await() was invoked from an I/O processor thread.  " +
-                        "Please use " + IoFutureListener.class.getSimpleName() +
-                        " or configure a proper thread model alternatively.");
+                    throw new IllegalStateException("DEAD LOCK: " + IoFuture.class.getSimpleName()
+                            + ".await() was invoked from an I/O processor thread.  " + "Please use "
+                            + IoFutureListener.class.getSimpleName()
+                            + " or configure a proper thread model alternatively.");
                 }
             } catch (Exception cnfe) {
                 // Ignore

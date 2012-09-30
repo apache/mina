@@ -51,8 +51,7 @@ public class VmPipeEventOrderTest {
             }
 
             @Override
-            public void messageSent(IoSession session, Object message)
-                    throws Exception {
+            public void messageSent(IoSession session, Object message) throws Exception {
                 session.close(true);
             }
         });
@@ -64,8 +63,7 @@ public class VmPipeEventOrderTest {
         connector.setHandler(new IoHandlerAdapter() {
 
             @Override
-            public void messageReceived(IoSession session, Object message)
-                    throws Exception {
+            public void messageReceived(IoSession session, Object message) throws Exception {
                 actual.append(message);
             }
 
@@ -106,8 +104,7 @@ public class VmPipeEventOrderTest {
         acceptor.setHandler(new IoHandlerAdapter() {
 
             @Override
-            public void messageReceived(IoSession session, Object message)
-                    throws Exception {
+            public void messageReceived(IoSession session, Object message) throws Exception {
                 actual.append(message);
             }
 
@@ -132,8 +129,7 @@ public class VmPipeEventOrderTest {
             }
 
             @Override
-            public void messageSent(IoSession session, Object message)
-                    throws Exception {
+            public void messageSent(IoSession session, Object message) throws Exception {
                 session.close(true);
             }
         });
@@ -177,11 +173,10 @@ public class VmPipeEventOrderTest {
             }
 
             @Override
-            public void messageReceived(IoSession session, Object message)
-                    throws Exception {
+            public void messageReceived(IoSession session, Object message) throws Exception {
                 stringBuffer.append("C");
             }
-            
+
             @Override
             public void sessionClosed(IoSession session) throws Exception {
                 stringBuffer.append("D");

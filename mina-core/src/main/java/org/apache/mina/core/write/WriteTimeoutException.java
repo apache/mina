@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.apache.mina.core.session.IoSessionConfig;
 
-
 /**
  * An exception which is thrown when write buffer is not flushed for
  * {@link IoSessionConfig#getWriteTimeout()} seconds.
@@ -33,8 +32,7 @@ import org.apache.mina.core.session.IoSessionConfig;
 public class WriteTimeoutException extends WriteException {
     private static final long serialVersionUID = 3906931157944579121L;
 
-    public WriteTimeoutException(Collection<WriteRequest> requests,
-            String message, Throwable cause) {
+    public WriteTimeoutException(Collection<WriteRequest> requests, String message, Throwable cause) {
         super(requests, message, cause);
     }
 
@@ -42,8 +40,7 @@ public class WriteTimeoutException extends WriteException {
         super(requests, s);
     }
 
-    public WriteTimeoutException(Collection<WriteRequest> requests,
-            Throwable cause) {
+    public WriteTimeoutException(Collection<WriteRequest> requests, Throwable cause) {
         super(requests, cause);
     }
 
@@ -51,8 +48,7 @@ public class WriteTimeoutException extends WriteException {
         super(requests);
     }
 
-    public WriteTimeoutException(WriteRequest request, String message,
-            Throwable cause) {
+    public WriteTimeoutException(WriteRequest request, String message, Throwable cause) {
         super(request, message, cause);
     }
 

@@ -48,8 +48,7 @@ public interface ProtocolEncoder {
      *
      * @throws Exception if the message violated protocol specification
      */
-    void encode(IoSession session, Object message, ProtocolEncoderOutput out)
-            throws Exception;
+    void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception;
 
     /**
      * Releases all resources related with this encoder.

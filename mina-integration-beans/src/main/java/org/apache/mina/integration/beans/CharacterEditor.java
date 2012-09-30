@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  */
 public class CharacterEditor extends AbstractPropertyEditor {
     private static final Pattern UNICODE = Pattern.compile("\\\\[uU][0-9a-fA-F]+");
-    
+
     @Override
     protected String toText(Object value) {
         return String.valueOf(value);
@@ -41,11 +41,11 @@ public class CharacterEditor extends AbstractPropertyEditor {
         if (text.length() == 0) {
             return Character.valueOf(Character.MIN_VALUE);
         }
-        
+
         if (UNICODE.matcher(text).matches()) {
             return Character.valueOf((char) Integer.parseInt(text.substring(2)));
         }
-        
+
         if (text.length() != 1) {
             throw new IllegalArgumentException("Too many characters: " + text);
         }

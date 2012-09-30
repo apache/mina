@@ -19,7 +19,6 @@
  */
 package org.apache.mina.core.future;
 
-
 /**
  * An {@link IoFuture} for asynchronous close requests.
  *

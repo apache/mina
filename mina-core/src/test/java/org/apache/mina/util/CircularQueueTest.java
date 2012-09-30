@@ -35,6 +35,7 @@ import org.junit.Test;
  */
 public class CircularQueueTest {
     private volatile int pushCount;
+
     private volatile int popCount;
 
     @Before
@@ -101,7 +102,7 @@ public class CircularQueueTest {
             fail();
         } catch (Exception e) {
             // an exception signifies a successfull test case
-            assertTrue(true);            
+            assertTrue(true);
         }
     }
 
@@ -188,30 +189,30 @@ public class CircularQueueTest {
             fail();
         } catch (Exception e) {
             // an exception signifies a successfull test case
-            assertTrue(true);            
+            assertTrue(true);
         }
     }
-    
+
     @Test
     public void testExpandAndShrink() throws Exception {
         CircularQueue<Integer> q = new CircularQueue<Integer>();
-        for (int i = 0; i < 1024; i ++) {
+        for (int i = 0; i < 1024; i++) {
             q.offer(i);
         }
-        
+
         assertEquals(1024, q.capacity());
-        
-        for (int i = 0; i < 512; i ++) {
+
+        for (int i = 0; i < 512; i++) {
             q.offer(i);
             q.poll();
         }
-        
+
         assertEquals(2048, q.capacity());
-        
-        for (int i = 0; i < 1024; i ++) { 
+
+        for (int i = 0; i < 1024; i++) {
             q.poll();
         }
-        
+
         assertEquals(4, q.capacity());
     }
 

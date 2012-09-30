@@ -31,15 +31,15 @@ import java.util.Queue;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SynchronizedQueue<E> implements Queue<E>, Serializable {
-    
+
     private static final long serialVersionUID = -1439242290701194806L;
-    
+
     private final Queue<E> q;
 
     public SynchronizedQueue(Queue<E> q) {
         this.q = q;
     }
-    
+
     public synchronized boolean add(E e) {
         return q.add(e);
     }

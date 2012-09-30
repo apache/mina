@@ -22,7 +22,6 @@ package org.apache.mina.core.file;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-
 /**
  * TODO Add documentation
  * 
@@ -34,13 +33,15 @@ public class DefaultFileRegion implements FileRegion {
     private final FileChannel channel;
 
     private final long originalPosition;
+
     private long position;
+
     private long remainingBytes;
 
     public DefaultFileRegion(FileChannel channel) throws IOException {
         this(channel, 0, channel.size());
     }
-    
+
     public DefaultFileRegion(FileChannel channel, long position, long remainingBytes) {
         if (channel == null) {
             throw new IllegalArgumentException("channel can not be null");

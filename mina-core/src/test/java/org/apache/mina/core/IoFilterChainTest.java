@@ -46,7 +46,9 @@ import static org.junit.Assert.assertSame;
  */
 public class IoFilterChainTest {
     private DummySession dummySession;
+
     private IoFilterChain chain;
+
     String testResult;
 
     private final IoHandler handler = new IoHandlerAdapter() {
@@ -202,8 +204,7 @@ public class IoFilterChainTest {
     public void testChained() throws Exception {
         chain.addLast("A", new EventOrderTestFilter('A'));
         chain.addLast("B", new EventOrderTestFilter('B'));
-        run("AS0 BS0 HS0" + "ASO BSO HSO" + "AMR BMR HMR"
-                + "BFW AFW AMS BMS HMS" + "ASI BSI HSI" + "AEC BEC HEC"
+        run("AS0 BS0 HS0" + "ASO BSO HSO" + "AMR BMR HMR" + "BFW AFW AMS BMS HMS" + "ASI BSI HSI" + "AEC BEC HEC"
                 + "ASC BSC HSC");
     }
 
@@ -228,7 +229,7 @@ public class IoFilterChainTest {
         chain.fireSessionClosed();
 
         testResult = formatResult(testResult);
-        String formatedExpectedResult = formatResult(expectedResult); 
+        String formatedExpectedResult = formatResult(expectedResult);
 
         assertEquals(formatedExpectedResult, testResult);
     }
@@ -236,10 +237,10 @@ public class IoFilterChainTest {
     private String formatResult(String result) {
         String newResult = result.replaceAll("\\s", "");
         StringBuilder buf = new StringBuilder(newResult.length() * 4 / 3);
-        
+
         for (int i = 0; i < newResult.length(); i++) {
             buf.append(newResult.charAt(i));
-        
+
             if (i % 3 == 2) {
                 buf.append(' ');
             }
@@ -274,43 +275,37 @@ public class IoFilterChainTest {
         }
 
         @Override
-        public void sessionIdle(NextFilter nextFilter, IoSession session,
-                IdleStatus status) {
+        public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) {
             testResult += id + "SI";
             nextFilter.sessionIdle(session, status);
         }
 
         @Override
-        public void exceptionCaught(NextFilter nextFilter, IoSession session,
-                Throwable cause) {
+        public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) {
             testResult += id + "EC";
             nextFilter.exceptionCaught(session, cause);
         }
 
         @Override
-        public void filterWrite(NextFilter nextFilter, IoSession session,
-                WriteRequest writeRequest) {
+        public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) {
             testResult += id + "FW";
             nextFilter.filterWrite(session, writeRequest);
         }
 
         @Override
-        public void messageReceived(NextFilter nextFilter, IoSession session,
-                Object message) {
+        public void messageReceived(NextFilter nextFilter, IoSession session, Object message) {
             testResult += id + "MR";
             nextFilter.messageReceived(session, message);
         }
 
         @Override
-        public void messageSent(NextFilter nextFilter, IoSession session,
-                WriteRequest writeRequest) {
+        public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) {
             testResult += id + "MS";
             nextFilter.messageSent(session, writeRequest);
         }
 
         @Override
-        public void filterClose(NextFilter nextFilter, IoSession session)
-                throws Exception {
+        public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
             nextFilter.filterClose(session);
         }
     }
@@ -322,16 +317,14 @@ public class IoFilterChainTest {
         public AddRemoveTestFilter() {
             super();
         }
-        
+
         @Override
-        public void onPostAdd(IoFilterChain parent, String name,
-                NextFilter nextFilter) {
+        public void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter) {
             testResult += "ADDED";
         }
 
         @Override
-        public void onPostRemove(IoFilterChain parent, String name,
-                NextFilter nextFilter) {
+        public void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) {
             testResult += "REMOVED";
         }
     }

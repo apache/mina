@@ -20,7 +20,6 @@
 
 package org.apache.mina.util;
 
-
 import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
@@ -32,10 +31,9 @@ import org.junit.Test;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ExpiringMapTest
-{
-    private ExpiringMap<String,String> theMap;
-    
+public class ExpiringMapTest {
+    private ExpiringMap<String, String> theMap;
+
     /**
      * Create the map, populate it and then kick off 
      * the Expirer, then sleep long enough so that the
@@ -44,10 +42,9 @@ public class ExpiringMapTest
      * @throws java.lang.Exception
      */
     @Before
-    public void setUp() throws Exception
-    {
-        theMap = new ExpiringMap<String,String>(1, 2);
-        theMap.put( "Apache", "MINA" );
+    public void setUp() throws Exception {
+        theMap = new ExpiringMap<String, String>(1, 2);
+        theMap.put("Apache", "MINA");
         theMap.getExpirer().startExpiringIfNotStarted();
         Thread.sleep(3000);
     }
@@ -57,7 +54,7 @@ public class ExpiringMapTest
      *
      */
     @Test
-    public void testGet(){
-        assertNull( theMap.get( "Apache" ) );
+    public void testGet() {
+        assertNull(theMap.get("Apache"));
     }
 }

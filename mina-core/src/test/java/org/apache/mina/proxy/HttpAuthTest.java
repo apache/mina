@@ -46,13 +46,11 @@ public class HttpAuthTest {
      * Tests Basic authentication mechanism.
      */
     @Test
-
     public void testBasicAuthResponse() {
         String USER = "Aladdin";
         String PWD = "open sesame";
 
-        assertEquals("QWxhZGRpbjpvcGVuIHNlc2FtZQ==", HttpBasicAuthLogicHandler
-                .createAuthorization(USER, PWD));
+        assertEquals("QWxhZGRpbjpvcGVuIHNlc2FtZQ==", HttpBasicAuthLogicHandler.createAuthorization(USER, PWD));
     }
 
     /**
@@ -79,8 +77,7 @@ public class HttpAuthTest {
 
         String response = null;
         try {
-            response = DigestUtilities.computeResponseValue(new DummySession(),
-                    map, METHOD, PWD, CHARSET_IN_USE, null);
+            response = DigestUtilities.computeResponseValue(new DummySession(), map, METHOD, PWD, CHARSET_IN_USE, null);
             assertEquals("6629fae49393a05397450978507c4ef1", response);
             writeResponse(map, response);
         } catch (Exception e) {

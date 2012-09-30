@@ -36,7 +36,7 @@ public interface IoSessionDataStructureFactory {
      * implementation must be thread-safe.
      */
     IoSessionAttributeMap getAttributeMap(IoSession session) throws Exception;
-    
+
     /**
      * Returns an {@link WriteRequest} which is going to be associated with
      * the specified <tt>session</tt>.  Please note that the returned

@@ -26,8 +26,9 @@ package org.apache.mina.statemachine;
  */
 class BreakAndGotoException extends BreakException {
     private static final long serialVersionUID = 711671882187950113L;
-    
+
     private final String stateId;
+
     private final boolean now;
 
     public BreakAndGotoException(String stateId, boolean now) {

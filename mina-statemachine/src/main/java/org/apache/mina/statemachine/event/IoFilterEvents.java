@@ -29,24 +29,17 @@ import org.apache.mina.statemachine.annotation.IoFilterTransition;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum IoFilterEvents {
-    ANY(Event.WILDCARD_EVENT_ID),
-    SESSION_CREATED("sessionCreated"),
-    SESSION_OPENED("sessionOpened"),
-    SESSION_CLOSED("sessionClosed"),
-    SESSION_IDLE("sessionIdle"),
-    MESSAGE_RECEIVED("messageReceived"),
-    MESSAGE_SENT("messageSent"),
-    EXCEPTION_CAUGHT("exceptionCaught"),
-    CLOSE("filterClose"),
-    WRITE("filterWrite"),
-    SET_TRAFFIC_MASK("filterSetTrafficMask");
+    ANY(Event.WILDCARD_EVENT_ID), SESSION_CREATED("sessionCreated"), SESSION_OPENED("sessionOpened"), SESSION_CLOSED(
+            "sessionClosed"), SESSION_IDLE("sessionIdle"), MESSAGE_RECEIVED("messageReceived"), MESSAGE_SENT(
+            "messageSent"), EXCEPTION_CAUGHT("exceptionCaught"), CLOSE("filterClose"), WRITE("filterWrite"), SET_TRAFFIC_MASK(
+            "filterSetTrafficMask");
 
     private final String value;
-    
+
     private IoFilterEvents(String value) {
         this.value = value;
     }
-    
+
     @Override
     public String toString() {
         return value;

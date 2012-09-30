@@ -49,14 +49,12 @@ public class StringUtilities {
      * @throws AuthenticationException if mandatory is true and if 
      * directivesMap.get(directive) == null
      */
-    public static String getDirectiveValue(
-            HashMap<String, String> directivesMap, String directive,
-            boolean mandatory) throws AuthenticationException {
+    public static String getDirectiveValue(HashMap<String, String> directivesMap, String directive, boolean mandatory)
+            throws AuthenticationException {
         String value = directivesMap.get(directive);
         if (value == null) {
             if (mandatory) {
-                throw new AuthenticationException("\"" + directive
-                        + "\" mandatory directive is missing");
+                throw new AuthenticationException("\"" + directive + "\" mandatory directive is missing");
             }
 
             return "";
@@ -73,12 +71,10 @@ public class StringUtilities {
      * @param sb the output buffer
      * @param directive the directive name to look for
      */
-    public static void copyDirective(HashMap<String, String> directives,
-            StringBuilder sb, String directive) {
+    public static void copyDirective(HashMap<String, String> directives, StringBuilder sb, String directive) {
         String directiveValue = directives.get(directive);
         if (directiveValue != null) {
-            sb.append(directive).append(" = \"").append(directiveValue).append(
-                    "\", ");
+            sb.append(directive).append(" = \"").append(directiveValue).append("\", ");
         }
     }
 
@@ -92,8 +88,7 @@ public class StringUtilities {
      * @param directive the directive name
      * @return the value of the copied directive
      */
-    public static String copyDirective(HashMap<String, String> src,
-            HashMap<String, String> dst, String directive) {
+    public static String copyDirective(HashMap<String, String> src, HashMap<String, String> dst, String directive) {
         String directiveValue = src.get(directive);
         if (directiveValue != null) {
             dst.put(directive, directiveValue);
@@ -110,8 +105,7 @@ public class StringUtilities {
      * @throws UnsupportedEncodingException 
      * @throws SaslException if the String cannot be parsed according to RFC 2831
      */
-    public static HashMap<String, String> parseDirectives(byte[] buf)
-            throws SaslException {
+    public static HashMap<String, String> parseDirectives(byte[] buf) throws SaslException {
         HashMap<String, String> map = new HashMap<String, String>();
         boolean gettingKey = true;
         boolean gettingQuotedValue = false;
@@ -128,8 +122,7 @@ public class StringUtilities {
             if (gettingKey) {
                 if (bch == ',') {
                     if (key.size() != 0) {
-                        throw new SaslException("Directive key contains a ',':"
-                                + key);
+                        throw new SaslException("Directive key contains a ',':" + key);
                     }
 
                     // Empty element, skip separator and lws
@@ -149,8 +142,7 @@ public class StringUtilities {
                             ++i; // Skip quote
                         }
                     } else {
-                        throw new SaslException("Valueless directive found: "
-                                + key.toString());
+                        throw new SaslException("Valueless directive found: " + key.toString());
                     }
                 } else if (isLws(bch)) {
                     // LWS that occurs after key
@@ -159,12 +151,10 @@ public class StringUtilities {
                     // Expecting '='
                     if (i < buf.length) {
                         if (buf[i] != '=') {
-                            throw new SaslException("'=' expected after key: "
-                                    + key.toString());
+                            throw new SaslException("'=' expected after key: " + key.toString());
                         }
                     } else {
-                        throw new SaslException("'=' expected after key: "
-                                + key.toString());
+                        throw new SaslException("'=' expected after key: " + key.toString());
                     }
                 } else {
                     key.write(bch); // Append to key
@@ -180,10 +170,8 @@ public class StringUtilities {
                         ++i; // Advance
                     } else {
                         // Trailing escape in a quoted value
-                        throw new SaslException(
-                                "Unmatched quote found for directive: "
-                                        + key.toString() + " with value: "
-                                        + value.toString());
+                        throw new SaslException("Unmatched quote found for directive: " + key.toString()
+                                + " with value: " + value.toString());
                     }
                 } else if (bch == '"') {
                     // closing quote
@@ -203,9 +191,8 @@ public class StringUtilities {
                 gettingQuotedValue = expectSeparator = false;
                 i = skipLws(buf, i + 1); // Skip separator and LWS
             } else if (expectSeparator) {
-                throw new SaslException(
-                        "Expecting comma or linear whitespace after quoted string: \""
-                                + value.toString() + "\"");
+                throw new SaslException("Expecting comma or linear whitespace after quoted string: \""
+                        + value.toString() + "\"");
             } else {
                 value.write(bch); // Unquoted value
                 ++i; // Advance
@@ -213,8 +200,8 @@ public class StringUtilities {
         }
 
         if (gettingQuotedValue) {
-            throw new SaslException("Unmatched quote found for directive: "
-                    + key.toString() + " with value: " + value.toString());
+            throw new SaslException("Unmatched quote found for directive: " + key.toString() + " with value: "
+                    + value.toString());
         }
 
         // Get last pair
@@ -234,11 +221,9 @@ public class StringUtilities {
      * @throws SaslException if either the key or the value is null or
      * if the key already has a value. 
      */
-    private static void extractDirective(HashMap<String, String> map,
-            String key, String value) throws SaslException {
+    private static void extractDirective(HashMap<String, String> map, String key, String value) throws SaslException {
         if (map.get(key) != null) {
-            throw new SaslException("Peer sent more than one " + key
-                    + " directive");
+            throw new SaslException("Peer sent more than one " + key + " directive");
         }
 
         map.put(key, value);
@@ -291,8 +276,7 @@ public class StringUtilities {
      * @return a non-null String containing the 8859_1 encoded string
      * @throws AuthenticationException 
      */
-    public static String stringTo8859_1(String str)
-            throws UnsupportedEncodingException {
+    public static String stringTo8859_1(String str) throws UnsupportedEncodingException {
         if (str == null) {
             return "";
         }
@@ -308,8 +292,7 @@ public class StringUtilities {
      * @param key the key of the header 
      * @return the value of the http header
      */
-    public static String getSingleValuedHeader(
-            Map<String, List<String>> headers, String key) {
+    public static String getSingleValuedHeader(Map<String, List<String>> headers, String key) {
         List<String> values = headers.get(key);
 
         if (values == null) {
@@ -317,8 +300,7 @@ public class StringUtilities {
         }
 
         if (values.size() > 1) {
-            throw new IllegalArgumentException("Header with key [\"" + key
-                    + "\"] isn't single valued !");
+            throw new IllegalArgumentException("Header with key [\"" + key + "\"] isn't single valued !");
         }
 
         return values.get(0);
@@ -334,8 +316,8 @@ public class StringUtilities {
      * then it is replaced by the new value. Otherwise it simply adds a new
      * value to this multi-valued header.
      */
-    public static void addValueToHeader(Map<String, List<String>> headers,
-            String key, String value, boolean singleValued) {
+    public static void addValueToHeader(Map<String, List<String>> headers, String key, String value,
+            boolean singleValued) {
         List<String> values = headers.get(key);
 
         if (values == null) {

@@ -41,8 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StateMachineProxyBuilder {
-    private static final Logger log = LoggerFactory
-            .getLogger(StateMachineProxyBuilder.class);
+    private static final Logger log = LoggerFactory.getLogger(StateMachineProxyBuilder.class);
 
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
 
@@ -55,14 +54,14 @@ public class StateMachineProxyBuilder {
     private boolean ignoreUnhandledEvents = false;
 
     private boolean ignoreStateContextLookupFailure = false;
-    
+
     private String name = null;
 
     /*
      * The classloader to use. Iif null we will use the current thread's 
      * context classloader.
      */
-    private ClassLoader defaultCl = null; 
+    private ClassLoader defaultCl = null;
 
     public StateMachineProxyBuilder() {
     }
@@ -79,7 +78,7 @@ public class StateMachineProxyBuilder {
         this.name = name;
         return this;
     }
-    
+
     /**
      * Sets the {@link StateContextLookup} to be used. The default is to use
      * a {@link SingletonStateContextLookup}.
@@ -87,8 +86,7 @@ public class StateMachineProxyBuilder {
      * @param contextLookup the {@link StateContextLookup} to use.
      * @return this {@link StateMachineProxyBuilder} for method chaining. 
      */
-    public StateMachineProxyBuilder setStateContextLookup(
-            StateContextLookup contextLookup) {
+    public StateMachineProxyBuilder setStateContextLookup(StateContextLookup contextLookup) {
         this.contextLookup = contextLookup;
         return this;
     }
@@ -112,8 +110,7 @@ public class StateMachineProxyBuilder {
      * @param interceptor the {@link EventArgumentsInterceptor} to use.
      * @return this {@link StateMachineProxyBuilder} for method chaining.
      */
-    public StateMachineProxyBuilder setEventArgumentsInterceptor(
-            EventArgumentsInterceptor interceptor) {
+    public StateMachineProxyBuilder setEventArgumentsInterceptor(EventArgumentsInterceptor interceptor) {
         this.interceptor = interceptor;
         return this;
     }
@@ -183,30 +180,34 @@ public class StateMachineProxyBuilder {
     public Object create(Class<?>[] ifaces, StateMachine sm) {
         ClassLoader cl = defaultCl;
         if (cl == null) {
-           cl = Thread.currentThread().getContextClassLoader();
+            cl = Thread.currentThread().getContextClassLoader();
         }
 
-        InvocationHandler handler = new MethodInvocationHandler(sm,
-                contextLookup, interceptor, eventFactory,
+        InvocationHandler handler = new MethodInvocationHandler(sm, contextLookup, interceptor, eventFactory,
                 ignoreUnhandledEvents, ignoreStateContextLookupFailure, name);
 
         return Proxy.newProxyInstance(cl, ifaces, handler);
     }
-    
+
     private static class MethodInvocationHandler implements InvocationHandler {
         private final StateMachine sm;
+
         private final StateContextLookup contextLookup;
+
         private final EventArgumentsInterceptor interceptor;
+
         private final EventFactory eventFactory;
+
         private final boolean ignoreUnhandledEvents;
+
         private final boolean ignoreStateContextLookupFailure;
+
         private final String name;
-        
+
         public MethodInvocationHandler(StateMachine sm, StateContextLookup contextLookup,
-                EventArgumentsInterceptor interceptor, EventFactory eventFactory,
-                boolean ignoreUnhandledEvents, boolean ignoreStateContextLookupFailure, 
-                String name) {
-            
+                EventArgumentsInterceptor interceptor, EventFactory eventFactory, boolean ignoreUnhandledEvents,
+                boolean ignoreStateContextLookupFailure, String name) {
+
             this.contextLookup = contextLookup;
             this.sm = sm;
             this.interceptor = interceptor;
@@ -215,7 +216,7 @@ public class StateMachineProxyBuilder {
             this.ignoreStateContextLookupFailure = ignoreStateContextLookupFailure;
             this.name = name;
         }
-        
+
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if ("hashCode".equals(method.getName()) && args == null) {
                 return new Integer(System.identityHashCode(proxy));
@@ -224,7 +225,7 @@ public class StateMachineProxyBuilder {
                 return Boolean.valueOf(proxy == args[0]);
             }
             if ("toString".equals(method.getName()) && args == null) {
-                return (name != null ? name : proxy.getClass().getName()) + "@" 
+                return (name != null ? name : proxy.getClass().getName()) + "@"
                         + Integer.toHexString(System.identityHashCode(proxy));
             }
 
@@ -243,8 +244,7 @@ public class StateMachineProxyBuilder {
                 if (ignoreStateContextLookupFailure) {
                     return null;
                 }
-                throw new IllegalStateException("Cannot determine state "
-                        + "context for method invocation: " + method);
+                throw new IllegalStateException("Cannot determine state " + "context for method invocation: " + method);
             }
 
             Event event = eventFactory.create(context, method, args);

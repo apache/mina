@@ -36,7 +36,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * Tests {@link CumulativeProtocolDecoder}.
  *
@@ -46,16 +45,15 @@ public class CumulativeProtocolDecoderTest {
     private final ProtocolCodecSession session = new ProtocolCodecSession();
 
     private IoBuffer buf;
+
     private IntegerDecoder decoder;
 
     @Before
     public void setUp() throws Exception {
         buf = IoBuffer.allocate(16);
         decoder = new IntegerDecoder();
-        session.setTransportMetadata(
-                new DefaultTransportMetadata(
-                        "mina", "dummy", false, true, SocketAddress.class,
-                        IoSessionConfig.class, IoBuffer.class));
+        session.setTransportMetadata(new DefaultTransportMetadata("mina", "dummy", false, true, SocketAddress.class,
+                IoSessionConfig.class, IoBuffer.class));
     }
 
     @After
@@ -96,9 +94,9 @@ public class CumulativeProtocolDecoderTest {
         assertEquals(buf.limit(), buf.position());
 
         List<Object> expected = new ArrayList<Object>();
-        
+
         for (int i = 0; i < 4; i++) {
-            assertTrue( session.getDecoderOutputQueue().contains(i));
+            assertTrue(session.getDecoderOutputQueue().contains(i));
         }
     }
 
@@ -111,13 +109,13 @@ public class CumulativeProtocolDecoderTest {
             // OK
         }
     }
-    
+
     @Test
     public void testBufferDerivation() throws Exception {
         decoder = new DuplicatingIntegerDecoder();
-        
+
         buf.putInt(1);
-        
+
         // Put some extra byte to make the decoder create an internal buffer.
         buf.put((byte) 0);
         buf.flip();
@@ -134,14 +132,14 @@ public class CumulativeProtocolDecoderTest {
         // Consequently, CumulativeProtocolDecoder will perform 
         // reallocation to avoid putting incoming data into
         // the internal buffer with auto-expansion disabled.
-        for (int i = 2; i < 10; i ++) {
+        for (int i = 2; i < 10; i++) {
             buf.clear();
             buf.putInt(i);
             // Put some extra byte to make the decoder keep the internal buffer.
             buf.put((byte) 0);
             buf.flip();
             buf.position(1);
-    
+
             decoder.decode(session, buf, session.getDecoderOutput());
             assertEquals(1, session.getDecoderOutputQueue().size());
             assertEquals(i, session.getDecoderOutputQueue().poll());
@@ -156,12 +154,11 @@ public class CumulativeProtocolDecoderTest {
         public IntegerDecoder() {
             super();
         }
-        
+
         @Override
-        protected boolean doDecode(IoSession session, IoBuffer in,
-                ProtocolDecoderOutput out) throws Exception {
+        protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
             assertTrue(in.hasRemaining());
-            
+
             if (in.remaining() < 4) {
                 return false;
             }
@@ -174,7 +171,7 @@ public class CumulativeProtocolDecoderTest {
             // Do nothing
         }
     }
-    
+
     private static class WrongDecoder extends CumulativeProtocolDecoder {
         /**
          * Default constructor
@@ -182,10 +179,9 @@ public class CumulativeProtocolDecoderTest {
         public WrongDecoder() {
             super();
         }
-        
+
         @Override
-        protected boolean doDecode(IoSession session, IoBuffer in,
-                ProtocolDecoderOutput out) throws Exception {
+        protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
             return true;
         }
 
@@ -201,10 +197,9 @@ public class CumulativeProtocolDecoderTest {
         public DuplicatingIntegerDecoder() {
             super();
         }
-        
+
         @Override
-        protected boolean doDecode(IoSession session, IoBuffer in,
-                ProtocolDecoderOutput out) throws Exception {
+        protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
             in.duplicate(); // Will disable auto-expansion.
             assertFalse(in.isAutoExpand());
             return super.doDecode(session, in, out);

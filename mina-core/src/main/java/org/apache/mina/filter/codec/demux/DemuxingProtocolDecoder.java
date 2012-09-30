@@ -73,8 +73,9 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
 
     private final AttributeKey STATE = new AttributeKey(getClass(), "state");
-    
+
     private MessageDecoderFactory[] decoderFactories = new MessageDecoderFactory[0];
+
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
     public DemuxingProtocolDecoder() {
@@ -89,8 +90,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         try {
             decoderClass.getConstructor(EMPTY_PARAMS);
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(
-                    "The specified class doesn't have a public default constructor.");
+            throw new IllegalArgumentException("The specified class doesn't have a public default constructor.");
         }
 
         boolean registered = false;
@@ -100,8 +100,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         }
 
         if (!registered) {
-            throw new IllegalArgumentException(
-                    "Unregisterable type: " + decoderClass);
+            throw new IllegalArgumentException("Unregisterable type: " + decoderClass);
         }
     }
 
@@ -115,31 +114,29 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         }
         MessageDecoderFactory[] decoderFactories = this.decoderFactories;
         MessageDecoderFactory[] newDecoderFactories = new MessageDecoderFactory[decoderFactories.length + 1];
-        System.arraycopy(decoderFactories, 0, newDecoderFactories, 0,
-                decoderFactories.length);
+        System.arraycopy(decoderFactories, 0, newDecoderFactories, 0, decoderFactories.length);
         newDecoderFactories[decoderFactories.length] = factory;
         this.decoderFactories = newDecoderFactories;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean doDecode(IoSession session, IoBuffer in,
-            ProtocolDecoderOutput out) throws Exception {
+    protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         State state = getState(session);
-        
+
         if (state.currentDecoder == null) {
             MessageDecoder[] decoders = state.decoders;
             int undecodables = 0;
-        
+
             for (int i = decoders.length - 1; i >= 0; i--) {
                 MessageDecoder decoder = decoders[i];
                 int limit = in.limit();
                 int pos = in.position();
 
                 MessageDecoderResult result;
-                
+
                 try {
                     result = decoder.decodable(session, in);
                 } finally {
@@ -153,9 +150,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
                 } else if (result == MessageDecoder.NOT_OK) {
                     undecodables++;
                 } else if (result != MessageDecoder.NEED_DATA) {
-                    throw new IllegalStateException(
-                            "Unexpected decode result (see your decodable()): "
-                                    + result);
+                    throw new IllegalStateException("Unexpected decode result (see your decodable()): " + result);
                 }
             }
 
@@ -163,8 +158,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
                 // Throw an exception if all decoders cannot decode data.
                 String dump = in.getHexDump();
                 in.position(in.limit()); // Skip data
-                ProtocolDecoderException e = new ProtocolDecoderException(
-                        "No appropriate message decoder: " + dump);
+                ProtocolDecoderException e = new ProtocolDecoderException("No appropriate message decoder: " + dump);
                 e.setHexdump(dump);
                 throw e;
             }
@@ -176,8 +170,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         }
 
         try {
-            MessageDecoderResult result = state.currentDecoder.decode(session, in,
-                    out);
+            MessageDecoderResult result = state.currentDecoder.decode(session, in, out);
             if (result == MessageDecoder.OK) {
                 state.currentDecoder = null;
                 return true;
@@ -185,16 +178,13 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
                 return false;
             } else if (result == MessageDecoder.NOT_OK) {
                 state.currentDecoder = null;
-                throw new ProtocolDecoderException(
-                        "Message decoder returned NOT_OK.");
+                throw new ProtocolDecoderException("Message decoder returned NOT_OK.");
             } else {
                 state.currentDecoder = null;
-                throw new IllegalStateException(
-                        "Unexpected decode result (see your decode()): "
-                                + result);
+                throw new IllegalStateException("Unexpected decode result (see your decode()): " + result);
             }
         } catch (Exception e) {
-            state.currentDecoder = null; 
+            state.currentDecoder = null;
             throw e;
         }
     }
@@ -203,8 +193,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
      * {@inheritDoc}
      */
     @Override
-    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
-            throws Exception {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         super.finishDecode(session, out);
         State state = getState(session);
         MessageDecoder currentDecoder = state.currentDecoder;
@@ -223,26 +212,27 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         super.dispose(session);
         session.removeAttribute(STATE);
     }
-    
+
     private State getState(IoSession session) throws Exception {
         State state = (State) session.getAttribute(STATE);
-        
+
         if (state == null) {
             state = new State();
             State oldState = (State) session.setAttributeIfAbsent(STATE, state);
-            
+
             if (oldState != null) {
                 state = oldState;
             }
         }
-        
+
         return state;
     }
-    
+
     private class State {
         private final MessageDecoder[] decoders;
+
         private MessageDecoder currentDecoder;
-        
+
         private State() throws Exception {
             MessageDecoderFactory[] decoderFactories = DemuxingProtocolDecoder.this.decoderFactories;
             decoders = new MessageDecoder[decoderFactories.length];
@@ -252,8 +242,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         }
     }
 
-    private static class SingletonMessageDecoderFactory implements
-            MessageDecoderFactory {
+    private static class SingletonMessageDecoderFactory implements MessageDecoderFactory {
         private final MessageDecoder decoder;
 
         private SingletonMessageDecoderFactory(MessageDecoder decoder) {
@@ -268,8 +257,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         }
     }
 
-    private static class DefaultConstructorMessageDecoderFactory implements
-            MessageDecoderFactory {
+    private static class DefaultConstructorMessageDecoderFactory implements MessageDecoderFactory {
         private final Class<?> decoderClass;
 
         private DefaultConstructorMessageDecoderFactory(Class<?> decoderClass) {
@@ -278,8 +266,7 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
             }
 
             if (!MessageDecoder.class.isAssignableFrom(decoderClass)) {
-                throw new IllegalArgumentException(
-                        "decoderClass is not assignable to MessageDecoder");
+                throw new IllegalArgumentException("decoderClass is not assignable to MessageDecoder");
             }
             this.decoderClass = decoderClass;
         }

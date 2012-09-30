@@ -28,6 +28,7 @@ import java.net.DatagramSocket;
  */
 public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig {
     private static boolean DEFAULT_BROADCAST = false;
+
     private static boolean DEFAULT_REUSE_ADDRESS = false;
 
     /* The SO_RCVBUF parameter. Set to -1 (ie, will default to OS default) */
@@ -39,11 +40,15 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     private static int DEFAULT_TRAFFIC_CLASS = 0;
 
     private boolean broadcast = DEFAULT_BROADCAST;
+
     private boolean reuseAddress = DEFAULT_REUSE_ADDRESS;
+
     private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
+
     private int sendBufferSize = DEFAULT_SEND_BUFFER_SIZE;
+
     private int trafficClass = DEFAULT_TRAFFIC_CLASS;
-    
+
     /**
      * Creates a new instance.
      */
@@ -145,5 +150,5 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     protected boolean isTrafficClassChanged() {
         return trafficClass != DEFAULT_TRAFFIC_CLASS;
     }
-    
+
 }

@@ -52,20 +52,24 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     /** 
      * This constant is deduced from the APR code. It is used when the timeout
      * has expired while doing a poll() operation.
-     */ 
+     */
     private static final int APR_TIMEUP_ERROR = -120001;
 
     private static final int POLLSET_SIZE = 1024;
 
     private final Object wakeupLock = new Object();
+
     private volatile long wakeupSocket;
+
     private volatile boolean toBeWakenUp;
 
     private volatile long pool;
+
     private volatile long pollset; // socket poller
+
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
-    private final Queue<Long> polledHandles =
-        new ConcurrentLinkedQueue<Long>();
+
+    private final Queue<Long> polledHandles = new ConcurrentLinkedQueue<Long>();
 
     /**
      * Constructor for {@link AprSocketAcceptor} using default parameters (multiple thread model).
@@ -105,8 +109,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
      * @param executor the executor for connection
      * @param processor the processor for I/O operations
      */
-    public AprSocketAcceptor(Executor executor,
-            IoProcessor<AprSession> processor) {
+    public AprSocketAcceptor(Executor executor, IoProcessor<AprSession> processor) {
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
@@ -135,8 +138,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     @Override
     protected Long open(SocketAddress localAddress) throws Exception {
         InetSocketAddress la = (InetSocketAddress) localAddress;
-        long handle = Socket.create(
-                Socket.APR_INET, Socket.SOCK_STREAM, Socket.APR_PROTO_TCP, pool);
+        long handle = Socket.create(Socket.APR_INET, Socket.SOCK_STREAM, Socket.APR_PROTO_TCP, pool);
 
         boolean success = false;
         try {
@@ -150,7 +152,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
             }
 
             // Configure the server socket,
-            result = Socket.optSet(handle, Socket.APR_SO_REUSEADDR, isReuseAddress()? 1 : 0);
+            result = Socket.optSet(handle, Socket.APR_SO_REUSEADDR, isReuseAddress() ? 1 : 0);
             if (result != Status.APR_SUCCESS) {
                 throwException(result);
             }
@@ -201,27 +203,17 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
         // initialize a memory pool for APR functions
         pool = Pool.create(AprLibrary.getInstance().getRootPool());
 
-        wakeupSocket = Socket.create(
-                Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
+        wakeupSocket = Socket.create(Socket.APR_INET, Socket.SOCK_DGRAM, Socket.APR_PROTO_UDP, pool);
 
-        pollset = Poll.create(
-                        POLLSET_SIZE,
-                        pool,
-                        Poll.APR_POLLSET_THREADSAFE,
-                        Long.MAX_VALUE);
+        pollset = Poll.create(POLLSET_SIZE, pool, Poll.APR_POLLSET_THREADSAFE, Long.MAX_VALUE);
 
         if (pollset <= 0) {
-            pollset = Poll.create(
-                    62,
-                    pool,
-                    Poll.APR_POLLSET_THREADSAFE,
-                    Long.MAX_VALUE);
+            pollset = Poll.create(62, pool, Poll.APR_POLLSET_THREADSAFE, Long.MAX_VALUE);
         }
 
         if (pollset <= 0) {
-            if (Status.APR_STATUS_IS_ENOTIMPL(- (int) pollset)) {
-                throw new RuntimeIoException(
-                        "Thread-safe pollset is not supported in this platform.");
+            if (Status.APR_STATUS_IS_ENOTIMPL(-(int) pollset)) {
+                throw new RuntimeIoException("Thread-safe pollset is not supported in this platform.");
             }
         }
     }
@@ -267,7 +259,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
 
             rv = Poll.maintain(pollset, polledSockets, true);
             if (rv > 0) {
-                for (int i = 0; i < rv; i ++) {
+                for (int i = 0; i < rv; i++) {
                     Poll.add(pollset, polledSockets[i], Poll.APR_POLLIN);
                 }
             } else if (rv < 0) {
@@ -281,7 +273,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
                 polledHandles.clear();
             }
 
-            for (int i = 0; i < rv; i ++) {
+            for (int i = 0; i < rv; i++) {
                 long flag = polledSockets[i];
                 long socket = polledSockets[++i];
                 if (socket == wakeupSocket) {
@@ -380,8 +372,6 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
      * @throws IOException the generated exception
      */
     private void throwException(int code) throws IOException {
-        throw new IOException(
-                org.apache.tomcat.jni.Error.strerror(-code) +
-                " (code: " + code + ")");
+        throw new IOException(org.apache.tomcat.jni.Error.strerror(-code) + " (code: " + code + ")");
     }
 }

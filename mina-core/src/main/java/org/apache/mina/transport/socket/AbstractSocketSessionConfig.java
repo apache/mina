@@ -27,8 +27,7 @@ import org.apache.mina.core.session.IoSessionConfig;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfig
-        implements SocketSessionConfig {
+public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfig implements SocketSessionConfig {
 
     protected AbstractSocketSessionConfig() {
         // Do nothing
@@ -39,7 +38,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
         if (!(config instanceof SocketSessionConfig)) {
             return;
         }
-        
+
         if (config instanceof AbstractSocketSessionConfig) {
             // Minimize unnecessary system calls by checking all 'propertyChanged' properties.
             AbstractSocketSessionConfig cfg = (AbstractSocketSessionConfig) config;
@@ -114,7 +113,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     protected boolean isReceiveBufferSizeChanged() {
         return true;
     }
-    
+
     /**
      * Returns <tt>true</tt> if and only if the <tt>reuseAddress</tt> property
      * has been changed by its setter method.  The system call related with
@@ -125,7 +124,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     protected boolean isReuseAddressChanged() {
         return true;
     }
-    
+
     /**
      * Returns <tt>true</tt> if and only if the <tt>sendBufferSize</tt> property
      * has been changed by its setter method.  The system call related with
@@ -136,7 +135,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     protected boolean isSendBufferSizeChanged() {
         return true;
     }
-    
+
     /**
      * Returns <tt>true</tt> if and only if the <tt>soLinger</tt> property
      * has been changed by its setter method.  The system call related with
@@ -147,7 +146,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     protected boolean isSoLingerChanged() {
         return true;
     }
-    
+
     /**
      * Returns <tt>true</tt> if and only if the <tt>tcpNoDelay</tt> property
      * has been changed by its setter method.  The system call related with
@@ -158,7 +157,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     protected boolean isTcpNoDelayChanged() {
         return true;
     }
-    
+
     /**
      * Returns <tt>true</tt> if and only if the <tt>trafficClass</tt> property
      * has been changed by its setter method.  The system call related with

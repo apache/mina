@@ -26,7 +26,6 @@ import java.util.Set;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.util.IdentityHashSet;
 
-
 /**
  * A default immutable implementation of {@link TransportMetadata}.
  *
@@ -35,20 +34,21 @@ import org.apache.mina.util.IdentityHashSet;
 public class DefaultTransportMetadata implements TransportMetadata {
 
     private final String providerName;
+
     private final String name;
+
     private final boolean connectionless;
+
     private final boolean fragmentation;
+
     private final Class<? extends SocketAddress> addressType;
+
     private final Class<? extends IoSessionConfig> sessionConfigType;
+
     private final Set<Class<? extends Object>> envelopeTypes;
 
-    public DefaultTransportMetadata(
-            String providerName,
-            String name,
-            boolean connectionless,
-            boolean fragmentation,
-            Class<? extends SocketAddress> addressType,
-            Class<? extends IoSessionConfig> sessionConfigType,
+    public DefaultTransportMetadata(String providerName, String name, boolean connectionless, boolean fragmentation,
+            Class<? extends SocketAddress> addressType, Class<? extends IoSessionConfig> sessionConfigType,
             Class<?>... envelopeTypes) {
 
         if (providerName == null) {
@@ -66,7 +66,7 @@ public class DefaultTransportMetadata implements TransportMetadata {
         if (name.length() == 0) {
             throw new IllegalArgumentException("name is empty.");
         }
-        
+
         if (addressType == null) {
             throw new IllegalArgumentException("addressType");
         }
@@ -90,9 +90,8 @@ public class DefaultTransportMetadata implements TransportMetadata {
         this.addressType = addressType;
         this.sessionConfigType = sessionConfigType;
 
-        Set<Class<? extends Object>> newEnvelopeTypes =
-            new IdentityHashSet<Class<? extends Object>>();
-        for (Class<? extends Object> c: envelopeTypes) {
+        Set<Class<? extends Object>> newEnvelopeTypes = new IdentityHashSet<Class<? extends Object>>();
+        for (Class<? extends Object> c : envelopeTypes) {
             newEnvelopeTypes.add(c);
         }
         this.envelopeTypes = Collections.unmodifiableSet(newEnvelopeTypes);

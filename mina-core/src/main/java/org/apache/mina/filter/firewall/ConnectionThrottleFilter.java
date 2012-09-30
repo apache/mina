@@ -45,6 +45,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     private final Map<String, Long> clients;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ConnectionThrottleFilter.class);
+
     /**
      * Default constructor.  Sets the wait time to 1 second
      */
@@ -95,8 +96,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
             if (clients.containsKey(addr.getAddress().getHostAddress())) {
 
                 LOGGER.debug("This is not a new client");
-                Long lastConnTime = clients.get(addr.getAddress()
-                        .getHostAddress());
+                Long lastConnTime = clients.get(addr.getAddress().getHostAddress());
 
                 clients.put(addr.getAddress().getHostAddress(), now);
 
@@ -106,7 +106,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
                     LOGGER.warn("Session connection interval too short");
                     return false;
                 }
-                
+
                 return true;
             }
 
@@ -118,8 +118,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     }
 
     @Override
-    public void sessionCreated(NextFilter nextFilter, IoSession session)
-            throws Exception {
+    public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         if (!isConnectionOk(session)) {
             LOGGER.warn("Connections coming in too fast; closing.");
             session.close(true);

@@ -58,8 +58,7 @@ public class ObjectSerializationTest {
         final String expected = "1234";
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectSerializationOutputStream osos = new ObjectSerializationOutputStream(
-                baos);
+        ObjectSerializationOutputStream osos = new ObjectSerializationOutputStream(baos);
 
         osos.writeObject(expected);
         osos.flush();
@@ -67,11 +66,9 @@ public class ObjectSerializationTest {
         testDecoderAndInputStream(expected, IoBuffer.wrap(baos.toByteArray()));
     }
 
-    private void testDecoderAndInputStream(String expected, IoBuffer in)
-            throws Exception {
+    private void testDecoderAndInputStream(String expected, IoBuffer in) throws Exception {
         // Test InputStream
-        ObjectSerializationInputStream osis = new ObjectSerializationInputStream(
-                in.duplicate().asInputStream());
+        ObjectSerializationInputStream osis = new ObjectSerializationInputStream(in.duplicate().asInputStream());
 
         Object actual = osis.readObject();
         assertEquals(expected, actual);

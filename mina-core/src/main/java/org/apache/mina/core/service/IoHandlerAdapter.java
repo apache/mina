@@ -24,7 +24,6 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * An adapter class for {@link IoHandler}.  You can extend this
  * class and selectively override required event handler methods only.  All
@@ -47,22 +46,18 @@ public class IoHandlerAdapter implements IoHandler {
         // Empty handler
     }
 
-    public void sessionIdle(IoSession session, IdleStatus status)
-            throws Exception {
+    public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
         // Empty handler
     }
 
-    public void exceptionCaught(IoSession session, Throwable cause)
-            throws Exception {
+    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         if (LOGGER.isWarnEnabled()) {
-            LOGGER.warn("EXCEPTION, please implement "
-                    + getClass().getName()
+            LOGGER.warn("EXCEPTION, please implement " + getClass().getName()
                     + ".exceptionCaught() for proper handling:", cause);
         }
     }
 
-    public void messageReceived(IoSession session, Object message)
-            throws Exception {
+    public void messageReceived(IoSession session, Object message) throws Exception {
         // Empty handler
     }
 

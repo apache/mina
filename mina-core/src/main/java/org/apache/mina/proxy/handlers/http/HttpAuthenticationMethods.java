@@ -35,9 +35,9 @@ import org.apache.mina.proxy.session.ProxyIoSession;
 public enum HttpAuthenticationMethods {
 
     NO_AUTH(1), BASIC(2), NTLM(3), DIGEST(4);
-    
+
     private final int id;
-    
+
     private HttpAuthenticationMethods(int id) {
         this.id = id;
     }
@@ -56,8 +56,7 @@ public enum HttpAuthenticationMethods {
      * @param proxyIoSession the proxy session object
      * @return a new logic handler 
      */
-    public AbstractAuthLogicHandler getNewHandler(ProxyIoSession proxyIoSession)
-        throws ProxyAuthException {
+    public AbstractAuthLogicHandler getNewHandler(ProxyIoSession proxyIoSession) throws ProxyAuthException {
         return getNewHandler(this.id, proxyIoSession);
     }
 
@@ -67,21 +66,17 @@ public enum HttpAuthenticationMethods {
      * @param method the authentication mechanism to use
      * @param proxyIoSession the proxy session object
      * @return a new logic handler 
-     */    
-    public static AbstractAuthLogicHandler getNewHandler(
-            int method, ProxyIoSession proxyIoSession)
+     */
+    public static AbstractAuthLogicHandler getNewHandler(int method, ProxyIoSession proxyIoSession)
             throws ProxyAuthException {
-        
+
         if (method == BASIC.id)
             return new HttpBasicAuthLogicHandler(proxyIoSession);
-        else
-        if (method == DIGEST.id)
+        else if (method == DIGEST.id)
             return new HttpDigestAuthLogicHandler(proxyIoSession);
-        else
-        if (method == NTLM.id)
+        else if (method == NTLM.id)
             return new HttpNTLMAuthLogicHandler(proxyIoSession);
-        else
-        if (method == NO_AUTH.id)
+        else if (method == NO_AUTH.id)
             return new HttpNoAuthLogicHandler(proxyIoSession);
         else
             return null;

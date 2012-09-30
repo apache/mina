@@ -40,8 +40,7 @@ public class DatagramTrafficControlTest extends AbstractTrafficControlTest {
     }
 
     @Override
-    protected ConnectFuture connect(int port, IoHandler handler)
-            throws Exception {
+    protected ConnectFuture connect(int port, IoHandler handler) throws Exception {
         IoConnector connector = new NioDatagramConnector();
         connector.setHandler(handler);
         return connector.connect(new InetSocketAddress("localhost", port));

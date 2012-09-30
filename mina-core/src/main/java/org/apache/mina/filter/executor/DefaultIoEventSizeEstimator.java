@@ -89,7 +89,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         } else if (message instanceof CharSequence) {
             answer += ((CharSequence) message).length() << 1;
         } else if (message instanceof Iterable) {
-            for (Object m: (Iterable<?>) message) {
+            for (Object m : (Iterable<?>) message) {
                 answer += estimateSize(m);
             }
         }
@@ -116,7 +116,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         int answer = 8; // Basic overhead.
         for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
             Field[] fields = c.getDeclaredFields();
-            for (Field f: fields) {
+            for (Field f : fields) {
                 if ((f.getModifiers() & Modifier.STATIC) != 0) {
                     // Ignore static fields.
                     continue;
@@ -133,7 +133,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
 
         // Put the final answer.
         Integer tmpAnswer = class2size.putIfAbsent(clazz, answer);
-        
+
         if (tmpAnswer != null) {
             answer = tmpAnswer;
         }
@@ -144,7 +144,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
     private static int align(int size) {
         if (size % 8 != 0) {
             size /= 8;
-            size ++;
+            size++;
             size *= 8;
         }
         return size;

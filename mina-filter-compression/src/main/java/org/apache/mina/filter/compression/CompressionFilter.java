@@ -91,7 +91,7 @@ public class CompressionFilter extends WriteRequestFilter {
     /**
      * A flag that allows you to disable compression once.
      */
-    public static final AttributeKey DISABLE_COMPRESSION_ONCE = new AttributeKey(CompressionFilter.class, "disableOnce"); 
+    public static final AttributeKey DISABLE_COMPRESSION_ONCE = new AttributeKey(CompressionFilter.class, "disableOnce");
 
     private boolean compressInbound = true;
 
@@ -132,16 +132,14 @@ public class CompressionFilter extends WriteRequestFilter {
      *                         {@link #COMPRESSION_MIN}, and
      *                         {@link #COMPRESSION_NONE}.
      */
-    public CompressionFilter(final boolean compressInbound,
-            final boolean compressOutbound, final int compressionLevel) {
+    public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, final int compressionLevel) {
         this.compressionLevel = compressionLevel;
         this.compressInbound = compressInbound;
         this.compressOutbound = compressOutbound;
     }
 
     @Override
-    public void messageReceived(NextFilter nextFilter, IoSession session,
-            Object message) throws Exception {
+    public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         if (!compressInbound || !(message instanceof IoBuffer)) {
             nextFilter.messageReceived(session, message);
             return;
@@ -161,9 +159,8 @@ public class CompressionFilter extends WriteRequestFilter {
      * @see org.apache.mina.core.IoFilter#filterWrite(org.apache.mina.core.IoFilter.NextFilter, org.apache.mina.core.IoSession, org.apache.mina.core.IoFilter.WriteRequest)
      */
     @Override
-    protected Object doFilterWrite(
-            NextFilter nextFilter, IoSession session,
-            WriteRequest writeRequest) throws IOException {
+    protected Object doFilterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest)
+            throws IOException {
         if (!compressOutbound) {
             return null;
         }
@@ -189,11 +186,9 @@ public class CompressionFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void onPreAdd(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         if (parent.contains(CompressionFilter.class)) {
-            throw new IllegalStateException(
-                    "Only one " + CompressionFilter.class + " is permitted.");
+            throw new IllegalStateException("Only one " + CompressionFilter.class + " is permitted.");
         }
 
         Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_DEFLATER);
@@ -234,8 +229,7 @@ public class CompressionFilter extends WriteRequestFilter {
     }
 
     @Override
-    public void onPostRemove(IoFilterChain parent, String name,
-            NextFilter nextFilter) throws Exception {
+    public void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         super.onPostRemove(parent, name, nextFilter);
         IoSession session = parent.getSession();
         if (session == null) {

@@ -39,22 +39,22 @@ public class HttpProxyConstants {
 
     /**
      * The HTTP PUT verb.
-     */    
+     */
     public final static String PUT = "PUT";
 
     /**
      * The HTTP 1.0 protocol version string.
-     */    
+     */
     public final static String HTTP_1_0 = "HTTP/1.0";
 
     /**
      * The HTTP 1.1 protocol version string.
-     */        
+     */
     public final static String HTTP_1_1 = "HTTP/1.1";
 
     /**
      * The CRLF character sequence used in HTTP protocol to end each line.
-     */        
+     */
     public final static String CRLF = "\r\n";
 
     /**
@@ -64,7 +64,7 @@ public class HttpProxyConstants {
     public final static String DEFAULT_KEEP_ALIVE_TIME = "300";
 
     // ProxyRequest properties
-    
+
     /**
      * The username property. Used in auth mechs.
      */

@@ -48,6 +48,7 @@ import org.junit.Test;
 public abstract class AbstractConnectorTest {
 
     protected abstract IoAcceptor createAcceptor();
+
     protected abstract IoConnector createConnector();
 
     @Test
@@ -76,8 +77,7 @@ public abstract class AbstractConnectorTest {
                     buf.append("X");
                 }
             });
-            ConnectFuture future = connector.connect(new InetSocketAddress(
-                    "localhost", port));
+            ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
             future.awaitUninterruptibly();
             buf.append("3");
             future.getSession().close(true);
@@ -111,10 +111,9 @@ public abstract class AbstractConnectorTest {
                 buf.append("Z");
             }
         });
-        
+
         try {
-            ConnectFuture future = connector.connect(new InetSocketAddress(
-                    "localhost", port));
+            ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
             future.awaitUninterruptibly();
             buf.append("1");
             try {
@@ -129,7 +128,7 @@ public abstract class AbstractConnectorTest {
             connector.dispose();
         }
     }
-    
+
     /**
      * Test to make sure the SessionCallback gets invoked before IoHandler.sessionCreated.
      */
@@ -138,10 +137,10 @@ public abstract class AbstractConnectorTest {
         final int callbackInvoked = 0;
         final int sessionCreatedInvoked = 1;
         final int sessionCreatedInvokedBeforeCallback = 2;
-        final boolean[] assertions = {false, false, false};
+        final boolean[] assertions = { false, false, false };
         final CountDownLatch latch = new CountDownLatch(2);
         final ConnectFuture[] callbackFuture = new ConnectFuture[1];
-        
+
         int port = AvailablePortFinder.getNextAvailable(1025);
 
         IoAcceptor acceptor = createAcceptor();
@@ -151,28 +150,31 @@ public abstract class AbstractConnectorTest {
             acceptor.setHandler(new IoHandlerAdapter());
             InetSocketAddress address = new InetSocketAddress(port);
             acceptor.bind(address);
-    
+
             connector.setHandler(new IoHandlerAdapter() {
-               @Override
+                @Override
                 public void sessionCreated(IoSession session) throws Exception {
-                       assertions[sessionCreatedInvoked] = true;
-                       assertions[sessionCreatedInvokedBeforeCallback] = !assertions[callbackInvoked];
-                       latch.countDown();
-                } 
-            });
-        
-            ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port), new IoSessionInitializer<ConnectFuture>() {
-                public void initializeSession(IoSession session, ConnectFuture future) {
-                    assertions[callbackInvoked] = true;
-                    callbackFuture[0] = future;
+                    assertions[sessionCreatedInvoked] = true;
+                    assertions[sessionCreatedInvokedBeforeCallback] = !assertions[callbackInvoked];
                     latch.countDown();
                 }
             });
-            
-            assertTrue("Timed out waiting for callback and IoHandler.sessionCreated to be invoked", latch.await(5, TimeUnit.SECONDS));
+
+            ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port),
+                    new IoSessionInitializer<ConnectFuture>() {
+                        public void initializeSession(IoSession session, ConnectFuture future) {
+                            assertions[callbackInvoked] = true;
+                            callbackFuture[0] = future;
+                            latch.countDown();
+                        }
+                    });
+
+            assertTrue("Timed out waiting for callback and IoHandler.sessionCreated to be invoked",
+                    latch.await(5, TimeUnit.SECONDS));
             assertTrue("Callback was not invoked", assertions[callbackInvoked]);
             assertTrue("IoHandler.sessionCreated was not invoked", assertions[sessionCreatedInvoked]);
-            assertFalse("IoHandler.sessionCreated was invoked before session callback", assertions[sessionCreatedInvokedBeforeCallback]);
+            assertFalse("IoHandler.sessionCreated was invoked before session callback",
+                    assertions[sessionCreatedInvokedBeforeCallback]);
             assertSame("Callback future should have been same future as returned by connect", future, callbackFuture[0]);
         } finally {
             try {

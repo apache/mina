@@ -29,9 +29,10 @@ import java.util.regex.Pattern;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NumberEditor extends AbstractPropertyEditor {
-    private static final Pattern DECIMAL = Pattern.compile(
-            "[-+]?[0-9]*\\.?[0-9]*(?:[Ee][-+]?[0-9]+)?");
+    private static final Pattern DECIMAL = Pattern.compile("[-+]?[0-9]*\\.?[0-9]*(?:[Ee][-+]?[0-9]+)?");
+
     private static final Pattern HEXADECIMAL = Pattern.compile("0x[0-9a-fA-F]+");
+
     private static final Pattern OCTET = Pattern.compile("0[0-9][0-9]*");
 
     @Override

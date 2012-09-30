@@ -100,8 +100,7 @@ public abstract class AbstractBindTest {
 
     private void setReuseAddress(boolean reuseAddress) {
         if (acceptor instanceof DatagramAcceptor) {
-            ((DatagramSessionConfig) acceptor.getSessionConfig())
-                    .setReuseAddress(reuseAddress);
+            ((DatagramSessionConfig) acceptor.getSessionConfig()).setReuseAddress(reuseAddress);
         } else if (acceptor instanceof SocketAcceptor) {
             ((SocketAcceptor) acceptor).setReuseAddress(reuseAddress);
         }
@@ -204,7 +203,7 @@ public abstract class AbstractBindTest {
         IoConnector connector = newConnector();
         IoSession session = null;
         connector.setHandler(new IoHandlerAdapter());
-        
+
         ConnectFuture future = connector.connect(createSocketAddress(port));
         future.awaitUninterruptibly();
         session = future.getSession();
@@ -226,10 +225,10 @@ public abstract class AbstractBindTest {
         for (IoSession element : managedSession) {
             assertFalse(element.isConnected());
         }
-        
+
         // Rebind
         bind(true);
-        
+
         // Check again the connection
         future = connector.connect(createSocketAddress(port));
         future.awaitUninterruptibly();
@@ -261,8 +260,7 @@ public abstract class AbstractBindTest {
     }
 
     private static class EchoProtocolHandler extends IoHandlerAdapter {
-        private static final Logger LOG = LoggerFactory
-                .getLogger(EchoProtocolHandler.class);
+        private static final Logger LOG = LoggerFactory.getLogger(EchoProtocolHandler.class);
 
         /**
          * Default constructor
@@ -270,12 +268,11 @@ public abstract class AbstractBindTest {
         public EchoProtocolHandler() {
             super();
         }
-        
+
         @Override
         public void sessionCreated(IoSession session) {
             if (session.getConfig() instanceof SocketSessionConfig) {
-                ((SocketSessionConfig) session.getConfig())
-                        .setReceiveBufferSize(2048);
+                ((SocketSessionConfig) session.getConfig()).setReceiveBufferSize(2048);
             }
 
             session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
@@ -283,8 +280,7 @@ public abstract class AbstractBindTest {
 
         @Override
         public void sessionIdle(IoSession session, IdleStatus status) {
-            LOG.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE)
-                    + " ***");
+            LOG.info("*** IDLE #" + session.getIdleCount(IdleStatus.BOTH_IDLE) + " ***");
         }
 
         @Override
@@ -294,8 +290,7 @@ public abstract class AbstractBindTest {
         }
 
         @Override
-        public void messageReceived(IoSession session, Object message)
-                throws Exception {
+        public void messageReceived(IoSession session, Object message) throws Exception {
             if (!(message instanceof IoBuffer)) {
                 return;
             }

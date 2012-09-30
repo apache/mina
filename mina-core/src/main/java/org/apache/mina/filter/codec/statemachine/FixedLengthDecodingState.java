@@ -48,8 +48,7 @@ public abstract class FixedLengthDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (buffer == null) {
             if (in.remaining() >= length) {
                 int limit = in.limit();
@@ -74,7 +73,7 @@ public abstract class FixedLengthDecodingState implements DecodingState {
             this.buffer = null;
             return finishDecode(product.flip(), out);
         }
-        
+
         buffer.put(in);
         return this;
     }
@@ -82,8 +81,7 @@ public abstract class FixedLengthDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         IoBuffer readData;
         if (buffer == null) {
             readData = IoBuffer.allocate(0);
@@ -91,7 +89,7 @@ public abstract class FixedLengthDecodingState implements DecodingState {
             readData = buffer.flip();
             buffer = null;
         }
-        return finishDecode(readData ,out);
+        return finishDecode(readData, out);
     }
 
     /**
@@ -105,6 +103,5 @@ public abstract class FixedLengthDecodingState implements DecodingState {
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(IoBuffer product,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(IoBuffer product, ProtocolDecoderOutput out) throws Exception;
 }

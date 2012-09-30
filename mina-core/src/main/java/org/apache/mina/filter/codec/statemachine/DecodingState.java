@@ -40,9 +40,8 @@ public interface DecodingState {
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception;
-    
+    DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception;
+
     /**
      * Invoked when the associated {@link IoSession} is closed. This method is 
      * useful when you deal with protocols which don't specify the length of a 

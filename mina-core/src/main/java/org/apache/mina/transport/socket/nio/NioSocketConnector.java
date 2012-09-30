@@ -43,9 +43,8 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class NioSocketConnector
-        extends AbstractPollingIoConnector<NioSession, SocketChannel>
-        implements SocketConnector {
+public final class NioSocketConnector extends AbstractPollingIoConnector<NioSession, SocketChannel> implements
+        SocketConnector {
 
     private volatile Selector selector;
 
@@ -90,7 +89,7 @@ public final class NioSocketConnector
         super(new DefaultSocketSessionConfig(), executor, processor);
         ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
     }
-    
+
     /**
      * Constructor for {@link NioSocketConnector} with default configuration which will use a built-in 
      * thread pool executor to manage the given number of processor instances. The processor class must have 
@@ -102,8 +101,7 @@ public final class NioSocketConnector
      * @see org.apache.mina.core.service.SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int)
      * @since 2.0.0-M4
      */
-    public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass,
-            int processorCount) {
+    public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass, int processorCount) {
         super(new DefaultSocketSessionConfig(), processorClass, processorCount);
     }
 
@@ -155,7 +153,7 @@ public final class NioSocketConnector
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) super.getSessionConfig();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -163,7 +161,7 @@ public final class NioSocketConnector
     public InetSocketAddress getDefaultRemoteAddress() {
         return (InetSocketAddress) super.getDefaultRemoteAddress();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -183,8 +181,7 @@ public final class NioSocketConnector
      * {@inheritDoc}
      */
     @Override
-    protected boolean connect(SocketChannel handle, SocketAddress remoteAddress)
-            throws Exception {
+    protected boolean connect(SocketChannel handle, SocketAddress remoteAddress) throws Exception {
         return handle.connect(remoteAddress);
     }
 
@@ -194,8 +191,8 @@ public final class NioSocketConnector
     @Override
     protected ConnectionRequest getConnectionRequest(SocketChannel handle) {
         SelectionKey key = handle.keyFor(selector);
-        
-        if ((key == null) || (!key.isValid())) { 
+
+        if ((key == null) || (!key.isValid())) {
             return null;
         }
 
@@ -208,11 +205,11 @@ public final class NioSocketConnector
     @Override
     protected void close(SocketChannel handle) throws Exception {
         SelectionKey key = handle.keyFor(selector);
-        
+
         if (key != null) {
             key.cancel();
         }
-        
+
         handle.close();
     }
 
@@ -227,7 +224,7 @@ public final class NioSocketConnector
             if (key != null) {
                 key.cancel();
             }
-            
+
             return true;
         }
 
@@ -238,12 +235,10 @@ public final class NioSocketConnector
      * {@inheritDoc}
      */
     @Override
-    protected SocketChannel newHandle(SocketAddress localAddress)
-            throws Exception {
+    protected SocketChannel newHandle(SocketAddress localAddress) throws Exception {
         SocketChannel ch = SocketChannel.open();
 
-        int receiveBufferSize =
-            (getSessionConfig()).getReceiveBufferSize();
+        int receiveBufferSize = (getSessionConfig()).getReceiveBufferSize();
         if (receiveBufferSize > 65535) {
             ch.socket().setReceiveBufferSize(receiveBufferSize);
         }
@@ -267,8 +262,7 @@ public final class NioSocketConnector
      * {@inheritDoc}
      */
     @Override
-    protected void register(SocketChannel handle, ConnectionRequest request)
-            throws Exception {
+    protected void register(SocketChannel handle, ConnectionRequest request) throws Exception {
         handle.register(selector, SelectionKey.OP_CONNECT, request);
     }
 

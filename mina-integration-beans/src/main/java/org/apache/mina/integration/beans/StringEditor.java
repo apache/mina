@@ -32,7 +32,7 @@ public class StringEditor extends AbstractPropertyEditor {
         if (value instanceof String) {
             return (String) value;
         }
-        
+
         PropertyEditor e = PropertyEditorFactory.getInstance(value);
         if (e == null) {
             return String.valueOf(value);

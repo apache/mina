@@ -49,18 +49,15 @@ public class Request {
         this(id, message, true, timeoutMillis);
     }
 
-    public Request(Object id, Object message, boolean useResponseQueue,
-                   long timeoutMillis) {
-        this(id, message, useResponseQueue, timeoutMillis,
-                TimeUnit.MILLISECONDS);
+    public Request(Object id, Object message, boolean useResponseQueue, long timeoutMillis) {
+        this(id, message, useResponseQueue, timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     public Request(Object id, Object message, long timeout, TimeUnit unit) {
         this(id, message, true, timeout, unit);
     }
 
-    public Request(Object id, Object message, boolean useResponseQueue,
-                   long timeout, TimeUnit unit) {
+    public Request(Object id, Object message, boolean useResponseQueue, long timeout, TimeUnit unit) {
         if (id == null) {
             throw new IllegalArgumentException("id");
         }
@@ -68,8 +65,7 @@ public class Request {
             throw new IllegalArgumentException("message");
         }
         if (timeout < 0) {
-            throw new IllegalArgumentException("timeout: " + timeout
-                    + " (expected: 0+)");
+            throw new IllegalArgumentException("timeout: " + timeout + " (expected: 0+)");
         } else if (timeout == 0) {
             timeout = Long.MAX_VALUE;
         }
@@ -105,15 +101,13 @@ public class Request {
         return !responses.isEmpty();
     }
 
-    public Response awaitResponse() throws RequestTimeoutException,
-            InterruptedException {
+    public Response awaitResponse() throws RequestTimeoutException, InterruptedException {
         checkUseResponseQueue();
         chechEndOfResponses();
         return convertToResponse(responses.take());
     }
 
-    public Response awaitResponse(long timeout, TimeUnit unit)
-            throws RequestTimeoutException, InterruptedException {
+    public Response awaitResponse(long timeout, TimeUnit unit) throws RequestTimeoutException, InterruptedException {
         checkUseResponseQueue();
         chechEndOfResponses();
         return convertToResponse(responses.poll(timeout, unit));
@@ -131,9 +125,8 @@ public class Request {
         throw (RequestTimeoutException) o;
     }
 
-    public Response awaitResponseUninterruptibly()
-            throws RequestTimeoutException {
-        for (; ;) {
+    public Response awaitResponseUninterruptibly() throws RequestTimeoutException {
+        for (;;) {
             try {
                 return awaitResponse();
             } catch (InterruptedException e) {
@@ -144,15 +137,13 @@ public class Request {
 
     private void chechEndOfResponses() {
         if (responses != null && endOfResponses && responses.isEmpty()) {
-            throw new NoSuchElementException(
-                    "All responses has been retrieved already.");
+            throw new NoSuchElementException("All responses has been retrieved already.");
         }
     }
 
     private void checkUseResponseQueue() {
         if (responses == null) {
-            throw new UnsupportedOperationException(
-                    "Response queue is not available; useResponseQueue is false.");
+            throw new UnsupportedOperationException("Response queue is not available; useResponseQueue is false.");
         }
     }
 
@@ -199,11 +190,9 @@ public class Request {
 
     @Override
     public String toString() {
-        String timeout = getTimeoutMillis() == Long.MAX_VALUE ? "max"
-                : String.valueOf(getTimeoutMillis());
+        String timeout = getTimeoutMillis() == Long.MAX_VALUE ? "max" : String.valueOf(getTimeoutMillis());
 
-        return "request: { id=" + getId() + ", timeout=" + timeout
-                + ", message=" + getMessage() + " }";
+        return "request: { id=" + getId() + ", timeout=" + timeout + ", message=" + getMessage() + " }";
     }
 
     Runnable getTimeoutTask() {

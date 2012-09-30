@@ -93,10 +93,7 @@ public abstract class AbstractTransition implements Transition {
             return true;
         }
         AbstractTransition that = (AbstractTransition) o;
-        return new EqualsBuilder()
-            .append(eventId, that.eventId)
-            .append(nextState, that.nextState)
-            .isEquals();
+        return new EqualsBuilder().append(eventId, that.eventId).append(nextState, that.nextState).isEquals();
     }
 
     public int hashCode() {
@@ -104,9 +101,6 @@ public abstract class AbstractTransition implements Transition {
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("eventId", eventId)
-            .append("nextState", nextState)
-            .toString();
+        return new ToStringBuilder(this).append("eventId", eventId).append("nextState", nextState).toString();
     }
 }

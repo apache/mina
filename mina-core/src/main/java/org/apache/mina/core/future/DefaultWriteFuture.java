@@ -21,7 +21,6 @@ package org.apache.mina.core.future;
 
 import org.apache.mina.core.session.IoSession;
 
-
 /**
  * A default implementation of {@link WriteFuture}.
  *
@@ -65,7 +64,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
         }
         return false;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -85,7 +84,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     public void setWritten() {
         setValue(Boolean.TRUE);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -93,7 +92,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
         if (exception == null) {
             throw new IllegalArgumentException("exception");
         }
-        
+
         setValue(exception);
     }
 

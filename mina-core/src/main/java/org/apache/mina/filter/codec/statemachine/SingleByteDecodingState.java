@@ -30,22 +30,19 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  */
 public abstract class SingleByteDecodingState implements DecodingState {
 
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (in.hasRemaining()) {
             return finishDecode(in.get(), out);
         }
-        
+
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
-        throw new ProtocolDecoderException(
-                "Unexpected end of session while waiting for a single byte.");
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
+        throw new ProtocolDecoderException("Unexpected end of session while waiting for a single byte.");
     }
 
     /**
@@ -59,6 +56,5 @@ public abstract class SingleByteDecodingState implements DecodingState {
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(byte b,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(byte b, ProtocolDecoderOutput out) throws Exception;
 }

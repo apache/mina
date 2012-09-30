@@ -39,7 +39,9 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  */
 public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     private final DecodingState state;
+
     private final Queue<IoBuffer> undecodedBuffers = new ConcurrentLinkedQueue<IoBuffer>();
+
     private IoSession session;
 
     /**
@@ -59,14 +61,12 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
-    public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (this.session == null) {
             this.session = session;
         } else if (this.session != session) {
-            throw new IllegalStateException(
-                    getClass().getSimpleName() + " is a stateful decoder.  " +
-                "You have to create one per session.");
+            throw new IllegalStateException(getClass().getSimpleName() + " is a stateful decoder.  "
+                    + "You have to create one per session.");
         }
 
         undecodedBuffers.offer(in);
@@ -81,21 +81,19 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
             int newRemaining = b.remaining();
             if (newRemaining != 0) {
                 if (oldRemaining == newRemaining) {
-                    throw new IllegalStateException(
-                            DecodingState.class.getSimpleName() + " must " +
-                            "consume at least one byte per decode().");
+                    throw new IllegalStateException(DecodingState.class.getSimpleName() + " must "
+                            + "consume at least one byte per decode().");
                 }
             } else {
                 undecodedBuffers.poll();
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public void finishDecode(IoSession session, ProtocolDecoderOutput out)
-            throws Exception {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         state.finishDecode(out);
     }
 

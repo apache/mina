@@ -57,22 +57,24 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-/** No qualifier*/ class SslHandler {
+/** No qualifier*/
+class SslHandler {
     /** A logger for this class */
     private final static Logger LOGGER = LoggerFactory.getLogger(SslHandler.class);
-    
+
     /** The SSL Filter which has created this handler */
     private final SslFilter sslFilter;
-    
+
     /** The current session */
     private final IoSession session;
-    
+
     private final Queue<IoFilterEvent> preHandshakeEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
+
     private final Queue<IoFilterEvent> filterWriteEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
-    
+
     /** A queue used to stack all the incoming data until the SSL session is established */
     private final Queue<IoFilterEvent> messageReceivedEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
-    
+
     private SSLEngine sslEngine;
 
     /**
@@ -96,17 +98,17 @@ import org.slf4j.LoggerFactory;
     private final IoBuffer emptyBuffer = IoBuffer.allocate(0);
 
     private SSLEngineResult.HandshakeStatus handshakeStatus;
-    
+
     /**
      * A flag set to true when the first SSL handshake has been completed
      * This is used to avoid sending a notification to the application handler
      * when we switch to a SECURE or UNSECURE session.
      */
     private boolean firstSSLNegociation;
-    
+
     /** A flag set to true when a SSL Handshake has been completed */
     private boolean handshakeComplete;
-    
+
     /** A flag used to indicate to the SslFilter that the buffer
      * it will write is already encrypted (this will be the case
      * for data being produced during the handshake). */
@@ -118,7 +120,7 @@ import org.slf4j.LoggerFactory;
      * @param sslContext
      * @throws SSLException
      */
-    /* no qualifier */ SslHandler(SslFilter sslFilter, IoSession session) throws SSLException {
+    /* no qualifier */SslHandler(SslFilter sslFilter, IoSession session) throws SSLException {
         this.sslFilter = sslFilter;
         this.session = session;
     }
@@ -128,7 +130,7 @@ import org.slf4j.LoggerFactory;
      *
      * @throws SSLException If the underlying SSLEngine handshake initialization failed
      */
-    /* no qualifier */ void init() throws SSLException {
+    /* no qualifier */void init() throws SSLException {
         if (sslEngine != null) {
             // We already have a SSL engine created, no need to create a new one
             return;
@@ -178,22 +180,21 @@ import org.slf4j.LoggerFactory;
 
         // Default value
         writingEncryptedData = false;
-        
+
         // We haven't yet started a SSL negotiation
         // set the flags accordingly
         firstSSLNegociation = true;
         handshakeComplete = false;
 
-        if ( LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} SSL Handler Initialization done.", sslFilter.getSessionInfo(session));
         }
     }
 
-    
     /**
      * Release allocated buffers.
      */
-    /* no qualifier */ void destroy() {
+    /* no qualifier */void destroy() {
         if (sslEngine == null) {
             return;
         }
@@ -234,56 +235,57 @@ import org.slf4j.LoggerFactory;
     /**
      * @return The SSL filter which has created this handler
      */
-    /* no qualifier */ SslFilter getSslFilter() {
+    /* no qualifier */SslFilter getSslFilter() {
         return sslFilter;
     }
 
-    /* no qualifier */ IoSession getSession() {
+    /* no qualifier */IoSession getSession() {
         return session;
     }
 
     /**
      * Check if we are writing encrypted data.
      */
-    /* no qualifier */ boolean isWritingEncryptedData() {
+    /* no qualifier */boolean isWritingEncryptedData() {
         return writingEncryptedData;
     }
 
     /**
      * Check if handshake is completed.
      */
-    /* no qualifier */ boolean isHandshakeComplete() {
+    /* no qualifier */boolean isHandshakeComplete() {
         return handshakeComplete;
     }
 
-    /* no qualifier */ boolean isInboundDone() {
+    /* no qualifier */boolean isInboundDone() {
         return sslEngine == null || sslEngine.isInboundDone();
     }
 
-    /* no qualifier */ boolean isOutboundDone() {
+    /* no qualifier */boolean isOutboundDone() {
         return sslEngine == null || sslEngine.isOutboundDone();
     }
 
     /**
      * Check if there is any need to complete handshake.
      */
-    /* no qualifier */ boolean needToCompleteHandshake() {
+    /* no qualifier */boolean needToCompleteHandshake() {
         return handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP && !isInboundDone();
     }
 
-    /* no qualifier */ void schedulePreHandshakeWriteRequest(NextFilter nextFilter, WriteRequest writeRequest) {
+    /* no qualifier */void schedulePreHandshakeWriteRequest(NextFilter nextFilter, WriteRequest writeRequest) {
         preHandshakeEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
     }
 
-    /* no qualifier */ void flushPreHandshakeEvents() throws SSLException {
+    /* no qualifier */void flushPreHandshakeEvents() throws SSLException {
         IoFilterEvent scheduledWrite;
 
         while ((scheduledWrite = preHandshakeEventQueue.poll()) != null) {
-            sslFilter.filterWrite(scheduledWrite.getNextFilter(), session, (WriteRequest) scheduledWrite.getParameter());
+            sslFilter
+                    .filterWrite(scheduledWrite.getNextFilter(), session, (WriteRequest) scheduledWrite.getParameter());
         }
     }
 
-    /* no qualifier */ void scheduleFilterWrite(NextFilter nextFilter, WriteRequest writeRequest) {
+    /* no qualifier */void scheduleFilterWrite(NextFilter nextFilter, WriteRequest writeRequest) {
         filterWriteEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
     }
 
@@ -294,11 +296,11 @@ import org.slf4j.LoggerFactory;
      * @param nextFilter The next filter to call
      * @param message The incoming data
      */
-    /* no qualifier */ void scheduleMessageReceived(NextFilter nextFilter, Object message) {
+    /* no qualifier */void scheduleMessageReceived(NextFilter nextFilter, Object message) {
         messageReceivedEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
     }
 
-    /* no qualifier */ void flushScheduledEvents() {
+    /* no qualifier */void flushScheduledEvents() {
         // Fire events only when no lock is hold for this handler.
         if (Thread.holdsLock(this)) {
             return;
@@ -329,9 +331,9 @@ import org.slf4j.LoggerFactory;
      * @param nextFilter Next filter in chain
      * @throws SSLException on errors
      */
-    /* no qualifier */ void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
-        if ( LOGGER.isDebugEnabled()) {
-            if ( !isOutboundDone()) {
+    /* no qualifier */void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
+        if (LOGGER.isDebugEnabled()) {
+            if (!isOutboundDone()) {
                 LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
             } else {
                 LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
@@ -344,7 +346,7 @@ import org.slf4j.LoggerFactory;
         }
 
         inNetBuffer.put(buf);
-        
+
         if (!handshakeComplete) {
             handshake(nextFilter);
         } else {
@@ -383,7 +385,7 @@ import org.slf4j.LoggerFactory;
      * 
      * @return buffer with data
      */
-    /* no qualifier */ IoBuffer fetchAppBuffer() {
+    /* no qualifier */IoBuffer fetchAppBuffer() {
         IoBuffer appBuffer = this.appBuffer.flip();
         this.appBuffer = null;
         return appBuffer;
@@ -394,7 +396,7 @@ import org.slf4j.LoggerFactory;
      * 
      * @return buffer with data
      */
-    /* no qualifier */ IoBuffer fetchOutNetBuffer() {
+    /* no qualifier */IoBuffer fetchOutNetBuffer() {
         IoBuffer answer = outNetBuffer;
         if (answer == null) {
             return emptyBuffer;
@@ -412,7 +414,7 @@ import org.slf4j.LoggerFactory;
      * @throws SSLException
      *             on errors
      */
-    /* no qualifier */ void encrypt(ByteBuffer src) throws SSLException {
+    /* no qualifier */void encrypt(ByteBuffer src) throws SSLException {
         if (!handshakeComplete) {
             throw new IllegalStateException();
         }
@@ -454,7 +456,7 @@ import org.slf4j.LoggerFactory;
      * @throws SSLException
      *             on errors
      */
-    /* no qualifier */ boolean closeOutbound() throws SSLException {
+    /* no qualifier */boolean closeOutbound() throws SSLException {
         if (sslEngine == null || sslEngine.isOutboundDone()) {
             return false;
         }
@@ -497,101 +499,101 @@ import org.slf4j.LoggerFactory;
          * CLOSED - The other peer closed the socket. Also normal.
          */
         if (status == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-            throw new SSLException("SSLEngine error during decrypt: " + status + " inNetBuffer: " + inNetBuffer + "appBuffer: "
-                    + appBuffer);
+            throw new SSLException("SSLEngine error during decrypt: " + status + " inNetBuffer: " + inNetBuffer
+                    + "appBuffer: " + appBuffer);
         }
     }
 
     /**
      * Perform any handshaking processing.
      */
-    /* no qualifier */ void handshake(NextFilter nextFilter) throws SSLException {
+    /* no qualifier */void handshake(NextFilter nextFilter) throws SSLException {
         for (;;) {
             switch (handshakeStatus) {
-                case FINISHED:
-                case NOT_HANDSHAKING:
-                    if ( LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} processing the FINISHED state", sslFilter.getSessionInfo(session));
+            case FINISHED:
+            case NOT_HANDSHAKING:
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} processing the FINISHED state", sslFilter.getSessionInfo(session));
+                }
+
+                session.setAttribute(SslFilter.SSL_SESSION, sslEngine.getSession());
+                handshakeComplete = true;
+
+                // Send the SECURE message only if it's the first SSL handshake
+                if (firstSSLNegociation && session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
+                    // SESSION_SECURED is fired only when it's the first handshake
+                    firstSSLNegociation = false;
+                    scheduleMessageReceived(nextFilter, SslFilter.SESSION_SECURED);
+                }
+
+                if (LOGGER.isDebugEnabled()) {
+                    if (!isOutboundDone()) {
+                        LOGGER.debug("{} is now secured", sslFilter.getSessionInfo(session));
+                    } else {
+                        LOGGER.debug("{} is not secured yet", sslFilter.getSessionInfo(session));
                     }
-                    
-                    session.setAttribute(SslFilter.SSL_SESSION, sslEngine.getSession());
-                    handshakeComplete = true;
-    
-                    // Send the SECURE message only if it's the first SSL handshake
-                    if (firstSSLNegociation && session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
-                        // SESSION_SECURED is fired only when it's the first handshake
-                        firstSSLNegociation = false;
-                        scheduleMessageReceived(nextFilter, SslFilter.SESSION_SECURED);
-                    }
-                    
-                    if ( LOGGER.isDebugEnabled()) {
-                        if ( !isOutboundDone()) {
-                            LOGGER.debug("{} is now secured", sslFilter.getSessionInfo(session));
-                        } else {
-                            LOGGER.debug("{} is not secured yet", sslFilter.getSessionInfo(session));
-                        }
-                    }
-    
+                }
+
+                return;
+
+            case NEED_TASK:
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} processing the NEED_TASK state", sslFilter.getSessionInfo(session));
+                }
+
+                handshakeStatus = doTasks();
+                break;
+
+            case NEED_UNWRAP:
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} processing the NEED_UNWRAP state", sslFilter.getSessionInfo(session));
+                }
+                // we need more data read
+                SSLEngineResult.Status status = unwrapHandshake(nextFilter);
+
+                if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW
+                        && handshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED || isInboundDone()) {
+                    // We need more data or the session is closed
                     return;
-    
-                case NEED_TASK:
-                    if ( LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} processing the NEED_TASK state", sslFilter.getSessionInfo(session));
+                }
+
+                break;
+
+            case NEED_WRAP:
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} processing the NEED_WRAP state", sslFilter.getSessionInfo(session));
+                }
+
+                // First make sure that the out buffer is completely empty.
+                // Since we
+                // cannot call wrap with data left on the buffer
+                if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
+                    return;
+                }
+
+                SSLEngineResult result;
+                createOutNetBuffer(0);
+
+                for (;;) {
+                    result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
+                    if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
+                        outNetBuffer.capacity(outNetBuffer.capacity() << 1);
+                        outNetBuffer.limit(outNetBuffer.capacity());
+                    } else {
+                        break;
                     }
-                    
-                    handshakeStatus = doTasks();
-                    break;
-    
-                case NEED_UNWRAP:
-                    if ( LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} processing the NEED_UNWRAP state", sslFilter.getSessionInfo(session));
-                    }
-                    // we need more data read
-                    SSLEngineResult.Status status = unwrapHandshake(nextFilter);
-    
-                    if (status == SSLEngineResult.Status.BUFFER_UNDERFLOW
-                            && handshakeStatus != SSLEngineResult.HandshakeStatus.FINISHED || isInboundDone()) {
-                        // We need more data or the session is closed
-                        return;
-                    }
-    
-                    break;
-    
-                case NEED_WRAP:
-                    if ( LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} processing the NEED_WRAP state", sslFilter.getSessionInfo(session));
-                    }
-                    
-                    // First make sure that the out buffer is completely empty.
-                    // Since we
-                    // cannot call wrap with data left on the buffer
-                    if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
-                        return;
-                    }
-    
-                    SSLEngineResult result;
-                    createOutNetBuffer(0);
-    
-                    for (;;) {
-                        result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
-                        if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-                            outNetBuffer.capacity(outNetBuffer.capacity() << 1);
-                            outNetBuffer.limit(outNetBuffer.capacity());
-                        } else {
-                            break;
-                        }
-                    }
-    
-                    outNetBuffer.flip();
-                    handshakeStatus = result.getHandshakeStatus();
-                    writeNetBuffer(nextFilter);
-                    break;
-    
-                default:
-                    String msg = "Invalid Handshaking State" + handshakeStatus +
-                        " while processing the Handshake for session " + session.getId();
-                    LOGGER.error(msg);
-                    throw new IllegalStateException(msg);
+                }
+
+                outNetBuffer.flip();
+                handshakeStatus = result.getHandshakeStatus();
+                writeNetBuffer(nextFilter);
+                break;
+
+            default:
+                String msg = "Invalid Handshaking State" + handshakeStatus
+                        + " while processing the Handshake for session " + session.getId();
+                LOGGER.error(msg);
+                throw new IllegalStateException(msg);
             }
         }
     }
@@ -608,7 +610,7 @@ import org.slf4j.LoggerFactory;
         }
     }
 
-    /* no qualifier */ WriteFuture writeNetBuffer(NextFilter nextFilter) throws SSLException {
+    /* no qualifier */WriteFuture writeNetBuffer(NextFilter nextFilter) throws SSLException {
         // Check if any net data needed to be writen
         if (outNetBuffer == null || !outNetBuffer.hasRemaining()) {
             // no; bail out
@@ -693,9 +695,9 @@ import org.slf4j.LoggerFactory;
     }
 
     private void renegotiateIfNeeded(NextFilter nextFilter, SSLEngineResult res) throws SSLException {
-        if ( ( res.getStatus() != SSLEngineResult.Status.CLOSED ) &&
-             ( res.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW ) &&
-             ( res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING ) ) {
+        if ((res.getStatus() != SSLEngineResult.Status.CLOSED)
+                && (res.getStatus() != SSLEngineResult.Status.BUFFER_UNDERFLOW)
+                && (res.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING)) {
             // Renegotiation required.
             handshakeComplete = false;
             handshakeStatus = res.getHandshakeStatus();
@@ -725,7 +727,7 @@ import org.slf4j.LoggerFactory;
             // Decode the incoming data
             res = sslEngine.unwrap(inNetBuffer.buf(), appBuffer.buf());
             status = res.getStatus();
-            
+
             // We can be processing the Handshake
             handshakeStatus = res.getHandshakeStatus();
 
@@ -736,19 +738,8 @@ import org.slf4j.LoggerFactory;
                 appBuffer.limit(appBuffer.capacity());
                 continue;
             }
-        } while (
-                    (
-                        (status == SSLEngineResult.Status.OK)
-                        ||
-                        (status == SSLEngineResult.Status.BUFFER_OVERFLOW)
-                    )
-                    &&
-                    (
-                        (handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING)
-                        ||
-                        (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)
-                    )
-                );
+        } while (((status == SSLEngineResult.Status.OK) || (status == SSLEngineResult.Status.BUFFER_OVERFLOW))
+                && ((handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) || (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
 
         return res;
     }
@@ -778,29 +769,29 @@ import org.slf4j.LoggerFactory;
      *            the buffer to copy
      * @return the new buffer, ready to read from
      */
-    /* no qualifier */ static IoBuffer copy(ByteBuffer src) {
+    /* no qualifier */static IoBuffer copy(ByteBuffer src) {
         IoBuffer copy = IoBuffer.allocate(src.remaining());
         copy.put(src);
         copy.flip();
         return copy;
     }
-    
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("SSLStatus <");
-        
+
         if (handshakeComplete) {
             sb.append("SSL established");
         } else {
-            sb.append("Processing Handshake" ).append("; ");
+            sb.append("Processing Handshake").append("; ");
             sb.append("Status : ").append(handshakeStatus).append("; ");
         }
-        
+
         sb.append(", ");
-        sb.append("HandshakeComplete :" ).append(handshakeComplete).append(", ");
+        sb.append("HandshakeComplete :").append(handshakeComplete).append(", ");
         sb.append(">");
         return sb.toString();
     }
-    
+
 }

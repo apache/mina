@@ -36,74 +36,74 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class MyIoHandler extends IoHandlerAdapter {
-  private static final Logger logger = LoggerFactory.getLogger(MyIoHandler.class);
-  public static AtomicInteger received = new AtomicInteger(0);
-  public static AtomicInteger closed = new AtomicInteger(0);
-  private final Object LOCK;
+    private static final Logger logger = LoggerFactory.getLogger(MyIoHandler.class);
 
-  public MyIoHandler(Object lock) {
-    LOCK = lock;
-  }
+    public static AtomicInteger received = new AtomicInteger(0);
 
-  @Override
-  public void exceptionCaught(IoSession session, Throwable cause) {
-    if (!(cause instanceof IOException)) {
-      logger.error("Exception: ", cause);
-    } else {
-      logger.info("I/O error: " + cause.getMessage());
+    public static AtomicInteger closed = new AtomicInteger(0);
+
+    private final Object LOCK;
+
+    public MyIoHandler(Object lock) {
+        LOCK = lock;
     }
-    session.close(true);
-  }
 
-  @Override
-  public void sessionOpened(IoSession session) throws Exception {
-      logger.info( "Session " + session.getId() + " is opened" );
-    session.resumeRead();
-  }
-
-  @Override
-  public void sessionCreated(IoSession session) throws Exception {
-      logger.info( "Creation of session " + session.getId() );
-    session.setAttribute(OPEN);
-    session.suspendRead();
-  }
-
-  @Override
-  public void sessionClosed(IoSession session) throws Exception {
-    session.removeAttribute(OPEN);
-    logger.info("{}> Session closed", session.getId());
-    final int clsd = closed.incrementAndGet();
-    
-    if (clsd == MSG_COUNT) {
-      synchronized (LOCK) {
-        LOCK.notifyAll();
-      }
+    @Override
+    public void exceptionCaught(IoSession session, Throwable cause) {
+        if (!(cause instanceof IOException)) {
+            logger.error("Exception: ", cause);
+        } else {
+            logger.info("I/O error: " + cause.getMessage());
+        }
+        session.close(true);
     }
-    
-    int i = 0;
-    
-    try
-    {
-        int j = 2 / i;
-    } 
-    catch ( Exception e )
-    {
-        //e.printStackTrace();
-    }
-  }
 
-  @Override
-  public void messageReceived(IoSession session, Object message) throws Exception {
-    IoBuffer msg = (IoBuffer) message;
-    logger.info("MESSAGE: " + msg.remaining() + " on session " + session.getId() );
-    final int rec = received.incrementAndGet();
-    
-    if (rec == MSG_COUNT) {
-      synchronized (LOCK) {
-        LOCK.notifyAll();
-      }
+    @Override
+    public void sessionOpened(IoSession session) throws Exception {
+        logger.info("Session " + session.getId() + " is opened");
+        session.resumeRead();
     }
-    
-    session.close(true);
-  }
+
+    @Override
+    public void sessionCreated(IoSession session) throws Exception {
+        logger.info("Creation of session " + session.getId());
+        session.setAttribute(OPEN);
+        session.suspendRead();
+    }
+
+    @Override
+    public void sessionClosed(IoSession session) throws Exception {
+        session.removeAttribute(OPEN);
+        logger.info("{}> Session closed", session.getId());
+        final int clsd = closed.incrementAndGet();
+
+        if (clsd == MSG_COUNT) {
+            synchronized (LOCK) {
+                LOCK.notifyAll();
+            }
+        }
+
+        int i = 0;
+
+        try {
+            int j = 2 / i;
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void messageReceived(IoSession session, Object message) throws Exception {
+        IoBuffer msg = (IoBuffer) message;
+        logger.info("MESSAGE: " + msg.remaining() + " on session " + session.getId());
+        final int rec = received.incrementAndGet();
+
+        if (rec == MSG_COUNT) {
+            synchronized (LOCK) {
+                LOCK.notifyAll();
+            }
+        }
+
+        session.close(true);
+    }
 }

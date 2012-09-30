@@ -43,7 +43,6 @@ public interface SerialSessionConfig extends IoSessionConfig {
      */
     void setInputBufferSize(int bufferSize);
 
-
     /**
      * Gets the output buffer size. Note that this method is advisory and the underlying OS
      * may choose not to report correct values for the buffer size.
@@ -83,8 +82,5 @@ public interface SerialSessionConfig extends IoSessionConfig {
      * @param bytes minimal amount of byte before producing a new frame, or -1 if disabled
      */
     void setReceiveThreshold(int bytes);
-    
-    
-   
 
 }

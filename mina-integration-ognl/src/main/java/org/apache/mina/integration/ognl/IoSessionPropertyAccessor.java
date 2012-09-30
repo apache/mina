@@ -34,12 +34,11 @@ import org.apache.mina.core.session.IoSession;
 public class IoSessionPropertyAccessor extends AbstractPropertyAccessor {
 
     @Override
-    protected Object getProperty0(OgnlContext context, Object target,
-            String name) throws OgnlException {
+    protected Object getProperty0(OgnlContext context, Object target, String name) throws OgnlException {
         if (target instanceof IoSession && "attributes".equals(name)) {
             Map<String, Object> attributes = new TreeMap<String, Object>();
             IoSession s = (IoSession) target;
-            for (Object key: s.getAttributeKeys()) {
+            for (Object key : s.getAttributeKeys()) {
                 Object value = s.getAttribute(key);
                 if (value == null) {
                     continue;
@@ -48,25 +47,22 @@ public class IoSessionPropertyAccessor extends AbstractPropertyAccessor {
             }
             return attributes;
         }
-        
+
         return OgnlRuntime.NotFound;
     }
 
     @Override
-    protected boolean hasGetProperty0(OgnlContext context, Object target,
-            String name) throws OgnlException {
+    protected boolean hasGetProperty0(OgnlContext context, Object target, String name) throws OgnlException {
         return target instanceof IoSession && "attributes".equals(name);
     }
 
     @Override
-    protected boolean hasSetProperty0(OgnlContext context, Object target,
-            String name) throws OgnlException {
+    protected boolean hasSetProperty0(OgnlContext context, Object target, String name) throws OgnlException {
         return false;
     }
 
     @Override
-    protected Object setProperty0(OgnlContext context, Object target,
-            String name, Object value) throws OgnlException {
+    protected Object setProperty0(OgnlContext context, Object target, String name, Object value) throws OgnlException {
         return OgnlRuntime.NotFound;
     }
 }

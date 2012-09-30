@@ -36,13 +36,14 @@ import org.apache.mina.core.session.IoSessionInitializer;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractIoConnector 
-        extends AbstractIoService implements IoConnector {
+public abstract class AbstractIoConnector extends AbstractIoService implements IoConnector {
     /**
      * The minimum timeout value that is supported (in milliseconds).
      */
     private long connectTimeoutCheckInterval = 50L;
+
     private long connectTimeoutInMillis = 60 * 1000L; // 1 minute by default
+
     private SocketAddress defaultRemoteAddress;
 
     /**
@@ -75,10 +76,10 @@ public abstract class AbstractIoConnector
     }
 
     public void setConnectTimeoutCheckInterval(long minimumConnectTimeout) {
-        if( getConnectTimeoutMillis() < minimumConnectTimeout ){
+        if (getConnectTimeoutMillis() < minimumConnectTimeout) {
             this.connectTimeoutInMillis = minimumConnectTimeout;
         }
-        
+
         this.connectTimeoutCheckInterval = minimumConnectTimeout;
     }
 
@@ -87,7 +88,7 @@ public abstract class AbstractIoConnector
      *  Take a look at <tt>getConnectTimeoutMillis()</tt>
      */
     public final int getConnectTimeout() {
-        return (int)connectTimeoutInMillis/1000;
+        return (int) connectTimeoutInMillis / 1000;
     }
 
     /**
@@ -102,10 +103,10 @@ public abstract class AbstractIoConnector
      *  Take a look at <tt>setConnectTimeoutMillis(long)</tt>
      */
     public final void setConnectTimeout(int connectTimeout) {
-        
-        setConnectTimeoutMillis( connectTimeout * 1000L );
+
+        setConnectTimeoutMillis(connectTimeout * 1000L);
     }
-    
+
     /**
      * Sets the connect timeout value in milliseconds.
      * 
@@ -131,16 +132,14 @@ public abstract class AbstractIoConnector
         if (defaultRemoteAddress == null) {
             throw new IllegalArgumentException("defaultRemoteAddress");
         }
-        
-        if (!getTransportMetadata().getAddressType().isAssignableFrom(
-                defaultRemoteAddress.getClass())) {
-            throw new IllegalArgumentException("defaultRemoteAddress type: "
-                    + defaultRemoteAddress.getClass() + " (expected: "
-                    + getTransportMetadata().getAddressType() + ")");
+
+        if (!getTransportMetadata().getAddressType().isAssignableFrom(defaultRemoteAddress.getClass())) {
+            throw new IllegalArgumentException("defaultRemoteAddress type: " + defaultRemoteAddress.getClass()
+                    + " (expected: " + getTransportMetadata().getAddressType() + ")");
         }
         this.defaultRemoteAddress = defaultRemoteAddress;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -149,10 +148,10 @@ public abstract class AbstractIoConnector
         if (defaultRemoteAddress == null) {
             throw new IllegalStateException("defaultRemoteAddress is not set.");
         }
-        
+
         return connect(defaultRemoteAddress, null, null);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -161,7 +160,7 @@ public abstract class AbstractIoConnector
         if (defaultRemoteAddress == null) {
             throw new IllegalStateException("defaultRemoteAddress is not set.");
         }
-        
+
         return connect(defaultRemoteAddress, null, sessionInitializer);
     }
 
@@ -171,7 +170,7 @@ public abstract class AbstractIoConnector
     public final ConnectFuture connect(SocketAddress remoteAddress) {
         return connect(remoteAddress, null, null);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -179,20 +178,19 @@ public abstract class AbstractIoConnector
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         return connect(remoteAddress, null, sessionInitializer);
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public ConnectFuture connect(SocketAddress remoteAddress,
-            SocketAddress localAddress) {
+    public ConnectFuture connect(SocketAddress remoteAddress, SocketAddress localAddress) {
         return connect(remoteAddress, localAddress, null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public final ConnectFuture connect(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
+    public final ConnectFuture connect(SocketAddress remoteAddress, SocketAddress localAddress,
+            IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         if (isDisposing()) {
             throw new IllegalStateException("The connector has been disposed.");
         }
@@ -201,56 +199,44 @@ public abstract class AbstractIoConnector
             throw new IllegalArgumentException("remoteAddress");
         }
 
-        if (!getTransportMetadata().getAddressType().isAssignableFrom(
-                remoteAddress.getClass())) {
-            throw new IllegalArgumentException("remoteAddress type: "
-                    + remoteAddress.getClass() + " (expected: "
+        if (!getTransportMetadata().getAddressType().isAssignableFrom(remoteAddress.getClass())) {
+            throw new IllegalArgumentException("remoteAddress type: " + remoteAddress.getClass() + " (expected: "
                     + getTransportMetadata().getAddressType() + ")");
         }
 
-        if (localAddress != null
-                && !getTransportMetadata().getAddressType().isAssignableFrom(
-                        localAddress.getClass())) {
-            throw new IllegalArgumentException("localAddress type: "
-                    + localAddress.getClass() + " (expected: "
+        if (localAddress != null && !getTransportMetadata().getAddressType().isAssignableFrom(localAddress.getClass())) {
+            throw new IllegalArgumentException("localAddress type: " + localAddress.getClass() + " (expected: "
                     + getTransportMetadata().getAddressType() + ")");
         }
 
         if (getHandler() == null) {
             if (getSessionConfig().isUseReadOperation()) {
                 setHandler(new IoHandler() {
-                    public void exceptionCaught(IoSession session,
-                            Throwable cause) throws Exception {
+                    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
                         // Empty handler
                     }
 
-                    public void messageReceived(IoSession session,
-                            Object message) throws Exception {
+                    public void messageReceived(IoSession session, Object message) throws Exception {
                         // Empty handler
                     }
 
-                    public void messageSent(IoSession session, Object message)
-                            throws Exception {
+                    public void messageSent(IoSession session, Object message) throws Exception {
                         // Empty handler
                     }
 
-                    public void sessionClosed(IoSession session)
-                            throws Exception {
+                    public void sessionClosed(IoSession session) throws Exception {
                         // Empty handler
                     }
 
-                    public void sessionCreated(IoSession session)
-                            throws Exception {
+                    public void sessionCreated(IoSession session) throws Exception {
                         // Empty handler
                     }
 
-                    public void sessionIdle(IoSession session, IdleStatus status)
-                            throws Exception {
+                    public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
                         // Empty handler
                     }
 
-                    public void sessionOpened(IoSession session)
-                            throws Exception {
+                    public void sessionOpened(IoSession session) throws Exception {
                         // Empty handler
                     }
                 });
@@ -267,8 +253,8 @@ public abstract class AbstractIoConnector
      *
      * @param localAddress <tt>null</tt> if no local address is specified
      */
-    protected abstract ConnectFuture connect0(SocketAddress remoteAddress,
-            SocketAddress localAddress, IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
+    protected abstract ConnectFuture connect0(SocketAddress remoteAddress, SocketAddress localAddress,
+            IoSessionInitializer<? extends ConnectFuture> sessionInitializer);
 
     /**
      * Adds required internal attributes and {@link IoFutureListener}s
@@ -278,8 +264,7 @@ public abstract class AbstractIoConnector
      * will call this method instead.
      */
     @Override
-    protected final void finishSessionInitialization0(
-            final IoSession session, IoFuture future) {
+    protected final void finishSessionInitialization0(final IoSession session, IoFuture future) {
         // In case that ConnectFuture.cancel() is invoked before
         // setSession() is invoked, add a listener that closes the
         // connection immediately on cancellation.
@@ -291,14 +276,14 @@ public abstract class AbstractIoConnector
             }
         });
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         TransportMetadata m = getTransportMetadata();
-        return '(' + m.getProviderName() + ' ' + m.getName() + " connector: " + 
-               "managedSessionCount: " + getManagedSessionCount() + ')'; 
+        return '(' + m.getProviderName() + ' ' + m.getName() + " connector: " + "managedSessionCount: "
+                + getManagedSessionCount() + ')';
     }
 }

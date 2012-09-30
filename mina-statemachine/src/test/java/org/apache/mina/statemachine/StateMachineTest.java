@@ -47,7 +47,7 @@ public class StateMachineTest {
         sm.handle(new Event("foo", context));
         assertEquals(true, context.getAttribute("success"));
     }
-    
+
     @Test
     public void testBreakAndGotoNow() throws Exception {
         State s1 = new State("s1");
@@ -60,7 +60,7 @@ public class StateMachineTest {
         sm.handle(new Event("foo", context));
         assertEquals(true, context.getAttribute("success"));
     }
-    
+
     @Test
     public void testBreakAndGotoNext() throws Exception {
         State s1 = new State("s1");
@@ -91,7 +91,7 @@ public class StateMachineTest {
             return true;
         }
     }
-    
+
     private static class BreakAndContinueTransition extends AbstractTransition {
         public BreakAndContinueTransition(Object eventId) {
             super(eventId);
@@ -107,7 +107,7 @@ public class StateMachineTest {
             return true;
         }
     }
-    
+
     private static class BreakAndGotoNowTransition extends AbstractTransition {
         private final String stateId;
 
@@ -154,7 +154,6 @@ public class StateMachineTest {
             super();
         }
 
-
         @Override
         protected boolean doExecute(StateContext stateContext, State state) {
             stateContext.setAttribute("SelfSuccess" + state.getId(), true);
@@ -163,13 +162,12 @@ public class StateMachineTest {
 
     }
 
-    
     @Test
     public void testOnEntry() throws Exception {
         State s1 = new State("s1");
         State s2 = new State("s2");
 
-        s1.addTransition(new SuccessTransition("foo", s2));        
+        s1.addTransition(new SuccessTransition("foo", s2));
         s1.addOnExitSelfTransaction(new SampleSelfTransition());
         s2.addOnEntrySelfTransaction(new SampleSelfTransition());
 
@@ -181,6 +179,5 @@ public class StateMachineTest {
         assertEquals(true, context.getAttribute("SelfSuccess" + s2.getId()));
 
     }
-    
 
 }

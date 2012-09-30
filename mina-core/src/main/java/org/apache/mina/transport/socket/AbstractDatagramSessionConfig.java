@@ -27,13 +27,12 @@ import org.apache.mina.core.session.IoSessionConfig;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractDatagramSessionConfig extends
-        AbstractIoSessionConfig implements DatagramSessionConfig {
+public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionConfig implements DatagramSessionConfig {
 
     private static final boolean DEFAULT_CLOSE_ON_PORT_UNREACHABLE = true;
 
     private boolean closeOnPortUnreachable = DEFAULT_CLOSE_ON_PORT_UNREACHABLE;
-    
+
     protected AbstractDatagramSessionConfig() {
         // Do nothing
     }
@@ -43,7 +42,7 @@ public abstract class AbstractDatagramSessionConfig extends
         if (!(config instanceof DatagramSessionConfig)) {
             return;
         }
-        
+
         if (config instanceof AbstractDatagramSessionConfig) {
             // Minimize unnecessary system calls by checking all 'propertyChanged' properties.
             AbstractDatagramSessionConfig cfg = (AbstractDatagramSessionConfig) config;
@@ -73,7 +72,7 @@ public abstract class AbstractDatagramSessionConfig extends
             }
         }
     }
-    
+
     /**
      * Returns <tt>true</tt> if and only if the <tt>broadcast</tt> property
      * has been changed by its setter method.  The system call related with
@@ -125,10 +124,10 @@ public abstract class AbstractDatagramSessionConfig extends
      * default, this method always returns <tt>true</tt> to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
-    protected  boolean isTrafficClassChanged() {
+    protected boolean isTrafficClassChanged() {
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */

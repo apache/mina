@@ -38,8 +38,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
-    private final static Logger logger = LoggerFactory
-            .getLogger(HttpSmartProxyHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(HttpSmartProxyHandler.class);
 
     /**
      * Has the HTTP proxy request been sent ?
@@ -60,8 +59,7 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
      * 
      * @param nextFilter the next filter
      */
-    public void doHandshake(final NextFilter nextFilter)
-            throws ProxyAuthException {
+    public void doHandshake(final NextFilter nextFilter) throws ProxyAuthException {
         logger.debug(" doHandshake()");
 
         if (authHandler != null) {
@@ -69,17 +67,15 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
         } else {
             if (requestSent) {
                 // Safety check
-                throw new ProxyAuthException(
-                        "Authentication request already sent");
+                throw new ProxyAuthException("Authentication request already sent");
             }
 
             logger.debug("  sending HTTP request");
 
             // Compute request headers
-            HttpProxyRequest req = (HttpProxyRequest) getProxyIoSession()
-                    .getRequest();
-            Map<String, List<String>> headers = req.getHeaders() != null ? req
-                    .getHeaders() : new HashMap<String, List<String>>();
+            HttpProxyRequest req = (HttpProxyRequest) getProxyIoSession().getRequest();
+            Map<String, List<String>> headers = req.getHeaders() != null ? req.getHeaders()
+                    : new HashMap<String, List<String>>();
 
             AbstractAuthLogicHandler.addKeepAliveHeaders(headers);
             req.setHeaders(headers);
@@ -97,15 +93,13 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
      * 
      * @param response the proxy response
      */
-    private void autoSelectAuthHandler(final HttpProxyResponse response)
-            throws ProxyAuthException {
+    private void autoSelectAuthHandler(final HttpProxyResponse response) throws ProxyAuthException {
         // Get the Proxy-Authenticate header
         List<String> values = response.getHeaders().get("Proxy-Authenticate");
         ProxyIoSession proxyIoSession = getProxyIoSession();
 
         if (values == null || values.size() == 0) {
-            authHandler = HttpAuthenticationMethods.NO_AUTH
-                    .getNewHandler(proxyIoSession);
+            authHandler = HttpAuthenticationMethods.NO_AUTH.getNewHandler(proxyIoSession);
 
         } else if (getProxyIoSession().getPreferedOrder() == null) {
             // No preference order set for auth mechanisms
@@ -119,8 +113,7 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
                 if (proxyAuthHeader.contains("ntlm")) {
                     method = HttpAuthenticationMethods.NTLM.getId();
                     break;
-                } else if (proxyAuthHeader.contains("digest")
-                        && method != HttpAuthenticationMethods.NTLM.getId()) {
+                } else if (proxyAuthHeader.contains("digest") && method != HttpAuthenticationMethods.NTLM.getId()) {
                     method = HttpAuthenticationMethods.DIGEST.getId();
                 } else if (proxyAuthHeader.contains("basic") && method == -1) {
                     method = HttpAuthenticationMethods.BASIC.getId();
@@ -129,28 +122,24 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
 
             if (method != -1) {
                 try {
-                    authHandler = HttpAuthenticationMethods.getNewHandler(
-                            method, proxyIoSession);
+                    authHandler = HttpAuthenticationMethods.getNewHandler(method, proxyIoSession);
                 } catch (Exception ex) {
                     logger.debug("Following exception occured:", ex);
                 }
             }
 
             if (authHandler == null) {
-                authHandler = HttpAuthenticationMethods.NO_AUTH
-                        .getNewHandler(proxyIoSession);
+                authHandler = HttpAuthenticationMethods.NO_AUTH.getNewHandler(proxyIoSession);
             }
 
         } else {
-            for (HttpAuthenticationMethods method : proxyIoSession
-                    .getPreferedOrder()) {
+            for (HttpAuthenticationMethods method : proxyIoSession.getPreferedOrder()) {
                 if (authHandler != null) {
                     break;
                 }
 
                 if (method == HttpAuthenticationMethods.NO_AUTH) {
-                    authHandler = HttpAuthenticationMethods.NO_AUTH
-                            .getNewHandler(proxyIoSession);
+                    authHandler = HttpAuthenticationMethods.NO_AUTH.getNewHandler(proxyIoSession);
                     break;
                 }
 
@@ -159,20 +148,14 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
 
                     try {
                         // test which auth mechanism to use
-                        if (proxyAuthHeader.contains("basic")
-                                && method == HttpAuthenticationMethods.BASIC) {
-                            authHandler = HttpAuthenticationMethods.BASIC
-                                    .getNewHandler(proxyIoSession);
+                        if (proxyAuthHeader.contains("basic") && method == HttpAuthenticationMethods.BASIC) {
+                            authHandler = HttpAuthenticationMethods.BASIC.getNewHandler(proxyIoSession);
                             break;
-                        } else if (proxyAuthHeader.contains("digest")
-                                && method == HttpAuthenticationMethods.DIGEST) {
-                            authHandler = HttpAuthenticationMethods.DIGEST
-                                    .getNewHandler(proxyIoSession);
+                        } else if (proxyAuthHeader.contains("digest") && method == HttpAuthenticationMethods.DIGEST) {
+                            authHandler = HttpAuthenticationMethods.DIGEST.getNewHandler(proxyIoSession);
                             break;
-                        } else if (proxyAuthHeader.contains("ntlm")
-                                && method == HttpAuthenticationMethods.NTLM) {
-                            authHandler = HttpAuthenticationMethods.NTLM
-                                    .getNewHandler(proxyIoSession);
+                        } else if (proxyAuthHeader.contains("ntlm") && method == HttpAuthenticationMethods.NTLM) {
+                            authHandler = HttpAuthenticationMethods.NTLM.getNewHandler(proxyIoSession);
                             break;
                         }
                     } catch (Exception ex) {
@@ -184,8 +167,7 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
         }
 
         if (authHandler == null) {
-            throw new ProxyAuthException(
-                    "Unknown authentication mechanism(s): " + values);
+            throw new ProxyAuthException("Unknown authentication mechanism(s): " + values);
         }
     }
 
@@ -195,15 +177,11 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
      * @param response The proxy response.
      */
     @Override
-    public void handleResponse(final HttpProxyResponse response)
-            throws ProxyAuthException {
+    public void handleResponse(final HttpProxyResponse response) throws ProxyAuthException {
         if (!isHandshakeComplete()
-                && ("close".equalsIgnoreCase(StringUtilities
-                        .getSingleValuedHeader(response.getHeaders(),
-                                "Proxy-Connection")) || "close"
-                        .equalsIgnoreCase(StringUtilities
-                                .getSingleValuedHeader(response.getHeaders(),
-                                        "Connection")))) {
+                && ("close".equalsIgnoreCase(StringUtilities.getSingleValuedHeader(response.getHeaders(),
+                        "Proxy-Connection")) || "close".equalsIgnoreCase(StringUtilities.getSingleValuedHeader(
+                        response.getHeaders(), "Connection")))) {
             getProxyIoSession().setReconnectionNeeded(true);
         }
 
@@ -213,8 +191,8 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
             }
             authHandler.handleResponse(response);
         } else {
-            throw new ProxyAuthException("Error: unexpected response code "
-                    + response.getStatusLine() + " received from proxy.");
+            throw new ProxyAuthException("Error: unexpected response code " + response.getStatusLine()
+                    + " received from proxy.");
         }
     }
 }

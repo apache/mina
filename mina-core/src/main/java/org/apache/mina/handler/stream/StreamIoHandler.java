@@ -45,8 +45,9 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class StreamIoHandler extends IoHandlerAdapter {
     private final static Logger LOGGER = LoggerFactory.getLogger(StreamIoHandler.class);
-    
+
     private static final AttributeKey KEY_IN = new AttributeKey(StreamIoHandler.class, "in");
+
     private static final AttributeKey KEY_OUT = new AttributeKey(StreamIoHandler.class, "out");
 
     private int readTimeout;
@@ -62,8 +63,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
      * <b>please note that you must forward the process request to other
      * thread or thread pool.</b>
      */
-    protected abstract void processStreamIo(IoSession session, InputStream in,
-            OutputStream out);
+    protected abstract void processStreamIo(IoSession session, InputStream in, OutputStream out);
 
     /**
      * Returns read timeout in seconds.
@@ -133,8 +133,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
      */
     @Override
     public void messageReceived(IoSession session, Object buf) {
-        final IoSessionInputStream in = (IoSessionInputStream) session
-                .getAttribute(KEY_IN);
+        final IoSessionInputStream in = (IoSessionInputStream) session.getAttribute(KEY_IN);
         in.write((IoBuffer) buf);
     }
 
@@ -143,8 +142,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
      */
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        final IoSessionInputStream in = (IoSessionInputStream) session
-                .getAttribute(KEY_IN);
+        final IoSessionInputStream in = (IoSessionInputStream) session.getAttribute(KEY_IN);
 
         IOException e = null;
         if (cause instanceof StreamIoException) {
@@ -167,8 +165,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
     @Override
     public void sessionIdle(IoSession session, IdleStatus status) {
         if (status == IdleStatus.READER_IDLE) {
-            throw new StreamIoException(new SocketTimeoutException(
-                    "Read timeout"));
+            throw new StreamIoException(new SocketTimeoutException("Read timeout"));
         }
     }
 

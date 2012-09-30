@@ -28,11 +28,11 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MyResponseEncoder implements ProtocolEncoder {
-  public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
+    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
 
-  }
+    }
 
-  public void dispose(IoSession session) throws Exception {
+    public void dispose(IoSession session) throws Exception {
 
-  }
+    }
 }

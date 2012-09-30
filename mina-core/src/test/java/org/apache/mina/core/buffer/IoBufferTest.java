@@ -113,18 +113,18 @@ public class IoBufferTest {
         time2 = System.currentTimeMillis();
         //System.out.println("Time for performance test 2: " + (time2 - time) + "ms");
     }
-    
-    @Test 
-    public void autoExpand() { 
-        IoBuffer buffer = IoBuffer.allocate(8, false); 
-        buffer.setAutoExpand(true); 
-         
-        assertTrue("Should AutoExpand", buffer.isAutoExpand()); 
-         
-        IoBuffer slice = buffer.slice(); 
-        assertFalse("Should *NOT* AutoExpand", buffer.isAutoExpand()); 
-        assertFalse("Should *NOT* AutoExpand", slice.isAutoExpand()); 
-    } 
+
+    @Test
+    public void autoExpand() {
+        IoBuffer buffer = IoBuffer.allocate(8, false);
+        buffer.setAutoExpand(true);
+
+        assertTrue("Should AutoExpand", buffer.isAutoExpand());
+
+        IoBuffer slice = buffer.slice();
+        assertFalse("Should *NOT* AutoExpand", buffer.isAutoExpand());
+        assertFalse("Should *NOT* AutoExpand", slice.isAutoExpand());
+    }
 
     /**
      * This class extends the AbstractIoBuffer class to have direct access to
@@ -196,7 +196,7 @@ public class IoBufferTest {
         // This assertion is just to make sure that deserialization occurred.
         assertNotSame(o, o2);
     }
-    
+
     @Test
     public void testNonserializableClass() throws Exception {
         Class<?> c = NonserializableClass.class;
@@ -211,7 +211,7 @@ public class IoBufferTest {
         assertEquals(c, o);
         assertSame(c, o);
     }
-    
+
     @Test
     public void testNonserializableInterface() throws Exception {
         Class<?> c = NonserializableInterface.class;
@@ -226,7 +226,7 @@ public class IoBufferTest {
         assertEquals(c, o);
         assertSame(c, o);
     }
-    
+
     @Test
     public void testAllocate() throws Exception {
         for (int i = 10; i < 1048576 * 2; i = i * 11 / 10) // increase by 10%
@@ -276,7 +276,7 @@ public class IoBufferTest {
         // Make sure the buffer is doubled up.
         buf = IoBuffer.allocate(1).setAutoExpand(true);
         int lastCapacity = buf.capacity();
-        for (int i = 0; i < 1048576; i ++) {
+        for (int i = 0; i < 1048576; i++) {
             buf.put((byte) 0);
             if (lastCapacity != buf.capacity()) {
                 assertEquals(lastCapacity * 2, buf.capacity());
@@ -332,7 +332,7 @@ public class IoBufferTest {
         assertEquals(8, buf.position());
         assertEquals(16, buf.limit());
         buf.clear();
-        for (int i = 0; i < 8; i ++) {
+        for (int i = 0; i < 8; i++) {
             assertEquals(1, buf.get());
         }
 
@@ -348,7 +348,7 @@ public class IoBufferTest {
         assertEquals(4, buf.position());
         assertEquals(8, buf.limit());
         buf.clear();
-        for (int i = 0; i < 4; i ++) {
+        for (int i = 0; i < 4; i++) {
             assertEquals(1, buf.get());
         }
 
@@ -375,7 +375,7 @@ public class IoBufferTest {
         assertEquals(9, buf.position());
         assertEquals(32, buf.limit());
         buf.clear();
-        for (int i = 0; i < 9; i ++) {
+        for (int i = 0; i < 9; i++) {
             assertEquals(1, buf.get());
         }
     }
@@ -905,8 +905,7 @@ public class IoBufferTest {
         try {
             original = IoBuffer.allocate(16);
             duplicate = original.asReadOnlyBuffer();
-            duplicate.putString("A very very very very looooooong string",
-                    Charset.forName("ISO-8859-1").newEncoder());
+            duplicate.putString("A very very very very looooooong string", Charset.forName("ISO-8859-1").newEncoder());
             fail("ReadOnly buffer's can't be expanded");
         } catch (ReadOnlyBufferException e) {
             // Expected an Exception, signifies test success
@@ -932,7 +931,7 @@ public class IoBufferTest {
         buf.reset();
         assertEquals(0xCDB3D0A4L, buf.getUnsignedInt());
     }
-    
+
     @Test
     public void testIndexOf() throws Exception {
         boolean direct = false;
@@ -1060,51 +1059,43 @@ public class IoBufferTest {
         // Test empty set
         buf.put((byte) 0);
         buf.flip();
-        assertEquals(EnumSet.noneOf(TestEnum.class), buf
-                .getEnumSet(TestEnum.class));
+        assertEquals(EnumSet.noneOf(TestEnum.class), buf.getEnumSet(TestEnum.class));
 
         buf.clear();
         buf.putShort((short) 0);
         buf.flip();
-        assertEquals(EnumSet.noneOf(TestEnum.class), buf
-                .getEnumSet(TestEnum.class));
+        assertEquals(EnumSet.noneOf(TestEnum.class), buf.getEnumSet(TestEnum.class));
 
         buf.clear();
         buf.putInt(0);
         buf.flip();
-        assertEquals(EnumSet.noneOf(TestEnum.class), buf
-                .getEnumSet(TestEnum.class));
+        assertEquals(EnumSet.noneOf(TestEnum.class), buf.getEnumSet(TestEnum.class));
 
         buf.clear();
         buf.putLong(0L);
         buf.flip();
-        assertEquals(EnumSet.noneOf(TestEnum.class), buf
-                .getEnumSet(TestEnum.class));
+        assertEquals(EnumSet.noneOf(TestEnum.class), buf.getEnumSet(TestEnum.class));
 
         // Test complete set
         buf.clear();
         buf.put((byte) -1);
         buf.flip();
-        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E8), buf
-                .getEnumSet(TestEnum.class));
+        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E8), buf.getEnumSet(TestEnum.class));
 
         buf.clear();
         buf.putShort((short) -1);
         buf.flip();
-        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E16), buf
-                .getEnumSetShort(TestEnum.class));
+        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E16), buf.getEnumSetShort(TestEnum.class));
 
         buf.clear();
         buf.putInt(-1);
         buf.flip();
-        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E32), buf
-                .getEnumSetInt(TestEnum.class));
+        assertEquals(EnumSet.range(TestEnum.E1, TestEnum.E32), buf.getEnumSetInt(TestEnum.class));
 
         buf.clear();
         buf.putLong(-1L);
         buf.flip();
-        assertEquals(EnumSet.allOf(TestEnum.class), buf
-                .getEnumSetLong(TestEnum.class));
+        assertEquals(EnumSet.allOf(TestEnum.class), buf.getEnumSetLong(TestEnum.class));
 
         // Test high bit set
         buf.clear();
@@ -1115,47 +1106,40 @@ public class IoBufferTest {
         buf.clear();
         buf.putShort(Short.MIN_VALUE);
         buf.flip();
-        assertEquals(EnumSet.of(TestEnum.E16), buf
-                .getEnumSetShort(TestEnum.class));
+        assertEquals(EnumSet.of(TestEnum.E16), buf.getEnumSetShort(TestEnum.class));
 
         buf.clear();
         buf.putInt(Integer.MIN_VALUE);
         buf.flip();
-        assertEquals(EnumSet.of(TestEnum.E32), buf
-                .getEnumSetInt(TestEnum.class));
+        assertEquals(EnumSet.of(TestEnum.E32), buf.getEnumSetInt(TestEnum.class));
 
         buf.clear();
         buf.putLong(Long.MIN_VALUE);
         buf.flip();
-        assertEquals(EnumSet.of(TestEnum.E64), buf
-                .getEnumSetLong(TestEnum.class));
+        assertEquals(EnumSet.of(TestEnum.E64), buf.getEnumSetLong(TestEnum.class));
 
         // Test high low bits set
         buf.clear();
         byte b = Byte.MIN_VALUE + 1;
         buf.put(b);
         buf.flip();
-        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E8), buf
-                .getEnumSet(TestEnum.class));
+        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E8), buf.getEnumSet(TestEnum.class));
 
         buf.clear();
         short s = Short.MIN_VALUE + 1;
         buf.putShort(s);
         buf.flip();
-        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E16), buf
-                .getEnumSetShort(TestEnum.class));
+        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E16), buf.getEnumSetShort(TestEnum.class));
 
         buf.clear();
         buf.putInt(Integer.MIN_VALUE + 1);
         buf.flip();
-        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E32), buf
-                .getEnumSetInt(TestEnum.class));
+        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E32), buf.getEnumSetInt(TestEnum.class));
 
         buf.clear();
         buf.putLong(Long.MIN_VALUE + 1);
         buf.flip();
-        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E64), buf
-                .getEnumSetLong(TestEnum.class));
+        assertEquals(EnumSet.of(TestEnum.E1, TestEnum.E64), buf.getEnumSetLong(TestEnum.class));
     }
 
     @Test
@@ -1281,154 +1265,154 @@ public class IoBufferTest {
 
         buf.flip();
     }
-    
+
     @Test
     public void testPutUnsigned() {
         IoBuffer buf = IoBuffer.allocate(4);
-        byte b = (byte)0x80;                // We should get 0x0080
-        short s = (short)0x8F81;           // We should get 0x0081
-        int i = 0x8FFFFF82;                // We should get 0x0082
-        long l = 0x8FFFFFFFFFFFFF83L;      // We should get 0x0083
-        
+        byte b = (byte) 0x80; // We should get 0x0080
+        short s = (short) 0x8F81; // We should get 0x0081
+        int i = 0x8FFFFF82; // We should get 0x0082
+        long l = 0x8FFFFFFFFFFFFF83L; // We should get 0x0083
+
         buf.mark();
 
         // Put the unsigned bytes
-        buf.putUnsigned( b );
-        buf.putUnsigned( s );
-        buf.putUnsigned( i );
-        buf.putUnsigned( l );
+        buf.putUnsigned(b);
+        buf.putUnsigned(s);
+        buf.putUnsigned(i);
+        buf.putUnsigned(l);
 
         buf.reset();
-        
+
         // Read back the unsigned bytes
-        assertEquals( 0x0080, buf.getUnsigned() );
-        assertEquals( 0x0081, buf.getUnsigned() );
-        assertEquals( 0x0082, buf.getUnsigned() );
-        assertEquals( 0x0083, buf.getUnsigned() );
+        assertEquals(0x0080, buf.getUnsigned());
+        assertEquals(0x0081, buf.getUnsigned());
+        assertEquals(0x0082, buf.getUnsigned());
+        assertEquals(0x0083, buf.getUnsigned());
     }
-    
+
     @Test
     public void testPutUnsignedIndex() {
         IoBuffer buf = IoBuffer.allocate(4);
-        byte b = (byte)0x80;               // We should get 0x0080
-        short s = (short)0x8F81;           // We should get 0x0081
-        int i = 0x8FFFFF82;                // We should get 0x0082
-        long l = 0x8FFFFFFFFFFFFF83L;      // We should get 0x0083
-        
+        byte b = (byte) 0x80; // We should get 0x0080
+        short s = (short) 0x8F81; // We should get 0x0081
+        int i = 0x8FFFFF82; // We should get 0x0082
+        long l = 0x8FFFFFFFFFFFFF83L; // We should get 0x0083
+
         buf.mark();
 
         // Put the unsigned bytes
-        buf.putUnsigned( 3, b );
-        buf.putUnsigned( 2, s );
-        buf.putUnsigned( 1, i );
-        buf.putUnsigned( 0, l );
+        buf.putUnsigned(3, b);
+        buf.putUnsigned(2, s);
+        buf.putUnsigned(1, i);
+        buf.putUnsigned(0, l);
 
         buf.reset();
-        
+
         // Read back the unsigned bytes
-        assertEquals( 0x0083, buf.getUnsigned() );
-        assertEquals( 0x0082, buf.getUnsigned() );
-        assertEquals( 0x0081, buf.getUnsigned() );
-        assertEquals( 0x0080, buf.getUnsigned() );
+        assertEquals(0x0083, buf.getUnsigned());
+        assertEquals(0x0082, buf.getUnsigned());
+        assertEquals(0x0081, buf.getUnsigned());
+        assertEquals(0x0080, buf.getUnsigned());
     }
 
     @Test
     public void testPutUnsignedShort() {
         IoBuffer buf = IoBuffer.allocate(8);
-        byte b = (byte)0x80;               // We should get 0x0080
-        short s = (short)0x8181;           // We should get 0x8181
-        int i = 0x82828282;                // We should get 0x8282
-        long l = 0x8383838383838383L;      // We should get 0x8383
-        
+        byte b = (byte) 0x80; // We should get 0x0080
+        short s = (short) 0x8181; // We should get 0x8181
+        int i = 0x82828282; // We should get 0x8282
+        long l = 0x8383838383838383L; // We should get 0x8383
+
         buf.mark();
 
         // Put the unsigned bytes
-        buf.putUnsignedShort( b );
-        buf.putUnsignedShort( s );
-        buf.putUnsignedShort( i );
-        buf.putUnsignedShort( l );
+        buf.putUnsignedShort(b);
+        buf.putUnsignedShort(s);
+        buf.putUnsignedShort(i);
+        buf.putUnsignedShort(l);
 
         buf.reset();
-        
+
         // Read back the unsigned bytes
-        assertEquals( 0x0080L, buf.getUnsignedShort() );
-        assertEquals( 0x8181L, buf.getUnsignedShort() );
-        assertEquals( 0x8282L, buf.getUnsignedShort() );
-        assertEquals( 0x8383L, buf.getUnsignedShort() );
+        assertEquals(0x0080L, buf.getUnsignedShort());
+        assertEquals(0x8181L, buf.getUnsignedShort());
+        assertEquals(0x8282L, buf.getUnsignedShort());
+        assertEquals(0x8383L, buf.getUnsignedShort());
     }
-    
+
     @Test
     public void testPutUnsignedShortIndex() {
         IoBuffer buf = IoBuffer.allocate(8);
-        byte b = (byte)0x80;               // We should get 0x00000080
-        short s = (short)0x8181;           // We should get 0x00008181
-        int i = 0x82828282;                // We should get 0x82828282
-        long l = 0x8383838383838383L;      // We should get 0x83838383
-        
+        byte b = (byte) 0x80; // We should get 0x00000080
+        short s = (short) 0x8181; // We should get 0x00008181
+        int i = 0x82828282; // We should get 0x82828282
+        long l = 0x8383838383838383L; // We should get 0x83838383
+
         buf.mark();
 
         // Put the unsigned shorts
-        buf.putUnsignedShort( 6, b );
-        buf.putUnsignedShort( 4, s );
-        buf.putUnsignedShort( 2, i );
-        buf.putUnsignedShort( 0, l );
+        buf.putUnsignedShort(6, b);
+        buf.putUnsignedShort(4, s);
+        buf.putUnsignedShort(2, i);
+        buf.putUnsignedShort(0, l);
 
         buf.reset();
-        
+
         // Read back the unsigned bytes
-        assertEquals( 0x8383L, buf.getUnsignedShort() );
-        assertEquals( 0x8282L, buf.getUnsignedShort() );
-        assertEquals( 0x8181L, buf.getUnsignedShort() );
-        assertEquals( 0x0080L, buf.getUnsignedShort() );
+        assertEquals(0x8383L, buf.getUnsignedShort());
+        assertEquals(0x8282L, buf.getUnsignedShort());
+        assertEquals(0x8181L, buf.getUnsignedShort());
+        assertEquals(0x0080L, buf.getUnsignedShort());
     }
-    
+
     @Test
     public void testPutUnsignedInt() {
         IoBuffer buf = IoBuffer.allocate(16);
-        byte b = (byte)0x80;               // We should get 0x00000080
-        short s = (short)0x8181;           // We should get 0x00008181
-        int i = 0x82828282;                // We should get 0x82828282
-        long l = 0x8383838383838383L;      // We should get 0x83838383
-        
+        byte b = (byte) 0x80; // We should get 0x00000080
+        short s = (short) 0x8181; // We should get 0x00008181
+        int i = 0x82828282; // We should get 0x82828282
+        long l = 0x8383838383838383L; // We should get 0x83838383
+
         buf.mark();
 
         // Put the unsigned bytes
-        buf.putUnsignedInt( b );
-        buf.putUnsignedInt( s );
-        buf.putUnsignedInt( i );
-        buf.putUnsignedInt( l );
+        buf.putUnsignedInt(b);
+        buf.putUnsignedInt(s);
+        buf.putUnsignedInt(i);
+        buf.putUnsignedInt(l);
 
         buf.reset();
-        
+
         // Read back the unsigned bytes
-        assertEquals( 0x0000000000000080L, buf.getUnsignedInt() );
-        assertEquals( 0x0000000000008181L, buf.getUnsignedInt() );
-        assertEquals( 0x0000000082828282L, buf.getUnsignedInt() );
-        assertEquals( 0x0000000083838383L, buf.getUnsignedInt() );
+        assertEquals(0x0000000000000080L, buf.getUnsignedInt());
+        assertEquals(0x0000000000008181L, buf.getUnsignedInt());
+        assertEquals(0x0000000082828282L, buf.getUnsignedInt());
+        assertEquals(0x0000000083838383L, buf.getUnsignedInt());
     }
-    
+
     @Test
     public void testPutUnsignedIntIndex() {
         IoBuffer buf = IoBuffer.allocate(16);
-        byte b = (byte)0x80;               // We should get 0x00000080
-        short s = (short)0x8181;           // We should get 0x00008181
-        int i = 0x82828282;                // We should get 0x82828282
-        long l = 0x8383838383838383L;      // We should get 0x83838383
-        
+        byte b = (byte) 0x80; // We should get 0x00000080
+        short s = (short) 0x8181; // We should get 0x00008181
+        int i = 0x82828282; // We should get 0x82828282
+        long l = 0x8383838383838383L; // We should get 0x83838383
+
         buf.mark();
 
         // Put the unsigned bytes
-        buf.putUnsignedInt( 12, b );
-        buf.putUnsignedInt( 8, s );
-        buf.putUnsignedInt( 4, i );
-        buf.putUnsignedInt( 0, l );
+        buf.putUnsignedInt(12, b);
+        buf.putUnsignedInt(8, s);
+        buf.putUnsignedInt(4, i);
+        buf.putUnsignedInt(0, l);
 
         buf.reset();
-        
+
         // Read back the unsigned bytes
-        assertEquals( 0x0000000083838383L, buf.getUnsignedInt() );
-        assertEquals( 0x0000000082828282L, buf.getUnsignedInt() );
-        assertEquals( 0x0000000000008181L, buf.getUnsignedInt() );
-        assertEquals( 0x0000000000000080L, buf.getUnsignedInt() );
+        assertEquals(0x0000000083838383L, buf.getUnsignedInt());
+        assertEquals(0x0000000082828282L, buf.getUnsignedInt());
+        assertEquals(0x0000000000008181L, buf.getUnsignedInt());
+        assertEquals(0x0000000000000080L, buf.getUnsignedInt());
     }
 }

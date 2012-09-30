@@ -39,10 +39,13 @@ import java.security.cert.CertificateException;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class KeyStoreFactory {
-    
+
     private String type = "JKS";
+
     private String provider = null;
+
     private char[] password = null;
+
     private byte[] data = null;
 
     /**
@@ -51,7 +54,8 @@ public class KeyStoreFactory {
      *
      * @return a new {@link KeyStore} instance.
      */
-    public KeyStore newInstance() throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException {
+    public KeyStore newInstance() throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException,
+            CertificateException, IOException {
         if (data == null) {
             throw new IllegalStateException("data property is not set.");
         }
@@ -127,7 +131,7 @@ public class KeyStoreFactory {
         System.arraycopy(data, 0, copy, 0, data.length);
         this.data = copy;
     }
-    
+
     /**
      * Sets the data which contains the key store.
      *
@@ -152,7 +156,7 @@ public class KeyStoreFactory {
             }
         }
     }
-    
+
     /**
      * Sets the data which contains the key store.
      *
@@ -161,7 +165,7 @@ public class KeyStoreFactory {
     public void setDataFile(File dataFile) throws IOException {
         setData(new BufferedInputStream(new FileInputStream(dataFile)));
     }
-    
+
     /**
      * Sets the data which contains the key store.
      *

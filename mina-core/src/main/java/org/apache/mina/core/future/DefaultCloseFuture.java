@@ -21,7 +21,6 @@ package org.apache.mina.core.future;
 
 import org.apache.mina.core.session.IoSession;
 
-
 /**
  * A default implementation of {@link CloseFuture}.
  *

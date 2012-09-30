@@ -33,15 +33,15 @@ import ognl.PropertyAccessor;
 public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
 
     static final Object READ_ONLY_MODE = new Object();
+
     static final Object QUERY = new Object();
-    
+
     @Override
-    public final boolean hasGetProperty(OgnlContext context, Object target,
-            Object oname) throws OgnlException {
+    public final boolean hasGetProperty(OgnlContext context, Object target, Object oname) throws OgnlException {
         if (oname == null) {
             return false;
         }
-        
+
         if (hasGetProperty0(context, target, oname.toString())) {
             return true;
         } else {
@@ -50,17 +50,16 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
     }
 
     @Override
-    public final boolean hasSetProperty(OgnlContext context, Object target,
-            Object oname) throws OgnlException {
+    public final boolean hasSetProperty(OgnlContext context, Object target, Object oname) throws OgnlException {
         if (context.containsKey(READ_ONLY_MODE)) {
             // Return true to trigger setPossibleProperty to throw an exception.
             return true;
         }
-        
+
         if (oname == null) {
             return false;
         }
-        
+
         if (hasSetProperty0(context, target, oname.toString())) {
             return true;
         } else {
@@ -69,8 +68,7 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
     }
 
     @Override
-    public final Object getPossibleProperty(Map context, Object target, String name)
-            throws OgnlException {
+    public final Object getPossibleProperty(Map context, Object target, String name) throws OgnlException {
         Object answer = getProperty0((OgnlContext) context, target, name);
         if (answer == OgnlRuntime.NotFound) {
             answer = super.getPossibleProperty(context, target, name);
@@ -79,56 +77,47 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
     }
 
     @Override
-    public final Object setPossibleProperty(Map context, Object target, String name,
-            Object value) throws OgnlException {
+    public final Object setPossibleProperty(Map context, Object target, String name, Object value) throws OgnlException {
         if (context.containsKey(READ_ONLY_MODE)) {
             throw new OgnlException("Expression must be read-only: " + context.get(QUERY));
         }
-        
+
         Object answer = setProperty0((OgnlContext) context, target, name, value);
         if (answer == OgnlRuntime.NotFound) {
             answer = super.setPossibleProperty(context, target, name, value);
         }
         return answer;
     }
-    
-    protected abstract boolean hasGetProperty0(
-            OgnlContext context, Object target, String name) throws OgnlException;
 
-    protected abstract boolean hasSetProperty0(
-            OgnlContext context, Object target, String name) throws OgnlException;
+    protected abstract boolean hasGetProperty0(OgnlContext context, Object target, String name) throws OgnlException;
 
-    protected abstract Object getProperty0(
-            OgnlContext context, Object target, String name) throws OgnlException;
+    protected abstract boolean hasSetProperty0(OgnlContext context, Object target, String name) throws OgnlException;
 
-    protected abstract Object setProperty0(
-            OgnlContext context, Object target, String name, Object value) throws OgnlException;
+    protected abstract Object getProperty0(OgnlContext context, Object target, String name) throws OgnlException;
 
+    protected abstract Object setProperty0(OgnlContext context, Object target, String name, Object value)
+            throws OgnlException;
 
     // The following methods uses the four method above, so there's no need
     // to override them.
-    
+
     @Override
-    public final Object getProperty(Map context, Object target, Object oname)
-            throws OgnlException {
+    public final Object getProperty(Map context, Object target, Object oname) throws OgnlException {
         return super.getProperty(context, target, oname);
     }
 
     @Override
-    public final boolean hasGetProperty(Map context, Object target, Object oname)
-            throws OgnlException {
+    public final boolean hasGetProperty(Map context, Object target, Object oname) throws OgnlException {
         return super.hasGetProperty(context, target, oname);
     }
 
     @Override
-    public final boolean hasSetProperty(Map context, Object target, Object oname)
-            throws OgnlException {
+    public final boolean hasSetProperty(Map context, Object target, Object oname) throws OgnlException {
         return super.hasSetProperty(context, target, oname);
     }
 
     @Override
-    public final void setProperty(Map context, Object target, Object oname,
-            Object value) throws OgnlException {
+    public final void setProperty(Map context, Object target, Object oname, Object value) throws OgnlException {
         super.setProperty(context, target, oname, value);
     }
 }

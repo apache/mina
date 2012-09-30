@@ -60,30 +60,18 @@ public class CompressionFilterTest {
 
     // the sample data to be used for testing
     String strCompress = "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  "
-            + "The quick brown fox jumps over the lazy dog.  ";
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  "
+            + "The quick brown fox jumps over the lazy dog.  " + "The quick brown fox jumps over the lazy dog.  ";
 
     @Before
     public void setUp() {
@@ -125,13 +113,11 @@ public class CompressionFilterTest {
         ioFilterChain.getSession();
         mockIoFilterChain.setReturnValue(session);
 
-        session.setAttribute(CompressionFilter.class.getName() + ".Deflater",
-                deflater);
+        session.setAttribute(CompressionFilter.class.getName() + ".Deflater", deflater);
         mockSession.setDefaultMatcher(new DataMatcher());
         mockSession.setReturnValue(null, MockControl.ONE);
 
-        session.setAttribute(CompressionFilter.class.getName() + ".Inflater",
-                inflater);
+        session.setAttribute(CompressionFilter.class.getName() + ".Inflater", inflater);
         mockSession.setReturnValue(null, MockControl.ONE);
 
         session.containsAttribute(CompressionFilter.DISABLE_COMPRESSION_ONCE);
@@ -171,13 +157,11 @@ public class CompressionFilterTest {
         ioFilterChain.getSession();
         mockIoFilterChain.setReturnValue(session);
 
-        session.setAttribute(CompressionFilter.class.getName() + ".Deflater",
-                deflater);
+        session.setAttribute(CompressionFilter.class.getName() + ".Deflater", deflater);
         mockSession.setDefaultMatcher(new DataMatcher());
         mockSession.setReturnValue(null, MockControl.ONE);
 
-        session.setAttribute(CompressionFilter.class.getName() + ".Inflater",
-                inflater);
+        session.setAttribute(CompressionFilter.class.getName() + ".Inflater", inflater);
         mockSession.setReturnValue(null, MockControl.ONE);
 
         session.getAttribute(CompressionFilter.class.getName() + ".Inflater");

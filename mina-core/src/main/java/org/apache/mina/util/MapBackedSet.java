@@ -34,7 +34,7 @@ import java.util.Set;
 public class MapBackedSet<E> extends AbstractSet<E> implements Serializable {
 
     private static final long serialVersionUID = -8347878570391674042L;
-    
+
     protected final Map<E, Boolean> map;
 
     public MapBackedSet(Map<E, Boolean> map) {

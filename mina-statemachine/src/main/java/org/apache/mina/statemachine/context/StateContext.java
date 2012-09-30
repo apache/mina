@@ -46,7 +46,7 @@ public interface StateContext {
      * @param state the new current {@link State}.
      */
     void setCurrentState(State state);
-    
+
     /**
      * Returns the value of the attribute with the specified key or 
      * <code>null</code>if not found.

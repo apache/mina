@@ -42,13 +42,13 @@ public class SubnetIPv6Test {
     @Test
     public void testIPv6() throws UnknownHostException {
         InetAddress a = InetAddress.getByName(TEST_V6ADDRESS);
-        
+
         assertTrue(a instanceof Inet6Address);
-        
+
         try {
             new Subnet(a, 24);
             fail("IPv6 not supported");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // signifies a successful test execution
             assertTrue(true);
         }

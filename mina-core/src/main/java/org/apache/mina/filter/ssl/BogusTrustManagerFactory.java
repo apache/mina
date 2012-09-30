@@ -41,20 +41,17 @@ import javax.net.ssl.X509TrustManager;
 public class BogusTrustManagerFactory extends TrustManagerFactory {
 
     public BogusTrustManagerFactory() {
-        super(new BogusTrustManagerFactorySpi(), new Provider("MinaBogus", 1.0,
-                "") {
+        super(new BogusTrustManagerFactorySpi(), new Provider("MinaBogus", 1.0, "") {
             private static final long serialVersionUID = -4024169055312053827L;
         }, "MinaBogus");
     }
 
     private static final X509TrustManager X509 = new X509TrustManager() {
-        public void checkClientTrusted(X509Certificate[] x509Certificates,
-                String s) throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
             // Do nothing
         }
 
-        public void checkServerTrusted(X509Certificate[] x509Certificates,
-                String s) throws CertificateException {
+        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
             // Do nothing
         }
 
@@ -65,8 +62,7 @@ public class BogusTrustManagerFactory extends TrustManagerFactory {
 
     private static final TrustManager[] X509_MANAGERS = new TrustManager[] { X509 };
 
-    private static class BogusTrustManagerFactorySpi extends
-            TrustManagerFactorySpi {
+    private static class BogusTrustManagerFactorySpi extends TrustManagerFactorySpi {
 
         @Override
         protected TrustManager[] engineGetTrustManagers() {
@@ -79,8 +75,7 @@ public class BogusTrustManagerFactory extends TrustManagerFactory {
         }
 
         @Override
-        protected void engineInit(
-                ManagerFactoryParameters managerFactoryParameters)
+        protected void engineInit(ManagerFactoryParameters managerFactoryParameters)
                 throws InvalidAlgorithmParameterException {
             // noop
         }

@@ -48,19 +48,20 @@ import org.junit.Test;
 public abstract class AbstractFileRegionTest {
 
     private static final int FILE_SIZE = 1 * 1024 * 1024; // 1MB file
-    
+
     protected abstract IoAcceptor createAcceptor();
+
     protected abstract IoConnector createConnector();
 
     @Test
     public void testSendLargeFile() throws Throwable {
         File file = createLargeFile();
         assertEquals("Test file not as big as specified", FILE_SIZE, file.length());
-        
+
         final CountDownLatch latch = new CountDownLatch(1);
-        final boolean[] success = {false};
-        final Throwable[] exception = {null};
-        
+        final boolean[] success = { false };
+        final Throwable[] exception = { null };
+
         int port = AvailablePortFinder.getNextAvailable(1025);
         IoAcceptor acceptor = createAcceptor();
         IoConnector connector = createConnector();
@@ -68,19 +69,21 @@ public abstract class AbstractFileRegionTest {
         try {
             acceptor.setHandler(new IoHandlerAdapter() {
                 private int index = 0;
+
                 @Override
-                public void exceptionCaught(IoSession session, Throwable cause)
-                        throws Exception {
+                public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
                     exception[0] = cause;
                     session.close(true);
                 }
+
                 @Override
                 public void messageReceived(IoSession session, Object message) throws Exception {
                     IoBuffer buffer = (IoBuffer) message;
                     while (buffer.hasRemaining()) {
                         int x = buffer.getInt();
                         if (x != index) {
-                            throw new Exception(String.format("Integer at %d was %d but should have been %d", index, x, index));
+                            throw new Exception(String.format("Integer at %d was %d but should have been %d", index, x,
+                                    index));
                         }
                         index++;
                     }
@@ -93,37 +96,37 @@ public abstract class AbstractFileRegionTest {
                     }
                 }
             });
-            
-            ((NioSocketAcceptor)acceptor).setReuseAddress(true);
-            
+
+            ((NioSocketAcceptor) acceptor).setReuseAddress(true);
+
             acceptor.bind(new InetSocketAddress(port));
-            
+
             connector.setHandler(new IoHandlerAdapter() {
                 @Override
-                public void exceptionCaught(IoSession session, Throwable cause)
-                        throws Exception {
+                public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
                     exception[0] = cause;
                     session.close(true);
                 }
+
                 @Override
                 public void sessionClosed(IoSession session) throws Exception {
                     latch.countDown();
                 }
             });
-            
+
             ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
             future.awaitUninterruptibly();
-            
+
             IoSession session = future.getSession();
             session.write(file);
-            
+
             latch.await();
-            
+
             if (exception[0] != null) {
                 throw exception[0];
             }
             assertTrue("Did not complete file transfer successfully", success[0]);
-            
+
             assertEquals("Written messages should be 1 (we wrote one file)", 1, session.getWrittenMessages());
             assertEquals("Written bytes should match file size", FILE_SIZE, session.getWrittenBytes());
         } finally {
@@ -134,7 +137,7 @@ public abstract class AbstractFileRegionTest {
             }
         }
     }
-    
+
     private File createLargeFile() throws IOException {
         File largeFile = File.createTempFile("mina-test", "largefile");
         largeFile.deleteOnExit();
@@ -144,7 +147,7 @@ public abstract class AbstractFileRegionTest {
         channel.close();
         return largeFile;
     }
-    
+
     private ByteBuffer createBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(FILE_SIZE);
         for (int i = 0; i < FILE_SIZE / 4; i++) {

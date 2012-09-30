@@ -70,8 +70,7 @@ public class WriteRequestWrapper implements WriteRequest {
         return "WR Wrapper" + parentRequest.toString();
     }
 
-    public boolean isEncoded()
-    {
+    public boolean isEncoded() {
         return false;
     }
 }

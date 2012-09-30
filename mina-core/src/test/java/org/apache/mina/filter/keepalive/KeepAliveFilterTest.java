@@ -46,19 +46,22 @@ import org.junit.Test;
 public class KeepAliveFilterTest {
     // Constants -----------------------------------------------------
     static final IoBuffer PING = IoBuffer.wrap(new byte[] { 1 });
+
     static final IoBuffer PONG = IoBuffer.wrap(new byte[] { 2 });
+
     private static final int INTERVAL = 2;
+
     private static final int TIMEOUT = 1;
 
     private int port;
+
     private NioSocketAcceptor acceptor;
 
     @Before
     public void setUp() throws Exception {
         acceptor = new NioSocketAcceptor();
         KeepAliveMessageFactory factory = new ServerFactory();
-        KeepAliveFilter filter = new KeepAliveFilter(factory,
-                IdleStatus.BOTH_IDLE);
+        KeepAliveFilter filter = new KeepAliveFilter(factory, IdleStatus.BOTH_IDLE);
         acceptor.getFilterChain().addLast("keep-alive", filter);
         acceptor.setHandler(new IoHandlerAdapter());
         acceptor.setDefaultLocalAddress(new InetSocketAddress(0));
@@ -93,32 +96,27 @@ public class KeepAliveFilterTest {
 
     // Private -------------------------------------------------------
 
-    private void keepAliveFilterForIdleStatus(IdleStatus status)
-            throws Exception {
+    private void keepAliveFilterForIdleStatus(IdleStatus status) throws Exception {
         NioSocketConnector connector = new NioSocketConnector();
-        KeepAliveFilter filter = new KeepAliveFilter(new ClientFactory(),
-                status, EXCEPTION, INTERVAL, TIMEOUT);
+        KeepAliveFilter filter = new KeepAliveFilter(new ClientFactory(), status, EXCEPTION, INTERVAL, TIMEOUT);
         filter.setForwardEvent(true);
         connector.getFilterChain().addLast("keep-alive", filter);
 
         final AtomicBoolean gotException = new AtomicBoolean(false);
         connector.setHandler(new IoHandlerAdapter() {
             @Override
-            public void exceptionCaught(IoSession session, Throwable cause)
-                    throws Exception {
+            public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
                 //cause.printStackTrace();
                 gotException.set(true);
             }
 
             @Override
-            public void sessionIdle(IoSession session, IdleStatus status)
-                    throws Exception {
+            public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
                 // Do nothing
             }
         });
 
-        ConnectFuture future = connector.connect(
-                new InetSocketAddress("127.0.0.1", port)).awaitUninterruptibly();
+        ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port)).awaitUninterruptibly();
         IoSession session = future.getSession();
         assertNotNull(session);
 
@@ -152,7 +150,7 @@ public class KeepAliveFilterTest {
         public ServerFactory() {
             super();
         }
-        
+
         public Object getRequest(IoSession session) {
             return null;
         }
@@ -183,7 +181,7 @@ public class KeepAliveFilterTest {
         public ClientFactory() {
             super();
         }
-        
+
         public Object getRequest(IoSession session) {
             return PING.duplicate();
         }

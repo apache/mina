@@ -47,14 +47,19 @@ public class SerialAddress extends SocketAddress {
     }
 
     public enum FlowControl {
-        NONE, RTSCTS_IN, RTSCTS_OUT, RTSCTS_IN_OUT,  XONXOFF_IN, XONXOFF_OUT, XONXOFF_IN_OUT
+        NONE, RTSCTS_IN, RTSCTS_OUT, RTSCTS_IN_OUT, XONXOFF_IN, XONXOFF_OUT, XONXOFF_IN_OUT
     }
 
     private final String name;
+
     private final int bauds;
+
     private final DataBits dataBits;
+
     private final StopBits stopBits;
+
     private final Parity parity;
+
     private final FlowControl flowControl;
 
     /**
@@ -67,8 +72,8 @@ public class SerialAddress extends SocketAddress {
      * @param parity parity used
      * @param flowControl flow control used
      */
-    public SerialAddress(String name, int bauds, DataBits dataBits,
-            StopBits stopBits, Parity parity, FlowControl flowControl) {
+    public SerialAddress(String name, int bauds, DataBits dataBits, StopBits stopBits, Parity parity,
+            FlowControl flowControl) {
         if (name == null) {
             throw new IllegalArgumentException("name");
         }
@@ -91,7 +96,7 @@ public class SerialAddress extends SocketAddress {
         if (flowControl == null) {
             throw new IllegalArgumentException("flowControl");
         }
-        
+
         this.name = name;
         this.bauds = bauds;
         this.dataBits = dataBits;
@@ -153,9 +158,8 @@ public class SerialAddress extends SocketAddress {
      */
     @Override
     public String toString() {
-        return name + " (bauds: " + bauds + ", dataBits: " + dataBits
-                + ", stopBits: " + stopBits + ", parity: " + parity
-                + ", flowControl: " + flowControl + ")";
+        return name + " (bauds: " + bauds + ", dataBits: " + dataBits + ", stopBits: " + stopBits + ", parity: "
+                + parity + ", flowControl: " + flowControl + ")";
     }
 
     int getDataBitsForRXTX() {

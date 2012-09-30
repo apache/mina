@@ -41,8 +41,7 @@ import org.apache.mina.proxy.handlers.http.HttpSmartProxyHandler;
  */
 public class ProxyIoSession {
 
-    public final static String PROXY_SESSION = ProxyConnector.class.getName()
-            + ".ProxySession";
+    public final static String PROXY_SESSION = ProxyConnector.class.getName() + ".ProxySession";
 
     private final static String DEFAULT_ENCODING = "ISO-8859-1";
 
@@ -122,7 +121,7 @@ public class ProxyIoSession {
     public IoSessionEventQueue getEventQueue() {
         return eventQueue;
     }
-    
+
     /**
      * Returns the list of the prefered order for the authentication methods.
      * This list is used by the {@link HttpSmartProxyHandler} to determine

@@ -19,14 +19,12 @@
  */
 package org.apache.mina.util.byteaccess;
 
-
 /**
  * A factory for <code>ByteArray</code>s.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface ByteArrayFactory
-{
+public interface ByteArrayFactory {
     /**
      * Creates an instance of {@link ByteArray} of size specified by the 
      * size parameter.
@@ -36,5 +34,5 @@ public interface ByteArrayFactory
      * @return
      *  The ByteArray
      */
-    ByteArray create( int size );
+    ByteArray create(int size);
 }

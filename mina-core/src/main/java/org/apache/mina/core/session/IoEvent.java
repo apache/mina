@@ -58,7 +58,7 @@ public class IoEvent implements Runnable {
     public Object getParameter() {
         return parameter;
     }
-    
+
     public void run() {
         fire();
     }
@@ -102,8 +102,7 @@ public class IoEvent implements Runnable {
         if (getParameter() == null) {
             return "[" + getSession() + "] " + getType().name();
         }
-        
-        return "[" + getSession() + "] " + getType().name() + ": "
-                    + getParameter();
+
+        return "[" + getSession() + "] " + getType().name() + ": " + getParameter();
     }
 }

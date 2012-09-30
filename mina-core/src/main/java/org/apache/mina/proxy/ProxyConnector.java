@@ -59,9 +59,8 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @since MINA 2.0.0-M3
  */
 public class ProxyConnector extends AbstractIoConnector {
-    private static final TransportMetadata METADATA = new DefaultTransportMetadata(
-            "proxy", "proxyconnector", false, true, InetSocketAddress.class,
-            SocketSessionConfig.class, IoBuffer.class, FileRegion.class);
+    private static final TransportMetadata METADATA = new DefaultTransportMetadata("proxy", "proxyconnector", false,
+            true, InetSocketAddress.class, SocketSessionConfig.class, IoBuffer.class, FileRegion.class);
 
     /**
      * Wrapped connector to use for outgoing TCP connections.
@@ -95,7 +94,7 @@ public class ProxyConnector extends AbstractIoConnector {
      * 
      * @param connector Connector used to establish proxy connections.
      */
-    public ProxyConnector(final SocketConnector connector) {        
+    public ProxyConnector(final SocketConnector connector) {
         this(connector, new DefaultSocketSessionConfig(), null);
     }
 
@@ -106,8 +105,8 @@ public class ProxyConnector extends AbstractIoConnector {
     public ProxyConnector(final SocketConnector connector, IoSessionConfig config, Executor executor) {
         super(config, executor);
         setConnector(connector);
-    }    
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -133,8 +132,7 @@ public class ProxyConnector extends AbstractIoConnector {
         }
 
         if (proxyIoSession.getProxyAddress() == null) {
-            throw new IllegalArgumentException(
-                    "proxySession.proxyAddress cannot be null");
+            throw new IllegalArgumentException("proxySession.proxyAddress cannot be null");
         }
 
         proxyIoSession.setConnector(this);
@@ -153,24 +151,20 @@ public class ProxyConnector extends AbstractIoConnector {
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected ConnectFuture connect0(
-            final SocketAddress remoteAddress,
-            final SocketAddress localAddress,
+    protected ConnectFuture connect0(final SocketAddress remoteAddress, final SocketAddress localAddress,
             final IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         if (!proxyIoSession.isReconnectionNeeded()) {
             // First connection
             IoHandler handler = getHandler();
             if (!(handler instanceof AbstractProxyIoHandler)) {
-                throw new IllegalArgumentException(
-                        "IoHandler must be an instance of AbstractProxyIoHandler");
+                throw new IllegalArgumentException("IoHandler must be an instance of AbstractProxyIoHandler");
             }
 
             connector.setHandler(handler);
             future = new DefaultConnectFuture();
         }
 
-        ConnectFuture conFuture = connector.connect(proxyIoSession
-                .getProxyAddress(), new ProxyIoSessionInitializer(
+        ConnectFuture conFuture = connector.connect(proxyIoSession.getProxyAddress(), new ProxyIoSessionInitializer(
                 sessionInitializer, proxyIoSession));
 
         // If proxy does not use reconnection like socks the connector's 
@@ -178,8 +172,7 @@ public class ProxyConnector extends AbstractIoConnector {
         // then we send back the connector's future which is only used
         // internally while <code>future</code> will be used to notify
         // the user of the connection state.
-        if (proxyIoSession.getRequest() instanceof SocksProxyRequest
-                || proxyIoSession.isReconnectionNeeded()) {
+        if (proxyIoSession.getRequest() instanceof SocksProxyRequest || proxyIoSession.isReconnectionNeeded()) {
             return conFuture;
         }
 

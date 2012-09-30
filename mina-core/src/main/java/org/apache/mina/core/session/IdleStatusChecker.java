@@ -37,20 +37,18 @@ import org.apache.mina.util.ConcurrentHashSet;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IdleStatusChecker {
-    
+
     // the list of session to check
-    private final Set<AbstractIoSession> sessions =
-        new ConcurrentHashSet<AbstractIoSession>();
+    private final Set<AbstractIoSession> sessions = new ConcurrentHashSet<AbstractIoSession>();
 
     /* create a task you can execute in the transport code,
      * if the transport is like NIO or APR you don't need to call it,
      * you just need to call the needed static sessions on select()/poll() 
      * timeout.
-     */ 
+     */
     private final NotifyingTask notifyingTask = new NotifyingTask();
-    
-    private final IoFutureListener<IoFuture> sessionCloseListener =
-        new SessionCloseListener();
+
+    private final IoFutureListener<IoFuture> sessionCloseListener = new SessionCloseListener();
 
     public IdleStatusChecker() {
         // Do nothing
@@ -63,7 +61,7 @@ public class IdleStatusChecker {
     public void addSession(AbstractIoSession session) {
         sessions.add(session);
         CloseFuture closeFuture = session.getCloseFuture();
-        
+
         // isn't service reponsability to remove the session nicely ?
         closeFuture.addListener(sessionCloseListener);
     }
@@ -89,10 +87,12 @@ public class IdleStatusChecker {
      */
     public class NotifyingTask implements Runnable {
         private volatile boolean cancelled;
+
         private volatile Thread thread;
-        
+
         // we forbid instantiation of this class outside
-        /** No qualifier */ NotifyingTask() {
+        /** No qualifier */
+        NotifyingTask() {
             // Do nothing
         }
 
@@ -145,7 +145,7 @@ public class IdleStatusChecker {
         public SessionCloseListener() {
             super();
         }
-        
+
         public void operationComplete(IoFuture future) {
             removeSession((AbstractIoSession) future.getSession());
         }

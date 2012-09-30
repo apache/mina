@@ -45,7 +45,7 @@ public abstract class AbstractStateContextLookup implements StateContextLookup {
         }
         this.contextFactory = contextFactory;
     }
-    
+
     public StateContext lookup(Object[] eventArgs) {
         for (int i = 0; i < eventArgs.length; i++) {
             if (supports(eventArgs[i].getClass())) {
@@ -59,7 +59,7 @@ public abstract class AbstractStateContextLookup implements StateContextLookup {
         }
         return null;
     }
-    
+
     /**
      * Extracts a {@link StateContext} from the specified event argument which
      * is an instance of a class {@link #supports(Class)} returns 
@@ -69,7 +69,7 @@ public abstract class AbstractStateContextLookup implements StateContextLookup {
      * @return the {@link StateContext}.
      */
     protected abstract StateContext lookup(Object eventArg);
-    
+
     /**
      * Stores a new {@link StateContext} in the specified event argument which
      * is an instance of a class {@link #supports(Class)} returns 

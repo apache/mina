@@ -29,11 +29,10 @@ import java.util.regex.Pattern;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class BooleanEditor extends AbstractPropertyEditor {
-    private static final Pattern TRUE = Pattern.compile(
-            "(?:true|t|yes|y|1)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern FALSE = Pattern.compile(
-            "(?:false|f|no|n|1)", Pattern.CASE_INSENSITIVE);
-    
+    private static final Pattern TRUE = Pattern.compile("(?:true|t|yes|y|1)", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern FALSE = Pattern.compile("(?:false|f|no|n|1)", Pattern.CASE_INSENSITIVE);
+
     @Override
     protected String toText(Object value) {
         return String.valueOf(value);
@@ -44,11 +43,11 @@ public class BooleanEditor extends AbstractPropertyEditor {
         if (TRUE.matcher(text).matches()) {
             return Boolean.TRUE;
         }
-        
+
         if (FALSE.matcher(text).matches()) {
             return Boolean.FALSE;
         }
-        
+
         throw new IllegalArgumentException("Wrong boolean value: " + text);
     }
 }

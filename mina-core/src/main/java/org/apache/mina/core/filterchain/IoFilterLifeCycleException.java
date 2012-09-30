@@ -19,7 +19,6 @@
  */
 package org.apache.mina.core.filterchain;
 
-
 /**
  * A {@link RuntimeException} which is thrown when {@link IoFilter#init()}
  * or {@link IoFilter#onPostAdd(IoFilterChain, String, org.apache.mina.core.filterchain.IoFilter.NextFilter)}

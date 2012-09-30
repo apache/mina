@@ -37,6 +37,7 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
 public class TextLineCodecFactory implements ProtocolCodecFactory {
 
     private final TextLineEncoder encoder;
+
     private final TextLineDecoder decoder;
 
     /**
@@ -70,8 +71,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * @param decodingDelimiter
      *  The line delimeter for the decoder
      */
-    public TextLineCodecFactory(Charset charset,
-            String encodingDelimiter, String decodingDelimiter) {
+    public TextLineCodecFactory(Charset charset, String encodingDelimiter, String decodingDelimiter) {
         encoder = new TextLineEncoder(charset, encodingDelimiter);
         decoder = new TextLineDecoder(charset, decodingDelimiter);
     }
@@ -87,8 +87,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * @param decodingDelimiter
      *  The line delimeter for the decoder
      */
-    public TextLineCodecFactory(Charset charset,
-            LineDelimiter encodingDelimiter, LineDelimiter decodingDelimiter) {
+    public TextLineCodecFactory(Charset charset, LineDelimiter encodingDelimiter, LineDelimiter decodingDelimiter) {
         encoder = new TextLineEncoder(charset, encodingDelimiter);
         decoder = new TextLineDecoder(charset, decodingDelimiter);
     }

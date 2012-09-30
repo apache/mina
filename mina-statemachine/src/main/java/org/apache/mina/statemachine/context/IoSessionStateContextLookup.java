@@ -32,11 +32,11 @@ public class IoSessionStateContextLookup extends AbstractStateContextLookup {
      * The default name of the {@link IoSession} attribute used to store the
      * {@link StateContext} object.
      */
-    public static final String DEFAULT_SESSION_ATTRIBUTE_NAME = 
-        IoSessionStateContextLookup.class.getName() + ".stateContext";
-    
+    public static final String DEFAULT_SESSION_ATTRIBUTE_NAME = IoSessionStateContextLookup.class.getName()
+            + ".stateContext";
+
     private final String sessionAttributeName;
-    
+
     /**
      * Creates a new instance using a {@link DefaultStateContextFactory} to
      * create {@link StateContext} objects for new {@link IoSession}s.
@@ -55,7 +55,7 @@ public class IoSessionStateContextLookup extends AbstractStateContextLookup {
     public IoSessionStateContextLookup(String sessionAttributeName) {
         this(new DefaultStateContextFactory(), sessionAttributeName);
     }
-    
+
     /**
      * Creates a new instance using the specified {@link StateContextFactory} to
      * create {@link StateContext} objects for new {@link IoSession}s.
@@ -78,7 +78,7 @@ public class IoSessionStateContextLookup extends AbstractStateContextLookup {
         super(contextFactory);
         this.sessionAttributeName = sessionAttributeName;
     }
-    
+
     protected StateContext lookup(Object eventArg) {
         IoSession session = (IoSession) eventArg;
         return (StateContext) session.getAttribute(sessionAttributeName);

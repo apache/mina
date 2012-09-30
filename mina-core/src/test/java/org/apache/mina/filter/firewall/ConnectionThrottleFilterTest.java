@@ -30,58 +30,52 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ConnectionThrottleFilterTest
-{
+public class ConnectionThrottleFilterTest {
     private ConnectionThrottleFilter filter;
 
     private DummySession sessionOne;
+
     private DummySession sessionTwo;
 
     @Before
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         filter = new ConnectionThrottleFilter();
 
         sessionOne = new DummySession();
-        sessionOne.setRemoteAddress( new InetSocketAddress(1234) );
+        sessionOne.setRemoteAddress(new InetSocketAddress(1234));
         sessionTwo = new DummySession();
-        sessionTwo.setRemoteAddress( new InetSocketAddress(1235) );
+        sessionTwo.setRemoteAddress(new InetSocketAddress(1235));
     }
 
     @After
-    public void tearDown() throws Exception
-    {
+    public void tearDown() throws Exception {
         filter = null;
     }
 
     @Test
-    public void testGoodConnection(){
-        filter.setAllowedInterval( 100 );
-        filter.isConnectionOk( sessionOne );
-        
-        try
-        {
-            Thread.sleep( 1000 );
-        }
-        catch ( InterruptedException e )
-        {
+    public void testGoodConnection() {
+        filter.setAllowedInterval(100);
+        filter.isConnectionOk(sessionOne);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
             //e.printStackTrace();
         }
 
-        boolean result = filter.isConnectionOk( sessionOne );
-        assertTrue( result );
+        boolean result = filter.isConnectionOk(sessionOne);
+        assertTrue(result);
     }
 
     @Test
-    public void testBadConnection(){
-        filter.setAllowedInterval( 1000 );
-        filter.isConnectionOk( sessionTwo );
-        assertFalse(filter.isConnectionOk( sessionTwo ));
+    public void testBadConnection() {
+        filter.setAllowedInterval(1000);
+        filter.isConnectionOk(sessionTwo);
+        assertFalse(filter.isConnectionOk(sessionTwo));
     }
 }

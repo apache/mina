@@ -19,17 +19,14 @@
  */
 package org.apache.mina.util.byteaccess;
 
-
 import java.util.NoSuchElementException;
-
 
 /**
  * A linked list that stores <code>ByteArray</code>s and maintains several useful invariants.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-class ByteArrayList
-{
+class ByteArrayList {
 
     /**
      * A {@link Node} which indicates the start and end of the list and does not
@@ -53,8 +50,7 @@ class ByteArrayList
      * Creates a new instance of ByteArrayList.
      *
      */
-    protected ByteArrayList()
-    {
+    protected ByteArrayList() {
         header = new Node();
     }
 
@@ -65,8 +61,7 @@ class ByteArrayList
      * @return
      *  The last byte in the array list
      */
-    public int lastByte()
-    {
+    public int lastByte() {
         return lastByte;
     }
 
@@ -77,8 +72,7 @@ class ByteArrayList
      * @return
      *  The first byte in the array list
      */
-    public int firstByte()
-    {
+    public int firstByte() {
         return firstByte;
     }
 
@@ -89,8 +83,7 @@ class ByteArrayList
      * @return
      *  True if empty, otherwise false
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return header.next == header;
     }
 
@@ -100,8 +93,7 @@ class ByteArrayList
      * @return
      *  
      */
-    public Node getFirst()
-    {
+    public Node getFirst() {
         return header.getNextNode();
     }
 
@@ -111,8 +103,7 @@ class ByteArrayList
      * @return
      *  The last node in the list
      */
-    public Node getLast()
-    {
+    public Node getLast() {
         return header.getPreviousNode();
     }
 
@@ -123,9 +114,8 @@ class ByteArrayList
      * @param ba
      *  The ByteArray to be added to the list
      */
-    public void addFirst( ByteArray ba )
-    {
-        addNode( new Node( ba ), header.next );
+    public void addFirst(ByteArray ba) {
+        addNode(new Node(ba), header.next);
         firstByte -= ba.last();
     }
 
@@ -136,9 +126,8 @@ class ByteArrayList
      * @param ba
      *  The ByteArray to be added to the list
      */
-    public void addLast( ByteArray ba )
-    {
-        addNode( new Node( ba ), header );
+    public void addLast(ByteArray ba) {
+        addNode(new Node(ba), header);
         lastByte += ba.last();
     }
 
@@ -148,11 +137,10 @@ class ByteArrayList
      * @return
      *  The node that was removed
      */
-    public Node removeFirst()
-    {
+    public Node removeFirst() {
         Node node = header.getNextNode();
         firstByte += node.ba.last();
-        return removeNode( node );
+        return removeNode(node);
     }
 
     /**
@@ -161,13 +149,11 @@ class ByteArrayList
      * @return
      *  The node that was taken off of the list
      */
-    public Node removeLast()
-    {
+    public Node removeLast() {
         Node node = header.getPreviousNode();
         lastByte -= node.ba.last();
-        return removeNode( node );
+        return removeNode(node);
     }
-
 
     //-----------------------------------------------------------------------
 
@@ -177,8 +163,7 @@ class ByteArrayList
      * @param nodeToInsert  new node to insert
      * @param insertBeforeNode  node to insert before
      */
-    protected void addNode( Node nodeToInsert, Node insertBeforeNode )
-    {
+    protected void addNode(Node nodeToInsert, Node insertBeforeNode) {
         // Insert node.
         nodeToInsert.next = insertBeforeNode;
         nodeToInsert.previous = insertBeforeNode.previous;
@@ -186,14 +171,12 @@ class ByteArrayList
         insertBeforeNode.previous = nodeToInsert;
     }
 
-
     /**
      * Removes the specified node from the list.
      *
      * @param node  the node to remove
      */
-    protected Node removeNode( Node node )
-    {
+    protected Node removeNode(Node node) {
         // Remove node.
         node.previous.next = node.next;
         node.next.previous = node.previous;
@@ -208,98 +191,78 @@ class ByteArrayList
      * From Commons Collections 3.1, all access to the <code>value</code> property
      * is via the methods on this class.
      */
-    public class Node
-    {
+    public class Node {
 
         /** A pointer to the node before this node */
         private Node previous;
-        
+
         /** A pointer to the node after this node */
         private Node next;
-        
+
         /** The ByteArray contained within this node */
         private ByteArray ba;
-        
-        private boolean removed;
 
+        private boolean removed;
 
         /**
          * Constructs a new header node.
          */
-        private Node()
-        {
+        private Node() {
             super();
             previous = this;
             next = this;
         }
 
-
         /**
          * Constructs a new node with a value.
          */
-        private Node( ByteArray ba )
-        {
+        private Node(ByteArray ba) {
             super();
-            
-            if ( ba == null )
-            {
-                throw new IllegalArgumentException( "ByteArray must not be null." );
+
+            if (ba == null) {
+                throw new IllegalArgumentException("ByteArray must not be null.");
             }
-            
+
             this.ba = ba;
         }
-
 
         /**
          * Gets the previous node.
          *
          * @return the previous node
          */
-        public Node getPreviousNode()
-        {
-            if ( !hasPreviousNode() )
-            {
+        public Node getPreviousNode() {
+            if (!hasPreviousNode()) {
                 throw new NoSuchElementException();
             }
             return previous;
         }
-
 
         /**
          * Gets the next node.
          *
          * @return the next node
          */
-        public Node getNextNode()
-        {
-            if ( !hasNextNode() )
-            {
+        public Node getNextNode() {
+            if (!hasNextNode()) {
                 throw new NoSuchElementException();
             }
             return next;
         }
 
-
-        public boolean hasPreviousNode()
-        {
+        public boolean hasPreviousNode() {
             return previous != header;
         }
 
-
-        public boolean hasNextNode()
-        {
+        public boolean hasNextNode() {
             return next != header;
         }
 
-
-        public ByteArray getByteArray()
-        {
+        public ByteArray getByteArray() {
             return ba;
         }
 
-
-        public boolean isRemoved()
-        {
+        public boolean isRemoved() {
             return removed;
         }
     }

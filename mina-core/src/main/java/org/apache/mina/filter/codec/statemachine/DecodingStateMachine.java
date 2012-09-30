@@ -48,8 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class DecodingStateMachine implements DecodingState {
-    private final Logger log = LoggerFactory
-            .getLogger(DecodingStateMachine.class);
+    private final Logger log = LoggerFactory.getLogger(DecodingStateMachine.class);
 
     private final List<Object> childProducts = new ArrayList<Object>();
 
@@ -64,6 +63,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     };
 
     private DecodingState currentState;
+
     private boolean initialized;
 
     /**
@@ -83,8 +83,8 @@ public abstract class DecodingStateMachine implements DecodingState {
      *        {@link ProtocolCodecFilter}.
      * @return the next state if the state machine should resume.
      */
-    protected abstract DecodingState finishDecode(List<Object> childProducts,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(List<Object> childProducts, ProtocolDecoderOutput out)
+            throws Exception;
 
     /**
      * Invoked to destroy this state machine once the end state has been reached
@@ -95,8 +95,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         DecodingState state = getCurrentState();
 
         final int limit = in.limit();
@@ -143,8 +142,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         DecodingState nextState;
         DecodingState state = getCurrentState();
         try {
@@ -155,7 +153,7 @@ public abstract class DecodingStateMachine implements DecodingState {
                     // Finished
                     break;
                 }
-    
+
                 // Exit if state didn't change.
                 if (oldState == state) {
                     break;
@@ -163,8 +161,7 @@ public abstract class DecodingStateMachine implements DecodingState {
             }
         } catch (Exception e) {
             state = null;
-            log.debug(
-                    "Ignoring the exception caused by a closed session.", e);
+            log.debug("Ignoring the exception caused by a closed session.", e);
         } finally {
             this.currentState = state;
             nextState = finishDecode(childProducts, out);
@@ -179,7 +176,7 @@ public abstract class DecodingStateMachine implements DecodingState {
         if (!initialized) {
             throw new IllegalStateException();
         }
-        
+
         initialized = false;
         childProducts.clear();
         try {

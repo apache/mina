@@ -33,8 +33,11 @@ import com.agical.rmock.extension.junit.RMockTestCase;
  */
 public class StateTest extends RMockTestCase {
     State state;
+
     Transition transition1;
+
     Transition transition2;
+
     Transition transition3;
 
     @BeforeClass
@@ -65,7 +68,7 @@ public class StateTest extends RMockTestCase {
         assertSame(transition2, state.getTransitions().get(1));
         assertSame(transition3, state.getTransitions().get(2));
     }
-    
+
     @Test
     public void testWeightedTransitions() throws Exception {
         assertTrue(state.getTransitions().isEmpty());
@@ -91,5 +94,5 @@ public class StateTest extends RMockTestCase {
         } catch (IllegalArgumentException npe) {
         }
     }
-    
+
 }

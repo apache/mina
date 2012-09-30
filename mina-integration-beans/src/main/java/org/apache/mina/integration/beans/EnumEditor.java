@@ -35,6 +35,7 @@ public class EnumEditor extends AbstractPropertyEditor {
     private static final Pattern ORDINAL = Pattern.compile("[0-9]+");
 
     private final Class enumType;
+
     private final Set<Enum> enums;
 
     public EnumEditor(Class enumType) {
@@ -55,7 +56,7 @@ public class EnumEditor extends AbstractPropertyEditor {
     protected Object toValue(String text) throws IllegalArgumentException {
         if (ORDINAL.matcher(text).matches()) {
             int ordinal = Integer.parseInt(text);
-            for (Enum e: enums) {
+            for (Enum e : enums) {
                 if (e.ordinal() == ordinal) {
                     return e;
                 }
@@ -64,7 +65,7 @@ public class EnumEditor extends AbstractPropertyEditor {
             throw new IllegalArgumentException("wrong ordinal: " + ordinal);
         }
 
-        for (Enum e: enums) {
+        for (Enum e : enums) {
             if (text.equalsIgnoreCase(e.toString())) {
                 return e;
             }

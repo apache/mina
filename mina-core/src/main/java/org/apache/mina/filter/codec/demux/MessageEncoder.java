@@ -45,6 +45,5 @@ public interface MessageEncoder<T> {
      *
      * @throws Exception if the message violated protocol specification
      */
-    void encode(IoSession session, T message, ProtocolEncoderOutput out)
-            throws Exception;
+    void encode(IoSession session, T message, ProtocolEncoderOutput out) throws Exception;
 }

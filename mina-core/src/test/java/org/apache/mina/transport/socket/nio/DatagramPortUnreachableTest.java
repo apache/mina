@@ -41,40 +41,38 @@ import org.junit.Test;
 public class DatagramPortUnreachableTest {
 
     Object mutex = new Object();
-    
+
     private void runTest(boolean closeOnPortUnreachable) throws Exception {
         IoConnector connector = new NioDatagramConnector();
         connector.setHandler(new IoHandlerAdapter() {
 
             @Override
-            public void exceptionCaught(IoSession session, Throwable cause)
-                    throws Exception {
+            public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
                 if (cause instanceof PortUnreachableException) {
-                    synchronized(mutex) {
+                    synchronized (mutex) {
                         mutex.notify();
                     }
                 }
             }
-            
+
         });
-        ConnectFuture future = connector.connect(new InetSocketAddress("localhost", 
-                AvailablePortFinder.getNextAvailable(20000)));
+        ConnectFuture future = connector.connect(new InetSocketAddress("localhost", AvailablePortFinder
+                .getNextAvailable(20000)));
         future.awaitUninterruptibly();
         IoSession session = future.getSession();
 
-        DatagramSessionConfig cfg = ((DatagramSessionConfig) session
-                .getConfig());
+        DatagramSessionConfig cfg = ((DatagramSessionConfig) session.getConfig());
         cfg.setUseReadOperation(true);
         cfg.setCloseOnPortUnreachable(closeOnPortUnreachable);
-        
-        synchronized(mutex) {
+
+        synchronized (mutex) {
             session.write(IoBuffer.allocate(1)).awaitUninterruptibly().isWritten();
             session.read();
             mutex.wait();
         }
-        
+
         Thread.sleep(500);
-        
+
         assertEquals(closeOnPortUnreachable, session.isClosing());
         connector.dispose();
     }

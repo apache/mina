@@ -115,8 +115,7 @@ class IoSessionInputStream extends InputStream {
                 try {
                     mutex.wait();
                 } catch (InterruptedException e) {
-                    IOException ioe = new IOException(
-                            "Interrupted while waiting for more data");
+                    IOException ioe = new IOException("Interrupted while waiting for more data");
                     ioe.initCause(e);
                     throw ioe;
                 }

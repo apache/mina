@@ -32,8 +32,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class IoSessionEvent {
-    private final static Logger logger = LoggerFactory
-            .getLogger(IoSessionEvent.class);
+    private final static Logger logger = LoggerFactory.getLogger(IoSessionEvent.class);
 
     /**
      * The next filter in the chain.
@@ -64,8 +63,7 @@ public class IoSessionEvent {
      * @param session the session
      * @param type the event type
      */
-    public IoSessionEvent(final NextFilter nextFilter, final IoSession session,
-            final IoSessionEventType type) {
+    public IoSessionEvent(final NextFilter nextFilter, final IoSession session, final IoSessionEventType type) {
         this.nextFilter = nextFilter;
         this.session = session;
         this.type = type;
@@ -79,12 +77,11 @@ public class IoSessionEvent {
      * @param session the session
      * @param status the idle status
      */
-    public IoSessionEvent(final NextFilter nextFilter, final IoSession session,
-            final IdleStatus status) {
+    public IoSessionEvent(final NextFilter nextFilter, final IoSession session, final IdleStatus status) {
         this(nextFilter, session, IoSessionEventType.IDLE);
         this.status = status;
     }
-    
+
     /**
      * Delivers this event to the next filter.
      */
@@ -103,9 +100,8 @@ public class IoSessionEvent {
      * @param status the idle status should only be non null only if the event type is 
      * {@link IoSessionEventType#IDLE} 
      */
-    private static void deliverEvent(final NextFilter nextFilter,
-            final IoSession session, final IoSessionEventType type,
-            final IdleStatus status) {
+    private static void deliverEvent(final NextFilter nextFilter, final IoSession session,
+            final IoSessionEventType type, final IdleStatus status) {
         switch (type) {
         case CREATED:
             nextFilter.sessionCreated(session);
@@ -127,8 +123,7 @@ public class IoSessionEvent {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(IoSessionEvent.class
-                .getSimpleName());
+        StringBuilder sb = new StringBuilder(IoSessionEvent.class.getSimpleName());
         sb.append('@');
         sb.append(Integer.toHexString(hashCode()));
         sb.append(" - [ ").append(session);

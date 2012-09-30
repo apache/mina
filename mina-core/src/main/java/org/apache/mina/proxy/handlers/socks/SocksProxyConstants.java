@@ -39,7 +39,7 @@ public class SocksProxyConstants {
      * The size of a server to client response in a SOCKS4/4a negotiation.
      */
     public final static int SOCKS_4_RESPONSE_SIZE = 8;
-    
+
     /**
      * Invalid IP used in SOCKS 4a protocol to specify that the
      * client can't resolve the destination host's domain name.
@@ -116,8 +116,7 @@ public class SocksProxyConstants {
 
     public final static byte NO_ACCEPTABLE_AUTH_METHOD = (byte) 0xFF;
 
-    public final static byte[] SUPPORTED_AUTH_METHODS = new byte[] { NO_AUTH,
-            GSSAPI_AUTH, BASIC_AUTH };
+    public final static byte[] SUPPORTED_AUTH_METHODS = new byte[] { NO_AUTH, GSSAPI_AUTH, BASIC_AUTH };
 
     public final static byte BASIC_AUTH_SUBNEGOTIATION_VERSION = 0x01;
 
@@ -127,14 +126,14 @@ public class SocksProxyConstants {
 
     /**
      * Kerberos providers OID's.
-     */ 
+     */
     public final static String KERBEROS_V5_OID = "1.2.840.113554.1.2.2";
 
     public final static String MS_KERBEROS_V5_OID = "1.2.840.48018.1.2.2";
 
     /**
      * Microsoft NTLM security support provider.
-     */ 
+     */
     public final static String NTLMSSP_OID = "1.3.6.1.4.1.311.2.2.10";
 
     /**
@@ -155,7 +154,7 @@ public class SocksProxyConstants {
         case V4_REPLY_REQUEST_FAILED_ID_NOT_CONFIRMED:
             return "Request failed because client's identd could not confirm the user ID string in the request";
 
-        // v5 codes
+            // v5 codes
         case V5_REPLY_SUCCEEDED:
             return "Request succeeded";
         case V5_REPLY_GENERAL_FAILURE:

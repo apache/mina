@@ -53,13 +53,13 @@ public class IoServiceListenerSupport {
     private final Map<Long, IoSession> readOnlyManagedSessions = Collections.unmodifiableMap(managedSessions);
 
     private final AtomicBoolean activated = new AtomicBoolean();
-    
+
     /** Time this listenerSupport has been activated */
     private volatile long activationTime;
-    
+
     /** A counter used to store the maximum sessions we managed since the listenerSupport has been activated */
     private volatile int largestManagedSessionCount = 0;
-    
+
     /** A global counter to count the number of sessions managed since the start */
     private volatile long cumulativeManagedSessionCount = 0;
 
@@ -72,7 +72,7 @@ public class IoServiceListenerSupport {
         if (service == null) {
             throw new IllegalArgumentException("service");
         }
-        
+
         this.service = service;
     }
 
@@ -189,7 +189,7 @@ public class IoServiceListenerSupport {
      */
     public void fireSessionCreated(IoSession session) {
         boolean firstSession = false;
-        
+
         if (session.getService() instanceof IoConnector) {
             synchronized (managedSessions) {
                 firstSession = managedSessions.isEmpty();
@@ -207,17 +207,17 @@ public class IoServiceListenerSupport {
         }
 
         // Fire session events.
-        IoFilterChain filterChain = session.getFilterChain(); 
+        IoFilterChain filterChain = session.getFilterChain();
         filterChain.fireSessionCreated();
         filterChain.fireSessionOpened();
 
         int managedSessionCount = managedSessions.size();
-        
+
         if (managedSessionCount > largestManagedSessionCount) {
             largestManagedSessionCount = managedSessionCount;
         }
-        
-        cumulativeManagedSessionCount ++;
+
+        cumulativeManagedSessionCount++;
 
         // Fire listener events.
         for (IoServiceListener l : listeners) {
@@ -256,11 +256,11 @@ public class IoServiceListenerSupport {
             // Fire a virtual service deactivation event for the last session of the connector.
             if (session.getService() instanceof IoConnector) {
                 boolean lastSession = false;
-                
+
                 synchronized (managedSessions) {
                     lastSession = managedSessions.isEmpty();
                 }
-                
+
                 if (lastSession) {
                     fireServiceDeactivated();
                 }

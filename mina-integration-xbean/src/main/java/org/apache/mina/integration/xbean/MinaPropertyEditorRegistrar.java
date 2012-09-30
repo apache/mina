@@ -19,7 +19,6 @@
  */
 package org.apache.mina.integration.xbean;
 
-
 import java.beans.PropertyEditor;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -32,7 +31,6 @@ import org.apache.mina.transport.vmpipe.VmPipeAddress;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
-
 /**
  * A custom Spring {@link PropertyEditorRegistrar} implementation which 
  * registers by default all the {@link PropertyEditor} implementations in the 
@@ -40,8 +38,7 @@ import org.springframework.beans.PropertyEditorRegistry;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class MinaPropertyEditorRegistrar implements PropertyEditorRegistrar
-{
+public class MinaPropertyEditorRegistrar implements PropertyEditorRegistrar {
     /**
      * Registers custom {@link PropertyEditor}s in the MINA Integration Beans
      * module.
@@ -62,13 +59,12 @@ public class MinaPropertyEditorRegistrar implements PropertyEditorRegistrar
      * @see org.springframework.beans.PropertyEditorRegistrar#
      * registerCustomEditors(org.springframework.beans.PropertyEditorRegistry)
      */
-    public void registerCustomEditors( PropertyEditorRegistry registry ) 
-    {
+    public void registerCustomEditors(PropertyEditorRegistry registry) {
         // it is expected that new PropertyEditor instances are created
-        registry.registerCustomEditor( InetAddress.class, new InetAddressEditor() );
-        registry.registerCustomEditor( InetSocketAddress.class, new InetSocketAddressEditor() );
-        registry.registerCustomEditor( SocketAddress.class, new InetSocketAddressEditor() );
-        registry.registerCustomEditor( VmPipeAddress.class, new VmPipeAddressEditor() );
+        registry.registerCustomEditor(InetAddress.class, new InetAddressEditor());
+        registry.registerCustomEditor(InetSocketAddress.class, new InetSocketAddressEditor());
+        registry.registerCustomEditor(SocketAddress.class, new InetSocketAddressEditor());
+        registry.registerCustomEditor(VmPipeAddress.class, new VmPipeAddressEditor());
         // registry.registerCustomEditor( Boolean.class, new BooleanEditor() );
     }
 }

@@ -40,8 +40,7 @@ public class SocketTrafficControlTest extends AbstractTrafficControlTest {
     }
 
     @Override
-    protected ConnectFuture connect(int port, IoHandler handler)
-            throws Exception {
+    protected ConnectFuture connect(int port, IoHandler handler) throws Exception {
         IoConnector connector = new NioSocketConnector();
         connector.setHandler(handler);
         return connector.connect(new InetSocketAddress("localhost", port));

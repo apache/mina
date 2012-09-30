@@ -35,10 +35,14 @@ import java.util.ArrayList;
  */
 public class Transform {
 
-    private static final String CDATA_START  = "<![CDATA[";
-    private static final String CDATA_END    = "]]>";
+    private static final String CDATA_START = "<![CDATA[";
+
+    private static final String CDATA_END = "]]>";
+
     private static final String CDATA_PSEUDO_END = "]]&gt;";
+
     private static final String CDATA_EMBEDED_END = CDATA_END + CDATA_PSEUDO_END + CDATA_START;
+
     private static final int CDATA_END_LEN = CDATA_END.length();
 
     /**
@@ -54,12 +58,10 @@ public class Transform {
         // Check if the string is null, zero length or devoid of special characters
         // if so, return what was sent in.
 
-        if(input == null
-            || input.length() == 0
-            || (input.indexOf('"') == -1 &&
-            input.indexOf('&') == -1 &&
-            input.indexOf('<') == -1 &&
-            input.indexOf('>') == -1)) {
+        if (input == null
+                || input.length() == 0
+                || (input.indexOf('"') == -1 && input.indexOf('&') == -1 && input.indexOf('<') == -1 && input
+                        .indexOf('>') == -1)) {
             return input;
         }
 
@@ -67,17 +69,17 @@ public class Transform {
         char ch;
 
         int len = input.length();
-        for(int i=0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             ch = input.charAt(i);
             if (ch > '>') {
                 buf.append(ch);
-            } else if(ch == '<') {
+            } else if (ch == '<') {
                 buf.append("&lt;");
-            } else if(ch == '>') {
+            } else if (ch == '>') {
                 buf.append("&gt;");
-            } else if(ch == '&') {
+            } else if (ch == '&') {
                 buf.append("&amp;");
-            } else if(ch == '"') {
+            } else if (ch == '"') {
                 buf.append("&quot;");
             } else {
                 buf.append(ch);
@@ -95,8 +97,7 @@ public class Transform {
      * section are the responsibility of the calling method.
      * @param str The String that is inserted into an existing CDATA Section within buf.
      * */
-    static public void appendEscapingCDATA(final StringBuffer buf,
-                                           final String str) {
+    static public void appendEscapingCDATA(final StringBuffer buf, final String str) {
         if (str != null) {
             int end = str.indexOf(CDATA_END);
             if (end < 0) {
@@ -132,11 +133,11 @@ public class Transform {
         ArrayList<String> lines = new ArrayList<String>();
         try {
             String line = reader.readLine();
-            while(line != null) {
+            while (line != null) {
                 lines.add(line);
                 line = reader.readLine();
             }
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             lines.add(ex.toString());
         }
         String[] rep = new String[lines.size()];

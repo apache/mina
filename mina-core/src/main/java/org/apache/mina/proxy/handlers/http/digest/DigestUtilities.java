@@ -39,8 +39,7 @@ import org.apache.mina.proxy.utils.StringUtilities;
  */
 public class DigestUtilities {
 
-    public final static String SESSION_HA1 = DigestUtilities.class
-            + ".SessionHA1";
+    public final static String SESSION_HA1 = DigestUtilities.class + ".SessionHA1";
 
     private static MessageDigest md5;
 
@@ -56,8 +55,7 @@ public class DigestUtilities {
     /**
      * The supported qualities of protections.
      */
-    public final static String[] SUPPORTED_QOPS = new String[] { "auth",
-            "auth-int" };
+    public final static String[] SUPPORTED_QOPS = new String[] { "auth", "auth-int" };
 
     /**
      * Computes the response to the DIGEST challenge.
@@ -69,26 +67,20 @@ public class DigestUtilities {
      * @param charsetName the name of the charset used for the challenge
      * @param body the html body to be hashed for integrity calculations
      */
-    public static String computeResponseValue(IoSession session,
-            HashMap<String, String> map, String method, String pwd,
-            String charsetName, String body) throws AuthenticationException,
-            UnsupportedEncodingException {
+    public static String computeResponseValue(IoSession session, HashMap<String, String> map, String method,
+            String pwd, String charsetName, String body) throws AuthenticationException, UnsupportedEncodingException {
 
         byte[] hA1;
         StringBuilder sb;
-        boolean isMD5Sess = "md5-sess".equalsIgnoreCase(StringUtilities
-                .getDirectiveValue(map, "algorithm", false));
+        boolean isMD5Sess = "md5-sess".equalsIgnoreCase(StringUtilities.getDirectiveValue(map, "algorithm", false));
 
         if (!isMD5Sess || (session.getAttribute(SESSION_HA1) == null)) {
             // Build A1
             sb = new StringBuilder();
-            sb.append(
-                    StringUtilities.stringTo8859_1(StringUtilities
-                            .getDirectiveValue(map, "username", true))).append(
+            sb.append(StringUtilities.stringTo8859_1(StringUtilities.getDirectiveValue(map, "username", true))).append(
                     ':');
 
-            String realm = StringUtilities.stringTo8859_1(StringUtilities
-                    .getDirectiveValue(map, "realm", false));
+            String realm = StringUtilities.stringTo8859_1(StringUtilities.getDirectiveValue(map, "realm", false));
             if (realm != null) {
                 sb.append(realm);
             }
@@ -105,11 +97,9 @@ public class DigestUtilities {
                 sb = new StringBuilder();
                 sb.append(ByteUtilities.asHex(prehA1));
                 sb.append(':').append(
-                        StringUtilities.stringTo8859_1(StringUtilities
-                                .getDirectiveValue(map, "nonce", true)));
+                        StringUtilities.stringTo8859_1(StringUtilities.getDirectiveValue(map, "nonce", true)));
                 sb.append(':').append(
-                        StringUtilities.stringTo8859_1(StringUtilities
-                                .getDirectiveValue(map, "cnonce", true)));
+                        StringUtilities.stringTo8859_1(StringUtilities.getDirectiveValue(map, "cnonce", true)));
 
                 synchronized (md5) {
                     md5.reset();
@@ -133,14 +123,12 @@ public class DigestUtilities {
 
         String qop = StringUtilities.getDirectiveValue(map, "qop", false);
         if ("auth-int".equalsIgnoreCase(qop)) {
-            ProxyIoSession proxyIoSession = (ProxyIoSession) session
-                    .getAttribute(ProxyIoSession.PROXY_SESSION);
+            ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
             byte[] hEntity;
 
             synchronized (md5) {
                 md5.reset();
-                hEntity = md5.digest(body.getBytes(proxyIoSession
-                        .getCharsetName()));
+                hEntity = md5.digest(body.getBytes(proxyIoSession.getCharsetName()));
             }
             sb.append(':').append(hEntity);
         }
@@ -153,8 +141,7 @@ public class DigestUtilities {
 
         sb = new StringBuilder();
         sb.append(ByteUtilities.asHex(hA1));
-        sb.append(':').append(
-                StringUtilities.getDirectiveValue(map, "nonce", true));
+        sb.append(':').append(StringUtilities.getDirectiveValue(map, "nonce", true));
         sb.append(":00000001:");
 
         sb.append(StringUtilities.getDirectiveValue(map, "cnonce", true));

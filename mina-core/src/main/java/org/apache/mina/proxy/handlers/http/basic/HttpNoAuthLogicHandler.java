@@ -35,14 +35,12 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
-    private final static Logger logger = LoggerFactory
-            .getLogger(HttpNoAuthLogicHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(HttpNoAuthLogicHandler.class);
 
     /**
      * {@inheritDoc}
      */
-    public HttpNoAuthLogicHandler(final ProxyIoSession proxyIoSession)
-            throws ProxyAuthException {
+    public HttpNoAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);
     }
 
@@ -50,8 +48,7 @@ public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
      * {@inheritDoc}
      */
     @Override
-    public void doHandshake(final NextFilter nextFilter)
-            throws ProxyAuthException {
+    public void doHandshake(final NextFilter nextFilter) throws ProxyAuthException {
         logger.debug(" doHandshake()");
 
         // Just send the request, no authentication needed
@@ -63,10 +60,8 @@ public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
      * {@inheritDoc}
      */
     @Override
-    public void handleResponse(final HttpProxyResponse response)
-            throws ProxyAuthException {
+    public void handleResponse(final HttpProxyResponse response) throws ProxyAuthException {
         // Should never get here !
-        throw new ProxyAuthException("Received error response code ("
-                + response.getStatusLine() + ").");
+        throw new ProxyAuthException("Received error response code (" + response.getStatusLine() + ").");
     }
 }

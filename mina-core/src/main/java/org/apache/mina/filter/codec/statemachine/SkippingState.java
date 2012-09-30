@@ -35,8 +35,7 @@ public abstract class SkippingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         int beginPos = in.position();
         int limit = in.limit();
         for (int i = beginPos; i < limit; i++) {
@@ -47,7 +46,7 @@ public abstract class SkippingState implements DecodingState {
                 this.skippedBytes = 0;
                 return finishDecode(answer);
             }
-            
+
             skippedBytes++;
         }
 
@@ -58,8 +57,7 @@ public abstract class SkippingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
-    public DecodingState finishDecode(ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         return finishDecode(skippedBytes);
     }
 
@@ -80,6 +78,5 @@ public abstract class SkippingState implements DecodingState {
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(int skippedBytes)
-            throws Exception;
+    protected abstract DecodingState finishDecode(int skippedBytes) throws Exception;
 }

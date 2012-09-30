@@ -36,7 +36,7 @@ public interface IoServiceListener extends EventListener {
      * @param service the {@link IoService}
      */
     void serviceActivated(IoService service) throws Exception;
-    
+
     /**
      * Invoked when a service is idle.
      */

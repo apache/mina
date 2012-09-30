@@ -77,24 +77,18 @@ import org.apache.mina.util.IdentityHashSet;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DemuxingIoHandler extends IoHandlerAdapter {
-    
-    private final Map<Class<?>, MessageHandler<?>> receivedMessageHandlerCache =
-        new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
 
-    private final Map<Class<?>, MessageHandler<?>> receivedMessageHandlers =
-        new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
+    private final Map<Class<?>, MessageHandler<?>> receivedMessageHandlerCache = new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
 
-    private final Map<Class<?>, MessageHandler<?>> sentMessageHandlerCache =
-        new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
+    private final Map<Class<?>, MessageHandler<?>> receivedMessageHandlers = new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
 
-    private final Map<Class<?>, MessageHandler<?>> sentMessageHandlers =
-        new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
+    private final Map<Class<?>, MessageHandler<?>> sentMessageHandlerCache = new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
 
-    private final Map<Class<?>, ExceptionHandler<?>> exceptionHandlerCache =
-        new ConcurrentHashMap<Class<?>, ExceptionHandler<?>>();
+    private final Map<Class<?>, MessageHandler<?>> sentMessageHandlers = new ConcurrentHashMap<Class<?>, MessageHandler<?>>();
 
-    private final Map<Class<?>, ExceptionHandler<?>> exceptionHandlers =
-        new ConcurrentHashMap<Class<?>, ExceptionHandler<?>>();
+    private final Map<Class<?>, ExceptionHandler<?>> exceptionHandlerCache = new ConcurrentHashMap<Class<?>, ExceptionHandler<?>>();
+
+    private final Map<Class<?>, ExceptionHandler<?>> exceptionHandlers = new ConcurrentHashMap<Class<?>, ExceptionHandler<?>>();
 
     /**
      * Creates a new instance with no registered {@link MessageHandler}s.
@@ -111,8 +105,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? super E> addReceivedMessageHandler(Class<E> type,
-            MessageHandler<? super E> handler) {
+    public <E> MessageHandler<? super E> addReceivedMessageHandler(Class<E> type, MessageHandler<? super E> handler) {
         receivedMessageHandlerCache.clear();
         return (MessageHandler<? super E>) receivedMessageHandlers.put(type, handler);
     }
@@ -137,8 +130,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E> MessageHandler<? super E> addSentMessageHandler(Class<E> type,
-            MessageHandler<? super E> handler) {
+    public <E> MessageHandler<? super E> addSentMessageHandler(Class<E> type, MessageHandler<? super E> handler) {
         sentMessageHandlerCache.clear();
         return (MessageHandler<? super E>) sentMessageHandlers.put(type, handler);
     }
@@ -154,7 +146,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
         sentMessageHandlerCache.clear();
         return (MessageHandler<? super E>) sentMessageHandlers.remove(type);
     }
-    
+
     /**
      * Registers a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
@@ -163,9 +155,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E extends Throwable> 
-    ExceptionHandler<? super E> addExceptionHandler(
-            Class<E> type, ExceptionHandler<? super E> handler) {
+    public <E extends Throwable> ExceptionHandler<? super E> addExceptionHandler(Class<E> type,
+            ExceptionHandler<? super E> handler) {
         exceptionHandlerCache.clear();
         return (ExceptionHandler<? super E>) exceptionHandlers.put(type, handler);
     }
@@ -177,8 +168,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <E extends Throwable> ExceptionHandler<? super E>
-    removeExceptionHandler(Class<E> type) {
+    public <E extends Throwable> ExceptionHandler<? super E> removeExceptionHandler(Class<E> type) {
         exceptionHandlerCache.clear();
         return (ExceptionHandler<? super E>) exceptionHandlers.remove(type);
     }
@@ -225,15 +215,13 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * be called.
      */
     @Override
-    public void messageReceived(IoSession session, Object message)
-            throws Exception {
+    public void messageReceived(IoSession session, Object message) throws Exception {
         MessageHandler<Object> handler = findReceivedMessageHandler(message.getClass());
         if (handler != null) {
             handler.handleMessage(session, message);
         } else {
-            throw new UnknownMessageTypeException(
-                    "No message handler found for message type: " +
-                    message.getClass().getSimpleName());
+            throw new UnknownMessageTypeException("No message handler found for message type: "
+                    + message.getClass().getSimpleName());
         }
     }
 
@@ -250,9 +238,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
         if (handler != null) {
             handler.handleMessage(session, message);
         } else {
-            throw new UnknownMessageTypeException(
-                    "No handler found for message type: " +
-                    message.getClass().getSimpleName());
+            throw new UnknownMessageTypeException("No handler found for message type: "
+                    + message.getClass().getSimpleName());
         }
     }
 
@@ -271,9 +258,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
         if (handler != null) {
             handler.exceptionCaught(session, cause);
         } else {
-            throw new UnknownMessageTypeException(
-                    "No handler found for exception type: " +
-                    cause.getClass().getSimpleName());
+            throw new UnknownMessageTypeException("No handler found for exception type: "
+                    + cause.getClass().getSimpleName());
         }
     }
 
@@ -290,33 +276,26 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     @SuppressWarnings("unchecked")
-    private MessageHandler<Object> findReceivedMessageHandler(
-            Class type, Set<Class> triedClasses) {
-        
-        return (MessageHandler<Object>) findHandler(
-                receivedMessageHandlers, receivedMessageHandlerCache, type, triedClasses);
+    private MessageHandler<Object> findReceivedMessageHandler(Class type, Set<Class> triedClasses) {
+
+        return (MessageHandler<Object>) findHandler(receivedMessageHandlers, receivedMessageHandlerCache, type,
+                triedClasses);
     }
 
     @SuppressWarnings("unchecked")
-    private MessageHandler<Object> findSentMessageHandler(
-            Class type, Set<Class> triedClasses) {
-        
-        return (MessageHandler<Object>) findHandler(
-                sentMessageHandlers, sentMessageHandlerCache, type, triedClasses);
+    private MessageHandler<Object> findSentMessageHandler(Class type, Set<Class> triedClasses) {
+
+        return (MessageHandler<Object>) findHandler(sentMessageHandlers, sentMessageHandlerCache, type, triedClasses);
     }
 
     @SuppressWarnings("unchecked")
-    private ExceptionHandler<Throwable> findExceptionHandler(
-            Class type, Set<Class> triedClasses) {
-        
-        return (ExceptionHandler<Throwable>) findHandler(
-                exceptionHandlers, exceptionHandlerCache, type, triedClasses);
+    private ExceptionHandler<Throwable> findExceptionHandler(Class type, Set<Class> triedClasses) {
+
+        return (ExceptionHandler<Throwable>) findHandler(exceptionHandlers, exceptionHandlerCache, type, triedClasses);
     }
 
     @SuppressWarnings("unchecked")
-    private Object findHandler(
-            Map handlers, Map handlerCache,
-            Class type, Set<Class> triedClasses) {
+    private Object findHandler(Map handlers, Map handlerCache, Class type, Set<Class> triedClasses) {
 
         Object handler = null;
 

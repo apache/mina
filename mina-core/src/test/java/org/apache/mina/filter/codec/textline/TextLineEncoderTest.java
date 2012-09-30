@@ -36,8 +36,7 @@ import org.junit.Test;
 public class TextLineEncoderTest {
     @Test
     public void testEncode() throws Exception {
-        TextLineEncoder encoder = new TextLineEncoder(Charset.forName("UTF-8"),
-                LineDelimiter.WINDOWS);
+        TextLineEncoder encoder = new TextLineEncoder(Charset.forName("UTF-8"), LineDelimiter.WINDOWS);
         ProtocolCodecSession session = new ProtocolCodecSession();
         ProtocolEncoderOutput out = session.getEncoderOutput();
 

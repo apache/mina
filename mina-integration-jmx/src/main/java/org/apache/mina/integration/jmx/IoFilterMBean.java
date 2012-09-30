@@ -29,18 +29,15 @@ public class IoFilterMBean extends ObjectMBean<IoFilter> {
     public IoFilterMBean(IoFilter source) {
         super(source);
     }
-    
+
     @Override
     protected boolean isOperation(String methodName, Class<?>[] paramTypes) {
         // Ignore some IoFilter methods.
-        if (methodName.matches(
-                "(init|destroy|on(Pre|Post)(Add|Remove)|" +
-                "session(Created|Opened|Idle|Closed)|" +
-                "exceptionCaught|message(Received|Sent)|" +
-                "filter(Close|Write|SetTrafficMask))")) {
+        if (methodName.matches("(init|destroy|on(Pre|Post)(Add|Remove)|" + "session(Created|Opened|Idle|Closed)|"
+                + "exceptionCaught|message(Received|Sent)|" + "filter(Close|Write|SetTrafficMask))")) {
             return false;
         }
-        
+
         return super.isOperation(methodName, paramTypes);
     }
 }

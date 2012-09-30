@@ -39,12 +39,8 @@ public class SerialAddressEditor extends AbstractPropertyEditor {
     @Override
     protected String toText(Object value) {
         SerialAddress addr = (SerialAddress) value;
-        return addr.getName() + ':' +
-               addr.getBauds() + ':' +
-               toText(addr.getDataBits()) + ':' +
-               toText(addr.getStopBits()) + ':' +
-               toText(addr.getParity()) + ':' +
-               toText(addr.getFlowControl());
+        return addr.getName() + ':' + addr.getBauds() + ':' + toText(addr.getDataBits()) + ':'
+                + toText(addr.getStopBits()) + ':' + toText(addr.getParity()) + ':' + toText(addr.getFlowControl());
     }
 
     private String toText(DataBits bits) {
@@ -113,18 +109,11 @@ public class SerialAddressEditor extends AbstractPropertyEditor {
     protected Object toValue(String text) throws IllegalArgumentException {
         String[] components = text.split(":");
         if (components.length != 6) {
-            throw new IllegalArgumentException(
-                    "SerialAddress must have 6 components separated " +
-                    "by colon: " + text);
+            throw new IllegalArgumentException("SerialAddress must have 6 components separated " + "by colon: " + text);
         }
 
-        return new SerialAddress(
-                components[0].trim(),
-                toBauds(components[1].trim()),
-                toDataBits(components[2].trim()),
-                toStopBits(components[3].trim()),
-                toParity(components[4].trim()),
-                toFlowControl(components[5].trim()));
+        return new SerialAddress(components[0].trim(), toBauds(components[1].trim()), toDataBits(components[2].trim()),
+                toStopBits(components[3].trim()), toParity(components[4].trim()), toFlowControl(components[5].trim()));
     }
 
     private int toBauds(String text) {

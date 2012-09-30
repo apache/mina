@@ -35,7 +35,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ExpiringMap<K, V> implements Map<K, V> {
-    
+
     /**
      * The default value, 60
      */
@@ -84,14 +84,12 @@ public class ExpiringMap<K, V> implements Map<K, V> {
      *  The time between checks to see if a value should be removed (seconds)
      */
     public ExpiringMap(int timeToLive, int expirationInterval) {
-        this(new ConcurrentHashMap<K, ExpiringObject>(),
-                new CopyOnWriteArrayList<ExpirationListener<V>>(), timeToLive,
+        this(new ConcurrentHashMap<K, ExpiringObject>(), new CopyOnWriteArrayList<ExpirationListener<V>>(), timeToLive,
                 expirationInterval);
     }
 
     private ExpiringMap(ConcurrentHashMap<K, ExpiringObject> delegate,
-            CopyOnWriteArrayList<ExpirationListener<V>> expirationListeners,
-            int timeToLive, int expirationInterval) {
+            CopyOnWriteArrayList<ExpirationListener<V>> expirationListeners, int timeToLive, int expirationInterval) {
         this.delegate = delegate;
         this.expirationListeners = expirationListeners;
 
@@ -101,8 +99,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
     }
 
     public V put(K key, V value) {
-        ExpiringObject answer = delegate.put(key, new ExpiringObject(key,
-                value, System.currentTimeMillis()));
+        ExpiringObject answer = delegate.put(key, new ExpiringObject(key, value, System.currentTimeMillis()));
         if (answer == null) {
             return null;
         }
@@ -183,8 +180,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         expirationListeners.add(listener);
     }
 
-    public void removeExpirationListener(
-            ExpirationListener<V> listener) {
+    public void removeExpirationListener(ExpirationListener<V> listener) {
         expirationListeners.remove(listener);
     }
 
@@ -219,8 +215,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
 
         ExpiringObject(K key, V value, long lastAccessTime) {
             if (value == null) {
-                throw new IllegalArgumentException(
-                        "An expiring object cannot be null.");
+                throw new IllegalArgumentException("An expiring object cannot be null.");
             }
 
             this.key = key;
@@ -271,7 +266,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
      * A Thread that monitors an {@link ExpiringMap} and will remove
      * elements that have passed the threshold.
      *
-     */ 
+     */
     public class Expirer implements Runnable {
         private final ReadWriteLock stateLock = new ReentrantReadWriteLock();
 
@@ -288,8 +283,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
          *
          */
         public Expirer() {
-            expirerThread = new Thread(this, "ExpiringMapExpirer-"
-                    + expirerCount++);
+            expirerThread = new Thread(this, "ExpiringMapExpirer-" + expirerCount++);
             expirerThread.setDaemon(true);
         }
 

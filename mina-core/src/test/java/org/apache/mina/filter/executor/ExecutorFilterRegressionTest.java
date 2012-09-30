@@ -59,12 +59,10 @@ public class ExecutorFilterRegressionTest {
     @Test
     public void testEventOrder() throws Throwable {
         final EventOrderChecker nextFilter = new EventOrderChecker();
-        final EventOrderCounter[] sessions = new EventOrderCounter[] {
-                new EventOrderCounter(), new EventOrderCounter(),
-                new EventOrderCounter(), new EventOrderCounter(),
-                new EventOrderCounter(), new EventOrderCounter(),
-                new EventOrderCounter(), new EventOrderCounter(),
-                new EventOrderCounter(), new EventOrderCounter(), };
+        final EventOrderCounter[] sessions = new EventOrderCounter[] { new EventOrderCounter(),
+                new EventOrderCounter(), new EventOrderCounter(), new EventOrderCounter(), new EventOrderCounter(),
+                new EventOrderCounter(), new EventOrderCounter(), new EventOrderCounter(), new EventOrderCounter(),
+                new EventOrderCounter(), };
         final int loop = 1000000;
         final int end = sessions.length - 1;
         final ExecutorFilter filter = this.filter;
@@ -100,11 +98,10 @@ public class ExecutorFilterRegressionTest {
         public EventOrderCounter() {
             super();
         }
-        
+
         public synchronized void setLastCount(Integer newCount) {
             if (lastCount != null) {
-                assertEquals(lastCount.intValue() + 1, newCount
-                        .intValue());
+                assertEquals(lastCount.intValue() + 1, newCount.intValue());
             }
 
             lastCount = newCount;
@@ -120,7 +117,7 @@ public class ExecutorFilterRegressionTest {
         public EventOrderChecker() {
             super();
         }
-        
+
         public void sessionOpened(IoSession session) {
             // Do nothing
         }

@@ -19,12 +19,10 @@
  */
 package org.apache.mina.util.byteaccess;
 
-
 import java.util.ArrayList;
 import java.util.Stack;
 
 import org.apache.mina.core.buffer.IoBuffer;
-
 
 /**
  * Creates <code>ByteArray</code>s, using a pool to reduce allocation where possible.
@@ -34,17 +32,22 @@ import org.apache.mina.core.buffer.IoBuffer;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ByteArrayPool implements ByteArrayFactory
-{
+public class ByteArrayPool implements ByteArrayFactory {
 
     private final int MAX_BITS = 32;
 
     private boolean freed;
+
     private final boolean direct;
+
     private ArrayList<Stack<DirectBufferByteArray>> freeBuffers;
+
     private int freeBufferCount = 0;
+
     private long freeMemory = 0;
+
     private final int maxFreeBuffers;
+
     private final int maxFreeMemory;
 
     /**
@@ -57,13 +60,11 @@ public class ByteArrayPool implements ByteArrayFactory
      * @param maxFreeMemory
      *  The maximum amount of free memory allowed
      */
-    public ByteArrayPool( boolean direct, int maxFreeBuffers, int maxFreeMemory )
-    {
+    public ByteArrayPool(boolean direct, int maxFreeBuffers, int maxFreeMemory) {
         this.direct = direct;
         freeBuffers = new ArrayList<Stack<DirectBufferByteArray>>();
-        for ( int i = 0; i < MAX_BITS; i++ )
-        {
-            freeBuffers.add( new Stack<DirectBufferByteArray>() );
+        for (int i = 0; i < MAX_BITS; i++) {
+            freeBuffers.add(new Stack<DirectBufferByteArray>());
         }
         this.maxFreeBuffers = maxFreeBuffers;
         this.maxFreeMemory = maxFreeMemory;
@@ -76,38 +77,31 @@ public class ByteArrayPool implements ByteArrayFactory
      * @param size
      *  The size of the array to build
      */
-    public ByteArray create( int size )
-    {
-        if ( size < 1 )
-        {
-            throw new IllegalArgumentException( "Buffer size must be at least 1: " + size );
+    public ByteArray create(int size) {
+        if (size < 1) {
+            throw new IllegalArgumentException("Buffer size must be at least 1: " + size);
         }
-        int bits = bits( size );
-        synchronized ( this )
-        {
-            if ( !freeBuffers.get(bits).isEmpty() )
-            {
-                DirectBufferByteArray ba = freeBuffers.get( bits ).pop();
-                ba.setFreed( false );
-                ba.getSingleIoBuffer().limit( size );
+        int bits = bits(size);
+        synchronized (this) {
+            if (!freeBuffers.get(bits).isEmpty()) {
+                DirectBufferByteArray ba = freeBuffers.get(bits).pop();
+                ba.setFreed(false);
+                ba.getSingleIoBuffer().limit(size);
                 return ba;
             }
         }
         IoBuffer bb;
         int bbSize = 1 << bits;
-        bb = IoBuffer.allocate( bbSize, direct );
-        bb.limit( size );
-        DirectBufferByteArray ba = new DirectBufferByteArray( bb );
-        ba.setFreed( false );
+        bb = IoBuffer.allocate(bbSize, direct);
+        bb.limit(size);
+        DirectBufferByteArray ba = new DirectBufferByteArray(bb);
+        ba.setFreed(false);
         return ba;
     }
 
-
-    private int bits( int index )
-    {
+    private int bits(int index) {
         int bits = 0;
-        while ( 1 << bits < index )
-        {
+        while (1 << bits < index) {
             bits++;
         }
         return bits;
@@ -117,13 +111,10 @@ public class ByteArrayPool implements ByteArrayFactory
      * Frees the buffers
      *
      */
-    public void free()
-    {
-        synchronized ( this )
-        {
-            if ( freed )
-            {
-                throw new IllegalStateException( "Already freed." );
+    public void free() {
+        synchronized (this) {
+            if (freed) {
+                throw new IllegalStateException("Already freed.");
             }
             freed = true;
             freeBuffers.clear();
@@ -131,41 +122,30 @@ public class ByteArrayPool implements ByteArrayFactory
         }
     }
 
-    private class DirectBufferByteArray extends BufferByteArray
-    {
+    private class DirectBufferByteArray extends BufferByteArray {
 
         public boolean freed;
 
-
-        public DirectBufferByteArray( IoBuffer bb )
-        {
-            super( bb );
+        public DirectBufferByteArray(IoBuffer bb) {
+            super(bb);
         }
 
-
-        public void setFreed( boolean freed )
-        {
+        public void setFreed(boolean freed) {
             this.freed = freed;
         }
 
-
         @Override
-        public void free()
-        {
-            synchronized ( this )
-            {
-                if ( freed )
-                {
-                    throw new IllegalStateException( "Already freed." );
+        public void free() {
+            synchronized (this) {
+                if (freed) {
+                    throw new IllegalStateException("Already freed.");
                 }
                 freed = true;
             }
-            int bits = bits( last() );
-            synchronized ( ByteArrayPool.this )
-            {
-                if ( freeBuffers != null && freeBufferCount < maxFreeBuffers && freeMemory + last() <= maxFreeMemory )
-                {
-                    freeBuffers.get( bits ).push( this );
+            int bits = bits(last());
+            synchronized (ByteArrayPool.this) {
+                if (freeBuffers != null && freeBufferCount < maxFreeBuffers && freeMemory + last() <= maxFreeMemory) {
+                    freeBuffers.get(bits).push(this);
                     freeBufferCount++;
                     freeMemory += last();
                     return;

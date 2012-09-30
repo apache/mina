@@ -47,10 +47,13 @@ import org.slf4j.MDC;
 public class Log4jXmlFormatter extends Formatter {
 
     private final int DEFAULT_SIZE = 256;
+
     private final int UPPER_LIMIT = 2048;
 
     private StringBuffer buf = new StringBuffer(DEFAULT_SIZE);
+
     private boolean locationInfo = false;
+
     private boolean properties = false;
 
     /**
@@ -144,12 +147,12 @@ public class Log4jXmlFormatter extends Formatter {
             Map contextMap = MDC.getCopyOfContextMap();
             if (contextMap != null) {
                 Set keySet = contextMap.keySet();
-                if (( keySet != null ) && ( keySet.size() > 0 )) {
+                if ((keySet != null) && (keySet.size() > 0)) {
                     buf.append("<log4j:properties>\r\n");
                     Object[] keys = keySet.toArray();
                     Arrays.sort(keys);
                     for (Object key1 : keys) {
-                        String key = (key1 == null?"":key1.toString());
+                        String key = (key1 == null ? "" : key1.toString());
                         Object val = contextMap.get(key);
                         if (val != null) {
                             buf.append("<log4j:data name=\"");

@@ -55,8 +55,7 @@ public class RequestTimeoutException extends RuntimeException {
     /**
      * Creates a new exception.
      */
-    public RequestTimeoutException(Request request, String message,
-            Throwable cause) {
+    public RequestTimeoutException(Request request, String message, Throwable cause) {
         super(message);
         initCause(cause);
         if (request == null) {

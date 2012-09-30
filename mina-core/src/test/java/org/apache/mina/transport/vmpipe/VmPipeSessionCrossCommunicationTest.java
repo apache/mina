@@ -125,12 +125,8 @@ public class VmPipeSessionCrossCommunicationTest {
                 ThreadInfo[] infos = threadMXBean.getThreadInfo(threads, Integer.MAX_VALUE);
 
                 for (ThreadInfo info : infos) {
-                    sb.append(info.getThreadName())
-                            .append(" blocked on ")
-                            .append(info.getLockName())
-                            .append(" owned by ")
-                            .append(info.getLockOwnerName())
-                            .append("\n");
+                    sb.append(info.getThreadName()).append(" blocked on ").append(info.getLockName())
+                            .append(" owned by ").append(info.getLockOwnerName()).append("\n");
                 }
 
                 for (ThreadInfo info : infos) {

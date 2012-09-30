@@ -748,156 +748,156 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @see ByteBuffer#putInt(int)
      */
     public abstract IoBuffer putInt(int value);
-    
+
     /**
      * Writes an unsigned byte into the ByteBuffer
      * @param value the byte to write
      */
     public abstract IoBuffer putUnsigned(byte value);
-    
+
     /**
      * Writes an unsigned byte into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the byte to write
      */
     public abstract IoBuffer putUnsigned(int index, byte value);
-    
+
     /**
      * Writes an unsigned byte into the ByteBuffer
      * @param value the short to write
      */
     public abstract IoBuffer putUnsigned(short value);
-    
+
     /**
      * Writes an unsigned byte into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the short to write
      */
     public abstract IoBuffer putUnsigned(int index, short value);
-    
+
     /**
      * Writes an unsigned byte into the ByteBuffer
      * @param value the int to write
      */
     public abstract IoBuffer putUnsigned(int value);
-    
+
     /**
      * Writes an unsigned byte into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the int to write
      */
     public abstract IoBuffer putUnsigned(int index, int value);
-    
+
     /**
      * Writes an unsigned byte into the ByteBuffer
      * @param value the long to write
      */
     public abstract IoBuffer putUnsigned(long value);
-    
+
     /**
      * Writes an unsigned byte into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the long to write
      */
     public abstract IoBuffer putUnsigned(int index, long value);
-    
+
     /**
      * Writes an unsigned int into the ByteBuffer
      * @param value the byte to write
      */
     public abstract IoBuffer putUnsignedInt(byte value);
-    
+
     /**
      * Writes an unsigned int into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the byte to write
      */
     public abstract IoBuffer putUnsignedInt(int index, byte value);
-    
+
     /**
      * Writes an unsigned int into the ByteBuffer
      * @param value the short to write
      */
     public abstract IoBuffer putUnsignedInt(short value);
-    
+
     /**
      * Writes an unsigned int into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the short to write
      */
     public abstract IoBuffer putUnsignedInt(int index, short value);
-    
+
     /**
      * Writes an unsigned int into the ByteBuffer
      * @param value the int to write
      */
     public abstract IoBuffer putUnsignedInt(int value);
-    
+
     /**
      * Writes an unsigned int into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the int to write
      */
     public abstract IoBuffer putUnsignedInt(int index, int value);
-    
+
     /**
      * Writes an unsigned int into the ByteBuffer
      * @param value the long to write
      */
     public abstract IoBuffer putUnsignedInt(long value);
-    
+
     /**
      * Writes an unsigned int into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the long to write
      */
     public abstract IoBuffer putUnsignedInt(int index, long value);
-    
+
     /**
      * Writes an unsigned short into the ByteBuffer
      * @param value the byte to write
      */
     public abstract IoBuffer putUnsignedShort(byte value);
-    
+
     /**
      * Writes an unsigned Short into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the byte to write
      */
     public abstract IoBuffer putUnsignedShort(int index, byte value);
-    
+
     /**
      * Writes an unsigned Short into the ByteBuffer
      * @param value the short to write
      */
     public abstract IoBuffer putUnsignedShort(short value);
-    
+
     /**
      * Writes an unsigned Short into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the short to write
      */
     public abstract IoBuffer putUnsignedShort(int index, short value);
-    
+
     /**
      * Writes an unsigned Short into the ByteBuffer
      * @param value the int to write
      */
     public abstract IoBuffer putUnsignedShort(int value);
-    
+
     /**
      * Writes an unsigned Short into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
      * @param value the int to write
      */
     public abstract IoBuffer putUnsignedShort(int index, int value);
-    
+
     /**
      * Writes an unsigned Short into the ByteBuffer
      * @param value the long to write
      */
     public abstract IoBuffer putUnsignedShort(long value);
-    
+
     /**
      * Writes an unsigned Short into the ByteBuffer at a specified position
      * @param index the position in the buffer to write the value
@@ -1081,7 +1081,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param fieldSize
      *            the maximum number of bytes to write
      */
-    public abstract IoBuffer putString(CharSequence val, int fieldSize, CharsetEncoder encoder) throws CharacterCodingException;
+    public abstract IoBuffer putString(CharSequence val, int fieldSize, CharsetEncoder encoder)
+            throws CharacterCodingException;
 
     /**
      * Reads a string which has a 16-bit length field before the actual encoded

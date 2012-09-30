@@ -58,7 +58,7 @@ public class LineDelimiter {
      * The CRLF line delimiter constant (<tt>"\r\n"</tt>)
      */
     public static final LineDelimiter CRLF = new LineDelimiter("\r\n");
-        
+
     /**
      * The line delimiter constant of UNIX (<tt>"\n"</tt>)
      */
@@ -90,7 +90,7 @@ public class LineDelimiter {
         if (value == null) {
             throw new IllegalArgumentException("delimiter");
         }
-        
+
         this.value = value;
     }
 
@@ -114,16 +114,16 @@ public class LineDelimiter {
      */
     @Override
     public boolean equals(Object o) {
-        if ( this == o) {
+        if (this == o) {
             return true;
         }
-        
+
         if (!(o instanceof LineDelimiter)) {
             return false;
         }
-        
+
         LineDelimiter that = (LineDelimiter) o;
-        
+
         return this.value.equals(that.value);
     }
 

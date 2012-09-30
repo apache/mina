@@ -75,16 +75,14 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
      */
     public void setMaxObjectSize(int maxObjectSize) {
         if (maxObjectSize <= 0) {
-            throw new IllegalArgumentException("maxObjectSize: "
-                    + maxObjectSize);
+            throw new IllegalArgumentException("maxObjectSize: " + maxObjectSize);
         }
 
         this.maxObjectSize = maxObjectSize;
     }
 
     @Override
-    protected boolean doDecode(IoSession session, IoBuffer in,
-            ProtocolDecoderOutput out) throws Exception {
+    protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (!in.prefixedDataAvailable(4, maxObjectSize)) {
             return false;
         }

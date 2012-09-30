@@ -62,6 +62,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractIoService implements IoService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIoService.class);
+
     /** 
      * The unique number identifying the Service. It's incremented
      * for each new IoService created.
@@ -152,7 +153,6 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     private IoServiceStatistics stats = new IoServiceStatistics(this);
-    
 
     /**
      * Constructor for {@link AbstractIoService}. You need to provide a default
@@ -175,10 +175,8 @@ public abstract class AbstractIoService implements IoService {
             throw new IllegalArgumentException("TransportMetadata");
         }
 
-        if (!getTransportMetadata().getSessionConfigType().isAssignableFrom(
-                sessionConfig.getClass())) {
-            throw new IllegalArgumentException("sessionConfig type: "
-                    + sessionConfig.getClass() + " (expected: "
+        if (!getTransportMetadata().getSessionConfigType().isAssignableFrom(sessionConfig.getClass())) {
+            throw new IllegalArgumentException("sessionConfig type: " + sessionConfig.getClass() + " (expected: "
                     + getTransportMetadata().getSessionConfigType() + ")");
         }
 
@@ -229,10 +227,8 @@ public abstract class AbstractIoService implements IoService {
         if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
             return (DefaultIoFilterChainBuilder) filterChainBuilder;
         }
-        
-        
-        throw new IllegalStateException(
-                    "Current filter chain builder is not a DefaultIoFilterChainBuilder.");
+
+        throw new IllegalStateException("Current filter chain builder is not a DefaultIoFilterChainBuilder.");
     }
 
     /**
@@ -274,48 +270,48 @@ public abstract class AbstractIoService implements IoService {
      * {@inheritDoc}
      */
     public final void dispose() {
-      dispose(false);
+        dispose(false);
     }
 
-  /**
-   * {@inheritDoc}
-   */
+    /**
+     * {@inheritDoc}
+     */
     public final void dispose(boolean awaitTermination) {
-      if (disposed) {
-          return;
-      }
+        if (disposed) {
+            return;
+        }
 
-      synchronized (disposalLock) {
-          if (!disposing) {
-              disposing = true;
+        synchronized (disposalLock) {
+            if (!disposing) {
+                disposing = true;
 
-              try {
-                  dispose0();
-              } catch (Exception e) {
-                  ExceptionMonitor.getInstance().exceptionCaught(e);
-              }
-          }
-      }
-
-      if (createdExecutor) {
-          ExecutorService e = (ExecutorService) executor;
-          e.shutdownNow();
-          if (awaitTermination) {
-
-            //Thread.currentThread().setName();
-
-            try {
-              LOGGER.debug("awaitTermination on {} called by thread=[{}]", this, Thread.currentThread().getName());
-              e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-              LOGGER.debug("awaitTermination on {} finished", this);
-            } catch (InterruptedException e1) {
-              LOGGER.warn("awaitTermination on [{}] was interrupted", this);
-              // Restore the interrupted status
-              Thread.currentThread().interrupt();
+                try {
+                    dispose0();
+                } catch (Exception e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
             }
-          }
-      }
-      disposed = true;
+        }
+
+        if (createdExecutor) {
+            ExecutorService e = (ExecutorService) executor;
+            e.shutdownNow();
+            if (awaitTermination) {
+
+                //Thread.currentThread().setName();
+
+                try {
+                    LOGGER.debug("awaitTermination on {} called by thread=[{}]", this, Thread.currentThread().getName());
+                    e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                    LOGGER.debug("awaitTermination on {} finished", this);
+                } catch (InterruptedException e1) {
+                    LOGGER.warn("awaitTermination on [{}] was interrupted", this);
+                    // Restore the interrupted status
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+        disposed = true;
     }
 
     /**
@@ -354,8 +350,7 @@ public abstract class AbstractIoService implements IoService {
         }
 
         if (isActive()) {
-            throw new IllegalStateException(
-                    "handler cannot be set while the service is active.");
+            throw new IllegalStateException("handler cannot be set while the service is active.");
         }
 
         this.handler = handler;
@@ -378,15 +373,13 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
-    public final void setSessionDataStructureFactory(
-            IoSessionDataStructureFactory sessionDataStructureFactory) {
+    public final void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory) {
         if (sessionDataStructureFactory == null) {
             throw new IllegalArgumentException("sessionDataStructureFactory");
         }
 
         if (isActive()) {
-            throw new IllegalStateException(
-                    "sessionDataStructureFactory cannot be set while the service is active.");
+            throw new IllegalStateException("sessionDataStructureFactory cannot be set while the service is active.");
         }
 
         this.sessionDataStructureFactory = sessionDataStructureFactory;
@@ -413,8 +406,7 @@ public abstract class AbstractIoService implements IoService {
         // Convert to Set.  We do not return a List here because only the
         // direct caller of MessageBroadcaster knows the order of write
         // operations.
-        final List<WriteFuture> futures = IoUtil.broadcast(message,
-                getManagedSessions().values());
+        final List<WriteFuture> futures = IoUtil.broadcast(message, getManagedSessions().values());
         return new AbstractSet<WriteFuture>() {
             @Override
             public Iterator<WriteFuture> iterator() {
@@ -432,7 +424,6 @@ public abstract class AbstractIoService implements IoService {
         return listeners;
     }
 
-
     protected final void executeWorker(Runnable worker) {
         executeWorker(worker, null);
     }
@@ -447,13 +438,12 @@ public abstract class AbstractIoService implements IoService {
 
     // TODO Figure out make it work without causing a compiler error / warning.
     @SuppressWarnings("unchecked")
-    protected final void initSession(IoSession session,
-            IoFuture future, IoSessionInitializer sessionInitializer) {
+    protected final void initSession(IoSession session, IoFuture future, IoSessionInitializer sessionInitializer) {
         // Update lastIoTime if needed.
         if (stats.getLastReadTime() == 0) {
             stats.setLastReadTime(getActivationTime());
         }
-        
+
         if (stats.getLastWriteTime() == 0) {
             stats.setLastWriteTime(getActivationTime());
         }
@@ -463,30 +453,26 @@ public abstract class AbstractIoService implements IoService {
         // the attributeMap at last is to make sure all session properties
         // such as remoteAddress are provided to IoSessionDataStructureFactory.
         try {
-            ((AbstractIoSession) session).setAttributeMap(session.getService()
-                    .getSessionDataStructureFactory().getAttributeMap(session));
+            ((AbstractIoSession) session).setAttributeMap(session.getService().getSessionDataStructureFactory()
+                    .getAttributeMap(session));
         } catch (IoSessionInitializationException e) {
             throw e;
         } catch (Exception e) {
-            throw new IoSessionInitializationException(
-                    "Failed to initialize an attributeMap.", e);
+            throw new IoSessionInitializationException("Failed to initialize an attributeMap.", e);
         }
 
         try {
-            ((AbstractIoSession) session).setWriteRequestQueue(session
-                    .getService().getSessionDataStructureFactory()
+            ((AbstractIoSession) session).setWriteRequestQueue(session.getService().getSessionDataStructureFactory()
                     .getWriteRequestQueue(session));
         } catch (IoSessionInitializationException e) {
             throw e;
         } catch (Exception e) {
-            throw new IoSessionInitializationException(
-                    "Failed to initialize a writeRequestQueue.", e);
+            throw new IoSessionInitializationException("Failed to initialize a writeRequestQueue.", e);
         }
 
         if ((future != null) && (future instanceof ConnectFuture)) {
             // DefaultIoFilterChain will notify the future. (We support ConnectFuture only for now).
-            session.setAttribute(DefaultIoFilterChain.SESSION_CREATED_FUTURE,
-                    future);
+            session.setAttribute(DefaultIoFilterChain.SESSION_CREATED_FUTURE, future);
         }
 
         if (sessionInitializer != null) {
@@ -502,8 +488,7 @@ public abstract class AbstractIoService implements IoService {
      * {@link #initSession(IoSession, IoFuture, IoSessionInitializer)} will call
      * this method instead.
      */
-    protected void finishSessionInitialization0(IoSession session,
-            IoFuture future) {
+    protected void finishSessionInitialization0(IoSession session, IoFuture future) {
         // Do nothing. Extended class might add some specific code 
     }
 
@@ -524,7 +509,7 @@ public abstract class AbstractIoService implements IoService {
             if (getValue() instanceof Exception) {
                 return (Exception) getValue();
             }
-            
+
             return null;
         }
 
@@ -549,5 +534,5 @@ public abstract class AbstractIoService implements IoService {
     public int getScheduledWriteMessages() {
         return stats.getScheduledWriteMessages();
     }
-    
+
 }

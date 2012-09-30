@@ -32,11 +32,11 @@ public enum IoSessionEventType {
      * The event type id.
      */
     private final int id;
-    
+
     private IoSessionEventType(int id) {
         this.id = id;
     }
-    
+
     /**
      * Returns the event id.
      * 
@@ -61,7 +61,7 @@ public enum IoSessionEventType {
         case CLOSED:
             return "- CLOSED event -";
         default:
-            return "- Event Id="+id+" -";
+            return "- Event Id=" + id + " -";
         }
     }
 }

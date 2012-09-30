@@ -32,7 +32,7 @@ public class NamePreservingRunnable implements Runnable {
 
     /** The runnable name */
     private final String newName;
-    
+
     /** The runnable task */
     private final Runnable runnable;
 

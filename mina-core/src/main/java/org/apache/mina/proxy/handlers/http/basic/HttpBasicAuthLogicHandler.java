@@ -42,18 +42,15 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
-    private final static Logger logger = LoggerFactory
-            .getLogger(HttpBasicAuthLogicHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(HttpBasicAuthLogicHandler.class);
 
     /**
      * {@inheritDoc}
      */
-    public HttpBasicAuthLogicHandler(final ProxyIoSession proxyIoSession)
-            throws ProxyAuthException {
+    public HttpBasicAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);
 
-        ((HttpProxyRequest) request).checkRequiredProperties(
-                HttpProxyConstants.USER_PROPERTY,
+        ((HttpProxyRequest) request).checkRequiredProperties(HttpProxyConstants.USER_PROPERTY,
                 HttpProxyConstants.PWD_PROPERTY);
     }
 
@@ -61,8 +58,7 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
      * {@inheritDoc}
      */
     @Override
-    public void doHandshake(final NextFilter nextFilter)
-            throws ProxyAuthException {
+    public void doHandshake(final NextFilter nextFilter) throws ProxyAuthException {
         logger.debug(" doHandshake()");
 
         if (step > 0) {
@@ -71,13 +67,11 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
 
         // Send request
         HttpProxyRequest req = (HttpProxyRequest) request;
-        Map<String, List<String>> headers = req.getHeaders() != null ? req
-                .getHeaders() : new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = req.getHeaders() != null ? req.getHeaders()
+                : new HashMap<String, List<String>>();
 
-        String username = req.getProperties().get(
-                HttpProxyConstants.USER_PROPERTY);
-        String password = req.getProperties().get(
-                HttpProxyConstants.PWD_PROPERTY);
+        String username = req.getProperties().get(HttpProxyConstants.USER_PROPERTY);
+        String password = req.getProperties().get(HttpProxyConstants.PWD_PROPERTY);
 
         StringUtilities.addValueToHeader(headers, "Proxy-Authorization",
                 "Basic " + createAuthorization(username, password), true);
@@ -96,21 +90,17 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
      * @param password the user password
      * @return the authorization header value as a string
      */
-    public static String createAuthorization(final String username,
-            final String password) {
-        return new String(Base64.encodeBase64((username + ":" + password)
-                .getBytes()));
+    public static String createAuthorization(final String username, final String password) {
+        return new String(Base64.encodeBase64((username + ":" + password).getBytes()));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void handleResponse(final HttpProxyResponse response)
-            throws ProxyAuthException {
+    public void handleResponse(final HttpProxyResponse response) throws ProxyAuthException {
         if (response.getStatusCode() != 407) {
-            throw new ProxyAuthException("Received error response code ("
-                    + response.getStatusLine() + ").");
+            throw new ProxyAuthException("Received error response code (" + response.getStatusLine() + ").");
         }
     }
 }

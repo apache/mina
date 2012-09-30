@@ -51,8 +51,7 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
         // Do nothing
     }
 
-    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
-            throws Exception {
+    public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         int beginPos = in.position();
         int limit = in.limit();
         int terminatorPos = -1;
@@ -99,16 +98,16 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
             in.position(terminatorPos + 1);
             return finishDecode(product, out);
         }
-        
+
         in.position(beginPos);
-        
+
         if (buffer == null) {
             buffer = IoBuffer.allocate(in.remaining());
             buffer.setAutoExpand(true);
         }
 
         buffer.put(in);
-        
+
         if (lastIsCR) {
             buffer.position(buffer.position() - 1);
         }
@@ -142,6 +141,5 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
      *         the state machine has reached its end.
      * @throws Exception if the read data violated protocol specification.
      */
-    protected abstract DecodingState finishDecode(IoBuffer product,
-            ProtocolDecoderOutput out) throws Exception;
+    protected abstract DecodingState finishDecode(IoBuffer product, ProtocolDecoderOutput out) throws Exception;
 }

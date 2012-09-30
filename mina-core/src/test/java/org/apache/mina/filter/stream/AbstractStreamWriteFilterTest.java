@@ -64,21 +64,20 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
     protected final IoSession session = new DummySession();
 
     abstract protected U createFilter();
-    
+
     abstract protected M createMessage(byte[] data) throws Exception;
-    
+
     @Test
     public void testWriteEmptyFile() throws Exception {
         AbstractStreamWriteFilter<M> filter = createFilter();
         M message = createMessage(new byte[0]);
 
-        WriteRequest writeRequest = new DefaultWriteRequest(message,
-                new DummyWriteFuture());
+        WriteRequest writeRequest = new DefaultWriteRequest(message, new DummyWriteFuture());
 
         NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
-       /*
-         * Record expectations
-         */
+        /*
+          * Record expectations
+          */
         nextFilter.messageSent(session, writeRequest);
 
         /*
@@ -107,8 +106,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         AbstractStreamWriteFilter<M> filter = createFilter();
 
         Object message = new Object();
-        WriteRequest writeRequest = new DefaultWriteRequest(message,
-                new DummyWriteFuture());
+        WriteRequest writeRequest = new DefaultWriteRequest(message, new DummyWriteFuture());
 
         NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
         /*
@@ -143,15 +141,13 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         AbstractStreamWriteFilter<M> filter = createFilter();
         M message = createMessage(data);
 
-        WriteRequest writeRequest = new DefaultWriteRequest(message,
-                new DummyWriteFuture());
+        WriteRequest writeRequest = new DefaultWriteRequest(message, new DummyWriteFuture());
 
         NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
         /*
          * Record expectations
          */
-        nextFilter.filterWrite(EasyMock.eq(session), eqWriteRequest(new DefaultWriteRequest(IoBuffer
-                .wrap(data))));
+        nextFilter.filterWrite(EasyMock.eq(session), eqWriteRequest(new DefaultWriteRequest(IoBuffer.wrap(data))));
         nextFilter.messageSent(session, writeRequest);
 
         /*
@@ -186,15 +182,11 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         byte[] chunk3 = new byte[] { 9, 10 };
 
         M message = createMessage(data);
-        WriteRequest writeRequest = new DefaultWriteRequest(message,
-                new DummyWriteFuture());
+        WriteRequest writeRequest = new DefaultWriteRequest(message, new DummyWriteFuture());
 
-        WriteRequest chunk1Request = new DefaultWriteRequest(IoBuffer
-                .wrap(chunk1));
-        WriteRequest chunk2Request = new DefaultWriteRequest(IoBuffer
-                .wrap(chunk2));
-        WriteRequest chunk3Request = new DefaultWriteRequest(IoBuffer
-                .wrap(chunk3));
+        WriteRequest chunk1Request = new DefaultWriteRequest(IoBuffer.wrap(chunk1));
+        WriteRequest chunk2Request = new DefaultWriteRequest(IoBuffer.wrap(chunk2));
+        WriteRequest chunk3Request = new DefaultWriteRequest(IoBuffer.wrap(chunk3));
 
         NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
         /*
@@ -242,8 +234,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
          */
         EasyMock.replay(nextFilter);
 
-        WriteRequest wr = new DefaultWriteRequest(new Object(),
-                new DummyWriteFuture());
+        WriteRequest wr = new DefaultWriteRequest(new Object(), new DummyWriteFuture());
         filter.filterWrite(nextFilter, session, wr);
         assertEquals(1, queue.size());
         assertSame(wr, queue.poll());
@@ -261,9 +252,8 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
     public void testWritesWriteRequestQueueWhenFinished() throws Exception {
         AbstractStreamWriteFilter<M> filter = createFilter();
         M message = createMessage(new byte[0]);
-        
-        WriteRequest wrs[] = new WriteRequest[] {
-                new DefaultWriteRequest(new Object(), new DummyWriteFuture()),
+
+        WriteRequest wrs[] = new WriteRequest[] { new DefaultWriteRequest(new Object(), new DummyWriteFuture()),
                 new DefaultWriteRequest(new Object(), new DummyWriteFuture()),
                 new DefaultWriteRequest(new Object(), new DummyWriteFuture()) };
         Queue<WriteRequest> queue = new LinkedList<WriteRequest>();
@@ -275,8 +265,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
          * Make up the situation.
          */
         session.setAttribute(filter.CURRENT_STREAM, message);
-        session.setAttribute(filter.CURRENT_WRITE_REQUEST,
-                new DefaultWriteRequest(message));
+        session.setAttribute(filter.CURRENT_WRITE_REQUEST, new DefaultWriteRequest(message));
         session.setAttribute(filter.WRITE_REQUEST_QUEUE, queue);
 
         /*
@@ -293,8 +282,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
          */
         EasyMock.replay(nextFilter);
 
-        filter.messageSent(nextFilter, session, new DefaultWriteRequest(
-                new Object()));
+        filter.messageSent(nextFilter, session, new DefaultWriteRequest(new Object()));
         assertEquals(0, queue.size());
 
         /*
@@ -339,8 +327,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
     public void testWriteUsingSocketTransport() throws Exception {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
-        SocketAddress address = new InetSocketAddress("localhost",
-                AvailablePortFinder.getNextAvailable());
+        SocketAddress address = new InetSocketAddress("localhost", AvailablePortFinder.getNextAvailable());
 
         NioSocketConnector connector = new NioSocketConnector();
 
@@ -351,13 +338,13 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         byte[] expectedMd5 = MessageDigest.getInstance("MD5").digest(data);
 
         M message = createMessage(data);
-        
+
         SenderHandler sender = new SenderHandler(message);
         ReceiverHandler receiver = new ReceiverHandler(data.length);
 
         acceptor.setHandler(sender);
         connector.setHandler(receiver);
-        
+
         acceptor.bind(address);
         connector.connect(address);
         sender.latch.await();
@@ -396,8 +383,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         }
 
         @Override
-        public void exceptionCaught(IoSession session, Throwable cause)
-                throws Exception {
+        public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
             LOGGER.error("SenderHandler: exceptionCaught", cause);
             latch.countDown();
         }
@@ -409,15 +395,13 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         }
 
         @Override
-        public void sessionIdle(IoSession session, IdleStatus status)
-                throws Exception {
+        public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
             LOGGER.info("SenderHandler: sessionIdle");
             latch.countDown();
         }
 
         @Override
-        public void messageSent(IoSession session, Object message)
-                throws Exception {
+        public void messageSent(IoSession session, Object message) throws Exception {
             LOGGER.info("SenderHandler: messageSent");
             if (message == this.message) {
                 LOGGER.info("message == this.message");
@@ -448,15 +432,13 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         }
 
         @Override
-        public void sessionIdle(IoSession session, IdleStatus status)
-                throws Exception {
+        public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
             LOGGER.info("ReceiverHandler: sessionIdle");
             session.close(true);
         }
 
         @Override
-        public void exceptionCaught(IoSession session, Throwable cause)
-                throws Exception {
+        public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
             LOGGER.error("ReceiverHandler: exceptionCaught", cause);
             latch.countDown();
         }
@@ -468,8 +450,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         }
 
         @Override
-        public void messageReceived(IoSession session, Object message)
-                throws Exception {
+        public void messageReceived(IoSession session, Object message) throws Exception {
             LOGGER.info("messageReceived");
             IoBuffer buf = (IoBuffer) message;
             while (buf.hasRemaining()) {
@@ -487,26 +468,26 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         EasyMock.reportMatcher(new WriteRequestMatcher(expected));
         return null;
     }
-    
+
     private static class WriteRequestMatcher implements IArgumentMatcher {
         private final WriteRequest expected;
-        
+
         public WriteRequestMatcher(WriteRequest expected) {
-                this.expected = expected;
+            this.expected = expected;
         }
-        
+
         public boolean matches(Object actual) {
             if (actual instanceof WriteRequest) {
                 WriteRequest w2 = (WriteRequest) actual;
 
                 return expected.getMessage().equals(w2.getMessage())
-                        && expected.getFuture().isWritten() == w2.getFuture()
-                        .isWritten();
+                        && expected.getFuture().isWritten() == w2.getFuture().isWritten();
             }
             return false;
         }
+
         public void appendTo(StringBuffer buffer) {
-                buffer.append("Expected a WriteRequest with the message '").append(expected.getMessage()).append("'");
+            buffer.append("Expected a WriteRequest with the message '").append(expected.getMessage()).append("'");
         }
     }
 
@@ -519,7 +500,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         public DummyWriteFuture() {
             super();
         }
-        
+
         public boolean isWritten() {
             return written;
         }
@@ -560,8 +541,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
             return this;
         }
 
-        public boolean await(long timeout, TimeUnit unit)
-                throws InterruptedException {
+        public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
             return true;
         }
 
@@ -590,5 +570,4 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         }
     }
 
-    
 }

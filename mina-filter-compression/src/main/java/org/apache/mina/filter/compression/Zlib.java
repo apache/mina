@@ -37,7 +37,7 @@ class Zlib {
     /** Try o get the best possible compression */
     public static final int COMPRESSION_MAX = JZlib.Z_BEST_COMPRESSION;
 
-    /** Favor speed over compression ratio */ 
+    /** Favor speed over compression ratio */
     public static final int COMPRESSION_MIN = JZlib.Z_BEST_SPEED;
 
     /** No compression */
@@ -46,10 +46,10 @@ class Zlib {
     /** Default compression */
     public static final int COMPRESSION_DEFAULT = JZlib.Z_DEFAULT_COMPRESSION;
 
-    /** Compression mode */ 
+    /** Compression mode */
     public static final int MODE_DEFLATER = 1;
 
-    /** Uncompress mode */ 
+    /** Uncompress mode */
     public static final int MODE_INFLATER = 2;
 
     /** The requested compression level */
@@ -80,8 +80,7 @@ class Zlib {
             this.compressionLevel = compressionLevel;
             break;
         default:
-            throw new IllegalArgumentException(
-                    "invalid compression level specified");
+            throw new IllegalArgumentException("invalid compression level specified");
         }
 
         // create a new instance of ZStream. This will be done only once.
@@ -124,7 +123,7 @@ class Zlib {
         IoBuffer outBuffer = IoBuffer.allocate(outBytes.length);
         outBuffer.setAutoExpand(true);
 
-        synchronized( zStream ) {
+        synchronized (zStream) {
             zStream.next_in = inBytes;
             zStream.next_in_index = 0;
             zStream.avail_in = inBytes.length;
@@ -132,7 +131,7 @@ class Zlib {
             zStream.next_out_index = 0;
             zStream.avail_out = outBytes.length;
             int retval = 0;
-    
+
             do {
                 retval = zStream.inflate(JZlib.Z_SYNC_FLUSH);
                 switch (retval) {
@@ -148,11 +147,9 @@ class Zlib {
                     // unknown error
                     outBuffer = null;
                     if (zStream.msg == null) {
-                        throw new IOException("Unknown error. Error code : "
-                                + retval);
+                        throw new IOException("Unknown error. Error code : " + retval);
                     } else {
-                        throw new IOException("Unknown error. Error code : "
-                                + retval + " and message : " + zStream.msg);
+                        throw new IOException("Unknown error. Error code : " + retval + " and message : " + zStream.msg);
                     }
                 }
             } while (zStream.avail_in > 0);
@@ -184,24 +181,22 @@ class Zlib {
         int outLen = (int) Math.round(inBytes.length * 1.001) + 1 + 12;
         byte[] outBytes = new byte[outLen];
 
-        synchronized(zStream) {
+        synchronized (zStream) {
             zStream.next_in = inBytes;
             zStream.next_in_index = 0;
             zStream.avail_in = inBytes.length;
             zStream.next_out = outBytes;
             zStream.next_out_index = 0;
             zStream.avail_out = outBytes.length;
-    
+
             int retval = zStream.deflate(JZlib.Z_SYNC_FLUSH);
             if (retval != JZlib.Z_OK) {
                 outBytes = null;
                 inBytes = null;
-                throw new IOException("Compression failed with return value : "
-                        + retval);
+                throw new IOException("Compression failed with return value : " + retval);
             }
-    
-            IoBuffer outBuf = IoBuffer
-                    .wrap(outBytes, 0, zStream.next_out_index);
+
+            IoBuffer outBuf = IoBuffer.wrap(outBytes, 0, zStream.next_out_index);
 
             return outBuf;
         }

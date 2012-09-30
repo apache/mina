@@ -336,7 +336,7 @@ public interface IoFilterChain {
          * @return The {@link NextFilter} of the filter.
          */
         NextFilter getNextFilter();
-        
+
         /**
          * Adds the specified filter with the specified name just before this entry.
          */
@@ -351,7 +351,7 @@ public interface IoFilterChain {
          * Replace the filter of this entry with the specified new filter.
          */
         void replace(IoFilter newFilter);
-        
+
         /**
          * Removes this entry from the chain it belongs to.
          */

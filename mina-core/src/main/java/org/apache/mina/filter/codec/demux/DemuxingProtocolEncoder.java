@@ -46,7 +46,7 @@ import org.apache.mina.util.IdentityHashSet;
  * @see MessageEncoder
  */
 public class DemuxingProtocolEncoder implements ProtocolEncoder {
-    
+
     private final AttributeKey STATE = new AttributeKey(getClass(), "state");
 
     @SuppressWarnings("rawtypes")
@@ -67,8 +67,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         try {
             encoderClass.getConstructor(EMPTY_PARAMS);
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(
-                    "The specified class doesn't have a public default constructor.");
+            throw new IllegalArgumentException("The specified class doesn't have a public default constructor.");
         }
 
         boolean registered = false;
@@ -78,8 +77,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
 
         if (!registered) {
-            throw new IllegalArgumentException(
-                    "Unregisterable type: " + encoderClass);
+            throw new IllegalArgumentException("Unregisterable type: " + encoderClass);
         }
     }
 
@@ -92,17 +90,17 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         if (messageType == null) {
             throw new IllegalArgumentException("messageType");
         }
-        
+
         if (factory == null) {
             throw new IllegalArgumentException("factory");
         }
-        
+
         synchronized (type2encoderFactory) {
             if (type2encoderFactory.containsKey(messageType)) {
-                throw new IllegalStateException(
-                        "The specified message type (" + messageType.getName() + ") is registered already.");
+                throw new IllegalStateException("The specified message type (" + messageType.getName()
+                        + ") is registered already.");
             }
-            
+
             type2encoderFactory.put(messageType, factory);
         }
     }
@@ -113,31 +111,30 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
             addMessageEncoder(messageType, encoderClass);
         }
     }
-    
+
     public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoder<? super T> encoder) {
         for (Class<? extends T> messageType : messageTypes) {
             addMessageEncoder(messageType, encoder);
         }
     }
-    
-    public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoderFactory<? super T> factory) {
+
+    public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes,
+            MessageEncoderFactory<? super T> factory) {
         for (Class<? extends T> messageType : messageTypes) {
             addMessageEncoder(messageType, factory);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public void encode(IoSession session, Object message,
-            ProtocolEncoderOutput out) throws Exception {
+    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         State state = getState(session);
         MessageEncoder<Object> encoder = findEncoder(state, message.getClass());
         if (encoder != null) {
             encoder.encode(session, message, out);
         } else {
-            throw new UnknownMessageTypeException(
-                    "No message encoder found for message: " + message);
+            throw new UnknownMessageTypeException("No message encoder found for message: " + message);
         }
     }
 
@@ -146,8 +143,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     }
 
     @SuppressWarnings("unchecked")
-    private MessageEncoder<Object> findEncoder(
-            State state, Class<?> type, Set<Class<?>> triedClasses) {
+    private MessageEncoder<Object> findEncoder(State state, Class<?> type, Set<Class<?>> triedClasses) {
         @SuppressWarnings("rawtypes")
         MessageEncoder encoder = null;
 
@@ -159,7 +155,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
          * Try the cache first.
          */
         encoder = state.findEncoderCache.get(type);
-        
+
         if (encoder != null) {
             return encoder;
         }
@@ -177,14 +173,14 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
             if (triedClasses == null) {
                 triedClasses = new IdentityHashSet<Class<?>>();
             }
-            
+
             triedClasses.add(type);
 
             Class<?>[] interfaces = type.getInterfaces();
-            
+
             for (Class<?> element : interfaces) {
                 encoder = findEncoder(state, element, triedClasses);
-                
+
                 if (encoder != null) {
                     break;
                 }
@@ -198,7 +194,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
              */
 
             Class<?> superclass = type.getSuperclass();
-            
+
             if (superclass != null) {
                 encoder = findEncoder(state, superclass);
             }
@@ -212,7 +208,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         if (encoder != null) {
             state.findEncoderCache.put(type, encoder);
             MessageEncoder<Object> tmpEncoder = state.findEncoderCache.putIfAbsent(type, encoder);
-            
+
             if (tmpEncoder != null) {
                 encoder = tmpEncoder;
             }
@@ -227,7 +223,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     public void dispose(IoSession session) throws Exception {
         session.removeAttribute(STATE);
     }
-    
+
     private State getState(IoSession session) throws Exception {
         State state = (State) session.getAttribute(STATE);
         if (state == null) {
@@ -239,24 +235,23 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
         return state;
     }
-    
+
     private class State {
         @SuppressWarnings("rawtypes")
         private final ConcurrentHashMap<Class<?>, MessageEncoder> findEncoderCache = new ConcurrentHashMap<Class<?>, MessageEncoder>();
 
         @SuppressWarnings("rawtypes")
         private final Map<Class<?>, MessageEncoder> type2encoder = new ConcurrentHashMap<Class<?>, MessageEncoder>();
-        
+
         @SuppressWarnings("rawtypes")
         private State() throws Exception {
-            for (Map.Entry<Class<?>, MessageEncoderFactory> e: type2encoderFactory.entrySet()) {
+            for (Map.Entry<Class<?>, MessageEncoderFactory> e : type2encoderFactory.entrySet()) {
                 type2encoder.put(e.getKey(), e.getValue().getEncoder());
             }
         }
     }
 
-    private static class SingletonMessageEncoderFactory<T> implements
-            MessageEncoderFactory<T> {
+    private static class SingletonMessageEncoderFactory<T> implements MessageEncoderFactory<T> {
         private final MessageEncoder<T> encoder;
 
         private SingletonMessageEncoderFactory(MessageEncoder<T> encoder) {
@@ -271,8 +266,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
     }
 
-    private static class DefaultConstructorMessageEncoderFactory<T> implements
-            MessageEncoderFactory<T> {
+    private static class DefaultConstructorMessageEncoderFactory<T> implements MessageEncoderFactory<T> {
         private final Class<MessageEncoder<T>> encoderClass;
 
         private DefaultConstructorMessageEncoderFactory(Class<MessageEncoder<T>> encoderClass) {
@@ -281,8 +275,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
             }
 
             if (!MessageEncoder.class.isAssignableFrom(encoderClass)) {
-                throw new IllegalArgumentException(
-                        "encoderClass is not assignable to MessageEncoder");
+                throw new IllegalArgumentException("encoderClass is not assignable to MessageEncoder");
             }
             this.encoderClass = encoderClass;
         }

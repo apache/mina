@@ -48,8 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
 
-    private final static Logger logger = LoggerFactory
-            .getLogger(HttpDigestAuthLogicHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(HttpDigestAuthLogicHandler.class);
 
     /**
      * The challenge directives provided by the server.
@@ -72,12 +71,10 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
         }
     }
 
-    public HttpDigestAuthLogicHandler(final ProxyIoSession proxyIoSession)
-            throws ProxyAuthException {
+    public HttpDigestAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);
 
-        ((HttpProxyRequest) request).checkRequiredProperties(
-                HttpProxyConstants.USER_PROPERTY,
+        ((HttpProxyRequest) request).checkRequiredProperties(HttpProxyConstants.USER_PROPERTY,
                 HttpProxyConstants.PWD_PROPERTY);
     }
 
@@ -86,33 +83,28 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
         logger.debug(" doHandshake()");
 
         if (step > 0 && directives == null) {
-            throw new ProxyAuthException(
-                    "Authentication challenge not received");
+            throw new ProxyAuthException("Authentication challenge not received");
         }
-        
+
         HttpProxyRequest req = (HttpProxyRequest) request;
-        Map<String, List<String>> headers = req.getHeaders() != null ? req
-                .getHeaders() : new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = req.getHeaders() != null ? req.getHeaders()
+                : new HashMap<String, List<String>>();
 
         if (step > 0) {
             logger.debug("  sending DIGEST challenge response");
 
             // Build a challenge response
             HashMap<String, String> map = new HashMap<String, String>();
-            map.put("username", req.getProperties().get(
-                    HttpProxyConstants.USER_PROPERTY));
+            map.put("username", req.getProperties().get(HttpProxyConstants.USER_PROPERTY));
             StringUtilities.copyDirective(directives, map, "realm");
             StringUtilities.copyDirective(directives, map, "uri");
             StringUtilities.copyDirective(directives, map, "opaque");
             StringUtilities.copyDirective(directives, map, "nonce");
-            String algorithm = StringUtilities.copyDirective(directives,
-                    map, "algorithm");
+            String algorithm = StringUtilities.copyDirective(directives, map, "algorithm");
 
             // Check for a supported algorithm
-            if (algorithm != null && !"md5".equalsIgnoreCase(algorithm)
-                    && !"md5-sess".equalsIgnoreCase(algorithm)) {
-                throw new ProxyAuthException(
-                        "Unknown algorithm required by server");
+            if (algorithm != null && !"md5".equalsIgnoreCase(algorithm) && !"md5-sess".equalsIgnoreCase(algorithm)) {
+                throw new ProxyAuthException("Unknown algorithm required by server");
             }
 
             // Check for a supported qop
@@ -127,8 +119,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
                         break;
                     }
 
-                    int pos = Arrays.binarySearch(
-                            DigestUtilities.SUPPORTED_QOPS, tk);
+                    int pos = Arrays.binarySearch(DigestUtilities.SUPPORTED_QOPS, tk);
                     if (pos > -1) {
                         token = tk;
                     }
@@ -141,17 +132,13 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
                     rnd.nextBytes(nonce);
 
                     try {
-                        String cnonce = new String(Base64
-                                .encodeBase64(nonce), proxyIoSession
-                                .getCharsetName());
+                        String cnonce = new String(Base64.encodeBase64(nonce), proxyIoSession.getCharsetName());
                         map.put("cnonce", cnonce);
                     } catch (UnsupportedEncodingException e) {
-                        throw new ProxyAuthException(
-                                "Unable to encode cnonce", e);
+                        throw new ProxyAuthException("Unable to encode cnonce", e);
                     }
                 } else {
-                    throw new ProxyAuthException(
-                            "No supported qop option available");
+                    throw new ProxyAuthException("No supported qop option available");
                 }
             }
 
@@ -160,17 +147,12 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
 
             // Compute the response
             try {
-                map.put("response", DigestUtilities
-                        .computeResponseValue(proxyIoSession.getSession(),
-                                map, req.getHttpVerb().toUpperCase(),
-                                req.getProperties().get(
-                                        HttpProxyConstants.PWD_PROPERTY),
-                                proxyIoSession.getCharsetName(), response
-                                        .getBody()));
+                map.put("response", DigestUtilities.computeResponseValue(proxyIoSession.getSession(), map, req
+                        .getHttpVerb().toUpperCase(), req.getProperties().get(HttpProxyConstants.PWD_PROPERTY),
+                        proxyIoSession.getCharsetName(), response.getBody()));
 
             } catch (Exception e) {
-                throw new ProxyAuthException(
-                        "Digest response computing failed", e);
+                throw new ProxyAuthException("Digest response computing failed", e);
             }
 
             // Prepare the challenge response header and add it to the 
@@ -186,8 +168,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
                     addSeparator = true;
                 }
 
-                boolean quotedValue = !"qop".equals(key)
-                        && !"nc".equals(key);
+                boolean quotedValue = !"qop".equals(key) && !"nc".equals(key);
                 sb.append(key);
                 if (quotedValue) {
                     sb.append("=\"").append(map.get(key)).append('\"');
@@ -196,8 +177,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
                 }
             }
 
-            StringUtilities.addValueToHeader(headers,
-                    "Proxy-Authorization", sb.toString(), true);
+            StringUtilities.addValueToHeader(headers, "Proxy-Authorization", sb.toString(), true);
         }
 
         addKeepAliveHeaders(headers);
@@ -208,22 +188,17 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
     }
 
     @Override
-    public void handleResponse(final HttpProxyResponse response)
-            throws ProxyAuthException {
+    public void handleResponse(final HttpProxyResponse response) throws ProxyAuthException {
         this.response = response;
 
         if (step == 0) {
-            if (response.getStatusCode() != 401
-                    && response.getStatusCode() != 407) {
-                throw new ProxyAuthException(
-                        "Received unexpected response code ("
-                                + response.getStatusLine() + ").");
+            if (response.getStatusCode() != 401 && response.getStatusCode() != 407) {
+                throw new ProxyAuthException("Received unexpected response code (" + response.getStatusLine() + ").");
             }
 
             // Header should look like this
             // Proxy-Authenticate: Digest still_some_more_stuff
-            List<String> values = response.getHeaders().get(
-                    "Proxy-Authenticate");
+            List<String> values = response.getHeaders().get("Proxy-Authenticate");
             String challengeResponse = null;
 
             for (String s : values) {
@@ -234,21 +209,18 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
             }
 
             if (challengeResponse == null) {
-                throw new ProxyAuthException(
-                        "Server doesn't support digest authentication method !");
+                throw new ProxyAuthException("Server doesn't support digest authentication method !");
             }
 
             try {
-                directives = StringUtilities.parseDirectives(challengeResponse
-                        .substring(7).getBytes(proxyIoSession.getCharsetName()));
+                directives = StringUtilities.parseDirectives(challengeResponse.substring(7).getBytes(
+                        proxyIoSession.getCharsetName()));
             } catch (Exception e) {
-                throw new ProxyAuthException(
-                        "Parsing of server digest directives failed", e);
+                throw new ProxyAuthException("Parsing of server digest directives failed", e);
             }
             step = 1;
         } else {
-            throw new ProxyAuthException("Received unexpected response code ("
-                    + response.getStatusLine() + ").");
+            throw new ProxyAuthException("Received unexpected response code (" + response.getStatusLine() + ").");
         }
     }
 }

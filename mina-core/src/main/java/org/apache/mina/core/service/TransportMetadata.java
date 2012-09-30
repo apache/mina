@@ -31,7 +31,7 @@ import org.apache.mina.core.session.IoSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface TransportMetadata {
-    
+
     /**
      * Returns the name of the service provider (e.g. "nio", "apr" and "rxtx").
      */

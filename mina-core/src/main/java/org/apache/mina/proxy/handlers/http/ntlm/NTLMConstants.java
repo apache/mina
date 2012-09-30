@@ -27,12 +27,10 @@ package org.apache.mina.proxy.handlers.http.ntlm;
  */
 public interface NTLMConstants {
     // Signature "NTLMSSP"+{0}
-    public final static byte[] NTLM_SIGNATURE = new byte[] { 0x4E, 0x54, 0x4C,
-            0x4D, 0x53, 0x53, 0x50, 0 };
+    public final static byte[] NTLM_SIGNATURE = new byte[] { 0x4E, 0x54, 0x4C, 0x4D, 0x53, 0x53, 0x50, 0 };
 
     // Version 5.1.2600 a Windows XP version (ex: Build 2600.xpsp_sp2_gdr.050301-1519 : Service Pack 2)
-    public final static byte[] DEFAULT_OS_VERSION = new byte[] { 0x05, 0x01,
-            0x28, 0x0A, 0, 0, 0, 0x0F };
+    public final static byte[] DEFAULT_OS_VERSION = new byte[] { 0x05, 0x01, 0x28, 0x0A, 0, 0, 0, 0x0F };
 
     /**
      * Message types
@@ -155,9 +153,8 @@ public interface NTLMConstants {
     public final static int FLAG_UNIDENTIFIED_11 = 0x10000000;
 
     // Default minimal flag set
-    public final static int DEFAULT_FLAGS = FLAG_NEGOTIATE_OEM
-            | FLAG_NEGOTIATE_UNICODE | FLAG_NEGOTIATE_WORKSTATION_SUPPLIED
-            | FLAG_NEGOTIATE_DOMAIN_SUPPLIED;
+    public final static int DEFAULT_FLAGS = FLAG_NEGOTIATE_OEM | FLAG_NEGOTIATE_UNICODE
+            | FLAG_NEGOTIATE_WORKSTATION_SUPPLIED | FLAG_NEGOTIATE_DOMAIN_SUPPLIED;
 
     /** 
      * Target Information sub blocks types. It may be that there are other 
