@@ -537,20 +537,30 @@ public class IoBufferTest {
         }
     }
 
+    //-------------------------------------------------------------------------
+    // The the clear method. It will erase all the data in all the inner
+    // ByteBuffer, thus the buffer size might increase.
+    // We will check those case :
+    // 1) clear an empty buffer
+    // 2) clear a buffer with one ByteBuffer
+    // 3) clear a buffer with numerous ByteBuffers
+    //-------------------------------------------------------------------------
     /**
      * Test the clear() method
      */
     @Test
-    public void testClear() {
+    public void testClearEmptyBuffer() {
         ByteBuffer bb1 = ByteBuffer.allocate(4);
-        bb1.put("0123".getBytes());
+        bb1.put("012".getBytes());
         bb1.flip();
 
         ByteBuffer bb2 = ByteBuffer.allocate(4);
-        bb2.put("4567".getBytes());
+        bb2.put("345".getBytes());
         bb2.flip();
 
         IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
+
+        assertEquals(6, ioBuffer.limit());
 
         // Move forward a bit
         ioBuffer.get();
@@ -561,6 +571,8 @@ public class IoBufferTest {
 
         // We should be back to the origin
         assertEquals(0, ioBuffer.position());
+
+        // The limit must have grown
         assertEquals(8, ioBuffer.limit());
     }
 

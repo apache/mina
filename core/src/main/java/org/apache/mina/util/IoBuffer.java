@@ -264,16 +264,34 @@ public class IoBuffer {
      * @see Buffer#clear()
      * Clears this IoBuffer.
      * <p>
-     * While the content of this IoBuffer is not changed, the following internal
-     * changes take place: the current position is reset back to the start of
-     * the buffer, the value of the buffer limit is made equal to the capacity
-     * and mark is cleared.
+     * the following internal changes take place: 
+     * <ul>
+     * <li>the current position is reset back to the start of the buffer</li> 
+     * <li>the value of the buffer limit is made equal to the capacity</li>
+     * <li>and mark is cleared</li>
+     * </ul>
+     * Note that the resulting IoBuffer might be wider than the original one, simply
+     * because we will extent the ByteBuffers limit to their capacity.
      *
      * @return this buffer.
      */
     public IoBuffer clear() {
         position = 0;
         mark = UNSET_MARK;
+
+        BufferNode node = buffers.head;
+        int offset = 0;
+
+        while (node != null) {
+            node.buffer.clear();
+            node.offset = offset;
+            offset += node.buffer.limit();
+            node = node.next;
+        }
+
+        limit = offset;
+        buffers.length = 0;
+        buffers.current = buffers.head;
 
         return this;
     }
