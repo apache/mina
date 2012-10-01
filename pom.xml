@@ -51,9 +51,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/tags/2.0.5</connection>
-    <url>http://svn.apache.org/viewvc/directory/mina/tags/2.0.5</url>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/branches/2.0</developerConnection>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/mina/tags/2.0.5</connection>
+    <url>http://svn.apache.org/viewvc/mina/mina/tags/2.0.5</url>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/mina/branches/2.0</developerConnection>
   </scm>
 
   <distributionManagement>
@@ -798,7 +798,7 @@
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
           <tagBase>
-            https://svn.apache.org/repos/asf/mina/tags
+            https://svn.apache.org/repos/asf/mina/mina/tags
           </tagBase>
           <preparationGoals>clean install</preparationGoals>
           <goals>clean deploy</goals>
