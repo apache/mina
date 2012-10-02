@@ -69,7 +69,11 @@ public class AvailablePortFinder {
     public static int getNextAvailable() {
         try {
             // Here, we simply return an available port found by the system
-            return new ServerSocket(0).getLocalPort();
+            ServerSocket serverSocket = new ServerSocket(0);
+            int port = serverSocket.getLocalPort();
+            serverSocket.close();
+
+            return port;
         } catch (IOException ioe) {
             throw new NoSuchElementException(ioe.getMessage());
         }
