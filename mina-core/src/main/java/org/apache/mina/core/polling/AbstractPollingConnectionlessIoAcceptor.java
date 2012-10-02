@@ -19,10 +19,6 @@
  */
 package org.apache.mina.core.polling;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.SelectionKey;
@@ -648,29 +644,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
             try {
                 for (SocketAddress socketAddress : localAddresses) {
                     H handle = open(socketAddress);
-                    InetSocketAddress inetSocketAddress = (InetSocketAddress) localAddress(handle);
-                    InetAddress inetAddress = inetSocketAddress.getAddress();
-
-                    if (inetAddress instanceof Inet6Address) {
-                        if (((Inet6Address) inetAddress).isIPv4CompatibleAddress()) {
-                            // Ugly hack to workaround a problem on linux : the ANY address is always converted to IPV6
-                            // even if the original address was an IPV4 address. We do store the two IPV4 and IPV6
-                            // ANY address in the map.
-                            byte[] ipV6Address = ((Inet6Address) inetAddress).getAddress();
-                            byte[] ipV4Address = new byte[4];
-
-                            for (int i = 0; i < 4; i++) {
-                                ipV4Address[i] = ipV6Address[12 + i];
-                            }
-
-                            InetAddress inet4Adress = Inet4Address.getByAddress(ipV4Address);
-                            newHandles.put(new InetSocketAddress(inet4Adress, inetSocketAddress.getPort()), handle);
-                        } else {
-                            newHandles.put(new InetSocketAddress(inetAddress, inetSocketAddress.getPort()), handle);
-                        }
-                    } else {
-                        newHandles.put(localAddress(handle), handle);
-                    }
+                    newHandles.put(localAddress(handle), handle);
                 }
 
                 boundHandles.putAll(newHandles);
