@@ -62,15 +62,19 @@ public class AvailablePortFinder {
     }
 
     /**
-     * Gets the next available port starting at the lowest port number.
+     * Gets an available port, selected by the system.
      *
      * @throws NoSuchElementException if there are no ports available
      */
     public static int getNextAvailable() {
+        ServerSocket serverSocket = null;
+
         try {
             // Here, we simply return an available port found by the system
-            ServerSocket serverSocket = new ServerSocket(0);
+            serverSocket = new ServerSocket(0);
             int port = serverSocket.getLocalPort();
+
+            // Don't forget to close the socket...
             serverSocket.close();
 
             return port;
@@ -111,6 +115,7 @@ public class AvailablePortFinder {
 
         ServerSocket ss = null;
         DatagramSocket ds = null;
+
         try {
             ss = new ServerSocket(port);
             ss.setReuseAddress(true);
