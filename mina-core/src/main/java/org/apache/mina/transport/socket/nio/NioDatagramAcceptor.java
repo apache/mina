@@ -19,6 +19,9 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
@@ -139,7 +142,25 @@ public final class NioDatagramAcceptor extends AbstractPollingConnectionlessIoAc
 
     @Override
     protected SocketAddress localAddress(DatagramChannel handle) throws Exception {
-        return handle.socket().getLocalSocketAddress();
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) handle.socket().getLocalSocketAddress();
+        InetAddress inetAddress = inetSocketAddress.getAddress();
+
+        if ((inetAddress instanceof Inet6Address) && (((Inet6Address) inetAddress).isIPv4CompatibleAddress())) {
+            // Ugly hack to workaround a problem on linux : the ANY address is always converted to IPV6
+            // even if the original address was an IPV4 address. We do store the two IPV4 and IPV6
+            // ANY address in the map.
+            byte[] ipV6Address = ((Inet6Address) inetAddress).getAddress();
+            byte[] ipV4Address = new byte[4];
+
+            for (int i = 0; i < 4; i++) {
+                ipV4Address[i] = ipV6Address[12 + i];
+            }
+
+            InetAddress inet4Adress = Inet4Address.getByAddress(ipV4Address);
+            return new InetSocketAddress(inet4Adress, inetSocketAddress.getPort());
+        } else {
+            return inetSocketAddress;
+        }
     }
 
     @Override
