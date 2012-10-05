@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core.polling;
 
+
 import java.net.SocketAddress;
 import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.SelectionKey;
@@ -48,6 +49,7 @@ import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.util.ExceptionMonitor;
 
+
 /**
  * {@link IoAcceptor} for datagram transport (UDP/IP).
  *
@@ -57,7 +59,8 @@ import org.apache.mina.util.ExceptionMonitor;
   * @param <S> the type of the {@link IoSession} this processor can handle
 */
 public abstract class AbstractPollingConnectionlessIoAcceptor<S extends AbstractIoSession, H> extends
-        AbstractIoAcceptor implements IoProcessor<S> {
+    AbstractIoAcceptor implements IoProcessor<S>
+{
 
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
 
@@ -68,7 +71,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
     private static final long SELECT_TIMEOUT = 1000L;
 
     /** A lock used to protect the selector to be waked up before it's created */
-    private final Semaphore lock = new Semaphore(1);
+    private final Semaphore lock = new Semaphore( 1 );
 
     private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
 
@@ -76,7 +79,7 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
     private final Queue<S> flushingSessions = new ConcurrentLinkedQueue<S>();
 
-    private final Map<SocketAddress, H> boundHandles = Collections.synchronizedMap(new HashMap<SocketAddress, H>());
+    private final Map<SocketAddress, H> boundHandles = Collections.synchronizedMap( new HashMap<SocketAddress, H>() );
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
 
@@ -89,89 +92,123 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
     private long lastIdleCheckTime;
 
+
     /**
      * Creates a new instance.
      */
-    protected AbstractPollingConnectionlessIoAcceptor(IoSessionConfig sessionConfig) {
-        this(sessionConfig, null);
+    protected AbstractPollingConnectionlessIoAcceptor( IoSessionConfig sessionConfig )
+    {
+        this( sessionConfig, null );
     }
 
+
     /**
      * Creates a new instance.
      */
-    protected AbstractPollingConnectionlessIoAcceptor(IoSessionConfig sessionConfig, Executor executor) {
-        super(sessionConfig, executor);
+    protected AbstractPollingConnectionlessIoAcceptor( IoSessionConfig sessionConfig, Executor executor )
+    {
+        super( sessionConfig, executor );
 
-        try {
+        try
+        {
             init();
             selectable = true;
-        } catch (RuntimeException e) {
+        }
+        catch ( RuntimeException e )
+        {
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeIoException("Failed to initialize.", e);
-        } finally {
-            if (!selectable) {
-                try {
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeIoException( "Failed to initialize.", e );
+        }
+        finally
+        {
+            if ( !selectable )
+            {
+                try
+                {
                     destroy();
-                } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
+                catch ( Exception e )
+                {
+                    ExceptionMonitor.getInstance().exceptionCaught( e );
                 }
             }
         }
     }
 
+
     protected abstract void init() throws Exception;
+
 
     protected abstract void destroy() throws Exception;
 
+
     protected abstract int select() throws Exception;
 
-    protected abstract int select(long timeout) throws Exception;
+
+    protected abstract int select( long timeout ) throws Exception;
+
 
     protected abstract void wakeup();
 
+
     protected abstract Set<SelectionKey> selectedHandles();
 
-    protected abstract H open(SocketAddress localAddress) throws Exception;
 
-    protected abstract void close(H handle) throws Exception;
+    protected abstract H open( SocketAddress localAddress ) throws Exception;
 
-    protected abstract SocketAddress localAddress(H handle) throws Exception;
 
-    protected abstract boolean isReadable(H handle);
+    protected abstract void close( H handle ) throws Exception;
 
-    protected abstract boolean isWritable(H handle);
 
-    protected abstract SocketAddress receive(H handle, IoBuffer buffer) throws Exception;
+    protected abstract SocketAddress localAddress( H handle ) throws Exception;
 
-    protected abstract int send(S session, IoBuffer buffer, SocketAddress remoteAddress) throws Exception;
 
-    protected abstract S newSession(IoProcessor<S> processor, H handle, SocketAddress remoteAddress) throws Exception;
+    protected abstract boolean isReadable( H handle );
 
-    protected abstract void setInterestedInWrite(S session, boolean interested) throws Exception;
+
+    protected abstract boolean isWritable( H handle );
+
+
+    protected abstract SocketAddress receive( H handle, IoBuffer buffer ) throws Exception;
+
+
+    protected abstract int send( S session, IoBuffer buffer, SocketAddress remoteAddress ) throws Exception;
+
+
+    protected abstract S newSession( IoProcessor<S> processor, H handle, SocketAddress remoteAddress ) throws Exception;
+
+
+    protected abstract void setInterestedInWrite( S session, boolean interested ) throws Exception;
+
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void dispose0() throws Exception {
+    protected void dispose0() throws Exception
+    {
         unbind();
         startupAcceptor();
         wakeup();
     }
 
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses) throws Exception {
+    protected final Set<SocketAddress> bindInternal( List<? extends SocketAddress> localAddresses ) throws Exception
+    {
         // Create a bind request as a Future operation. When the selector
         // have handled the registration, it will signal this future.
-        AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
+        AcceptorOperationFuture request = new AcceptorOperationFuture( localAddresses );
 
         // adds the Registration request to the queue for the Workers
         // to handle
-        registerQueue.add(request);
+        registerQueue.add( request );
 
         // creates the Acceptor instance and has the local
         // executor kick it off.
@@ -180,20 +217,24 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         // As we just started the acceptor, we have to unblock the select()
         // in order to process the bind request we just have added to the
         // registerQueue.
-        try {
+        try
+        {
             lock.acquire();
 
             // Wait a bit to give a chance to the Acceptor thread to do the select()
-            Thread.sleep(10);
+            Thread.sleep( 10 );
             wakeup();
-        } finally {
+        }
+        finally
+        {
             lock.release();
         }
 
         // Now, we wait until this request is completed.
         request.awaitUninterruptibly();
 
-        if (request.getException() != null) {
+        if ( request.getException() != null )
+        {
             throw request.getException();
         }
 
@@ -202,105 +243,137 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         // because of deadlock.
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
 
-        for (H handle : boundHandles.values()) {
-            newLocalAddresses.add(localAddress(handle));
+        for ( H handle : boundHandles.values() )
+        {
+            newLocalAddresses.add( localAddress( handle ) );
         }
 
         return newLocalAddresses;
     }
 
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final void unbind0(List<? extends SocketAddress> localAddresses) throws Exception {
-        AcceptorOperationFuture request = new AcceptorOperationFuture(localAddresses);
+    protected final void unbind0( List<? extends SocketAddress> localAddresses ) throws Exception
+    {
+        AcceptorOperationFuture request = new AcceptorOperationFuture( localAddresses );
 
-        cancelQueue.add(request);
+        cancelQueue.add( request );
         startupAcceptor();
         wakeup();
 
         request.awaitUninterruptibly();
 
-        if (request.getException() != null) {
+        if ( request.getException() != null )
+        {
             throw request.getException();
         }
     }
 
+
     /**
      * {@inheritDoc}
      */
-    public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
-        if (isDisposing()) {
-            throw new IllegalStateException("Already disposed.");
+    public final IoSession newSession( SocketAddress remoteAddress, SocketAddress localAddress )
+    {
+        if ( isDisposing() )
+        {
+            throw new IllegalStateException( "Already disposed." );
         }
 
-        if (remoteAddress == null) {
-            throw new IllegalArgumentException("remoteAddress");
+        if ( remoteAddress == null )
+        {
+            throw new IllegalArgumentException( "remoteAddress" );
         }
 
-        synchronized (bindLock) {
-            if (!isActive()) {
-                throw new IllegalStateException("Can't create a session from a unbound service.");
+        synchronized ( bindLock )
+        {
+            if ( !isActive() )
+            {
+                throw new IllegalStateException( "Can't create a session from a unbound service." );
             }
 
-            try {
-                return newSessionWithoutLock(remoteAddress, localAddress);
-            } catch (RuntimeException e) {
+            try
+            {
+                return newSessionWithoutLock( remoteAddress, localAddress );
+            }
+            catch ( RuntimeException e )
+            {
                 throw e;
-            } catch (Error e) {
+            }
+            catch ( Error e )
+            {
                 throw e;
-            } catch (Exception e) {
-                throw new RuntimeIoException("Failed to create a session.", e);
+            }
+            catch ( Exception e )
+            {
+                throw new RuntimeIoException( "Failed to create a session.", e );
             }
         }
     }
 
-    private IoSession newSessionWithoutLock(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
-        H handle = boundHandles.get(localAddress);
 
-        if (handle == null) {
-            throw new IllegalArgumentException("Unknown local address: " + localAddress);
+    private IoSession newSessionWithoutLock( SocketAddress remoteAddress, SocketAddress localAddress ) throws Exception
+    {
+        H handle = boundHandles.get( localAddress );
+
+        if ( handle == null )
+        {
+            throw new IllegalArgumentException( "Unknown local address: " + localAddress );
         }
 
         IoSession session;
 
-        synchronized (sessionRecycler) {
-            session = sessionRecycler.recycle(remoteAddress);
+        synchronized ( sessionRecycler )
+        {
+            session = sessionRecycler.recycle( remoteAddress );
 
-            if (session != null) {
+            if ( session != null )
+            {
                 return session;
             }
 
             // If a new session needs to be created.
-            S newSession = newSession(this, handle, remoteAddress);
-            getSessionRecycler().put(newSession);
+            S newSession = newSession( this, handle, remoteAddress );
+            getSessionRecycler().put( newSession );
             session = newSession;
         }
 
-        initSession(session, null, null);
+        initSession( session, null, null );
 
-        try {
-            this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
-            getListeners().fireSessionCreated(session);
-        } catch (Throwable t) {
-            ExceptionMonitor.getInstance().exceptionCaught(t);
+        try
+        {
+            this.getFilterChainBuilder().buildFilterChain( session.getFilterChain() );
+            getListeners().fireSessionCreated( session );
+        }
+        catch ( Throwable t )
+        {
+            ExceptionMonitor.getInstance().exceptionCaught( t );
         }
 
         return session;
     }
 
-    public final IoSessionRecycler getSessionRecycler() {
+
+    public final IoSessionRecycler getSessionRecycler()
+    {
         return sessionRecycler;
     }
 
-    public final void setSessionRecycler(IoSessionRecycler sessionRecycler) {
-        synchronized (bindLock) {
-            if (isActive()) {
-                throw new IllegalStateException("sessionRecycler can't be set while the acceptor is bound.");
+
+    public final void setSessionRecycler( IoSessionRecycler sessionRecycler )
+    {
+        synchronized ( bindLock )
+        {
+            if ( isActive() )
+            {
+                throw new IllegalStateException( "sessionRecycler can't be set while the acceptor is bound." );
             }
 
-            if (sessionRecycler == null) {
+            if ( sessionRecycler == null )
+            {
                 sessionRecycler = DEFAULT_RECYCLER;
             }
 
@@ -308,110 +381,151 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void add(S session) {
-        // Nothing to do for UDP
-    }
 
     /**
      * {@inheritDoc}
      */
-    public void flush(S session) {
-        if (scheduleFlush(session)) {
+    public void add( S session )
+    {
+        // Nothing to do for UDP
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public void flush( S session )
+    {
+        if ( scheduleFlush( session ) )
+        {
             wakeup();
         }
     }
 
+
     /**
      * {@inheritDoc}
      */
-    public void write(S session, WriteRequest writeRequest) {
+    public void write( S session, WriteRequest writeRequest )
+    {
         // We will try to write the message directly
         long currentTime = System.currentTimeMillis();
         final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
         final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize()
-                + (session.getConfig().getMaxReadBufferSize() >>> 1);
+            + ( session.getConfig().getMaxReadBufferSize() >>> 1 );
 
         int writtenBytes = 0;
 
-        try {
-            for (;;) {
-                if (writeRequest == null) {
-                    writeRequest = writeRequestQueue.poll(session);
+        // Deal with the special case of a Message marker (no bytes in the request)
+        // We just have to return after having calle dthe messageSent event
+        IoBuffer buf = ( IoBuffer ) writeRequest.getMessage();
 
-                    if (writeRequest == null) {
-                        setInterestedInWrite(session, false);
+        if ( buf.remaining() == 0 )
+        {
+            // Clear and fire event
+            session.setCurrentWriteRequest( null );
+            buf.reset();
+            session.getFilterChain().fireMessageSent( writeRequest );
+            return;
+        }
+
+        // Now, write the data
+        try
+        {
+            for ( ;; )
+            {
+                if ( writeRequest == null )
+                {
+                    writeRequest = writeRequestQueue.poll( session );
+
+                    if ( writeRequest == null )
+                    {
+                        setInterestedInWrite( session, false );
                         break;
                     }
 
-                    session.setCurrentWriteRequest(writeRequest);
+                    session.setCurrentWriteRequest( writeRequest );
                 }
 
-                IoBuffer buf = (IoBuffer) writeRequest.getMessage();
+                buf = ( IoBuffer ) writeRequest.getMessage();
 
-                if (buf.remaining() == 0) {
+                if ( buf.remaining() == 0 )
+                {
                     // Clear and fire event
-                    session.setCurrentWriteRequest(null);
+                    session.setCurrentWriteRequest( null );
                     buf.reset();
-                    session.getFilterChain().fireMessageSent(writeRequest);
+                    session.getFilterChain().fireMessageSent( writeRequest );
                     continue;
                 }
 
                 SocketAddress destination = writeRequest.getDestination();
 
-                if (destination == null) {
+                if ( destination == null )
+                {
                     destination = session.getRemoteAddress();
                 }
 
-                int localWrittenBytes = send(session, buf, destination);
+                int localWrittenBytes = send( session, buf, destination );
 
-                if ((localWrittenBytes == 0) || (writtenBytes >= maxWrittenBytes)) {
+                if ( ( localWrittenBytes == 0 ) || ( writtenBytes >= maxWrittenBytes ) )
+                {
                     // Kernel buffer is full or wrote too much
-                    setInterestedInWrite(session, true);
+                    setInterestedInWrite( session, true );
 
-                    session.getWriteRequestQueue().offer(session, writeRequest);
-                    scheduleFlush(session);
-                } else {
-                    setInterestedInWrite(session, false);
+                    session.getWriteRequestQueue().offer( session, writeRequest );
+                    scheduleFlush( session );
+                }
+                else
+                {
+                    setInterestedInWrite( session, false );
 
                     // Clear and fire event
-                    session.setCurrentWriteRequest(null);
+                    session.setCurrentWriteRequest( null );
                     writtenBytes += localWrittenBytes;
                     buf.reset();
-                    session.getFilterChain().fireMessageSent(writeRequest);
+                    session.getFilterChain().fireMessageSent( writeRequest );
 
                     break;
                 }
             }
-        } catch (Exception e) {
-            session.getFilterChain().fireExceptionCaught(e);
-        } finally {
-            session.increaseWrittenBytes(writtenBytes, currentTime);
+        }
+        catch ( Exception e )
+        {
+            session.getFilterChain().fireExceptionCaught( e );
+        }
+        finally
+        {
+            session.increaseWrittenBytes( writtenBytes, currentTime );
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void remove(S session) {
-        getSessionRecycler().remove(session);
-        getListeners().fireSessionDestroyed(session);
-    }
 
     /**
      * {@inheritDoc}
      */
-    public void updateTrafficControl(S session) {
+    public void remove( S session )
+    {
+        getSessionRecycler().remove( session );
+        getListeners().fireSessionDestroyed( session );
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateTrafficControl( S session )
+    {
         throw new UnsupportedOperationException();
     }
+
 
     /**
      * Starts the inner Acceptor thread.
      */
-    private void startupAcceptor() throws InterruptedException {
-        if (!selectable) {
+    private void startupAcceptor() throws InterruptedException
+    {
+        if ( !selectable )
+        {
             registerQueue.clear();
             cancelQueue.clear();
             flushingSessions.clear();
@@ -419,22 +533,30 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
 
         lock.acquire();
 
-        if (acceptor == null) {
+        if ( acceptor == null )
+        {
             acceptor = new Acceptor();
-            executeWorker(acceptor);
-        } else {
+            executeWorker( acceptor );
+        }
+        else
+        {
             lock.release();
         }
     }
 
-    private boolean scheduleFlush(S session) {
+
+    private boolean scheduleFlush( S session )
+    {
         // Set the schedule for flush flag if the session
         // has not already be added to the flushingSessions
         // queue
-        if (session.setScheduledForFlush(true)) {
-            flushingSessions.add(session);
+        if ( session.setScheduledForFlush( true ) )
+        {
+            flushingSessions.add( session );
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -444,112 +566,151 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
      * clients. It's an infinite loop, which can be stopped when all
      * the registered handles have been removed (unbound).
      */
-    private class Acceptor implements Runnable {
-        public void run() {
+    private class Acceptor implements Runnable
+    {
+        public void run()
+        {
             int nHandles = 0;
             lastIdleCheckTime = System.currentTimeMillis();
 
             // Release the lock
             lock.release();
 
-            while (selectable) {
-                try {
-                    int selected = select(SELECT_TIMEOUT);
+            while ( selectable )
+            {
+                try
+                {
+                    int selected = select( SELECT_TIMEOUT );
 
                     nHandles += registerHandles();
 
-                    if (nHandles == 0) {
-                        try {
+                    if ( nHandles == 0 )
+                    {
+                        try
+                        {
                             lock.acquire();
 
-                            if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
+                            if ( registerQueue.isEmpty() && cancelQueue.isEmpty() )
+                            {
                                 acceptor = null;
                                 break;
                             }
-                        } finally {
+                        }
+                        finally
+                        {
                             lock.release();
                         }
                     }
 
-                    if (selected > 0) {
-                        processReadySessions(selectedHandles());
+                    if ( selected > 0 )
+                    {
+                        processReadySessions( selectedHandles() );
                     }
 
                     long currentTime = System.currentTimeMillis();
-                    flushSessions(currentTime);
+                    flushSessions( currentTime );
                     nHandles -= unregisterHandles();
 
-                    notifyIdleSessions(currentTime);
-                } catch (ClosedSelectorException cse) {
+                    notifyIdleSessions( currentTime );
+                }
+                catch ( ClosedSelectorException cse )
+                {
                     // If the selector has been closed, we can exit the loop
                     break;
-                } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                }
+                catch ( Exception e )
+                {
+                    ExceptionMonitor.getInstance().exceptionCaught( e );
 
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
+                    try
+                    {
+                        Thread.sleep( 1000 );
+                    }
+                    catch ( InterruptedException e1 )
+                    {
                     }
                 }
             }
 
-            if (selectable && isDisposing()) {
+            if ( selectable && isDisposing() )
+            {
                 selectable = false;
-                try {
+                try
+                {
                     destroy();
-                } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                } finally {
-                    disposalFuture.setValue(true);
+                }
+                catch ( Exception e )
+                {
+                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                }
+                finally
+                {
+                    disposalFuture.setValue( true );
                 }
             }
         }
     }
+
 
     @SuppressWarnings("unchecked")
-    private void processReadySessions(Set<SelectionKey> handles) {
+    private void processReadySessions( Set<SelectionKey> handles )
+    {
         Iterator<SelectionKey> iterator = handles.iterator();
 
-        while (iterator.hasNext()) {
+        while ( iterator.hasNext() )
+        {
             SelectionKey key = iterator.next();
-            H handle = (H) key.channel();
+            H handle = ( H ) key.channel();
             iterator.remove();
 
-            try {
-                if ((key != null) && key.isValid() && key.isReadable()) {
-                    readHandle(handle);
+            try
+            {
+                if ( ( key != null ) && key.isValid() && key.isReadable() )
+                {
+                    readHandle( handle );
                 }
 
-                if ((key != null) && key.isValid() && key.isWritable()) {
-                    for (IoSession session : getManagedSessions().values()) {
-                        scheduleFlush((S) session);
+                if ( ( key != null ) && key.isValid() && key.isWritable() )
+                {
+                    for ( IoSession session : getManagedSessions().values() )
+                    {
+                        scheduleFlush( ( S ) session );
                     }
                 }
-            } catch (Throwable t) {
-                ExceptionMonitor.getInstance().exceptionCaught(t);
+            }
+            catch ( Throwable t )
+            {
+                ExceptionMonitor.getInstance().exceptionCaught( t );
             }
         }
     }
 
-    private void readHandle(H handle) throws Exception {
-        IoBuffer readBuf = IoBuffer.allocate(getSessionConfig().getReadBufferSize());
 
-        SocketAddress remoteAddress = receive(handle, readBuf);
+    private void readHandle( H handle ) throws Exception
+    {
+        IoBuffer readBuf = IoBuffer.allocate( getSessionConfig().getReadBufferSize() );
 
-        if (remoteAddress != null) {
-            IoSession session = newSessionWithoutLock(remoteAddress, localAddress(handle));
+        SocketAddress remoteAddress = receive( handle, readBuf );
+
+        if ( remoteAddress != null )
+        {
+            IoSession session = newSessionWithoutLock( remoteAddress, localAddress( handle ) );
 
             readBuf.flip();
 
-            session.getFilterChain().fireMessageReceived(readBuf);
+            session.getFilterChain().fireMessageReceived( readBuf );
         }
     }
 
-    private void flushSessions(long currentTime) {
-        for (;;) {
+
+    private void flushSessions( long currentTime )
+    {
+        for ( ;; )
+        {
             S session = flushingSessions.poll();
 
-            if (session == null) {
+            if ( session == null )
+            {
                 break;
             }
 
@@ -557,112 +718,144 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
             // as we are flushing it now
             session.unscheduledForFlush();
 
-            try {
-                boolean flushedAll = flush(session, currentTime);
-                if (flushedAll && !session.getWriteRequestQueue().isEmpty(session) && !session.isScheduledForFlush()) {
-                    scheduleFlush(session);
+            try
+            {
+                boolean flushedAll = flush( session, currentTime );
+                if ( flushedAll && !session.getWriteRequestQueue().isEmpty( session ) && !session.isScheduledForFlush() )
+                {
+                    scheduleFlush( session );
                 }
-            } catch (Exception e) {
-                session.getFilterChain().fireExceptionCaught(e);
+            }
+            catch ( Exception e )
+            {
+                session.getFilterChain().fireExceptionCaught( e );
             }
         }
     }
 
-    private boolean flush(S session, long currentTime) throws Exception {
+
+    private boolean flush( S session, long currentTime ) throws Exception
+    {
         final WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
         final int maxWrittenBytes = session.getConfig().getMaxReadBufferSize()
-                + (session.getConfig().getMaxReadBufferSize() >>> 1);
+            + ( session.getConfig().getMaxReadBufferSize() >>> 1 );
 
         int writtenBytes = 0;
 
-        try {
-            for (;;) {
+        try
+        {
+            for ( ;; )
+            {
                 WriteRequest req = session.getCurrentWriteRequest();
 
-                if (req == null) {
-                    req = writeRequestQueue.poll(session);
+                if ( req == null )
+                {
+                    req = writeRequestQueue.poll( session );
 
-                    if (req == null) {
-                        setInterestedInWrite(session, false);
+                    if ( req == null )
+                    {
+                        setInterestedInWrite( session, false );
                         break;
                     }
 
-                    session.setCurrentWriteRequest(req);
+                    session.setCurrentWriteRequest( req );
                 }
 
-                IoBuffer buf = (IoBuffer) req.getMessage();
+                IoBuffer buf = ( IoBuffer ) req.getMessage();
 
-                if (buf.remaining() == 0) {
+                if ( buf.remaining() == 0 )
+                {
                     // Clear and fire event
-                    session.setCurrentWriteRequest(null);
+                    session.setCurrentWriteRequest( null );
                     buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
+                    session.getFilterChain().fireMessageSent( req );
                     continue;
                 }
 
                 SocketAddress destination = req.getDestination();
 
-                if (destination == null) {
+                if ( destination == null )
+                {
                     destination = session.getRemoteAddress();
                 }
 
-                int localWrittenBytes = send(session, buf, destination);
+                int localWrittenBytes = send( session, buf, destination );
 
-                if ((localWrittenBytes == 0) || (writtenBytes >= maxWrittenBytes)) {
+                if ( ( localWrittenBytes == 0 ) || ( writtenBytes >= maxWrittenBytes ) )
+                {
                     // Kernel buffer is full or wrote too much
-                    setInterestedInWrite(session, true);
+                    setInterestedInWrite( session, true );
 
                     return false;
-                } else {
-                    setInterestedInWrite(session, false);
+                }
+                else
+                {
+                    setInterestedInWrite( session, false );
 
                     // Clear and fire event
-                    session.setCurrentWriteRequest(null);
+                    session.setCurrentWriteRequest( null );
                     writtenBytes += localWrittenBytes;
                     buf.reset();
-                    session.getFilterChain().fireMessageSent(req);
+                    session.getFilterChain().fireMessageSent( req );
                 }
             }
-        } finally {
-            session.increaseWrittenBytes(writtenBytes, currentTime);
+        }
+        finally
+        {
+            session.increaseWrittenBytes( writtenBytes, currentTime );
         }
 
         return true;
     }
 
-    private int registerHandles() {
-        for (;;) {
+
+    private int registerHandles()
+    {
+        for ( ;; )
+        {
             AcceptorOperationFuture req = registerQueue.poll();
 
-            if (req == null) {
+            if ( req == null )
+            {
                 break;
             }
 
             Map<SocketAddress, H> newHandles = new HashMap<SocketAddress, H>();
             List<SocketAddress> localAddresses = req.getLocalAddresses();
 
-            try {
-                for (SocketAddress socketAddress : localAddresses) {
-                    H handle = open(socketAddress);
-                    newHandles.put(localAddress(handle), handle);
+            try
+            {
+                for ( SocketAddress socketAddress : localAddresses )
+                {
+                    H handle = open( socketAddress );
+                    newHandles.put( localAddress( handle ), handle );
                 }
 
-                boundHandles.putAll(newHandles);
+                boundHandles.putAll( newHandles );
 
                 getListeners().fireServiceActivated();
                 req.setDone();
 
                 return newHandles.size();
-            } catch (Exception e) {
-                req.setException(e);
-            } finally {
+            }
+            catch ( Exception e )
+            {
+                req.setException( e );
+            }
+            finally
+            {
                 // Roll back if failed to bind all addresses.
-                if (req.getException() != null) {
-                    for (H handle : newHandles.values()) {
-                        try {
-                            close(handle);
-                        } catch (Exception e) {
-                            ExceptionMonitor.getInstance().exceptionCaught(e);
+                if ( req.getException() != null )
+                {
+                    for ( H handle : newHandles.values() )
+                    {
+                        try
+                        {
+                            close( handle );
+                        }
+                        catch ( Exception e )
+                        {
+                            ExceptionMonitor.getInstance().exceptionCaught( e );
                         }
                     }
 
@@ -674,29 +867,40 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         return 0;
     }
 
-    private int unregisterHandles() {
+
+    private int unregisterHandles()
+    {
         int nHandles = 0;
 
-        for (;;) {
+        for ( ;; )
+        {
             AcceptorOperationFuture request = cancelQueue.poll();
-            if (request == null) {
+            if ( request == null )
+            {
                 break;
             }
 
             // close the channels
-            for (SocketAddress socketAddress : request.getLocalAddresses()) {
-                H handle = boundHandles.remove(socketAddress);
+            for ( SocketAddress socketAddress : request.getLocalAddresses() )
+            {
+                H handle = boundHandles.remove( socketAddress );
 
-                if (handle == null) {
+                if ( handle == null )
+                {
                     continue;
                 }
 
-                try {
-                    close(handle);
+                try
+                {
+                    close( handle );
                     wakeup(); // wake up again to trigger thread death
-                } catch (Throwable e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
-                } finally {
+                }
+                catch ( Throwable e )
+                {
+                    ExceptionMonitor.getInstance().exceptionCaught( e );
+                }
+                finally
+                {
                     nHandles++;
                 }
             }
@@ -707,11 +911,14 @@ public abstract class AbstractPollingConnectionlessIoAcceptor<S extends Abstract
         return nHandles;
     }
 
-    private void notifyIdleSessions(long currentTime) {
+
+    private void notifyIdleSessions( long currentTime )
+    {
         // process idle sessions
-        if (currentTime - lastIdleCheckTime >= 1000) {
+        if ( currentTime - lastIdleCheckTime >= 1000 )
+        {
             lastIdleCheckTime = currentTime;
-            AbstractIoSession.notifyIdleness(getListeners().getManagedSessions().values().iterator(), currentTime);
+            AbstractIoSession.notifyIdleness( getListeners().getManagedSessions().values().iterator(), currentTime );
         }
     }
 }
