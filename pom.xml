@@ -51,8 +51,8 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/mina/tags/2.0.5</connection>
-    <url>http://svn.apache.org/viewvc/mina/mina/tags/2.0.5</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/mina/mina/tags/2.0.6</connection>
+    <url>http://svn.apache.org/viewvc/mina/mina/tags/2.0.6</url>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mina/mina/branches/2.0</developerConnection>
   </scm>
 
