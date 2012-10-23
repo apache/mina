@@ -19,8 +19,6 @@
  */
 package org.apache.mina.transport.socket;
 
-import java.net.InetSocketAddress;
-
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IoSessionRecycler;
 
@@ -30,12 +28,6 @@ import org.apache.mina.core.session.IoSessionRecycler;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface DatagramAcceptor extends IoAcceptor {
-    InetSocketAddress getLocalAddress();
-
-    InetSocketAddress getDefaultLocalAddress();
-
-    void setDefaultLocalAddress(InetSocketAddress localAddress);
-
     /**
      * Returns the {@link IoSessionRecycler} for this service.
      */

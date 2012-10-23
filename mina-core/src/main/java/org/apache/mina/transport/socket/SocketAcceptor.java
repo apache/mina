@@ -19,7 +19,6 @@
  */
 package org.apache.mina.transport.socket;
 
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 
 import org.apache.mina.core.service.IoAcceptor;
@@ -31,12 +30,6 @@ import org.apache.mina.core.service.IoAcceptor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SocketAcceptor extends IoAcceptor {
-    InetSocketAddress getLocalAddress();
-
-    InetSocketAddress getDefaultLocalAddress();
-
-    void setDefaultLocalAddress(InetSocketAddress localAddress);
-
     /**
      * @see ServerSocket#getReuseAddress()
      */

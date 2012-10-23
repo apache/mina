@@ -93,7 +93,7 @@ public class SslFilterTest {
         EchoHandler handler = new EchoHandler();
         acceptor.setHandler(handler);
         acceptor.bind(new InetSocketAddress(0));
-        port = acceptor.getLocalAddress().getPort();
+        port = ((InetSocketAddress)acceptor.getLocalAddress()).getPort();
         //System.out.println("MINA server started.");
 
         Socket socket = getClientSocket(useSSL);
