@@ -38,6 +38,7 @@ import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
+import org.apache.mina.transport.socket.SocketSessionConfig;
 
 /**
  * A dummy {@link IoSession} for unit-testing or non-network-use of
@@ -125,6 +126,13 @@ public class DummySession extends AbstractIoSession {
 
                     @Override
                     protected void dispose0() throws Exception {
+                    }
+                    
+                    /**
+                     * {@inheritDoc}
+                     */
+                    public IoSessionConfig getSessionConfig() {
+                        return sessionConfig;
                     }
                 });
 

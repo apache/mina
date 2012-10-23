@@ -385,9 +385,8 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
     /**
      * {@inheritDoc}
      */
-    @Override
     public SocketSessionConfig getSessionConfig() {
-        return (SocketSessionConfig) super.getSessionConfig();
+        return (SocketSessionConfig) sessionConfig;
     }
 
     /**

@@ -97,9 +97,8 @@ public final class NioDatagramConnector extends AbstractPollingIoConnector<NioSe
         return NioDatagramSession.METADATA;
     }
 
-    @Override
     public DatagramSessionConfig getSessionConfig() {
-        return (DatagramSessionConfig) super.getSessionConfig();
+        return (DatagramSessionConfig) sessionConfig;
     }
 
     @Override

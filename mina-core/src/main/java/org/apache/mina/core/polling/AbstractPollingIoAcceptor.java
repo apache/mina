@@ -667,8 +667,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     /**
      * {@inheritDoc}
      */
-    @Override
     public SocketSessionConfig getSessionConfig() {
-        return (SocketSessionConfig) super.getSessionConfig();
+        return (SocketSessionConfig)sessionConfig;
     }
 }

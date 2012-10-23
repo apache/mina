@@ -70,9 +70,11 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
         return VmPipeSession.METADATA;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public VmPipeSessionConfig getSessionConfig() {
-        return (VmPipeSessionConfig) super.getSessionConfig();
+        return (VmPipeSessionConfig) sessionConfig;
     }
 
     @Override

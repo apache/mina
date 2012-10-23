@@ -149,9 +149,8 @@ public final class NioSocketConnector extends AbstractPollingIoConnector<NioSess
     /**
      * {@inheritDoc}
      */
-    @Override
     public SocketSessionConfig getSessionConfig() {
-        return (SocketSessionConfig) super.getSessionConfig();
+        return (SocketSessionConfig) sessionConfig;
     }
 
     /**

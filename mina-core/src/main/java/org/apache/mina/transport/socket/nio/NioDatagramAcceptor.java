@@ -79,9 +79,11 @@ public final class NioDatagramAcceptor extends AbstractPollingConnectionlessIoAc
         return NioDatagramSession.METADATA;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public DatagramSessionConfig getSessionConfig() {
-        return (DatagramSessionConfig) super.getSessionConfig();
+        return (DatagramSessionConfig) sessionConfig;
     }
 
     @Override

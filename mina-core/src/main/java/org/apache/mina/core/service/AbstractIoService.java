@@ -97,7 +97,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * The default {@link IoSessionConfig} which will be used to configure new sessions.
      */
-    private final IoSessionConfig sessionConfig;
+    protected final IoSessionConfig sessionConfig;
 
     private final IoServiceListener serviceActivationListener = new IoServiceListener() {
         public void serviceActivated(IoService service) {
@@ -354,13 +354,6 @@ public abstract class AbstractIoService implements IoService {
         }
 
         this.handler = handler;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public IoSessionConfig getSessionConfig() {
-        return sessionConfig;
     }
 
     /**

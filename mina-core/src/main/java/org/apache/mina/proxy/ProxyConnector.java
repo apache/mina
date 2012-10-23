@@ -110,7 +110,6 @@ public class ProxyConnector extends AbstractIoConnector {
     /**
      * {@inheritDoc}
      */
-    @Override
     public IoSessionConfig getSessionConfig() {
         return connector.getSessionConfig();
     }

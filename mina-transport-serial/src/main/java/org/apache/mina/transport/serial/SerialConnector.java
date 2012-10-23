@@ -36,6 +36,7 @@ import org.apache.mina.core.service.AbstractIoConnector;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.session.IdleStatusChecker;
+import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,5 +170,9 @@ public final class SerialConnector extends AbstractIoConnector {
 
     IdleStatusChecker getIdleStatusChecker0() {
         return idleChecker;
+    }
+
+    public IoSessionConfig getSessionConfig() {
+        return sessionConfig;
     }
 }
