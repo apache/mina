@@ -47,6 +47,7 @@ import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionRecycler;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
+import org.apache.mina.transport.socket.DatagramAcceptor;
 import org.apache.mina.util.ExceptionMonitor;
 
 
@@ -59,7 +60,7 @@ import org.apache.mina.util.ExceptionMonitor;
   * @param <S> the type of the {@link IoSession} this processor can handle
 */
 public abstract class AbstractPollingConnectionlessIoAcceptor<S extends AbstractIoSession, H> extends
-    AbstractIoAcceptor implements IoProcessor<S>
+    AbstractIoAcceptor implements DatagramAcceptor, IoProcessor<S>
 {
 
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();

@@ -45,8 +45,7 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
-public final class NioDatagramAcceptor extends AbstractPollingConnectionlessIoAcceptor<NioSession, DatagramChannel>
-        implements DatagramAcceptor {
+public final class NioDatagramAcceptor extends AbstractPollingConnectionlessIoAcceptor<NioSession, DatagramChannel> {
 
     private volatile Selector selector;
 

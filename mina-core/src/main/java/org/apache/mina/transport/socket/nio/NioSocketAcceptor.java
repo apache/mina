@@ -39,8 +39,6 @@ import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
-import org.apache.mina.transport.socket.SocketAcceptor;
-import org.apache.mina.transport.socket.SocketSessionConfig;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).  This class
@@ -48,8 +46,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel> implements
-        SocketAcceptor {
+public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel> {
 
     private volatile Selector selector;
 
@@ -119,14 +116,6 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
      */
     public TransportMetadata getTransportMetadata() {
         return NioSocketSession.METADATA;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SocketSessionConfig getSessionConfig() {
-        return (SocketSessionConfig) super.getSessionConfig();
     }
 
     /**

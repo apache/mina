@@ -35,8 +35,6 @@ import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
-import org.apache.mina.transport.socket.SocketAcceptor;
-import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
@@ -48,7 +46,7 @@ import org.apache.tomcat.jni.Status;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Long> implements SocketAcceptor {
+public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSession, Long> {
     /** 
      * This constant is deduced from the APR code. It is used when the timeout
      * has expired while doing a poll() operation.
@@ -356,14 +354,6 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
      */
     public TransportMetadata getTransportMetadata() {
         return AprSocketSession.METADATA;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SocketSessionConfig getSessionConfig() {
-        return (SocketSessionConfig) super.getSessionConfig();
     }
 
     /**
