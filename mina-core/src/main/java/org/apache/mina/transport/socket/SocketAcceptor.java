@@ -19,7 +19,9 @@
  */
 package org.apache.mina.transport.socket;
 
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.Set;
 
 import org.apache.mina.core.service.IoAcceptor;
 
@@ -30,6 +32,28 @@ import org.apache.mina.core.service.IoAcceptor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SocketAcceptor extends IoAcceptor {
+    /**
+     * Returns the local InetSocketAddress which is bound currently.  If more than one
+     * address are bound, only one of them will be returned, but it's not
+     * necessarily the firstly bound address.
+     * This method overrides the {@link IoAcceptor#getLocalAddress()} method.
+     */
+    InetSocketAddress getLocalAddress();
+
+    /**
+     * Returns a {@link Set} of the local InetSocketAddress which are bound currently.
+     * This method overrides the {@link IoAcceptor#getDefaultLocalAddress()} method.
+     */
+    InetSocketAddress getDefaultLocalAddress();
+
+    /**
+     * Sets the default local InetSocketAddress to bind when no argument is specified in
+     * {@link #bind()} method. Please note that the default will not be used
+     * if any local InetSocketAddress is specified.
+     * This method overrides the {@link IoAcceptor#setDefaultLocalAddress()} method.
+     */
+    void setDefaultLocalAddress(InetSocketAddress localAddress);
+
     /**
      * @see ServerSocket#getReuseAddress()
      */
