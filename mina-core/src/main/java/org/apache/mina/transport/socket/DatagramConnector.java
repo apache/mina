@@ -19,8 +19,6 @@
  */
 package org.apache.mina.transport.socket;
 
-import java.net.InetSocketAddress;
-
 import org.apache.mina.core.service.IoConnector;
 
 /**
@@ -29,7 +27,9 @@ import org.apache.mina.core.service.IoConnector;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface DatagramConnector extends IoConnector {
-    InetSocketAddress getDefaultRemoteAddress();
-
-    void setDefaultRemoteAddress(InetSocketAddress remoteAddress);
+    /**
+     * Returns the default configuration of the new FatagramSessions created by 
+     * this connect service.
+     */
+    DatagramSessionConfig getSessionConfig();
 }

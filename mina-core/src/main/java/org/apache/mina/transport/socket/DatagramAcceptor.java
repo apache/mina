@@ -20,6 +20,7 @@
 package org.apache.mina.transport.socket;
 
 import org.apache.mina.core.service.IoAcceptor;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionRecycler;
 
 /**
@@ -39,4 +40,10 @@ public interface DatagramAcceptor extends IoAcceptor {
      * @param sessionRecycler <tt>null</tt> to use the default recycler
      */
     void setSessionRecycler(IoSessionRecycler sessionRecycler);
+
+    /**
+     * Returns the default Datagram configuration of the new {@link IoSession}s
+     * created by this service.
+     */
+    DatagramSessionConfig getSessionConfig();
 }
