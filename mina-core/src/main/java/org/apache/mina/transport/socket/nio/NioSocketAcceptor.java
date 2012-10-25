@@ -39,6 +39,7 @@ import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
+import org.apache.mina.transport.socket.SocketAcceptor;
 
 /**
  * {@link IoAcceptor} for socket transport (TCP/IP).  This class
@@ -46,7 +47,8 @@ import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel> {
+public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel> 
+    implements SocketAcceptor {
 
     private volatile Selector selector;
 
