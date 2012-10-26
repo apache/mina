@@ -27,11 +27,14 @@ import java.nio.channels.SocketChannel;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 
@@ -258,6 +261,23 @@ class NioSocketSession extends NioSession {
             } catch (SocketException e) {
                 throw new RuntimeIoException(e);
             }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean isSecured() {
+        // If the session does not have a SslFilter, we can return false
+        IoFilterChain chain = getFilterChain();
+
+        IoFilter sslFilter = chain.get(SslFilter.class);
+
+        if (sslFilter != null) {
+        // Get the SslHandler from the SslFilter
+            return ((SslFilter)sslFilter).isSslStarted(this);
+        } else {
+            return false;
         }
     }
 }

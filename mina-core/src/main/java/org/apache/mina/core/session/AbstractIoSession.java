@@ -232,6 +232,14 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    public boolean isSecured() {
+        // Always false...
+        return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public final CloseFuture getCloseFuture() {
         return closeFuture;
     }

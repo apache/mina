@@ -319,20 +319,27 @@ public interface IoSession {
     boolean containsAttribute(Object key);
 
     /**
-     * Returns the set of keys of all user-defined attributes.
+     * @return the set of keys of all user-defined attributes.
      */
     Set<Object> getAttributeKeys();
 
     /**
-     * Returns <code>true</code> if this session is connected with remote peer.
+     * @return <code>true</code> if this session is connected with remote peer.
      */
     boolean isConnected();
 
     /**
-     * Returns <code>true</tt> if and only if this session is being closed
+     * @return <code>true</tt> if and only if this session is being closed
      * (but not disconnected yet) or is closed.
      */
     boolean isClosing();
+    
+    /**
+     * @return <code>true</tt> if the session has started and initialized a SslEngine,
+     * <code>false</code> if the session is not yet secured (the handshake is not completed)
+     * or if SSL is not set for this session, or if SSL is not even an option.
+     */
+    boolean isSecured();
 
     /**
      * Returns the {@link CloseFuture} of this session.  This method returns
