@@ -61,15 +61,16 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * Create a TCP server with new selector pool of default size.
      */
     public NioTcpServer() {
-        this(new NioSelectorLoop(), new FixedSelectorLoopPool(Runtime.getRuntime().availableProcessors()+1));
+        this(new NioSelectorLoop(), new FixedSelectorLoopPool(Runtime.getRuntime().availableProcessors() + 1));
     }
-    
+
     /**
      * Create a TCP server with provided selector loops pool
+     * 
      * @param acceptSelectorLoop the selector loop for handling accept events (connection of new session)
      * @param readWriteSelectorLoop the pool of selector loop for handling read/write events of connected sessions
      */
-    public NioTcpServer(final SelectorLoop acceptSelectorLoop, SelectorLoopPool readWriteSelectorLoop) {
+    public NioTcpServer(final SelectorLoop acceptSelectorLoop, final SelectorLoopPool readWriteSelectorLoop) {
         super();
         this.acceptSelectorLoop = acceptSelectorLoop;
         this.readWriteSelectorPool = readWriteSelectorLoop;
@@ -77,13 +78,14 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
     /**
      * Get the inner Server socket for accepting new client connections
+     * 
      * @return
      */
     public ServerSocketChannel getServerSocketChannel() {
         return this.serverChannel;
     }
 
-    public void setServerSocketChannel(ServerSocketChannel serverChannel) {
+    public void setServerSocketChannel(final ServerSocketChannel serverChannel) {
         this.serverChannel = serverChannel;
     }
 
@@ -157,7 +159,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
     /**
      * @param acceptKey the acceptKey to set
      */
-    public void setAcceptKey(SelectionKey acceptKey) {
+    public void setAcceptKey(final SelectionKey acceptKey) {
         this.acceptKey = acceptKey;
     }
 
@@ -165,7 +167,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void ready(boolean accept, boolean read, ByteBuffer readBuffer, boolean write) {
+    public void ready(final boolean accept, final boolean read, final ByteBuffer readBuffer, final boolean write) {
         if (accept) {
             LOG.debug("acceptable new client");
 
@@ -174,7 +176,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
                 LOG.debug("new client accepted");
                 createSession(getServerSocketChannel().accept());
 
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOG.error("error while accepting new client", e);
             }
         }
@@ -198,49 +200,49 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
                 config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
 
         // apply the default service socket configuration
-        Boolean keepAlive = config.isKeepAlive();
+        final Boolean keepAlive = config.isKeepAlive();
 
         if (keepAlive != null) {
             session.getConfig().setKeepAlive(keepAlive);
         }
 
-        Boolean oobInline = config.isOobInline();
+        final Boolean oobInline = config.isOobInline();
 
         if (oobInline != null) {
             session.getConfig().setOobInline(oobInline);
         }
 
-        Boolean reuseAddress = config.isReuseAddress();
+        final Boolean reuseAddress = config.isReuseAddress();
 
         if (reuseAddress != null) {
             session.getConfig().setReuseAddress(reuseAddress);
         }
 
-        Boolean tcpNoDelay = config.isTcpNoDelay();
+        final Boolean tcpNoDelay = config.isTcpNoDelay();
 
         if (tcpNoDelay != null) {
             session.getConfig().setTcpNoDelay(tcpNoDelay);
         }
 
-        Integer receiveBufferSize = config.getReceiveBufferSize();
+        final Integer receiveBufferSize = config.getReceiveBufferSize();
 
         if (receiveBufferSize != null) {
             session.getConfig().setReceiveBufferSize(receiveBufferSize);
         }
 
-        Integer sendBufferSize = config.getSendBufferSize();
+        final Integer sendBufferSize = config.getSendBufferSize();
 
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
         }
 
-        Integer trafficClass = config.getTrafficClass();
+        final Integer trafficClass = config.getTrafficClass();
 
         if (trafficClass != null) {
             session.getConfig().setTrafficClass(trafficClass);
         }
 
-        Integer soLinger = config.getSoLinger();
+        final Integer soLinger = config.getSoLinger();
 
         if (soLinger != null) {
             session.getConfig().setSoLinger(soLinger);
@@ -250,9 +252,6 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         if (config.isSecured()) {
             session.initSecure(config.getSslContext());
         }
-
-        // event session created
-        session.processSessionCreated();
 
         // add the session to the queue for being added to the selector
         readWriteSelectorLoop.register(false, true, false, session, socketChannel);

@@ -45,42 +45,39 @@ import org.slf4j.LoggerFactory;
 public class NioUdpEchoServer {
     static final Logger LOG = LoggerFactory.getLogger(NioUdpEchoServer.class);
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         LOG.info("starting echo server");
 
-        NioUdpServer server = new NioUdpServer(new NioSelectorLoop());
+        final NioUdpServer server = new NioUdpServer(new NioSelectorLoop());
 
         // create the fitler chain for this service
         server.setFilters(new LoggingFilter("LoggingFilter1"), new IoFilter() {
 
             @Override
-            public void sessionOpened(IoSession session) {
+            public void sessionOpened(final IoSession session) {
                 LOG.info("session {} open", session);
             }
 
             @Override
-            public void sessionIdle(IoSession session, IdleStatus status) {
+            public void sessionIdle(final IoSession session, final IdleStatus status) {
                 LOG.info("session {} idle", session);
             }
 
             @Override
-            public void sessionCreated(IoSession session) {
-                LOG.info("session {} created", session);
-            }
-
-            @Override
-            public void sessionClosed(IoSession session) {
+            public void sessionClosed(final IoSession session) {
                 LOG.info("session {} open", session);
             }
 
             @Override
-            public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
+            public void messageWriting(final IoSession session, final Object message,
+                    final WriteFilterChainController controller) {
                 // we just push the message in the chain
                 controller.callWriteNextFilter(message);
             }
 
             @Override
-            public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
+            public void messageReceived(final IoSession session, final Object message,
+                    final ReadFilterChainController controller) {
 
                 if (message instanceof ByteBuffer) {
                     LOG.info("echoing");
@@ -92,43 +89,43 @@ public class NioUdpEchoServer {
         server.addListeners(new IoServiceListener() {
 
             @Override
-            public void sessionDestroyed(IoSession session) {
+            public void sessionDestroyed(final IoSession session) {
                 LOG.info("session destroyed {}", session);
 
             }
 
             @Override
-            public void sessionCreated(IoSession session) {
+            public void sessionCreated(final IoSession session) {
                 LOG.info("session created {}", session);
 
-                String welcomeStr = "welcome\n";
-                ByteBuffer bf = ByteBuffer.allocate(welcomeStr.length());
+                final String welcomeStr = "welcome\n";
+                final ByteBuffer bf = ByteBuffer.allocate(welcomeStr.length());
                 bf.put(welcomeStr.getBytes());
                 bf.flip();
                 session.write(bf);
             }
 
             @Override
-            public void serviceInactivated(IoService service) {
+            public void serviceInactivated(final IoService service) {
                 LOG.info("service deactivated {}", service);
             }
 
             @Override
-            public void serviceActivated(IoService service) {
+            public void serviceActivated(final IoService service) {
                 LOG.info("service activated {}", service);
             }
         });
 
         try {
-            SocketAddress address = new InetSocketAddress(9999);
+            final SocketAddress address = new InetSocketAddress(9999);
             server.bind(address);
             LOG.debug("Running the server for 25 sec");
             Thread.sleep(25000);
             LOG.debug("Unbinding the UDP port");
             server.unbind();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.error("I/O exception", e);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             LOG.error("Interrupted exception", e);
         }
     }

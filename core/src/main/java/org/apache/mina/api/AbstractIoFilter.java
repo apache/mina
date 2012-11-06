@@ -28,31 +28,42 @@ import org.apache.mina.filterchain.WriteFilterChainController;
  */
 public abstract class AbstractIoFilter implements IoFilter {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void sessionCreated(IoSession session) {
-
+    public void sessionOpened(final IoSession session) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void sessionOpened(IoSession session) {
+    public void sessionClosed(final IoSession session) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void sessionClosed(IoSession session) {
+    public void sessionIdle(final IoSession session, final IdleStatus status) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void sessionIdle(IoSession session, IdleStatus status) {
-    }
-
-    @Override
-    public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
+    public void messageReceived(final IoSession session, final Object message,
+            final ReadFilterChainController controller) {
         controller.callReadNextFilter(message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
+    public void messageWriting(final IoSession session, final Object message,
+            final WriteFilterChainController controller) {
         controller.callWriteNextFilter(message);
     }
-
 }

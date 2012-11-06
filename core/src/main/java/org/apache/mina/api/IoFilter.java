@@ -25,46 +25,35 @@ import org.apache.mina.filterchain.WriteFilterChainController;
 
 /**
  * Filter are interceptors/processors for incoming data received/sent.
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoFilter {
 
     /**
-     * Invoked from an I/O processor thread when a new connection has been created. Because this method is supposed to
-     * be called from the same thread that handles I/O of multiple sessions, please implement this method to perform
-     * tasks that consumes minimal amount of time such as socket parameter and user-defined session attribute
-     * initialization.
-     *
-     * @param session {@link IoSession} associated with the invocation
-     *
-     */
-    void sessionCreated(IoSession session);
-
-    /**
      * Invoked when a connection has been opened.
-     *
+     * 
      * @param session {@link IoSession} associated with the invocation
      */
     void sessionOpened(IoSession session);
 
     /**
      * Invoked when a connection is closed.
-     *
+     * 
      * @param session {@link IoSession} associated with the invocation
      */
     void sessionClosed(IoSession session);
 
     /**
      * Invoked with the related {@link IdleStatus} when a connection becomes idle.
-     *
+     * 
      * @param session {@link IoSession} associated with the invocation
      */
     void sessionIdle(IoSession session, IdleStatus status);
 
     /**
      * Invoked when a message is received.
-     *
+     * 
      * @param session {@link IoSession} associated with the invocation
      * @param message the incoming message to process
      */
@@ -72,7 +61,7 @@ public interface IoFilter {
 
     /**
      * Invoked when a message is under writing. The filter is supposed to apply the needed transformation.
-     *
+     * 
      * @param session {@link IoSession} associated with the invocation
      * @param message the message to process before writing
      */

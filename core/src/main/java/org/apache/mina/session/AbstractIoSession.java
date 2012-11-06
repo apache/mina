@@ -73,9 +73,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /** the {@link IdleChecker} in charge of detecting idle event for this session */
     protected final IdleChecker idleChecker;
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Basic statistics
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /** The number of bytes read since this session has been created */
     private volatile long readBytes;
@@ -89,9 +89,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /** Last time something was written for this session */
     private volatile long lastWriteTime;
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Session state
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /** The session's state : one of CREATED, CONNECTED, CLOSING, CLOSED, SECURING, CONNECTED_SECURED */
     protected volatile SessionState state;
@@ -111,9 +111,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /** is this session registered for being polled for write ready events */
     private final AtomicBoolean registeredForWrite = new AtomicBoolean();
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Write queue
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /** the queue of pending writes for the session, to be dequeued by the {@link SelectorProcessor} */
     private final Queue<WriteRequest> writeQueue = new DefaultWriteQueue();
@@ -127,9 +127,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /** A Write lock on the reentrant writeQueue lock */
     private final Lock writeQueueWriteLock = writeQueueLock.writeLock();
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Filter chain
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /** The list of {@link IoFilter} implementing this chain. */
     private final IoFilter[] chain;
@@ -150,7 +150,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @param service the service this session is associated with
      * @param selectorLoop the selector loop in charge of processing this session read/write events
      */
-    public AbstractIoSession(IoService service, IdleChecker idleChecker) {
+    public AbstractIoSession(final IoService service, final IdleChecker idleChecker) {
         // generated a unique id
         id = NEXT_ID.getAndIncrement();
         creationTime = System.currentTimeMillis();
@@ -163,9 +163,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         this.state = SessionState.CREATED;
     }
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Session State management
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /**
      * {@inheritDoc}
      */
@@ -254,7 +254,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void changeState(SessionState to) throws IllegalStateException {
+    public void changeState(final SessionState to) throws IllegalStateException {
         try {
             stateWriteLock.lock();
 
@@ -329,9 +329,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         }
     }
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // SSL/TLS session state management
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /**
      * {@inheritDoc}
      */
@@ -343,7 +343,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * {@inheritDoc}
      */
-    public void setSecured(boolean secured) {
+    public void setSecured(final boolean secured) {
         this.secured = secured;
     }
 
@@ -351,8 +351,8 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void initSecure(SSLContext sslContext) throws SSLException {
-        SslHelper sslHelper = new SslHelper(this, sslContext);
+    public void initSecure(final SSLContext sslContext) throws SSLException {
+        final SslHelper sslHelper = new SslHelper(this, sslContext);
         sslHelper.init();
 
         attributes.setAttribute(SSL_HELPER, sslHelper);
@@ -385,9 +385,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
     /**
      * To be called by the internal plumber when some bytes are written on the socket
+     * 
      * @param bytesCount number of extra bytes written
      */
-    public void incrementWrittenBytes(int bytesCount) {
+    public void incrementWrittenBytes(final int bytesCount) {
         writtenBytes += bytesCount;
     }
 
@@ -438,7 +439,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @see #setAttribute(AttributeKey, Object)
      */
     @Override
-    public final <T> T getAttribute(AttributeKey<T> key, T defaultValue) {
+    public final <T> T getAttribute(final AttributeKey<T> key, final T defaultValue) {
         return attributes.getAttribute(key, defaultValue);
     }
 
@@ -449,29 +450,25 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @see #setAttribute(AttributeKey, Object)
      */
     @Override
-    public final <T> T getAttribute(AttributeKey<T> key) {
+    public final <T> T getAttribute(final AttributeKey<T> key) {
         return attributes.getAttribute(key);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @exception IllegalArgumentException
-     * <ul>
-     *   <li>
-     *     if <code>key==null</code>
-     *   </li>
-     *   <li>
-     *     if <code>value</code> is not <code>null</code> and not
-     *     an instance of type that is specified in by the given
-     *     <code>key</code> (see {@link AttributeKey#getType()})
-     *   </li>
-     *  </ul>
+     * @exception IllegalArgumentException <ul>
+     *            <li>
+     *            if <code>key==null</code></li>
+     *            <li>
+     *            if <code>value</code> is not <code>null</code> and not an instance of type that is specified in by the
+     *            given <code>key</code> (see {@link AttributeKey#getType()})</li>
+     *            </ul>
      * 
      * @see #getAttribute(AttributeKey)
      */
     @Override
-    public final <T> T setAttribute(AttributeKey<? extends T> key, T value) {
+    public final <T> T setAttribute(final AttributeKey<? extends T> key, final T value) {
         return attributes.setAttribute(key, value);
     };
 
@@ -488,23 +485,22 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * {@inheritDoc}
      * 
-     * @exception IllegalArgumentException
-     *                if <code>key==null</code>
+     * @exception IllegalArgumentException if <code>key==null</code>
      */
     @Override
-    public <T> T removeAttribute(AttributeKey<T> key) {
+    public <T> T removeAttribute(final AttributeKey<T> key) {
         return attributes.removeAttribute(key);
     }
 
-    //----------------------------------------------------
+    // ----------------------------------------------------
     // Write management
-    //----------------------------------------------------
+    // ----------------------------------------------------
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void write(Object message) {
+    public void write(final Object message) {
         doWriteWithFuture(message, null);
     }
 
@@ -512,13 +508,13 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public IoFuture<Void> writeWithFuture(Object message) {
-        IoFuture<Void> future = new DefaultWriteFuture();
+    public IoFuture<Void> writeWithFuture(final Object message) {
+        final IoFuture<Void> future = new DefaultWriteFuture();
         doWriteWithFuture(message, future);
         return future;
     }
 
-    private void doWriteWithFuture(Object message, IoFuture<Void> future) {
+    private void doWriteWithFuture(final Object message, final IoFuture<Void> future) {
         LOG.debug("writing message {} to session {}", message, this);
 
         if ((state == SessionState.CLOSED) || (state == SessionState.CLOSING)) {
@@ -534,7 +530,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public WriteRequest enqueueWriteRequest(Object message) {
+    public WriteRequest enqueueWriteRequest(final Object message) {
         WriteRequest request = null;
 
         try {
@@ -543,7 +539,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
             if (isConnectedSecured()) {
                 // SSL/TLS : we have to encrypt the message
-                SslHelper sslHelper = getAttribute(SSL_HELPER, null);
+                final SslHelper sslHelper = getAttribute(SSL_HELPER, null);
 
                 if (sslHelper == null) {
                     throw new IllegalStateException();
@@ -592,9 +588,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         writeQueueWriteLock.unlock();
     }
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Close session management
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /** we pre-allocate a close future for lock-less {@link #close(boolean)} */
     private final IoFuture<Void> closeFuture = new AbstractIoFuture<Void>() {
@@ -603,7 +599,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
          * {@inheritDoc}
          */
         @Override
-        protected boolean cancelOwner(boolean mayInterruptIfRunning) {
+        protected boolean cancelOwner(final boolean mayInterruptIfRunning) {
             // we don't cancel close
             return false;
         }
@@ -613,7 +609,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public IoFuture<Void> close(boolean immediately) {
+    public IoFuture<Void> close(final boolean immediately) {
         switch (state) {
         case CREATED:
             LOG.error("Session {} not opened", this);
@@ -646,20 +642,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      */
     protected abstract void channelClose();
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Event processing using the filter chain
-    //------------------------------------------------------------------------
-
-    /**
-     * process session create event using the filter chain. To be called by the session {@link SelectorProcessor} .
-     */
-    public void processSessionCreated() {
-        LOG.debug("processing session created event for session {}", this);
-
-        for (IoFilter filter : chain) {
-            filter.sessionCreated(this);
-        }
-    }
+    // ------------------------------------------------------------------------
 
     /**
      * process session opened event using the filter chain. To be called by the session {@link SelectorProcessor} .
@@ -667,7 +652,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void processSessionOpened() {
         LOG.debug("processing session open event");
 
-        for (IoFilter filter : chain) {
+        for (final IoFilter filter : chain) {
             filter.sessionOpened(this);
         }
     }
@@ -678,7 +663,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void processSessionClosed() {
         LOG.debug("processing session closed event");
 
-        for (IoFilter filter : chain) {
+        for (final IoFilter filter : chain) {
             filter.sessionClosed(this);
         }
     }
@@ -686,22 +671,24 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * process session idle event using the filter chain. To be called by the session {@link SelectorProcessor} .
      */
-    public void processSessionIdle(IdleStatus status) {
+    public void processSessionIdle(final IdleStatus status) {
         LOG.debug("processing session idle {} event for session {}", status, this);
 
-        for (IoFilter filter : chain) {
+        for (final IoFilter filter : chain) {
             filter.sessionIdle(this, status);
         }
     }
 
     /**
-     * process session message received event using the filter chain. To be called by the session {@link SelectorProcessor} .
-     * @param message the received message 
+     * process session message received event using the filter chain. To be called by the session
+     * {@link SelectorProcessor} .
+     * 
+     * @param message the received message
      */
-    public void processMessageReceived(ByteBuffer message) {
+    public void processMessageReceived(final ByteBuffer message) {
         LOG.debug("processing message '{}' received event for session {}", message, this);
 
-        // save basic statistics 
+        // save basic statistics
         readBytes += message.remaining();
         lastReadTime = System.currentTimeMillis();
 
@@ -715,10 +702,12 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session message writing event using the filter chain. To be called by the session {@link SelectorProcessor} .
-     * @param message the wrote message, should be transformed into ByteBuffer at the end of the filter chain 
+     * process session message writing event using the filter chain. To be called by the session
+     * {@link SelectorProcessor} .
+     * 
+     * @param message the wrote message, should be transformed into ByteBuffer at the end of the filter chain
      */
-    public void processMessageWriting(Object message, IoFuture<Void> future) {
+    public void processMessageWriting(final Object message, final IoFuture<Void> future) {
         LOG.debug("processing message '{}' writing event for session {}", message, this);
 
         lastWriteRequest = null;
@@ -728,14 +717,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         } else {
             writeChainPosition = chain.length - 1;
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
-            int position = writeChainPosition;
-            IoFilter nextFilter = chain[position];
+            final int position = writeChainPosition;
+            final IoFilter nextFilter = chain[position];
             nextFilter.messageWriting(this, message, this);
         }
 
         // put the future in the last write request
         if (future != null) {
-            WriteRequest request = lastWriteRequest;
+            final WriteRequest request = lastWriteRequest;
 
             if (request != null) {
                 ((DefaultWriteRequest) request).setFuture(future);
@@ -744,11 +733,13 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session message received event using the filter chain. To be called by the session {@link SelectorProcessor} .
-     * @param message the received message 
+     * process session message received event using the filter chain. To be called by the session
+     * {@link SelectorProcessor} .
+     * 
+     * @param message the received message
      */
     @Override
-    public void callWriteNextFilter(Object message) {
+    public void callWriteNextFilter(final Object message) {
         LOG.debug("calling next filter for writing for message '{}' position : {}", message, writeChainPosition);
 
         writeChainPosition--;
@@ -767,7 +758,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * At the end of write chain processing, enqueue final encoded {@link ByteBuffer} message in the session
      */
-    private void enqueueFinalWriteMessage(Object message) {
+    private void enqueueFinalWriteMessage(final Object message) {
         LOG.debug("end of write chan we enqueue the message in the session : {}", message);
         lastWriteRequest = enqueueWriteRequest(message);
     }
@@ -776,7 +767,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void callReadNextFilter(Object message) {
+    public void callReadNextFilter(final Object message) {
         readChainPosition++;
 
         if (readChainPosition >= chain.length) {

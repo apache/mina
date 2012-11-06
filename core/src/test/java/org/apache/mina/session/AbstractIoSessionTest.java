@@ -18,9 +18,16 @@
  */
 package org.apache.mina.session;
 
-import static junit.framework.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -45,12 +52,12 @@ import org.junit.Test;
 public class AbstractIoSessionTest {
 
     private class DummySession extends AbstractIoSession {
-        private DummySession(IoService service) {
+        private DummySession(final IoService service) {
             super(service, null);
         }
 
         @Override
-        public IoFuture<Void> close(boolean immediately) {
+        public IoFuture<Void> close(final boolean immediately) {
             return null;
         }
 
@@ -155,18 +162,18 @@ public class AbstractIoSessionTest {
 
     @Test
     public void testCreationTime() {
-        long before = System.currentTimeMillis();
-        long creation = (new DummySession(service)).getCreationTime();
-        long after = System.currentTimeMillis();
+        final long before = System.currentTimeMillis();
+        final long creation = (new DummySession(service)).getCreationTime();
+        final long after = System.currentTimeMillis();
         Assert.assertTrue(creation <= after);
         Assert.assertTrue(creation >= before);
     }
 
     @Test
     public void testAttachment() {
-        AbstractIoSession aio = new DummySession(service);
-        String value = "value";
-        AttributeKey<String> key = new AttributeKey<String>(String.class, "test");
+        final AbstractIoSession aio = new DummySession(service);
+        final String value = "value";
+        final AttributeKey<String> key = new AttributeKey<String>(String.class, "test");
         assertNull(aio.getAttribute(key, null));
         assertEquals(null, aio.setAttribute(key, value));
 
@@ -183,23 +190,23 @@ public class AbstractIoSessionTest {
 
     @Test
     public void chain_reads() {
-        DummySession session = new DummySession(service);
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        final DummySession session = new DummySession(service);
+        final ByteBuffer buffer = ByteBuffer.allocate(1024);
 
-        long before = System.currentTimeMillis();
+        final long before = System.currentTimeMillis();
         session.processMessageReceived(buffer);
         verify(filter1).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
         verify(filter2).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
         verify(filter3).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
         assertEquals(1024L, session.getReadBytes());
-        long lastRead = session.getLastReadTime();
+        final long lastRead = session.getLastReadTime();
         assertTrue(lastRead - before < 100);
     }
 
     @Test
     public void chain_writes() {
-        DummySession session = new DummySession(service);
-        ByteBuffer buffer = mock(ByteBuffer.class);
+        final DummySession session = new DummySession(service);
+        final ByteBuffer buffer = mock(ByteBuffer.class);
         session.processMessageWriting(buffer, null);
         verify(filter1).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
         verify(filter2).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
@@ -207,17 +214,8 @@ public class AbstractIoSessionTest {
     }
 
     @Test
-    public void chain_created() {
-        DummySession session = new DummySession(service);
-        session.processSessionCreated();
-        verify(filter1).sessionCreated(eq(session));
-        verify(filter2).sessionCreated(eq(session));
-        verify(filter3).sessionCreated(eq(session));
-    }
-
-    @Test
     public void chain_open() {
-        DummySession session = new DummySession(service);
+        final DummySession session = new DummySession(service);
         session.processSessionOpened();
         verify(filter1).sessionOpened(eq(session));
         verify(filter2).sessionOpened(eq(session));
@@ -226,7 +224,7 @@ public class AbstractIoSessionTest {
 
     @Test
     public void chain_close() {
-        DummySession session = new DummySession(service);
+        final DummySession session = new DummySession(service);
         session.processSessionClosed();
         verify(filter1).sessionClosed(eq(session));
         verify(filter2).sessionClosed(eq(session));
@@ -235,7 +233,7 @@ public class AbstractIoSessionTest {
 
     @Test
     public void increment_written_bytes() {
-        DummySession session = new DummySession(service);
+        final DummySession session = new DummySession(service);
         assertEquals(0, session.getWrittenBytes());
         session.incrementWrittenBytes(1024);
         assertEquals(1024, session.getWrittenBytes());

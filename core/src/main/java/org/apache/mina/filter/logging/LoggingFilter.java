@@ -32,8 +32,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A simple filter logging incoming events.
+ * 
  * @author jvermillar
- *
+ * 
  */
 public class LoggingFilter implements IoFilter {
 
@@ -48,9 +49,6 @@ public class LoggingFilter implements IoFilter {
 
     /** The log level for the messageReceived event. Default to INFO. */
     private LogLevel messageReceivedLevel = LogLevel.INFO;
-
-    /** The log level for the sessionCreated event. Default to INFO. */
-    private LogLevel sessionCreatedLevel = LogLevel.INFO;
 
     /** The log level for the sessionOpened event. Default to INFO. */
     private LogLevel sessionOpenedLevel = LogLevel.INFO;
@@ -73,7 +71,7 @@ public class LoggingFilter implements IoFilter {
      * 
      * @param clazz the class which name will be used to create the logger
      */
-    public LoggingFilter(Class<?> clazz) {
+    public LoggingFilter(final Class<?> clazz) {
         this(clazz.getName());
     }
 
@@ -82,7 +80,7 @@ public class LoggingFilter implements IoFilter {
      * 
      * @param name the name used to create the logger. If null, will default to "LoggingFilter"
      */
-    public LoggingFilter(String name) {
+    public LoggingFilter(final String name) {
         if (name == null) {
             this.name = LoggingFilter.class.getName();
         } else {
@@ -93,14 +91,13 @@ public class LoggingFilter implements IoFilter {
     }
 
     /**
-     * Log if the logger and the current event log level are compatible. We log
-     * a formated message and its parameters.
+     * Log if the logger and the current event log level are compatible. We log a formated message and its parameters.
      * 
      * @param eventLevel the event log level as requested by the user
      * @param message the formated message to log
      * @param param the parameter injected into the message
      */
-    private void log(LogLevel eventLevel, String message, Object param) {
+    private void log(final LogLevel eventLevel, final String message, final Object param) {
         switch (eventLevel) {
         case TRACE:
             logger.trace(message, param);
@@ -123,13 +120,12 @@ public class LoggingFilter implements IoFilter {
     }
 
     /**
-     * Log if the logger and the current event log level are compatible. We log
-     * a simple message.
+     * Log if the logger and the current event log level are compatible. We log a simple message.
      * 
      * @param eventLevel the event log level as requested by the user
      * @param message the message to log
      */
-    private void log(LogLevel eventLevel, String message) {
+    private void log(final LogLevel eventLevel, final String message) {
         switch (eventLevel) {
         case TRACE:
             logger.trace(message);
@@ -155,15 +151,7 @@ public class LoggingFilter implements IoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void sessionCreated(IoSession session) {
-        log(sessionCreatedLevel, "CREATED");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void sessionOpened(IoSession session) {
+    public void sessionOpened(final IoSession session) {
         log(sessionOpenedLevel, "OPENED");
 
     }
@@ -172,7 +160,7 @@ public class LoggingFilter implements IoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void sessionClosed(IoSession session) {
+    public void sessionClosed(final IoSession session) {
         log(sessionClosedLevel, "CLOSED");
     }
 
@@ -180,7 +168,7 @@ public class LoggingFilter implements IoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void sessionIdle(IoSession session, IdleStatus status) {
+    public void sessionIdle(final IoSession session, final IdleStatus status) {
         log(sessionIdleLevel, "IDLE");
     }
 
@@ -188,7 +176,8 @@ public class LoggingFilter implements IoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
+    public void messageReceived(final IoSession session, final Object message,
+            final ReadFilterChainController controller) {
         if (message instanceof ByteBuffer) {
             log(messageReceivedLevel, "RECEIVED: {}", ByteBufferDumper.dump((ByteBuffer) message));
         } else {
@@ -202,7 +191,8 @@ public class LoggingFilter implements IoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void messageWriting(IoSession session, Object message, WriteFilterChainController controller) {
+    public void messageWriting(final IoSession session, final Object message,
+            final WriteFilterChainController controller) {
         if (message instanceof ByteBuffer) {
             log(messageReceivedLevel, "WRITTING: {}", ByteBufferDumper.dump((ByteBuffer) message));
         } else {
@@ -211,16 +201,16 @@ public class LoggingFilter implements IoFilter {
         controller.callWriteNextFilter(message);
     }
 
-    //=========================
+    // =========================
     // SETTERS & GETTERS
-    //=========================
+    // =========================
 
     /**
      * Set the LogLevel for the MessageReceived event.
      * 
      * @param level The LogLevel to set
      */
-    public void setMessageReceivedLogLevel(LogLevel level) {
+    public void setMessageReceivedLogLevel(final LogLevel level) {
         messageReceivedLevel = level;
     }
 
@@ -238,7 +228,7 @@ public class LoggingFilter implements IoFilter {
      * 
      * @param level The LogLevel to set
      */
-    public void setMessageWritingLogLevel(LogLevel level) {
+    public void setMessageWritingLogLevel(final LogLevel level) {
         messageWritingLevel = level;
     }
 
@@ -252,29 +242,11 @@ public class LoggingFilter implements IoFilter {
     }
 
     /**
-     * Set the LogLevel for the SessionCreated event.
-     * 
-     * @param level The LogLevel to set
-     */
-    public void setSessionCreatedLogLevel(LogLevel level) {
-        sessionCreatedLevel = level;
-    }
-
-    /**
-     * Get the LogLevel for the SessionCreated event.
-     * 
-     * @return The LogLevel for the SessionCreated eventType
-     */
-    public LogLevel getSessionCreatedLogLevel() {
-        return sessionCreatedLevel;
-    }
-
-    /**
      * Set the LogLevel for the SessionOpened event.
      * 
      * @param level The LogLevel to set
      */
-    public void setSessionOpenedLogLevel(LogLevel level) {
+    public void setSessionOpenedLogLevel(final LogLevel level) {
         sessionOpenedLevel = level;
     }
 
@@ -292,7 +264,7 @@ public class LoggingFilter implements IoFilter {
      * 
      * @param level The LogLevel to set
      */
-    public void setSessionIdleLogLevel(LogLevel level) {
+    public void setSessionIdleLogLevel(final LogLevel level) {
         sessionIdleLevel = level;
     }
 
@@ -310,7 +282,7 @@ public class LoggingFilter implements IoFilter {
      * 
      * @param level The LogLevel to set
      */
-    public void setSessionClosedLogLevel(LogLevel level) {
+    public void setSessionClosedLogLevel(final LogLevel level) {
         sessionClosedLevel = level;
     }
 
