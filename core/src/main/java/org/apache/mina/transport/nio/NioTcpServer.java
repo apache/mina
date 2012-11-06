@@ -47,7 +47,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
     private final SelectorLoop acceptSelectorLoop;
 
-    private final SelectorLoop readWriteSelectorLoop;
+    private final SelectorLoopPool readWriteSelectorPool;
 
     // the key used for selecting accept event
     private SelectionKey acceptKey = null;
@@ -57,10 +57,22 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
     private final IdleChecker idleChecker = new IndexedIdleChecker();
 
-    public NioTcpServer(final SelectorLoop acceptSelectorLoop, SelectorLoop readWriteSelectorLoop) {
+    /**
+     * Create a TCP server with new selector pool of default size.
+     */
+    public NioTcpServer() {
+        this(new NioSelectorLoop(), new FixedSelectorLoopPool(Runtime.getRuntime().availableProcessors()+1));
+    }
+    
+    /**
+     * Create a TCP server with provided selector loops pool
+     * @param acceptSelectorLoop the selector loop for handling accept events (connection of new session)
+     * @param readWriteSelectorLoop the pool of selector loop for handling read/write events of connected sessions
+     */
+    public NioTcpServer(final SelectorLoop acceptSelectorLoop, SelectorLoopPool readWriteSelectorLoop) {
         super();
         this.acceptSelectorLoop = acceptSelectorLoop;
-        this.readWriteSelectorLoop = readWriteSelectorLoop;
+        this.readWriteSelectorPool = readWriteSelectorLoop;
     }
 
     /**
@@ -175,6 +187,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         LOG.debug("create session");
         final SocketChannel socketChannel = clientSocket;
         final TcpSessionConfig config = getSessionConfig();
+        final SelectorLoop readWriteSelectorLoop = readWriteSelectorPool.getSelectorLoop();
         final NioTcpSession session = new NioTcpSession(this, socketChannel, readWriteSelectorLoop, idleChecker);
 
         socketChannel.configureBlocking(false);

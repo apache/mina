@@ -51,7 +51,7 @@ public class NioEchoServer {
     public static void main(String[] args) {
         LOG.info("starting echo server");
 
-        NioTcpServer acceptor = new NioTcpServer(new NioSelectorLoop(), new NioSelectorLoop());
+        NioTcpServer acceptor = new NioTcpServer();
 
         // create the fitler chain for this service
         acceptor.setFilters(new LoggingFilter("LoggingFilter1"), new IoFilter() {

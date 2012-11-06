@@ -39,7 +39,6 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.ldap.LdapCodec;
-import org.apache.mina.transport.nio.NioSelectorLoop;
 import org.apache.mina.transport.nio.NioTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,7 @@ public class LdapTest {
 
     public static void main(String[] args) throws Exception {
         LdapTest ldapServer = new LdapTest();
-        NioTcpServer acceptor = new NioTcpServer(new NioSelectorLoop(), new NioSelectorLoop());
+        NioTcpServer acceptor = new NioTcpServer();
         acceptor.setFilters(new LoggingFilter("INCOMING"), new LdapCodec(), new LoggingFilter("DECODED"),
                 ldapServer.new DummyLdapServer());
 
