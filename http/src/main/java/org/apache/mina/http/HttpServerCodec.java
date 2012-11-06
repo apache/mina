@@ -49,13 +49,13 @@ public class HttpServerCodec extends ProtocolCodecFilter {
     }
 
     @Override
-    public void sessionCreated(IoSession session) {
-        super.sessionCreated(session);
+    public void sessionOpened(final IoSession session) {
+        super.sessionOpened(session);
         session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
     }
 
     @Override
-    public void sessionClosed(IoSession session) {
+    public void sessionClosed(final IoSession session) {
         super.sessionClosed(session);
         session.removeAttribute(DECODER_STATE_ATT);
         session.removeAttribute(PARTIAL_HEAD_ATT);
