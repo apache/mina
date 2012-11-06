@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.mina.transport.nio;
 
 import java.nio.channels.SelectableChannel;
