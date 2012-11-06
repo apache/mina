@@ -57,6 +57,7 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         if (eventSizeEstimator == null) {
             throw new IllegalArgumentException("eventSizeEstimator");
         }
+        
         this.eventSizeEstimator = eventSizeEstimator;
 
         setThreshold(threshold);
@@ -78,6 +79,7 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         if (threshold <= 0) {
             throw new IllegalArgumentException("threshold: " + threshold);
         }
+        
         this.threshold = threshold;
     }
 
@@ -108,10 +110,12 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
 
     private int estimateSize(IoEvent event) {
         int size = getEventSizeEstimator().estimateSize(event);
+        
         if (size < 0) {
             throw new IllegalStateException(IoEventSizeEstimator.class.getSimpleName() + " returned "
                     + "a negative value (" + size + "): " + event);
         }
+        
         return size;
     }
 
@@ -147,7 +151,7 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
     protected void unblock() {
         synchronized (lock) {
             if (waiters > 0) {
-                lock.notify();
+                lock.notifyAll();
             }
         }
     }
