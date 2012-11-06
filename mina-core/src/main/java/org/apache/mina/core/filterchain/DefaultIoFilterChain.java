@@ -583,11 +583,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 buffer.mark();
                 int remaining = buffer.remaining();
 
-                if (remaining == 0) {
-                    // Zero-sized buffer means the internal message
-                    // delimiter.
-                    s.increaseScheduledWriteMessages();
-                } else {
+                if (remaining > 0) {
                     s.increaseScheduledWriteBytes(remaining);
                 }
             } else {

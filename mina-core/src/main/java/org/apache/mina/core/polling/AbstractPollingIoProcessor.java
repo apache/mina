@@ -944,6 +944,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             int pos = buf.position();
             buf.reset();
 
+            session.increaseScheduledWriteMessages();
+
             fireMessageSent(session, req);
 
             // And set it back to its position
