@@ -71,7 +71,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
     }
 
     /**
-     * Estimate the size of an Objecr in number of bytes
+     * Estimate the size of an Object in number of bytes
      * @param message The object to estimate
      * @return The estimated size of the object
      */
@@ -99,6 +99,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
 
     private int estimateSize(Class<?> clazz, Set<Class<?>> visitedClasses) {
         Integer objectSize = class2size.get(clazz);
+        
         if (objectSize != null) {
             return objectSize;
         }
@@ -114,8 +115,10 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
         visitedClasses.add(clazz);
 
         int answer = 8; // Basic overhead.
+        
         for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
             Field[] fields = c.getDeclaredFields();
+            
             for (Field f : fields) {
                 if ((f.getModifiers() & Modifier.STATIC) != 0) {
                     // Ignore static fields.
@@ -147,6 +150,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
             size++;
             size *= 8;
         }
+        
         return size;
     }
 }

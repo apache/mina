@@ -29,7 +29,7 @@ import org.apache.mina.core.session.IoEvent;
  */
 public interface IoEventSizeEstimator {
     /**
-     * Estimate the IoEvent size in numberof bytes
+     * Estimate the IoEvent size in number of bytes
      * @param event The event we want to estimate the size of
      * @return The estimated size of this event
      */
