@@ -20,7 +20,6 @@ package org.apache.mina.transport.nio;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 /**
  * A fixed size pool of {@link SelectorLoop}.
  * 
@@ -29,20 +28,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FixedSelectorLoopPool implements SelectorLoopPool {
 
     // the pool of selector loop
-    private SelectorLoop[] pool;
-    
+    private final SelectorLoop[] pool;
+
     // the index of the next selector loop to be served
-    private AtomicInteger nextIndex = new AtomicInteger();
-    
+    private final AtomicInteger nextIndex = new AtomicInteger();
+
     /**
      * Create a pool of "size" {@link SelectorLoop}
+     * 
      * @param size
      */
-    public FixedSelectorLoopPool(int size) {
-        
+    public FixedSelectorLoopPool(final int size) {
+
         pool = new SelectorLoop[size];
-        for(int i=0;i<size;i++) {
-            pool[i] = new NioSelectorLoop();
+        for (int i = 0; i < size; i++) {
+            pool[i] = new NioSelectorLoop("I/O", i);
         }
     }
 

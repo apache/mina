@@ -55,13 +55,14 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
     // the server socket for accepting clients
     private ServerSocketChannel serverChannel = null;
 
-    private final IdleChecker idleChecker = new IndexedIdleChecker();
+    private IdleChecker idleChecker;
 
     /**
      * Create a TCP server with new selector pool of default size.
      */
     public NioTcpServer() {
-        this(new NioSelectorLoop(), new FixedSelectorLoopPool(Runtime.getRuntime().availableProcessors() + 1));
+        this(new NioSelectorLoop("accept", 0),
+                new FixedSelectorLoopPool(Runtime.getRuntime().availableProcessors() + 1));
     }
 
     /**
@@ -114,6 +115,9 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
         acceptSelectorLoop.register(true, false, false, this, serverChannel);
 
+        idleChecker = new IndexedIdleChecker();
+        idleChecker.start();
+
         // it's the first address bound, let's fire the event
         this.fireServiceActivated();
 
@@ -147,6 +151,8 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
         // will stop the acceptor processor if we are the last service
         acceptSelectorLoop.decrementServiceCount();
+
+        idleChecker.destroy();
     }
 
     /**
@@ -254,10 +260,12 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         }
 
         // add the session to the queue for being added to the selector
-        readWriteSelectorLoop.register(false, true, false, session, socketChannel);
-        readWriteSelectorLoop.incrementServiceCount();
+        // readWriteSelectorLoop.register(false, true, false, session, socketChannel);
+        // readWriteSelectorLoop.incrementServiceCount();
         session.processSessionOpened();
         session.setConnected();
+        idleChecker.sessionRead(session, System.currentTimeMillis());
+        idleChecker.sessionWritten(session, System.currentTimeMillis());
     }
 
 }

@@ -25,6 +25,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.Iterator;
 
 import org.apache.mina.api.RuntimeIoException;
 import org.slf4j.Logger;
@@ -35,11 +36,10 @@ import org.slf4j.LoggerFactory;
  */
 public class NioSelectorLoop implements SelectorLoop {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NioSelectorLoop.class);
+    private final Logger logger;
 
     /**
-     * A timeout used for the select, as we need to get out to deal with idle
-     * sessions
+     * A timeout used for the select, as we need to get out to deal with idle sessions
      */
     private static final long SELECT_TIMEOUT = 1000L;
 
@@ -47,19 +47,22 @@ public class NioSelectorLoop implements SelectorLoop {
     private Selector selector;
 
     /** the worker thread in charge of polling the selector */
-    private final SelectorWorker worker = new SelectorWorker();
+    private final SelectorWorker worker;
 
-    /**  the number of service using this selector */
+    /** the number of service using this selector */
     private int serviceCount = 0;
 
     /** Read buffer for all the incoming bytes (default to 64Kb) */
     private final ByteBuffer readBuffer = ByteBuffer.allocate(64 * 1024);
 
-    public NioSelectorLoop() {
+    public NioSelectorLoop(final String prefix, final int index) {
+        logger = LoggerFactory.getLogger(NioSelectorLoop.class.getName() + ":" + prefix + "-" + index);
+        worker = new SelectorWorker(prefix, index);
+
         try {
             selector = Selector.open();
-        } catch (IOException ioe) {
-            LOGGER.error("Impossible to open a new NIO selector, O/S is out of file descriptor ?");
+        } catch (final IOException ioe) {
+            logger.error("Impossible to open a new NIO selector, O/S is out of file descriptor ?");
             throw new RuntimeIoException(ioe);
         }
     }
@@ -69,9 +72,9 @@ public class NioSelectorLoop implements SelectorLoop {
      */
     @Override
     public void register(final boolean accept, final boolean read, final boolean write,
-            final SelectorListener listener, SelectableChannel channel) {
-        LOGGER.debug("adding to registration queue : {} for accept : {}, read : {}, write : {}", new Object[] {
-                listener, accept, read, write });
+            final SelectorListener listener, final SelectableChannel channel) {
+        logger.debug("registering : {} for accept : {}, read : {}, write : {}", new Object[] { listener, accept, read,
+                                write });
         int ops = 0;
         if (accept) {
             ops |= SelectionKey.OP_ACCEPT;
@@ -84,8 +87,8 @@ public class NioSelectorLoop implements SelectorLoop {
         }
         try {
             channel.register(selector, ops, listener);
-        } catch (ClosedChannelException e) {
-            LOGGER.error("Trying to register an already closed channel : ", e);
+        } catch (final ClosedChannelException e) {
+            logger.error("Trying to register an already closed channel : ", e);
         }
     }
 
@@ -94,13 +97,13 @@ public class NioSelectorLoop implements SelectorLoop {
      */
     @Override
     public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
-            final SelectorListener listener, SelectableChannel channel) {
-        LOGGER.debug("modifying registration : {} for accept : {}, read : {}, write : {}", new Object[] { listener,
-                accept, read, write });
+            final SelectorListener listener, final SelectableChannel channel) {
+        logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}", new Object[] { listener,
+                                accept, read, write });
 
-        SelectionKey key = channel.keyFor(selector);
+        final SelectionKey key = channel.keyFor(selector);
         if (key == null) {
-            LOGGER.error("Trying to modify the registration of a not registered channel");
+            logger.error("Trying to modify the registration of a not registered channel");
             return;
         }
 
@@ -121,11 +124,11 @@ public class NioSelectorLoop implements SelectorLoop {
      * {@inheritDoc}
      */
     @Override
-    public void unregister(final SelectorListener listener, SelectableChannel channel) {
-        LOGGER.debug("unregistering : {}", listener);
-        SelectionKey key = channel.keyFor(selector);
+    public void unregister(final SelectorListener listener, final SelectableChannel channel) {
+        logger.debug("unregistering : {}", listener);
+        final SelectionKey key = channel.keyFor(selector);
         if (key == null) {
-            LOGGER.error("Trying to modify the registration of a not registered channel");
+            logger.error("Trying to modify the registration of a not registered channel");
             return;
         }
         key.cancel();
@@ -138,7 +141,7 @@ public class NioSelectorLoop implements SelectorLoop {
     @Override
     public synchronized void incrementServiceCount() {
         serviceCount++;
-        LOGGER.debug("service count: {}", serviceCount);
+        logger.debug("service count: {}", serviceCount);
         if (serviceCount == 1) {
             worker.start();
         }
@@ -150,52 +153,60 @@ public class NioSelectorLoop implements SelectorLoop {
     @Override
     public synchronized void decrementServiceCount() {
         serviceCount--;
-        LOGGER.debug("service count: {}", serviceCount);
+        logger.debug("service count: {}", serviceCount);
         if (serviceCount < 0) {
-            LOGGER.error("service count should not be negative : bug ?");
+            logger.error("service count should not be negative : bug ?");
         }
     }
 
     /**
-     * The worker processing incoming session creation, session destruction
-     * requests, session write and reads. It will also bind new servers.
+     * The worker processing incoming session creation, session destruction requests, session write and reads. It will
+     * also bind new servers.
      */
     private class SelectorWorker extends Thread {
+
+        public SelectorWorker(final String prefix, final int index) {
+            super("SelectorWorker " + prefix + "-" + index);
+        }
 
         @Override
         public void run() {
             if (selector == null) {
-                LOGGER.debug("opening a new selector");
+                logger.debug("opening a new selector");
 
                 try {
                     selector = Selector.open();
-                } catch (IOException e) {
-                    LOGGER.error("IOException while opening a new Selector", e);
+                } catch (final IOException e) {
+                    logger.error("IOException while opening a new Selector", e);
                 }
             }
 
             for (;;) {
                 try {
-                    LOGGER.debug("selecting...");
-                    int readyCount = selector.select(SELECT_TIMEOUT);
-                    LOGGER.debug("... done selecting : {}", readyCount);
+                    logger.debug("selecting...");
+                    final int readyCount = selector.select();
+                    logger.debug("... done selecting : {} events", readyCount);
                     if (readyCount > 0) {
-                        for (SelectionKey key : selector.selectedKeys()) {
-                            SelectorListener listener = (SelectorListener) key.attachment();
+                        final Iterator<SelectionKey> it = selector.selectedKeys().iterator();
+
+                        while (it.hasNext()) {
+                            final SelectionKey key = it.next();
+                            final SelectorListener listener = (SelectorListener) key.attachment();
                             listener.ready(key.isAcceptable(), key.isReadable(), key.isReadable() ? readBuffer : null,
                                     key.isWritable());
+                            it.remove();
                         }
                     }
 
-                } catch (Exception e) {
-                    LOGGER.error("Unexpected exception : ", e);
+                } catch (final Exception e) {
+                    logger.error("Unexpected exception : ", e);
                 }
 
                 // stop the worker if needed (no more service)
                 synchronized (NioSelectorLoop.this) {
-                    LOGGER.debug("remaing {} service", serviceCount);
+                    logger.debug("remaing {} service", serviceCount);
                     if (serviceCount <= 0) {
-                        LOGGER.debug("stop the worker");
+                        logger.debug("stop the worker");
                         break;
                     }
                 }

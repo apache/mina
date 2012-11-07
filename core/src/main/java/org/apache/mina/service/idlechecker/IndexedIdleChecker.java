@@ -18,8 +18,9 @@
  */
 package org.apache.mina.service.idlechecker;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.session.AbstractIoSession;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * <li>we round it at the next second</li>
  * <li>we store a reference to this session in a circular buffer like :</li>
  * </ul>
+ * 
  * <pre>
  * 
  *               +--- Current time
@@ -48,9 +50,9 @@ import org.slf4j.LoggerFactory;
  *               |   +--> { S2, S7, S12...} (sessions that will TO in one second)
  *               +------> { S5, S6, S8...} (sessions that are idle for the maximum delay of 1 hour )
  * </pre>
- *
- *The maximum idle itme is one hour.
- *
+ * 
+ * The maximum idle itme is one hour.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IndexedIdleChecker implements IdleChecker {
@@ -67,37 +69,68 @@ public class IndexedIdleChecker implements IdleChecker {
     private static final AttributeKey<Integer> WRITE_IDLE_INDEX = AttributeKey.createKey(Integer.class,
             "idle.write.index");
 
-    private long lastCheckTime = 0L;
+    private long lastCheckTimeMs = 0L;
 
     @SuppressWarnings("unchecked")
-    private Set<AbstractIoSession>[] readIdleSessionIndex = new Set[MAX_IDLE_TIME_IN_SEC];
+    private final Set<AbstractIoSession>[] readIdleSessionIndex = new Set[MAX_IDLE_TIME_IN_SEC];
 
     @SuppressWarnings("unchecked")
-    private Set<AbstractIoSession>[] writeIdleSessionIndex = new Set[MAX_IDLE_TIME_IN_SEC];
+    private final Set<AbstractIoSession>[] writeIdleSessionIndex = new Set[MAX_IDLE_TIME_IN_SEC];
+
+    private final int granularityInMs = 1000;
+
+    private final Worker worker = new Worker();
+
+    private volatile boolean running = true;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void sessionRead(AbstractIoSession session, long timeInMs) {
+    public void start() {
+        worker.start();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() {
+        running = false;
+        try {
+            // interrupt the sleep
+            worker.interrupt();
+            // wait for worker to stop
+            worker.join();
+        } catch (final InterruptedException e) {
+            // interrupted, we don't care much
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sessionRead(final AbstractIoSession session, final long timeInMs) {
         LOG.debug("session read event, compute idle index of session {}", session);
 
         // remove from the old index position
-        Integer oldIndex = session.getAttribute(READ_IDLE_INDEX);
+        final Integer oldIndex = session.getAttribute(READ_IDLE_INDEX);
         if (oldIndex != null && readIdleSessionIndex[oldIndex] != null) {
             LOG.debug("remove for old index {}", oldIndex);
             readIdleSessionIndex[oldIndex].remove(session);
         }
 
-        long idleTimeInMs = session.getConfig().getIdleTimeInMillis(IdleStatus.READ_IDLE);
+        final long idleTimeInMs = session.getConfig().getIdleTimeInMillis(IdleStatus.READ_IDLE);
         // is idle enabled ?
         if (idleTimeInMs <= 0L) {
             LOG.debug("no read idle configuration");
         } else {
-            int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L) + 1;
-            int index = nextIdleTimeInSeconds % MAX_IDLE_TIME_IN_SEC;
+            final int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L) + 1;
+            final int index = nextIdleTimeInSeconds % MAX_IDLE_TIME_IN_SEC;
             if (readIdleSessionIndex[index] == null) {
-                readIdleSessionIndex[index] = new HashSet<AbstractIoSession>();
+                readIdleSessionIndex[index] = Collections
+                        .newSetFromMap(new ConcurrentHashMap<AbstractIoSession, Boolean>());
             }
 
             LOG.debug("marking session {} idle for index {}", session, index);
@@ -110,25 +143,26 @@ public class IndexedIdleChecker implements IdleChecker {
      * {@inheritDoc}
      */
     @Override
-    public void sessionWritten(AbstractIoSession session, long timeInMs) {
+    public void sessionWritten(final AbstractIoSession session, final long timeInMs) {
         LOG.debug("session write event, compute idle index of session {}", session);
 
         // remove from the old index position
-        Integer oldIndex = session.getAttribute(WRITE_IDLE_INDEX);
+        final Integer oldIndex = session.getAttribute(WRITE_IDLE_INDEX);
         if (oldIndex != null && writeIdleSessionIndex[oldIndex] != null) {
             LOG.debug("remove for old index {}", oldIndex);
             writeIdleSessionIndex[oldIndex].remove(session);
         }
 
-        long idleTimeInMs = session.getConfig().getIdleTimeInMillis(IdleStatus.WRITE_IDLE);
+        final long idleTimeInMs = session.getConfig().getIdleTimeInMillis(IdleStatus.WRITE_IDLE);
         // is idle enabled ?
         if (idleTimeInMs <= 0L) {
             LOG.debug("no write idle configuration");
         } else {
-            int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L) + 1;
-            int index = nextIdleTimeInSeconds % MAX_IDLE_TIME_IN_SEC;
+            final int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L) + 1;
+            final int index = nextIdleTimeInSeconds % MAX_IDLE_TIME_IN_SEC;
             if (writeIdleSessionIndex[index] == null) {
-                writeIdleSessionIndex[index] = new HashSet<AbstractIoSession>();
+                writeIdleSessionIndex[index] = Collections
+                        .newSetFromMap(new ConcurrentHashMap<AbstractIoSession, Boolean>());
             }
 
             writeIdleSessionIndex[index].add(session);
@@ -140,13 +174,13 @@ public class IndexedIdleChecker implements IdleChecker {
      * {@inheritDoc}
      */
     @Override
-    public int processIdleSession(long time) {
+    public int processIdleSession(final long timeMs) {
         int counter = 0;
-        long delta = time - lastCheckTime;
+        final long delta = timeMs - lastCheckTimeMs;
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("checking idle time, last = {}, now = {}, delta = {}",
-                    new Object[] { lastCheckTime, time, delta });
+            LOG.debug("checking idle time, last = {}, now = {}, delta = {}", new Object[] { lastCheckTimeMs, timeMs,
+                                    delta });
         }
 
         if (delta < 1000) {
@@ -154,8 +188,9 @@ public class IndexedIdleChecker implements IdleChecker {
             return 0;
         }
 
-        int startIdx = ((int) (Math.max(lastCheckTime, time - MAX_IDLE_TIME_IN_MS + 1) / 1000L)) % MAX_IDLE_TIME_IN_SEC;
-        int endIdx = ((int) (time / 1000L)) % MAX_IDLE_TIME_IN_SEC;
+        final int startIdx = ((int) (Math.max(lastCheckTimeMs, timeMs - MAX_IDLE_TIME_IN_MS + 1) / 1000L))
+                % MAX_IDLE_TIME_IN_SEC;
+        final int endIdx = ((int) (timeMs / 1000L)) % MAX_IDLE_TIME_IN_SEC;
 
         LOG.debug("scaning from index {} to index {}", startIdx, endIdx);
 
@@ -170,20 +205,20 @@ public class IndexedIdleChecker implements IdleChecker {
         } while (index != endIdx);
 
         // save last check time for next call
-        lastCheckTime = time;
+        lastCheckTimeMs = timeMs;
         LOG.debug("detected {} idleing sessions", counter);
         return counter;
     }
 
-    private int processIndex(Set<AbstractIoSession>[] indexByTime, int position, IdleStatus status) {
-        Set<AbstractIoSession> sessions = indexByTime[position];
+    private int processIndex(final Set<AbstractIoSession>[] indexByTime, final int position, final IdleStatus status) {
+        final Set<AbstractIoSession> sessions = indexByTime[position];
         if (sessions == null) {
             return 0;
         }
 
         int counter = 0;
 
-        for (AbstractIoSession idleSession : sessions) {
+        for (final AbstractIoSession idleSession : sessions) {
             idleSession.setAttribute(status == IdleStatus.READ_IDLE ? READ_IDLE_INDEX : WRITE_IDLE_INDEX, null);
             // check if idle detection wasn't disabled since the index update
             if (idleSession.getConfig().getIdleTimeInMillis(status) > 0) {
@@ -191,8 +226,31 @@ public class IndexedIdleChecker implements IdleChecker {
             }
             counter++;
         }
-        // clear the processed index entry 
+        // clear the processed index entry
         indexByTime[position] = null;
         return counter;
+    }
+
+    /**
+     * Thread in charge of checking the idleing sessions and fire events
+     */
+    private class Worker extends Thread {
+
+        public Worker() {
+            super("IdleChecker");
+            setDaemon(true);
+        }
+
+        @Override
+        public void run() {
+            while (running) {
+                try {
+                    sleep(granularityInMs);
+                    processIdleSession(System.currentTimeMillis());
+                } catch (final InterruptedException e) {
+                    break;
+                }
+            }
+        }
     }
 }
