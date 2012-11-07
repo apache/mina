@@ -27,6 +27,7 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.AttributeKey;
+import org.apache.mina.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,26 +103,13 @@ public class ProtocolCodecFilter extends AbstractIoFilter {
      * as an anonymous class, using the two parameters (encoder and decoder), which are class names. Instances for those
      * classes will be created in this constructor.
      * 
-     * @param encoder The class responsible for encoding the message
-     * @param decoder The class responsible for decoding the message
+     * @param encoderClass The class responsible for encoding the message
+     * @param decoderClass The class responsible for decoding the message
      */
     public ProtocolCodecFilter(final Class<? extends ProtocolEncoder> encoderClass,
             final Class<? extends ProtocolDecoder> decoderClass) {
-        if (encoderClass == null) {
-            throw new IllegalArgumentException("encoderClass");
-        }
-
-        if (decoderClass == null) {
-            throw new IllegalArgumentException("decoderClass");
-        }
-
-        if (!ProtocolEncoder.class.isAssignableFrom(encoderClass)) {
-            throw new IllegalArgumentException("encoderClass: " + encoderClass.getName());
-        }
-
-        if (!ProtocolDecoder.class.isAssignableFrom(decoderClass)) {
-            throw new IllegalArgumentException("decoderClass: " + decoderClass.getName());
-        }
+        Assert.assertNotNull(encoderClass, "Encoder Class");
+        Assert.assertNotNull(decoderClass, "Decoder Class");
 
         try {
             encoderClass.getConstructor(EMPTY_PARAMS);
