@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A LDAP message codec.
  * 
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class LdapCodec extends ProtocolCodecFilter {
     private static final Logger LOG = LoggerFactory.getLogger(LdapCodec.class);
