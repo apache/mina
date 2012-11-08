@@ -23,10 +23,11 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 /**
- *
+ * 
  * A network serer bound to a local addresse
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- *
+ * 
  */
 public interface IoServer extends IoService {
 
@@ -36,20 +37,25 @@ public interface IoServer extends IoService {
     SocketAddress getBoundAddress();
 
     /**
-     * Binds to the specified local addresses and start to accept incoming
-     * connections.
-     *
-     * @throws IOException
-     *             if failed to bind
+     * Binds to the specified local addresses and start to accept incoming connections.
+     * 
+     * @throws IOException if failed to bind
      */
     void bind(SocketAddress localAddress) throws IOException;
 
     /**
-     * Unbinds from the local addresses that this service is bound to and stops
-     * to accept incoming connections. This method returns silently if no local
-     * address is bound yet.
-     * @throws IOException
-     *             if failed to unbind
+     * Binds the server to the specified port.
+     * 
+     * @param port the local TCP port to bind.
+     * @throws IOException if failed to bind.
+     */
+    void bind(int port) throws IOException;
+
+    /**
+     * Unbinds from the local addresses that this service is bound to and stops to accept incoming connections. This
+     * method returns silently if no local address is bound yet.
+     * 
+     * @throws IOException if failed to unbind
      */
     void unbind() throws IOException;
 

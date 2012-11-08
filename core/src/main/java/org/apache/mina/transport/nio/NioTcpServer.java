@@ -20,6 +20,7 @@
 package org.apache.mina.transport.nio;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -88,6 +89,14 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
     public void setServerSocketChannel(final ServerSocketChannel serverChannel) {
         this.serverChannel = serverChannel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void bind(final int port) throws IOException {
+        bind(new InetSocketAddress(port));
     }
 
     /**

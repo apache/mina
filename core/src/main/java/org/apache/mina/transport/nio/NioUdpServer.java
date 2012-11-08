@@ -20,6 +20,7 @@
 package org.apache.mina.transport.nio;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
@@ -93,6 +94,14 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     @Override
     public SocketAddress getBoundAddress() {
         return address;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void bind(final int port) throws IOException {
+        bind(new InetSocketAddress(port));
     }
 
     /**

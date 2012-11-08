@@ -618,6 +618,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             state = SessionState.CLOSING;
             if (immediately) {
                 channelClose();
+                processSessionClosed();
             } else {
                 // flush this session the flushing code will close the session
                 flushWriteQueue();
