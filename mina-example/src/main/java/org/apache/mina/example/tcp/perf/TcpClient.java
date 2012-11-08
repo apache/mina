@@ -23,12 +23,10 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
-import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
@@ -55,8 +53,6 @@ public class TcpClient extends IoHandlerAdapter {
         connector = new NioSocketConnector();
 
         connector.setHandler(this);
-        SocketSessionConfig dcfg = (SocketSessionConfig) connector.getSessionConfig();
-
         ConnectFuture connFuture = connector.connect(new InetSocketAddress("localhost", TcpServer.PORT));
 
         connFuture.awaitUninterruptibly();
@@ -134,7 +130,7 @@ public class TcpClient extends IoHandlerAdapter {
             IoBuffer buffer = IoBuffer.allocate(4);
             buffer.putInt(i);
             buffer.flip();
-            WriteFuture future = session.write(buffer);
+            session.write(buffer);
 
             while (client.received == false) {
                 Thread.sleep(1);
