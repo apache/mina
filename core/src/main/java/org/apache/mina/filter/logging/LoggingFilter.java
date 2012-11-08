@@ -47,6 +47,9 @@ public class LoggingFilter implements IoFilter {
     /** The log level for the messageWritting event. Default to INFO. */
     private LogLevel messageWritingLevel = LogLevel.INFO;
 
+    /** The log level for the messageSent event. Default to INFO. */
+    private LogLevel messageSentLevel = LogLevel.INFO;
+
     /** The log level for the messageReceived event. Default to INFO. */
     private LogLevel messageReceivedLevel = LogLevel.INFO;
 
@@ -176,6 +179,14 @@ public class LoggingFilter implements IoFilter {
      * {@inheritDoc}
      */
     @Override
+    public void messageSent(final IoSession session, final Object message) {
+        log(messageSentLevel, "IDLE");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void messageReceived(final IoSession session, final Object message,
             final ReadFilterChainController controller) {
         if (message instanceof ByteBuffer) {
@@ -294,4 +305,23 @@ public class LoggingFilter implements IoFilter {
     public LogLevel getSessionClosedLogLevel() {
         return sessionClosedLevel;
     }
+
+    /**
+     * Get the LogLevel for the messageSent event.
+     * 
+     * @return The LogLevel for the messageSent eventType
+     */
+    public LogLevel getMessageSentLevel() {
+        return messageSentLevel;
+    }
+
+    /**
+     * Set the LogLevel for the messageSent event.
+     * 
+     * @param level The LogLevel to set
+     */
+    public void setMessageSentLevel(final LogLevel messageSentLevel) {
+        this.messageSentLevel = messageSentLevel;
+    }
+
 }

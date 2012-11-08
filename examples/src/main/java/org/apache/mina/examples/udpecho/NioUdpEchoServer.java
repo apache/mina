@@ -84,6 +84,11 @@ public class NioUdpEchoServer {
                     session.write(message);
                 }
             }
+
+            @Override
+            public void messageSent(final IoSession session, final Object message) {
+                LOG.info("message {} sent", message);
+            }
         });
 
         server.addListeners(new IoServiceListener() {

@@ -66,4 +66,12 @@ public interface IoFilter {
      * @param message the message to process before writing
      */
     void messageWriting(IoSession session, Object message, WriteFilterChainController controller);
+
+    /**
+     * Invoked when a high level message was written to the low level O/S buffer.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     * @param message the incoming message to process
+     */
+    void messageSent(IoSession session, Object message);
 }

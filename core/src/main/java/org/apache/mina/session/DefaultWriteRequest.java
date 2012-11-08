@@ -31,16 +31,20 @@ import org.apache.mina.util.ByteBufferDumper;
  */
 public class DefaultWriteRequest implements WriteRequest {
     /** The stored message */
-    private Object message;
+    private final Object message;
+
+    /** The high level message (before being processed by the filter chain */
+    private Object highLevelMessage;
 
     /** the future to complete when this message is written */
     private IoFuture<Void> future;
 
     /**
      * Creates a new instance of a WriteRequest
+     * 
      * @param message The stored message
      */
-    public DefaultWriteRequest(Object message) {
+    public DefaultWriteRequest(final Object message) {
         this.message = message;
     }
 
@@ -55,23 +59,34 @@ public class DefaultWriteRequest implements WriteRequest {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoFuture<Void> getFuture() {
         return future;
     }
 
     /**
      * Associates a Future to this WriteRequest instance
+     * 
      * @param future The associated Future
      */
-    public void setFuture(IoFuture<Void> future) {
+    public void setFuture(final IoFuture<Void> future) {
         this.future = future;
+    }
+
+    public Object getHighLevelMessage() {
+        return highLevelMessage;
+    }
+
+    public void setHighLevelMessage(final Object highLevelMessage) {
+        this.highLevelMessage = highLevelMessage;
     }
 
     /**
      * @see Object#toString()
      */
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
 
         sb.append("WriteRequest[");
 

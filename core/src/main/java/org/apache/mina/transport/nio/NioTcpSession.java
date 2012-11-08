@@ -30,6 +30,7 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.DefaultWriteFuture;
+import org.apache.mina.session.DefaultWriteRequest;
 import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.tcp.ProxyTcpSessionConfig;
@@ -38,11 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A NIO based TCP session, should be used by {@link NioTcpServer} and {@link NioTcpClient}.
- * A TCP session is a connection between a our server/client and the remote end-point.
+ * A NIO based TCP session, should be used by {@link NioTcpServer} and {@link NioTcpClient}. A TCP session is a
+ * connection between a our server/client and the remote end-point.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- *
+ * 
  */
 public class NioTcpSession extends AbstractIoSession implements SelectorListener {
 
@@ -57,7 +58,8 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
     /** the socket configuration */
     private final TcpSessionConfig configuration;
 
-    NioTcpSession(IoService service, SocketChannel channel, SelectorLoop selectorLoop, IdleChecker idleChecker) {
+    NioTcpSession(final IoService service, final SocketChannel channel, final SelectorLoop selectorLoop,
+            final IdleChecker idleChecker) {
         super(service, idleChecker);
         this.channel = channel;
         this.selectorLoop = selectorLoop;
@@ -66,6 +68,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
 
     /**
      * Get the underlying {@link SocketChannel} of this session
+     * 
      * @return the socket channel used by this session
      */
     SocketChannel getSocketChannel() {
@@ -80,7 +83,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
         if (channel == null) {
             return null;
         }
-        Socket socket = channel.socket();
+        final Socket socket = channel.socket();
 
         if (socket == null) {
             return null;
@@ -98,7 +101,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
             return null;
         }
 
-        Socket socket = channel.socket();
+        final Socket socket = channel.socket();
 
         if (socket == null) {
             return null;
@@ -187,9 +190,8 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
     protected void channelClose() {
         try {
             selectorLoop.unregister(this, channel);
-            selectorLoop.decrementServiceCount();
             channel.close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.error("Exception while closing the channel : ", e);
         }
     }
@@ -207,13 +209,13 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
      * {@inheritDoc}
      */
     @Override
-    public void ready(boolean accept, boolean read, ByteBuffer readBuffer, boolean write) {
+    public void ready(final boolean accept, final boolean read, final ByteBuffer readBuffer, final boolean write) {
         if (read) {
             try {
 
                 LOG.debug("readable session : {}", this);
                 readBuffer.clear();
-                int readCount = channel.read(readBuffer);
+                final int readCount = channel.read(readBuffer);
 
                 LOG.debug("read {} bytes", readCount);
 
@@ -231,7 +233,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                         // We are reading data over a SSL/TLS encrypted connection.
                         // Redirect
                         // the processing to the SslHelper class.
-                        SslHelper sslHelper = getAttribute(SSL_HELPER, null);
+                        final SslHelper sslHelper = getAttribute(SSL_HELPER, null);
 
                         if (sslHelper == null) {
                             throw new IllegalStateException();
@@ -245,7 +247,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
 
                     idleChecker.sessionRead(this, System.currentTimeMillis());
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOG.error("Exception while reading : ", e);
             }
 
@@ -261,22 +263,22 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                 boolean isEmpty = false;
 
                 try {
-                    Queue<WriteRequest> queue = acquireWriteQueue();
+                    final Queue<WriteRequest> queue = acquireWriteQueue();
 
                     do {
                         // get a write request from the queue
-                        WriteRequest wreq = queue.peek();
+                        final WriteRequest wreq = queue.peek();
 
                         if (wreq == null) {
                             break;
                         }
 
-                        ByteBuffer buf = (ByteBuffer) wreq.getMessage();
+                        final ByteBuffer buf = (ByteBuffer) wreq.getMessage();
 
                         // Note that if the connection is secured, the buffer
                         // already
                         // contains encrypted data.
-                        int wrote = getSocketChannel().write(buf);
+                        final int wrote = getSocketChannel().write(buf);
                         incrementWrittenBytes(wrote);
                         LOG.debug("wrote {} bytes to {}", wrote, this);
 
@@ -286,10 +288,15 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                             // completed write request, let's remove it
                             queue.remove();
                             // complete the future
-                            DefaultWriteFuture future = (DefaultWriteFuture) wreq.getFuture();
+                            final DefaultWriteFuture future = (DefaultWriteFuture) wreq.getFuture();
 
                             if (future != null) {
                                 future.complete();
+                            }
+                            // generate the message sent event
+                            final Object highLevel = ((DefaultWriteRequest) wreq).getHighLevelMessage();
+                            if (highLevel != null) {
+                                processMessageSent(highLevel);
                             }
                         } else {
                             // output socket buffer is full, we need
@@ -316,7 +323,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                         selectorLoop.modifyRegistration(false, !isReadSuspended(), false, this, channel);
                     }
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOG.error("Exception while reading : ", e);
             }
         }

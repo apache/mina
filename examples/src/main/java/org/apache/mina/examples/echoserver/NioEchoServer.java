@@ -86,6 +86,11 @@ public class NioEchoServer {
                     session.write(message);
                 }
             }
+
+            @Override
+            public void messageSent(final IoSession session, final Object message) {
+                LOG.info("message {} sent", message);
+            }
         });
 
         acceptor.addListeners(new IoServiceListener() {

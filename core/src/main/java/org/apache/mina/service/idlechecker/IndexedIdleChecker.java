@@ -196,7 +196,8 @@ public class IndexedIdleChecker implements IdleChecker {
 
         int index = startIdx;
         do {
-            LOG.debug("scanning index {}", index);
+
+            LOG.trace("scanning index {}", index);
             // look at the read idle index
             counter += processIndex(readIdleSessionIndex, index, IdleStatus.READ_IDLE);
             counter += processIndex(writeIdleSessionIndex, index, IdleStatus.WRITE_IDLE);

@@ -58,7 +58,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     // the key used for selecting read event
     private SelectionKey readKey = null;
 
-    // list of all the sessions by remote socket address 
+    // list of all the sessions by remote socket address
     private final Map<SocketAddress /* remote socket address */, NioUdpSession> sessions = new ConcurrentHashMap<SocketAddress, NioUdpSession>();
 
     /**
@@ -70,8 +70,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     }
 
     /**
-     * Get the inner datagram channel for read and write operations.
-     * To be called by the {@link NioSelectorProcessor}
+     * Get the inner datagram channel for read and write operations. To be called by the {@link NioSelectorProcessor}
      * 
      * @return the datagram channel bound to this {@link NioUdpServer}.
      */
@@ -100,7 +99,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void bind(SocketAddress localAddress) throws IOException {
+    public void bind(final SocketAddress localAddress) throws IOException {
         if (localAddress == null) {
             // We should at least have one address to bind on
             throw new IllegalArgumentException("LocalAdress cannot be null");
@@ -121,7 +120,6 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
         datagramChannel.configureBlocking(false);
 
         selectorLoop.register(false, true, false, this, datagramChannel);
-        selectorLoop.incrementServiceCount();
 
         // it's the first address bound, let's fire the event
         this.fireServiceActivated();
@@ -138,8 +136,6 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
         }
 
         selectorLoop.unregister(this, datagramChannel);
-        selectorLoop.decrementServiceCount();
-
         datagramChannel.socket().close();
         datagramChannel.close();
 
@@ -157,7 +153,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     /**
      * @param readKey the readKey to set
      */
-    public void setReadKey(SelectionKey readKey) {
+    public void setReadKey(final SelectionKey readKey) {
         this.readKey = readKey;
     }
 
@@ -165,13 +161,13 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void ready(boolean accept, boolean read, ByteBuffer readBuffer, boolean write) {
+    public void ready(final boolean accept, final boolean read, final ByteBuffer readBuffer, final boolean write) {
         if (read) {
             try {
                 LOG.debug("readable datagram for UDP service : {}", this);
                 readBuffer.clear();
 
-                SocketAddress source = datagramChannel.receive(readBuffer);
+                final SocketAddress source = datagramChannel.receive(readBuffer);
                 readBuffer.flip();
 
                 LOG.debug("read {} bytes form {}", readBuffer.remaining(), source);
@@ -184,7 +180,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
                 }
 
                 session.receivedDatagram(readBuffer);
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 LOG.error("IOException while reading the socket", ex);
             }
         }

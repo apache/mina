@@ -120,9 +120,6 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
         // it's the first address bound, let's fire the event
         this.fireServiceActivated();
-
-        // will start the selector processor if we are the first service
-        acceptSelectorLoop.incrementServiceCount();
     }
 
     /**
@@ -150,8 +147,6 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         this.fireServiceInactivated();
 
         // will stop the acceptor processor if we are the last service
-        acceptSelectorLoop.decrementServiceCount();
-
         idleChecker.destroy();
     }
 
@@ -260,8 +255,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         }
 
         // add the session to the queue for being added to the selector
-        // readWriteSelectorLoop.register(false, true, false, session, socketChannel);
-        // readWriteSelectorLoop.incrementServiceCount();
+        readWriteSelectorLoop.register(false, true, false, session, socketChannel);
         session.processSessionOpened();
         session.setConnected();
         idleChecker.sessionRead(session, System.currentTimeMillis());

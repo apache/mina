@@ -66,4 +66,11 @@ public abstract class AbstractIoFilter implements IoFilter {
             final WriteFilterChainController controller) {
         controller.callWriteNextFilter(message);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void messageSent(final IoSession session, final Object message) {
+    }
 }

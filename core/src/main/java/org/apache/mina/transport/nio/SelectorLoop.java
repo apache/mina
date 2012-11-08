@@ -33,8 +33,4 @@ public interface SelectorLoop {
 
     public abstract void unregister(SelectorListener listener, SelectableChannel channel);
 
-    public abstract void incrementServiceCount();
-
-    public abstract void decrementServiceCount();
-
 }
