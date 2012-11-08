@@ -47,6 +47,11 @@ public class DateUtil {
         DateUtil.RFC_1123_FORMAT.setTimeZone(DateUtil.GMT_ZONE);
     }
 
+    /**
+     * Returns the current date as String
+     *
+     * @return Current Date as String, in the format <i>EEE, dd MMM yyyy HH:mm:ss zzz</i>
+     */
     public static String getCurrentAsString() {
         return DateUtil.RFC_1123_FORMAT.format(new Date());
     }
