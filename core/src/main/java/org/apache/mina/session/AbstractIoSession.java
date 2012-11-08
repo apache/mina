@@ -724,20 +724,20 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         }
 
         // put the future in the last write request
-        if (future != null) {
-            final WriteRequest request = lastWriteRequest;
 
-            if (request != null) {
+        final WriteRequest request = lastWriteRequest;
+        if (request != null) {
+            if (future != null) {
                 ((DefaultWriteRequest) request).setFuture(future);
-                ((DefaultWriteRequest) request).setHighLevelMessage(message);
             }
+            ((DefaultWriteRequest) request).setHighLevelMessage(message);
         }
     }
 
     public void processMessageSent(final Object highLevelMessage) {
         LOG.debug("processing message '{}' sent event for session {}", highLevelMessage, this);
         final int size = chain.length;
-        for (int i = size - 1; i <= 0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
             chain[i].messageSent(this, highLevelMessage);
         }
     }
