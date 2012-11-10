@@ -24,13 +24,12 @@ import java.net.SocketAddress;
 
 /**
  * 
- * A network serer bound to a local addresse
+ * A network server bound to a local address
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
 public interface IoServer extends IoService {
-
     /**
      * Returns the local addresses which are bound currently.
      */
@@ -58,5 +57,4 @@ public interface IoServer extends IoService {
      * @throws IOException if failed to unbind
      */
     void unbind() throws IOException;
-
 }

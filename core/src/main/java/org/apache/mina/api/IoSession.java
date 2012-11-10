@@ -378,27 +378,9 @@ public interface IoSession {
     public WriteRequest enqueueWriteRequest(Object message);
 
     /**
-     * Get the {@link Queue} of this session. The write queue contains the pending writes. This
-     * method will lock the WriteQueue using the WriteLock lock. The {@link releaseWriteQueue()
-     * method must be called when finished : <br/>
-     * <code>
-     *   try {
-     *       Queue<WriteRequest> queue = session.acquireWriteQueue();
-     *       ...
-     *       // We use the queue here
-     *       ...
-     *   } finally {
-     *       session.releaseWriteQueue();
-     *   }
-     * <code>
+     * Get the {@link Queue} of this session. The write queue contains the pending writes. 
      * 
      * @return the write queue of this session
      */
-    public Queue<WriteRequest> acquireWriteQueue();
-
-    /**
-     * Release the WriteQueue after having acquired it with the {@link acquireWriteQeuee()} method.
-     */
-    public void releaseWriteQueue();
-
+    public Queue<WriteRequest> getWriteQueue();
 }

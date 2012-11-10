@@ -118,15 +118,6 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /** the queue of pending writes for the session, to be dequeued by the {@link SelectorProcessor} */
     private final Queue<WriteRequest> writeQueue = new DefaultWriteQueue();
 
-    /** A lock to protect the access to the write queue */
-    private final ReadWriteLock writeQueueLock = new ReentrantReadWriteLock();
-
-    /** A Read lock on the reentrant writeQueue lock */
-    private final Lock writeQueueReadLock = writeQueueLock.readLock();
-
-    /** A Write lock on the reentrant writeQueue lock */
-    private final Lock writeQueueWriteLock = writeQueueLock.writeLock();
-
     // ------------------------------------------------------------------------
     // Filter chain
     // ------------------------------------------------------------------------
@@ -533,27 +524,20 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public WriteRequest enqueueWriteRequest(final Object message) {
         WriteRequest request = null;
 
-        try {
-            // Lock the queue while the message is written into it
-            writeQueueReadLock.lock();
+        if (isConnectedSecured()) {
+            // SSL/TLS : we have to encrypt the message
+            final SslHelper sslHelper = getAttribute(SSL_HELPER, null);
 
-            if (isConnectedSecured()) {
-                // SSL/TLS : we have to encrypt the message
-                final SslHelper sslHelper = getAttribute(SSL_HELPER, null);
-
-                if (sslHelper == null) {
-                    throw new IllegalStateException();
-                }
-
-                request = sslHelper.processWrite(this, message, writeQueue);
-            } else {
-                // Plain message
-                request = new DefaultWriteRequest(message);
-
-                writeQueue.add(request);
+            if (sslHelper == null) {
+                throw new IllegalStateException();
             }
-        } finally {
-            writeQueueReadLock.unlock();
+
+            request = sslHelper.processWrite(this, message, writeQueue);
+        } else {
+            // Plain message
+            request = new DefaultWriteRequest(message);
+
+            writeQueue.add(request);
         }
 
         // If it wasn't, we register this session as interested to write.
@@ -575,17 +559,8 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public Queue<WriteRequest> acquireWriteQueue() {
-        writeQueueWriteLock.lock();
+    public Queue<WriteRequest> getWriteQueue() {
         return writeQueue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void releaseWriteQueue() {
-        writeQueueWriteLock.unlock();
     }
 
     // ------------------------------------------------------------------------

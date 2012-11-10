@@ -24,7 +24,16 @@ import java.nio.channels.SelectableChannel;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SelectorLoop {
-
+    /**
+     * Register a channel on a Selector, for some events. We can register for OP_ACCEPT,
+     * OP_READ or OP_WRITE.
+     * 
+     * @param accept Registers for OP_ACCEPT events
+     * @param read Registers for OP_READ events
+     * @param write Registers for OP_WRITE events
+     * @param listener The listener
+     * @param channel
+     */
     public abstract void register(boolean accept, boolean read, boolean write, SelectorListener listener,
             SelectableChannel channel);
 

@@ -41,9 +41,10 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NioTcpServer extends AbstractTcpServer implements SelectorListener {
+    /** A logger for this class */
     static final Logger LOG = LoggerFactory.getLogger(NioTcpServer.class);
 
-    // the bound local address
+    /** the bound local address */
     private SocketAddress address = null;
 
     private final SelectorLoop acceptSelectorLoop;
@@ -190,6 +191,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
                 LOG.error("error while accepting new client", e);
             }
         }
+
         if (read || write) {
             throw new IllegalStateException("should not receive read or write events");
         }

@@ -34,23 +34,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class holds a Selector and handle all the incoming events for the 
+ * sessions registered on this selector.ALl the events will be processed
+ * by some dedicated thread, taken from a pool.
+ * It will loop forever, untill the instance is stopped.
+ *  
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NioSelectorLoop implements SelectorLoop {
-
+    /** The logger for this class */
     private final Logger logger;
 
     /** the selector managed by this class */
     private Selector selector;
 
-    /** the worker thread in charge of polling the selector */
+    /** the worker thread in charge of processing the events */
     private final SelectorWorker worker;
 
     /** Read buffer for all the incoming bytes (default to 64Kb) */
     private final ByteBuffer readBuffer = ByteBuffer.allocate(64 * 1024);
 
+    /** The queue containing the channels to register on the selector */
     private final Queue<Registration> registrationQueue = new ConcurrentLinkedQueue<Registration>();
 
+    /**
+     * Creates an instance of the SelectorLoop.
+     * 
+     * @param prefix 
+     * @param index
+     */
     public NioSelectorLoop(final String prefix, final int index) {
         logger = LoggerFactory.getLogger(NioSelectorLoop.class.getName() + ":" + prefix + "-" + index);
         worker = new SelectorWorker(prefix, index);
@@ -74,20 +86,25 @@ public class NioSelectorLoop implements SelectorLoop {
     public void register(final boolean accept, final boolean read, final boolean write,
             final SelectorListener listener, final SelectableChannel channel) {
         logger.debug("registering : {} for accept : {}, read : {}, write : {}", new Object[] { listener, accept, read,
-                                write });
+                write });
         int ops = 0;
+
         if (accept) {
             ops |= SelectionKey.OP_ACCEPT;
         }
+
         if (read) {
             ops |= SelectionKey.OP_READ;
         }
+
         if (write) {
             ops |= SelectionKey.OP_WRITE;
         }
 
         // TODO : if it's the same selector/worker, we don't need to do that we could directly enqueue
         registrationQueue.add(new Registration(ops, channel, listener));
+
+        // Now, wakeup the selector in order to let it update the selectionKey status
         selector.wakeup();
     }
 
@@ -98,7 +115,7 @@ public class NioSelectorLoop implements SelectorLoop {
     public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
             final SelectorListener listener, final SelectableChannel channel) {
         logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}", new Object[] { listener,
-                                accept, read, write });
+                accept, read, write });
 
         final SelectionKey key = channel.keyFor(selector);
         if (key == null) {
@@ -137,8 +154,8 @@ public class NioSelectorLoop implements SelectorLoop {
     }
 
     /**
-     * The worker processing incoming session creation, session destruction requests, session write and reads. It will
-     * also bind new servers.
+     * The worker processing incoming session creation, session destruction requests, 
+     * session write and reads. It will also bind new servers.
      */
     private class SelectorWorker extends Thread {
 
@@ -156,6 +173,7 @@ public class NioSelectorLoop implements SelectorLoop {
                     final int readyCount = selector.select();
                     logger.debug("... done selecting : {} events", readyCount);
                     final Iterator<SelectionKey> it = selector.selectedKeys().iterator();
+
                     while (it.hasNext()) {
                         final SelectionKey key = it.next();
                         final SelectorListener listener = (SelectorListener) key.attachment();
@@ -193,7 +211,9 @@ public class NioSelectorLoop implements SelectorLoop {
         }
 
         private final int ops;
+
         private final SelectableChannel channel;
+
         private final SelectorListener listener;
     }
 }
