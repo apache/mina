@@ -19,14 +19,12 @@
  */
 package org.apache.mina.service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.mina.api.IoFilter;
+import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
-import org.apache.mina.api.IoServiceListener;
 import org.apache.mina.api.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +44,8 @@ public abstract class AbstractIoService implements IoService {
     /** The placeholder of managed open sessions */
     private final Map<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
 
-    /**
-     * Placeholder for storing all the listeners added
-     */
-    private final List<IoServiceListener> listeners = new CopyOnWriteArrayList<IoServiceListener>();
+    /** The high level business logic */
+    private IoHandler handler;
 
     /**
      * The Service states
@@ -85,40 +81,11 @@ public abstract class AbstractIoService implements IoService {
     }
 
     /**
-     * 
      * {@inheritDoc}
      */
     @Override
-    public void addListeners(final IoServiceListener... listeners) {
-        if (listeners != null) {
-            for (IoServiceListener listener : listeners) {
-                // Don't add an existing listener into the list
-                if (!this.listeners.contains(listener)) {
-                    this.listeners.add(listener);
-                }
-            }
-
-            return;
-        }
-
-        LOG.warn("Trying to add Null Listener");
-    }
-
-    /**
-     * 
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeListeners(final IoServiceListener... listeners) {
-        if (listeners != null) {
-            for (IoServiceListener listener : listeners) {
-                this.listeners.remove(listener);
-            }
-
-            return;
-        }
-
-        LOG.warn("Trying to remove Null Listener");
+    public void setIoHandler(final IoHandler handler) {
+        this.handler = handler;
     }
 
     /**
@@ -202,8 +169,8 @@ public abstract class AbstractIoService implements IoService {
      * Inform all current the listeners of the service activation.
      */
     protected void fireServiceActivated() {
-        for (IoServiceListener listener : this.listeners) {
-            listener.serviceActivated(this);
+        if (handler != null) {
+            handler.serviceActivated(this);
         }
     }
 
@@ -211,23 +178,9 @@ public abstract class AbstractIoService implements IoService {
      * Inform all current the listeners of the service desactivation.
      */
     protected void fireServiceInactivated() {
-        for (IoServiceListener listener : this.listeners) {
-            listener.serviceInactivated(this);
+        if (handler != null) {
+            handler.serviceInactivated(this);
         }
-    }
-
-    public void fireSessionCreated(final IoSession session) {
-        for (IoServiceListener listener : this.listeners) {
-            listener.sessionCreated(session);
-        }
-        this.managedSessions.put(session.getId(), session);
-    }
-
-    public void fireSessionDestroyed(final IoSession session) {
-        for (IoServiceListener listener : this.listeners) {
-            listener.sessionDestroyed(session);
-        }
-        this.managedSessions.remove(session.getId());
     }
 
     private IoFilter[] filters;

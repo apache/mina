@@ -22,8 +22,8 @@ package org.apache.mina.api;
 import java.util.Map;
 
 /**
- * Base interface for all {@link IoServer}s and {@link IoClient}s that provide I/O service 
- * and manage {@link IoSession}s.
+ * Base interface for all {@link IoServer}s and {@link IoClient}s that provide I/O service and manage {@link IoSession}
+ * s.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -37,18 +37,11 @@ public interface IoService {
     Map<Long, IoSession> getManagedSessions();
 
     /**
-     * Adds some {@link IoServiceListener} that listens any events related with this service.
+     * Set the {@link IoHandler} in charge of your business logic for this service.
      * 
-     * @param listeners The {@link IoServiceListener} to add
+     * @param handler the hanlder called for every event of the service (new connections, messages receiveds, etc..)
      */
-    void addListeners(IoServiceListener... listeners);
-
-    /**
-     * Removed some existing {@link IoServiceListener} that listens any events related with this service.
-     * 
-     * @param listeners The {@link IoServiceListener} to rmove
-     */
-    void removeListeners(IoServiceListener... listeners);
+    void setIoHandler(IoHandler handler);
 
     /**
      * Get the list of filters installed on this service
@@ -65,8 +58,7 @@ public interface IoService {
     void setFilters(IoFilter... filters);
 
     /**
-     * Returns the default configuration of the new {@link IoSession}s
-     * created by this service.
+     * Returns the default configuration of the new {@link IoSession}s created by this service.
      * 
      * @return The default configuration for this {@link IoService}
      */

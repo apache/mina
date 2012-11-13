@@ -25,10 +25,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
+import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFilter;
-import org.apache.mina.api.IoService;
-import org.apache.mina.api.IoServiceListener;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
@@ -38,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A basic Acceptor test
+ * A basic Server test
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -93,36 +92,19 @@ public class NioEchoServer {
             }
         });
 
-        acceptor.addListeners(new IoServiceListener() {
-
+        acceptor.setIoHandler(new AbstractIoHandler() {
             @Override
-            public void sessionDestroyed(final IoSession session) {
-                LOG.info("session destroyed {}", session);
-
-            }
-
-            @Override
-            public void sessionCreated(final IoSession session) {
-                LOG.info("session created {}", session);
+            public void sessionOpened(final IoSession session) {
+                LOG.info("session opened {}", session);
 
                 final String welcomeStr = "welcome\n";
                 final ByteBuffer bf = ByteBuffer.allocate(welcomeStr.length());
                 bf.put(welcomeStr.getBytes());
                 bf.flip();
                 session.write(bf);
-            }
 
-            @Override
-            public void serviceInactivated(final IoService service) {
-                LOG.info("service deactivated {}", service);
-            }
-
-            @Override
-            public void serviceActivated(final IoService service) {
-                LOG.info("service activated {}", service);
             }
         });
-
         try {
             final SocketAddress address = new InetSocketAddress(9999);
             acceptor.bind(address);

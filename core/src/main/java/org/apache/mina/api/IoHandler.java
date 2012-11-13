@@ -19,39 +19,57 @@
  */
 package org.apache.mina.api;
 
-import java.util.EventListener;
+public interface IoHandler {
 
-/**
- * Listens to events related to an {@link IoService}.
- *
- * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- */
-public interface IoServiceListener extends EventListener {
+    /**
+     * Invoked when a connection has been opened.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void sessionOpened(IoSession session);
+
+    /**
+     * Invoked when a connection is closed.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void sessionClosed(IoSession session);
+
+    /**
+     * Invoked with the related {@link IdleStatus} when a connection becomes idle.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void sessionIdle(IoSession session, IdleStatus status);
+
+    /**
+     * Invoked when a message is received.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     * @param message the incoming message to process
+     */
+    void messageReceived(IoSession session, Object message);
+
+    /**
+     * Invoked when a high level message was written to the low level O/S buffer.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     * @param message the incoming message to process
+     */
+    void messageSent(IoSession session, Object message);
+
     /**
      * Invoked when a new service is activated by an {@link IoService}.
-     *
+     * 
      * @param service the {@link IoService}
      */
     void serviceActivated(IoService service);
 
     /**
      * Invoked when a service is inactivated by an {@link IoService}.
-     *
+     * 
      * @param service the {@link IoService}
      */
     void serviceInactivated(IoService service);
 
-    /**
-     * Invoked when a new session is created by an {@link IoService}.
-     *
-     * @param session the new session
-     */
-    void sessionCreated(IoSession session);
-
-    /**
-     * Invoked when a session is being destroyed by an {@link IoService}.
-     *
-     * @param session the session to be destroyed
-     */
-    void sessionDestroyed(IoSession session);
 }
