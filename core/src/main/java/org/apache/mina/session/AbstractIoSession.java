@@ -623,18 +623,33 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     // Event processing using the filter chain
     // ------------------------------------------------------------------------
 
+    /** send a caught exception to the {@link IoHandler} (if any) */
+    private void processException(final Throwable t) {
+        LOG.debug("caught session exception ", t);
+        final IoHandler handler = getService().getIoHandler();
+        if (handler != null) {
+            handler.exceptionCaught(this, t);
+        }
+    }
+
     /**
      * process session opened event using the filter chain. To be called by the session {@link SelectorProcessor} .
      */
     public void processSessionOpened() {
         LOG.debug("processing session open event");
 
-        for (final IoFilter filter : chain) {
-            filter.sessionOpened(this);
-        }
-        final IoHandler handler = getService().getIoHandler();
-        if (handler != null) {
-            handler.sessionOpened(this);
+        try {
+
+            for (final IoFilter filter : chain) {
+                filter.sessionOpened(this);
+            }
+            final IoHandler handler = getService().getIoHandler();
+
+            if (handler != null) {
+                handler.sessionOpened(this);
+            }
+        } catch (final RuntimeException e) {
+            processException(e);
         }
     }
 
@@ -643,14 +658,17 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      */
     public void processSessionClosed() {
         LOG.debug("processing session closed event");
+        try {
+            for (final IoFilter filter : chain) {
+                filter.sessionClosed(this);
+            }
 
-        for (final IoFilter filter : chain) {
-            filter.sessionClosed(this);
-        }
-
-        final IoHandler handler = getService().getIoHandler();
-        if (handler != null) {
-            handler.sessionClosed(this);
+            final IoHandler handler = getService().getIoHandler();
+            if (handler != null) {
+                handler.sessionClosed(this);
+            }
+        } catch (final RuntimeException e) {
+            processException(e);
         }
     }
 
@@ -660,13 +678,18 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void processSessionIdle(final IdleStatus status) {
         LOG.debug("processing session idle {} event for session {}", status, this);
 
-        for (final IoFilter filter : chain) {
-            filter.sessionIdle(this, status);
+        try {
+            for (final IoFilter filter : chain) {
+                filter.sessionIdle(this, status);
+            }
+            final IoHandler handler = getService().getIoHandler();
+            if (handler != null) {
+                handler.sessionIdle(this, status);
+            }
+        } catch (final RuntimeException e) {
+            processException(e);
         }
-        final IoHandler handler = getService().getIoHandler();
-        if (handler != null) {
-            handler.sessionIdle(this, status);
-        }
+
     }
 
     /**
@@ -678,21 +701,26 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void processMessageReceived(final ByteBuffer message) {
         LOG.debug("processing message '{}' received event for session {}", message, this);
 
-        // save basic statistics
-        readBytes += message.remaining();
-        lastReadTime = System.currentTimeMillis();
+        try {
+            // save basic statistics
+            readBytes += message.remaining();
+            lastReadTime = System.currentTimeMillis();
 
-        if (chain.length < 1) {
-            LOG.debug("Nothing to do, the chain is empty");
-        } else {
-            readChainPosition = 0;
-            // we call the first filter, it's supposed to call the next ones using the filter chain controller
-            chain[readChainPosition].messageReceived(this, message, this);
+            if (chain.length < 1) {
+                LOG.debug("Nothing to do, the chain is empty");
+            } else {
+                readChainPosition = 0;
+                // we call the first filter, it's supposed to call the next ones using the filter chain controller
+                chain[readChainPosition].messageReceived(this, message, this);
+            }
+            final IoHandler handler = getService().getIoHandler();
+            if (handler != null) {
+                handler.messageReceived(this, message);
+            }
+        } catch (final RuntimeException e) {
+            processException(e);
         }
-        final IoHandler handler = getService().getIoHandler();
-        if (handler != null) {
-            handler.messageReceived(this, message);
-        }
+
     }
 
     /**
@@ -704,39 +732,50 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void processMessageWriting(final Object message, final IoFuture<Void> future) {
         LOG.debug("processing message '{}' writing event for session {}", message, this);
 
-        lastWriteRequest = null;
+        try {
+            lastWriteRequest = null;
 
-        if (chain.length < 1) {
-            enqueueFinalWriteMessage(message);
-        } else {
-            writeChainPosition = chain.length - 1;
-            // we call the first filter, it's supposed to call the next ones using the filter chain controller
-            final int position = writeChainPosition;
-            final IoFilter nextFilter = chain[position];
-            nextFilter.messageWriting(this, message, this);
-        }
-
-        // put the future in the last write request
-
-        final WriteRequest request = lastWriteRequest;
-        if (request != null) {
-            if (future != null) {
-                ((DefaultWriteRequest) request).setFuture(future);
+            if (chain.length < 1) {
+                enqueueFinalWriteMessage(message);
+            } else {
+                writeChainPosition = chain.length - 1;
+                // we call the first filter, it's supposed to call the next ones using the filter chain controller
+                final int position = writeChainPosition;
+                final IoFilter nextFilter = chain[position];
+                nextFilter.messageWriting(this, message, this);
             }
-            ((DefaultWriteRequest) request).setHighLevelMessage(message);
+
+            // put the future in the last write request
+
+            final WriteRequest request = lastWriteRequest;
+            if (request != null) {
+                if (future != null) {
+                    ((DefaultWriteRequest) request).setFuture(future);
+                }
+                ((DefaultWriteRequest) request).setHighLevelMessage(message);
+            }
+        } catch (final RuntimeException e) {
+            processException(e);
         }
+
     }
 
     public void processMessageSent(final Object highLevelMessage) {
         LOG.debug("processing message '{}' sent event for session {}", highLevelMessage, this);
-        final int size = chain.length;
-        for (int i = size - 1; i >= 0; i--) {
-            chain[i].messageSent(this, highLevelMessage);
+
+        try {
+            final int size = chain.length;
+            for (int i = size - 1; i >= 0; i--) {
+                chain[i].messageSent(this, highLevelMessage);
+            }
+            final IoHandler handler = getService().getIoHandler();
+            if (handler != null) {
+                handler.messageSent(this, highLevelMessage);
+            }
+        } catch (final RuntimeException e) {
+            processException(e);
         }
-        final IoHandler handler = getService().getIoHandler();
-        if (handler != null) {
-            handler.messageSent(this, highLevelMessage);
-        }
+
     }
 
     /**
@@ -784,5 +823,4 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
         readChainPosition--;
     }
-
 }

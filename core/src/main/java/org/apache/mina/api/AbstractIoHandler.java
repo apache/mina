@@ -73,4 +73,11 @@ public abstract class AbstractIoHandler implements IoHandler {
     @Override
     public void serviceInactivated(final IoService service) {
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void exceptionCaught(final IoSession session, final Throwable cause) {
+    }
 }

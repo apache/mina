@@ -72,4 +72,11 @@ public interface IoHandler {
      */
     void serviceInactivated(IoService service);
 
+    /**
+     * Invoked when any runtime exception is thrown during session processing (filters, unexpected error, etc..).
+     * 
+     * @param session the session related to the exception
+     * @param cause the caught exception
+     */
+    void exceptionCaught(IoSession session, Throwable cause);
 }
