@@ -48,7 +48,7 @@ public class NioTcpServerHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerHandlerTest.class);
 
-    private static final int CLIENT_COUNT = 1;
+    private static final int CLIENT_COUNT = 50;
 
     private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 
