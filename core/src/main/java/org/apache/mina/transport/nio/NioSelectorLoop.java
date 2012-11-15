@@ -34,11 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class holds a Selector and handle all the incoming events for the 
- * sessions registered on this selector.ALl the events will be processed
- * by some dedicated thread, taken from a pool.
- * It will loop forever, untill the instance is stopped.
- *  
+ * This class holds a Selector and handle all the incoming events for the sessions registered on this selector.ALl the
+ * events will be processed by some dedicated thread, taken from a pool. It will loop forever, untill the instance is
+ * stopped.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NioSelectorLoop implements SelectorLoop {
@@ -60,7 +59,7 @@ public class NioSelectorLoop implements SelectorLoop {
     /**
      * Creates an instance of the SelectorLoop.
      * 
-     * @param prefix 
+     * @param prefix
      * @param index
      */
     public NioSelectorLoop(final String prefix, final int index) {
@@ -86,7 +85,7 @@ public class NioSelectorLoop implements SelectorLoop {
     public void register(final boolean accept, final boolean read, final boolean write,
             final SelectorListener listener, final SelectableChannel channel) {
         logger.debug("registering : {} for accept : {}, read : {}, write : {}", new Object[] { listener, accept, read,
-                write });
+                                write });
         int ops = 0;
 
         if (accept) {
@@ -115,7 +114,7 @@ public class NioSelectorLoop implements SelectorLoop {
     public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
             final SelectorListener listener, final SelectableChannel channel) {
         logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}", new Object[] { listener,
-                accept, read, write });
+                                accept, read, write });
 
         final SelectionKey key = channel.keyFor(selector);
         if (key == null) {
@@ -154,8 +153,8 @@ public class NioSelectorLoop implements SelectorLoop {
     }
 
     /**
-     * The worker processing incoming session creation, session destruction requests, 
-     * session write and reads. It will also bind new servers.
+     * The worker processing incoming session creation, session destruction requests, session write and reads. It will
+     * also bind new servers.
      */
     private class SelectorWorker extends Thread {
 
@@ -197,6 +196,7 @@ public class NioSelectorLoop implements SelectorLoop {
                     }
                 } catch (final Exception e) {
                     logger.error("Unexpected exception : ", e);
+                    e.printStackTrace();
                 }
             }
         }

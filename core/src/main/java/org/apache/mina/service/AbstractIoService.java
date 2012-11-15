@@ -89,6 +89,14 @@ public abstract class AbstractIoService implements IoService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoHandler getIoHandler() {
+        return handler;
+    }
+
+    /**
      * @return true if the IoService is active
      */
     public boolean isActive() {

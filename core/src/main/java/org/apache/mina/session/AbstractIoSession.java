@@ -35,6 +35,7 @@ import javax.net.ssl.SSLException;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
+import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.api.RuntimeIoException;
@@ -631,6 +632,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         for (final IoFilter filter : chain) {
             filter.sessionOpened(this);
         }
+        final IoHandler handler = getService().getIoHandler();
+        if (handler != null) {
+            handler.sessionOpened(this);
+        }
     }
 
     /**
@@ -642,6 +647,11 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         for (final IoFilter filter : chain) {
             filter.sessionClosed(this);
         }
+
+        final IoHandler handler = getService().getIoHandler();
+        if (handler != null) {
+            handler.sessionClosed(this);
+        }
     }
 
     /**
@@ -652,6 +662,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
         for (final IoFilter filter : chain) {
             filter.sessionIdle(this, status);
+        }
+        final IoHandler handler = getService().getIoHandler();
+        if (handler != null) {
+            handler.sessionIdle(this, status);
         }
     }
 
@@ -674,6 +688,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             readChainPosition = 0;
             // we call the first filter, it's supposed to call the next ones using the filter chain controller
             chain[readChainPosition].messageReceived(this, message, this);
+        }
+        final IoHandler handler = getService().getIoHandler();
+        if (handler != null) {
+            handler.messageReceived(this, message);
         }
     }
 
@@ -714,6 +732,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         final int size = chain.length;
         for (int i = size - 1; i >= 0; i--) {
             chain[i].messageSent(this, highLevelMessage);
+        }
+        final IoHandler handler = getService().getIoHandler();
+        if (handler != null) {
+            handler.messageSent(this, highLevelMessage);
         }
     }
 

@@ -48,7 +48,7 @@ public class AbstractIoFutureTest {
 
     @Test
     public void testSet() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
 
         assertFalse(future.isCancelled());
         assertFalse(future.isDone());
@@ -60,10 +60,10 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({ "unchecked", "ThrowableResultOfMethodCallIgnored" })
+    @SuppressWarnings({ "unchecked" })
     public void testSetListeners() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
-        IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
 
         future.register(listener);
 
@@ -80,10 +80,10 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({ "unchecked", "ThrowableResultOfMethodCallIgnored" })
+    @SuppressWarnings({ "unchecked" })
     public void testSetListenersAlreadySet() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
-        IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
 
         assertFalse(future.isCancelled());
         assertFalse(future.isDone());
@@ -111,7 +111,7 @@ public class AbstractIoFutureTest {
                 try {
                     Thread.sleep(1000);
                     future.setResult(true);
-                } catch (InterruptedException ignored) {
+                } catch (final InterruptedException ignored) {
                 }
             }
         }).start();
@@ -120,18 +120,18 @@ public class AbstractIoFutureTest {
             assertTrue(future.get(1, TimeUnit.DAYS));
             assertFalse(future.isCancelled());
             assertTrue(future.isDone());
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             fail("This future was not interrupted");
-        } catch (ExecutionException ee) {
+        } catch (final ExecutionException ee) {
             fail("This future did not have an execution exception");
-        } catch (TimeoutException e) {
+        } catch (final TimeoutException e) {
             fail("This future was not interrupted");
         }
     }
 
     @Test
     public void testException() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
 
         assertFalse(future.isCancelled());
         assertFalse(future.isDone());
@@ -144,9 +144,9 @@ public class AbstractIoFutureTest {
         try {
             future.get();
             fail("This future had an execution exception");
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             fail("This future was not interrupted");
-        } catch (ExecutionException ee) {
+        } catch (final ExecutionException ee) {
             assertTrue(ee.getCause() instanceof NullPointerException);
         }
 
@@ -155,10 +155,10 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({ "ThrowableResultOfMethodCallIgnored", "unchecked" })
+    @SuppressWarnings({ "unchecked" })
     public void testExceptionListeners() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
-        IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
 
         future.register(listener);
 
@@ -175,10 +175,10 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({ "ThrowableResultOfMethodCallIgnored", "unchecked" })
+    @SuppressWarnings({ "unchecked" })
     public void testExceptionListenersExceptionAlreadySet() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
-        IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
 
         assertFalse(future.isCancelled());
         assertFalse(future.isDone());
@@ -195,7 +195,7 @@ public class AbstractIoFutureTest {
 
     @Test
     public void testImmediateExceptionForTimedGet() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
 
         assertFalse(future.isCancelled());
         assertFalse(future.isDone());
@@ -208,11 +208,11 @@ public class AbstractIoFutureTest {
         try {
             future.get(1, TimeUnit.DAYS);
             fail("This future had an execution exception");
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             fail("This future was not interrupted");
-        } catch (ExecutionException ee) {
+        } catch (final ExecutionException ee) {
             assertTrue(ee.getCause() instanceof NullPointerException);
-        } catch (TimeoutException e) {
+        } catch (final TimeoutException e) {
             fail("This future was not interrupted");
         }
 
@@ -233,17 +233,17 @@ public class AbstractIoFutureTest {
                 try {
                     Thread.sleep(1000);
                     future.setException(new NullPointerException());
-                } catch (InterruptedException ignored) {
+                } catch (final InterruptedException ignored) {
                 }
             }
         }).start();
 
         try {
             assertTrue(future.get(1, TimeUnit.DAYS));
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             fail("This future was not interrupted");
-        } catch (ExecutionException ee) {
-        } catch (TimeoutException e) {
+        } catch (final ExecutionException ee) {
+        } catch (final TimeoutException e) {
             fail("This future was not interrupted");
         }
 
@@ -253,7 +253,7 @@ public class AbstractIoFutureTest {
 
     @Test
     public void testCancel() throws Exception {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         doReturn(true).when(future).cancelOwner(anyBoolean());
 
         assertFalse(future.isCancelled());
@@ -268,13 +268,13 @@ public class AbstractIoFutureTest {
         try {
             future.get();
             fail("This future was canceled");
-        } catch (CancellationException ignore) {
+        } catch (final CancellationException ignore) {
         }
     }
 
     @Test
     public void testCancelUncancelableOwner() throws Exception {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         doReturn(false).when(future).cancelOwner(anyBoolean());
 
         assertFalse(future.isCancelled());
@@ -286,7 +286,7 @@ public class AbstractIoFutureTest {
 
     @Test
     public void testCancelFinishedFuture() throws Exception {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         doReturn(true).when(future).cancelOwner(anyBoolean());
 
         future.setResult(true);
@@ -301,11 +301,11 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({ "unchecked", "ThrowableResultOfMethodCallIgnored" })
+    @SuppressWarnings({ "unchecked" })
     public void testCanceledListeners() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         doReturn(true).when(future).cancelOwner(anyBoolean());
-        IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
+        final IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
 
         future.register(listener);
 
@@ -322,11 +322,11 @@ public class AbstractIoFutureTest {
     }
 
     @Test
-    @SuppressWarnings({ "unchecked", "ThrowableResultOfMethodCallIgnored" })
+    @SuppressWarnings({ "unchecked" })
     public void testCanceledListenersAlreadySet() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
         doReturn(true).when(future).cancelOwner(anyBoolean());
-        IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
+        final IoFutureListener<Boolean> listener = mock(IoFutureListener.class);
 
         assertFalse(future.isCancelled());
         assertFalse(future.isDone());
@@ -343,7 +343,7 @@ public class AbstractIoFutureTest {
 
     @Test
     public void testTimeout() {
-        MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
+        final MockAbstractIoFuture<Boolean> future = spy(new MockAbstractIoFuture<Boolean>());
 
         assertFalse(future.isCancelled());
         assertFalse(future.isDone());
@@ -351,24 +351,24 @@ public class AbstractIoFutureTest {
         try {
             future.get(10, TimeUnit.MILLISECONDS);
             fail("This future has timed out");
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             fail("This future was not interrupted");
-        } catch (ExecutionException ee) {
+        } catch (final ExecutionException ee) {
             fail("This future did not have an execution exception");
-        } catch (TimeoutException e) {
+        } catch (final TimeoutException e) {
         }
     }
 
     private static Matcher<Throwable> matchesExecutionException() {
         return new BaseMatcher<Throwable>() {
             @Override
-            public boolean matches(Object item) {
+            public boolean matches(final Object item) {
                 return item instanceof ExecutionException
                         && ((ExecutionException) item).getCause() instanceof NullPointerException;
             }
 
             @Override
-            public void describeTo(Description description) {
+            public void describeTo(final Description description) {
                 description.appendText("ExecutionException(NullPointerException)");
             }
         };
@@ -377,7 +377,7 @@ public class AbstractIoFutureTest {
     public static class MockAbstractIoFuture<V> extends AbstractIoFuture<V> {
 
         @Override
-        protected boolean cancelOwner(boolean mayInterruptIfRunning) {
+        protected boolean cancelOwner(final boolean mayInterruptIfRunning) {
             throw new UnsupportedOperationException();
         }
     }

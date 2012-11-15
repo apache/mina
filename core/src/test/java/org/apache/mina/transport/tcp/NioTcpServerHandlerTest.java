@@ -21,7 +21,6 @@ package org.apache.mina.transport.tcp;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -29,25 +28,27 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.api.AbstractIoFilter;
+import junit.framework.Assert;
+
+import org.apache.mina.api.AbstractIoHandler;
+import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.filterchain.ReadFilterChainController;
-import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.transport.nio.NioTcpServer;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class test the event dispatching of {@link NioTcpServer}.
+ * This class test the event dispatching of {@link NioTcpServer}. It tests if alls the {@link IoHandler} events are
+ * correctly generated.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioTcpServerEventTest {
+public class NioTcpServerHandlerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerEventTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerHandlerTest.class);
 
-    private static final int CLIENT_COUNT = 50;
+    private static final int CLIENT_COUNT = 1;
 
     private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 
@@ -57,11 +58,15 @@ public class NioTcpServerEventTest {
 
     private final CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
 
+    private final CountDownLatch idleLatch = new CountDownLatch(CLIENT_COUNT);
+
     @Test
     public void generate_all_kind_of_server_event() throws IOException, InterruptedException {
         final NioTcpServer server = new NioTcpServer();
-        server.setFilters(new MyCodec(), new Handler());
+        server.setFilters();
+        server.setIoHandler(new Handler());
         server.bind(0);
+
         // warm up
         Thread.sleep(100);
 
@@ -110,29 +115,7 @@ public class NioTcpServerEventTest {
         server.unbind();
     }
 
-    private class MyCodec extends AbstractIoFilter {
-
-        @Override
-        public void messageReceived(final IoSession session, final Object message,
-                final ReadFilterChainController controller) {
-            if (message instanceof ByteBuffer) {
-                final ByteBuffer in = (ByteBuffer) message;
-                final byte[] buffer = new byte[in.remaining()];
-                in.get(buffer);
-                controller.callReadNextFilter(new String(buffer));
-            } else {
-                fail();
-            }
-        }
-
-        @Override
-        public void messageWriting(final IoSession session, final Object message,
-                final WriteFilterChainController controller) {
-            controller.callWriteNextFilter(ByteBuffer.wrap(message.toString().getBytes()));
-        }
-    }
-
-    private class Handler extends AbstractIoFilter {
+    private class Handler extends AbstractIoHandler {
 
         @Override
         public void sessionOpened(final IoSession session) {
@@ -147,11 +130,15 @@ public class NioTcpServerEventTest {
         }
 
         @Override
-        public void messageReceived(final IoSession session, final Object message,
-                final ReadFilterChainController controller) {
+        public void messageReceived(final IoSession session, final Object message) {
             LOG.info("** message received {}", message);
             msgReadLatch.countDown();
-            session.write(message.toString());
+            if (message instanceof ByteBuffer) {
+                final ByteBuffer msg = (ByteBuffer) message;
+                session.write(ByteBuffer.allocate(msg.remaining()).put(msg).flip());
+            } else {
+                Assert.fail("non bytebuffer received??");
+            }
         }
 
         @Override
@@ -160,4 +147,5 @@ public class NioTcpServerEventTest {
             msgSentLatch.countDown();
         }
     }
+
 }

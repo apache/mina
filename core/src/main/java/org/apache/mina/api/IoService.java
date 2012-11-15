@@ -39,9 +39,16 @@ public interface IoService {
     /**
      * Set the {@link IoHandler} in charge of your business logic for this service.
      * 
-     * @param handler the hanlder called for every event of the service (new connections, messages receiveds, etc..)
+     * @param handler the handler called for every event of the service (new connections, messages received, etc..)
      */
     void setIoHandler(IoHandler handler);
+
+    /**
+     * Get the {@link IoHandler} in charge of your business logic for this service.
+     * 
+     * @return the handler called for every event of the service (new connections, messages received, etc..)
+     */
+    IoHandler getIoHandler();
 
     /**
      * Get the list of filters installed on this service

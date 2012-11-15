@@ -267,6 +267,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
         // add the session to the queue for being added to the selector
         readWriteSelectorLoop.register(false, true, false, session, socketChannel);
+
         session.processSessionOpened();
         session.setConnected();
         idleChecker.sessionRead(session, System.currentTimeMillis());
