@@ -264,13 +264,13 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
             LOG.debug("ready for write");
             LOG.debug("writable session : {}", this);
 
-            Queue<WriteRequest> queue = getWriteQueue();
+            Queue<WriteRequest> writeQueue = getWriteQueue();
 
             do {
                 // get a write request from the queue. We left it in the queue,
                 // just in case we can't write all of the message content into
                 // the channel : we will have to retrieve the message later
-                final WriteRequest writeRequest = queue.peek();
+                final WriteRequest writeRequest = writeQueue.peek();
 
                 if (writeRequest == null) {
                     // Nothing to write : we are done
@@ -300,7 +300,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                     // completed write request, let's remove it (we use poll() instead
                     // of remove(), because remove() may throw an exception if the
                     // queue is empty.
-                    queue.poll();
+                    writeQueue.poll();
 
                     // complete the future if we have one (we should...)
                     final DefaultWriteFuture future = (DefaultWriteFuture) writeRequest.getFuture();
@@ -321,24 +321,29 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                     // writing. 
                     break;
                 }
-            } while (!queue.isEmpty());
+            } while (!writeQueue.isEmpty());
 
             // We may have exited from the loop for some other reason 
             // that an empty queue
             // if the session is no more interested in writing, we need
             // to stop listening for OP_WRITE events
-            if (queue.isEmpty()) {
-                if (isClosing()) {
-                    LOG.debug("closing session {} have empty write queue, so we close it", this);
-                    // we was flushing writes, now we to the close
-                    channelClose();
+            //
+            // IMPORTANT : this section is synchronized so that the OP_WRITE flag
+            // can be set safely by both the selector thread and the writer thread.
+            synchronized (writeQueue) {
+                if (writeQueue.isEmpty()) {
+                    if (isClosing()) {
+                        LOG.debug("closing session {} have empty write queue, so we close it", this);
+                        // we was flushing writes, now we to the close
+                        channelClose();
+                    } else {
+                        // no more write event needed
+                        selectorLoop.modifyRegistration(false, !isReadSuspended(), false, this, channel);
+                    }
                 } else {
-                    // no more write event needed
-                    selectorLoop.modifyRegistration(false, !isReadSuspended(), false, this, channel);
+                    // We have some more data to write : the channel OP_WRITE interest remains 
+                    // as it was.
                 }
-            } else {
-                // We have some more data to write : the channel OP_WRITE interest remains 
-                // as it was.
             }
         } catch (final IOException e) {
             LOG.error("Exception while reading : ", e);

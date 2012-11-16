@@ -448,8 +448,6 @@ public class SslHelper {
                     appBuffer.flip();
                     WriteRequest request = new DefaultWriteRequest(appBuffer);
 
-                    writeQueue.add(request);
-
                     return request;
                 }
             }

@@ -537,14 +537,16 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         } else {
             // Plain message
             request = new DefaultWriteRequest(message);
-
-            writeQueue.add(request);
         }
 
-        // If it wasn't, we register this session as interested to write.
-        // It's done in atomic fashion for avoiding two concurrent registering.
-        if (!registeredForWrite.getAndSet(true)) {
-            flushWriteQueue();
+        synchronized (writeQueue) {
+            writeQueue.add(request);
+
+            // If it wasn't, we register this session as interested to write.
+            // It's done in atomic fashion for avoiding two concurrent registering.
+            if (!registeredForWrite.getAndSet(true)) {
+                flushWriteQueue();
+            }
         }
 
         return request;
