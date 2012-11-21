@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Queue;
 
@@ -45,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class NioTcpSession extends AbstractIoSession implements SelectorListener {
+public class NioTcpSession extends AbstractIoSession implements NioSession, SelectorListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpSession.class);
 
@@ -365,5 +367,39 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
         if (accept) {
             throw new IllegalStateException("accept event should never occur on NioTcpSession");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SelectionKey getSelectionKey() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSelectionKey(SelectionKey key) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSelector(Selector selector) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void wakeup() {
+        selectorLoop.wakeup();
     }
 }

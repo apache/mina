@@ -549,6 +549,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             }
         }
 
+        // Always wake-up the selector here!
+        // TODO : wake up the selector.
+
         return request;
     }
 

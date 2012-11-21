@@ -26,11 +26,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class FixedSelectorLoopPool implements SelectorLoopPool {
-
-    // the pool of selector loop
+    /** the pool of selector loop */
     private final SelectorLoop[] pool;
 
-    // the index of the next selector loop to be served
+    /** the index of the next selector loop to be served */
     private final AtomicInteger nextIndex = new AtomicInteger();
 
     /**
@@ -39,8 +38,12 @@ public class FixedSelectorLoopPool implements SelectorLoopPool {
      * @param size
      */
     public FixedSelectorLoopPool(final int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("We can't create a pool with no Selectorloop in it");
+        }
 
         pool = new SelectorLoop[size];
+
         for (int i = 0; i < size; i++) {
             pool[i] = new NioSelectorLoop("I/O", i);
         }

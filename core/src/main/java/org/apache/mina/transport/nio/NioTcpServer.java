@@ -68,12 +68,26 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
     }
 
     /**
+     * Create a TCP server with provided selector loops pool. We will use one SelectorLoop get from
+     * the pool to manage the OP_ACCEPT events. If the pool contains only one SelectorLoop, then
+     * all the events will be managed by the same Selector.
+     * 
+     * @param acceptSelectorLoop the selector loop for handling accept events (connection of new session)
+     * @param readWriteSelectorLoop the pool of selector loop for handling read/write events of connected sessions
+     */
+    public NioTcpServer(SelectorLoopPool selectorLoopPool) {
+        super();
+        this.acceptSelectorLoop = selectorLoopPool.getSelectorLoop();
+        this.readWriteSelectorPool = selectorLoopPool;
+    }
+
+    /**
      * Create a TCP server with provided selector loops pool
      * 
      * @param acceptSelectorLoop the selector loop for handling accept events (connection of new session)
      * @param readWriteSelectorLoop the pool of selector loop for handling read/write events of connected sessions
      */
-    public NioTcpServer(final SelectorLoop acceptSelectorLoop, final SelectorLoopPool readWriteSelectorLoop) {
+    public NioTcpServer(SelectorLoop acceptSelectorLoop, SelectorLoopPool readWriteSelectorLoop) {
         super();
         this.acceptSelectorLoop = acceptSelectorLoop;
         this.readWriteSelectorPool = readWriteSelectorLoop;
@@ -266,7 +280,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         }
 
         // add the session to the queue for being added to the selector
-        readWriteSelectorLoop.register(false, true, false, session, socketChannel);
+        readWriteSelectorLoop.register(session, false, true, false, session, socketChannel);
 
         session.processSessionOpened();
         session.setConnected();

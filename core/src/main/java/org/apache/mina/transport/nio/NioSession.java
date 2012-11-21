@@ -20,6 +20,7 @@
 package org.apache.mina.transport.nio;
 
 import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 
 import org.apache.mina.api.IoSession;
 
@@ -40,4 +41,17 @@ public interface NioSession extends IoSession {
      * @param key The session's SelectionKey
      */
     void setSelectionKey(SelectionKey key);
+
+    /**
+     * Refers to the Selector in used by this session. A session is managed by one
+     * single selector during its own life.
+     * 
+     * @param selector The selector managing this session
+     */
+    void setSelector(Selector selector);
+
+    /**
+     * Wakeup the associated selector
+     */
+    void wakeup();
 }

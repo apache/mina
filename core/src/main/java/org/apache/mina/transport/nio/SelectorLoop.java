@@ -20,10 +20,26 @@ package org.apache.mina.transport.nio;
 
 import java.nio.channels.SelectableChannel;
 
+import org.apache.mina.api.IoSession;
+
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SelectorLoop {
+    /**
+     * Register a channel on a Selector, for some events. We can register for OP_ACCEPT,
+     * OP_READ or OP_WRITE.
+     * 
+     * @param session The session
+     * @param accept Registers for OP_ACCEPT events
+     * @param read Registers for OP_READ events
+     * @param write Registers for OP_WRITE events
+     * @param listener The listener
+     * @param channel
+     */
+    void register(IoSession session, boolean accept, boolean read, boolean write, SelectorListener listener,
+            SelectableChannel channel);
+
     /**
      * Register a channel on a Selector, for some events. We can register for OP_ACCEPT,
      * OP_READ or OP_WRITE.
@@ -34,12 +50,15 @@ public interface SelectorLoop {
      * @param listener The listener
      * @param channel
      */
-    public abstract void register(boolean accept, boolean read, boolean write, SelectorListener listener,
+    void register(boolean accept, boolean read, boolean write, SelectorListener listener, SelectableChannel channel);
+
+    void modifyRegistration(boolean accept, boolean read, boolean write, SelectorListener listener,
             SelectableChannel channel);
 
-    public abstract void modifyRegistration(boolean accept, boolean read, boolean write, SelectorListener listener,
-            SelectableChannel channel);
+    void unregister(SelectorListener listener, SelectableChannel channel);
 
-    public abstract void unregister(SelectorListener listener, SelectableChannel channel);
-
+    /**
+     * Wake up the selector
+     */
+    void wakeup();
 }

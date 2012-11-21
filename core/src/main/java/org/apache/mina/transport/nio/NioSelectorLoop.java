@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.mina.api.IoSession;
 import org.apache.mina.api.RuntimeIoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,9 +63,27 @@ public class NioSelectorLoop implements SelectorLoop {
      * @param prefix
      * @param index
      */
+    public NioSelectorLoop(final String prefix) {
+        this(prefix, -1);
+    }
+
+    /**
+     * Creates an instance of the SelectorLoop.
+     * 
+     * @param prefix
+     * @param index
+     */
     public NioSelectorLoop(final String prefix, final int index) {
-        logger = LoggerFactory.getLogger(NioSelectorLoop.class.getName() + ":" + prefix + "-" + index);
-        worker = new SelectorWorker(prefix, index);
+        String name = NioSelectorLoop.class.getName() + ":" + prefix;
+        String workerName = "SelectorWorker " + prefix;
+
+        if (index >= 0) {
+            name += "-" + index;
+            workerName += "-" + index;
+        }
+
+        logger = LoggerFactory.getLogger(name);
+        worker = new SelectorWorker(workerName);
 
         try {
             logger.debug("open a selector");
@@ -82,10 +101,19 @@ public class NioSelectorLoop implements SelectorLoop {
      * {@inheritDoc}
      */
     @Override
-    public void register(final boolean accept, final boolean read, final boolean write,
-            final SelectorListener listener, final SelectableChannel channel) {
+    public void register(boolean accept, boolean read, boolean write, SelectorListener listener,
+            SelectableChannel channel) {
+        register(null, accept, read, write, listener, channel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void register(IoSession session, boolean accept, boolean read, boolean write, SelectorListener listener,
+            SelectableChannel channel) {
         logger.debug("registering : {} for accept : {}, read : {}, write : {}", new Object[] { listener, accept, read,
-                                write });
+                write });
         int ops = 0;
 
         if (accept) {
@@ -101,7 +129,7 @@ public class NioSelectorLoop implements SelectorLoop {
         }
 
         // TODO : if it's the same selector/worker, we don't need to do that we could directly enqueue
-        registrationQueue.add(new Registration(ops, channel, listener));
+        registrationQueue.add(new Registration(session, ops, channel, listener));
 
         // Now, wakeup the selector in order to let it update the selectionKey status
         selector.wakeup();
@@ -114,7 +142,7 @@ public class NioSelectorLoop implements SelectorLoop {
     public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
             final SelectorListener listener, final SelectableChannel channel) {
         logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}", new Object[] { listener,
-                                accept, read, write });
+                accept, read, write });
 
         final SelectionKey key = channel.keyFor(selector);
         if (key == null) {
@@ -158,8 +186,8 @@ public class NioSelectorLoop implements SelectorLoop {
      */
     private class SelectorWorker extends Thread {
 
-        public SelectorWorker(final String prefix, final int index) {
-            super("SelectorWorker " + prefix + "-" + index);
+        public SelectorWorker(String name) {
+            super(name);
             setDaemon(true);
         }
 
@@ -188,7 +216,13 @@ public class NioSelectorLoop implements SelectorLoop {
                         final Registration reg = registrationQueue.poll();
 
                         try {
-                            reg.channel.register(selector, reg.ops, reg.listener);
+                            SelectionKey selectionKey = reg.channel.register(selector, reg.ops, reg.listener);
+
+                            IoSession session = reg.getSession();
+
+                            if (session != null) {
+                                ((NioSession) session).setSelectionKey(selectionKey);
+                            }
                         } catch (final ClosedChannelException ex) {
                             // dead session..
                             logger.error("socket is already dead", ex);
@@ -204,10 +238,11 @@ public class NioSelectorLoop implements SelectorLoop {
 
     private class Registration {
 
-        public Registration(final int ops, final SelectableChannel channel, final SelectorListener listener) {
+        public Registration(IoSession session, int ops, SelectableChannel channel, SelectorListener listener) {
             this.ops = ops;
             this.channel = channel;
             this.listener = listener;
+            this.session = session;
         }
 
         private final int ops;
@@ -215,5 +250,16 @@ public class NioSelectorLoop implements SelectorLoop {
         private final SelectableChannel channel;
 
         private final SelectorListener listener;
+
+        private final IoSession session;
+
+        public IoSession getSession() {
+            return session;
+        }
+    }
+
+    @Override
+    public void wakeup() {
+        selector.wakeup();
     }
 }

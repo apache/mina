@@ -21,8 +21,8 @@
  */
 package org.apache.mina.service.idlecheker;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.net.SocketAddress;
 
