@@ -33,7 +33,9 @@ import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.transport.nio.FixedSelectorLoopPool;
 import org.apache.mina.transport.nio.NioTcpServer;
+import org.apache.mina.transport.nio.SelectorLoopPool;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +49,9 @@ public class NioTcpServerFilterEventTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerFilterEventTest.class);
 
-    private static final int CLIENT_COUNT = 50;
+    private static final int CLIENT_COUNT = 100;
+
+    private static final int WAIT_TIME = 200;
 
     private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 
@@ -65,17 +69,24 @@ public class NioTcpServerFilterEventTest {
         // warm up
         Thread.sleep(100);
 
+        long t0 = System.currentTimeMillis();
         final int port = server.getServerSocketChannel().socket().getLocalPort();
 
         final Socket[] clients = new Socket[CLIENT_COUNT];
 
         // connect some clients
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            clients[i] = new Socket("127.0.0.1", port);
+            //System.out.println("Creation client " + i);
+            try {
+                clients[i] = new Socket("127.0.0.1", port);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Creation client " + i + " failed");
+            }
         }
 
         // does the session open message was fired ?
-        assertTrue(openLatch.await(200, TimeUnit.MILLISECONDS));
+        assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // write some messages
         for (int i = 0; i < CLIENT_COUNT; i++) {
@@ -84,10 +95,10 @@ public class NioTcpServerFilterEventTest {
         }
 
         // test is message was received by the server
-        assertTrue(msgReadLatch.await(200, TimeUnit.MILLISECONDS));
+        assertTrue(msgReadLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // does response was wrote and sent ?
-        assertTrue(msgSentLatch.await(200, TimeUnit.MILLISECONDS));
+        assertTrue(msgSentLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // read the echos
         final byte[] buffer = new byte[1024];
@@ -105,7 +116,77 @@ public class NioTcpServerFilterEventTest {
         }
 
         // does the session close event was fired ?
-        assertTrue(closedLatch.await(200, TimeUnit.MILLISECONDS));
+        assertTrue(closedLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        long t1 = System.currentTimeMillis();
+
+        System.out.println("Delta = " + (t1 - t0));
+
+        server.unbind();
+    }
+
+    /**
+     * A test that creates 50 clients, each one of them writing one message. We will
+     * check that for each client we correctly process the sessionOpened, messageReceived,
+     * messageSent and sessionClosed events.
+     * We use only one selector to process all the OP events.
+     */
+    @Test
+    public void generateAllKindOfServerEventOneSelector() throws IOException, InterruptedException {
+        SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool(1);
+        final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool);
+        server.setFilters(new MyCodec(), new Handler());
+        server.bind(0);
+        // warm up
+        Thread.sleep(100);
+
+        long t0 = System.currentTimeMillis();
+        final int port = server.getServerSocketChannel().socket().getLocalPort();
+
+        final Socket[] clients = new Socket[CLIENT_COUNT];
+
+        // connect some clients
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            //System.out.println("Creation client 2 " + i);
+            clients[i] = new Socket("127.0.0.1", port);
+        }
+
+        // does the session open message was fired ?
+        assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // write some messages
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            clients[i].getOutputStream().write(("test:" + i).getBytes());
+            clients[i].getOutputStream().flush();
+        }
+
+        // test is message was received by the server
+        assertTrue(msgReadLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // does response was wrote and sent ?
+        assertTrue(msgSentLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // read the echos
+        final byte[] buffer = new byte[1024];
+
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            final int bytes = clients[i].getInputStream().read(buffer);
+            final String text = new String(buffer, 0, bytes);
+            assertEquals("test:" + i, text);
+        }
+
+        // close the session
+        assertEquals(CLIENT_COUNT, closedLatch.getCount());
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            clients[i].close();
+        }
+
+        // does the session close event was fired ?
+        assertTrue(closedLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        long t1 = System.currentTimeMillis();
+
+        System.out.println("Delta = " + (t1 - t0));
 
         server.unbind();
     }

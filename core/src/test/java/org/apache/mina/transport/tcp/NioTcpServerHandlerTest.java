@@ -33,7 +33,9 @@ import junit.framework.Assert;
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.transport.nio.FixedSelectorLoopPool;
 import org.apache.mina.transport.nio.NioTcpServer;
+import org.apache.mina.transport.nio.SelectorLoopPool;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +50,9 @@ public class NioTcpServerHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerHandlerTest.class);
 
-    private static final int CLIENT_COUNT = 50;
+    private static final int CLIENT_COUNT = 100;
+
+    private static final int WAIT_TIME = 200;
 
     private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 
@@ -80,7 +84,7 @@ public class NioTcpServerHandlerTest {
         }
 
         // does the session open message was fired ?
-        assertTrue(openLatch.await(200, TimeUnit.MILLISECONDS));
+        assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // write some messages
         for (int i = 0; i < CLIENT_COUNT; i++) {
@@ -89,10 +93,10 @@ public class NioTcpServerHandlerTest {
         }
 
         // test is message was received by the server
-        assertTrue(msgReadLatch.await(200, TimeUnit.MILLISECONDS));
+        assertTrue(msgReadLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // does response was wrote and sent ?
-        assertTrue(msgSentLatch.await(200, TimeUnit.MILLISECONDS));
+        assertTrue(msgSentLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // read the echos
         final byte[] buffer = new byte[1024];
@@ -110,7 +114,63 @@ public class NioTcpServerHandlerTest {
         }
 
         // does the session close event was fired ?
-        assertTrue(closedLatch.await(200, TimeUnit.MILLISECONDS));
+        assertTrue(closedLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        server.unbind();
+    }
+
+    @Test
+    public void generateAllKindOfServerEventOneSelector() throws IOException, InterruptedException {
+        SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool(1);
+        final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool);
+        server.setFilters();
+        server.setIoHandler(new Handler());
+        server.bind(0);
+
+        // warm up
+        Thread.sleep(100);
+
+        final int port = server.getServerSocketChannel().socket().getLocalPort();
+
+        final Socket[] clients = new Socket[CLIENT_COUNT];
+
+        // connect some clients
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            clients[i] = new Socket("127.0.0.1", port);
+        }
+
+        // does the session open message was fired ?
+        assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // write some messages
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            clients[i].getOutputStream().write(("test:" + i).getBytes());
+            clients[i].getOutputStream().flush();
+        }
+
+        // test is message was received by the server
+        assertTrue(msgReadLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // does response was wrote and sent ?
+        assertTrue(msgSentLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // read the echos
+        final byte[] buffer = new byte[1024];
+
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            final int bytes = clients[i].getInputStream().read(buffer);
+            final String text = new String(buffer, 0, bytes);
+            assertEquals("test:" + i, text);
+        }
+
+        // close the session
+        assertEquals(CLIENT_COUNT, closedLatch.getCount());
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            clients[i].close();
+        }
+
+        // does the session close event was fired ?
+        assertTrue(closedLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         server.unbind();
     }
