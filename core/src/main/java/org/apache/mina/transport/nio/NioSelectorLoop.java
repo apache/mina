@@ -230,7 +230,6 @@ public class NioSelectorLoop implements SelectorLoop {
                     }
                 } catch (final Exception e) {
                     logger.error("Unexpected exception : ", e);
-                    e.printStackTrace();
                 }
             }
         }

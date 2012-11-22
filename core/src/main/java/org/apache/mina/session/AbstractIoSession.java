@@ -628,7 +628,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     // ------------------------------------------------------------------------
 
     /** send a caught exception to the {@link IoHandler} (if any) */
-    private void processException(final Throwable t) {
+    protected void processException(final Throwable t) {
         LOG.debug("caught session exception ", t);
         final IoHandler handler = getService().getIoHandler();
         if (handler != null) {

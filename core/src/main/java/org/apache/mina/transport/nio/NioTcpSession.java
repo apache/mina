@@ -195,6 +195,7 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
             channel.close();
         } catch (final IOException e) {
             LOG.error("Exception while closing the channel : ", e);
+            processException(e);
         }
     }
 
@@ -208,8 +209,8 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
     }
 
     /**
-     * Process a read operation : read the data from the channel and push
-     * them to the chain.
+     * Process a read operation : read the data from the channel and push them to the chain.
+     * 
      * @param readBuffer The buffer that will contain the read data
      */
     private void processRead(final ByteBuffer readBuffer) {
@@ -254,12 +255,13 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
             }
         } catch (final IOException e) {
             LOG.error("Exception while reading : ", e);
+            processException(e);
         }
     }
 
     /**
-     * Process a write operation. This will be executed only because the session
-     * has something to write into the channel.
+     * Process a write operation. This will be executed only because the session has something to write into the
+     * channel.
      */
     private void processWrite() {
         try {
@@ -320,12 +322,12 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
                 } else {
                     // output socket buffer is full, we need
                     // to give up until next selection for
-                    // writing. 
+                    // writing.
                     break;
                 }
             } while (!writeQueue.isEmpty());
 
-            // We may have exited from the loop for some other reason 
+            // We may have exited from the loop for some other reason
             // that an empty queue
             // if the session is no more interested in writing, we need
             // to stop listening for OP_WRITE events
@@ -343,12 +345,13 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
                         selectorLoop.modifyRegistration(false, !isReadSuspended(), false, this, channel);
                     }
                 } else {
-                    // We have some more data to write : the channel OP_WRITE interest remains 
+                    // We have some more data to write : the channel OP_WRITE interest remains
                     // as it was.
                 }
             }
         } catch (final IOException e) {
             LOG.error("Exception while reading : ", e);
+            processException(e);
         }
     }
 
