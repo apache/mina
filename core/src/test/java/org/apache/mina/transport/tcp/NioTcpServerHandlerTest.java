@@ -52,7 +52,7 @@ public class NioTcpServerHandlerTest {
 
     private static final int CLIENT_COUNT = 100;
 
-    private static final int WAIT_TIME = 200;
+    private static final int WAIT_TIME = 2000;
 
     private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 
