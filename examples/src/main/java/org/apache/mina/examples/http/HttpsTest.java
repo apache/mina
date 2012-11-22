@@ -39,12 +39,8 @@ import org.apache.mina.http.api.HttpRequest;
 import org.apache.mina.http.api.HttpStatus;
 import org.apache.mina.http.api.HttpVersion;
 import org.apache.mina.transport.nio.NioTcpServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HttpsTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(HttpsTest.class);
 
     public static void main(String[] args) throws Exception {
 

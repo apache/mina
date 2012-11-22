@@ -40,14 +40,11 @@ import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.ldap.LdapCodec;
 import org.apache.mina.transport.nio.NioTcpServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A simple LDAP server class used to test theLDAP encoder/decoder. It only deal with the BindRequest message.
  */
 public class LdapTest {
-    private static final Logger LOG = LoggerFactory.getLogger(LdapTest.class);
 
     public static void main(String[] args) throws Exception {
         LdapTest ldapServer = new LdapTest();

@@ -41,8 +41,8 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
-import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.service.idlechecker.IdleChecker;
+import org.apache.mina.transport.nio.SelectorLoop;
 import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +116,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     // Write queue
     // ------------------------------------------------------------------------
 
-    /** the queue of pending writes for the session, to be dequeued by the {@link SelectorProcessor} */
+    /** the queue of pending writes for the session, to be dequeued by the {@link SelectorLoop} */
     private final Queue<WriteRequest> writeQueue = new DefaultWriteQueue();
 
     // ------------------------------------------------------------------------
@@ -638,7 +638,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session opened event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     * process session opened event using the filter chain. To be called by the session {@link SelectorLoop} .
      */
     public void processSessionOpened() {
         LOG.debug("processing session open event");
@@ -659,7 +659,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session closed event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     * process session closed event using the filter chain. To be called by the session {@link SelectorLoop} .
      */
     public void processSessionClosed() {
         LOG.debug("processing session closed event");
@@ -678,7 +678,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session idle event using the filter chain. To be called by the session {@link SelectorProcessor} .
+     * process session idle event using the filter chain. To be called by the session {@link SelectorLoop} .
      */
     public void processSessionIdle(final IdleStatus status) {
         LOG.debug("processing session idle {} event for session {}", status, this);
@@ -698,8 +698,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session message received event using the filter chain. To be called by the session
-     * {@link SelectorProcessor} .
+     * process session message received event using the filter chain. To be called by the session {@link SelectorLoop} .
      * 
      * @param message the received message
      */
@@ -729,8 +728,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session message writing event using the filter chain. To be called by the session
-     * {@link SelectorProcessor} .
+     * process session message writing event using the filter chain. To be called by the session {@link SelectorLoop} .
      * 
      * @param message the wrote message, should be transformed into ByteBuffer at the end of the filter chain
      */
@@ -769,14 +767,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         LOG.debug("processing message '{}' sent event for session {}", highLevelMessage, this);
 
         try {
-        final int size = chain.length;
-        for (int i = size - 1; i >= 0; i--) {
-            chain[i].messageSent(this, highLevelMessage);
-        }
-        final IoHandler handler = getService().getIoHandler();
-        if (handler != null) {
-            handler.messageSent(this, highLevelMessage);
-        }
+            final int size = chain.length;
+            for (int i = size - 1; i >= 0; i--) {
+                chain[i].messageSent(this, highLevelMessage);
+            }
+            final IoHandler handler = getService().getIoHandler();
+            if (handler != null) {
+                handler.messageSent(this, highLevelMessage);
+            }
         } catch (final RuntimeException e) {
             processException(e);
         }
@@ -784,8 +782,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session message received event using the filter chain. To be called by the session
-     * {@link SelectorProcessor} .
+     * process session message received event using the filter chain. To be called by the session {@link SelectorLoop} .
      * 
      * @param message the received message
      */

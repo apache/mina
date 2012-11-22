@@ -26,12 +26,8 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.session.AttributeKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HttpServerCodec extends ProtocolCodecFilter {
-
-    private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
 
     /** Key for decoder current state */
     private static final AttributeKey<DecoderState> DECODER_STATE_ATT = createKey(DecoderState.class,

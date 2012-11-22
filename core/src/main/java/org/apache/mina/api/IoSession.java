@@ -27,10 +27,10 @@ import java.util.Set;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 
-import org.apache.mina.service.SelectorProcessor;
 import org.apache.mina.session.AttributeKey;
 import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
+import org.apache.mina.transport.nio.SelectorLoop;
 
 /**
  * A handle which represents a connection between two end-points regardless of transport types.
@@ -133,20 +133,20 @@ public interface IoSession {
     boolean isSecured();
 
     /**
-     * Changes the session's state from the current state to a new state. Not all the
-     * transition are allowed. Here is the list of all the possible transitions :<br/>
+     * Changes the session's state from the current state to a new state. Not all the transition are allowed. Here is
+     * the list of all the possible transitions :<br/>
      * <ul>
-     *   <li>CREATED   -> CONNECTED</li>
-     *   <li>CREATED   -> SECURING</li>
-     *   <li>CREATED   -> CLOSING</li>
-     *   <li>CONNECTED -> SECURING</li>
-     *   <li>CONNECTED -> CLOSING</li>
-     *   <li>SECURING  -> SECURED</li>
-     *   <li>SECURING  -> CLOSING</li>
-     *   <li>SECURED   -> CONNECTED</li>
-     *   <li>SECURED   -> SECURING</li>
-     *   <li>SECURED   -> CLOSING</li>
-     *   <li>CLOSING   -> CLOSED</li>
+     * <li>CREATED -> CONNECTED</li>
+     * <li>CREATED -> SECURING</li>
+     * <li>CREATED -> CLOSING</li>
+     * <li>CONNECTED -> SECURING</li>
+     * <li>CONNECTED -> CLOSING</li>
+     * <li>SECURING -> SECURED</li>
+     * <li>SECURING -> CLOSING</li>
+     * <li>SECURED -> CONNECTED</li>
+     * <li>SECURED -> SECURING</li>
+     * <li>SECURED -> CLOSING</li>
+     * <li>CLOSING -> CLOSED</li>
      * </ul>
      * 
      * @param newState The final SessionState
@@ -268,59 +268,48 @@ public interface IoSession {
     /* Session context management */
 
     /**
-     * Returns the value of the user-defined attribute for the given
-     * <code>key</code>.If the there is no attribute with the specified key the <tt>defaultValue</tt> will be returned.
+     * Returns the value of the user-defined attribute for the given <code>key</code>.If the there is no attribute with
+     * the specified key the <tt>defaultValue</tt> will be returned.
      * 
-     * @param key
-     *            the attribute's key, must not be <code>null</code>
+     * @param key the attribute's key, must not be <code>null</code>
      * @return <tt>defaultValue</tt> if there is no attribute with the specified key
-     * @exception IllegalArgumentException
-     *                if <code>key==null</code>
+     * @exception IllegalArgumentException if <code>key==null</code>
      * @see #setAttribute(AttributeKey, Object)
      */
     <T> T getAttribute(AttributeKey<T> key, T defaultValue);
 
     /**
-     * Returns the value of the user-defined attribute for the given
-     * <code>key</code>.If the there is no attribute with the specified key <code>null</code> will be returned.
+     * Returns the value of the user-defined attribute for the given <code>key</code>.If the there is no attribute with
+     * the specified key <code>null</code> will be returned.
      * 
-     * @param key
-     *            the attribute's key, must not be <code>null</code>
+     * @param key the attribute's key, must not be <code>null</code>
      * @return <code>null</code> if there is no attribute with the specified key
-     * @exception IllegalArgumentException
-     *                if <code>key==null</code>
+     * @exception IllegalArgumentException if <code>key==null</code>
      * @see #setAttribute(AttributeKey, Object)
      */
     <T> T getAttribute(AttributeKey<T> key);
 
     /**
-     * Sets a user-defined attribute. If the <code>value</code> is
-     * <code>null</code> the attribute will be removed from this
-     * {@link IoSession}.
+     * Sets a user-defined attribute. If the <code>value</code> is <code>null</code> the attribute will be removed from
+     * this {@link IoSession}.
      * 
-     * @param key
-     *            the attribute's key, must not be <code>null</code>
-     * @param value
-     *            the attribute's value, <code>null</code> to remove the
-     *            attribute
-     * @return the old attribute's value or <code>null</code> if there is no
-     *         previous value
-     * @exception IllegalArgumentException
-     *                <ul>
-     *                <li>if <code>key==null</code>
-     *                <li>if <code>value</code> is not <code>null</code> and not
-     *                an instance of type that is specified in by the given
-     *                <code>key</code> (see {@link AttributeKey#getType()})
+     * @param key the attribute's key, must not be <code>null</code>
+     * @param value the attribute's value, <code>null</code> to remove the attribute
+     * @return the old attribute's value or <code>null</code> if there is no previous value
+     * @exception IllegalArgumentException <ul>
+     *            <li>if <code>key==null</code>
+     *            <li>if <code>value</code> is not <code>null</code> and not an instance of type that is specified in by
+     *            the given <code>key</code> (see {@link AttributeKey#getType()})
      * 
-     *                </ul>
+     *            </ul>
      * 
      * @see #getAttribute(AttributeKey)
      */
     <T> T setAttribute(AttributeKey<? extends T> key, T value);
 
     /**
-     * Returns an unmodifiable {@link Set} of all Keys of this {@link IoSession}. If
-     * this {@link IoSession} contains no attributes an empty {@link Set} will be returned.
+     * Returns an unmodifiable {@link Set} of all Keys of this {@link IoSession}. If this {@link IoSession} contains no
+     * attributes an empty {@link Set} will be returned.
      * 
      * @return all Keys, never <code>null</code>
      * @see Collections#unmodifiableSet(Set)
@@ -328,16 +317,13 @@ public interface IoSession {
     Set<AttributeKey<?>> getAttributeKeys();
 
     /**
-     * Removes the specified Attribute from this container. The old value will
-     * be returned, <code>null</code> will be rutrnen if there is no such
-     * attribute in this container.<br>
+     * Removes the specified Attribute from this container. The old value will be returned, <code>null</code> will be
+     * rutrnen if there is no such attribute in this container.<br>
      * <br>
      * This method is equivalent to <code>setAttribute(key,null)</code>.
      * 
-     * @param key
-     *            of the attribute to be removed,must not be <code>null</code>
-     * @return the removed value, <code>null</code> if this container doesn't
-     *         contain the specified attribute
+     * @param key of the attribute to be removed,must not be <code>null</code>
+     * @return the removed value, <code>null</code> if this container doesn't contain the specified attribute
      * @exception IllegalArgumentException if <code>key==null</code>
      */
     public <T> T removeAttribute(AttributeKey<T> key);
@@ -355,7 +341,7 @@ public interface IoSession {
     /* SESSION WRITING */
     /**
      * Enqueue a message for writing. This method wont block ! The message will by asynchronously processed by the
-     * filter chain and wrote to socket by the {@link SelectorProcessor}.
+     * filter chain and wrote to socket by the {@link SelectorLoop}
      * 
      */
     public void write(Object message);
@@ -378,7 +364,7 @@ public interface IoSession {
     public WriteRequest enqueueWriteRequest(Object message);
 
     /**
-     * Get the {@link Queue} of this session. The write queue contains the pending writes. 
+     * Get the {@link Queue} of this session. The write queue contains the pending writes.
      * 
      * @return the write queue of this session
      */
