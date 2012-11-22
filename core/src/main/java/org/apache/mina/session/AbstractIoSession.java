@@ -38,7 +38,6 @@ import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.service.idlechecker.IdleChecker;
@@ -594,7 +593,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         switch (state) {
         case CREATED:
             LOG.error("Session {} not opened", this);
-            throw new RuntimeIoException("cannot close an not opened session");
+            throw new IllegalStateException("cannot close an not opened session");
         case CONNECTED:
             state = SessionState.CLOSING;
             if (immediately) {
@@ -613,7 +612,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             LOG.warn("Already closed session {}", this);
             break;
         default:
-            throw new RuntimeIoException("not implemented session state : " + state);
+            throw new IllegalStateException("not implemented session state : " + state);
         }
 
         return closeFuture;

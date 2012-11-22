@@ -30,7 +30,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.api.IoSession;
-import org.apache.mina.api.RuntimeIoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +89,8 @@ public class NioSelectorLoop implements SelectorLoop {
             selector = Selector.open();
         } catch (final IOException ioe) {
             logger.error("Impossible to open a new NIO selector, O/S is out of file descriptor ?");
-            throw new RuntimeIoException(ioe);
+            throw new IllegalStateException("Impossible to open a new NIO selector, O/S is out of file descriptor ?",
+                    ioe);
         }
         logger.debug("starting worker thread");
         worker.start();
@@ -113,7 +113,7 @@ public class NioSelectorLoop implements SelectorLoop {
     public void register(IoSession session, boolean accept, boolean read, boolean write, SelectorListener listener,
             SelectableChannel channel) {
         logger.debug("registering : {} for accept : {}, read : {}, write : {}", new Object[] { listener, accept, read,
-                write });
+                                write });
         int ops = 0;
 
         if (accept) {
@@ -142,7 +142,7 @@ public class NioSelectorLoop implements SelectorLoop {
     public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
             final SelectorListener listener, final SelectableChannel channel) {
         logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}", new Object[] { listener,
-                accept, read, write });
+                                accept, read, write });
 
         final SelectionKey key = channel.keyFor(selector);
         if (key == null) {

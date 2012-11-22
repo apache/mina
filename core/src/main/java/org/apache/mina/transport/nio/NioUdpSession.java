@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
-import org.apache.mina.api.RuntimeIoException;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.util.AbstractIoFuture;
@@ -34,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A UDP session based on NIO
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NioUdpSession extends AbstractIoSession {
@@ -109,7 +109,7 @@ public class NioUdpSession extends AbstractIoSession {
         switch (state) {
         case CREATED:
             LOG.error("Session {} not opened", this);
-            throw new RuntimeIoException("cannot close an not opened session");
+            throw new IllegalStateException("cannot close an not opened session");
         case CONNECTED:
         case CLOSING:
             if (immediately) {
@@ -192,6 +192,7 @@ public class NioUdpSession extends AbstractIoSession {
 
     /**
      * Called when the session received a datagram.
+     * 
      * @param readBuffer the received datagram
      */
     void receivedDatagram(ByteBuffer readBuffer) {
