@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.Assert;
 
 import org.apache.mina.api.AbstractIoHandler;
+import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.transport.nio.FixedSelectorLoopPool;
@@ -68,6 +69,7 @@ public class NioTcpServerHandlerTest {
     public void generate_all_kind_of_server_event() throws IOException, InterruptedException {
         final NioTcpServer server = new NioTcpServer();
         server.setFilters();
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 1000);
         server.setIoHandler(new Handler());
         server.bind(0);
 
@@ -106,6 +108,9 @@ public class NioTcpServerHandlerTest {
             final String text = new String(buffer, 0, bytes);
             assertEquals("test:" + i, text);
         }
+
+        // does the session idle event was fired ?
+        assertTrue(idleLatch.await(5 * WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // close the session
         assertEquals(CLIENT_COUNT, closedLatch.getCount());
@@ -205,6 +210,13 @@ public class NioTcpServerHandlerTest {
         public void messageSent(final IoSession session, final Object message) {
             LOG.info("** message sent {}", message);
             msgSentLatch.countDown();
+        }
+
+        @Override
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            if (status == IdleStatus.READ_IDLE) {
+                idleLatch.countDown();
+            }
         }
     }
 

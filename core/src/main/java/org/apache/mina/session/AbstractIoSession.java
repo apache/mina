@@ -769,14 +769,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         LOG.debug("processing message '{}' sent event for session {}", highLevelMessage, this);
 
         try {
-            final int size = chain.length;
-            for (int i = size - 1; i >= 0; i--) {
-                chain[i].messageSent(this, highLevelMessage);
-            }
-            final IoHandler handler = getService().getIoHandler();
-            if (handler != null) {
-                handler.messageSent(this, highLevelMessage);
-            }
+        final int size = chain.length;
+        for (int i = size - 1; i >= 0; i--) {
+            chain[i].messageSent(this, highLevelMessage);
+        }
+        final IoHandler handler = getService().getIoHandler();
+        if (handler != null) {
+            handler.messageSent(this, highLevelMessage);
+        }
         } catch (final RuntimeException e) {
             processException(e);
         }
@@ -828,4 +828,5 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
         readChainPosition--;
     }
+
 }

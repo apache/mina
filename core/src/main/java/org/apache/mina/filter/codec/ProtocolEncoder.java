@@ -21,6 +21,7 @@ package org.apache.mina.filter.codec;
 
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.util.IoBuffer;
 
 /**
  * Encodes higher-level message objects into binary or protocol-specific data.
