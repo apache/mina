@@ -72,16 +72,16 @@ public class HttpServerDecoder implements ProtocolDecoder {
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
 
     public void decode(final IoSession session, final IoBuffer msg, final ProtocolDecoderOutput out) {
-        DecoderState state = (DecoderState)session.getAttribute(DECODER_STATE_ATT);
+        DecoderState state = (DecoderState) session.getAttribute(DECODER_STATE_ATT);
         if (null == state) {
-        	session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
-        	state = (DecoderState)session.getAttribute(DECODER_STATE_ATT);
+            session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
+            state = (DecoderState) session.getAttribute(DECODER_STATE_ATT);
         }
         switch (state) {
         case HEAD:
             LOG.debug("decoding HEAD");
             // grab the stored a partial HEAD request
-            final ByteBuffer oldBuffer = (ByteBuffer)session.getAttribute(PARTIAL_HEAD_ATT);
+            final ByteBuffer oldBuffer = (ByteBuffer) session.getAttribute(PARTIAL_HEAD_ATT);
             // concat the old buffer and the new incoming one
             IoBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg).flip();
             // now let's decode like it was a new message
@@ -101,18 +101,12 @@ public class HttpServerDecoder implements ProtocolDecoder {
             } else {
                 out.write(rq);
                 // is it a request with some body content ?
-                if (rq.getMethod() == HttpMethod.POST || rq.getMethod() == HttpMethod.PUT) {
-                    LOG.debug("request with content");
+                final String contentLen = rq.getHeader("content-length");
+
+                if (contentLen != null) {
+                    LOG.debug("found content len : {}", contentLen);
+                    session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(contentLen));
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
-
-                    final String contentLen = rq.getHeader("content-length");
-
-                    if (contentLen != null) {
-                        LOG.debug("found content len : {}", contentLen);
-                        session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(contentLen));
-                    } else {
-                        throw new HttpException(HttpStatus.CLIENT_ERROR_LENGTH_REQUIRED, "no content length !");
-                    }
                 } else {
                     LOG.debug("request without content");
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
@@ -127,10 +121,10 @@ public class HttpServerDecoder implements ProtocolDecoder {
             final int chunkSize = msg.remaining();
             // send the chunk of body
             if (chunkSize != 0) {
-            	final IoBuffer wb = IoBuffer.allocate(msg.remaining());
-    			wb.put(msg);
-    			wb.flip();
-    			out.write(wb);
+                final IoBuffer wb = IoBuffer.allocate(msg.remaining());
+                wb.put(msg);
+                wb.flip();
+                out.write(wb);
             }
             msg.position(msg.limit());
             // do we have reach end of body ?
@@ -160,7 +154,7 @@ public class HttpServerDecoder implements ProtocolDecoder {
     }
 
     private HttpRequestImpl parseHttpRequestHead(final ByteBuffer buffer) {
-    	// Java 6 >> String raw = new String(buffer.array(), 0, buffer.limit(), Charset.forName("UTF-8"));
+        // Java 6 >> String raw = new String(buffer.array(), 0, buffer.limit(), Charset.forName("UTF-8"));
         final String raw = new String(buffer.array(), 0, buffer.limit());
         final String[] headersAndBody = RAW_VALUE_PATTERN.split(raw, -1);
 
