@@ -219,7 +219,7 @@ public class StateMachineProxyBuilder {
 
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if ("hashCode".equals(method.getName()) && args == null) {
-                return new Integer(System.identityHashCode(proxy));
+                return Integer.valueOf(System.identityHashCode(proxy));
             }
             if ("equals".equals(method.getName()) && args.length == 1) {
                 return Boolean.valueOf(proxy == args[0]);

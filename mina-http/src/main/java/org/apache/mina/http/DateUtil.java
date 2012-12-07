@@ -45,7 +45,9 @@ public class DateUtil {
     }
 
     public static String getCurrentAsString() {
-        return DateUtil.RFC_1123_FORMAT.format(new Date()); //NOPMD
+        synchronized(DateUtil.RFC_1123_FORMAT) {
+            return DateUtil.RFC_1123_FORMAT.format(new Date()); //NOPMD
+        }
     }
 
     /**
@@ -60,7 +62,9 @@ public class DateUtil {
     private static long parseDateStringToMilliseconds(final String dateString) {
 
         try {
-            return DateUtil.RFC_1123_FORMAT.parse(dateString).getTime(); //NOPMD
+            synchronized (DateUtil.RFC_1123_FORMAT) {
+                return DateUtil.RFC_1123_FORMAT.parse(dateString).getTime(); //NOPMD
+            }
         } catch (final ParseException e) {
             return 0;
         }
@@ -101,7 +105,9 @@ public class DateUtil {
         final Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(dateValue);
 
-        return DateUtil.RFC_1123_FORMAT.format(calendar.getTime()); //NOPMD
+        synchronized (DateUtil.RFC_1123_FORMAT) {
+            return DateUtil.RFC_1123_FORMAT.format(calendar.getTime()); //NOPMD
+        }
     }
 
     /**
@@ -112,7 +118,9 @@ public class DateUtil {
      * @return a <code>String</code> representation of the date.
      */
     public static String getDateAsString(Date date) {
-        return RFC_1123_FORMAT.format(date); //NOPMD
+        synchronized (DateUtil.RFC_1123_FORMAT) {
+            return RFC_1123_FORMAT.format(date); //NOPMD
+        }
     }
 
 }

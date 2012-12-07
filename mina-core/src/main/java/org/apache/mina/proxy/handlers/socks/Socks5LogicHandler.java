@@ -342,7 +342,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
                         + "the socks proxy server");
             }
 
-            getSession().setAttribute(SELECTED_AUTH_METHOD, new Byte(method));
+            getSession().setAttribute(SELECTED_AUTH_METHOD, Byte.valueOf(method));
 
         } else if (step == SocksProxyConstants.SOCKS5_AUTH_STEP) {
             // Authentication to the SOCKS server 

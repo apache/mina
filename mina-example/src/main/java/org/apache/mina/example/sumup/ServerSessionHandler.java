@@ -45,7 +45,7 @@ public class ServerSessionHandler extends IoHandlerAdapter {
         session.getConfig().setIdleTime(IdleStatus.BOTH_IDLE, 60);
 
         // initial sum is zero
-        session.setAttribute(SUM_KEY, new Integer(0));
+        session.setAttribute(SUM_KEY, Integer.valueOf(0));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class ServerSessionHandler extends IoHandlerAdapter {
         } else {
             // sum up
             sum = (int) expectedSum;
-            session.setAttribute(SUM_KEY, new Integer(sum));
+            session.setAttribute(SUM_KEY, Integer.valueOf(sum));
 
             // return the result message
             ResultMessage rm = new ResultMessage();
