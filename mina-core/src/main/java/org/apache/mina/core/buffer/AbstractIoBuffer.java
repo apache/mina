@@ -2201,13 +2201,18 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 @Override
                 protected void writeClassDescriptor(ObjectStreamClass desc) throws IOException {
                     try {
-                        Class<?> clz = Class.forName(desc.getName());
-                        if (!Serializable.class.isAssignableFrom(clz)) { // NON-Serializable class
+                        if (!desc.forClass().isArray()) {
+                            Class<?> clz = Thread.currentThread().getContextClassLoader().loadClass(desc.getName());
+                            if (!Serializable.class.isAssignableFrom(clz)) { // NON-Serializable class
+                                write(0);
+                                super.writeClassDescriptor(desc);
+                            } else { // Serializable class
+                                write(1);
+                                writeUTF(desc.getName());
+                            }
+                        } else {
                             write(0);
                             super.writeClassDescriptor(desc);
-                        } else { // Serializable class
-                            write(1);
-                            writeUTF(desc.getName());
                         }
                     } catch (ClassNotFoundException ex) { // Primitive types
                         write(0);
@@ -2227,8 +2232,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         putInt(newPos - oldPos - 4);
         position(newPos);
         return this;
-    }
-
+    } 
+    
     /**
      * {@inheritDoc}
      */
