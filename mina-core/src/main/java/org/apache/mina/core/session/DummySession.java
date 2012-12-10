@@ -77,7 +77,7 @@ public class DummySession extends AbstractIoSession {
 
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
 
-    private final IoProcessor<AbstractIoSession> processor;
+    private final IoProcessor<IoSession> processor;
 
     private volatile IoHandler handler = new IoHandlerAdapter();
 
@@ -136,12 +136,12 @@ public class DummySession extends AbstractIoSession {
                     }
                 });
 
-        processor = new IoProcessor<AbstractIoSession>() {
-            public void add(AbstractIoSession session) {
+        processor = new IoProcessor<IoSession>() {
+            public void add(IoSession session) {
                 // Do nothing
             }
 
-            public void flush(AbstractIoSession session) {
+            public void flush(IoSession session) {
                 DummySession s = (DummySession) session;
                 WriteRequest req = s.getWriteRequestQueue().poll(session);
 
@@ -165,7 +165,7 @@ public class DummySession extends AbstractIoSession {
             /**
              * {@inheritDoc}
              */
-            public void write(AbstractIoSession session, WriteRequest writeRequest) {
+            public void write(IoSession session, WriteRequest writeRequest) {
                 WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
 
                 writeRequestQueue.offer(session, writeRequest);
@@ -175,13 +175,13 @@ public class DummySession extends AbstractIoSession {
                 }
             }
 
-            public void remove(AbstractIoSession session) {
+            public void remove(IoSession session) {
                 if (!session.getCloseFuture().isClosed()) {
                     session.getFilterChain().fireSessionClosed();
                 }
             }
 
-            public void updateTrafficControl(AbstractIoSession session) {
+            public void updateTrafficControl(IoSession session) {
                 // Do nothing
             }
 
@@ -291,7 +291,7 @@ public class DummySession extends AbstractIoSession {
     }
 
     @Override
-    public final IoProcessor<AbstractIoSession> getProcessor() {
+    public final IoProcessor<IoSession> getProcessor() {
         return processor;
     }
 

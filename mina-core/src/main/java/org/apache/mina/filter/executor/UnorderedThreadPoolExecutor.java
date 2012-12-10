@@ -267,6 +267,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
         IoEvent e = (IoEvent) task;
         boolean offeredEvent = queueHandler.accept(this, e);
+        
         if (offeredEvent) {
             getQueue().offer(e);
         }
