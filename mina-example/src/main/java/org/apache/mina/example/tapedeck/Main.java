@@ -81,7 +81,6 @@ public class Main {
                 new TextLineEncoder(), new CommandDecoder());
         acceptor.getFilterChain().addLast("log1", new LoggingFilter("log1"));
         acceptor.getFilterChain().addLast("codec", pcf);
-//        acceptor.getFilterChain().addLast("authentication", createAuthenticationIoFilter());
         acceptor.getFilterChain().addLast("log2", new LoggingFilter("log2"));
         acceptor.setHandler(createIoHandler());
         acceptor.bind(new InetSocketAddress(PORT));

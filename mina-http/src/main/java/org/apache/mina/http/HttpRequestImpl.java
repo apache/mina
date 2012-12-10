@@ -48,7 +48,7 @@ public class HttpRequestImpl implements HttpRequest {
         this.method = method;
         this.requestedPath = requestedPath;
         this.queryString = queryString;
-        this.headers = headers;//Collections.unmodifiableMap(headers);
+        this.headers = headers;
     }
 
     public HttpVersion getProtocolVersion() {
@@ -60,7 +60,6 @@ public class HttpRequestImpl implements HttpRequest {
     }
 
     public boolean isKeepAlive() {
-        // TODO Auto-generated method stub
         return false;
     }
 

@@ -65,6 +65,5 @@ public class MinaPropertyEditorRegistrar implements PropertyEditorRegistrar {
         registry.registerCustomEditor(InetSocketAddress.class, new InetSocketAddressEditor());
         registry.registerCustomEditor(SocketAddress.class, new InetSocketAddressEditor());
         registry.registerCustomEditor(VmPipeAddress.class, new VmPipeAddressEditor());
-        // registry.registerCustomEditor( Boolean.class, new BooleanEditor() );
     }
 }

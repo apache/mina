@@ -80,10 +80,6 @@ public class TcpServer extends IoHandlerAdapter {
             System.out.println("Received " + nb + " messages");
         }
 
-        //System.out.println("Message : " + ((IoBuffer) message).getInt());
-
-        //((IoBuffer) message).flip();
-
         // If we want to test the write operation, uncomment this line
         session.write(message);
     }

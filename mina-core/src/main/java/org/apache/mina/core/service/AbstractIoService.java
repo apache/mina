@@ -298,8 +298,6 @@ public abstract class AbstractIoService implements IoService {
             e.shutdownNow();
             if (awaitTermination) {
 
-                //Thread.currentThread().setName();
-
                 try {
                     LOGGER.debug("awaitTermination on {} called by thread=[{}]", this, Thread.currentThread().getName());
                     e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);

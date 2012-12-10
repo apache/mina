@@ -123,10 +123,6 @@ public class TcpClient extends IoHandlerAdapter {
         long t0 = System.currentTimeMillis();
 
         for (int i = 0; i <= TcpServer.MAX_RECEIVED; i++) {
-            //if (i % 2 == 0) {
-            //Thread.sleep(1);
-            //}
-
             IoBuffer buffer = IoBuffer.allocate(4);
             buffer.putInt(i);
             buffer.flip();

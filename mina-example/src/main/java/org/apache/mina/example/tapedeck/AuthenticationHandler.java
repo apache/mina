@@ -119,16 +119,6 @@ public class AuthenticationHandler {
         session.close(true);
     }
     
-//    
-//    @IoFilterTransition(on = SESSION_CREATED, in = ROOT)
-//    public void sessionCreated(NextFilter nextFilter, IoSession session) {
-//        nextFilter.sessionCreated(session);
-//    }
-//    @IoFilterTransition(on = SESSION_OPENED, in = ROOT)
-//    public void sessionOpened(NextFilter nextFilter, IoSession session) {
-//        nextFilter.sessionOpened(session);
-//    }
-    
     @IoFilterTransition(on = SESSION_CLOSED, in = DONE)
     public void sessionClosed(NextFilter nextFilter, IoSession session) {
         nextFilter.sessionClosed(session);

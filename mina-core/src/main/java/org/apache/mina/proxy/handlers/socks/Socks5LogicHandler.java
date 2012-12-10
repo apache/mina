@@ -368,7 +368,6 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
                         getSession().setAttribute(GSS_TOKEN, token);
                         len = 0;
                     } else {
-                        //buf.position(oldPos);
                         return;
                     }
                 } else {

@@ -257,10 +257,8 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
 
         if (isInterested) {
             newInterestOps |= SelectionKey.OP_WRITE;
-            //newInterestOps &= ~SelectionKey.OP_READ;
         } else {
             newInterestOps &= ~SelectionKey.OP_WRITE;
-            //newInterestOps |= SelectionKey.OP_READ;
         }
 
         key.interestOps(newInterestOps);

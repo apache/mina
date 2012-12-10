@@ -147,12 +147,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         if (index < first() || index > last()) {
             throw new IndexOutOfBoundsException();
         }
-        // Optimisation when removing exactly one component.
-        //        if (index == start() + getFirst().length()) {
-        //            ByteArray component = getFirst();
-        //            removeFirst();
-        //            return component;
-        //        }
+
         // Removing
         CompositeByteArray prefix = new CompositeByteArray(byteArrayFactory);
         int remaining = index - first();

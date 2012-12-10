@@ -42,6 +42,7 @@ public class NTLMUtilities implements NTLMConstants {
     public final static byte[] writeSecurityBuffer(short length, int bufferOffset) {
         byte[] b = new byte[8];
         writeSecurityBuffer(length, length, bufferOffset, b, 0);
+        
         return b;
     }
 
@@ -99,7 +100,7 @@ public class NTLMUtilities implements NTLMConstants {
     public final static byte[] getOsVersion() {
         String os = System.getProperty("os.name");
 
-        if (os == null || !os.toUpperCase().contains("WINDOWS")) {
+        if ((os == null) || !os.toUpperCase().contains("WINDOWS")) {
             return DEFAULT_OS_VERSION;
         }
 
@@ -231,6 +232,7 @@ public class NTLMUtilities implements NTLMConstants {
     public final static int writeSecurityBufferAndUpdatePointer(ByteArrayOutputStream baos, short len, int pointer)
             throws IOException {
         baos.write(writeSecurityBuffer(len, pointer));
+        
         return pointer + len;
     }
 
@@ -243,6 +245,7 @@ public class NTLMUtilities implements NTLMConstants {
     public final static byte[] extractChallengeFromType2Message(byte[] msg) {
         byte[] challenge = new byte[8];
         System.arraycopy(msg, 24, challenge, 0, 8);
+        
         return challenge;
     }
 
@@ -301,6 +304,7 @@ public class NTLMUtilities implements NTLMConstants {
 
         // now we convert it to a string
         int flags = msgFlags == null ? extractFlagsFromType2Message(msg) : msgFlags;
+        
         if (ByteUtilities.isFlagSet(flags, FLAG_NEGOTIATE_UNICODE)) {
             return new String(targetName, "UTF-16LE");
         }
@@ -319,10 +323,11 @@ public class NTLMUtilities implements NTLMConstants {
     public final static byte[] extractTargetInfoFromType2Message(byte[] msg, Integer msgFlags) {
         int flags = msgFlags == null ? extractFlagsFromType2Message(msg) : msgFlags;
 
-        if (!ByteUtilities.isFlagSet(flags, FLAG_NEGOTIATE_TARGET_INFO))
+        if (!ByteUtilities.isFlagSet(flags, FLAG_NEGOTIATE_TARGET_INFO)) {
             return null;
+        }
 
-        int pos = 40; //isFlagSet(flags, FLAG_NEGOTIATE_LOCAL_CALL) ? 40 : 32;
+        int pos = 40;
 
         return readSecurityBufferTarget(msg, pos);
     }
@@ -343,29 +348,33 @@ public class NTLMUtilities implements NTLMConstants {
         int flags = msgFlags == null ? extractFlagsFromType2Message(msg) : msgFlags;
 
         byte[] infoBlock = extractTargetInfoFromType2Message(msg, flags);
+        
         if (infoBlock == null) {
             out.println("No target information block found !");
         } else {
             int pos = 0;
+            
             while (infoBlock[pos] != 0) {
                 out.print("---\nType " + infoBlock[pos] + ": ");
+                
                 switch (infoBlock[pos]) {
-                case 1:
-                    out.println("Server name");
-                    break;
-                case 2:
-                    out.println("Domain name");
-                    break;
-                case 3:
-                    out.println("Fully qualified DNS hostname");
-                    break;
-                case 4:
-                    out.println("DNS domain name");
-                    break;
-                case 5:
-                    out.println("Parent DNS domain name");
-                    break;
+                    case 1:
+                        out.println("Server name");
+                        break;
+                    case 2:
+                        out.println("Domain name");
+                        break;
+                    case 3:
+                        out.println("Fully qualified DNS hostname");
+                        break;
+                    case 4:
+                        out.println("DNS domain name");
+                        break;
+                    case 5:
+                        out.println("Parent DNS domain name");
+                        break;
                 }
+                
                 byte[] len = new byte[2];
                 System.arraycopy(infoBlock, pos + 2, len, 0, 2);
                 ByteUtilities.changeByteEndianess(len, 0, 2);
@@ -373,11 +382,13 @@ public class NTLMUtilities implements NTLMConstants {
                 int length = ByteUtilities.makeIntFromByte2(len, 0);
                 out.println("Length: " + length + " bytes");
                 out.print("Data: ");
+                
                 if (ByteUtilities.isFlagSet(flags, FLAG_NEGOTIATE_UNICODE)) {
                     out.println(new String(infoBlock, pos + 4, length, "UTF-16LE"));
                 } else {
                     out.println(new String(infoBlock, pos + 4, length, "ASCII"));
                 }
+                
                 pos += 4 + length;
                 out.flush();
             }
@@ -408,10 +419,6 @@ public class NTLMUtilities implements NTLMConstants {
             throw new IllegalArgumentException("osVersion should be a 8 byte wide array");
         }
 
-        //TOSEE breaks tests
-        /*int flags = serverFlags != null ? serverFlags | 
-                FLAG_NEGOTIATE_WORKSTATION_SUPPLIED | 
-                FLAG_NEGOTIATE_DOMAIN_SUPPLIED : DEFAULT_FLAGS;*/
         int flags = serverFlags != null ? serverFlags : DEFAULT_FLAGS;
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

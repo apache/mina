@@ -51,9 +51,6 @@ public class HttpServerEncoder implements ProtocolEncoder {
                 sb.append("\r\n");
             }
             sb.append("\r\n");
-            // Java 6 >> byte[] bytes = sb.toString().getBytes(Charset.forName("UTF-8"));
-            // byte[] bytes = sb.toString().getBytes();
-            // out.write(ByteBuffer.wrap(bytes));
             IoBuffer buf = IoBuffer.allocate(sb.length()).setAutoExpand(true);
             buf.putString(sb.toString(), ENCODER);
             buf.flip();

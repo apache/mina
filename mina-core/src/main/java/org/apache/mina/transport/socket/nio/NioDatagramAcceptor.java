@@ -750,10 +750,8 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
 
         if (isInterested) {
             newInterestOps |= SelectionKey.OP_WRITE;
-            //newInterestOps &= ~SelectionKey.OP_READ;
         } else {
             newInterestOps &= ~SelectionKey.OP_WRITE;
-            //newInterestOps |= SelectionKey.OP_READ;
         }
 
         key.interestOps(newInterestOps);
