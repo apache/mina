@@ -67,6 +67,7 @@ public class MethodSelfTransition extends AbstractSelfTransition {
 
         Method[] candidates = target.getClass().getMethods();
         Method result = null;
+        
         for (int i = 0; i < candidates.length; i++) {
             if (candidates[i].getName().equals(methodName)) {
                 if (result != null) {
@@ -108,10 +109,11 @@ public class MethodSelfTransition extends AbstractSelfTransition {
         Object[] args = new Object[types.length];
 
         int i = 0;
+        
         if (types[i].isAssignableFrom(StateContext.class)) {
             args[i++] = stateContext;
         }
-        if (i < types.length && types[i].isAssignableFrom(State.class)) {
+        if ((i < types.length) && types[i].isAssignableFrom(State.class)) {
             args[i++] = state;
         }
 

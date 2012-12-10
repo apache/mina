@@ -52,7 +52,6 @@ public class UdpClient extends IoHandlerAdapter {
         connector = new NioDatagramConnector();
 
         connector.setHandler(this);
-        DatagramSessionConfig dcfg = (DatagramSessionConfig) connector.getSessionConfig();
 
         ConnectFuture connFuture = connector.connect(new InetSocketAddress("localhost", UdpServer.PORT));
 

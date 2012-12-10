@@ -846,7 +846,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
 
                     if ((localWrittenBytes > 0) && ((IoBuffer) message).hasRemaining()) {
                         // the buffer isn't empty, we re-interest it in writing
-                        writtenBytes += localWrittenBytes;
                         setInterestedInWrite(session, true);
                         return false;
                     }
@@ -860,7 +859,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // return 0 indicating that we need
                     // to pause until writing may resume.
                     if ((localWrittenBytes > 0) && (((FileRegion) message).getRemainingBytes() > 0)) {
-                        writtenBytes += localWrittenBytes;
                         setInterestedInWrite(session, true);
                         return false;
                     }

@@ -131,8 +131,6 @@ public class UdpServer extends IoHandlerAdapter {
         //DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
         //chain.addLast("logger", new LoggingFilter());
 
-        DatagramSessionConfig dcfg = acceptor.getSessionConfig();
-
         acceptor.bind(new InetSocketAddress(PORT));
 
         System.out.println("Server started...");

@@ -115,6 +115,7 @@ public class RequestResponseFilter extends WriteRequestFilter {
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         ResponseInspector responseInspector = (ResponseInspector) session.getAttribute(RESPONSE_INSPECTOR);
         Object requestId = responseInspector.getRequestId(message);
+        
         if (requestId == null) {
             // Not a response message.  Ignore.
             nextFilter.messageReceived(session, message);
@@ -123,28 +124,34 @@ public class RequestResponseFilter extends WriteRequestFilter {
 
         // Retrieve (or remove) the corresponding request.
         ResponseType type = responseInspector.getResponseType(message);
+        
         if (type == null) {
             nextFilter.exceptionCaught(session, new IllegalStateException(responseInspector.getClass().getName()
                     + "#getResponseType() may not return null."));
+            
+            return;
         }
 
         Map<Object, Request> requestStore = getRequestStore(session);
 
         Request request;
+        
         switch (type) {
-        case WHOLE:
-        case PARTIAL_LAST:
-            synchronized (requestStore) {
-                request = requestStore.remove(requestId);
-            }
-            break;
-        case PARTIAL:
-            synchronized (requestStore) {
-                request = requestStore.get(requestId);
-            }
-            break;
-        default:
-            throw new InternalError();
+            case WHOLE:
+            case PARTIAL_LAST:
+                synchronized (requestStore) {
+                    request = requestStore.remove(requestId);
+                }
+                break;
+                
+            case PARTIAL:
+                synchronized (requestStore) {
+                    request = requestStore.get(requestId);
+                }
+                break;
+                
+            default:
+                throw new InternalError();
         }
 
         if (request == null) {

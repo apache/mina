@@ -131,8 +131,6 @@ public class TcpServer extends IoHandlerAdapter {
         //DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
         //chain.addLast("logger", new LoggingFilter());
 
-        SocketSessionConfig scfg = acceptor.getSessionConfig();
-
         acceptor.bind(new InetSocketAddress(PORT));
 
         System.out.println("Server started...");

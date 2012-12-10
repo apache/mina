@@ -781,10 +781,12 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     private void throwMBeanException(Throwable e) throws MBeanException {
         if (e instanceof OgnlException) {
             OgnlException ognle = (OgnlException) e;
+            
             if (ognle.getReason() != null) {
                 throwMBeanException(ognle.getReason());
             } else {
                 String message = ognle.getMessage();
+                
                 if (e instanceof NoSuchPropertyException) {
                     message = "No such property: " + message;
                 } else if (e instanceof ExpressionSyntaxException) {
@@ -792,7 +794,8 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 } else if (e instanceof InappropriateExpressionException) {
                     message = "Inappropriate expression: " + message;
                 }
-                e = new IllegalArgumentException(ognle.getMessage());
+                
+                e = new IllegalArgumentException(message);
                 e.setStackTrace(ognle.getStackTrace());
             }
         }
