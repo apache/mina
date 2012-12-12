@@ -80,8 +80,8 @@ public class HttpClientDecoder implements ProtocolDecoder {
     public void decode(final IoSession session, final IoBuffer msg, final ProtocolDecoderOutput out) {
         DecoderState state = (DecoderState)session.getAttribute(DECODER_STATE_ATT);
         if (null == state) {
-        	session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
-        	state = (DecoderState)session.getAttribute(DECODER_STATE_ATT);
+            session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
+            state = (DecoderState)session.getAttribute(DECODER_STATE_ATT);
         }
         switch (state) {
         case HEAD:
@@ -105,7 +105,7 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 session.setAttribute(PARTIAL_HEAD_ATT, partial);
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
             } else {
-            	out.write(rp);
+                out.write(rp);
                 // is it a response with some body content ?
                 LOG.debug("response with content");
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
@@ -119,7 +119,7 @@ public class HttpClientDecoder implements ProtocolDecoder {
                     LOG.debug("no content len but chunked");
                     session.setAttribute(BODY_CHUNKED, Boolean.valueOf("true"));
                 } else if ("close".equalsIgnoreCase(rp.getHeader("connection"))) {
-                	session.close(true);
+                    session.close(true);
                 } else {
                     throw new HttpException(HttpStatus.CLIENT_ERROR_LENGTH_REQUIRED, "no content length !");
                 }
@@ -132,10 +132,10 @@ public class HttpClientDecoder implements ProtocolDecoder {
             final int chunkSize = msg.remaining();
             // send the chunk of body
             if (chunkSize != 0) {
-            	final IoBuffer wb = IoBuffer.allocate(msg.remaining());
-    			wb.put(msg);
-    			wb.flip();
-    			out.write(wb);
+                final IoBuffer wb = IoBuffer.allocate(msg.remaining());
+                wb.put(msg);
+                wb.flip();
+                out.write(wb);
             }
             msg.position(msg.limit());
             
@@ -144,9 +144,9 @@ public class HttpClientDecoder implements ProtocolDecoder {
             
             // if chunked, remaining is the msg.remaining()
             if( session.getAttribute(BODY_CHUNKED) != null ) {
-            	remaining = chunkSize;
+                remaining = chunkSize;
             } else {
-            	// otherwise, manage with content-length
+                // otherwise, manage with content-length
                 remaining = (Integer) session.getAttribute(BODY_REMAINING_BYTES);
                 remaining -= chunkSize;
             }
@@ -156,13 +156,13 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
                 session.removeAttribute(BODY_REMAINING_BYTES);
                 if( session.getAttribute(BODY_CHUNKED) != null ) {
-                	session.removeAttribute(BODY_CHUNKED);
+                    session.removeAttribute(BODY_CHUNKED);
                 }
                 out.write(new HttpEndOfContent());
             } else {
-            	if( session.getAttribute(BODY_CHUNKED) == null ) {
-            		session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(remaining));
-            	}
+                if( session.getAttribute(BODY_CHUNKED) == null ) {
+                    session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(remaining));
+                }
             }
 
             break;
@@ -202,11 +202,11 @@ public class HttpClientDecoder implements ProtocolDecoder {
         HttpStatus status = null;
         final int statusCode = Integer.valueOf(elements[1]);
         for (int i = 0; i < HttpStatus.values().length; i++) {
-        	status = HttpStatus.values()[i];
-			if (statusCode == status.code()) {
-				break;
-			}
-		}
+            status = HttpStatus.values()[i];
+            if (statusCode == status.code()) {
+                break;
+            }
+        }
         final HttpVersion version = HttpVersion.fromString(elements[0]);
 
         // we put the buffer position where we found the beginning of the HTTP body
