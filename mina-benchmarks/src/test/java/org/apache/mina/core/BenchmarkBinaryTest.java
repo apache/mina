@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -66,10 +68,10 @@ public abstract class BenchmarkBinaryTest {
     @Parameters
     public static Collection<Object[]> getParameters() {
         Object[][] parameters = new Object[][] { 
-                { 1000000, 10, 2 * 60 }, 
-                { 1000000, 1 * 1024, 2 * 60 }, 
-                { 1000000, 10 * 1024, 2 * 60 },
-                { 1000, 64 * 1024 * 1024, 10 * 60 }
+                { 100000, 10, 2 * 60 }, 
+                { 100000, 1 * 1024, 2 * 60 }, 
+                { 100000, 10 * 1024, 2 * 60 },
+                { 100, 64 * 1024 * 1024, 10 * 60 }
         };
         return Arrays.asList(parameters);
     }
@@ -102,6 +104,7 @@ public abstract class BenchmarkBinaryTest {
         CountDownLatch counter = new CountDownLatch(numberOfMessages);
 
         client.start(port, counter, data);
-        counter.await(timeout, TimeUnit.SECONDS);
+        boolean result = counter.await(timeout, TimeUnit.SECONDS);
+        assertTrue("Still " + counter.getCount() + " messages to send on a total of " + numberOfMessages, result);
     }
 }
