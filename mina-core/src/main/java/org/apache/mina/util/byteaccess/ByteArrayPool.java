@@ -124,7 +124,7 @@ public class ByteArrayPool implements ByteArrayFactory {
 
     private class DirectBufferByteArray extends BufferByteArray {
 
-        public boolean freed;
+        private boolean freed;
 
         public DirectBufferByteArray(IoBuffer bb) {
             super(bb);

@@ -217,9 +217,9 @@ public class State {
     }
 
     private static class TransitionHolder implements Comparable<TransitionHolder> {
-        Transition transition;
+        private Transition transition;
 
-        int weight;
+        private int weight;
 
         TransitionHolder(Transition transition, int weight) {
             this.transition = transition;

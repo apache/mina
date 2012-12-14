@@ -59,7 +59,7 @@ class VmPipeSession extends AbstractIoSession {
 
     private final Lock lock;
 
-    final BlockingQueue<Object> receivedMessageQueue;
+    /** Package protected*/ final BlockingQueue<Object> receivedMessageQueue;
 
     /*
      * Constructor for client-side session.

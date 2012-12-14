@@ -49,7 +49,7 @@ public class TapeDeckServer {
     };
     
     static class TapeDeckContext extends AbstractStateContext {
-        public String tapeName;
+        private String tapeName;
     }
     
     @IoHandlerTransition(on = SESSION_OPENED, in = EMPTY)

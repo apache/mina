@@ -32,21 +32,21 @@ public class MessageDecoderResult {
      * and {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
      * Please refer to each method's documentation for detailed explanation.
      */
-    public static MessageDecoderResult OK = new MessageDecoderResult("OK");
+    public static final MessageDecoderResult OK = new MessageDecoderResult("OK");
 
     /**
      * Represents a result from {@link MessageDecoder#decodable(IoSession, IoBuffer)}
      * and {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
      * Please refer to each method's documentation for detailed explanation.
      */
-    public static MessageDecoderResult NEED_DATA = new MessageDecoderResult("NEED_DATA");
+    public static final MessageDecoderResult NEED_DATA = new MessageDecoderResult("NEED_DATA");
 
     /**
      * Represents a result from {@link MessageDecoder#decodable(IoSession, IoBuffer)}
      * and {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
      * Please refer to each method's documentation for detailed explanation.
      */
-    public static MessageDecoderResult NOT_OK = new MessageDecoderResult("NOT_OK");
+    public static final MessageDecoderResult NOT_OK = new MessageDecoderResult("NOT_OK");
 
     private final String name;
 

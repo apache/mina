@@ -45,9 +45,9 @@ public class AuthenticationHandler {
     @State(ROOT) public static final String FAILED = "Failed";
 
     static class AuthenticationContext extends AbstractStateContext {
-        public String user;
-        public String password;
-        public int tries = 0;
+        private String user;
+        private String password;
+        private int tries = 0;
     }
 
     @IoFilterTransition(on = SESSION_OPENED, in = START, next = WAIT_USER)

@@ -43,7 +43,7 @@ public class ImageResponseDecoder extends CumulativeProtocolDecoder {
     public static final int MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
     private static class DecoderState {
-        BufferedImage image1;
+        private BufferedImage image1;
     }
 
     protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {

@@ -42,12 +42,12 @@ public class HttpProxyRequest extends ProxyRequest {
     /**
      * The HTTP verb.
      */
-    public final String httpVerb;
+    private final String httpVerb;
 
     /**
      * The HTTP URI.
      */
-    public final String httpURI;
+    private final String httpURI;
 
     /**
      * The HTTP protocol version.

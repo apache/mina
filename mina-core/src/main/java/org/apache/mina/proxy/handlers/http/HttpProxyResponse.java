@@ -32,27 +32,27 @@ public class HttpProxyResponse {
     /**
      * The HTTP response protocol version.
      */
-    public final String httpVersion;
+    private final String httpVersion;
 
     /**
      * The HTTP response status line.
      */
-    public final String statusLine;
+    private final String statusLine;
 
     /**
      * The HTTP response status code;
      */
-    public final int statusCode;
+    private final int statusCode;
 
     /**
      * The HTTP response headers.
      */
-    public final Map<String, List<String>> headers;
+    private final Map<String, List<String>> headers;
 
     /**
      * The HTTP response body.
      */
-    public String body;
+    private String body;
 
     /**
      * Constructor of an HTTP proxy response.

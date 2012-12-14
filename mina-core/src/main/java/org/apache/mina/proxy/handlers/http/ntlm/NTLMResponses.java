@@ -43,15 +43,8 @@ import javax.crypto.spec.SecretKeySpec;
 public class NTLMResponses {
 
     // LAN Manager magic constant used in LM Response calculation
-    public static byte[] LM_HASH_MAGIC_CONSTANT = null;
-
-    static {
-        try {
-            LM_HASH_MAGIC_CONSTANT = "KGS!@#$%".getBytes("US-ASCII");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
+    public static final byte[] LM_HASH_MAGIC_CONSTANT = 
+            new byte[]{ 'K', 'G', 'S', '!', '@', '#', '$', '%' };
 
     /**
      * Calculates the LM Response for the given challenge, using the specified

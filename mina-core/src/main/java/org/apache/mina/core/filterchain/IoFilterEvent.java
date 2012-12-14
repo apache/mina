@@ -37,10 +37,10 @@ import org.slf4j.LoggerFactory;
  */
 public class IoFilterEvent extends IoEvent {
     /** A logger for this class */
-    static Logger LOGGER = LoggerFactory.getLogger(IoFilterEvent.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(IoFilterEvent.class);
 
     /** A speedup for logs */
-    static boolean DEBUG = LOGGER.isDebugEnabled();
+    private static boolean DEBUG = LOGGER.isDebugEnabled();
 
     private final NextFilter nextFilter;
 
