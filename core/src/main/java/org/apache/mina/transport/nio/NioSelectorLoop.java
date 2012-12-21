@@ -161,6 +161,7 @@ public class NioSelectorLoop implements SelectorLoop {
             ops |= SelectionKey.OP_WRITE;
         }
         key.interestOps(ops);
+        key.selector().wakeup();
     }
 
     /**

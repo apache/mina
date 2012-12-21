@@ -21,6 +21,7 @@ package org.apache.mina.service.server;
 
 import org.apache.mina.api.IoServer;
 import org.apache.mina.service.AbstractIoService;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 
 /**
  * Base implementation for {@link IoServer}s.
@@ -30,9 +31,13 @@ import org.apache.mina.service.AbstractIoService;
 public abstract class AbstractIoServer extends AbstractIoService implements IoServer {
     /**
      * Create an new AbstractIoServer instance
+     * 
+     * @param eventExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O one).
+     *        Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
      */
-    protected AbstractIoServer() {
-        super();
+    protected AbstractIoServer(final IoHandlerExecutor eventExecutor) {
+        super(eventExecutor);
     }
 
     // does the reuse address flag should be positioned
@@ -40,6 +45,7 @@ public abstract class AbstractIoServer extends AbstractIoService implements IoSe
 
     /**
      * Set the reuse address flag on the server socket
+     * 
      * @param reuseAddress <code>true</code> to enable
      */
     public void setReuseAddress(final boolean reuseAddress) {
@@ -48,6 +54,7 @@ public abstract class AbstractIoServer extends AbstractIoService implements IoSe
 
     /**
      * Is the reuse address enabled for this server.
+     * 
      * @return
      */
     public boolean isReuseAddress() {

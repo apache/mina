@@ -25,6 +25,7 @@ import org.apache.mina.api.IoClient;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.service.AbstractIoService;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 
 /**
  * TODO
@@ -35,8 +36,8 @@ public abstract class AbstractIoClient extends AbstractIoService implements IoCl
     /**
      * Create an new AbstractIoClient instance
      */
-    protected AbstractIoClient() {
-        super();
+    protected AbstractIoClient(IoHandlerExecutor eventExecutor) {
+        super(eventExecutor);
     }
 
     @Override

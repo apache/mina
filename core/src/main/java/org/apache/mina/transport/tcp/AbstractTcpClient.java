@@ -20,6 +20,7 @@
 package org.apache.mina.transport.tcp;
 
 import org.apache.mina.service.client.AbstractIoClient;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 
 /**
  * Base class for UDP based Clients
@@ -30,7 +31,7 @@ public abstract class AbstractTcpClient extends AbstractIoClient {
     /**
      * Create an new AbsractTcpClient instance
      */
-    protected AbstractTcpClient() {
-        super();
+    protected AbstractTcpClient(IoHandlerExecutor ioHandlerExecutor) {
+        super(ioHandlerExecutor);
     }
 }

@@ -23,6 +23,7 @@ import javax.net.ssl.SSLException;
 
 import org.apache.mina.api.IoSession;
 import org.apache.mina.service.client.AbstractIoClient;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 
 /**
  * TODO
@@ -33,8 +34,8 @@ public abstract class AbstractUdpClient extends AbstractIoClient {
     /**
      * Create an new AbsractUdpClient instance
      */
-    protected AbstractUdpClient() {
-        super();
+    protected AbstractUdpClient(IoHandlerExecutor ioHandlerExecutor) {
+        super(ioHandlerExecutor);
     }
 
     /**

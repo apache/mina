@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.api.IoSessionConfig;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.udp.AbstractUdpServer;
@@ -65,8 +66,8 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     /**
      * Create a new instance of NioUdpServer
      */
-    public NioUdpServer(final NioSelectorLoop selectorLoop) {
-        super();
+    public NioUdpServer(NioSelectorLoop selectorLoop, IoHandlerExecutor ioHandlerExecutor) {
+        super(ioHandlerExecutor);
         this.selectorLoop = selectorLoop;
     }
 

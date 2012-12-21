@@ -20,6 +20,7 @@
 package org.apache.mina.transport.nio;
 
 import org.apache.mina.api.IoSessionConfig;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.transport.tcp.AbstractTcpClient;
 
 /**
@@ -31,8 +32,8 @@ public class NioTcpClient extends AbstractTcpClient {
     /**
      * Create a new instance of NioTcpClient
      */
-    public NioTcpClient() {
-        super();
+    public NioTcpClient(IoHandlerExecutor ioHandlerExecutor) {
+        super(ioHandlerExecutor);
     }
 
     @Override

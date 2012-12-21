@@ -26,6 +26,7 @@ import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,9 @@ public abstract class AbstractIoService implements IoService {
     /** The high level business logic */
     private IoHandler handler;
 
+    /** used for executing IoHandler event in another pool of thread (not in the low level I/O one) */
+    protected final IoHandlerExecutor ioHandlerExecutor;
+
     /**
      * The Service states
      */
@@ -67,9 +71,14 @@ public abstract class AbstractIoService implements IoService {
 
     /**
      * Create an AbstractIoService
+     * 
+     * @param eventExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O one).
+     *        Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
      */
-    protected AbstractIoService() {
+    protected AbstractIoService(final IoHandlerExecutor eventExecutor) {
         this.state = ServiceState.NONE;
+        this.ioHandlerExecutor = eventExecutor;
     }
 
     /**
@@ -94,6 +103,14 @@ public abstract class AbstractIoService implements IoService {
     @Override
     public IoHandler getIoHandler() {
         return handler;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoHandlerExecutor getIoHandlerExecutor() {
+        return ioHandlerExecutor;
     }
 
     /**

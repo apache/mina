@@ -21,6 +21,8 @@ package org.apache.mina.api;
 
 import java.util.Map;
 
+import org.apache.mina.service.executor.IoHandlerExecutor;
+
 /**
  * Base interface for all {@link IoServer}s and {@link IoClient}s that provide I/O service and manage {@link IoSession}
  * s.
@@ -49,6 +51,12 @@ public interface IoService {
      * @return the handler called for every event of the service (new connections, messages received, etc..)
      */
     IoHandler getIoHandler();
+
+    /**
+     * Get the {@link IoHandlerExecutor} used for executing {@link IoHandler} events in another pool of thread (not in
+     * the low level I/O one).
+     */
+    IoHandlerExecutor getIoHandlerExecutor();
 
     /**
      * Get the list of filters installed on this service

@@ -20,6 +20,7 @@
 package org.apache.mina.transport.nio;
 
 import org.apache.mina.api.IoSessionConfig;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.transport.udp.AbstractUdpClient;
 
 /**
@@ -31,8 +32,8 @@ public class NioUdpClient extends AbstractUdpClient {
     /**
      * Create a new instance of NioUdpClient
      */
-    public NioUdpClient() {
-        super();
+    public NioUdpClient(IoHandlerExecutor ioHandlerExecutor) {
+        super(ioHandlerExecutor);
     }
 
     @Override

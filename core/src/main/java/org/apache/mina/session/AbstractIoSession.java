@@ -40,6 +40,12 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.service.executor.CloseEvent;
+import org.apache.mina.service.executor.IdleEvent;
+import org.apache.mina.service.executor.IoHandlerExecutor;
+import org.apache.mina.service.executor.OpenEvent;
+import org.apache.mina.service.executor.ReceiveEvent;
+import org.apache.mina.service.executor.SentEvent;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.transport.nio.SelectorLoop;
 import org.apache.mina.util.AbstractIoFuture;
@@ -650,7 +656,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             final IoHandler handler = getService().getIoHandler();
 
             if (handler != null) {
-                handler.sessionOpened(this);
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+                if (executor != null) {
+                    // asynchronous event
+                    executor.execute(new OpenEvent(this));
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.sessionOpened(this);
+                }
             }
         } catch (final RuntimeException e) {
             processException(e);
@@ -669,7 +682,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
             final IoHandler handler = getService().getIoHandler();
             if (handler != null) {
-                handler.sessionClosed(this);
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+                if (executor != null) {
+                    // asynchronous event
+                    executor.execute(new CloseEvent(this));
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.sessionClosed(this);
+                }
             }
         } catch (final RuntimeException e) {
             processException(e);
@@ -688,13 +708,27 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             }
             final IoHandler handler = getService().getIoHandler();
             if (handler != null) {
-                handler.sessionIdle(this, status);
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+                if (executor != null) {
+                    // asynchronous event
+                    executor.execute(new IdleEvent(this, status));
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.sessionIdle(this, status);
+                }
             }
         } catch (final RuntimeException e) {
             processException(e);
         }
-
     }
+
+    /** for knowing if the message buffer is the selector loop one */
+    static ThreadLocal<ByteBuffer> tl = new ThreadLocal<ByteBuffer>() {
+        @Override
+        protected ByteBuffer initialValue() {
+            return null;
+        }
+    };
 
     /**
      * process session message received event using the filter chain. To be called by the session {@link SelectorLoop} .
@@ -704,6 +738,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void processMessageReceived(final ByteBuffer message) {
         LOG.debug("processing message '{}' received event for session {}", message, this);
 
+        tl.set(message);
         try {
             // save basic statistics
             readBytes += message.remaining();
@@ -711,14 +746,30 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
             if (chain.length < 1) {
                 LOG.debug("Nothing to do, the chain is empty");
+                final IoHandler handler = getService().getIoHandler();
+                if (handler != null) {
+                    IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+                    if (executor != null) {
+                        // asynchronous event
+                        // copy the bytebuffer
+                        LOG.debug("copying bytebuffer before pushing to the executor");
+                        ByteBuffer original = message;
+                        ByteBuffer clone = ByteBuffer.allocate(original.capacity());
+                        original.rewind();// copy from the beginning
+                        clone.put(original);
+                        original.rewind();
+                        clone.flip();
+                        executor.execute(new ReceiveEvent(this, clone));
+                    } else {
+                        // synchronous call (in the I/O loop)
+                        handler.messageReceived(this, message);
+                    }
+                }
+
             } else {
                 readChainPosition = 0;
                 // we call the first filter, it's supposed to call the next ones using the filter chain controller
                 chain[readChainPosition].messageReceived(this, message, this);
-            }
-            final IoHandler handler = getService().getIoHandler();
-            if (handler != null) {
-                handler.messageReceived(this, message);
             }
         } catch (final RuntimeException e) {
             processException(e);
@@ -772,7 +823,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             }
             final IoHandler handler = getService().getIoHandler();
             if (handler != null) {
-                handler.messageSent(this, highLevelMessage);
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+                if (executor != null) {
+                    // asynchronous event
+                    executor.execute(new SentEvent(this, highLevelMessage));
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.messageSent(this, highLevelMessage);
+                }
             }
         } catch (final RuntimeException e) {
             processException(e);
@@ -805,7 +863,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * At the end of write chain processing, enqueue final encoded {@link ByteBuffer} message in the session
      */
     private void enqueueFinalWriteMessage(final Object message) {
-        LOG.debug("end of write chan we enqueue the message in the session : {}", message);
+        LOG.debug("end of write chain we enqueue the message in the session : {}", message);
         lastWriteRequest = enqueueWriteRequest(message);
     }
 
@@ -818,6 +876,29 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
         if (readChainPosition >= chain.length) {
             // end of chain processing
+            final IoHandler handler = getService().getIoHandler();
+            if (handler != null) {
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+                if (executor != null) {
+                    // asynchronous event
+                    if (message == tl.get()) {
+                        // copy the bytebuffer
+                        LOG.debug("copying bytebuffer before pushing to the executor");
+                        ByteBuffer original = (ByteBuffer) message;
+                        ByteBuffer clone = ByteBuffer.allocate(original.capacity());
+                        original.rewind();// copy from the beginning
+                        clone.put(original);
+                        original.rewind();
+                        clone.flip();
+                        executor.execute(new ReceiveEvent(this, clone));
+                    } else {
+                        executor.execute(new ReceiveEvent(this, message));
+                    }
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.messageReceived(this, message);
+                }
+            }
         } else {
             chain[readChainPosition].messageReceived(this, message, this);
         }

@@ -19,8 +19,7 @@
  */
 package org.apache.mina.transport.tcp;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -53,7 +52,7 @@ public class NioTcpServerHandlerTest {
 
     private static final int CLIENT_COUNT = 100;
 
-    private static final int WAIT_TIME = 2000;
+    private static final int WAIT_TIME = 5000;
 
     private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 
@@ -127,7 +126,7 @@ public class NioTcpServerHandlerTest {
     @Test
     public void generateAllKindOfServerEventOneSelector() throws IOException, InterruptedException {
         SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool(1);
-        final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool);
+        final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool, null);
         server.setFilters();
         server.setIoHandler(new Handler());
         server.bind(0);
@@ -184,19 +183,19 @@ public class NioTcpServerHandlerTest {
 
         @Override
         public void sessionOpened(final IoSession session) {
-            LOG.info("** session open");
+            LOG.debug("** session open");
             openLatch.countDown();
         }
 
         @Override
         public void sessionClosed(final IoSession session) {
-            LOG.info("** session closed");
+            LOG.debug("** session closed");
             closedLatch.countDown();
         }
 
         @Override
         public void messageReceived(final IoSession session, final Object message) {
-            LOG.info("** message received {}", message);
+            LOG.debug("** message received {}", message);
             msgReadLatch.countDown();
             if (message instanceof ByteBuffer) {
                 final ByteBuffer msg = (ByteBuffer) message;
@@ -208,7 +207,7 @@ public class NioTcpServerHandlerTest {
 
         @Override
         public void messageSent(final IoSession session, final Object message) {
-            LOG.info("** message sent {}", message);
+            LOG.debug("** message sent {}", message);
             msgSentLatch.countDown();
         }
 

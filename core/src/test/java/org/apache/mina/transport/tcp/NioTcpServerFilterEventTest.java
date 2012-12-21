@@ -19,9 +19,7 @@
  */
 package org.apache.mina.transport.tcp;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static junit.framework.Assert.*;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -76,7 +74,7 @@ public class NioTcpServerFilterEventTest {
 
         // connect some clients
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            //System.out.println("Creation client " + i);
+            // System.out.println("Creation client " + i);
             try {
                 clients[i] = new Socket("127.0.0.1", port);
             } catch (Exception e) {
@@ -126,15 +124,14 @@ public class NioTcpServerFilterEventTest {
     }
 
     /**
-     * A test that creates 50 clients, each one of them writing one message. We will
-     * check that for each client we correctly process the sessionOpened, messageReceived,
-     * messageSent and sessionClosed events.
-     * We use only one selector to process all the OP events.
+     * A test that creates 50 clients, each one of them writing one message. We will check that for each client we
+     * correctly process the sessionOpened, messageReceived, messageSent and sessionClosed events. We use only one
+     * selector to process all the OP events.
      */
     @Test
     public void generateAllKindOfServerEventOneSelector() throws IOException, InterruptedException {
         SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool(1);
-        final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool);
+        final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool, null);
         server.setFilters(new MyCodec(), new Handler());
         server.bind(0);
         // warm up
@@ -147,7 +144,7 @@ public class NioTcpServerFilterEventTest {
 
         // connect some clients
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            //System.out.println("Creation client 2 " + i);
+            // System.out.println("Creation client 2 " + i);
             clients[i] = new Socket("127.0.0.1", port);
         }
 

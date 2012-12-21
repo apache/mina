@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.tcp;
 
+import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.server.AbstractIoServer;
 
 /**
@@ -32,9 +33,13 @@ public abstract class AbstractTcpServer extends AbstractIoServer {
 
     /**
      * Create an new AbsractTcpServer instance
+     * 
+     * @param eventExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O one).
+     *        Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
      */
-    protected AbstractTcpServer() {
-        super();
+    protected AbstractTcpServer(final IoHandlerExecutor eventExecutor) {
+        super(eventExecutor);
         this.config = new DefaultTcpSessionConfig();
     }
 
@@ -48,6 +53,7 @@ public abstract class AbstractTcpServer extends AbstractIoServer {
 
     /**
      * Set the default configuration for created TCP sessions
+     * 
      * @param config
      */
     public void setSessionConfig(final TcpSessionConfig config) {

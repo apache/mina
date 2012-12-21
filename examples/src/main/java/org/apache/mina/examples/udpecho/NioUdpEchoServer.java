@@ -47,7 +47,7 @@ public class NioUdpEchoServer {
     public static void main(final String[] args) {
         LOG.info("starting echo server");
 
-        final NioUdpServer server = new NioUdpServer(new NioSelectorLoop("I/O", 0));
+        final NioUdpServer server = new NioUdpServer(new NioSelectorLoop("I/O", 0), null);
 
         // create the fitler chain for this service
         server.setFilters(new LoggingFilter("LoggingFilter1"), new IoFilter() {

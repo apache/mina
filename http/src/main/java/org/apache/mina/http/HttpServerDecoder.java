@@ -102,25 +102,6 @@ public class HttpServerDecoder implements ProtocolDecoder {
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
             } else {
                 controller.callReadNextFilter(rq);
-
-                // is it a request with some body content ?
-                if (rq.getMethod() == HttpMethod.POST || rq.getMethod() == HttpMethod.PUT) {
-                    LOG.debug("request with content");
-                    session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
-
-                    String contentLen = rq.getHeader("content-length");
-
-                    if (contentLen != null) {
-                        LOG.debug("found content len : {}", contentLen);
-                        session.setAttribute(BODY_REMAINING_BYTES, new Integer(contentLen));
-                    } else {
-                        throw new RuntimeException("no content length !");
-                    }
-                } else {
-                    LOG.debug("request without content");
-                    session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
-
-                }
             }
 
             return null;

@@ -22,6 +22,7 @@ package org.apache.mina.transport.udp;
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.api.IoSession;
+import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.server.AbstractIoServer;
 
 /**
@@ -33,8 +34,8 @@ public abstract class AbstractUdpServer extends AbstractIoServer {
     /**
      * Create an new AbsractUdpServer instance
      */
-    protected AbstractUdpServer() {
-        super();
+    protected AbstractUdpServer(IoHandlerExecutor ioHandlerExecutor) {
+        super(ioHandlerExecutor);
     }
 
     /**

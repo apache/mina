@@ -19,7 +19,7 @@
  */
 package org.apache.mina.service.executor;
 
-public interface HandlerExecutor {
+public interface IoHandlerExecutor {
 
     void execute(Event command);
 }
