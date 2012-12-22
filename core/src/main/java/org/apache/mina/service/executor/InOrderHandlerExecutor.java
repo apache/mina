@@ -22,15 +22,28 @@ package org.apache.mina.service.executor;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.mina.api.IoHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Use this executor if you want the {@link IoHandler} events of a session to be executed in order and on the same
+ * thread. In your {@link IoHandler} code you don't need to care about session level concurrency.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class InOrderHandlerExecutor implements IoHandlerExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(InOrderHandlerExecutor.class);
 
     private Worker[] workers;
 
+    /**
+     * Create an {@link InOrderHandlerExecutor} with a given number of thread and a given queue size.
+     * 
+     * @param workerThreadCount the worker thread count
+     * @param queueSize the size of the queue for each worker thread
+     */
     public InOrderHandlerExecutor(int workerThreadCount, int queueSize) {
         LOG.debug("creating InOrderHandlerExecutor workerThreadCount = {} queueSize = {}", workerThreadCount, queueSize);
         workers = new Worker[workerThreadCount];
@@ -59,6 +72,7 @@ public class InOrderHandlerExecutor implements IoHandlerExecutor {
         }
     }
 
+    /** thread in charge of gathering events from a queue and running them */
     private static class Worker extends Thread {
 
         private static HandlerCaller caller = new HandlerCaller();

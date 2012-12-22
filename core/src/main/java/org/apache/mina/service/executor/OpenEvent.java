@@ -21,6 +21,11 @@ package org.apache.mina.service.executor;
 
 import org.apache.mina.api.IoSession;
 
+/**
+ * An {@link IoSession} open {@link Event}
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class OpenEvent implements Event {
     private final IoSession session;
 

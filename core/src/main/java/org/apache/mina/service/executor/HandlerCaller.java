@@ -1,7 +1,13 @@
 package org.apache.mina.service.executor;
 
+import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoSession;
 
+/**
+ * In charge of calling the {@link IoHandler} for a given {@link Event}
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 class HandlerCaller implements EventVisitor {
 
     @Override

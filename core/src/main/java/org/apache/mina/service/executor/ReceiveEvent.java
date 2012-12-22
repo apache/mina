@@ -21,6 +21,11 @@ package org.apache.mina.service.executor;
 
 import org.apache.mina.api.IoSession;
 
+/**
+ * A {@link IoSession} received a message {@link Event}.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ReceiveEvent implements Event {
     private final IoSession session;
     private final Object message;

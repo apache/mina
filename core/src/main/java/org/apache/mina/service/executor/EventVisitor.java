@@ -19,7 +19,13 @@
  */
 package org.apache.mina.service.executor;
 
+/**
+ * Implement this interface for implementing different behavior on different {@link Event}.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public interface EventVisitor {
+
     void visit(OpenEvent event);
 
     void visit(CloseEvent event);

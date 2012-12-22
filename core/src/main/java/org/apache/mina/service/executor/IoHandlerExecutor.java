@@ -19,7 +19,19 @@
  */
 package org.apache.mina.service.executor;
 
+import org.apache.mina.api.IoHandler;
+
+/**
+ * A class in charge of executing {@link IoHandler} related events.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public interface IoHandlerExecutor {
 
-    void execute(Event command);
+    /**
+     * execute a given event
+     * 
+     * @param event the event to execute
+     */
+    void execute(Event event);
 }

@@ -22,6 +22,11 @@ package org.apache.mina.service.executor;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoSession;
 
+/**
+ * An {@link IoSession} is idle (no sent or receive events)
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class IdleEvent implements Event {
 
     private final IoSession session;

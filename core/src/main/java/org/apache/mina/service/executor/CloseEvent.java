@@ -21,6 +21,11 @@ package org.apache.mina.service.executor;
 
 import org.apache.mina.api.IoSession;
 
+/**
+ * A session was closed event.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class CloseEvent implements Event {
     private final IoSession session;
 
