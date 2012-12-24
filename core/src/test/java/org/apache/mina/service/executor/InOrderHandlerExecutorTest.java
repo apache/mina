@@ -19,44 +19,40 @@
  */
 package org.apache.mina.service.executor;
 
-import java.util.concurrent.Executor;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
-import org.apache.mina.util.Assert;
+import org.apache.mina.api.IoSession;
+import org.junit.Test;
 
 /**
- * (in progress)
+ * Unit test for {@link InOrderHandlerExecutor}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
-public class OutOfOrderHandlerExecutor implements IoHandlerExecutor {
+public class InOrderHandlerExecutorTest {
 
-    private final Executor executor;
+    private InOrderHandlerExecutor executor;
 
-    public OutOfOrderHandlerExecutor(Executor executor) {
-        Assert.assertNotNull(executor, "executor");
-        this.executor = executor;
-    }
+    @Test
+    public void execute_open_events() {
+        // prepare
+        executor = new InOrderHandlerExecutor(1, 1);
+        IoSession session = mock(IoSession.class);
+        when(session.getId()).thenReturn(12345L);
 
-    @Override
-    public void execute(Event event) {
-        executor.execute(new EventRunner(event));
-    }
+        Event evt = mock(Event.class);
+        when(evt.getSession()).thenReturn(session);
 
-    private static class EventRunner implements Runnable {
+        // run
 
-        private final Event event;
+        executor.execute(evt);
 
-        public EventRunner(Event event) {
-            this.event = event;
-        }
+        // verify
+        verify(session).getId();
+        verify(evt).getSession();
 
-        private static HandlerCaller caller = new HandlerCaller();
-
-        @Override
-        public void run() {
-            event.visit(caller);
-        }
-
+        verify(evt).visit(any(EventVisitor.class));
+        verifyNoMoreInteractions(evt, session);
     }
 }
