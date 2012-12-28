@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.mina.api.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,23 +100,18 @@ public class NioSelectorLoop implements SelectorLoop {
      * {@inheritDoc}
      */
     @Override
-    public void register(boolean accept, boolean read, boolean write, SelectorListener listener,
-            SelectableChannel channel) {
-        register(null, accept, read, write, listener, channel);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void register(IoSession session, boolean accept, boolean read, boolean write, SelectorListener listener,
-            SelectableChannel channel) {
-        logger.debug("registering : {} for accept : {}, read : {}, write : {}", new Object[] { listener, accept, read,
-                                write });
+    public void register(boolean accept, boolean connect, boolean read, boolean write, SelectorListener listener,
+            SelectableChannel channel, RegistrationCallback callback) {
+        logger.debug("registering : {} for accept : {}, connect: {}, read : {}, write : {}, channel : {}",
+                new Object[] { listener, accept, connect, read, write, channel });
         int ops = 0;
 
         if (accept) {
             ops |= SelectionKey.OP_ACCEPT;
+        }
+
+        if (connect) {
+            ops |= SelectionKey.OP_CONNECT;
         }
 
         if (read) {
@@ -129,7 +123,7 @@ public class NioSelectorLoop implements SelectorLoop {
         }
 
         // TODO : if it's the same selector/worker, we don't need to do that we could directly enqueue
-        registrationQueue.add(new Registration(session, ops, channel, listener));
+        registrationQueue.add(new Registration(ops, channel, listener, callback));
 
         // Now, wakeup the selector in order to let it update the selectionKey status
         selector.wakeup();
@@ -141,8 +135,8 @@ public class NioSelectorLoop implements SelectorLoop {
     @Override
     public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
             final SelectorListener listener, final SelectableChannel channel) {
-        logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}", new Object[] { listener,
-                                accept, read, write });
+        logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}, channel : {}", new Object[] {
+                                listener, accept, read, write, channel });
 
         final SelectionKey key = channel.keyFor(selector);
         if (key == null) {
@@ -161,7 +155,9 @@ public class NioSelectorLoop implements SelectorLoop {
             ops |= SelectionKey.OP_WRITE;
         }
         key.interestOps(ops);
-        key.selector().wakeup();
+
+        // we need to wakeup for the registration to be modified (TODO : not needed if we are in the worker thread)
+        selector.wakeup();
     }
 
     /**
@@ -205,10 +201,12 @@ public class NioSelectorLoop implements SelectorLoop {
                     while (it.hasNext()) {
                         final SelectionKey key = it.next();
                         final SelectorListener listener = (SelectorListener) key.attachment();
-                        listener.ready(key.isAcceptable(), key.isReadable(), key.isReadable() ? readBuffer : null,
-                                key.isWritable());
+                        logger.debug("key : {}", key);
+                        listener.ready(key.isAcceptable(), key.isConnectable(), key.isReadable(),
+                                key.isReadable() ? readBuffer : null, key.isWritable());
                         // if you don't remove the event of the set, the selector will present you this event again and
                         // again
+                        logger.debug("remove");
                         it.remove();
                     }
 
@@ -219,10 +217,8 @@ public class NioSelectorLoop implements SelectorLoop {
                         try {
                             SelectionKey selectionKey = reg.channel.register(selector, reg.ops, reg.listener);
 
-                            IoSession session = reg.getSession();
-
-                            if (session != null) {
-                                ((NioSession) session).setSelectionKey(selectionKey);
+                            if (reg.getCallback() != null) {
+                                reg.getCallback().done(selectionKey);
                             }
                         } catch (final ClosedChannelException ex) {
                             // dead session..
@@ -236,13 +232,18 @@ public class NioSelectorLoop implements SelectorLoop {
         }
     }
 
-    private class Registration {
+    @Override
+    public void wakeup() {
+        selector.wakeup();
+    }
 
-        public Registration(IoSession session, int ops, SelectableChannel channel, SelectorListener listener) {
+    private static class Registration {
+
+        public Registration(int ops, SelectableChannel channel, SelectorListener listener, RegistrationCallback callback) {
             this.ops = ops;
             this.channel = channel;
             this.listener = listener;
-            this.session = session;
+            this.callback = callback;
         }
 
         private final int ops;
@@ -251,15 +252,10 @@ public class NioSelectorLoop implements SelectorLoop {
 
         private final SelectorListener listener;
 
-        private final IoSession session;
+        private final RegistrationCallback callback;
 
-        public IoSession getSession() {
-            return session;
+        public RegistrationCallback getCallback() {
+            return callback;
         }
-    }
-
-    @Override
-    public void wakeup() {
-        selector.wakeup();
     }
 }

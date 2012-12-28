@@ -24,11 +24,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Queue;
 
 import org.apache.mina.api.IoService;
+import org.apache.mina.api.IoSession;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.DefaultWriteFuture;
@@ -37,6 +37,7 @@ import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.tcp.ProxyTcpSessionConfig;
 import org.apache.mina.transport.tcp.TcpSessionConfig;
+import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class NioTcpSession extends AbstractIoSession implements NioSession, SelectorListener {
+public class NioTcpSession extends AbstractIoSession implements SelectorListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpSession.class);
 
@@ -60,12 +61,21 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
     /** the socket configuration */
     private final TcpSessionConfig configuration;
 
+    /** the future representing this session connection operation (client only) */
+    private ConnectFuture connectFuture;
+
+    private SelectionKey selectionKey;
+
     NioTcpSession(final IoService service, final SocketChannel channel, final SelectorLoop selectorLoop,
             final IdleChecker idleChecker) {
         super(service, idleChecker);
         this.channel = channel;
         this.selectorLoop = selectorLoop;
         this.configuration = new ProxyTcpSessionConfig(channel.socket());
+    }
+
+    void setConnectFuture(ConnectFuture connectFuture) {
+        this.connectFuture = connectFuture;
     }
 
     /**
@@ -183,6 +193,12 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
         }
 
         state = SessionState.CONNECTED;
+
+        if (connectFuture != null) {
+            connectFuture.complete(this);
+            connectFuture = null; // free some memory
+        }
+        processSessionOpen();
     }
 
     /**
@@ -359,7 +375,32 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
      * {@inheritDoc}
      */
     @Override
-    public void ready(final boolean accept, final boolean read, final ByteBuffer readBuffer, final boolean write) {
+    public void ready(final boolean accept, boolean connect, final boolean read, final ByteBuffer readBuffer,
+            final boolean write) {
+        LOG.debug("session {} ready for accept={}, connect={}, read={}, write={}", new Object[] { this, accept,
+                                connect, read, write });
+        if (connect) {
+            try {
+
+                boolean isConnected = channel.finishConnect();
+                if (!isConnected) {
+                    LOG.error("unable to connect session {}", this);
+                } else {
+                    // cancel current registration for connection
+                    selectionKey.cancel();
+                    selectionKey = null;
+                    // register for reading
+                    selectorLoop.register(false, false, true, false, this, channel, null);
+                    setConnected();
+                }
+            } catch (IOException e) {
+                LOG.debug("Connection error, we cancel the future", e);
+                if (connectFuture != null) {
+                    connectFuture.error(e);
+                }
+            }
+        }
+
         if (read) {
             processRead(readBuffer);
         }
@@ -372,37 +413,29 @@ public class NioTcpSession extends AbstractIoSession implements NioSession, Sele
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SelectionKey getSelectionKey() {
-        return null;
+    void setSelectionKey(SelectionKey key) {
+        this.selectionKey = key;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSelectionKey(SelectionKey key) {
-        // TODO Auto-generated method stub
+    static class ConnectFuture extends AbstractIoFuture<IoSession> {
 
-    }
+        @Override
+        protected boolean cancelOwner(boolean mayInterruptIfRunning) {
+            return false;
+        }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSelector(Selector selector) {
-        // TODO Auto-generated method stub
+        /**
+         * session connected
+         */
+        public void complete(IoSession session) {
+            setResult(session);
+        }
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void wakeup() {
-        selectorLoop.wakeup();
+        /**
+         * connection error
+         */
+        public void error(Exception e) {
+            setException(e);
+        }
     }
 }

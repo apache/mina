@@ -28,10 +28,31 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractTcpClient extends AbstractIoClient {
+
+    /** the default session configuration */
+    private TcpSessionConfig config;
+
     /**
      * Create an new AbsractTcpClient instance
      */
     protected AbstractTcpClient(IoHandlerExecutor ioHandlerExecutor) {
         super(ioHandlerExecutor);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TcpSessionConfig getSessionConfig() {
+        return this.config;
+    }
+
+    /**
+     * Set the default configuration for created TCP sessions
+     * 
+     * @param config
+     */
+    public void setSessionConfig(final TcpSessionConfig config) {
+        this.config = config;
     }
 }

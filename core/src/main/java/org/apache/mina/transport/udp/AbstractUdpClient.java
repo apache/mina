@@ -19,8 +19,11 @@
  */
 package org.apache.mina.transport.udp;
 
+import java.net.SocketAddress;
+
 import javax.net.ssl.SSLException;
 
+import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.service.client.AbstractIoClient;
 import org.apache.mina.service.executor.IoHandlerExecutor;
@@ -44,4 +47,15 @@ public abstract class AbstractUdpClient extends AbstractIoClient {
     public void initSecured(IoSession session) throws SSLException {
         // Do nothing : UDP does not support SSL
     }
+
+    /**
+     * Connects to the specified remote address binding to the specified local address.
+     * 
+     * @param remoteAddress Remote {@link SocketAddress} to connect
+     * @param localAddress Local {@link SocketAddress} to use while initiating connection to remote
+     *        {@link SocketAddress}
+     * @return the {@link IoFuture} instance which is completed when the connection attempt initiated by this call
+     *         succeeds or fails.
+     */
+    public abstract IoFuture<IoSession> connect(SocketAddress remoteAddress, SocketAddress localAddress);
 }

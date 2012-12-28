@@ -34,6 +34,7 @@ import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.tcp.AbstractTcpServer;
 import org.apache.mina.transport.tcp.TcpSessionConfig;
+import org.apache.mina.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,8 +68,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      */
     public NioTcpServer() {
         this(new NioSelectorLoop("accept", 0),
-                new FixedSelectorLoopPool(Runtime.getRuntime().availableProcessors() + 1), new InOrderHandlerExecutor(
-                        Runtime.getRuntime().availableProcessors() + 1, Runtime.getRuntime().availableProcessors() + 1));
+                new FixedSelectorLoopPool(Runtime.getRuntime().availableProcessors() + 1), null);
     }
 
     /**
@@ -76,8 +76,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * the OP_ACCEPT events. If the pool contains only one SelectorLoop, then all the events will be managed by the same
      * Selector.
      * 
-     * @param acceptSelectorLoop the selector loop for handling accept events (connection of new session)
-     * @param readWriteSelectorLoop the pool of selector loop for handling read/write events of connected sessions
+     * @param selectorLoopPool the selector loop pool for handling all I/O events (accept, read, write)
      * @param ioHandlerExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O
      *        one). Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
      *        operations.
@@ -130,10 +129,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      */
     @Override
     public synchronized void bind(final SocketAddress localAddress) throws IOException {
-        if (localAddress == null) {
-            // We should at least have one address to bind on
-            throw new IllegalArgumentException("LocalAdress cannot be null");
-        }
+        Assert.assertNotNull(localAddress, "localAddress");
 
         // check if the address is already bound
         if (this.address != null) {
@@ -148,7 +144,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         serverChannel.socket().bind(address);
         serverChannel.configureBlocking(false);
 
-        acceptSelectorLoop.register(true, false, false, this, serverChannel);
+        acceptSelectorLoop.register(true, false, false, false, this, serverChannel, null);
 
         idleChecker = new IndexedIdleChecker();
         idleChecker.start();
@@ -203,7 +199,8 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void ready(final boolean accept, final boolean read, final ByteBuffer readBuffer, final boolean write) {
+    public void ready(final boolean accept, boolean connect, final boolean read, final ByteBuffer readBuffer,
+            final boolean write) {
         if (accept) {
             LOG.debug("acceptable new client");
 
@@ -291,9 +288,13 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         }
 
         // add the session to the queue for being added to the selector
-        readWriteSelectorLoop.register(session, false, true, false, session, socketChannel);
+        readWriteSelectorLoop.register(false, false, true, false, session, socketChannel, new RegistrationCallback() {
 
-        session.processSessionOpened();
+            @Override
+            public void done(SelectionKey selectionKey) {
+                session.setSelectionKey(selectionKey);
+            }
+        });
         session.setConnected();
         idleChecker.sessionRead(session, System.currentTimeMillis());
         idleChecker.sessionWritten(session, System.currentTimeMillis());

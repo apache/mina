@@ -49,7 +49,7 @@ public class NioTcpServerFilterEventTest {
 
     private static final int CLIENT_COUNT = 100;
 
-    private static final int WAIT_TIME = 5000;
+    private static final int WAIT_TIME = 30000;
 
     private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 

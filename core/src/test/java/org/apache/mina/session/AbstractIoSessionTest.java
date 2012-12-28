@@ -216,7 +216,7 @@ public class AbstractIoSessionTest {
     @Test
     public void chain_open() {
         final DummySession session = new DummySession(service);
-        session.processSessionOpened();
+        session.processSessionOpen();
         verify(filter1).sessionOpened(eq(session));
         verify(filter2).sessionOpened(eq(session));
         verify(filter3).sessionOpened(eq(session));

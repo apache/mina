@@ -643,9 +643,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * process session opened event using the filter chain. To be called by the session {@link SelectorLoop} .
+     * process session open event using the filter chain. To be called by the session {@link SelectorLoop} .
      */
-    public void processSessionOpened() {
+    public void processSessionOpen() {
         LOG.debug("processing session open event");
 
         try {

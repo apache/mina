@@ -19,6 +19,11 @@
  */
 package org.apache.mina.transport.nio;
 
+import java.io.IOException;
+import java.net.SocketAddress;
+
+import org.apache.mina.api.IoFuture;
+import org.apache.mina.api.IoSession;
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.transport.udp.AbstractUdpClient;
@@ -38,6 +43,18 @@ public class NioUdpClient extends AbstractUdpClient {
 
     @Override
     public IoSessionConfig getSessionConfig() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public IoFuture<IoSession> connect(SocketAddress remoteAddress) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public IoFuture<IoSession> connect(SocketAddress remoteAddress, SocketAddress localAddress) {
         // TODO Auto-generated method stub
         return null;
     }

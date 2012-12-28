@@ -19,11 +19,7 @@
  */
 package org.apache.mina.service.client;
 
-import java.net.SocketAddress;
-
 import org.apache.mina.api.IoClient;
-import org.apache.mina.api.IoFuture;
-import org.apache.mina.api.IoSession;
 import org.apache.mina.service.AbstractIoService;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 
@@ -33,6 +29,9 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoClient extends AbstractIoService implements IoClient {
+
+    private long connectTimeoutInMillis = 10000;
+
     /**
      * Create an new AbstractIoClient instance
      */
@@ -42,21 +41,12 @@ public abstract class AbstractIoClient extends AbstractIoService implements IoCl
 
     @Override
     public long getConnectTimeoutMillis() {
-        return 0;
+        return connectTimeoutInMillis;
     }
 
     @Override
     public void setConnectTimeoutMillis(long connectTimeoutInMillis) {
-    }
-
-    @Override
-    public IoFuture<IoSession> connect(SocketAddress remoteAddress) {
-        return null;
-    }
-
-    @Override
-    public IoFuture<IoSession> connect(SocketAddress remoteAddress, SocketAddress localAddress) {
-        return null;
+        this.connectTimeoutInMillis = connectTimeoutInMillis;
     }
 
 }

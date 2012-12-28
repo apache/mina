@@ -22,10 +22,12 @@ package org.apache.mina.transport.nio;
 import java.nio.ByteBuffer;
 
 /**
+ * Listen for selector events.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SelectorListener {
 
-    void ready(boolean accept, boolean read, ByteBuffer readBuffer, boolean write);
+    void ready(boolean accept, boolean connect, boolean read, ByteBuffer readBuffer, boolean write);
 
 }

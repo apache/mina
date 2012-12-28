@@ -129,7 +129,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
         datagramChannel.socket().bind(address);
         datagramChannel.configureBlocking(false);
 
-        selectorLoop.register(false, true, false, this, datagramChannel);
+        selectorLoop.register(false, false, true, false, this, datagramChannel, null);
 
         // it's the first address bound, let's fire the event
         this.fireServiceActivated();
@@ -171,7 +171,8 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void ready(final boolean accept, final boolean read, final ByteBuffer readBuffer, final boolean write) {
+    public void ready(final boolean accept, boolean connect, final boolean read, final ByteBuffer readBuffer,
+            final boolean write) {
         if (read) {
             try {
                 LOG.debug("readable datagram for UDP service : {}", this);
