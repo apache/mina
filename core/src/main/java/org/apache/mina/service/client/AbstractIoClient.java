@@ -30,23 +30,11 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
  */
 public abstract class AbstractIoClient extends AbstractIoService implements IoClient {
 
-    private long connectTimeoutInMillis = 10000;
-
     /**
      * Create an new AbstractIoClient instance
      */
     protected AbstractIoClient(IoHandlerExecutor eventExecutor) {
         super(eventExecutor);
-    }
-
-    @Override
-    public long getConnectTimeoutMillis() {
-        return connectTimeoutInMillis;
-    }
-
-    @Override
-    public void setConnectTimeoutMillis(long connectTimeoutInMillis) {
-        this.connectTimeoutInMillis = connectTimeoutInMillis;
     }
 
 }

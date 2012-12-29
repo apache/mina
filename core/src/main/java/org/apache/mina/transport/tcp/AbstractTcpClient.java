@@ -32,11 +32,15 @@ public abstract class AbstractTcpClient extends AbstractIoClient {
     /** the default session configuration */
     private TcpSessionConfig config;
 
+    /** the connection timeout in milliseconds, after that delay the connection to remote server should fail. */
+    private int connectTimeoutInMillis = 10000;
+
     /**
      * Create an new AbsractTcpClient instance
      */
     protected AbstractTcpClient(IoHandlerExecutor ioHandlerExecutor) {
         super(ioHandlerExecutor);
+        this.config = new DefaultTcpSessionConfig();
     }
 
     /**
@@ -55,4 +59,23 @@ public abstract class AbstractTcpClient extends AbstractIoClient {
     public void setSessionConfig(final TcpSessionConfig config) {
         this.config = config;
     }
+
+    /**
+     * Returns the connect timeout in milliseconds. The default value is 10 seconds.
+     * 
+     * @return the connect timeout in milliseconds
+     */
+    public int getConnectTimeoutMillis() {
+        return connectTimeoutInMillis;
+    }
+
+    /**
+     * Sets the connect timeout in milliseconds. The default value is 1 minute.
+     * 
+     * @param connectTimeoutInMillis Connection timeout in ms
+     */
+    public void setConnectTimeoutMillis(int connectTimeoutInMillis) {
+        this.connectTimeoutInMillis = connectTimeoutInMillis;
+    }
+
 }

@@ -24,6 +24,7 @@ import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
+import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.service.executor.InOrderHandlerExecutor;
@@ -31,6 +32,7 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.tcp.AbstractTcpClient;
+import org.apache.mina.transport.tcp.TcpSessionConfig;
 import org.apache.mina.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,19 +107,81 @@ public class NioTcpClient extends AbstractTcpClient {
 
         SocketChannel clientSocket = SocketChannel.open();
 
+        clientSocket.socket().setSoTimeout(getConnectTimeoutMillis());
         // non blocking
         clientSocket.configureBlocking(false);
 
-        // connect to a running server
-        boolean connected = clientSocket.connect(remoteAddress);
+        // apply idle configuration
         final NioTcpSession session = new NioTcpSession(this, clientSocket, readWriteSelectorPool.getSelectorLoop(),
                 idleChecker);
+        final TcpSessionConfig config = getSessionConfig();
+
+        session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
+        session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE,
+                config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
+
+        // apply the default service socket configuration
+        final Boolean keepAlive = config.isKeepAlive();
+
+        if (keepAlive != null) {
+            session.getConfig().setKeepAlive(keepAlive);
+        }
+
+        final Boolean oobInline = config.isOobInline();
+
+        if (oobInline != null) {
+            session.getConfig().setOobInline(oobInline);
+        }
+
+        final Boolean reuseAddress = config.isReuseAddress();
+
+        if (reuseAddress != null) {
+            session.getConfig().setReuseAddress(reuseAddress);
+        }
+
+        final Boolean tcpNoDelay = config.isTcpNoDelay();
+
+        if (tcpNoDelay != null) {
+            session.getConfig().setTcpNoDelay(tcpNoDelay);
+        }
+
+        final Integer receiveBufferSize = config.getReceiveBufferSize();
+
+        if (receiveBufferSize != null) {
+            session.getConfig().setReceiveBufferSize(receiveBufferSize);
+        }
+
+        final Integer sendBufferSize = config.getSendBufferSize();
+
+        if (sendBufferSize != null) {
+            session.getConfig().setSendBufferSize(sendBufferSize);
+        }
+
+        final Integer trafficClass = config.getTrafficClass();
+
+        if (trafficClass != null) {
+            session.getConfig().setTrafficClass(trafficClass);
+        }
+
+        final Integer soLinger = config.getSoLinger();
+
+        if (soLinger != null) {
+            session.getConfig().setSoLinger(soLinger);
+        }
+
+        // Set the secured flag if the service is to be used over SSL/TLS
+        if (config.isSecured()) {
+            session.initSecure(config.getSslContext());
+        }
+
+        // connect to a running server
+        boolean connected = clientSocket.connect(remoteAddress);
 
         NioTcpSession.ConnectFuture connectFuture = new NioTcpSession.ConnectFuture();
         session.setConnectFuture(connectFuture);
 
         if (!connected) {
-            // async connection, let's the connection complete in background, the selector loop will dectect whe nthe
+            // async connection, let's the connection complete in background, the selector loop will dectect when the
             // connection is successful
             connectSelectorLoop.register(false, true, false, false, session, clientSocket, new RegistrationCallback() {
 
