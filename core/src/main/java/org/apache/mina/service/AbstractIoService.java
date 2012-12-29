@@ -48,6 +48,9 @@ public abstract class AbstractIoService implements IoService {
     /** The high level business logic */
     private IoHandler handler;
 
+    /** Filters chain */
+    private IoFilter[] filters = new IoFilter[0];
+
     /** used for executing IoHandler event in another pool of thread (not in the low level I/O one) */
     protected final IoHandlerExecutor ioHandlerExecutor;
 
@@ -207,8 +210,6 @@ public abstract class AbstractIoService implements IoService {
             handler.serviceInactivated(this);
         }
     }
-
-    private IoFilter[] filters;
 
     /**
      * {@inheritDoc}
