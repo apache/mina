@@ -60,20 +60,6 @@ public class Main {
                 })).create(IoHandler.class, sm);
     }
     
-    private static IoFilter createAuthenticationIoFilter() {
-        StateMachine sm = StateMachineFactory.getInstance(
-                IoFilterTransition.class).create(AuthenticationHandler.START,
-                new AuthenticationHandler());
-
-        return new StateMachineProxyBuilder().setStateContextLookup(
-                new IoSessionStateContextLookup(new StateContextFactory() {
-                    public StateContext create() {
-                        return new AuthenticationHandler.AuthenticationContext();
-                    }
-                }, "authContext")).setIgnoreUnhandledEvents(true).setIgnoreStateContextLookupFailure(true).create(
-                IoFilter.class, sm);
-    }
-    
     public static void main(String[] args) throws Exception {
         SocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
