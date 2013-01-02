@@ -45,15 +45,15 @@ import org.slf4j.LoggerFactory;
 public class NioTcpClient extends AbstractTcpClient {
 
     /** A logger for this class */
-    static final Logger LOG = LoggerFactory.getLogger(NioTcpClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NioTcpClient.class);
 
-    // the SelectorLoop for connecting the sessions
-    private final SelectorLoop connectSelectorLoop;
+    /** the SelectorLoop for connecting the sessions */
+    private SelectorLoop connectSelectorLoop;
 
-    // the Selectorloop for handling read/write session events
-    private final SelectorLoopPool readWriteSelectorPool;
+    /** the Selectorloop for handling read/write session events */
+    private SelectorLoopPool readWriteSelectorPool;
 
-    // for detecting idle session
+    /** for detecting idle session */
     private IdleChecker idleChecker;
 
     /**
@@ -61,8 +61,8 @@ public class NioTcpClient extends AbstractTcpClient {
      * {@link InOrderHandlerExecutor})
      */
     public NioTcpClient() {
-        this(new NioSelectorLoop("connect", 0), new FixedSelectorLoopPool(
-                Runtime.getRuntime().availableProcessors() + 1), null);
+        // Default to 2 threads in the pool
+        this(new NioSelectorLoop("connect", 0), new FixedSelectorLoopPool(2), null);
     }
 
     /**
@@ -77,8 +77,8 @@ public class NioTcpClient extends AbstractTcpClient {
      */
     public NioTcpClient(SelectorLoopPool selectorLoopPool, IoHandlerExecutor handlerExecutor) {
         super(handlerExecutor);
-        this.connectSelectorLoop = selectorLoopPool.getSelectorLoop();
-        this.readWriteSelectorPool = selectorLoopPool;
+        connectSelectorLoop = selectorLoopPool.getSelectorLoop();
+        readWriteSelectorPool = selectorLoopPool;
     }
 
     /**
@@ -108,62 +108,64 @@ public class NioTcpClient extends AbstractTcpClient {
         SocketChannel clientSocket = SocketChannel.open();
 
         clientSocket.socket().setSoTimeout(getConnectTimeoutMillis());
+
         // non blocking
         clientSocket.configureBlocking(false);
 
         // apply idle configuration
+        // Has to be final, as it's used in a inner class...
         final NioTcpSession session = new NioTcpSession(this, clientSocket, readWriteSelectorPool.getSelectorLoop(),
                 idleChecker);
-        final TcpSessionConfig config = getSessionConfig();
+        TcpSessionConfig config = getSessionConfig();
 
         session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
         session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE,
                 config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
 
         // apply the default service socket configuration
-        final Boolean keepAlive = config.isKeepAlive();
+        Boolean keepAlive = config.isKeepAlive();
 
         if (keepAlive != null) {
             session.getConfig().setKeepAlive(keepAlive);
         }
 
-        final Boolean oobInline = config.isOobInline();
+        Boolean oobInline = config.isOobInline();
 
         if (oobInline != null) {
             session.getConfig().setOobInline(oobInline);
         }
 
-        final Boolean reuseAddress = config.isReuseAddress();
+        Boolean reuseAddress = config.isReuseAddress();
 
         if (reuseAddress != null) {
             session.getConfig().setReuseAddress(reuseAddress);
         }
 
-        final Boolean tcpNoDelay = config.isTcpNoDelay();
+        Boolean tcpNoDelay = config.isTcpNoDelay();
 
         if (tcpNoDelay != null) {
             session.getConfig().setTcpNoDelay(tcpNoDelay);
         }
 
-        final Integer receiveBufferSize = config.getReceiveBufferSize();
+        Integer receiveBufferSize = config.getReceiveBufferSize();
 
         if (receiveBufferSize != null) {
             session.getConfig().setReceiveBufferSize(receiveBufferSize);
         }
 
-        final Integer sendBufferSize = config.getSendBufferSize();
+        Integer sendBufferSize = config.getSendBufferSize();
 
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
         }
 
-        final Integer trafficClass = config.getTrafficClass();
+        Integer trafficClass = config.getTrafficClass();
 
         if (trafficClass != null) {
             session.getConfig().setTrafficClass(trafficClass);
         }
 
-        final Integer soLinger = config.getSoLinger();
+        Integer soLinger = config.getSoLinger();
 
         if (soLinger != null) {
             session.getConfig().setSoLinger(soLinger);
@@ -181,7 +183,7 @@ public class NioTcpClient extends AbstractTcpClient {
         session.setConnectFuture(connectFuture);
 
         if (!connected) {
-            // async connection, let's the connection complete in background, the selector loop will dectect when the
+            // async connection, let's the connection complete in background, the selector loop will detect when the
             // connection is successful
             connectSelectorLoop.register(false, true, false, false, session, clientSocket, new RegistrationCallback() {
 
@@ -200,6 +202,7 @@ public class NioTcpClient extends AbstractTcpClient {
                     session.setSelectionKey(selectionKey);
                 }
             });
+
             session.setConnected();
         }
         return connectFuture;

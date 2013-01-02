@@ -23,7 +23,7 @@ import org.apache.mina.service.client.AbstractIoClient;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 
 /**
- * Base class for UDP based Clients
+ * Base class for TCP based Clients
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -40,7 +40,7 @@ public abstract class AbstractTcpClient extends AbstractIoClient {
      */
     protected AbstractTcpClient(IoHandlerExecutor ioHandlerExecutor) {
         super(ioHandlerExecutor);
-        this.config = new DefaultTcpSessionConfig();
+        config = new DefaultTcpSessionConfig();
     }
 
     /**
@@ -48,7 +48,7 @@ public abstract class AbstractTcpClient extends AbstractIoClient {
      */
     @Override
     public TcpSessionConfig getSessionConfig() {
-        return this.config;
+        return config;
     }
 
     /**
@@ -77,5 +77,4 @@ public abstract class AbstractTcpClient extends AbstractIoClient {
     public void setConnectTimeoutMillis(int connectTimeoutInMillis) {
         this.connectTimeoutInMillis = connectTimeoutInMillis;
     }
-
 }
