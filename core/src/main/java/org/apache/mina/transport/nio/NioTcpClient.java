@@ -48,10 +48,12 @@ public class NioTcpClient extends AbstractTcpClient {
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpClient.class);
 
     /** the SelectorLoop for connecting the sessions */
-    private SelectorLoop connectSelectorLoop;
+    // This is final, so that we know if it's not initialized
+    private final SelectorLoop connectSelectorLoop;
 
     /** the Selectorloop for handling read/write session events */
-    private SelectorLoopPool readWriteSelectorPool;
+    // This is final, so that we know if it's not initialized
+    private final SelectorLoopPool readWriteSelectorPool;
 
     /** for detecting idle session */
     private IdleChecker idleChecker;
