@@ -222,7 +222,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
     @Override
     public void flushWriteQueue() {
         // register for write
-        selectorLoop.modifyRegistration(false, !isReadSuspended(), true, this, channel);
+        selectorLoop.modifyRegistration(false, !isReadSuspended(), true, this, channel, true);
     }
 
     /**
@@ -359,7 +359,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                         channelClose();
                     } else {
                         // no more write event needed
-                        selectorLoop.modifyRegistration(false, !isReadSuspended(), false, this, channel);
+                        selectorLoop.modifyRegistration(false, !isReadSuspended(), false, this, channel, false);
 
                         // Reset the flag in IoSession too
                         setNotRegisteredForWrite();

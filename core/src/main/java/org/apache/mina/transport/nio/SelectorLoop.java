@@ -33,12 +33,13 @@ public interface SelectorLoop {
      * @param write Registers for OP_WRITE events
      * @param listener The listener
      * @param channel
+     * @param wakeup Tells if we should do a wakeup() on the selector
      */
     void register(boolean accept, boolean connect, boolean read, boolean write, SelectorListener listener,
             SelectableChannel channel, RegistrationCallback callback);
 
     void modifyRegistration(boolean accept, boolean read, boolean write, SelectorListener listener,
-            SelectableChannel channel);
+            SelectableChannel channel, boolean wakeup);
 
     void unregister(SelectorListener listener, SelectableChannel channel);
 

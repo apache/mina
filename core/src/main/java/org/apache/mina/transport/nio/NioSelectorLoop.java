@@ -126,7 +126,7 @@ public class NioSelectorLoop implements SelectorLoop {
         registrationQueue.add(new Registration(ops, channel, listener, callback));
 
         // Now, wakeup the selector in order to let it update the selectionKey status
-        selector.wakeup();
+        wakeup();
     }
 
     /**
@@ -134,7 +134,7 @@ public class NioSelectorLoop implements SelectorLoop {
      */
     @Override
     public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
-            final SelectorListener listener, final SelectableChannel channel) {
+            final SelectorListener listener, final SelectableChannel channel, boolean wakeup) {
         logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}, channel : {}", new Object[] {
                 listener, accept, read, write, channel });
 
@@ -161,7 +161,9 @@ public class NioSelectorLoop implements SelectorLoop {
         key.interestOps(ops);
 
         // we need to wakeup for the registration to be modified (TODO : not needed if we are in the worker thread)
-        selector.wakeup();
+        if (wakeup) {
+            wakeup();
+        }
     }
 
     /**
@@ -200,22 +202,26 @@ public class NioSelectorLoop implements SelectorLoop {
                     logger.debug("selecting...");
                     final int readyCount = selector.select();
                     logger.debug("... done selecting : {} events", readyCount);
-                    final Iterator<SelectionKey> it = selector.selectedKeys().iterator();
 
-                    while (it.hasNext()) {
-                        final SelectionKey key = it.next();
-                        final SelectorListener listener = (SelectorListener) key.attachment();
-                        logger.debug("key : {}", key);
-                        boolean isAcceptable = key.isAcceptable();
-                        boolean isConnectable = key.isConnectable();
-                        boolean isReadable = key.isReadable();
-                        boolean isWritable = key.isWritable();
-                        listener.ready(isAcceptable, isConnectable, isReadable, isReadable ? readBuffer : null,
-                                isWritable);
-                        // if you don't remove the event of the set, the selector will present you this event again and
-                        // again
-                        logger.debug("remove");
-                        it.remove();
+                    if (readyCount > 0) {
+                        final Iterator<SelectionKey> it = selector.selectedKeys().iterator();
+
+                        while (it.hasNext()) {
+                            final SelectionKey key = it.next();
+                            final SelectorListener listener = (SelectorListener) key.attachment();
+                            logger.debug("key : {}", key);
+                            int ops = key.readyOps();
+                            boolean isAcceptable = (ops & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT;
+                            boolean isConnectable = (ops & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT;
+                            boolean isReadable = (ops & SelectionKey.OP_READ) == SelectionKey.OP_READ;
+                            boolean isWritable = (ops & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE;
+                            listener.ready(isAcceptable, isConnectable, isReadable, isReadable ? readBuffer : null,
+                                    isWritable);
+                            // if you don't remove the event of the set, the selector will present you this event again and
+                            // again
+                            logger.debug("remove");
+                            it.remove();
+                        }
                     }
 
                     // new registration
