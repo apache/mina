@@ -63,18 +63,12 @@ public class Mina3BenchmarkServer implements BenchmarkServer {
         tcpServer.getSessionConfig().setTcpNoDelay(true);
         tcpServer.setIoHandler(new IoHandler() {
             public void sessionOpened(IoSession session) {
-                System.out.println("Server session opened");
+                //System.out.println("Server session opened");
                 session.setAttribute(STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
-                State state = session.getAttribute(STATE_ATTRIBUTE);
-
-                if (state == null) {
-                    System.out.println("State is null");
-                }
-
             }
 
             public void messageReceived(IoSession session, Object message) {
-                System.out.println("Server Message received : " + message);
+                //System.out.println("Server Message received : " + message);
                 if (message instanceof ByteBuffer) {
                     ByteBuffer buffer = (ByteBuffer) message;
 
@@ -139,7 +133,7 @@ public class Mina3BenchmarkServer implements BenchmarkServer {
 
             @Override
             public void messageSent(IoSession session, Object message) {
-                System.out.println("Server message sent :" + message);
+                //System.out.println("Server message sent :" + message);
             }
 
             @Override
