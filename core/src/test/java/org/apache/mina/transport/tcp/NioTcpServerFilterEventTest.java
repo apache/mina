@@ -19,7 +19,9 @@
  */
 package org.apache.mina.transport.tcp;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -130,7 +132,7 @@ public class NioTcpServerFilterEventTest {
      */
     @Test
     public void generateAllKindOfServerEventOneSelector() throws IOException, InterruptedException {
-        SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool(1);
+        SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool("Server", 1);
         final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool, null);
         server.setFilters(new MyCodec(), new Handler());
         server.bind(0);

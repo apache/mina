@@ -28,6 +28,7 @@ import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.transport.nio.NioTcpClient;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -38,6 +39,7 @@ import org.junit.Test;
 public class NioTcpClientTimeoutTest {
 
     @Test
+    @Ignore
     public void timeout() throws IOException, InterruptedException {
         NioTcpClient client = new NioTcpClient();
         client.setConnectTimeoutMillis(1000);
@@ -56,6 +58,5 @@ public class NioTcpClientTimeoutTest {
         } finally {
             server.close();
         }
-
     }
 }

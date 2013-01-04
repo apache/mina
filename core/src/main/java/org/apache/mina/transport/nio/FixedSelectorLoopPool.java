@@ -37,7 +37,7 @@ public class FixedSelectorLoopPool implements SelectorLoopPool {
      * 
      * @param size
      */
-    public FixedSelectorLoopPool(final int size) {
+    public FixedSelectorLoopPool(String prefix, final int size) {
         if (size <= 0) {
             throw new IllegalArgumentException("We can't create a pool with no Selectorloop in it");
         }
@@ -45,7 +45,7 @@ public class FixedSelectorLoopPool implements SelectorLoopPool {
         pool = new SelectorLoop[size];
 
         for (int i = 0; i < size; i++) {
-            pool[i] = new NioSelectorLoop("I/O", i);
+            pool[i] = new NioSelectorLoop(prefix + "-I/O", i);
         }
     }
 

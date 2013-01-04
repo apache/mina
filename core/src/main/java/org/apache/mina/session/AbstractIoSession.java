@@ -653,6 +653,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             for (final IoFilter filter : chain) {
                 filter.sessionOpened(this);
             }
+
             final IoHandler handler = getService().getIoHandler();
 
             if (handler != null) {

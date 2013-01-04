@@ -36,5 +36,4 @@ public abstract class AbstractIoClient extends AbstractIoService implements IoCl
     protected AbstractIoClient(IoHandlerExecutor eventExecutor) {
         super(eventExecutor);
     }
-
 }
