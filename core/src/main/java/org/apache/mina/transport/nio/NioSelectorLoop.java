@@ -136,7 +136,7 @@ public class NioSelectorLoop implements SelectorLoop {
     public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
             final SelectorListener listener, final SelectableChannel channel) {
         logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}, channel : {}", new Object[] {
-                                listener, accept, read, write, channel });
+                listener, accept, read, write, channel });
 
         final SelectionKey key = channel.keyFor(selector);
         if (key == null) {
@@ -202,8 +202,12 @@ public class NioSelectorLoop implements SelectorLoop {
                         final SelectionKey key = it.next();
                         final SelectorListener listener = (SelectorListener) key.attachment();
                         logger.debug("key : {}", key);
-                        listener.ready(key.isAcceptable(), key.isConnectable(), key.isReadable(),
-                                key.isReadable() ? readBuffer : null, key.isWritable());
+                        boolean isAcceptable = key.isAcceptable();
+                        boolean isConnectable = key.isConnectable();
+                        boolean isReadable = key.isReadable();
+                        boolean isWritable = key.isWritable();
+                        listener.ready(isAcceptable, isConnectable, isReadable, isReadable ? readBuffer : null,
+                                isWritable);
                         // if you don't remove the event of the set, the selector will present you this event again and
                         // again
                         logger.debug("remove");
@@ -256,6 +260,52 @@ public class NioSelectorLoop implements SelectorLoop {
 
         public RegistrationCallback getCallback() {
             return callback;
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("Registration : [");
+
+            boolean hasOp = false;
+
+            if ((ops & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+                sb.append("OP_READ");
+                hasOp = true;
+            }
+
+            if ((ops & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                if (hasOp) {
+                    sb.append("|");
+                }
+
+                sb.append("OP_WRITE");
+                hasOp = true;
+            }
+
+            if ((ops & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
+                if (hasOp) {
+                    sb.append("|");
+                }
+
+                sb.append("OP_ACCEPT");
+                hasOp = true;
+            }
+
+            if ((ops & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT) {
+                if (hasOp) {
+                    sb.append("|");
+                }
+
+                sb.append("OP_CONNECT");
+                hasOp = true;
+            }
+
+            if (channel != null) {
+                sb.append(", ").append(channel);
+            }
+
+            return sb.toString();
         }
     }
 }
