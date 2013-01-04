@@ -198,6 +198,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
             connectFuture.complete(this);
             connectFuture = null; // free some memory
         }
+
         processSessionOpen();
     }
 
@@ -378,20 +379,27 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
     public void ready(final boolean accept, boolean connect, final boolean read, final ByteBuffer readBuffer,
             final boolean write) {
         LOG.debug("session {} ready for accept={}, connect={}, read={}, write={}", new Object[] { this, accept,
-                                connect, read, write });
+                connect, read, write });
         if (connect) {
             try {
 
                 boolean isConnected = channel.finishConnect();
+
                 if (!isConnected) {
                     LOG.error("unable to connect session {}", this);
                 } else {
                     // cancel current registration for connection
                     selectionKey.cancel();
                     selectionKey = null;
-                    // register for reading
-                    selectorLoop.register(false, false, true, false, this, channel, null);
-                    setConnected();
+
+                    // Register for reading
+                    selectorLoop.register(false, false, true, false, this, channel, new RegistrationCallback() {
+
+                        @Override
+                        public void done(SelectionKey selectionKey) {
+                            setConnected();
+                        }
+                    });
                 }
             } catch (IOException e) {
                 LOG.debug("Connection error, we cancel the future", e);

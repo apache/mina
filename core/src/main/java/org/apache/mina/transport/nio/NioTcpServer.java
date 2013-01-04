@@ -67,8 +67,8 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * {@link InOrderHandlerExecutor})
      */
     public NioTcpServer() {
-        this(new NioSelectorLoop("accept", 0),
-                new FixedSelectorLoopPool(Runtime.getRuntime().availableProcessors() + 1), null);
+        this(new NioSelectorLoop("accept", 0), new FixedSelectorLoopPool("Server", Runtime.getRuntime()
+                .availableProcessors() + 1), null);
     }
 
     /**
@@ -293,9 +293,10 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
             @Override
             public void done(SelectionKey selectionKey) {
                 session.setSelectionKey(selectionKey);
+                session.setConnected();
             }
         });
-        session.setConnected();
+
         idleChecker.sessionRead(session, System.currentTimeMillis());
         idleChecker.sessionWritten(session, System.currentTimeMillis());
     }
