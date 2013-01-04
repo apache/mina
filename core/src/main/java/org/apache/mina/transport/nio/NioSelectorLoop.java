@@ -145,15 +145,19 @@ public class NioSelectorLoop implements SelectorLoop {
         }
 
         int ops = 0;
+
         if (accept) {
             ops |= SelectionKey.OP_ACCEPT;
         }
+
         if (read) {
             ops |= SelectionKey.OP_READ;
         }
+
         if (write) {
             ops |= SelectionKey.OP_WRITE;
         }
+
         key.interestOps(ops);
 
         // we need to wakeup for the registration to be modified (TODO : not needed if we are in the worker thread)

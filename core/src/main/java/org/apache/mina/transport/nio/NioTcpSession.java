@@ -360,6 +360,9 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                     } else {
                         // no more write event needed
                         selectorLoop.modifyRegistration(false, !isReadSuspended(), false, this, channel);
+
+                        // Reset the flag in IoSession too
+                        setNotRegisteredForWrite();
                     }
                 } else {
                     // We have some more data to write : the channel OP_WRITE interest remains
