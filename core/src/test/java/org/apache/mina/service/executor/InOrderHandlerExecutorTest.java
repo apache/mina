@@ -35,7 +35,7 @@ public class InOrderHandlerExecutorTest {
     private InOrderHandlerExecutor executor;
 
     @Test
-    public void execute_open_events() {
+    public void execute_open_events() throws InterruptedException {
         // prepare
         executor = new InOrderHandlerExecutor(1, 1);
         IoSession session = mock(IoSession.class);
@@ -51,7 +51,7 @@ public class InOrderHandlerExecutorTest {
         // verify
         verify(session).getId();
         verify(evt).getSession();
-
+        Thread.sleep(200);
         verify(evt).visit(any(EventVisitor.class));
         verifyNoMoreInteractions(evt, session);
     }
