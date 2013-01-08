@@ -140,6 +140,24 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
         throw new RuntimeException("Not implemented");
     }
 
+    @Override
+    public int writeDirect(Object message) {
+        try {
+            // Check that we can write into the channel
+            if (!isRegisteredForWrite()) {
+                // We don't have pending writes
+                return channel.write((ByteBuffer) message);
+            } else {
+                return -1;
+            }
+        } catch (final IOException e) {
+            LOG.error("Exception while reading : ", e);
+            processException(e);
+
+            return -1;
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -331,7 +349,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                     }
 
                     // generate the message sent event
-                    final Object highLevel = ((DefaultWriteRequest) writeRequest).getHighLevelMessage();
+                    final Object highLevel = ((DefaultWriteRequest) writeRequest).getOriginalMessage();
 
                     if (highLevel != null) {
                         processMessageSent(highLevel);
@@ -370,7 +388,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                 }
             }
         } catch (final IOException e) {
-            LOG.error("Exception while reading : ", e);
+            LOG.error("Exception while writing : ", e);
             processException(e);
         }
     }

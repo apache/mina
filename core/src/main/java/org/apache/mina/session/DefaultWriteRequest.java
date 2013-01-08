@@ -31,21 +31,23 @@ import org.apache.mina.util.ByteBufferDumper;
  */
 public class DefaultWriteRequest implements WriteRequest {
     /** The stored message */
-    private final Object message;
+    private Object message;
 
-    /** The high level message (before being processed by the filter chain */
-    private Object highLevelMessage;
+    /** The original message (before being processed by the filter chain */
+    private Object originalMessage;
 
     /** the future to complete when this message is written */
     private IoFuture<Void> future;
 
     /**
-     * Creates a new instance of a WriteRequest
+     * Creates a new instance of a WriteRequest, storing the message as it was
+     * when the IoSession.write() has been called.
      * 
-     * @param message The stored message
+     * @param message The original message
      */
-    public DefaultWriteRequest(final Object message) {
-        this.message = message;
+    public DefaultWriteRequest(Object originalMessage) {
+        this.message = originalMessage;
+        this.originalMessage = originalMessage;
     }
 
     /**
@@ -60,25 +62,32 @@ public class DefaultWriteRequest implements WriteRequest {
      * {@inheritDoc}
      */
     @Override
+    public void setMessage(Object message) {
+        this.message = message;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IoFuture<Void> getFuture() {
         return future;
     }
 
     /**
-     * Associates a Future to this WriteRequest instance
-     * 
-     * @param future The associated Future
+     * {@inheritDoc}
      */
+    @Override
     public void setFuture(final IoFuture<Void> future) {
         this.future = future;
     }
 
-    public Object getHighLevelMessage() {
-        return highLevelMessage;
-    }
-
-    public void setHighLevelMessage(final Object highLevelMessage) {
-        this.highLevelMessage = highLevelMessage;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getOriginalMessage() {
+        return originalMessage;
     }
 
     /**
@@ -91,12 +100,42 @@ public class DefaultWriteRequest implements WriteRequest {
         sb.append("WriteRequest[");
 
         if (future != null) {
-            sb.append("Future,");
+            sb.append("Future : ");
+            sb.append(future);
+            sb.append(",");
+        } else {
+            sb.append("No future, ");
+        }
+
+        if (originalMessage != null) {
+            // Dump the original message
+            sb.append("Original message : '");
+
+            if (originalMessage instanceof ByteBuffer) {
+                sb.append(ByteBufferDumper.dump((ByteBuffer) originalMessage));
+            } else {
+                sb.append(originalMessage);
+            }
+
+            sb.append("', ");
+        } else {
+            sb.append("No Orginal message,");
         }
 
         if (message != null) {
+            // Dump the encoded message
             // Just dump the first 16 bytes
-            sb.append(ByteBufferDumper.dump((ByteBuffer) message, 16, false));
+            sb.append("Encoded message : '");
+
+            if (message instanceof ByteBuffer) {
+                sb.append(ByteBufferDumper.dump((ByteBuffer) message, 16, false));
+            } else {
+                sb.append(message);
+            }
+
+            sb.append("'");
+        } else {
+            sb.append("No encoded message,");
         }
 
         sb.append("]");

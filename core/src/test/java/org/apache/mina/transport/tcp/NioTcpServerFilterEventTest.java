@@ -33,6 +33,7 @@ import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.nio.FixedSelectorLoopPool;
 import org.apache.mina.transport.nio.NioTcpServer;
 import org.apache.mina.transport.nio.SelectorLoopPool;
@@ -206,9 +207,9 @@ public class NioTcpServerFilterEventTest {
         }
 
         @Override
-        public void messageWriting(final IoSession session, final Object message,
-                final WriteFilterChainController controller) {
-            controller.callWriteNextFilter(ByteBuffer.wrap(message.toString().getBytes()));
+        public void messageWriting(IoSession session, WriteRequest writeRequest, WriteFilterChainController controller) {
+            writeRequest.setMessage(ByteBuffer.wrap(writeRequest.getMessage().toString().getBytes()));
+            controller.callWriteNextFilter(writeRequest);
         }
     }
 

@@ -137,9 +137,6 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /** the current position in the read chain for this thread */
     private int readChainPosition;
 
-    /** hold the last WriteRequest created for the high level message currently written (can be null) */
-    private WriteRequest lastWriteRequest;
-
     /**
      * Create an {@link org.apache.mina.api.IoSession} with a unique identifier (
      * {@link org.apache.mina.api.IoSession#getId()}) and an associated {@link IoService}
@@ -519,17 +516,25 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             return;
         }
 
+        WriteRequest writeRequest = new DefaultWriteRequest(message);
+
         // process the queue
-        processMessageWriting(message, future);
+        processMessageWriting(writeRequest, future);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int writeDirect(Object message) {
+        // Default to 0 : this method should be overwritten if needed
+        return 0;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public WriteRequest enqueueWriteRequest(final Object message) {
-        WriteRequest request = null;
-
+    public WriteRequest enqueueWriteRequest(WriteRequest writeRequest) {
         if (isConnectedSecured()) {
             // SSL/TLS : we have to encrypt the message
             final SslHelper sslHelper = getAttribute(SSL_HELPER, null);
@@ -538,32 +543,65 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                 throw new IllegalStateException();
             }
 
-            request = sslHelper.processWrite(this, message, writeQueue);
-        } else {
-            // Plain message
-            request = new DefaultWriteRequest(message);
+            writeRequest = sslHelper.processWrite(this, writeRequest, writeQueue);
         }
 
         synchronized (writeQueue) {
-            writeQueue.add(request);
+            if (writeQueue.isEmpty()) {
+                ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
 
-            // If it wasn't, we register this session as interested to write.
-            // It's done in atomic fashion for avoiding two concurrent registering.
-            if (!registeredForWrite.getAndSet(true)) {
-                flushWriteQueue();
+                // We don't have anything in the writeQueue, let's try to write the
+                // data in the channel immediately if we can
+                int written = writeDirect(writeRequest.getMessage());
+
+                LOG.debug("wrote {} bytes to {}", written, this);
+
+                if (written > 0) {
+                    incrementWrittenBytes(written);
+                }
+
+                // Update the idle status for this session
+                idleChecker.sessionWritten(this, System.currentTimeMillis());
+
+                if ((written < 0) || message.remaining() > 0) {
+                    // We have to push the request on the writeQueue
+                    writeQueue.add(writeRequest);
+
+                    // If it wasn't, we register this session as interested to write.
+                    // It's done in atomic fashion for avoiding two concurrent registering.
+                    if (!registeredForWrite.getAndSet(true)) {
+                        flushWriteQueue();
+                    }
+                } else {
+                    // The message has been fully written : update the stats, and signal the handler
+                    // generate the message sent event
+                    // complete the future if we have one (we should...)
+                    final DefaultWriteFuture future = (DefaultWriteFuture) writeRequest.getFuture();
+
+                    if (future != null) {
+                        future.complete();
+                    }
+
+                    final Object highLevel = ((DefaultWriteRequest) writeRequest).getOriginalMessage();
+
+                    if (highLevel != null) {
+                        processMessageSent(highLevel);
+                    }
+                }
             }
         }
 
-        // Always wake-up the selector here!
-        // TODO : wake up the selector.
-
-        return request;
+        return writeRequest;
     }
 
     public abstract void flushWriteQueue();
 
     public void setNotRegisteredForWrite() {
         registeredForWrite.set(false);
+    }
+
+    protected boolean isRegisteredForWrite() {
+        return registeredForWrite.get();
     }
 
     /**
@@ -783,24 +821,27 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * 
      * @param message the wrote message, should be transformed into ByteBuffer at the end of the filter chain
      */
-    public void processMessageWriting(final Object message, final IoFuture<Void> future) {
-        LOG.debug("processing message '{}' writing event for session {}", message, this);
+    public void processMessageWriting(WriteRequest writeRequest, final IoFuture<Void> future) {
+        LOG.debug("processing message '{}' writing event for session {}", writeRequest, this);
 
         try {
-            lastWriteRequest = null;
+            //lastWriteRequest = null;
 
             if (chain.length < 1) {
-                enqueueFinalWriteMessage(message);
+                enqueueWriteRequest(writeRequest);
             } else {
                 writeChainPosition = chain.length - 1;
                 // we call the first filter, it's supposed to call the next ones using the filter chain controller
                 final int position = writeChainPosition;
                 final IoFilter nextFilter = chain[position];
-                nextFilter.messageWriting(this, message, this);
+                nextFilter.messageWriting(this, writeRequest, this);
             }
 
             // put the future in the last write request
-
+            if (future != null) {
+                writeRequest.setFuture(future);
+            }
+            /*
             final WriteRequest request = lastWriteRequest;
             if (request != null) {
                 if (future != null) {
@@ -808,6 +849,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                 }
                 ((DefaultWriteRequest) request).setHighLevelMessage(message);
             }
+                */
         } catch (final RuntimeException e) {
             processException(e);
         }
@@ -845,27 +887,19 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @param message the received message
      */
     @Override
-    public void callWriteNextFilter(final Object message) {
+    public void callWriteNextFilter(WriteRequest message) {
         LOG.debug("calling next filter for writing for message '{}' position : {}", message, writeChainPosition);
 
         writeChainPosition--;
 
         if (writeChainPosition < 0 || chain.length == 0) {
             // end of chain processing
-            enqueueFinalWriteMessage(message);
+            enqueueWriteRequest(message);
         } else {
             chain[writeChainPosition].messageWriting(this, message, this);
         }
 
         writeChainPosition++;
-    }
-
-    /**
-     * At the end of write chain processing, enqueue final encoded {@link ByteBuffer} message in the session
-     */
-    private void enqueueFinalWriteMessage(final Object message) {
-        LOG.debug("end of write chain we enqueue the message in the session : {}", message);
-        lastWriteRequest = enqueueWriteRequest(message);
     }
 
     /**

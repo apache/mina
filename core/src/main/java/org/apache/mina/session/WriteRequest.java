@@ -22,8 +22,17 @@ package org.apache.mina.session;
 import org.apache.mina.api.IoFuture;
 
 /**
- * The write request created by the {@link org.apache.mina.api.IoSession#write} method, travel around the filter chain and finish as a
- * socket write.
+ * The write request created by the {@link org.apache.mina.api.IoSession#write} method, 
+ * which is transmitted through the filter chain and finish as a socket write.<br/>
+ * 
+ * We store the original message into this data structure, along the associated potentially
+ * modified message if the original message gets encoded during the process.<br/>
+ * 
+ * Note that when we always ends with the message being a ByteBuffer when we reach 
+ * the socket.<br/>
+ * 
+ * We also keep a Future into this data structure to inform the caller about the write
+ * completion.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -36,8 +45,28 @@ public interface WriteRequest {
     Object getMessage();
 
     /**
+     * Store the encoded message
+     * 
+     * @param The encoded message
+     */
+    void setMessage(Object message);
+
+    /**
+     * Gets the original message, as written by the handler, before passing through the filter chain.
+     * 
+     * @return The original message
+     */
+    Object getOriginalMessage();
+
+    /**
      * The future to be completed on a write success
      * @return the future
      */
     IoFuture<Void> getFuture();
+
+    /**
+     * Store the future into the request
+     * @param the future
+     */
+    void setFuture(IoFuture<Void> future);
 }

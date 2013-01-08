@@ -46,6 +46,7 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.AttributeKey;
+import org.apache.mina.session.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,32 +93,33 @@ public class LdapCodec extends ProtocolCodecFilter {
     }
 
     @Override
-    public void messageWriting(final IoSession session, final Object message,
-            final WriteFilterChainController controller) {
+    public void messageWriting(IoSession session, WriteRequest writeRequest, WriteFilterChainController controller) {
+        Object message = writeRequest.getOriginalMessage();
+
         if (message instanceof AddResponse) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof BindResponse) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof DeleteResponse) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof CompareResponse) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof ExtendedResponse) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof IntermediateResponse) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof ModifyResponse) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof ModifyDnResponse) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof SearchResultDone) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof SearchResultEntry) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof SearchResultReference) {
-            ldapEncoder.encode(session, message, controller);
+            ldapEncoder.encode(session, writeRequest, controller);
         } else if (message instanceof ByteBuffer) {
-            controller.callWriteNextFilter(message);
+            controller.callWriteNextFilter(writeRequest);
         }
     }
 }

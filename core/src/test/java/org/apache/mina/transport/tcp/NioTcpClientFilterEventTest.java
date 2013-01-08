@@ -19,7 +19,10 @@
  */
 package org.apache.mina.transport.tcp;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -37,6 +40,7 @@ import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.nio.NioTcpClient;
 import org.apache.mina.transport.nio.NioTcpServer;
 import org.junit.Test;
@@ -156,9 +160,9 @@ public class NioTcpClientFilterEventTest {
         }
 
         @Override
-        public void messageWriting(final IoSession session, final Object message,
-                final WriteFilterChainController controller) {
-            controller.callWriteNextFilter(ByteBuffer.wrap(message.toString().getBytes()));
+        public void messageWriting(IoSession session, WriteRequest writeRequest, WriteFilterChainController controller) {
+            writeRequest.setMessage(ByteBuffer.wrap(writeRequest.getMessage().toString().getBytes()));
+            controller.callWriteNextFilter(writeRequest);
         }
     }
 

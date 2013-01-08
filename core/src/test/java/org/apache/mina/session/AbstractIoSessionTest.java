@@ -206,7 +206,7 @@ public class AbstractIoSessionTest {
     @Test
     public void chain_writes() {
         final DummySession session = new DummySession(service);
-        final ByteBuffer buffer = mock(ByteBuffer.class);
+        final WriteRequest buffer = mock(DefaultWriteRequest.class);
         session.processMessageWriting(buffer, null);
         verify(filter1).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));
         verify(filter2).messageWriting(eq(session), eq(buffer), any(WriteFilterChainController.class));

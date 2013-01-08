@@ -20,6 +20,7 @@ package org.apache.mina.api;
 
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.session.WriteRequest;
 
 /**
  * A convenient {@link IoFilter} implementation to be sub-classed for easier IoFilter implementation.
@@ -62,8 +63,7 @@ public abstract class AbstractIoFilter implements IoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void messageWriting(final IoSession session, final Object message,
-            final WriteFilterChainController controller) {
+    public void messageWriting(IoSession session, WriteRequest message, WriteFilterChainController controller) {
         controller.callWriteNextFilter(message);
     }
 

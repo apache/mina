@@ -27,6 +27,7 @@ import org.apache.directory.shared.ldap.model.message.Message;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.session.WriteRequest;
 
 /**
  * A LDAP message encoder. It is based on shared-ldap encoder.
@@ -49,11 +50,12 @@ public class LdapProtocolEncoder implements ProtocolEncoder {
     /**
      * {@inheritDoc}
      */
-    public Object encode(IoSession session, Object message, WriteFilterChainController controller) {
+    public Object encode(IoSession session, WriteRequest writeRequest, WriteFilterChainController controller) {
         try {
-            ByteBuffer buffer = encoder.encodeMessage((Message) message);
+            ByteBuffer buffer = encoder.encodeMessage((Message) writeRequest.getOriginalMessage());
+            writeRequest.setMessage(buffer);
 
-            controller.callWriteNextFilter(buffer);
+            controller.callWriteNextFilter(writeRequest);
         } catch (Exception e) {
             return null;
         }

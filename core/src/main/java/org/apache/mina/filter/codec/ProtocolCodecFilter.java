@@ -27,6 +27,7 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.AttributeKey;
+import org.apache.mina.session.WriteRequest;
 import org.apache.mina.util.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -210,8 +211,7 @@ public class ProtocolCodecFilter extends AbstractIoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void messageWriting(final IoSession session, final Object message,
-            final WriteFilterChainController controller) {
+    public void messageWriting(IoSession session, WriteRequest message, WriteFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_WRITTING for session {}", session);
 
         final ProtocolEncoder encoder = session.getAttribute(ENCODER, null);

@@ -324,7 +324,8 @@ public class SslHelper {
                 outBuffer.flip();
 
                 // Get out of the Connected state
-                session.enqueueWriteRequest(outBuffer);
+                WriteRequest writeRequest = new DefaultWriteRequest(outBuffer);
+                session.enqueueWriteRequest(writeRequest);
             }
         }
     }
@@ -383,7 +384,9 @@ public class SslHelper {
 
                 // Done. We can now push this buffer into the write queue.
                 outBuffer.flip();
-                session.enqueueWriteRequest(outBuffer);
+                WriteRequest writeRequest = new DefaultWriteRequest(inBuffer);
+                writeRequest.setMessage(outBuffer);
+                session.enqueueWriteRequest(writeRequest);
                 hsStatus = result.getHandshakeStatus();
 
                 // Nothing more to wrap : get out.

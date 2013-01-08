@@ -21,6 +21,7 @@ package org.apache.mina.filter.codec;
 
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.session.WriteRequest;
 import org.apache.mina.util.IoBuffer;
 
 /**
@@ -49,7 +50,7 @@ public interface ProtocolEncoder {
      *
      * @throws Exception if the message violated protocol specification
      */
-    Object encode(IoSession session, Object message, WriteFilterChainController controller); // throws Exception;
+    Object encode(IoSession session, WriteRequest message, WriteFilterChainController controller); // throws Exception;
 
     /**
      * Releases all resources related with this encoder.

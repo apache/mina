@@ -19,6 +19,7 @@
  */
 package org.apache.mina.http;
 
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -28,26 +29,37 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpResponse;
+import org.apache.mina.session.WriteRequest;
 
-public class HttpServerEncoder implements ProtocolEncoder {
 
-    public Object encode(IoSession session, Object message, WriteFilterChainController controller) {
-        if (message instanceof HttpResponse) {
-            HttpResponse msg = (HttpResponse) message;
-            StringBuilder sb = new StringBuilder(msg.getStatus().line());
+public class HttpServerEncoder implements ProtocolEncoder
+{
 
-            for (Map.Entry<String, String> header : msg.getHeaders().entrySet()) {
-                sb.append(header.getKey());
-                sb.append(": ");
-                sb.append(header.getValue());
-                sb.append("\r\n");
+    public Object encode( IoSession session, WriteRequest message, WriteFilterChainController controller )
+    {
+        if ( message.getOriginalMessage() instanceof HttpResponse )
+        {
+            HttpResponse msg = ( HttpResponse ) message;
+            StringBuilder sb = new StringBuilder( msg.getStatus().line() );
+
+            for ( Map.Entry<String, String> header : msg.getHeaders().entrySet() )
+            {
+                sb.append( header.getKey() );
+                sb.append( ": " );
+                sb.append( header.getValue() );
+                sb.append( "\r\n" );
             }
-            sb.append("\r\n");
-            byte[] bytes = sb.toString().getBytes(Charset.forName("UTF-8"));
-            controller.callWriteNextFilter(ByteBuffer.wrap(bytes));
-        } else if (message instanceof ByteBuffer) {
-            controller.callWriteNextFilter(message);
-        } else if (message instanceof HttpEndOfContent) {
+            sb.append( "\r\n" );
+            byte[] bytes = sb.toString().getBytes( Charset.forName( "UTF-8" ) );
+            message.setMessage( ByteBuffer.wrap( bytes ) );
+            controller.callWriteNextFilter( message );
+        }
+        else if ( message.getOriginalMessage() instanceof ByteBuffer )
+        {
+            controller.callWriteNextFilter( message );
+        }
+        else if ( message.getOriginalMessage() instanceof HttpEndOfContent )
+        {
             // end of HTTP content
             // keep alive ?
             return null;
@@ -56,8 +68,10 @@ public class HttpServerEncoder implements ProtocolEncoder {
         return null;
     }
 
+
     @Override
-    public void dispose(IoSession session) throws Exception {
+    public void dispose( IoSession session ) throws Exception
+    {
         // TODO Auto-generated method stub
     }
 }

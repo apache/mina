@@ -347,6 +347,16 @@ public interface IoSession {
     public void write(Object message);
 
     /**
+     * Writes the message immediately. If we can't write all the message, we will get back the number of
+     * written bytes.
+     * 
+     * @param message the message to write
+     * @return the number of written bytes
+     * 
+     */
+    public int writeDirect(Object message);
+
+    /**
      * Same as {@link IoSession#write(Object)}, but provide a {@link IoFuture} for tracking the completion of this
      * write.
      * 
@@ -358,10 +368,10 @@ public interface IoSession {
     /**
      * Internal method for enqueue write request after filter chain processing
      * 
-     * @param message the message to put in the write request
+     * @param writeRequest the message to put in the write request
      * @return the created write request
      */
-    public WriteRequest enqueueWriteRequest(Object message);
+    public WriteRequest enqueueWriteRequest(WriteRequest writeRequest);
 
     /**
      * Get the {@link Queue} of this session. The write queue contains the pending writes.

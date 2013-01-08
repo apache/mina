@@ -199,4 +199,10 @@ public class NioUdpSession extends AbstractIoSession {
         processMessageReceived(readBuffer);
         idleChecker.sessionRead(this, System.currentTimeMillis());
     }
+
+    @Override
+    public int writeDirect(Object message) {
+        // TODO
+        return 0;
+    }
 }

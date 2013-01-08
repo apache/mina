@@ -22,6 +22,7 @@ package org.apache.mina.api;
 
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.session.WriteRequest;
 
 /**
  * Filter are interceptors/processors for incoming data received/sent.
@@ -65,7 +66,7 @@ public interface IoFilter {
      * @param session {@link IoSession} associated with the invocation
      * @param message the message to process before writing
      */
-    void messageWriting(IoSession session, Object message, WriteFilterChainController controller);
+    void messageWriting(IoSession session, WriteRequest message, WriteFilterChainController controller);
 
     /**
      * Invoked when a high level message was written to the low level O/S buffer.

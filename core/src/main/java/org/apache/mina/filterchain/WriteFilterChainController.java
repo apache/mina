@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filterchain;
 
+import org.apache.mina.session.WriteRequest;
 
 /**
  * Chain controller used by a filter for calling the next filter in write order.
@@ -28,5 +29,5 @@ package org.apache.mina.filterchain;
  */
 public interface WriteFilterChainController {
 
-    void callWriteNextFilter(Object message);
+    void callWriteNextFilter(WriteRequest message);
 }
