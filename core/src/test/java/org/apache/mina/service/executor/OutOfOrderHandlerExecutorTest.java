@@ -20,7 +20,8 @@
 package org.apache.mina.service.executor;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.concurrent.Executor;
 
@@ -35,7 +36,6 @@ import org.mockito.ArgumentCaptor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class OutOfOrderHandlerExecutorTest {
-
     private OutOfOrderHandlerExecutor handlerExecutor;
 
     private Executor executor;

@@ -33,7 +33,6 @@ import org.junit.Test;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtocolCodecFilterTest {
-
     @Test
     public void constructor_args() {
         try {

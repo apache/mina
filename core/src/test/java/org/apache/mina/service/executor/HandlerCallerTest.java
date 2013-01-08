@@ -19,7 +19,10 @@
  */
 package org.apache.mina.service.executor;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoHandler;
@@ -34,11 +37,12 @@ import org.junit.Test;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class HandlerCallerTest {
-
     private HandlerCaller caller = new HandlerCaller();
 
     private IoSession session;
+
     private IoService service;
+
     private IoHandler handler;
 
     @Before

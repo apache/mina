@@ -20,7 +20,10 @@
 package org.apache.mina.service.executor;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import org.apache.mina.api.IoSession;
 import org.junit.Test;
@@ -31,7 +34,6 @@ import org.junit.Test;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class InOrderHandlerExecutorTest {
-
     private InOrderHandlerExecutor executor;
 
     @Test
