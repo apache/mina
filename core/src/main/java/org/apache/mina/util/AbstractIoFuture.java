@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * An abstract implementation of {@link IoFuture}.  Owners of this future
  * must implement {@link #cancelOwner(boolean)} to receive notifications of
  * when the future should be canceled.
- * <p/>
+ * <p>
  * Concrete implementations of this abstract class should consider overriding
  * the two methods {@link #scheduleResult(org.apache.mina.api.IoFutureListener, Object)}
  * and {@link #scheduleException(org.apache.mina.api.IoFutureListener, Throwable)}
