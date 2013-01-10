@@ -23,10 +23,14 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * An interface for a server
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface BenchmarkClient {
+    /** Starts the client */
     public void start(int port, CountDownLatch counter, byte[] data) throws IOException;
 
+    /** Stops the client */
     public void stop() throws IOException;
 }
