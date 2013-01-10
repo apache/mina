@@ -347,16 +347,6 @@ public interface IoSession {
     public void write(Object message);
 
     /**
-     * Writes the message immediately. If we can't write all the message, we will get back the number of
-     * written bytes.
-     * 
-     * @param message the message to write
-     * @return the number of written bytes
-     * 
-     */
-    public int writeDirect(Object message);
-
-    /**
      * Same as {@link IoSession#write(Object)}, but provide a {@link IoFuture} for tracking the completion of this
      * write.
      * 

@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
@@ -34,6 +35,7 @@ import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.AbstractIoSessionConfig;
+import org.apache.mina.session.WriteRequest;
 import org.junit.Test;
 
 /**
@@ -173,7 +175,6 @@ public class IndexedIdleChekerTest {
 
         @Override
         public boolean isClosed() {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -182,7 +183,6 @@ public class IndexedIdleChekerTest {
          */
         @Override
         protected void channelClose() {
-
         }
 
         /**
@@ -190,7 +190,22 @@ public class IndexedIdleChekerTest {
          */
         @Override
         public void flushWriteQueue() {
+        }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected int writeDirect(Object message) {
+            return 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest) {
+            return null;
         }
     }
 }

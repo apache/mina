@@ -523,12 +523,15 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * {@inheritDoc}
+     * Writes the message immediately. If we can't write all the message, we will get back the number of
+     * written bytes.
+     * 
+     * @param message the message to write
+     * @return the number of written bytes
      */
-    public int writeDirect(Object message) {
-        // Default to 0 : this method should be overwritten if needed
-        return 0;
-    }
+    protected abstract int writeDirect(Object message);
+
+    protected abstract ByteBuffer convertToDirectBuffer(WriteRequest writeRequest);
 
     /**
      * {@inheritDoc}
@@ -547,8 +550,11 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         }
 
         synchronized (writeQueue) {
+            ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
+
             if (writeQueue.isEmpty()) {
-                ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
+                // Transfer the buffer in a DirectByteBuffer if it's a HeapByteBuffer and if it's too big
+                message = convertToDirectBuffer(writeRequest);
 
                 // We don't have anything in the writeQueue, let's try to write the
                 // data in the channel immediately if we can
@@ -562,8 +568,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
                 // Update the idle status for this session
                 idleChecker.sessionWritten(this, System.currentTimeMillis());
+                int remaining = message.remaining();
 
-                if ((written < 0) || message.remaining() > 0) {
+                if ((written < 0) || (remaining > 0)) {
                     // We have to push the request on the writeQueue
                     writeQueue.add(writeRequest);
 
@@ -588,6 +595,12 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                         processMessageSent(highLevel);
                     }
                 }
+            } else {
+                // Transfer the buffer in a DirectByteBuffer if it's a HeapByteBuffer
+                message = convertToDirectBuffer(writeRequest);
+
+                // We have to push the request on the writeQueue
+                writeQueue.add(writeRequest);
             }
         }
 
@@ -841,15 +854,6 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             if (future != null) {
                 writeRequest.setFuture(future);
             }
-            /*
-            final WriteRequest request = lastWriteRequest;
-            if (request != null) {
-                if (future != null) {
-                    ((DefaultWriteRequest) request).setFuture(future);
-                }
-                ((DefaultWriteRequest) request).setHighLevelMessage(message);
-            }
-                */
         } catch (final RuntimeException e) {
             processException(e);
         }

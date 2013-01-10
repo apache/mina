@@ -27,6 +27,7 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.session.AbstractIoSession;
+import org.apache.mina.session.WriteRequest;
 import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,9 +201,19 @@ public class NioUdpSession extends AbstractIoSession {
         idleChecker.sessionRead(this, System.currentTimeMillis());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public int writeDirect(Object message) {
-        // TODO
+    protected int writeDirect(Object message) {
         return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest) {
+        return null;
     }
 }

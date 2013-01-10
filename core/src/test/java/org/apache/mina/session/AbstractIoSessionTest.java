@@ -136,6 +136,22 @@ public class AbstractIoSessionTest {
         @Override
         public void flushWriteQueue() {
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected int writeDirect(Object message) {
+            return 0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest) {
+            return null;
+        }
     }
 
     private IoService service = null;

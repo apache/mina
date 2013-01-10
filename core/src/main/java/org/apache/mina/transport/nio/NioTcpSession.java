@@ -64,7 +64,14 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
     /** the future representing this session connection operation (client only) */
     private ConnectFuture connectFuture;
 
+    /** The associated selectionKey */
     private SelectionKey selectionKey;
+
+    /** The Direct Buffer used to send data */
+    private ByteBuffer sendBuffer;
+
+    /** The size of the buffer configured in the socket to send data */
+    private int sendBufferSize;
 
     NioTcpSession(final IoService service, final SocketChannel channel, final SelectorLoop selectorLoop,
             final IdleChecker idleChecker) {
@@ -72,6 +79,8 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
         this.channel = channel;
         this.selectorLoop = selectorLoop;
         this.configuration = new ProxyTcpSessionConfig(channel.socket());
+        sendBufferSize = configuration.getSendBufferSize();
+        sendBuffer = ByteBuffer.allocateDirect(sendBufferSize);
     }
 
     void setConnectFuture(ConnectFuture connectFuture) {
@@ -140,8 +149,11 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public int writeDirect(Object message) {
+    protected int writeDirect(Object message) {
         try {
             // Check that we can write into the channel
             if (!isRegisteredForWrite()) {
@@ -156,6 +168,37 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
 
             return -1;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest) {
+        ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
+
+        if (!message.isDirect()) {
+            //int sendBufferSize = configuration.getSendBufferSize();
+            int remaining = message.remaining();
+
+            if (remaining > sendBufferSize) {
+                ByteBuffer directBuffer = ByteBuffer.allocateDirect(remaining);
+                directBuffer.put(message);
+                directBuffer.flip();
+                writeRequest.setMessage(directBuffer);
+
+                return directBuffer;
+            } else {
+                sendBuffer.clear();
+                sendBuffer.put(message);
+                sendBuffer.flip();
+                writeRequest.setMessage(sendBuffer);
+
+                return sendBuffer;
+            }
+        }
+
+        return message;
     }
 
     /**

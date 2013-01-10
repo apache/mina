@@ -56,12 +56,12 @@ public class Mina3ClientVsMina3ServerBenchmarkBinaryTest extends BenchmarkBinary
 
     @Parameters
     public static Collection<Object[]> getParameters() {
-        Object[][] parameters = new Object[][] { 
+        Object[][] parameters = new Object[][] {
                 { 1000000, 10, 2 * 60 }, 
-                { 1000000, 1 * 1024, 2 * 60 }, 
-                { 1000000, 10 * 1024, 2 * 60 },
-                { 100, 64 * 1024 * 1024, 10 * 60 }
-        };
+                { 1000000, 1 * 1024, 2 * 60 },
+                { 1000000, 10 * 1024, 2 * 60 }, 
+                { 100, 64 * 1024 * 1024, 10 * 60 } 
+                };
         return Arrays.asList(parameters);
     }
 }
