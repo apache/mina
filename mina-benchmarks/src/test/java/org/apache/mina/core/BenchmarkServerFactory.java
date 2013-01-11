@@ -34,7 +34,7 @@ public class BenchmarkServerFactory implements BenchmarkFactory<BenchmarkServer>
         case Mina:
             return new MinaBenchmarkServer();
         case Netty:
-            return null;
+            return new NettyBenchmarkServer();
         default:
             throw new IllegalArgumentException("Invalid type " + type);
         }
