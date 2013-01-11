@@ -1,0 +1,13 @@
+.classpath
+.project
+.settings
+.wtpmodules
+*.ipr
+*.iws
+*.iml
+target/
+bin/
+*.log
+.deployables
+.clover
+
