@@ -846,6 +846,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
 
                     if ((localWrittenBytes > 0) && ((IoBuffer) message).hasRemaining()) {
                         // the buffer isn't empty, we re-interest it in writing
+                        writtenBytes += localWrittenBytes;
                         setInterestedInWrite(session, true);
                         return false;
                     }
@@ -859,6 +860,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // return 0 indicating that we need
                     // to pause until writing may resume.
                     if ((localWrittenBytes > 0) && (((FileRegion) message).getRemainingBytes() > 0)) {
+                        writtenBytes += localWrittenBytes;
                         setInterestedInWrite(session, true);
                         return false;
                     }
@@ -879,6 +881,10 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // Wrote too much
                     scheduleFlush(session);
                     return false;
+                }
+
+                if (message instanceof IoBuffer) {
+                    ((IoBuffer) message).free();
                 }
             } while (writtenBytes < maxWrittenBytes);
         } catch (Exception e) {
@@ -913,7 +919,9 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             } catch (IOException ioe) {
                 // We have had an issue while trying to send data to the 
                 // peer : let's close the session.
+                buf.free();
                 session.close(true);
+                return 0;
             }
 
         }
@@ -924,8 +932,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             // Buffer has been sent, clear the current request.
             int pos = buf.position();
             buf.reset();
-
-            session.increaseScheduledWriteMessages();
 
             fireMessageSent(session, req);
 
