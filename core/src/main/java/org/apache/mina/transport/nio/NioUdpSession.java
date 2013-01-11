@@ -213,7 +213,7 @@ public class NioUdpSession extends AbstractIoSession {
      * {@inheritDoc}
      */
     @Override
-    protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest) {
-        return null;
+    protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew) {
+        return (ByteBuffer) writeRequest.getMessage();
     }
 }

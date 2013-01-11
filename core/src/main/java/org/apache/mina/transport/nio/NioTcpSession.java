@@ -174,14 +174,13 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
      * {@inheritDoc}
      */
     @Override
-    protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest) {
+    protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew) {
         ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
 
         if (!message.isDirect()) {
-            //int sendBufferSize = configuration.getSendBufferSize();
             int remaining = message.remaining();
 
-            if (remaining > sendBufferSize) {
+            if ((remaining > sendBufferSize) || createNew) {
                 ByteBuffer directBuffer = ByteBuffer.allocateDirect(remaining);
                 directBuffer.put(message);
                 directBuffer.flip();

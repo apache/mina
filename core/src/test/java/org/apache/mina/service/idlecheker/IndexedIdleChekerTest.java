@@ -204,7 +204,7 @@ public class IndexedIdleChekerTest {
          * {@inheritDoc}
          */
         @Override
-        protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest) {
+        protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew) {
             return null;
         }
     }

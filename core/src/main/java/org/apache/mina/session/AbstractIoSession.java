@@ -531,7 +531,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      */
     protected abstract int writeDirect(Object message);
 
-    protected abstract ByteBuffer convertToDirectBuffer(WriteRequest writeRequest);
+    /**
+     * Copy the HeapBuffer into a DirectBuffer, if needed.
+     * 
+     * @param writeRequest The request containing the HeapBuffer
+     * @param createNew A flag to force the creation of a DirectBuffer
+     * @return A DirectBuffer
+     */
+    protected abstract ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew);
 
     /**
      * {@inheritDoc}
@@ -554,7 +561,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
             if (writeQueue.isEmpty()) {
                 // Transfer the buffer in a DirectByteBuffer if it's a HeapByteBuffer and if it's too big
-                message = convertToDirectBuffer(writeRequest);
+                message = convertToDirectBuffer(writeRequest, false);
 
                 // We don't have anything in the writeQueue, let's try to write the
                 // data in the channel immediately if we can
@@ -571,6 +578,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                 int remaining = message.remaining();
 
                 if ((written < 0) || (remaining > 0)) {
+                    // Create a DirectBuffer unconditionally
+                    convertToDirectBuffer(writeRequest, true);
+
                     // We have to push the request on the writeQueue
                     writeQueue.add(writeRequest);
 
@@ -597,7 +607,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                 }
             } else {
                 // Transfer the buffer in a DirectByteBuffer if it's a HeapByteBuffer
-                message = convertToDirectBuffer(writeRequest);
+                message = convertToDirectBuffer(writeRequest, true);
 
                 // We have to push the request on the writeQueue
                 writeQueue.add(writeRequest);
