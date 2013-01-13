@@ -29,17 +29,17 @@ import org.apache.mina.api.IoSession;
 import org.junit.Test;
 
 /**
- * Unit test for {@link InOrderHandlerExecutor}.
+ * Unit test for {@link OrderedHandlerExecutor}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class InOrderHandlerExecutorTest {
-    private InOrderHandlerExecutor executor;
+public class OrderedHandlerExecutorTest {
+    private OrderedHandlerExecutor executor;
 
     @Test
     public void execute_open_events() throws InterruptedException {
         // prepare
-        executor = new InOrderHandlerExecutor(1, 1);
+        executor = new OrderedHandlerExecutor(1, 1);
         IoSession session = mock(IoSession.class);
         when(session.getId()).thenReturn(12345L);
 

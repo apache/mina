@@ -27,7 +27,7 @@ import java.nio.channels.SocketChannel;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.service.executor.InOrderHandlerExecutor;
+import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
@@ -63,7 +63,7 @@ public class NioTcpClient extends AbstractTcpClient {
 
     /**
      * Create a TCP client with new selector pool of default size and a {@link IoHandlerExecutor} of default type (
-     * {@link InOrderHandlerExecutor})
+     * {@link OrderedHandlerExecutor})
      */
     public NioTcpClient() {
         // Default to 2 threads in the pool

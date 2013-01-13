@@ -28,7 +28,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.api.IdleStatus;
-import org.apache.mina.service.executor.InOrderHandlerExecutor;
+import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
@@ -64,7 +64,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
 
     /**
      * Create a TCP server with new selector pool of default size and a {@link IoHandlerExecutor} of default type (
-     * {@link InOrderHandlerExecutor})
+     * {@link OrderedHandlerExecutor})
      */
     public NioTcpServer() {
         this(new NioSelectorLoop("accept", 0), new FixedSelectorLoopPool("Server", Runtime.getRuntime()
