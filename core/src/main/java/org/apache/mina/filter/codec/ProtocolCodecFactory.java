@@ -31,17 +31,17 @@ import org.apache.mina.api.IoSession;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface ProtocolCodecFactory {
+public interface ProtocolCodecFactory<MESSAGE,ENCODED> {
 
     /**
      * Returns a new (or reusable) instance of {@link ProtocolEncoder} which
      * encodes message objects into binary or protocol-specific data.
      */
-    ProtocolEncoder getEncoder(IoSession session);
+    ProtocolEncoder<MESSAGE,ENCODED> getEncoder(IoSession session);
 
     /**
      * Returns a new (or reusable) instance of {@link ProtocolDecoder} which
      * decodes binary or protocol-specific data into message objects.
      */
-    ProtocolDecoder getDecoder(IoSession session);
+    ProtocolDecoder<ENCODED,MESSAGE> getDecoder(IoSession session);
 }

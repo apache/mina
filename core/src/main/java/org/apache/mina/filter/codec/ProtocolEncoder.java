@@ -19,43 +19,21 @@
  */
 package org.apache.mina.filter.codec;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.api.IoSession;
-import org.apache.mina.filterchain.WriteFilterChainController;
-import org.apache.mina.session.WriteRequest;
-import org.apache.mina.util.IoBuffer;
 
 /**
- * Encodes higher-level message objects into binary or protocol-specific data.
- * MINA invokes {@link #encode(IoSession, Object, ProtocolEncoderOutput)}
- * method with message which is popped from the session write queue, and then
- * the encoder implementation puts encoded messages (typically {@link IoBuffer}s)
- * into {@link ProtocolEncoderOutput} by calling {@link ProtocolEncoderOutput#write(Object)}.
- * <p>
- * Please refer to
- * <a href="../../../../../xref-examples/org/apache/mina/examples/reverser/TextLineEncoder.html"><code>TextLineEncoder</code></a>
- * example.
- *
+ * In charge of encoding a message of type MESSAGE into another form (could be a {@link ByteBuffer} or any other protocol level construction.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
- * @see ProtocolEncoderException
  */
-public interface ProtocolEncoder {
+public interface ProtocolEncoder<INPUT /* message type */, OUTPUT> {
 
     /**
-     * Encodes higher-level message objects into binary or protocol-specific data.
-     * MINA invokes {@link #encode(IoSession, Object, ProtocolEncoderOutput)}
-     * method with message which is popped from the session write queue, and then
-     * the encoder implementation puts encoded messages (typically {@link ByteBuffer}s)
-     * into {@link ProtocolEncoderOutput}.
-     *
-     * @throws Exception if the message violated protocol specification
+     * Encodes higher-level message objects of type <code>INPUT</code> into binary or protocol-specific data of type <code>OUTPUT</code>.
      */
-    Object encode(IoSession session, WriteRequest message, WriteFilterChainController controller); // throws Exception;
+	OUTPUT encode(IoSession session, INPUT message);
 
-    /**
-     * Releases all resources related with this encoder.
-     *
-     * @throws Exception if failed to dispose all resources
-     */
-    void dispose(IoSession session) throws Exception;
 }
