@@ -19,26 +19,54 @@
  */
 package org.apache.mina.filter.codec;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.api.IoSession;
+import org.apache.mina.filterchain.ReadFilterChainController;
+import org.apache.mina.util.IoBuffer;
 
 /**
  * Decodes binary or protocol-specific data into higher-level message objects.
+ * MINA invokes {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
+ * method with read data, and then the decoder implementation puts decoded
+ * messages into {@link ProtocolDecoderOutput} by calling
+ * {@link ProtocolDecoderOutput#write(Object)}.
+ * <p>
+ * Please refer to
+ * <a href="../../../../../xref-examples/org/apache/mina/examples/reverser/TextLineDecoder.html"><code>TextLineDecoder</code></a>
+ * example.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
+ * @see ProtocolDecoderException
  */
-public interface ProtocolDecoder<INPUT,OUTPUT> {
+public interface ProtocolDecoder {
 
-	/**
-	 * Decode binary or protocol-specific content of type <code>INPUT</code> into higher-level protocol message objects, of type OUTPUT
-	 * @param session the session for this message 
-	 * @param input the received message to decode 
-	 * @return the decoded message or <code>null</code> if nothing was decoded
-	 */
-	OUTPUT decode(IoSession session, INPUT input);
-	
-	/**
-	 * Finish decoding, for example if the decoder accumulated some unused input, it should discard it, or throw an Exception
-	 */
-    void finishDecode(IoSession session);
+    /**
+     * Decodes binary or protocol-specific content into higher-level message objects.
+     * MINA invokes {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
+     * method with read data, and then the decoder implementation puts decoded
+     * messages into {@link ProtocolDecoderOutput}.
+     *
+     * @throws Exception if the read data violated protocol specification
+     */
+    Object decode(IoSession session, ByteBuffer in, ReadFilterChainController controller);// throws Exception;
+
+    /**
+     * Invoked when the specified <tt>session</tt> is closed.  This method is useful
+     * when you deal with the protocol which doesn't specify the length of a message
+     * such as HTTP response without <tt>content-length</tt> header. Implement this
+     * method to process the remaining data that {@link #decode(IoSession, ByteBuffer, ProtocolDecoderOutput)}
+     * method didn't process completely.
+     *
+     * @throws Exception if the read data violated protocol specification
+     */
+    Object finishDecode(IoSession session) throws Exception;
+
+    /**
+     * Releases all resources related with this decoder.
+     *
+     * @throws Exception if failed to dispose all resources
+     */
+    void dispose(IoSession session) throws Exception;
 }
