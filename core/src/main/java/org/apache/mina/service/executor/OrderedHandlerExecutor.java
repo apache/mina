@@ -32,20 +32,20 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class InOrderHandlerExecutor implements IoHandlerExecutor {
+public class OrderedHandlerExecutor implements IoHandlerExecutor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InOrderHandlerExecutor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OrderedHandlerExecutor.class);
 
     private Worker[] workers;
 
     /**
-     * Create an {@link InOrderHandlerExecutor} with a given number of thread and a given queue size.
+     * Create an {@link OrderedHandlerExecutor} with a given number of thread and a given queue size.
      * 
      * @param workerThreadCount the worker thread count
      * @param queueSize the size of the queue for each worker thread
      */
-    public InOrderHandlerExecutor(int workerThreadCount, int queueSize) {
-        LOG.debug("creating InOrderHandlerExecutor workerThreadCount = {} queueSize = {}", workerThreadCount, queueSize);
+    public OrderedHandlerExecutor(int workerThreadCount, int queueSize) {
+        LOG.debug("creating OrderedHandlerExecutor workerThreadCount = {} queueSize = {}", workerThreadCount, queueSize);
         workers = new Worker[workerThreadCount];
 
         for (int i = 0; i < workerThreadCount; i++) {

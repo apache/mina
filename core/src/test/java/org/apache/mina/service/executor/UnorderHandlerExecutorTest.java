@@ -31,25 +31,25 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * Unit test for {@link OutOfOrderHandlerExecutor}
+ * Unit test for {@link UnorderHandlerExecutor}
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class OutOfOrderHandlerExecutorTest {
-    private OutOfOrderHandlerExecutor handlerExecutor;
+public class UnorderHandlerExecutorTest {
+    private UnorderHandlerExecutor handlerExecutor;
 
     private Executor executor;
 
     @Before
     public void setup() {
         executor = mock(Executor.class);
-        handlerExecutor = new OutOfOrderHandlerExecutor(executor);
+        handlerExecutor = new UnorderHandlerExecutor(executor);
     }
 
     @Test
     public void null_param() {
         try {
-            new OutOfOrderHandlerExecutor(null);
+            new UnorderHandlerExecutor(null);
             Assert.fail();
         } catch (IllegalArgumentException ex) {
             // happy

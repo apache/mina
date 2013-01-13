@@ -29,11 +29,11 @@ import org.apache.mina.util.Assert;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class OutOfOrderHandlerExecutor implements IoHandlerExecutor {
+public class UnorderHandlerExecutor implements IoHandlerExecutor {
 
     private final Executor executor;
 
-    public OutOfOrderHandlerExecutor(Executor executor) {
+    public UnorderHandlerExecutor(Executor executor) {
         Assert.assertNotNull(executor, "executor");
         this.executor = executor;
     }
