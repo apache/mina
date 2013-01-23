@@ -18,43 +18,26 @@
  */
 package org.apache.mina.filter.codec;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.apache.mina.api.IoSession;
+import org.apache.mina.codec.ProtocolDecoder;
+import org.apache.mina.codec.ProtocolEncoder;
 import org.junit.Test;
 
 /**
  * Unit test for {@link ProtocolCodecFilter}
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtocolCodecFilterTest {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void constructor_args() {
         try {
             new ProtocolCodecFilter(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            // happy
-        } catch (Exception e2) {
-            fail();
-        }
-
-        try {
-            new ProtocolCodecFilter(null, mock(ProtocolDecoder.class));
-            fail();
-        } catch (IllegalArgumentException e) {
-            // happy
-        } catch (Exception e2) {
-            fail();
-        }
-
-        try {
-            new ProtocolCodecFilter(mock(ProtocolEncoder.class), null);
             fail();
         } catch (IllegalArgumentException e) {
             // happy
@@ -81,6 +64,7 @@ public class ProtocolCodecFilterTest {
         }
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void codec_factory() {
         ProtocolEncoder encoder = mock(ProtocolEncoder.class);
@@ -91,10 +75,6 @@ public class ProtocolCodecFilterTest {
         when(factory.getDecoder(any(IoSession.class))).thenReturn(decoder);
 
         ProtocolCodecFilter codec = new ProtocolCodecFilter(factory);
-        assertEquals(encoder, codec.getEncoder(null));
-        assertEquals(decoder, codec.getDecoder(null));
-
-        codec = new ProtocolCodecFilter(encoder, decoder);
         assertEquals(encoder, codec.getEncoder(null));
         assertEquals(decoder, codec.getDecoder(null));
     }

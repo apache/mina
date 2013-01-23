@@ -19,51 +19,15 @@
  */
 package org.apache.mina.http.api;
 
+import java.nio.ByteBuffer;
+
 /**
- * Type safe enumeration representing HTTP protocol version
+ * Marker interface for decoded HTTP elements (P.D.U.: Protocol Data Units)
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public enum HttpVersion {
-    /**
-     * HTTP 1/1
-     */
-    HTTP_1_1("HTTP/1.1"),
+public interface HttpPdu {
 
-    /**
-     * HTTP 1/0
-     */
-    HTTP_1_0("HTTP/1.0");
-
-    private final String value;
-
-    private HttpVersion(String value) {
-        this.value = value;
-    }
-
-    /**
-     * Returns the {@link HttpVersion} instance from the specified string.
-     * 
-     * @return The version, or <code>null</code> if no version is found
-     */
-    public static HttpVersion fromString(String string) {
-        if (HTTP_1_1.toString().equalsIgnoreCase(string)) {
-            return HTTP_1_1;
-        }
-
-        if (HTTP_1_0.toString().equalsIgnoreCase(string)) {
-            return HTTP_1_0;
-        }
-
-        return null;
-    }
-
-    /**
-     * @return A String representation of this version
-     */
-    @Override
-    public String toString() {
-        return value;
-    }
+    public ByteBuffer encode(HttpPduEncodingVisitor visitor);
 
 }

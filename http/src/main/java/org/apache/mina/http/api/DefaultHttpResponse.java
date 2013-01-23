@@ -19,8 +19,13 @@
  */
 package org.apache.mina.http.api;
 
+import java.nio.ByteBuffer;
 import java.util.Map;
 
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class DefaultHttpResponse implements HttpResponse {
 
     private final HttpVersion version;
@@ -35,42 +40,74 @@ public class DefaultHttpResponse implements HttpResponse {
         this.headers = headers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HttpVersion getProtocolVersion() {
         return version;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getContentType() {
         return headers.get("content-type");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isKeepAlive() {
         // TODO check header and version for keep alive
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getHeader(String name) {
         return headers.get(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsHeader(String name) {
         return headers.containsKey(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> getHeaders() {
         return headers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HttpStatus getStatus() {
         return status;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ByteBuffer encode(HttpPduEncodingVisitor visitor) {
+        return visitor.visit(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         String result = "HTTP RESPONSE STATUS: " + status + "\n";

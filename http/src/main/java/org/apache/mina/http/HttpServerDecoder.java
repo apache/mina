@@ -19,36 +19,29 @@
  */
 package org.apache.mina.http;
 
-import static org.apache.mina.session.AttributeKey.createKey;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.mina.api.IoSession;
-import org.apache.mina.filter.codec.ProtocolDecoder;
-import org.apache.mina.filterchain.ReadFilterChainController;
+import org.apache.mina.codec.ProtocolDecoder;
+import org.apache.mina.codec.ProtocolDecoderException;
+import org.apache.mina.http.api.HttpContentChunk;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpMethod;
+import org.apache.mina.http.api.HttpPdu;
 import org.apache.mina.http.api.HttpVersion;
-import org.apache.mina.session.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpServerDecoder implements ProtocolDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
-
-    /** Key for decoder current state */
-    private static final AttributeKey<DecoderState> DECODER_STATE_ATT = createKey(DecoderState.class,
-            "internal_http.ds");
-
-    /** Key for the partial HTTP requests head */
-    private static final AttributeKey<ByteBuffer> PARTIAL_HEAD_ATT = createKey(ByteBuffer.class, "internal_http.ph");
-
-    /** Key for the number of bytes remaining to read for completing the body */
-    private static final AttributeKey<Integer> BODY_REMAINING_BYTES = createKey(Integer.class, "internal_http.brb");
+/**
+ * In charge of decoding received bytes into HTTP message.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
+    private static final Logger LOG = LoggerFactory.getLogger(HttpServerDecoder.class);
 
     /** Regex to parse HttpRequest Request Line */
     public static final Pattern REQUEST_LINE_PATTERN = Pattern.compile(" ");
@@ -74,17 +67,23 @@ public class HttpServerDecoder implements ProtocolDecoder {
     /** Regex to split cookie header following RFC6265 Section 5.4 */
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
 
-    @Override
-    public Object decode(IoSession session, ByteBuffer msg, ReadFilterChainController controller) {
-        DecoderState state = session.getAttribute(DECODER_STATE_ATT, null);
+    /** State of the decoder */
+    private DecoderState state = DecoderState.NEW;
 
+    /** The previously received buffer, not totally decoded */
+    private ByteBuffer partial;
+
+    /** Number of bytes remaining to read for completing the body */
+    private int remainingBytes;
+
+    @Override
+    public HttpPdu[] decode(ByteBuffer msg) throws ProtocolDecoderException {
+        LOG.debug("decode : {}", msg);
         switch (state) {
         case HEAD:
             LOG.debug("decoding HEAD");
-            // grab the stored a partial HEAD request
-            ByteBuffer oldBuffer = session.getAttribute(PARTIAL_HEAD_ATT, null);
             // concat the old buffer and the new incoming one
-            msg = ByteBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg);
+            msg = ByteBuffer.allocate(partial.remaining() + msg.remaining()).put(partial).put(msg);
             msg.flip();
             // now let's decode like it was a new message
 
@@ -94,36 +93,27 @@ public class HttpServerDecoder implements ProtocolDecoder {
 
             if (rq == null) {
                 // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
-                ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
+                partial = ByteBuffer.allocate(msg.remaining());
                 partial.put(msg);
                 partial.flip();
-                // no request decoded, we accumulate
-                session.setAttribute(PARTIAL_HEAD_ATT, partial);
-                session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
             } else {
-                controller.callReadNextFilter(rq);
+                return new HttpPdu[] { rq };
             }
-
             return null;
-
         case BODY:
             LOG.debug("decoding BODY");
             int chunkSize = msg.remaining();
             // send the chunk of body
-            controller.callReadNextFilter(msg);
+            HttpContentChunk chunk = new HttpContentChunk(msg);
             // do we have reach end of body ?
-            int remaining = session.getAttribute(BODY_REMAINING_BYTES, null);
-            remaining -= chunkSize;
+            remainingBytes -= chunkSize;
 
-            if (remaining <= 0) {
+            if (remainingBytes <= 0) {
                 LOG.debug("end of HTTP body");
-                controller.callReadNextFilter(new HttpEndOfContent());
-                session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
-                session.removeAttribute(BODY_REMAINING_BYTES);
-            } else {
-                session.setAttribute(BODY_REMAINING_BYTES, new Integer(remaining));
+                state = DecoderState.NEW;
+                remainingBytes = 0;
+                return new HttpPdu[] { chunk, new HttpEndOfContent() };
             }
-
             break;
 
         default:
@@ -131,15 +121,6 @@ public class HttpServerDecoder implements ProtocolDecoder {
         }
 
         return null;
-    }
-
-    @Override
-    public Object finishDecode(IoSession session) throws Exception {
-        return null;
-    }
-
-    @Override
-    public void dispose(IoSession session) throws Exception {
     }
 
     private HttpRequestImpl parseHttpRequestHead(ByteBuffer buffer) {
@@ -172,5 +153,10 @@ public class HttpServerDecoder implements ProtocolDecoder {
         buffer.position(headersAndBody[0].length() + 4);
 
         return new HttpRequestImpl(version, method, requestedPath, generalHeaders);
+    }
+
+    @Override
+    public void finishDecode() {
+
     }
 }

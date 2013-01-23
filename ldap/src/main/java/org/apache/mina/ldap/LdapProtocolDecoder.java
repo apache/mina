@@ -33,7 +33,7 @@ import org.apache.directory.shared.ldap.model.exception.ResponseCarryingMessageE
 import org.apache.directory.shared.ldap.model.message.Message;
 import org.apache.directory.shared.util.Strings;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.codec.ProtocolDecoder;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.session.AttributeKey;
 import org.slf4j.Logger;

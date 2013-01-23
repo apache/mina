@@ -27,23 +27,16 @@
     <version>3.0.0-M1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>mina-core</artifactId>
-  <name>Apache MINA Core ${project.version}</name>
+  <artifactId>mina-codec</artifactId>
+  <name>Apache MINA Codec ${project.version}</name>
   <packaging>bundle</packaging>
 
   <properties>
-    <symbolicName>${project.groupId}.core</symbolicName>
+    <symbolicName>${project.groupId}.codec</symbolicName>
     <exportedPackage>${project.groupId}</exportedPackage>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mina-codec</artifactId>
-      <version>${project.version}</version>
-      <type>bundle</type>
-    </dependency>
-
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>

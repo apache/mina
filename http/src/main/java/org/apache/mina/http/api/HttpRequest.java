@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * An HTTP request
  * 
- * @author jvermillar
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
 public interface HttpRequest extends HttpMessage {

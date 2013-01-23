@@ -25,7 +25,7 @@ import org.apache.directory.shared.ldap.codec.api.LdapApiServiceFactory;
 import org.apache.directory.shared.ldap.codec.api.LdapEncoder;
 import org.apache.directory.shared.ldap.model.message.Message;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.filter.codec.ProtocolEncoder;
+import org.apache.mina.codec.ProtocolEncoder;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
 

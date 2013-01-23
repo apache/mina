@@ -6,34 +6,33 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *
+ *  
  *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
- *  under the License.
- *
+ *  under the License. 
+ *  
  */
-package org.apache.mina.filter.codec;
+package org.apache.mina.http.api;
 
 import java.nio.ByteBuffer;
 
-import org.apache.mina.api.IoSession;
-
 /**
- * In charge of encoding a message of type MESSAGE into another form (could be a {@link ByteBuffer} or any other protocol level construction.
+ * Visitor in charge of encoding an HTTP message into bytes.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
-public interface ProtocolEncoder<INPUT /* message type */, OUTPUT> {
+public interface HttpPduEncodingVisitor {
 
-    /**
-     * Encodes higher-level message objects of type <code>INPUT</code> into binary or protocol-specific data of type <code>OUTPUT</code>.
-     */
-	OUTPUT encode(IoSession session, INPUT message);
+    public ByteBuffer visit(HttpRequest msg);
 
+    public ByteBuffer visit(HttpResponse msg);
+
+    public ByteBuffer visit(HttpContentChunk msg);
+
+    public ByteBuffer visit(HttpEndOfContent msg);
 }

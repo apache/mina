@@ -20,6 +20,8 @@
 package org.apache.mina.filter.codec;
 
 import org.apache.mina.api.IoSession;
+import org.apache.mina.codec.ProtocolDecoder;
+import org.apache.mina.codec.ProtocolEncoder;
 
 /**
  * Provides {@link ProtocolEncoder} and {@link ProtocolDecoder} which translates

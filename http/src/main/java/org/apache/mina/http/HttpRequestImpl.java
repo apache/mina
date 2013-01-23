@@ -19,11 +19,13 @@
  */
 package org.apache.mina.http;
 
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.http.api.HttpMethod;
+import org.apache.mina.http.api.HttpPduEncodingVisitor;
 import org.apache.mina.http.api.HttpRequest;
 import org.apache.mina.http.api.HttpVersion;
 
@@ -44,60 +46,98 @@ public class HttpRequestImpl implements HttpRequest {
         this.headers = Collections.unmodifiableMap(headers);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HttpVersion getProtocolVersion() {
         return version;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getContentType() {
         return headers.get("content-type");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isKeepAlive() {
-        // TODO Auto-generated method stub
+        // TODO check headers
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getHeader(String name) {
         return headers.get(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsHeader(String name) {
         return headers.containsKey(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, String> getHeaders() {
         return headers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean containsParameter(String name) {
         // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getParameter(String name) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, List<String>> getParameters() {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HttpMethod getMethod() {
         return method;
     }
 
+    @Override
+    public ByteBuffer encode(HttpPduEncodingVisitor visitor) {
+        return visitor.visit(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         String result = "HTTP REQUEST METHOD: " + method + "\n";

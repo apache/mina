@@ -20,9 +20,31 @@
 package org.apache.mina.http.api;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
-public interface HttpContentChunk {
+/**
+ * A chunk of an HTTP request or response. can be follwowed by another chunk or {@link HttpEndOfContent} marking the end
+ * of the content
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class HttpContentChunk implements HttpPdu {
 
-    List<ByteBuffer> getContent();
+    private ByteBuffer content;
+
+    public HttpContentChunk(ByteBuffer content) {
+        this.content = content;
+    }
+
+    /**
+     * The content of the chunk. A part of the HTTP message content.
+     */
+    public ByteBuffer getContent() {
+        return content;
+    }
+
+    @Override
+    public ByteBuffer encode(HttpPduEncodingVisitor visitor) {
+        return visitor.visit(this);
+    }
+
 }

@@ -19,59 +19,66 @@
  */
 package org.apache.mina.http;
 
-
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import org.apache.mina.api.IoSession;
-import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.filterchain.WriteFilterChainController;
+import org.apache.mina.codec.ProtocolEncoder;
+import org.apache.mina.http.api.HttpContentChunk;
 import org.apache.mina.http.api.HttpEndOfContent;
+import org.apache.mina.http.api.HttpPdu;
+import org.apache.mina.http.api.HttpPduEncodingVisitor;
+import org.apache.mina.http.api.HttpRequest;
 import org.apache.mina.http.api.HttpResponse;
-import org.apache.mina.session.WriteRequest;
 
+/**
+ * In charge of encoding HTTP message into bytes.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class HttpServerEncoder implements ProtocolEncoder<HttpPdu, ByteBuffer> {
 
-public class HttpServerEncoder implements ProtocolEncoder
-{
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ByteBuffer encode(HttpPdu message) {
+        return message.encode(visitor);
+    }
 
-    public Object encode( IoSession session, WriteRequest message, WriteFilterChainController controller )
-    {
-        if ( message.getOriginalMessage() instanceof HttpResponse )
-        {
-            HttpResponse msg = ( HttpResponse ) message;
-            StringBuilder sb = new StringBuilder( msg.getStatus().line() );
+    private HttpPduEncodingVisitor visitor = new HttpPduEncodingVisitor() {
 
-            for ( Map.Entry<String, String> header : msg.getHeaders().entrySet() )
-            {
-                sb.append( header.getKey() );
-                sb.append( ": " );
-                sb.append( header.getValue() );
-                sb.append( "\r\n" );
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ByteBuffer visit(HttpResponse msg) {
+            StringBuilder sb = new StringBuilder(msg.getStatus().line());
+
+            for (Map.Entry<String, String> header : msg.getHeaders().entrySet()) {
+                sb.append(header.getKey());
+                sb.append(": ");
+                sb.append(header.getValue());
+                sb.append("\r\n");
             }
-            sb.append( "\r\n" );
-            byte[] bytes = sb.toString().getBytes( Charset.forName( "UTF-8" ) );
-            message.setMessage( ByteBuffer.wrap( bytes ) );
-            controller.callWriteNextFilter( message );
+            sb.append("\r\n");
+            byte[] bytes = sb.toString().getBytes(Charset.forName("UTF-8"));
+            return ByteBuffer.wrap(bytes);
         }
-        else if ( message.getOriginalMessage() instanceof ByteBuffer )
-        {
-            controller.callWriteNextFilter( message );
+
+        @Override
+        public ByteBuffer visit(HttpContentChunk msg) {
+            return msg.getContent();
         }
-        else if ( message.getOriginalMessage() instanceof HttpEndOfContent )
-        {
-            // end of HTTP content
-            // keep alive ?
+
+        @Override
+        public ByteBuffer visit(HttpEndOfContent msg) {
             return null;
         }
 
-        return null;
-    }
-
-
-    @Override
-    public void dispose( IoSession session ) throws Exception
-    {
-        // TODO Auto-generated method stub
-    }
+        @Override
+        public ByteBuffer visit(HttpRequest msg) {
+            throw new IllegalStateException("cannot encode that on server side");
+        }
+    };
 }

@@ -19,8 +19,25 @@
  */
 package org.apache.mina.http.api;
 
-public class HttpEndOfContent {
+import java.nio.ByteBuffer;
 
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class HttpEndOfContent implements HttpPdu {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ByteBuffer encode(HttpPduEncodingVisitor visitor) {
+        return visitor.visit(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "HttpEndOfContent";

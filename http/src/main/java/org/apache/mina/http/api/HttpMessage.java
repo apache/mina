@@ -25,10 +25,10 @@ import java.util.Map;
 /**
  * An HTTP message, the ancestor of HTTP request & response.
  * 
- * @author jvermillar
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public interface HttpMessage {
+public interface HttpMessage extends HttpPdu {
 
     /**
      * The HTTP version of the message

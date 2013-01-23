@@ -17,28 +17,31 @@
  *  under the License.
  *
  */
-package org.apache.mina.filter.codec;
-
-import org.apache.mina.api.IoSession;
+package org.apache.mina.codec;
 
 /**
  * Decodes binary or protocol-specific data into higher-level message objects.
- *
+ * 
+ * Should be state-full, and have one instance per new session.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public interface ProtocolDecoder<INPUT,OUTPUT> {
+public interface ProtocolDecoder<INPUT, OUTPUT> {
 
-	/**
-	 * Decode binary or protocol-specific content of type <code>INPUT</code> into higher-level protocol message objects, of type OUTPUT
-	 * @param session the session for this message 
-	 * @param input the received message to decode 
-	 * @return the decoded message or <code>null</code> if nothing was decoded
-	 */
-	OUTPUT decode(IoSession session, INPUT input);
-	
-	/**
-	 * Finish decoding, for example if the decoder accumulated some unused input, it should discard it, or throw an Exception
-	 */
-    void finishDecode(IoSession session);
+    /**
+     * Decode binary or protocol-specific content of type <code>INPUT</code> into higher-level protocol message objects,
+     * of type OUTPUT
+     * 
+     * @param input the received message to decode
+     * @return the decoded messages or <code>null</code> if nothing was decoded
+     * @throws ProtocolDecoderException if something wrong happen during decoding (e.g. : a malformed input message)
+     */
+    OUTPUT[] decode(INPUT input) throws ProtocolDecoderException;
+
+    /**
+     * Finish decoding, for example if the decoder accumulated some unused input, it should discard it, or throw an
+     * Exception
+     */
+    void finishDecode();
 }
