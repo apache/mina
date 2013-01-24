@@ -66,7 +66,7 @@ public abstract class BenchmarkBinaryTest {
 
     public abstract Type getServerType();
 
-    @Parameters
+    @Parameters(name="{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
         Object[][] parameters = new Object[][] { { 100000, 10, 2 * 60 }, { 100000, 1 * 1024, 2 * 60 },
                 { 100000, 10 * 1024, 2 * 60 }, { 100, 64 * 1024 * 1024, 10 * 60 } };

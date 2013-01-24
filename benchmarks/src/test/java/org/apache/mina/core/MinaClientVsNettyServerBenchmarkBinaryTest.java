@@ -54,7 +54,7 @@ public class MinaClientVsNettyServerBenchmarkBinaryTest extends BenchmarkBinaryT
         return Type.Netty;
     }
 
-    @Parameters
+    @Parameters(name="{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
         Object[][] parameters = new Object[][] { 
                 { 1000000, 10, 2 * 60 }, 

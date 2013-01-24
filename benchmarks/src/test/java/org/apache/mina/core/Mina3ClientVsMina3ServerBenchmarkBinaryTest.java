@@ -54,7 +54,7 @@ public class Mina3ClientVsMina3ServerBenchmarkBinaryTest extends BenchmarkBinary
         return Type.Mina;
     }
 
-    @Parameters
+    @Parameters(name="{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
         Object[][] parameters = new Object[][] {
                 { 1000000, 10, 2 * 60 }, 
