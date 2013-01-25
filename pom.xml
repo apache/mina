@@ -347,5 +347,16 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>benchmarks</id>
+      <activation>
+        <property>
+          <name>benchmarks</name>
+        </property>
+      </activation>
+      <modules>
+        <module>benchmarks</module>
+      </modules>
+    </profile>
   </profiles>
 </project>
