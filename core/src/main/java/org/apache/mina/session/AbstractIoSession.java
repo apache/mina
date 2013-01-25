@@ -155,6 +155,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         LOG.debug("Created new session with id : {}", id);
 
         this.state = SessionState.CREATED;
+        service.getManagedSessions().put(id, this);
     }
 
     // ------------------------------------------------------------------------
@@ -756,6 +757,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         } catch (final RuntimeException e) {
             processException(e);
         }
+        service.getManagedSessions().remove(id);
     }
 
     /**
