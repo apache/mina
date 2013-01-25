@@ -88,7 +88,7 @@
     <version.guava>10.0.1</version.guava>
     <version.junit>4.11</version.junit>
     <version.log4j>2.0-beta2</version.log4j>
-    <version.mockito-all>1.9.0-rc1</version.mockito-all>
+    <version.mockito-core>1.9.5</version.mockito-core>
     <version.slf4j.api>1.6.4</version.slf4j.api>
 
     <!-- Plugins versions =============================================== -->
@@ -132,8 +132,8 @@
 
       <dependency>
           <groupId>org.mockito</groupId>
-          <artifactId>mockito-all</artifactId>
-          <version>${version.mockito-all}</version>
+          <artifactId>mockito-core</artifactId>
+          <version>${version.mockito-core}</version>
           <scope>test</scope>
       </dependency>
 
