@@ -54,7 +54,7 @@ public class NettyClientVsMinaServerBenchmarkBinaryTest
     }
     
     //TODO: analyze with Netty is so slow on large message: last test lower to 100 messages
-    @Parameters
+    @Parameters(name="{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
         Object[][] parameters = new Object[][] { 
             { 200000, 10, 2 * 60 } //, 

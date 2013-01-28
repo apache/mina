@@ -27,6 +27,7 @@ import java.util.Map;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -37,6 +38,8 @@ import org.jboss.netty.channel.ChildChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 /**
@@ -59,6 +62,8 @@ public class NettyBenchmarkServer implements BenchmarkServer {
     private static final String LENGTH_ATTRIBUTE = NettyBenchmarkServer.class.getName() + ".length";
 
     private ChannelFactory factory;
+
+    private ChannelGroup allChannels = new DefaultChannelGroup();
 
     /**
      * Allocate a map as attachment for storing attributes.
@@ -104,6 +109,7 @@ public class NettyBenchmarkServer implements BenchmarkServer {
                     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
                         System.out.println("channelOpen");
                         setAttribute(ctx, STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
+                        allChannels.add(ctx.getChannel());
                     }
 
                     @Override
@@ -157,19 +163,25 @@ public class NettyBenchmarkServer implements BenchmarkServer {
                     }
 
                     @Override
+                    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+                        allChannels.remove(ctx.getChannel());
+                    }
+
+                    @Override
                     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
                         e.getCause().printStackTrace();
                     }
                 });
             }
         });
-        bootstrap.bind(new InetSocketAddress(port));
+        allChannels.add(bootstrap.bind(new InetSocketAddress(port)));
     }
 
     /**
      * {@inheritedDoc}
      */
     public void stop() throws IOException {
+        allChannels.disconnect().awaitUninterruptibly();
         factory.releaseExternalResources();
     }
 }
