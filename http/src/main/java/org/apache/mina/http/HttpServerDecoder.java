@@ -79,6 +79,9 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
     @Override
     public HttpPdu[] decode(ByteBuffer msg) throws ProtocolDecoderException {
         LOG.debug("decode : {}", msg);
+        if (msg.remaining() <= 0) {
+            return null;
+        }
         switch (state) {
         case HEAD:
             LOG.debug("decoding HEAD");

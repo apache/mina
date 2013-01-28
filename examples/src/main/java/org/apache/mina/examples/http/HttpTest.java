@@ -29,11 +29,13 @@ import java.util.Map;
 import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.http.DateUtil;
 import org.apache.mina.http.HttpServerDecoder;
 import org.apache.mina.http.HttpServerEncoder;
 import org.apache.mina.http.api.DefaultHttpResponse;
+import org.apache.mina.http.api.HttpContentChunk;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpMethod;
 import org.apache.mina.http.api.HttpPdu;
@@ -46,18 +48,18 @@ public class HttpTest {
 
     public static void main(String[] args) throws Exception {
 
-        NioTcpServer acceptor = new NioTcpServer();
-        acceptor.setFilters(/* new LoggingFilter("INCOMING"), */new ProtocolCodecFilter<HttpPdu, ByteBuffer>(
-                HttpServerEncoder.class, HttpServerDecoder.class), /* new LoggingFilter("DECODED"), */
-                new DummyHttpSever());
+        NioTcpServer httpServer = new NioTcpServer();
+        httpServer.setReuseAddress(true);
+        httpServer.setFilters(new LoggingFilter("INCOMING"), new ProtocolCodecFilter<HttpPdu, ByteBuffer>(
+                HttpServerEncoder.class, HttpServerDecoder.class), new LoggingFilter("DECODED"), new DummyHttpSever());
 
-        acceptor.getSessionConfig().setTcpNoDelay(true);
+        httpServer.getSessionConfig().setTcpNoDelay(true);
 
-        acceptor.bind(new InetSocketAddress(8080));
+        httpServer.bind(new InetSocketAddress(8080));
 
         // run for 20 seconds
         Thread.sleep(20000);
-        acceptor.unbind();
+        httpServer.unbind();
 
     }
 
@@ -99,7 +101,7 @@ public class HttpTest {
             // compute content len
             headers.put("Content-Length", String.valueOf(content.remaining()));
             session.write(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpStatus.SUCCESS_OK, headers));
-            session.write(content);
+            session.write(new HttpContentChunk(content));
             session.write(new HttpEndOfContent());
             session.close(false);
 

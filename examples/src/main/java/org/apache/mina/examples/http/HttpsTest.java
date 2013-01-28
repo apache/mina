@@ -28,13 +28,16 @@ import java.util.Map;
 
 import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.http.DateUtil;
-import org.apache.mina.http.HttpServerCodec;
+import org.apache.mina.http.HttpServerDecoder;
+import org.apache.mina.http.HttpServerEncoder;
 import org.apache.mina.http.api.DefaultHttpResponse;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpMethod;
+import org.apache.mina.http.api.HttpPdu;
 import org.apache.mina.http.api.HttpRequest;
 import org.apache.mina.http.api.HttpStatus;
 import org.apache.mina.http.api.HttpVersion;
@@ -44,21 +47,21 @@ public class HttpsTest {
 
     public static void main(String[] args) throws Exception {
 
-        NioTcpServer acceptor = new NioTcpServer();
+        NioTcpServer httpServer = new NioTcpServer();
 
-        acceptor.setFilters(new LoggingFilter("INCOMING"), new HttpServerCodec(), new LoggingFilter("DECODED"),
-                new DummyHttpSever());
+        httpServer.setFilters(new LoggingFilter("INCOMING"), new ProtocolCodecFilter<HttpPdu, ByteBuffer>(
+                HttpServerEncoder.class, HttpServerDecoder.class), new LoggingFilter("DECODED"), new DummyHttpSever());
 
-        acceptor.getSessionConfig().setTcpNoDelay(true);
+        httpServer.getSessionConfig().setTcpNoDelay(true);
 
         // Make it use https, injecting a default SSLContext instance
-        acceptor.getSessionConfig().setSslContext(BogusSslContextFactory.getInstance(true));
+        httpServer.getSessionConfig().setSslContext(BogusSslContextFactory.getInstance(true));
 
-        acceptor.bind(new InetSocketAddress(8080));
+        httpServer.bind(new InetSocketAddress(8080));
 
         // run for 20 seconds
         Thread.sleep(20000);
-        acceptor.unbind();
+        httpServer.unbind();
 
     }
 
