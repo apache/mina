@@ -110,8 +110,6 @@
       <module>http</module>
       <module>ldap</module>
       <module>examples</module>
-      <!-- Temporarilly commented. Should be run with a dedicatd benchmark profile -->
-      <!-- module>benchmarks</module-->
   </modules>
 
   <dependencyManagement>

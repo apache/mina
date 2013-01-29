@@ -54,13 +54,21 @@ public class MinaClientVsNettyServerBenchmarkBinaryTest extends BenchmarkBinaryT
         return Type.Netty;
     }
 
-    @Parameters(name="{0} messages of size {1}")
+    @Parameters()
     public static Collection<Object[]> getParameters() {
         Object[][] parameters = new Object[][] { 
                 { 1000000, 10, 2 * 60 }, 
                 { 1000000, 1 * 1024, 2 * 60 },
                 { 1000000, 10 * 1024, 2 * 60 }, 
-                { 100, 64 * 1024 * 1024, 10 * 60 } };
+                { 1000000, 20 * 1024, 2 * 60 }, 
+                {  500000, 50 * 1024, 2 * 60 }, 
+                {  200000, 100 * 1024, 2 * 60 }, 
+                {  100000, 200 * 1024, 2 * 60 }, 
+                {   50000, 500 * 1024, 2 * 60 }, 
+                {   20000, 1024 * 1024, 2 * 60 }, 
+                {    2000, 10 * 1024* 1024, 2 * 60 }, 
+                {    500, 64 * 1024 * 1024, 2 * 60 }
+        }; 
         return Arrays.asList(parameters);
     }
 }
