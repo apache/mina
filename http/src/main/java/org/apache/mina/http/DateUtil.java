@@ -28,6 +28,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class DateUtil {
 
     private final static Locale LOCALE = Locale.US;

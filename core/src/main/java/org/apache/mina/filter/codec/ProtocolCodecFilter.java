@@ -64,7 +64,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      * 
      * @param factory The associated factory
      */
-    public ProtocolCodecFilter(final ProtocolCodecFactory<MESSAGE, ENCODED> factory) {
+    public ProtocolCodecFilter(ProtocolCodecFactory<MESSAGE, ENCODED> factory) {
         if (factory == null) {
             throw new IllegalArgumentException("factory");
         }
@@ -80,20 +80,20 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      * @param encoderClass The class responsible for encoding the message
      * @param decoderClass The class responsible for decoding the message
      */
-    public ProtocolCodecFilter(final Class<? extends ProtocolEncoder<MESSAGE, ENCODED>> encoderClass,
-            final Class<? extends ProtocolDecoder<ENCODED, MESSAGE>> decoderClass) {
+    public ProtocolCodecFilter(Class<? extends ProtocolEncoder<MESSAGE, ENCODED>> encoderClass,
+            Class<? extends ProtocolDecoder<ENCODED, MESSAGE>> decoderClass) {
         Assert.assertNotNull(encoderClass, "Encoder Class");
         Assert.assertNotNull(decoderClass, "Decoder Class");
 
         try {
             encoderClass.getConstructor(EMPTY_PARAMS);
-        } catch (final NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("encoderClass doesn't have a public default constructor.");
         }
 
         try {
             decoderClass.getConstructor(EMPTY_PARAMS);
-        } catch (final NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("decoderClass doesn't have a public default constructor.");
         }
 
@@ -101,7 +101,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
 
         try {
             encoder = encoderClass.newInstance();
-        } catch (final Exception e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("encoderClass cannot be initialized");
         }
 
@@ -109,19 +109,19 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
 
         try {
             decoder = decoderClass.newInstance();
-        } catch (final Exception e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("decoderClass cannot be initialized");
         }
 
         // Create the inner factory based on the two parameters.
         this.factory = new ProtocolCodecFactory<MESSAGE, ENCODED>() {
             @Override
-            public ProtocolEncoder<MESSAGE, ENCODED> getEncoder(final IoSession session) {
+            public ProtocolEncoder<MESSAGE, ENCODED> getEncoder(IoSession session) {
                 return encoder;
             }
 
             @Override
-            public ProtocolDecoder<ENCODED, MESSAGE> getDecoder(final IoSession session) {
+            public ProtocolDecoder<ENCODED, MESSAGE> getDecoder(IoSession session) {
                 return decoder;
             }
         };
@@ -133,7 +133,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      * @param session The associated session we will get the encoder from
      * @return The encoder instance, if any
      */
-    public ProtocolEncoder<MESSAGE, ENCODED> getEncoder(final IoSession session) {
+    public ProtocolEncoder<MESSAGE, ENCODED> getEncoder(IoSession session) {
         return factory.getEncoder(session);
     }
 
@@ -143,7 +143,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      * @param session The associated session we will get the decoder from
      * @return The decoder instance, if any
      */
-    public ProtocolDecoder<ENCODED, MESSAGE> getDecoder(final IoSession session) {
+    public ProtocolDecoder<ENCODED, MESSAGE> getDecoder(IoSession session) {
         return factory.getDecoder(session);
     }
 
@@ -159,10 +159,10 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void messageReceived(final IoSession session, final Object in, final ReadFilterChainController controller) {
+    public void messageReceived(IoSession session, Object in, ReadFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session);
 
-        final ProtocolDecoder<ENCODED, MESSAGE> decoder = getDecoder(session);
+        ProtocolDecoder<ENCODED, MESSAGE> decoder = getDecoder(session);
 
         // Loop until the codec cannot decode more
         MESSAGE[] msg;
@@ -185,7 +185,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
     public void messageWriting(IoSession session, WriteRequest message, WriteFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_WRITTING for session {}", session);
 
-        final ProtocolEncoder<MESSAGE, ENCODED> encoder = session.getAttribute(ENCODER, null);
+        ProtocolEncoder<MESSAGE, ENCODED> encoder = getEncoder(session);
         ENCODED encoded = encoder.encode((MESSAGE) message.getMessage());
         message.setMessage(encoded);
 
@@ -196,12 +196,12 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void sessionOpened(final IoSession session) {
+    public void sessionOpened(IoSession session) {
         // Initialize the encoder and decoder if we use a factory
         if (factory != null) {
-            final ProtocolEncoder<MESSAGE, ENCODED> encoder = factory.getEncoder(session);
+            ProtocolEncoder<MESSAGE, ENCODED> encoder = factory.getEncoder(session);
             session.setAttribute(ENCODER, encoder);
-            final ProtocolDecoder<ENCODED, MESSAGE> decoder = factory.getDecoder(session);
+            ProtocolDecoder<ENCODED, MESSAGE> decoder = factory.getDecoder(session);
             session.setAttribute(DECODER, decoder);
         }
     }
@@ -210,7 +210,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      * {@inheritDoc}
      */
     @Override
-    public void sessionClosed(final IoSession session) {
+    public void sessionClosed(IoSession session) {
         disposeCodec(session);
     }
 
@@ -218,7 +218,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
     /**
      * Dispose the encoder, decoder, and the callback for the decoded messages.
      */
-    private void disposeCodec(final IoSession session) {
+    private void disposeCodec(IoSession session) {
         // We just remove the two instances of encoder/decoder to release resources
         // from the session
         disposeEncoder(session);
@@ -229,7 +229,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      * Dispose the encoder, removing its instance from the session's attributes, and calling the associated dispose
      * method.
      */
-    private void disposeEncoder(final IoSession session) {
+    private void disposeEncoder(IoSession session) {
         session.removeAttribute(ENCODER);
     }
 
@@ -237,12 +237,12 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      * Dispose the decoder, removing its instance from the session's attributes, and calling the associated dispose
      * method.
      */
-    private void disposeDecoder(final IoSession session) {
+    private void disposeDecoder(IoSession session) {
         @SuppressWarnings("unchecked")
-        final ProtocolDecoder<ENCODED, MESSAGE> decoder = session.removeAttribute(DECODER);
+        ProtocolDecoder<ENCODED, MESSAGE> decoder = session.removeAttribute(DECODER);
         try {
             decoder.finishDecode();
-        } catch (final Throwable t) {
+        } catch (Throwable t) {
             LOGGER.warn("Failed to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }

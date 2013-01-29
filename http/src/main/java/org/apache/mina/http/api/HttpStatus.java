@@ -21,6 +21,8 @@ package org.apache.mina.http.api;
 
 /**
  * An <code>Enumeration</code> of all known HTTP status codes.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum HttpStatus {
 

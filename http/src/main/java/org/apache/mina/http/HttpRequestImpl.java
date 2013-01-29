@@ -29,6 +29,10 @@ import org.apache.mina.http.api.HttpPduEncodingVisitor;
 import org.apache.mina.http.api.HttpRequest;
 import org.apache.mina.http.api.HttpVersion;
 
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class HttpRequestImpl implements HttpRequest {
 
     private final HttpVersion version;

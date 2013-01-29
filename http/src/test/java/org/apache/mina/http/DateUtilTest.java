@@ -11,6 +11,8 @@ import org.junit.Test;
 
 /**
  * Test class for DateUtil
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DateUtilTest {
 

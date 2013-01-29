@@ -19,6 +19,10 @@
  */
 package org.apache.mina.http;
 
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ArrayUtil {
 
     public static String[] dropFromEndWhile(String[] array, String regex) {
