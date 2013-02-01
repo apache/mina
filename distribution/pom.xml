@@ -130,6 +130,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-http</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- We don't include distrinution as a dependency : it's not part of the release --> 
   </dependencies>
 
