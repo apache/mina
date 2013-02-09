@@ -62,7 +62,7 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
     public static final Pattern HEADERS_BODY_PATTERN = Pattern.compile("\\r\\n");
 
     /** Regex to parse header name and value */
-    public static final Pattern HEADER_VALUE_PATTERN = Pattern.compile(": ");
+    public static final Pattern HEADER_VALUE_PATTERN = Pattern.compile(":");
 
     /** Regex to split cookie header following RFC6265 Section 5.4 */
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
@@ -143,7 +143,7 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
 
         for (int i = 1; i < headerFields.length; i++) {
             String[] header = HEADER_VALUE_PATTERN.split(headerFields[i]);
-            generalHeaders.put(header[0].toLowerCase(), header[1]);
+            generalHeaders.put(header[0].toLowerCase(), header[1].trim());
         }
 
         String[] elements = REQUEST_LINE_PATTERN.split(requestLine);
