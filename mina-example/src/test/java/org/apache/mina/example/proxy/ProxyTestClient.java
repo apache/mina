@@ -39,7 +39,6 @@ import org.apache.mina.proxy.handlers.http.HttpProxyRequest;
 import org.apache.mina.proxy.handlers.socks.SocksProxyConstants;
 import org.apache.mina.proxy.handlers.socks.SocksProxyRequest;
 import org.apache.mina.proxy.session.ProxyIoSession;
-import org.apache.mina.proxy.utils.MD4Provider;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
@@ -78,15 +77,6 @@ public class ProxyTestClient {
      * Set this variable to true in order to generate HTTP/1.1 requests.
      */
     private final static boolean USE_HTTP_1_1 = false;
-
-    /**
-     * NTLM proxy authentication needs a JCE provider that handles MD4 hashing.
-     */
-    static {
-        if (Security.getProvider("MINA") == null) {
-            Security.addProvider(new MD4Provider());
-        }
-    }
 
     /**
      * Creates a connection to the endpoint through a proxy server using the specified
