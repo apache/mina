@@ -31,7 +31,6 @@ import java.security.Security;
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMResponses;
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMUtilities;
 import org.apache.mina.proxy.utils.ByteUtilities;
-import org.apache.mina.proxy.utils.MD4Provider;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,12 +43,6 @@ import org.slf4j.LoggerFactory;
  */
 public class NTLMTest {
     private final static Logger logger = LoggerFactory.getLogger(NTLMTest.class);
-
-    static {
-        if (Security.getProvider("MINA") == null) {
-            Security.addProvider(new MD4Provider());
-        }
-    }
 
     /**
      * Tests bytes manipulations.
