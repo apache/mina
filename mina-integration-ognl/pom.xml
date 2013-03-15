@@ -55,11 +55,5 @@
       <groupId>ognl</groupId>
       <artifactId>ognl</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>javassist</artifactId>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 </project>
