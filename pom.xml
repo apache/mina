@@ -108,7 +108,6 @@
       <module>core</module>
       <module>codec</module>
       <module>http</module>
-      <module>ldap</module>
       <module>examples</module>
   </modules>
 
