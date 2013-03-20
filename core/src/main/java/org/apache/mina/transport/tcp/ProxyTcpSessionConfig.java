@@ -25,6 +25,7 @@ import javax.net.ssl.SSLContext;
 
 import org.apache.mina.api.ConfigurationException;
 import org.apache.mina.api.IdleStatus;
+import org.apache.mina.session.TrafficClassEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +134,7 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
      * {@inheritDoc}
      */
     @Override
-    public Integer getReceiveBufferSize() {
+    public Integer getReadBufferSize() {
         try {
             return socket.getReceiveBufferSize();
         } catch (SocketException e) {
@@ -145,7 +146,7 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
      * {@inheritDoc}
      */
     @Override
-    public void setReceiveBufferSize(int receiveBufferSize) {
+    public void setReadBufferSize(int receiveBufferSize) {
         LOG.debug("set receive buffer size '{}' for session '{}'", receiveBufferSize, this);
         try {
             socket.setReceiveBufferSize(receiveBufferSize);
@@ -183,7 +184,7 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
      * {@inheritDoc}
      */
     @Override
-    public Integer getTrafficClass() {
+    public int getTrafficClass() {
         try {
             return socket.getTrafficClass();
         } catch (SocketException e) {
@@ -199,6 +200,19 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
         LOG.debug("set traffic class '{}' for session '{}'", trafficClass, this);
         try {
             socket.setTrafficClass(trafficClass);
+        } catch (SocketException e) {
+            throw new ConfigurationException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setTrafficClass(TrafficClassEnum trafficClass) {
+        LOG.debug("set traffic class '{}' for session '{}'", trafficClass, this);
+        try {
+            socket.setTrafficClass(trafficClass.getValue());
         } catch (SocketException e) {
             throw new ConfigurationException(e);
         }

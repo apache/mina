@@ -17,58 +17,50 @@
  *  under the License.
  *
  */
-package org.apache.mina.core;
+package org.apache.mina.core.nio.udp;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.mina.core.BenchmarkBinaryTest;
+import org.apache.mina.core.BenchmarkFactory;
 import org.apache.mina.core.BenchmarkFactory.Type;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NettyClientVsNettyServerBenchmarkBinaryTest
-    extends BenchmarkBinaryTest {
+public class Netty3ClientVsNetty3ServerUdpBenchmarkBinaryTest extends BenchmarkBinaryTest {
 
     /**
      * @param numberOfMessages
      * @param messageSize
      */
-    public NettyClientVsNettyServerBenchmarkBinaryTest( int numberOfMessages, int messageSize, int timeout ) {
-        super( numberOfMessages, messageSize, timeout );
+    public Netty3ClientVsNetty3ServerUdpBenchmarkBinaryTest(int numberOfMessages, int messageSize, int timeout) {
+        super(numberOfMessages, messageSize, timeout);
     }
 
     /** {@inheritDoc}
      */
     @Override
     public Type getClientType() {
-        return Type.Netty;
+        return Type.Netty3_tcp;
     }
 
     /** {@inheritDoc}
      */
     @Override
     public Type getServerType() {
-        return Type.Netty;
+        return Type.Netty3_tcp;
     }
-    
+
     //TODO: analyze with Netty is so slow on large message: last test lower to 100 messages
-    @Parameters(name="{0} messages of size {1}")
+    @Parameters(name = "{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
-        Object[][] parameters = new Object[][] { 
-                { 1000000, 10, 2 * 60 }, 
-                { 1000000, 1 * 1024, 2 * 60 },
-                { 1000000, 10 * 1024, 2 * 60 }, 
-                { 1000000, 20 * 1024, 2 * 60 }, 
-                {  500000, 50 * 1024, 2 * 60 }, 
-                {  200000, 100 * 1024, 2 * 60 }, 
-                {  100000, 200 * 1024, 2 * 60 }, 
-                {   50000, 500 * 1024, 2 * 60 }, 
-                {   20000, 1024 * 1024, 2 * 60 }, 
-                {    2000, 10 * 1024* 1024, 2 * 60 }, 
-                {    500, 64 * 1024 * 1024, 2 * 60 } 
-        };
+        Object[][] parameters = new Object[][] { { 1000000, 10, 2 * 60 }, { 1000000, 1 * 1024, 2 * 60 },
+                { 1000000, 10 * 1024, 2 * 60 }, { 1000000, 20 * 1024, 2 * 60 }, { 500000, 50 * 1024, 2 * 60 },
+                { 200000, 100 * 1024, 2 * 60 }, { 100000, 200 * 1024, 2 * 60 }, { 50000, 500 * 1024, 2 * 60 },
+                { 20000, 1024 * 1024, 2 * 60 }, { 2000, 10 * 1024 * 1024, 2 * 60 }, { 500, 64 * 1024 * 1024, 2 * 60 } };
         return Arrays.asList(parameters);
     }
 }

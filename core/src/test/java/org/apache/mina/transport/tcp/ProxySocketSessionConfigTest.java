@@ -135,18 +135,18 @@ public class ProxySocketSessionConfigTest {
     @Test
     public void receiveBufferSize() throws SocketException {
         when(socket.getReceiveBufferSize()).thenReturn(1234);
-        assertEquals(1234, config.getReceiveBufferSize().intValue());
+        assertEquals(1234, config.getReadBufferSize().intValue());
         verify(socket).getReceiveBufferSize();
         verifyNoMoreInteractions(socket);
 
-        config.setReceiveBufferSize(1234);
+        config.setReadBufferSize(1234);
         verify(socket).setReceiveBufferSize(eq(1234));
         verifyNoMoreInteractions(socket);
 
         // handle error
         when(socket.getReceiveBufferSize()).thenThrow(new SocketException("test"));
         try {
-            config.getReceiveBufferSize();
+            config.getReadBufferSize();
             fail();
         } catch (ConfigurationException e) {
             assertEquals("test", e.getCause().getMessage());
@@ -155,7 +155,7 @@ public class ProxySocketSessionConfigTest {
         // handle error
         doThrow(new SocketException("test")).when(socket).setReceiveBufferSize(eq(1234));
         try {
-            config.setReceiveBufferSize(1234);
+            config.setReadBufferSize(1234);
             fail();
         } catch (ConfigurationException e) {
             assertEquals("test", e.getCause().getMessage());
@@ -196,7 +196,7 @@ public class ProxySocketSessionConfigTest {
     @Test
     public void trafficClass() throws SocketException {
         when(socket.getTrafficClass()).thenReturn(1234);
-        assertEquals(1234, config.getTrafficClass().intValue());
+        assertEquals(1234, config.getTrafficClass());
         verify(socket).getTrafficClass();
         verifyNoMoreInteractions(socket);
 

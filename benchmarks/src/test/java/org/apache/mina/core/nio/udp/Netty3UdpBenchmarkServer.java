@@ -17,17 +17,17 @@
  *  under the License.
  *
  */
-package org.apache.mina.core;
+package org.apache.mina.core.nio.udp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.mina.core.BenchmarkServer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -40,12 +40,12 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NettyBenchmarkServer implements BenchmarkServer {
+public class Netty3UdpBenchmarkServer implements BenchmarkServer {
 
     private static enum State {
         WAIT_FOR_FIRST_BYTE_LENGTH, WAIT_FOR_SECOND_BYTE_LENGTH, WAIT_FOR_THIRD_BYTE_LENGTH, WAIT_FOR_FOURTH_BYTE_LENGTH, READING
@@ -57,9 +57,9 @@ public class NettyBenchmarkServer implements BenchmarkServer {
         ACK.writeByte(0);
     }
 
-    private static final String STATE_ATTRIBUTE = NettyBenchmarkServer.class.getName() + ".state";
+    private static final String STATE_ATTRIBUTE = Netty3UdpBenchmarkServer.class.getName() + ".state";
 
-    private static final String LENGTH_ATTRIBUTE = NettyBenchmarkServer.class.getName() + ".length";
+    private static final String LENGTH_ATTRIBUTE = Netty3UdpBenchmarkServer.class.getName() + ".length";
 
     private ChannelFactory factory;
 
@@ -92,10 +92,8 @@ public class NettyBenchmarkServer implements BenchmarkServer {
      * {@inheritDoc}
      */
     public void start(int port) throws IOException {
-        factory = new NioServerSocketChannelFactory();
+        factory = new NioDatagramChannelFactory();
         ServerBootstrap bootstrap = new ServerBootstrap(factory);
-        bootstrap.setOption("receiveBufferSize", 128 * 1024);
-        bootstrap.setOption("tcpNoDelay", true);
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             public ChannelPipeline getPipeline() throws Exception {
                 return Channels.pipeline(new SimpleChannelUpstreamHandler() {

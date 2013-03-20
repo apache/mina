@@ -21,6 +21,7 @@ package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.channels.DatagramChannel;
 
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
@@ -34,11 +35,23 @@ import org.apache.mina.transport.udp.AbstractUdpClient;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NioUdpClient extends AbstractUdpClient {
+    /** the SelectorLoop for connecting the sessions */
+    // This is final, so that we know if it's not initialized
+    private final SelectorLoop connectSelectorLoop;
+
+    /**
+     * Create a new instance of NioUdpClient
+     */
+    public NioUdpClient() {
+        this(null);
+    }
+
     /**
      * Create a new instance of NioUdpClient
      */
     public NioUdpClient(IoHandlerExecutor ioHandlerExecutor) {
         super(ioHandlerExecutor);
+        connectSelectorLoop = new NioSelectorLoop("connect", 0);
     }
 
     @Override
@@ -49,7 +62,13 @@ public class NioUdpClient extends AbstractUdpClient {
 
     @Override
     public IoFuture<IoSession> connect(SocketAddress remoteAddress) throws IOException {
-        // TODO Auto-generated method stub
+        DatagramChannel ch = DatagramChannel.open();
+
+        if (remoteAddress != null) {
+            ch.socket().bind(remoteAddress);
+            ch.connect(remoteAddress);
+        }
+
         return null;
     }
 

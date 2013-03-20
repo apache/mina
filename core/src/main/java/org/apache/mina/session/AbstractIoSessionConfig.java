@@ -26,19 +26,31 @@ import org.apache.mina.api.IoSessionConfig;
 
 /**
  * Base class for session configuration.
- * Implement des session configuration properties commons to all the different transports.
+ * Implements session configuration properties commons to all the different transports.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoSessionConfig implements IoSessionConfig {
-
     //=====================
     // idle management
     //=====================    
-
+    /** The delay we wait for a read before we consider the session is staled */
     private long idleTimeRead = -1;
 
+    /** The delay we wait for a write before we consider the session is staled */
     private long idleTimeWrite = -1;
+
+    /** The SO_RCVBUF socket option. The default buffer size used for Read */
+    private Integer readBufferSize = null;
+
+    /** The SO_SNDBUF socket option. The default buffer size used for Write */
+    private Integer sendBufferSize = null;
+
+    /** The ToS value */
+    private TrafficClassEnum trafficClass = TrafficClassEnum.IPTOS_DEFAULT;
+
+    /** The SO_REUSEADDR socket option */
+    private Boolean reuseAddress = null;
 
     /**
      * {@inheritDoc}
@@ -72,4 +84,69 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
         }
     }
 
+    /**
+    * {@inheritDoc}
+    */
+    public Integer getReadBufferSize() {
+        return readBufferSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setReadBufferSize(int readBufferSize) {
+        if (readBufferSize <= 0) {
+            throw new IllegalArgumentException("readBufferSize: " + readBufferSize + " (expected: 1+)");
+        }
+        this.readBufferSize = readBufferSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Integer getSendBufferSize() {
+        return sendBufferSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setSendBufferSize(int sendBufferSize) {
+        this.sendBufferSize = sendBufferSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getTrafficClass() {
+        return trafficClass.getValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTrafficClass(TrafficClassEnum trafficClass) {
+        this.trafficClass = trafficClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTrafficClass(int trafficClass) {
+        this.trafficClass = TrafficClassEnum.valueOf(trafficClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Boolean isReuseAddress() {
+        return reuseAddress;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setReuseAddress(boolean reuseAddress) {
+        this.reuseAddress = reuseAddress;
+    }
 }

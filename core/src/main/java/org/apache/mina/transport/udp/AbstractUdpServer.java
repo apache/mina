@@ -31,11 +31,15 @@ import org.apache.mina.service.server.AbstractIoServer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractUdpServer extends AbstractIoServer {
+    /** the default session configuration */
+    private UdpSessionConfig config;
+
     /**
      * Create an new AbsractUdpServer instance
      */
     protected AbstractUdpServer(IoHandlerExecutor ioHandlerExecutor) {
         super(ioHandlerExecutor);
+        this.config = new DefaultUdpSessionConfig();
     }
 
     /**

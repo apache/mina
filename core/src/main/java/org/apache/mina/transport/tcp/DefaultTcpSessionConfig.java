@@ -34,45 +34,6 @@ public class DefaultTcpSessionConfig extends AbstractIoSessionConfig implements 
     private SSLContext sslContext;
 
     //=====================
-    // buffers
-    //=====================
-    private Integer receiveBufferSize = null;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getReceiveBufferSize() {
-        return receiveBufferSize;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setReceiveBufferSize(int receiveBufferSize) {
-        this.receiveBufferSize = receiveBufferSize;
-    }
-
-    private Integer sendBufferSize = null;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getSendBufferSize() {
-        return sendBufferSize;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSendBufferSize(int sendBufferSize) {
-        this.sendBufferSize = sendBufferSize;
-    }
-
-    //=====================
     // socket options
     //=====================
 
@@ -110,24 +71,6 @@ public class DefaultTcpSessionConfig extends AbstractIoSessionConfig implements 
     @Override
     public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
-    }
-
-    private Integer trafficClass;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Integer getTrafficClass() {
-        return trafficClass;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setTrafficClass(int trafficClass) {
-        this.trafficClass = trafficClass;
     }
 
     private Boolean keepAlive = null;

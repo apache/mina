@@ -19,6 +19,10 @@
  */
 package org.apache.mina.core;
 
+import org.apache.mina.core.nio.tcp.Mina3TcpBenchmarkClient;
+import org.apache.mina.core.nio.tcp.Netty3TcpBenchmarkClient;
+import org.apache.mina.core.nio.udp.Mina3UdpBenchmarkClient;
+
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -28,10 +32,12 @@ public class BenchmarkClientFactory implements BenchmarkFactory<BenchmarkClient>
 
     public BenchmarkClient get(Type type) {
         switch (type) {
-        case Mina:
-            return new Mina3BenchmarkClient();
-        case Netty:
-            return new NettyBenchmarkClient();
+        case Mina3_tcp:
+            return new Mina3TcpBenchmarkClient();
+        case Mina3_udp:
+            return new Mina3UdpBenchmarkClient();
+        case Netty3_tcp:
+            return new Netty3TcpBenchmarkClient();
         default:
             throw new IllegalArgumentException("Invalid type " + type);
         }

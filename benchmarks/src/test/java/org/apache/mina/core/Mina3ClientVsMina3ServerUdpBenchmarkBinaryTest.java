@@ -28,13 +28,13 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class MinaClientVsNettyServerBenchmarkBinaryTest extends BenchmarkBinaryTest {
+public class Mina3ClientVsMina3ServerUdpBenchmarkBinaryTest extends BenchmarkBinaryTest {
 
     /**
      * @param numberOfMessages
      * @param messageSize
      */
-    public MinaClientVsNettyServerBenchmarkBinaryTest(int numberOfMessages, int messageSize, int timeout) {
+    public Mina3ClientVsMina3ServerUdpBenchmarkBinaryTest(int numberOfMessages, int messageSize, int timeout) {
         super(numberOfMessages, messageSize, timeout);
     }
 
@@ -43,7 +43,7 @@ public class MinaClientVsNettyServerBenchmarkBinaryTest extends BenchmarkBinaryT
      */
     @Override
     public Type getClientType() {
-        return Type.Mina;
+        return Type.Mina3_udp;
     }
 
     /**
@@ -51,24 +51,15 @@ public class MinaClientVsNettyServerBenchmarkBinaryTest extends BenchmarkBinaryT
      */
     @Override
     public Type getServerType() {
-        return Type.Netty;
+        return Type.Mina3_udp;
     }
 
-    @Parameters()
+    @Parameters(name = "{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
-        Object[][] parameters = new Object[][] { 
-                { 1000000, 10, 2 * 60 }, 
-                { 1000000, 1 * 1024, 2 * 60 },
-                { 1000000, 10 * 1024, 2 * 60 }, 
-                { 1000000, 20 * 1024, 2 * 60 }, 
-                {  500000, 50 * 1024, 2 * 60 }, 
-                {  200000, 100 * 1024, 2 * 60 }, 
-                {  100000, 200 * 1024, 2 * 60 }, 
-                {   50000, 500 * 1024, 2 * 60 }, 
-                {   20000, 1024 * 1024, 2 * 60 }, 
-                {    2000, 10 * 1024* 1024, 2 * 60 }, 
-                {    500, 64 * 1024 * 1024, 2 * 60 }
-        }; 
+        Object[][] parameters = new Object[][] { { 1000000, 10, 2 * 60 }, { 1000000, 1 * 1024, 2 * 60 },
+                { 1000000, 10 * 1024, 2 * 60 }, { 1000000, 20 * 1024, 2 * 60 }, { 500000, 50 * 1024, 2 * 60 },
+                { 200000, 100 * 1024, 2 * 60 }, { 100000, 200 * 1024, 2 * 60 }, { 50000, 500 * 1024, 2 * 60 },
+                { 20000, 1024 * 1024, 2 * 60 }, { 2000, 10 * 1024 * 1024, 2 * 60 }, { 500, 64 * 1024 * 1024, 2 * 60 } };
         return Arrays.asList(parameters);
     }
 }

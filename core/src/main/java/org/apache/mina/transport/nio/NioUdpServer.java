@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.executor.IoHandlerExecutor;
+import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.udp.AbstractUdpServer;
@@ -62,6 +63,14 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
 
     // list of all the sessions by remote socket address
     private final Map<SocketAddress /* remote socket address */, NioUdpSession> sessions = new ConcurrentHashMap<SocketAddress, NioUdpSession>();
+
+    /**
+     * Create an UDP server with new selector pool of default size and a {@link IoHandlerExecutor} of default type (
+     * {@link OrderedHandlerExecutor})
+     */
+    public NioUdpServer() {
+        this(new NioSelectorLoop("accept", 0), null);
+    }
 
     /**
      * Create a new instance of NioUdpServer

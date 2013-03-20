@@ -19,12 +19,49 @@
  */
 package org.apache.mina.api;
 
+import java.net.DatagramSocket;
+import java.net.Socket;
+
+import org.apache.mina.session.TrafficClassEnum;
+
 /**
  * The configuration of {@link IoSession}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoSessionConfig {
+
+    /**
+     * Returns the size of the read buffer that I/O processor allocates
+     * per each read.  It's unusual to adjust this property because
+     * it's often adjusted automatically by the I/O processor.
+     * 
+     * @return The buffer size, or null if its not set
+     */
+    Integer getReadBufferSize();
+
+    /**
+     * Sets the size of the read buffer that I/O processor allocates
+     * per each read.  It's unusual to adjust this property because
+     * it's often adjusted automatically by the I/O processor.
+     * 
+     * @param readBufferSize The buffer size used to read data from the socket
+     */
+    void setReadBufferSize(int readBufferSize);
+
+    /**
+     * @see DatagramSocket#getSendBufferSize()
+     */
+    Integer getSendBufferSize();
+
+    /**
+     * Sets the size of the buffer that I/O processor allocates
+     * per each write.  It's unusual to adjust this property because
+     * it's often adjusted automatically by the I/O processor.
+     * 
+     * @param sendBufferSize The buffer size used to send data into the socket
+     */
+    void setSendBufferSize(int sendBufferSize);
 
     /**
      * Returns idle time for the specified type of idleness in milli-seconds.
@@ -41,4 +78,35 @@ public interface IoSessionConfig {
      * @param ildeTimeInMilli the timeout in milliseconds (<code>-1</code> for no idle detection on this status)
      */
     void setIdleTimeInMillis(IdleStatus status, long ildeTimeInMilli);
+
+    /**
+     * @see Socket#getTrafficClass()
+     * @return The ToS set for this session
+     */
+    int getTrafficClass();
+
+    /**
+     * Set the ToS flag for this session
+     * @see Socket#setTrafficClass(int)
+     * @param trafficClass The ToS to set
+     */
+    void setTrafficClass(TrafficClassEnum trafficClass);
+
+    /**
+     * Set the ToS flag for this session
+     * @see Socket#setTrafficClass(int)
+     * @param trafficClass The ToS to set
+     */
+    void setTrafficClass(int trafficClass);
+
+    /**
+     * @see Socket#getReuseAddress()
+     */
+    Boolean isReuseAddress();
+
+    /**
+     * @see Socket#setReuseAddress(boolean)
+     * return <code>null</code> if the default system value is used 
+     */
+    void setReuseAddress(boolean reuseAddress);
 }

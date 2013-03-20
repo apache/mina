@@ -41,50 +41,6 @@ public interface TcpSessionConfig extends IoSessionConfig {
     void setTcpNoDelay(boolean tcpNoDelay);
 
     /**
-     * @see Socket#getReuseAddress()
-     * return <code>null</code> if the default system value is used 
-     */
-    Boolean isReuseAddress();
-
-    /**
-     * @see Socket#setReuseAddress(boolean)
-     */
-    void setReuseAddress(boolean reuseAddress);
-
-    /**
-     * @see Socket#getReceiveBufferSize() 
-     * return <code>null</code> if the default system value is used
-     */
-    Integer getReceiveBufferSize();
-
-    /**
-     * @see Socket#setReceiveBufferSize(int)
-     */
-    void setReceiveBufferSize(int receiveBufferSize);
-
-    /**
-     * @see Socket#getSendBufferSize() 
-     * return <code>null</code> if the default system value is used
-     */
-    Integer getSendBufferSize();
-
-    /**
-     * @see Socket#setSendBufferSize(int)
-     */
-    void setSendBufferSize(int sendBufferSize);
-
-    /**
-     * @see Socket#getTrafficClass()
-     * return <code>null</code> if the default system value is used
-     */
-    Integer getTrafficClass();
-
-    /**
-     * @see Socket#setTrafficClass(int) 
-     */
-    void setTrafficClass(int trafficClass);
-
-    /**
      * @see Socket#getKeepAlive() 
      * return <code>null</code> if the default system value is used
      */

@@ -27,8 +27,8 @@ import java.nio.channels.SocketChannel;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.executor.IoHandlerExecutor;
+import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.tcp.AbstractTcpClient;
@@ -153,10 +153,10 @@ public class NioTcpClient extends AbstractTcpClient {
             session.getConfig().setTcpNoDelay(tcpNoDelay);
         }
 
-        Integer receiveBufferSize = config.getReceiveBufferSize();
+        Integer receiveBufferSize = config.getReadBufferSize();
 
         if (receiveBufferSize != null) {
-            session.getConfig().setReceiveBufferSize(receiveBufferSize);
+            session.getConfig().setReadBufferSize(receiveBufferSize);
         }
 
         Integer sendBufferSize = config.getSendBufferSize();

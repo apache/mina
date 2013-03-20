@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.core;
+package org.apache.mina.core.nio.tcp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -27,13 +27,14 @@ import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.core.BenchmarkServer;
 import org.apache.mina.session.AttributeKey;
 import org.apache.mina.transport.nio.NioTcpServer;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class Mina3BenchmarkServer implements BenchmarkServer {
+public class Mina3TcpBenchmarkServer implements BenchmarkServer {
 
     private static enum State {
         WAIT_FOR_FIRST_BYTE_LENGTH, WAIT_FOR_SECOND_BYTE_LENGTH, WAIT_FOR_THIRD_BYTE_LENGTH, WAIT_FOR_FOURTH_BYTE_LENGTH, READING
@@ -47,10 +48,10 @@ public class Mina3BenchmarkServer implements BenchmarkServer {
     }
 
     private static final AttributeKey<State> STATE_ATTRIBUTE = new AttributeKey<State>(State.class,
-            Mina3BenchmarkServer.class.getName() + ".state");
+            Mina3TcpBenchmarkServer.class.getName() + ".state");
 
     private static final AttributeKey<Integer> LENGTH_ATTRIBUTE = new AttributeKey<Integer>(Integer.class,
-            Mina3BenchmarkServer.class.getName() + ".length");
+            Mina3TcpBenchmarkServer.class.getName() + ".length");
 
     private NioTcpServer tcpServer;
 
@@ -59,7 +60,7 @@ public class Mina3BenchmarkServer implements BenchmarkServer {
      */
     public void start(int port) throws IOException {
         tcpServer = new NioTcpServer();
-        tcpServer.getSessionConfig().setReceiveBufferSize(128 * 1024);
+        tcpServer.getSessionConfig().setReadBufferSize(128 * 1024);
         tcpServer.getSessionConfig().setTcpNoDelay(true);
         tcpServer.setIoHandler(new IoHandler() {
             public void sessionOpened(IoSession session) {

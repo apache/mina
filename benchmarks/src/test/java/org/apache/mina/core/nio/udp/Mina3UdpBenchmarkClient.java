@@ -17,34 +17,35 @@
  *  under the License.
  *
  */
-package org.apache.mina.core;
+package org.apache.mina.core.nio.udp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.mina.api.IdleStatus;
+import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.transport.nio.NioTcpClient;
+import org.apache.mina.core.BenchmarkClient;
+import org.apache.mina.transport.nio.NioUdpClient;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class Mina3BenchmarkClient implements BenchmarkClient {
-    // The TCP client
-    private NioTcpClient client;
+public class Mina3UdpBenchmarkClient implements BenchmarkClient {
+    // The UDP client
+    private NioUdpClient udpClient;
 
     /**
      * {@inheritDoc}
      */
     public void start(int port, final CountDownLatch counter, final byte[] data) throws IOException {
-        client = new NioTcpClient();
-        client.getSessionConfig().setSendBufferSize(64 * 1024);
-        client.getSessionConfig().setTcpNoDelay(true);
-        client.setIoHandler(new IoHandler() {
+        udpClient = new NioUdpClient();
+        udpClient.setIoHandler(new IoHandler() {
             private void sendMessage(IoSession session, byte[] data) {
                 ByteBuffer iobuf = ByteBuffer.wrap(data);
                 session.write(iobuf);
@@ -99,13 +100,22 @@ public class Mina3BenchmarkClient implements BenchmarkClient {
             }
         });
 
-        client.connect(new InetSocketAddress(port));
+        IoFuture<IoSession> future = udpClient.connect(new InetSocketAddress(port));
+
+        try {
+            IoSession session = future.get();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
      * {@inheritedDoc}
      */
     public void stop() throws IOException {
-        client.disconnect();
     }
 }

@@ -17,12 +17,13 @@
  *  under the License.
  *
  */
-package org.apache.mina.core;
+package org.apache.mina.core.nio.tcp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.mina.core.BenchmarkClient;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -39,14 +40,14 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NettyBenchmarkClient implements BenchmarkClient {
+public class Netty3TcpBenchmarkClient implements BenchmarkClient {
 
     private ChannelFactory factory;
 
     /**
      * 
      */
-    public NettyBenchmarkClient() {
+    public Netty3TcpBenchmarkClient() {
     }
 
     /**
