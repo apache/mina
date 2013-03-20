@@ -18,8 +18,6 @@
  */
 package org.apache.mina.transport.udp;
 
-import java.net.DatagramSocket;
-
 import org.apache.mina.session.AbstractIoSessionConfig;
 
 /**
@@ -33,33 +31,24 @@ public class DefaultUdpSessionConfig extends AbstractIoSessionConfig implements 
     // The Broadcast flag and field 
     private static boolean DEFAULT_BROADCAST = false;
 
+    /** The SO_BROADCAST socket option. It tells whether the socket is allowed
+     * to send packets to and from a brodcast address (like 192.168.1.255) */
     private boolean broadcast = DEFAULT_BROADCAST;
 
+    //=====================
+    // socket options
+    //=====================
     /**
-     * @see DatagramSocket#getBroadcast()
+     * {@inheritDoc}
      */
     public boolean isBroadcast() {
         return broadcast;
     }
 
-    //=====================
-    // socket options
-    //=====================
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void setBroadcast(boolean broadcast) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean isCloseOnPortUnreachable() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void setCloseOnPortUnreachable(boolean closeOnPortUnreachable) {
-        // TODO Auto-generated method stub
-
+        this.broadcast = broadcast;
     }
 }

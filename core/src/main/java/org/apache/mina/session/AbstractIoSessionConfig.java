@@ -52,6 +52,9 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /** The SO_REUSEADDR socket option */
     private Boolean reuseAddress = null;
 
+    /** The SO_TIMEOUT socket option */
+    private Integer timeout = null;
+
     /**
      * {@inheritDoc}
      */
@@ -148,5 +151,19 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
      */
     public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 }

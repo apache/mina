@@ -106,7 +106,25 @@ public interface IoSessionConfig {
 
     /**
      * @see Socket#setReuseAddress(boolean)
+     * @see DatagramSocket#setReuseAddress(boolean)
      * return <code>null</code> if the default system value is used 
      */
     void setReuseAddress(boolean reuseAddress);
+
+    /**
+     * Get the SO_TIMEOUT set for this socket
+     * @see Socket#getSoTimeout()
+     * @see DatagramSocket#getSoTimeout()
+     * 
+     * @return The Timeout, in milliseconds. 0 means infinite.
+     */
+    Integer getTimeout();
+
+    /**
+     * Sets the SO_TIMEOUT option for this socket
+     * @see Socket#setSoTimeout(int)
+     * @see DatagramSocket#setSoTimeout(int)
+     * @param timeOut The timeout to set, in milliseconds. 0 means infinite
+     */
+    void setTimeout(int timeOut);
 }

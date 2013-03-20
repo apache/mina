@@ -309,4 +309,26 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
     @Override
     public void setSslContext(SSLContext sslContext) {
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Integer getTimeout() {
+        try {
+            return socket.getSoTimeout();
+        } catch (SocketException e) {
+            throw new ConfigurationException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTimeout(int timeout) {
+        try {
+            socket.setSoTimeout(timeout);
+        } catch (SocketException e) {
+            throw new ConfigurationException(e);
+        }
+    }
 }
