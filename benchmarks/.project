@@ -7,6 +7,7 @@
     transports such as TCP/IP and UDP/IP via Java NIO. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects>
     <project>mina-core</project>
+    <project>mina-codec</project>
   </projects>
   <buildSpec>
     <buildCommand>
