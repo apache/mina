@@ -31,14 +31,27 @@ import org.apache.mina.service.server.AbstractIoServer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractUdpServer extends AbstractIoServer {
-    /** the default session configuration */
-    private UdpSessionConfig config;
+    /**
+     * Create an new AbsractUdpServer instance
+     * 
+     * @param eventExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O one).
+     *        Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
+     */
+    protected AbstractUdpServer(IoHandlerExecutor ioHandlerExecutor) {
+        super(new DefaultUdpSessionConfig(), ioHandlerExecutor);
+    }
 
     /**
      * Create an new AbsractUdpServer instance
+     * 
+     * @param sessionConfig The configuration to use for this server
+     * @param eventExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O one).
+     *        Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
      */
-    protected AbstractUdpServer(IoHandlerExecutor ioHandlerExecutor) {
-        super(ioHandlerExecutor);
+    protected AbstractUdpServer(UdpSessionConfig config, IoHandlerExecutor ioHandlerExecutor) {
+        super(config, ioHandlerExecutor);
         this.config = new DefaultUdpSessionConfig();
     }
 
@@ -47,5 +60,19 @@ public abstract class AbstractUdpServer extends AbstractIoServer {
      */
     public void initSecured(IoSession session) throws SSLException {
         throw new RuntimeException("SSL is not supported for UDP");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UdpSessionConfig getSessionConfig() {
+        return (UdpSessionConfig) config;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setSessionConfig(UdpSessionConfig config) {
+        this.config = config;
     }
 }

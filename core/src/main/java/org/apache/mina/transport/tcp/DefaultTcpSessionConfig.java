@@ -36,8 +36,17 @@ public class DefaultTcpSessionConfig extends AbstractIoSessionConfig implements 
     //=====================
     // socket options
     //=====================
-
+    /** The TCP_NODELAY socket option */
     private Boolean tcpNoDelay = null;
+
+    /** The OOBINLINE socket option */
+    private Boolean oobInline = null;
+
+    /** The SO_KEEPALIVE socket option */
+    private Boolean keepAlive = null;
+
+    /** The SO_LINGER socket option */
+    private Integer soLinger;
 
     /**
      * {@inheritDoc}
@@ -55,26 +64,6 @@ public class DefaultTcpSessionConfig extends AbstractIoSessionConfig implements 
         this.tcpNoDelay = tcpNoDelay;
     }
 
-    private Boolean reuseAddress = null;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Boolean isReuseAddress() {
-        return reuseAddress;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setReuseAddress(boolean reuseAddress) {
-        this.reuseAddress = reuseAddress;
-    }
-
-    private Boolean keepAlive = null;
-
     /**
      * {@inheritDoc}
      */
@@ -90,8 +79,6 @@ public class DefaultTcpSessionConfig extends AbstractIoSessionConfig implements 
     public void setKeepAlive(boolean keepAlive) {
         this.keepAlive = keepAlive;
     }
-
-    private Boolean oobInline = null;
 
     /**
      * {@inheritDoc}
@@ -109,8 +96,6 @@ public class DefaultTcpSessionConfig extends AbstractIoSessionConfig implements 
         this.oobInline = oobInline;
 
     }
-
-    private Integer soLinger;
 
     /**
      * {@inheritDoc}

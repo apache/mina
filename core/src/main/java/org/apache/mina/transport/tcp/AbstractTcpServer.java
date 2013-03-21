@@ -28,8 +28,6 @@ import org.apache.mina.service.server.AbstractIoServer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractTcpServer extends AbstractIoServer {
-    /** the default session configuration */
-    private TcpSessionConfig config;
 
     /**
      * Create an new AbsractTcpServer instance
@@ -38,9 +36,20 @@ public abstract class AbstractTcpServer extends AbstractIoServer {
      *        Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
      *        operations.
      */
-    protected AbstractTcpServer(final IoHandlerExecutor eventExecutor) {
-        super(eventExecutor);
-        this.config = new DefaultTcpSessionConfig();
+    protected AbstractTcpServer(IoHandlerExecutor eventExecutor) {
+        super(new DefaultTcpSessionConfig(), eventExecutor);
+    }
+
+    /**
+     * Create an new AbsractTcpServer instance, with a specific configuration
+     * 
+     * @param sessionConfig The configuration to use for this server
+     * @param eventExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O one).
+     *        Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
+     */
+    protected AbstractTcpServer(TcpSessionConfig config, IoHandlerExecutor eventExecutor) {
+        super(config, eventExecutor);
     }
 
     /**
@@ -48,7 +57,7 @@ public abstract class AbstractTcpServer extends AbstractIoServer {
      */
     @Override
     public TcpSessionConfig getSessionConfig() {
-        return this.config;
+        return (TcpSessionConfig) config;
     }
 
     /**
@@ -56,7 +65,7 @@ public abstract class AbstractTcpServer extends AbstractIoServer {
      * 
      * @param config
      */
-    public void setSessionConfig(final TcpSessionConfig config) {
+    public void setSessionConfig(TcpSessionConfig config) {
         this.config = config;
     }
 }

@@ -72,6 +72,17 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
     }
 
     /**
+     * Create a TCP server with new selector pool of default size and a {@link IoHandlerExecutor} of default type (
+     * {@link OrderedHandlerExecutor})
+     * 
+     * @param config The specific configuration to use
+     */
+    public NioTcpServer(TcpSessionConfig config) {
+        this(config, new NioSelectorLoop("accept", 0), new FixedSelectorLoopPool("Server", Runtime.getRuntime()
+                .availableProcessors() + 1), null);
+    }
+
+    /**
      * Create a TCP server with provided selector loops pool. We will use one SelectorLoop get from the pool to manage
      * the OP_ACCEPT events. If the pool contains only one SelectorLoop, then all the events will be managed by the same
      * Selector.
@@ -82,9 +93,22 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      *        operations.
      */
     public NioTcpServer(SelectorLoopPool selectorLoopPool, IoHandlerExecutor handlerExecutor) {
-        super(handlerExecutor);
-        this.acceptSelectorLoop = selectorLoopPool.getSelectorLoop();
-        this.readWriteSelectorPool = selectorLoopPool;
+        this(selectorLoopPool.getSelectorLoop(), selectorLoopPool, handlerExecutor);
+    }
+
+    /**
+     * Create a TCP server with provided selector loops pool. We will use one SelectorLoop get from the pool to manage
+     * the OP_ACCEPT events. If the pool contains only one SelectorLoop, then all the events will be managed by the same
+     * Selector.
+     * 
+     * @param config The specific configuration to use
+     * @param selectorLoopPool the selector loop pool for handling all I/O events (accept, read, write)
+     * @param ioHandlerExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O
+     *        one). Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
+     */
+    public NioTcpServer(TcpSessionConfig config, SelectorLoopPool selectorLoopPool, IoHandlerExecutor handlerExecutor) {
+        this(config, selectorLoopPool.getSelectorLoop(), selectorLoopPool, handlerExecutor);
     }
 
     /**
@@ -99,6 +123,23 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
     public NioTcpServer(SelectorLoop acceptSelectorLoop, SelectorLoopPool readWriteSelectorLoop,
             IoHandlerExecutor handlerExecutor) {
         super(handlerExecutor);
+        this.acceptSelectorLoop = acceptSelectorLoop;
+        this.readWriteSelectorPool = readWriteSelectorLoop;
+    }
+
+    /**
+     * Create a TCP server with provided selector loops pool
+     * 
+     * @param config The specific configuration to use
+     * @param acceptSelectorLoop the selector loop for handling accept events (connection of new session)
+     * @param readWriteSelectorLoop the pool of selector loop for handling read/write events of connected sessions
+     * @param ioHandlerExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O
+     *        one). Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
+     */
+    public NioTcpServer(TcpSessionConfig config, SelectorLoop acceptSelectorLoop,
+            SelectorLoopPool readWriteSelectorLoop, IoHandlerExecutor handlerExecutor) {
+        super(config, handlerExecutor);
         this.acceptSelectorLoop = acceptSelectorLoop;
         this.readWriteSelectorPool = readWriteSelectorLoop;
     }

@@ -28,12 +28,12 @@ import java.nio.channels.SelectionKey;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.udp.AbstractUdpServer;
+import org.apache.mina.transport.udp.UdpSessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     private SocketAddress address = null;
 
     // the processor used for read and write this server
-    private final NioSelectorLoop selectorLoop;
+    //private final NioSelectorLoop selectorLoop;
 
     // used for detecting idle sessions
     private final IdleChecker idleChecker = new IndexedIdleChecker();
@@ -64,20 +64,92 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     // list of all the sessions by remote socket address
     private final Map<SocketAddress /* remote socket address */, NioUdpSession> sessions = new ConcurrentHashMap<SocketAddress, NioUdpSession>();
 
+    /** The selector loop used to accept incoming connection */
+    private final SelectorLoop acceptSelectorLoop;
+
+    /** The read/write selectorPool */
+    private final SelectorLoopPool readWriteSelectorPool;
+
     /**
-     * Create an UDP server with new selector pool of default size and a {@link IoHandlerExecutor} of default type (
+     * Create an UDP server with a new selector pool of default size and a {@link IoHandlerExecutor} of default type (
      * {@link OrderedHandlerExecutor})
      */
     public NioUdpServer() {
-        this(new NioSelectorLoop("accept", 0), null);
+        this(new NioSelectorLoop("accept", 0), new FixedSelectorLoopPool("Server", Runtime.getRuntime()
+                .availableProcessors() + 1), null);
     }
 
     /**
-     * Create a new instance of NioUdpServer
+     * Create an UDP server with a new selector pool of default size and a {@link IoHandlerExecutor} of default type (
+     * {@link OrderedHandlerExecutor})
+     * 
+     * @param sessionConfig The configuration to use for this server
      */
-    public NioUdpServer(NioSelectorLoop selectorLoop, IoHandlerExecutor ioHandlerExecutor) {
-        super(ioHandlerExecutor);
-        this.selectorLoop = selectorLoop;
+    public NioUdpServer(UdpSessionConfig config) {
+        this(config, new NioSelectorLoop("accept", 0), new FixedSelectorLoopPool("Server", Runtime.getRuntime()
+                .availableProcessors() + 1), null);
+    }
+
+    /**
+     * Create a UDP server with provided selector loops pool. We will use one SelectorLoop get from the pool to manage
+     * the OP_ACCEPT events. If the pool contains only one SelectorLoop, then all the events will be managed by the same
+     * Selector.
+     * 
+     * @param selectorLoopPool the selector loop pool for handling all I/O events (accept, read, write)
+     * @param ioHandlerExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O
+     *        one). Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
+     */
+    public NioUdpServer(SelectorLoopPool selectorLoopPool, IoHandlerExecutor handlerExecutor) {
+        this(selectorLoopPool.getSelectorLoop(), selectorLoopPool, handlerExecutor);
+    }
+
+    /**
+     * Create a UDP server with provided selector loops pool. We will use one SelectorLoop get from the pool to manage
+     * the OP_ACCEPT events. If the pool contains only one SelectorLoop, then all the events will be managed by the same
+     * Selector.
+     * 
+     * @param sessionConfig The configuration to use for this server
+     * @param selectorLoopPool the selector loop pool for handling all I/O events (accept, read, write)
+     * @param ioHandlerExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O
+     *        one). Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
+     */
+    public NioUdpServer(UdpSessionConfig config, SelectorLoopPool selectorLoopPool, IoHandlerExecutor handlerExecutor) {
+        this(config, selectorLoopPool.getSelectorLoop(), selectorLoopPool, handlerExecutor);
+    }
+
+    /**
+     * Create an UDP server with provided selector loops pool
+     * 
+     * @param acceptSelectorLoop the selector loop for handling accept events (connection of new session)
+     * @param readWriteSelectorLoop the pool of selector loop for handling read/write events of connected sessions
+     * @param ioHandlerExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O
+     *        one). Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
+     */
+    public NioUdpServer(SelectorLoop acceptSelectorLoop, SelectorLoopPool readWriteSelectorLoop,
+            IoHandlerExecutor handlerExecutor) {
+        super(handlerExecutor);
+        this.acceptSelectorLoop = acceptSelectorLoop;
+        this.readWriteSelectorPool = readWriteSelectorLoop;
+    }
+
+    /**
+     * Create an UDP server with provided selector loops pool
+     * 
+     * @param sessionConfig The configuration to use for this server
+     * @param acceptSelectorLoop the selector loop for handling accept events (connection of new session)
+     * @param readWriteSelectorLoop the pool of selector loop for handling read/write events of connected sessions
+     * @param ioHandlerExecutor used for executing IoHandler event in another pool of thread (not in the low level I/O
+     *        one). Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
+     *        operations.
+     */
+    public NioUdpServer(UdpSessionConfig config, SelectorLoop acceptSelectorLoop,
+            SelectorLoopPool readWriteSelectorLoop, IoHandlerExecutor handlerExecutor) {
+        super(config, handlerExecutor);
+        this.acceptSelectorLoop = acceptSelectorLoop;
+        this.readWriteSelectorPool = readWriteSelectorLoop;
     }
 
     /**
@@ -87,15 +159,6 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
      */
     public DatagramChannel getDatagramChannel() {
         return datagramChannel;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IoSessionConfig getSessionConfig() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /**
@@ -138,7 +201,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
         datagramChannel.socket().bind(address);
         datagramChannel.configureBlocking(false);
 
-        selectorLoop.register(false, false, true, false, this, datagramChannel, null);
+        acceptSelectorLoop.register(false, false, true, false, this, datagramChannel, null);
 
         // it's the first address bound, let's fire the event
         this.fireServiceActivated();
@@ -154,7 +217,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
             throw new IllegalStateException("server not bound");
         }
 
-        selectorLoop.unregister(this, datagramChannel);
+        acceptSelectorLoop.unregister(this, datagramChannel);
         datagramChannel.socket().close();
         datagramChannel.close();
 
@@ -195,6 +258,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
                 // let's find the corresponding session
 
                 NioUdpSession session = sessions.get(source);
+
                 if (session == null) {
                     session = new NioUdpSession(this, idleChecker, address, source);
                 }

@@ -20,6 +20,7 @@
 package org.apache.mina.service.server;
 
 import org.apache.mina.api.IoServer;
+import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.AbstractIoService;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 
@@ -29,6 +30,9 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoServer extends AbstractIoService implements IoServer {
+    /** the default session configuration */
+    protected IoSessionConfig config;
+
     /**
      * Create an new AbstractIoServer instance
      * 
@@ -36,8 +40,9 @@ public abstract class AbstractIoServer extends AbstractIoService implements IoSe
      *        Use <code>null</code> if you don't want one. Be careful, the IoHandler processing will block the I/O
      *        operations.
      */
-    protected AbstractIoServer(final IoHandlerExecutor eventExecutor) {
+    protected AbstractIoServer(IoSessionConfig config, IoHandlerExecutor eventExecutor) {
         super(eventExecutor);
+        this.config = config;
     }
 
     // does the reuse address flag should be positioned
@@ -48,7 +53,7 @@ public abstract class AbstractIoServer extends AbstractIoService implements IoSe
      * 
      * @param reuseAddress <code>true</code> to enable
      */
-    public void setReuseAddress(final boolean reuseAddress) {
+    public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
     }
 
@@ -61,4 +66,20 @@ public abstract class AbstractIoServer extends AbstractIoService implements IoSe
         return this.reuseAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoSessionConfig getSessionConfig() {
+        return config;
+    }
+
+    /**
+     * Set the default configuration for created TCP sessions
+     * 
+     * @param config
+     */
+    public void setSessionConfig(IoSessionConfig config) {
+        this.config = config;
+    }
 }
