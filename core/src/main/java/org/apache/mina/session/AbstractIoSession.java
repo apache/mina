@@ -38,6 +38,7 @@ import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.service.executor.CloseEvent;
@@ -78,6 +79,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
     /** the {@link IdleChecker} in charge of detecting idle event for this session */
     protected final IdleChecker idleChecker;
+
+    /** The session config */
+    protected IoSessionConfig config;
 
     // ------------------------------------------------------------------------
     // Basic statistics
@@ -151,6 +155,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         this.service = service;
         this.chain = service.getFilters();
         this.idleChecker = idleChecker;
+        this.config = service.getSessionConfig();
 
         LOG.debug("Created new session with id : {}", id);
 
