@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.mina.core.BenchmarkServer;
-import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelFactory;
@@ -93,7 +93,7 @@ public class Netty3UdpBenchmarkServer implements BenchmarkServer {
      */
     public void start(int port) throws IOException {
         factory = new NioDatagramChannelFactory();
-        ServerBootstrap bootstrap = new ServerBootstrap(factory);
+        ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(factory);
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             public ChannelPipeline getPipeline() throws Exception {
                 return Channels.pipeline(new SimpleChannelUpstreamHandler() {

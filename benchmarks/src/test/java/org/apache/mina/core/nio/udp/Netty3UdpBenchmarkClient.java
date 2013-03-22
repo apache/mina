@@ -24,7 +24,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.mina.core.BenchmarkClient;
-import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelFactory;
@@ -55,7 +55,7 @@ public class Netty3UdpBenchmarkClient implements BenchmarkClient {
      */
     public void start(final int port, final CountDownLatch counter, final byte[] data) throws IOException {
         factory = new NioDatagramChannelFactory();
-        ClientBootstrap bootstrap = new ClientBootstrap(factory);
+        ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(factory);
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             public ChannelPipeline getPipeline() throws Exception {
                 return Channels.pipeline(new SimpleChannelUpstreamHandler() {
