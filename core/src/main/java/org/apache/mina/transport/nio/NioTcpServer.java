@@ -260,11 +260,11 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         }
     }
 
-    private void createSession(final SocketChannel clientSocket) throws IOException {
+    private void createSession(SocketChannel clientSocket) throws IOException {
         LOG.debug("create session");
-        final SocketChannel socketChannel = clientSocket;
-        final TcpSessionConfig config = getSessionConfig();
-        final SelectorLoop readWriteSelectorLoop = readWriteSelectorPool.getSelectorLoop();
+        SocketChannel socketChannel = clientSocket;
+        TcpSessionConfig config = getSessionConfig();
+        SelectorLoop readWriteSelectorLoop = readWriteSelectorPool.getSelectorLoop();
         final NioTcpSession session = new NioTcpSession(this, socketChannel, readWriteSelectorLoop, idleChecker);
 
         socketChannel.configureBlocking(false);
@@ -275,49 +275,49 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
                 config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
 
         // apply the default service socket configuration
-        final Boolean keepAlive = config.isKeepAlive();
+        Boolean keepAlive = config.isKeepAlive();
 
         if (keepAlive != null) {
             session.getConfig().setKeepAlive(keepAlive);
         }
 
-        final Boolean oobInline = config.isOobInline();
+        Boolean oobInline = config.isOobInline();
 
         if (oobInline != null) {
             session.getConfig().setOobInline(oobInline);
         }
 
-        final Boolean reuseAddress = config.isReuseAddress();
+        Boolean reuseAddress = config.isReuseAddress();
 
         if (reuseAddress != null) {
             session.getConfig().setReuseAddress(reuseAddress);
         }
 
-        final Boolean tcpNoDelay = config.isTcpNoDelay();
+        Boolean tcpNoDelay = config.isTcpNoDelay();
 
         if (tcpNoDelay != null) {
             session.getConfig().setTcpNoDelay(tcpNoDelay);
         }
 
-        final Integer receiveBufferSize = config.getReadBufferSize();
+        Integer receiveBufferSize = config.getReadBufferSize();
 
         if (receiveBufferSize != null) {
             session.getConfig().setReadBufferSize(receiveBufferSize);
         }
 
-        final Integer sendBufferSize = config.getSendBufferSize();
+        Integer sendBufferSize = config.getSendBufferSize();
 
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
         }
 
-        final Integer trafficClass = config.getTrafficClass();
+        Integer trafficClass = config.getTrafficClass();
 
         if (trafficClass != null) {
             session.getConfig().setTrafficClass(trafficClass);
         }
 
-        final Integer soLinger = config.getSoLinger();
+        Integer soLinger = config.getSoLinger();
 
         if (soLinger != null) {
             session.getConfig().setSoLinger(soLinger);
