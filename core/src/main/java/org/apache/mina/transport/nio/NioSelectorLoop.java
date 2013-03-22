@@ -133,8 +133,8 @@ public class NioSelectorLoop implements SelectorLoop {
      * {@inheritDoc}
      */
     @Override
-    public void modifyRegistration(final boolean accept, final boolean read, final boolean write,
-            final SelectorListener listener, final SelectableChannel channel, boolean wakeup) {
+    public void modifyRegistration(boolean accept, boolean read, boolean write, final SelectorListener listener,
+            SelectableChannel channel, boolean wakeup) {
         logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}, channel : {}", new Object[] {
                 listener, accept, read, write, channel });
 
