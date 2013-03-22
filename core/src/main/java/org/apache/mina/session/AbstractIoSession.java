@@ -20,6 +20,7 @@
 package org.apache.mina.session;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectableChannel;
 import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
@@ -61,6 +62,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractIoSession implements IoSession, ReadFilterChainController, WriteFilterChainController {
     /** The logger for this class */
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIoSession.class);
+
+    /** the NIO channel for this session */
+    protected final SelectableChannel channel;
 
     /** unique identifier generator */
     private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
@@ -148,7 +152,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @param service the service this session is associated with
      * @param selectorLoop the selector loop in charge of processing this session read/write events
      */
-    public AbstractIoSession(final IoService service, final IdleChecker idleChecker) {
+    public AbstractIoSession(final IoService service, SelectableChannel channel, final IdleChecker idleChecker) {
         // generated a unique id
         id = NEXT_ID.getAndIncrement();
         creationTime = System.currentTimeMillis();
@@ -156,6 +160,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         this.chain = service.getFilters();
         this.idleChecker = idleChecker;
         this.config = service.getSessionConfig();
+        this.channel = channel;
 
         LOG.debug("Created new session with id : {}", id);
 
@@ -713,6 +718,35 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * process session open event using the filter chain. To be called by the session {@link SelectorLoop} .
      */
     public void processSessionOpen() {
+        LOG.debug("processing session open event");
+
+        try {
+
+            for (final IoFilter filter : chain) {
+                filter.sessionOpened(this);
+            }
+
+            final IoHandler handler = getService().getIoHandler();
+
+            if (handler != null) {
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+                if (executor != null) {
+                    // asynchronous event
+                    executor.execute(new OpenEvent(this));
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.sessionOpened(this);
+                }
+            }
+        } catch (final RuntimeException e) {
+            processException(e);
+        }
+    }
+
+    /**
+     * process session open event using the filter chain. To be called by the session {@link SelectorLoop} .
+     */
+    public void processSessionCreated() {
         LOG.debug("processing session open event");
 
         try {

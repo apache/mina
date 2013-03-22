@@ -19,15 +19,18 @@
 
 package org.apache.mina.transport.nio;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
 
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
-import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.WriteRequest;
+import org.apache.mina.transport.udp.UdpSessionConfig;
 import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +40,16 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioUdpSession extends AbstractIoSession {
+public class NioUdpSession extends AbstractIoSession implements SelectorListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioUdpSession.class);
 
     private final SocketAddress localAddress;
 
     private final SocketAddress remoteAddress;
+
+    /** the socket configuration */
+    private final UdpSessionConfig configuration;
 
     /** we pre-allocate a close future for lock-less {@link #close(boolean)} */
     private final IoFuture<Void> closeFuture = new AbstractIoFuture<Void>() {
@@ -63,11 +69,13 @@ public class NioUdpSession extends AbstractIoSession {
      * @param writeProcessor
      * @param idleChecker
      */
-    public NioUdpSession(IoService service, IdleChecker idleChecker, SocketAddress localAddress,
-            SocketAddress remoteAddress) {
-        super(service, idleChecker);
+    /* No qualifier*/NioUdpSession(IoService service, IdleChecker idleChecker, DatagramChannel datagramChannel,
+            SocketAddress localAddress, SocketAddress remoteAddress) {
+        super(service, datagramChannel, idleChecker);
         this.localAddress = localAddress;
         this.remoteAddress = remoteAddress;
+        this.config = service.getSessionConfig();
+        this.configuration = (UdpSessionConfig) this.config;
     }
 
     /**
@@ -187,8 +195,8 @@ public class NioUdpSession extends AbstractIoSession {
      * {@inheritDoc}
      */
     @Override
-    public IoSessionConfig getConfig() {
-        return null;
+    public UdpSessionConfig getConfig() {
+        return configuration;
     }
 
     /**
@@ -206,7 +214,20 @@ public class NioUdpSession extends AbstractIoSession {
      */
     @Override
     protected int writeDirect(Object message) {
-        return 0;
+        try {
+            // Check that we can write into the channel
+            if (!isRegisteredForWrite()) {
+                // We don't have pending writes
+                return ((DatagramChannel) channel).write((ByteBuffer) message);
+            } else {
+                return -1;
+            }
+        } catch (final IOException e) {
+            LOG.error("Exception while reading : ", e);
+            processException(e);
+
+            return -1;
+        }
     }
 
     /**
@@ -215,5 +236,31 @@ public class NioUdpSession extends AbstractIoSession {
     @Override
     protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew) {
         return (ByteBuffer) writeRequest.getMessage();
+    }
+
+    void setSelectionKey(SelectionKey key) {
+        //this.selectionKey = key;
+    }
+
+    /**
+     * Set this session status as connected. To be called by the processor selecting/polling this session.
+     */
+    void setConnected() {
+        if (!isCreated()) {
+            throw new RuntimeException("Trying to open a non created session");
+        }
+
+        state = SessionState.CONNECTED;
+
+        /*if (connectFuture != null) {
+            connectFuture.complete(this);
+            connectFuture = null; // free some memory
+        }*/
+
+        processSessionOpen();
+    }
+
+    @Override
+    public void ready(boolean accept, boolean connect, boolean read, ByteBuffer readBuffer, boolean write) {
     }
 }

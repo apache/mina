@@ -52,9 +52,6 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpSession.class);
 
-    /** the NIO socket channel for this TCP session */
-    private final SocketChannel channel;
-
     /** the selector loop in charge of generating read/write events for this session */
     private final SelectorLoop selectorLoop;
 
@@ -73,10 +70,9 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
     /** The size of the buffer configured in the socket to send data */
     private int sendBufferSize;
 
-    NioTcpSession(final IoService service, final SocketChannel channel, final SelectorLoop selectorLoop,
-            final IdleChecker idleChecker) {
-        super(service, idleChecker);
-        this.channel = channel;
+    /* No qualifier*/NioTcpSession(final IoService service, final SocketChannel channel,
+            final SelectorLoop selectorLoop, final IdleChecker idleChecker) {
+        super(service, channel, idleChecker);
         this.selectorLoop = selectorLoop;
         this.configuration = new ProxyTcpSessionConfig(channel.socket());
         sendBufferSize = configuration.getSendBufferSize();
@@ -93,7 +89,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
      * @return the socket channel used by this session
      */
     SocketChannel getSocketChannel() {
-        return channel;
+        return (SocketChannel) channel;
     }
 
     /**
@@ -104,7 +100,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
         if (channel == null) {
             return null;
         }
-        final Socket socket = channel.socket();
+        final Socket socket = ((SocketChannel) channel).socket();
 
         if (socket == null) {
             return null;
@@ -122,7 +118,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
             return null;
         }
 
-        final Socket socket = channel.socket();
+        final Socket socket = ((SocketChannel) channel).socket();
 
         if (socket == null) {
             return null;
@@ -158,7 +154,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
             // Check that we can write into the channel
             if (!isRegisteredForWrite()) {
                 // We don't have pending writes
-                return channel.write((ByteBuffer) message);
+                return ((SocketChannel) channel).write((ByteBuffer) message);
             } else {
                 return -1;
             }
@@ -298,7 +294,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
             readBuffer.clear();
 
             // Read everything we can up to the buffer size
-            final int readCount = channel.read(readBuffer);
+            final int readCount = ((SocketChannel) channel).read(readBuffer);
 
             LOG.debug("read {} bytes", readCount);
 
@@ -366,7 +362,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
 
                 // Try to write the data, and get back the number of bytes
                 // actually written
-                final int written = channel.write(buf);
+                final int written = ((SocketChannel) channel).write(buf);
                 LOG.debug("wrote {} bytes to {}", written, this);
 
                 if (written > 0) {
@@ -446,7 +442,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
         if (connect) {
             try {
 
-                boolean isConnected = channel.finishConnect();
+                boolean isConnected = ((SocketChannel) channel).finishConnect();
 
                 if (!isConnected) {
                     LOG.error("unable to connect session {}", this);
