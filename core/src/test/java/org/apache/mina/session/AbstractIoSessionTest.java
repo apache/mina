@@ -53,7 +53,7 @@ public class AbstractIoSessionTest {
 
     private class DummySession extends AbstractIoSession {
         private DummySession(final IoService service) {
-            super(service, null);
+            super(service, null, null);
         }
 
         @Override

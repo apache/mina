@@ -93,7 +93,7 @@ public class IndexedIdleChekerTest {
         int writeIdleCount = 0;
 
         private DummySession(IoService service, IdleChecker checker) {
-            super(service, checker);
+            super(service, null, checker);
         }
 
         @Override
