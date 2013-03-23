@@ -28,26 +28,24 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class Mina3ClientVsMina3ServerUdpBenchmarkBinaryTest extends BenchmarkBinaryTest {
+public class Netty3ClientVsMina3ServerUdpBenchmarkBinaryTest extends BenchmarkBinaryTest {
 
     /**
      * @param numberOfMessages
      * @param messageSize
      */
-    public Mina3ClientVsMina3ServerUdpBenchmarkBinaryTest(int numberOfMessages, int messageSize, int timeout) {
+    public Netty3ClientVsMina3ServerUdpBenchmarkBinaryTest(int numberOfMessages, int messageSize, int timeout) {
         super(numberOfMessages, messageSize, timeout);
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      */
     @Override
     public Type getClientType() {
-        return Type.Mina3_udp;
+        return Type.Netty3_udp;
     }
 
-    /**
-     * {@inheritDoc}
+    /** {@inheritDoc}
      */
     @Override
     public Type getServerType() {
@@ -56,8 +54,8 @@ public class Mina3ClientVsMina3ServerUdpBenchmarkBinaryTest extends BenchmarkBin
 
     @Parameters(name = "{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
-        Object[][] parameters = new Object[][] { 
-                { 1000000, 10, 2 * 60 }, 
+        Object[][] parameters = new Object[][] {
+                { 1000000, 10, 2 * 60 } , 
                 { 1000000, 1 * 1024, 2 * 60 },
                 { 1000000, 10 * 1024, 2 * 60 }, 
                 { 1000000, 20 * 1024, 2 * 60 }, 
