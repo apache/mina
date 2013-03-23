@@ -207,6 +207,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     @Override
     public void ready(final boolean accept, boolean connect, final boolean read, final ByteBuffer readBuffer,
             final boolean write) {
+        // Process the reads first
         if (read) {
             try {
                 LOG.debug("readable datagram for UDP service : {}", this);
@@ -222,8 +223,6 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
                     NioUdpSession session = sessions.get(source);
 
                     if (session == null) {
-                        //session = new NioUdpSession(this, idleChecker, address, source);
-
                         session = createSession(source, datagramChannel);
                     }
 
@@ -233,6 +232,8 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
                 LOG.error("IOException while reading the socket", ex);
             }
         }
+
+        // Now, process the writes
         if (write) {
             // TODO : flush session
         }
@@ -242,8 +243,9 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
             throws IOException {
         LOG.debug("create session");
         UdpSessionConfig config = getSessionConfig();
-        final NioUdpSession session = new NioUdpSession(this, idleChecker, datagramChannel,
-                datagramChannel.getLocalAddress(), remoteAddress);
+        SocketAddress localAddress = new InetSocketAddress(datagramChannel.socket().getLocalAddress(), datagramChannel
+                .socket().getLocalPort());
+        final NioUdpSession session = new NioUdpSession(this, idleChecker, datagramChannel, localAddress, remoteAddress);
 
         // apply idle configuration
         session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));

@@ -218,8 +218,16 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
             // Check that we can write into the channel
             if (!isRegisteredForWrite()) {
                 // We don't have pending writes
+                // First, connect if we aren't already connected
+                if (!((DatagramChannel) channel).isConnected()) {
+                    ((DatagramChannel) channel).connect(remoteAddress);
+                }
+
+                // And try to write the data. We will either write them all,
+                // or none
                 return ((DatagramChannel) channel).write((ByteBuffer) message);
             } else {
+                System.out.println("Cannot write");
                 return -1;
             }
         } catch (final IOException e) {
@@ -235,7 +243,20 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
      */
     @Override
     protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew) {
-        return (ByteBuffer) writeRequest.getMessage();
+        ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
+
+        if (!message.isDirect()) {
+            int remaining = message.remaining();
+
+            ByteBuffer directBuffer = ByteBuffer.allocateDirect(remaining);
+            directBuffer.put(message);
+            directBuffer.flip();
+            writeRequest.setMessage(directBuffer);
+
+            return directBuffer;
+        }
+
+        return message;
     }
 
     void setSelectionKey(SelectionKey key) {
