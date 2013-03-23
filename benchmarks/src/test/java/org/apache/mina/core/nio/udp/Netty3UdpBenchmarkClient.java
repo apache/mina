@@ -56,6 +56,7 @@ public class Netty3UdpBenchmarkClient implements BenchmarkClient {
     public void start(final int port, final CountDownLatch counter, final byte[] data) throws IOException {
         factory = new NioDatagramChannelFactory();
         ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(factory);
+        bootstrap.setOption("sendBufferSize", 65536);
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             public ChannelPipeline getPipeline() throws Exception {
                 return Channels.pipeline(new SimpleChannelUpstreamHandler() {

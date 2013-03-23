@@ -52,23 +52,17 @@ public class Mina3TcpBenchmarkClient implements BenchmarkClient {
             }
 
             public void sessionOpened(IoSession session) {
-                //System.out.println("Client session opened");
                 sendMessage(session, data);
             }
 
             public void messageReceived(IoSession session, Object message) {
-                //System.out.println("Client message received : " + message);
                 if (message instanceof ByteBuffer) {
                     ByteBuffer buffer = (ByteBuffer) message;
-                    //System.out.println("length=" + buffer.remaining());
                     for (int i = 0; i < buffer.remaining(); ++i) {
                         counter.countDown();
                         long count = counter.getCount();
                         if (count > 0) {
                             sendMessage(session, data);
-                            if (count % 100000 == 0) {
-                                System.out.println("Received " + count);
-                            }
                         }
                     }
                 }
@@ -88,7 +82,6 @@ public class Mina3TcpBenchmarkClient implements BenchmarkClient {
 
             @Override
             public void messageSent(IoSession session, Object message) {
-                //System.out.println("Client message sent : " + message);
             }
 
             @Override

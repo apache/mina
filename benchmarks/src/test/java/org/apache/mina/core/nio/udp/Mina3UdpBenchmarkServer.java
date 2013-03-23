@@ -30,6 +30,8 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
 import org.apache.mina.session.AttributeKey;
 import org.apache.mina.transport.nio.NioUdpServer;
+import org.apache.mina.transport.udp.DefaultUdpSessionConfig;
+import org.apache.mina.transport.udp.UdpSessionConfig;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -59,14 +61,11 @@ public class Mina3UdpBenchmarkServer implements BenchmarkServer {
      * {@inheritDoc}
      */
     public void start(int port) throws IOException {
-        udpServer = new NioUdpServer();
+        UdpSessionConfig config = new DefaultUdpSessionConfig();
+        config.setReadBufferSize(65536);
+        udpServer = new NioUdpServer(config);
         udpServer.setIoHandler(new IoHandler() {
-            public void sessionCreated(IoSession session) {
-                System.out.println("Session created...");
-            }
-
             public void sessionOpened(IoSession session) {
-                //System.out.println("Server session opened");
                 session.setAttribute(STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
             }
 
