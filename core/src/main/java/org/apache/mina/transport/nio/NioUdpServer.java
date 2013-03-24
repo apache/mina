@@ -50,9 +50,6 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     // the bound local address
     private SocketAddress address = null;
 
-    // the processor used for read and write this server
-    //private final NioSelectorLoop selectorLoop;
-
     // used for detecting idle sessions
     private final IdleChecker idleChecker = new IndexedIdleChecker();
 
@@ -208,34 +205,39 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
     public void ready(final boolean accept, boolean connect, final boolean read, final ByteBuffer readBuffer,
             final boolean write) {
         // Process the reads first
-        if (read) {
-            try {
-                LOG.debug("readable datagram for UDP service : {}", this);
-                readBuffer.clear();
+        try {
+            final SocketAddress source = datagramChannel.receive(readBuffer);
+            NioUdpSession session = null;
 
-                final SocketAddress source = datagramChannel.receive(readBuffer);
-                readBuffer.flip();
+            // let's find the corresponding session
+            if (source != null) {
+                session = sessions.get(source);
 
-                LOG.debug("read {} bytes form {}", readBuffer.remaining(), source);
+                if (session == null) {
+                    session = createSession(source, datagramChannel);
+                }
+                if (read) {
+                    LOG.debug("readable datagram for UDP service : {}", this);
+                    readBuffer.clear();
 
-                // let's find the corresponding session
-                if (source != null) {
-                    NioUdpSession session = sessions.get(source);
+                    readBuffer.flip();
 
-                    if (session == null) {
-                        session = createSession(source, datagramChannel);
-                    }
+                    LOG.debug("read {} bytes form {}", readBuffer.remaining(), source);
 
                     session.receivedDatagram(readBuffer);
-                }
-            } catch (final IOException ex) {
-                LOG.error("IOException while reading the socket", ex);
-            }
-        }
 
-        // Now, process the writes
-        if (write) {
-            // TODO : flush session
+                }
+
+                // Now, process the writes
+                if (write) {
+                    session.processWrite(readSelectorLoop);
+                }
+            } else {
+                LOG.debug("Do data to read");
+            }
+
+        } catch (final IOException ex) {
+            LOG.error("IOException while reading the socket", ex);
         }
     }
 
