@@ -19,8 +19,10 @@
  */
 package org.apache.mina.session;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
@@ -49,6 +51,7 @@ import org.apache.mina.service.executor.OpenEvent;
 import org.apache.mina.service.executor.ReceiveEvent;
 import org.apache.mina.service.executor.SentEvent;
 import org.apache.mina.service.idlechecker.IdleChecker;
+import org.apache.mina.transport.nio.SelectorListener;
 import org.apache.mina.transport.nio.SelectorLoop;
 import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
@@ -996,4 +999,103 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         readChainPosition--;
     }
 
+    /**
+     * Process a write operation. This will be executed only because the session has something to write into the
+     * channel.
+     */
+    public void processWrite(SelectorLoop selectorLoop) {
+        try {
+            LOG.debug("ready for write");
+            LOG.debug("writable session : {}", this);
+
+            Queue<WriteRequest> writeQueue = getWriteQueue();
+
+            do {
+                // get a write request from the queue. We left it in the queue,
+                // just in case we can't write all of the message content into
+                // the channel : we will have to retrieve the message later
+                final WriteRequest writeRequest = writeQueue.peek();
+
+                if (writeRequest == null) {
+                    // Nothing to write : we are done
+                    break;
+                }
+
+                // The message is necessarily a ByteBuffer at this point
+                final ByteBuffer buf = (ByteBuffer) writeRequest.getMessage();
+
+                // Note that if the connection is secured, the buffer
+                // already contains encrypted data.
+
+                // Try to write the data, and get back the number of bytes
+                // actually written
+                final int written = ((SocketChannel) channel).write(buf);
+                LOG.debug("wrote {} bytes to {}", written, this);
+
+                if (written > 0) {
+                    incrementWrittenBytes(written);
+                }
+
+                // Update the idle status for this session
+                idleChecker.sessionWritten(this, System.currentTimeMillis());
+
+                // Ok, we may not have written everything. Check that.
+                if (buf.remaining() == 0) {
+                    // completed write request, let's remove it (we use poll() instead
+                    // of remove(), because remove() may throw an exception if the
+                    // queue is empty.
+                    writeQueue.poll();
+
+                    // complete the future if we have one (we should...)
+                    final DefaultWriteFuture future = (DefaultWriteFuture) writeRequest.getFuture();
+
+                    if (future != null) {
+                        future.complete();
+                    }
+
+                    // generate the message sent event
+                    final Object highLevel = ((DefaultWriteRequest) writeRequest).getOriginalMessage();
+
+                    if (highLevel != null) {
+                        processMessageSent(highLevel);
+                    }
+                } else {
+                    // output socket buffer is full, we need
+                    // to give up until next selection for
+                    // writing.
+                    break;
+                }
+            } while (!writeQueue.isEmpty());
+
+            // We may have exited from the loop for some other reason
+            // that an empty queue
+            // if the session is no more interested in writing, we need
+            // to stop listening for OP_WRITE events
+            //
+            // IMPORTANT : this section is synchronized so that the OP_WRITE flag
+            // can be set safely by both the selector thread and the writer thread.
+            synchronized (writeQueue) {
+                if (writeQueue.isEmpty()) {
+                    if (isClosing()) {
+                        LOG.debug("closing session {} have empty write queue, so we close it", this);
+                        // we was flushing writes, now we to the close
+                        channelClose();
+                    } else {
+                        // no more write event needed
+                        selectorLoop.modifyRegistration(false, !isReadSuspended(), false, (SelectorListener) this,
+                                channel, false);
+
+                        // Reset the flag in IoSession too
+                        setNotRegisteredForWrite();
+                    }
+                } else {
+                    // We have some more data to write : the channel OP_WRITE interest remains
+                    // as it was.
+                }
+            }
+        } catch (final IOException e) {
+            LOG.error("Exception while writing : ", e);
+            processException(e);
+        }
+    }
 }

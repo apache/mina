@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.nio;
+package org.apache.mina.transport.nio.udp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -33,6 +33,9 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
+import org.apache.mina.transport.nio.NioSelectorLoop;
+import org.apache.mina.transport.nio.SelectorListener;
+import org.apache.mina.transport.nio.SelectorLoop;
 import org.apache.mina.transport.udp.AbstractUdpServer;
 import org.apache.mina.transport.udp.UdpSessionConfig;
 import org.slf4j.Logger;
