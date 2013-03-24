@@ -29,7 +29,7 @@ import java.net.SocketAddress;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public interface IoServer extends IoService {
+public interface IoServer {
     /**
      * Returns the local addresses which are bound currently.
      */

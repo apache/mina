@@ -27,7 +27,7 @@ import java.net.SocketAddress;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface IoClient extends IoService {
+public interface IoClient {
 
     /**
      * Connects to the specified remote address.
@@ -38,5 +38,4 @@ public interface IoClient extends IoService {
      * @throws IOException
      */
     IoFuture<IoSession> connect(SocketAddress remoteAddress) throws IOException;
-
 }
