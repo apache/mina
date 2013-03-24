@@ -39,7 +39,7 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.ldap.LdapCodec;
-import org.apache.mina.transport.nio.NioTcpServer;
+import org.apache.mina.transport.nio.tcp.NioTcpServer;
 
 /**
  * A simple LDAP server class used to test theLDAP encoder/decoder. It only deal with the BindRequest message.
