@@ -29,7 +29,7 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
 import org.apache.mina.session.AttributeKey;
-import org.apache.mina.transport.nio.NioTcpServer;
+import org.apache.mina.transport.nio.tcp.NioTcpServer;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>

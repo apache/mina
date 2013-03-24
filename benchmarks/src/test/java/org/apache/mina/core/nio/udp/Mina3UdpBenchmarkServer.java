@@ -29,7 +29,7 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
 import org.apache.mina.session.AttributeKey;
-import org.apache.mina.transport.nio.NioUdpServer;
+import org.apache.mina.transport.nio.udp.NioUdpServer;
 import org.apache.mina.transport.udp.DefaultUdpSessionConfig;
 import org.apache.mina.transport.udp.UdpSessionConfig;
 
