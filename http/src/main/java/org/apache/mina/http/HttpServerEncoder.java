@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import org.apache.mina.codec.ProtocolEncoder;
+import org.apache.mina.codec.StatelessProtocolEncoder;
 import org.apache.mina.http.api.HttpContentChunk;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpPdu;
@@ -36,13 +36,22 @@ import org.apache.mina.http.api.HttpResponse;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class HttpServerEncoder implements ProtocolEncoder<HttpPdu, ByteBuffer> {
+public class HttpServerEncoder implements StatelessProtocolEncoder<HttpPdu, ByteBuffer> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ByteBuffer encode(HttpPdu message) {
+    public Void createEncoderState() {
+        // steless, so it's not used
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ByteBuffer encode(HttpPdu message, Void context) {
         return message.encode(visitor);
     }
 

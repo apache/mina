@@ -17,39 +17,19 @@
  *  under the License.
  *
  */
+
 package org.apache.mina.codec;
 
 import java.nio.ByteBuffer;
 
 /**
- * In charge of encoding a message of type MESSAGE into another form (could be a {@link ByteBuffer} or any other
- * protocol level construction.
- * 
- * Must be immutable, a CONTEXT will be provided per session.
+ * A state less {@link ProtocolEncoder} : no context stored for the different sessions.
  * 
  * @param <INPUT> the incoming message to encode (your high level protocol Pojo/DTO)
  * @param <OUTPUT> the encoded message (the low level message, usually a {@link ByteBuffer})
- * @param <ENCODING_STATE> the context where to save the current encoding state (e.g. encoding context switching..)
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
-public interface ProtocolEncoder<INPUT /* message type */, OUTPUT, ENCODING_STATE> {
-
-    /**
-     * Create a new session context for this decoder
-     * 
-     * @return the newly created context
-     */
-    ENCODING_STATE createEncoderState();
-
-    /**
-     * Encodes higher-level message objects of type <code>INPUT</code> into binary or protocol-specific data of type
-     * <code>OUTPUT</code>.
-     * 
-     * @param message the message to encode
-     * @param context the encoding context (will be stored in the session for the next decode call)
-     */
-    OUTPUT encode(INPUT message, ENCODING_STATE context);
+public interface StatelessProtocolEncoder<INPUT, OUTPUT> extends ProtocolEncoder<INPUT, OUTPUT, Void> {
 
 }

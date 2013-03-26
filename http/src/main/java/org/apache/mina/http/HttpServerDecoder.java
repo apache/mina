@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
+public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu, HttpDecoderState> {
     private static final Logger LOG = LoggerFactory.getLogger(HttpServerDecoder.class);
 
     /** Regex to parse HttpRequest Request Line */
@@ -67,26 +67,29 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
     /** Regex to split cookie header following RFC6265 Section 5.4 */
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
 
-    /** State of the decoder */
-    private DecoderState state = DecoderState.NEW;
-
-    /** The previously received buffer, not totally decoded */
-    private ByteBuffer partial;
-
-    /** Number of bytes remaining to read for completing the body */
-    private int remainingBytes;
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public HttpPdu[] decode(ByteBuffer msg) throws ProtocolDecoderException {
+    public HttpDecoderState createDecoderState() {
+        return new HttpDecoderState();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HttpPdu[] decode(ByteBuffer msg, HttpDecoderState context) throws ProtocolDecoderException {
         LOG.debug("decode : {}", msg);
         if (msg.remaining() <= 0) {
             return null;
         }
-        switch (state) {
+        switch (context.getState()) {
         case HEAD:
             LOG.debug("decoding HEAD");
             // concat the old buffer and the new incoming one
-            msg = ByteBuffer.allocate(partial.remaining() + msg.remaining()).put(partial).put(msg);
+            msg = ByteBuffer.allocate(context.getPartial().remaining() + msg.remaining()).put(context.getPartial())
+                    .put(msg);
             msg.flip();
             // now let's decode like it was a new message
 
@@ -96,9 +99,9 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
 
             if (rq == null) {
                 // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
-                partial = ByteBuffer.allocate(msg.remaining());
-                partial.put(msg);
-                partial.flip();
+                context.setPartial(ByteBuffer.allocate(msg.remaining()));
+                context.getPartial().put(msg);
+                context.getPartial().flip();
             } else {
                 return new HttpPdu[] { rq };
             }
@@ -109,18 +112,18 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
             // send the chunk of body
             HttpContentChunk chunk = new HttpContentChunk(msg);
             // do we have reach end of body ?
-            remainingBytes -= chunkSize;
+            context.setRemainingBytes(context.getRemainingBytes() - chunkSize);
 
-            if (remainingBytes <= 0) {
+            if (context.getRemainingBytes() <= 0) {
                 LOG.debug("end of HTTP body");
-                state = DecoderState.NEW;
-                remainingBytes = 0;
+                context.setState(DecoderState.NEW);
+                context.setRemainingBytes(0);
                 return new HttpPdu[] { chunk, new HttpEndOfContent() };
             }
             break;
 
         default:
-            throw new RuntimeException("Unknonwn decoder state : " + state);
+            throw new RuntimeException("Unknonwn decoder state : " + context.getState());
         }
 
         return null;
@@ -158,8 +161,11 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu> {
         return new HttpRequestImpl(version, method, requestedPath, generalHeaders);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void finishDecode() {
+    public void finishDecode(HttpDecoderState context) {
 
     }
 }

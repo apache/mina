@@ -19,8 +19,7 @@
  */
 package org.apache.mina.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -35,44 +34,49 @@ import org.junit.Test;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class HttpServerDecoderTest {
-    
+
     @Test
-    public void verifyThatHeaderWithoutLeadingSpaceIsSupported() throws UnsupportedEncodingException, ProtocolDecoderException {
+    public void verifyThatHeaderWithoutLeadingSpaceIsSupported() throws UnsupportedEncodingException,
+            ProtocolDecoderException {
         String reqStr = "GET / HTTP/1.0\r\nHost:localhost\r\n\r\n";
         ByteBuffer buffer = ByteBuffer.allocate(reqStr.length());
         buffer.put(reqStr.getBytes("US-ASCII"));
         buffer.rewind();
         HttpServerDecoder decoder = new HttpServerDecoder();
-        HttpPdu[] pdus = decoder.decode(buffer);
+        HttpDecoderState state = decoder.createDecoderState();
+        HttpPdu[] pdus = decoder.decode(buffer, state);
         assertNotNull(pdus);
         assertEquals(1, pdus.length);
-        assertEquals("localhost", ((HttpRequestImpl)pdus[0]).getHeader("host"));
+        assertEquals("localhost", ((HttpRequestImpl) pdus[0]).getHeader("host"));
     }
 
     @Test
-    public void verifyThatLeadingSpacesAreRemovedFromHeader() throws UnsupportedEncodingException, ProtocolDecoderException {
+    public void verifyThatLeadingSpacesAreRemovedFromHeader() throws UnsupportedEncodingException,
+            ProtocolDecoderException {
         String reqStr = "GET / HTTP/1.0\r\nHost:  localhost\r\n\r\n";
         ByteBuffer buffer = ByteBuffer.allocate(reqStr.length());
         buffer.put(reqStr.getBytes("US-ASCII"));
         buffer.rewind();
         HttpServerDecoder decoder = new HttpServerDecoder();
-        HttpPdu[] pdus = decoder.decode(buffer);
+        HttpDecoderState state = decoder.createDecoderState();
+        HttpPdu[] pdus = decoder.decode(buffer, state);
         assertNotNull(pdus);
         assertEquals(1, pdus.length);
-        assertEquals("localhost", ((HttpRequestImpl)pdus[0]).getHeader("host"));
+        assertEquals("localhost", ((HttpRequestImpl) pdus[0]).getHeader("host"));
     }
 
-
     @Test
-    public void verifyThatTrailingSpacesAreRemovedFromHeader() throws UnsupportedEncodingException, ProtocolDecoderException {
+    public void verifyThatTrailingSpacesAreRemovedFromHeader() throws UnsupportedEncodingException,
+            ProtocolDecoderException {
         String reqStr = "GET / HTTP/1.0\r\nHost:localhost  \r\n\r\n";
         ByteBuffer buffer = ByteBuffer.allocate(reqStr.length());
         buffer.put(reqStr.getBytes("US-ASCII"));
         buffer.rewind();
         HttpServerDecoder decoder = new HttpServerDecoder();
-        HttpPdu[] pdus = decoder.decode(buffer);
+        HttpDecoderState state = decoder.createDecoderState();
+        HttpPdu[] pdus = decoder.decode(buffer, state);
         assertNotNull(pdus);
         assertEquals(1, pdus.length);
-        assertEquals("localhost", ((HttpRequestImpl)pdus[0]).getHeader("host"));
+        assertEquals("localhost", ((HttpRequestImpl) pdus[0]).getHeader("host"));
     }
 }

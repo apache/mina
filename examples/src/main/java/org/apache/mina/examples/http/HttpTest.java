@@ -32,6 +32,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.http.DateUtil;
+import org.apache.mina.http.HttpDecoderState;
 import org.apache.mina.http.HttpServerDecoder;
 import org.apache.mina.http.HttpServerEncoder;
 import org.apache.mina.http.api.DefaultHttpResponse;
@@ -50,8 +51,9 @@ public class HttpTest {
 
         NioTcpServer httpServer = new NioTcpServer();
         httpServer.setReuseAddress(true);
-        httpServer.setFilters(new LoggingFilter("INCOMING"), new ProtocolCodecFilter<HttpPdu, ByteBuffer>(
-                HttpServerEncoder.class, HttpServerDecoder.class), new LoggingFilter("DECODED"), new DummyHttpSever());
+        httpServer.setFilters(new LoggingFilter("INCOMING"),
+                new ProtocolCodecFilter<HttpPdu, ByteBuffer, Void, HttpDecoderState>(new HttpServerEncoder(),
+                        new HttpServerDecoder()), new LoggingFilter("DECODED"), new DummyHttpSever());
 
         httpServer.getSessionConfig().setTcpNoDelay(true);
 

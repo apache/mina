@@ -39,112 +39,32 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
+public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STATE> extends AbstractIoFilter {
     /** A logger for this class */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolCodecFilter.class);
 
-    private static final Class<?>[] EMPTY_PARAMS = new Class[0];
+    /** the immutable encoder */
+    private final ProtocolEncoder<MESSAGE, ENCODED, ENCODING_STATE> encoder;
+
+    /** the immutable decoder */
+    private final ProtocolDecoder<ENCODED, MESSAGE, DECODING_STATE> decoder;
 
     /** key for session attribute holding the encoder */
-    @SuppressWarnings("rawtypes")
-    private final AttributeKey<ProtocolEncoder> ENCODER = new AttributeKey<ProtocolEncoder>(ProtocolEncoder.class,
-            "internal_encoder");
+    private final AttributeKey<Object> ENCODER = new AttributeKey<Object>(Object.class, "internal_encoder");
 
     /** key for session attribute holding the decoder */
-    @SuppressWarnings("rawtypes")
-    private final AttributeKey<ProtocolDecoder> DECODER = new AttributeKey<ProtocolDecoder>(ProtocolDecoder.class,
-            "internal_decoder");
-
-    /** The factory responsible for creating the encoder and decoder */
-    private final ProtocolCodecFactory<MESSAGE, ENCODED> factory;
+    private final AttributeKey<Object> DECODER = new AttributeKey<Object>(Object.class, "internal_decoder");
 
     /**
+     * Creates a new instance of ProtocolCodecFilter, with the specified encoder and decoder.
      * 
-     * Creates a new instance of ProtocolCodecFilter, associating a factory for the creation of the encoder and decoder.
-     * 
-     * @param factory The associated factory
      */
-    public ProtocolCodecFilter(ProtocolCodecFactory<MESSAGE, ENCODED> factory) {
-        if (factory == null) {
-            throw new IllegalArgumentException("factory");
-        }
-
-        this.factory = factory;
-    }
-
-    /**
-     * Creates a new instance of ProtocolCodecFilter, without any factory. The encoder/decoder factory will be created
-     * as an anonymous class, using the two parameters (encoder and decoder), which are class names. Instances for those
-     * classes will be created in this constructor.
-     * 
-     * @param encoderClass The class responsible for encoding the message
-     * @param decoderClass The class responsible for decoding the message
-     */
-    public ProtocolCodecFilter(Class<? extends ProtocolEncoder<MESSAGE, ENCODED>> encoderClass,
-            Class<? extends ProtocolDecoder<ENCODED, MESSAGE>> decoderClass) {
-        Assert.assertNotNull(encoderClass, "Encoder Class");
-        Assert.assertNotNull(decoderClass, "Decoder Class");
-
-        try {
-            encoderClass.getConstructor(EMPTY_PARAMS);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException("encoderClass doesn't have a public default constructor.");
-        }
-
-        try {
-            decoderClass.getConstructor(EMPTY_PARAMS);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException("decoderClass doesn't have a public default constructor.");
-        }
-
-        final ProtocolEncoder<MESSAGE, ENCODED> encoder;
-
-        try {
-            encoder = encoderClass.newInstance();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("encoderClass cannot be initialized");
-        }
-
-        final ProtocolDecoder<ENCODED, MESSAGE> decoder;
-
-        try {
-            decoder = decoderClass.newInstance();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("decoderClass cannot be initialized");
-        }
-
-        // Create the inner factory based on the two parameters.
-        this.factory = new ProtocolCodecFactory<MESSAGE, ENCODED>() {
-            @Override
-            public ProtocolEncoder<MESSAGE, ENCODED> getEncoder(IoSession session) {
-                return encoder;
-            }
-
-            @Override
-            public ProtocolDecoder<ENCODED, MESSAGE> getDecoder(IoSession session) {
-                return decoder;
-            }
-        };
-    }
-
-    /**
-     * Get the encoder instance from a given session.
-     * 
-     * @param session The associated session we will get the encoder from
-     * @return The encoder instance, if any
-     */
-    public ProtocolEncoder<MESSAGE, ENCODED> getEncoder(IoSession session) {
-        return factory.getEncoder(session);
-    }
-
-    /**
-     * Get the decoder instance from a given session.
-     * 
-     * @param session The associated session we will get the decoder from
-     * @return The decoder instance, if any
-     */
-    public ProtocolDecoder<ENCODED, MESSAGE> getDecoder(IoSession session) {
-        return factory.getDecoder(session);
+    public ProtocolCodecFilter(ProtocolEncoder<MESSAGE, ENCODED, ENCODING_STATE> encoder,
+            ProtocolDecoder<ENCODED, MESSAGE, DECODING_STATE> decoder) {
+        Assert.assertNotNull(encoder, "encoder");
+        Assert.assertNotNull(decoder, "decoder");
+        this.encoder = encoder;
+        this.decoder = decoder;
     }
 
     /**
@@ -162,12 +82,12 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
     public void messageReceived(IoSession session, Object in, ReadFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session);
 
-        ProtocolDecoder<ENCODED, MESSAGE> decoder = getDecoder(session);
+        DECODING_STATE state = getDecodingState(session);
 
-        // Loop until the codec cannot decode more
+        // Loop until the decoder cannot decode more
         MESSAGE[] msg;
         try {
-            while ((msg = decoder.decode((ENCODED) in)) != null) {
+            while ((msg = decoder.decode((ENCODED) in, state)) != null) {
                 for (MESSAGE m : msg) {
                     controller.callReadNextFilter(m);
                 }
@@ -185,8 +105,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
     public void messageWriting(IoSession session, WriteRequest message, WriteFilterChainController controller) {
         LOGGER.debug("Processing a MESSAGE_WRITTING for session {}", session);
 
-        ProtocolEncoder<MESSAGE, ENCODED> encoder = getEncoder(session);
-        ENCODED encoded = encoder.encode((MESSAGE) message.getMessage());
+        ENCODED encoded = encoder.encode((MESSAGE) message.getMessage(), getEncodingState(session));
         message.setMessage(encoded);
 
         controller.callWriteNextFilter(message);
@@ -197,13 +116,13 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      */
     @Override
     public void sessionOpened(IoSession session) {
-        // Initialize the encoder and decoder if we use a factory
-        if (factory != null) {
-            ProtocolEncoder<MESSAGE, ENCODED> encoder = factory.getEncoder(session);
-            session.setAttribute(ENCODER, encoder);
-            ProtocolDecoder<ENCODED, MESSAGE> decoder = factory.getDecoder(session);
-            session.setAttribute(DECODER, decoder);
-        }
+        // Initialize the encoder and decoder state
+
+        ENCODING_STATE encodingState = encoder.createEncoderState();
+        session.setAttribute(ENCODER, encodingState);
+
+        DECODING_STATE decodingState = decoder.createDecoderState();
+        session.setAttribute(DECODER, decodingState);
     }
 
     /**
@@ -211,39 +130,20 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED> extends AbstractIoFilter {
      */
     @Override
     public void sessionClosed(IoSession session) {
-        disposeCodec(session);
+        decoder.finishDecode(getDecodingState(session));
+
     }
 
     // ----------- Helper methods ---------------------------------------------
-    /**
-     * Dispose the encoder, decoder, and the callback for the decoded messages.
-     */
-    private void disposeCodec(IoSession session) {
-        // We just remove the two instances of encoder/decoder to release resources
-        // from the session
-        disposeEncoder(session);
-        disposeDecoder(session);
+
+    @SuppressWarnings("unchecked")
+    private DECODING_STATE getDecodingState(IoSession session) {
+        return (DECODING_STATE) session.getAttribute(DECODER);
     }
 
-    /**
-     * Dispose the encoder, removing its instance from the session's attributes, and calling the associated dispose
-     * method.
-     */
-    private void disposeEncoder(IoSession session) {
-        session.removeAttribute(ENCODER);
+    @SuppressWarnings("unchecked")
+    private ENCODING_STATE getEncodingState(IoSession session) {
+        return (ENCODING_STATE) session.getAttribute(ENCODER);
     }
 
-    /**
-     * Dispose the decoder, removing its instance from the session's attributes, and calling the associated dispose
-     * method.
-     */
-    private void disposeDecoder(IoSession session) {
-        @SuppressWarnings("unchecked")
-        ProtocolDecoder<ENCODED, MESSAGE> decoder = session.removeAttribute(DECODER);
-        try {
-            decoder.finishDecode();
-        } catch (Throwable t) {
-            LOGGER.warn("Failed to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
-        }
-    }
 }

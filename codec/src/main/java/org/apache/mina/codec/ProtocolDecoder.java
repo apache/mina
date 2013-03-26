@@ -19,29 +19,44 @@
  */
 package org.apache.mina.codec;
 
+import java.nio.ByteBuffer;
+
 /**
  * Decodes binary or protocol-specific data into higher-level message objects.
  * 
- * Should be state-full, and have one instance per new session.
+ * Must be immutable, a CONTEXT will be provided per session.
+ * 
+ * @param <INPUT> the incoming message to decode (the low level message, usually a {@link ByteBuffer})
+ * @param <OUTPUT> the decoded message (your high level protocol Pojo/DTO)
+ * @param <DECODING_STATE> the context where to save the current decoding state (e.g. accumulated bytes, encoding
+ *        context switching..)
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public interface ProtocolDecoder<INPUT, OUTPUT> {
+public interface ProtocolDecoder<INPUT, OUTPUT, DECODING_STATE> {
+
+    /**
+     * Create a new session context for this decoder
+     * 
+     * @return the newly created context
+     */
+    DECODING_STATE createDecoderState();
 
     /**
      * Decode binary or protocol-specific content of type <code>INPUT</code> into higher-level protocol message objects,
      * of type OUTPUT
      * 
      * @param input the received message to decode
+     * @param context the decoding context (will be stored in the session for the next decode call)
      * @return the decoded messages or <code>null</code> if nothing was decoded
      * @throws ProtocolDecoderException if something wrong happen during decoding (e.g. : a malformed input message)
      */
-    OUTPUT[] decode(INPUT input) throws ProtocolDecoderException;
+    OUTPUT[] decode(INPUT input, DECODING_STATE context) throws ProtocolDecoderException;
 
     /**
      * Finish decoding, for example if the decoder accumulated some unused input, it should discard it, or throw an
      * Exception
      */
-    void finishDecode();
+    void finishDecode(DECODING_STATE context);
 }
