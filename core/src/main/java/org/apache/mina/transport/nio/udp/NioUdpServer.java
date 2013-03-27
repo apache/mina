@@ -221,8 +221,6 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
                 }
                 if (read) {
                     LOG.debug("readable datagram for UDP service : {}", this);
-                    readBuffer.clear();
-
                     readBuffer.flip();
 
                     LOG.debug("read {} bytes form {}", readBuffer.remaining(), source);
