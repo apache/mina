@@ -29,7 +29,7 @@ public interface BenchmarkFactory<T> {
      * The different types of providers
      */
     public enum Type {
-        Mina3_tcp, Mina3_udp, Netty3_tcp, Netty3_udp, Netty4_tcp, Netty4_udp
+        Mina3_tcp, Mina3_udp, Netty3_tcp, Netty3_udp, Netty4_tcp, Netty4_udp, Bio_tcp, Bio_udp
     }
 
     /**
