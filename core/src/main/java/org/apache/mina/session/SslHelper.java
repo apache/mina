@@ -78,8 +78,6 @@ public class SslHelper {
     public static final AttributeKey<Boolean> NEED_CLIENT_AUTH = createKey(Boolean.class, "internal_needClientAuth");
 
     /** Incoming buffer accumulating bytes read from the channel */
-    private ByteBuffer accBuffer;
-
     /** An empty buffer used during the handshake phase */
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
 
@@ -157,30 +155,6 @@ public class SslHelper {
     }
 
     /**
-     * A helper method used to accumulate some ByteBuffer in the inner buffer.
-     * 
-     * @param buffer The buffer to add.
-     */
-    private void addInBuffer(ByteBuffer buffer) {
-        if (accBuffer.capacity() - accBuffer.limit() < buffer.remaining()) {
-            // Increase the internal buffer
-            ByteBuffer newBuffer = ByteBuffer.allocate(accBuffer.capacity() + buffer.remaining());
-
-            // Copy the two buffers
-            newBuffer.put(accBuffer);
-            newBuffer.put(buffer);
-
-            // And reset the position to the original position
-            newBuffer.flip();
-
-            accBuffer = newBuffer;
-        } else {
-            accBuffer.put(buffer);
-            accBuffer.flip();
-        }
-    }
-
-    /**
      * Process the NEED_TASK action.
      * 
      * @param engine The SSLEngine instance
@@ -206,16 +180,8 @@ public class SslHelper {
      * the application buffer.
      */
     private SSLEngineResult unwrap(ByteBuffer inBuffer, ByteBuffer appBuffer) throws SSLException {
-        ByteBuffer tempBuffer = null;
-
         // First work with either the new incoming buffer, or the accumulating buffer
-        if ((accBuffer != null) && (accBuffer.remaining() > 0)) {
-            // Add the new incoming data into the local buffer
-            addInBuffer(inBuffer);
-            tempBuffer = this.accBuffer;
-        } else {
-            tempBuffer = inBuffer;
-        }
+        ByteBuffer tempBuffer = inBuffer;
 
         // Loop until we have processed the entire incoming buffer,
         // or until we have to stop
@@ -226,24 +192,16 @@ public class SslHelper {
             switch (result.getStatus()) {
             case OK:
                 // Ok, we have unwrapped a message, return.
-                accBuffer = null;
-
                 return result;
 
             case BUFFER_UNDERFLOW:
                 // We need to read some more data from the channel.
-                if (this.accBuffer == null) {
-                    this.accBuffer = ByteBuffer.allocate(tempBuffer.capacity() + 4096);
-                    this.accBuffer.put(inBuffer);
-                }
 
                 inBuffer.clear();
 
                 return result;
 
             case CLOSED:
-                accBuffer = null;
-
                 // We have received a Close message, we can exit now
                 if (session.isConnectedSecured()) {
                     return result;
@@ -270,7 +228,9 @@ public class SslHelper {
     public void processRead(AbstractIoSession session, ByteBuffer readBuffer) throws SSLException {
         if (session.isConnectedSecured()) {
             // Unwrap the incoming data
-            processUnwrap(session, readBuffer);
+            while (readBuffer.hasRemaining()) {
+                processUnwrap(session, readBuffer);
+            }
         } else {
             // Process the SSL handshake now
             processHandShake(session, readBuffer);
@@ -433,7 +393,7 @@ public class SslHelper {
 
         try {
             while (true) {
-                // Encypt the message
+                // Encrypt the message
                 SSLEngineResult result = sslEngine.wrap(buf, appBuffer);
 
                 switch (result.getStatus()) {
