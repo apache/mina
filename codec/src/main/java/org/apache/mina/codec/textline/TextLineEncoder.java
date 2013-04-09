@@ -138,7 +138,7 @@ public class TextLineEncoder implements StatelessProtocolEncoder<String, ByteBuf
             if (value.length() > maxLineLength) {
                 throw new IllegalArgumentException("Line length: " + message.length());
             }
-            return charsetEncoder.encode(CharBuffer.wrap(value).append(CharBuffer.wrap(delimiter.getValue())));
+            return charsetEncoder.encode(CharBuffer.wrap(value + delimiter.getValue()));
         } catch (CharacterCodingException e) {
             throw new RuntimeException(e);
         }
