@@ -87,7 +87,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
         // Loop until the decoder cannot decode more
         MESSAGE[] msg;
         try {
-            while ((msg = decoder.decode((ENCODED) in, state)) != null) {
+            while (((msg = decoder.decode((ENCODED) in, state)) != null) && (msg.length > 0)) {
                 for (MESSAGE m : msg) {
                     controller.callReadNextFilter(m);
                 }
