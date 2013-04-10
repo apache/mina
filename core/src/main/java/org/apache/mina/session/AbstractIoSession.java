@@ -567,7 +567,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                 throw new IllegalStateException();
             }
 
-            writeRequest = sslHelper.processWrite(this, writeRequest, writeQueue);
+            writeRequest = sslHelper.processWrite(this, writeRequest.getMessage(), writeQueue);
         }
 
         synchronized (writeQueue) {

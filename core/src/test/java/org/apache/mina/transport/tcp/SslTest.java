@@ -152,7 +152,6 @@ public class SslTest {
     }
 
     @Test
-    @Ignore("Waiting for the SSLHelper to be refactored")
     public void testSSL() throws Exception {
         final int port = startServer();
 
