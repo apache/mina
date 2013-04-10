@@ -79,7 +79,7 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu, H
      * {@inheritDoc}
      */
     @Override
-    public HttpPdu[] decode(ByteBuffer msg, HttpDecoderState context) throws ProtocolDecoderException {
+    public HttpPdu decode(ByteBuffer msg, HttpDecoderState context) throws ProtocolDecoderException {
         LOG.debug("decode : {}", msg);
         if (msg.remaining() <= 0) {
             return null;
@@ -103,7 +103,7 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu, H
                 context.getPartial().put(msg);
                 context.getPartial().flip();
             } else {
-                return new HttpPdu[] { rq };
+                return rq;
             }
             return null;
         case BODY:
@@ -118,10 +118,13 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu, H
                 LOG.debug("end of HTTP body");
                 context.setState(DecoderState.NEW);
                 context.setRemainingBytes(0);
-                return new HttpPdu[] { chunk, new HttpEndOfContent() };
+                context.setState(DecoderState.DONE);
+                return chunk;
+
             }
             break;
-
+        case DONE:
+            return new HttpEndOfContent();
         default:
             throw new RuntimeException("Unknonwn decoder state : " + context.getState());
         }

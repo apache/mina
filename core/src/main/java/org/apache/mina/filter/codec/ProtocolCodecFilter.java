@@ -85,12 +85,10 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
         DECODING_STATE state = getDecodingState(session);
 
         // Loop until the decoder cannot decode more
-        MESSAGE[] msg;
+        MESSAGE msg;
         try {
-            while (((msg = decoder.decode((ENCODED) in, state)) != null) && (msg.length > 0)) {
-                for (MESSAGE m : msg) {
-                    controller.callReadNextFilter(m);
-                }
+            while (((msg = decoder.decode((ENCODED) in, state)) != null)) {
+                controller.callReadNextFilter(msg);
             }
         } catch (ProtocolDecoderException e) {
             LOGGER.debug("decoding exception : ", e);

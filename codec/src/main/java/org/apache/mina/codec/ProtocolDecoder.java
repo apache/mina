@@ -49,10 +49,10 @@ public interface ProtocolDecoder<INPUT, OUTPUT, DECODING_STATE> {
      * 
      * @param input the received message to decode
      * @param context the decoding context (will be stored in the session for the next decode call)
-     * @return the decoded messages or <code>null</code> if nothing was decoded
+     * @return the decoded message or <code>null</code> if nothing was decoded
      * @throws ProtocolDecoderException if something wrong happen during decoding (e.g. : a malformed input message)
      */
-    OUTPUT[] decode(INPUT input, DECODING_STATE context) throws ProtocolDecoderException;
+    OUTPUT decode(INPUT input, DECODING_STATE context) throws ProtocolDecoderException;
 
     /**
      * Finish decoding, for example if the decoder accumulated some unused input, it should discard it, or throw an

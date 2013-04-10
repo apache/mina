@@ -44,10 +44,10 @@ public class HttpServerDecoderTest {
         buffer.rewind();
         HttpServerDecoder decoder = new HttpServerDecoder();
         HttpDecoderState state = decoder.createDecoderState();
-        HttpPdu[] pdus = decoder.decode(buffer, state);
+        HttpPdu pdus = decoder.decode(buffer, state);
         assertNotNull(pdus);
-        assertEquals(1, pdus.length);
-        assertEquals("localhost", ((HttpRequestImpl) pdus[0]).getHeader("host"));
+
+        assertEquals("localhost", ((HttpRequestImpl) pdus).getHeader("host"));
     }
 
     @Test
@@ -59,10 +59,9 @@ public class HttpServerDecoderTest {
         buffer.rewind();
         HttpServerDecoder decoder = new HttpServerDecoder();
         HttpDecoderState state = decoder.createDecoderState();
-        HttpPdu[] pdus = decoder.decode(buffer, state);
+        HttpPdu pdus = decoder.decode(buffer, state);
         assertNotNull(pdus);
-        assertEquals(1, pdus.length);
-        assertEquals("localhost", ((HttpRequestImpl) pdus[0]).getHeader("host"));
+        assertEquals("localhost", ((HttpRequestImpl) pdus).getHeader("host"));
     }
 
     @Test
@@ -74,9 +73,8 @@ public class HttpServerDecoderTest {
         buffer.rewind();
         HttpServerDecoder decoder = new HttpServerDecoder();
         HttpDecoderState state = decoder.createDecoderState();
-        HttpPdu[] pdus = decoder.decode(buffer, state);
+        HttpPdu pdus = decoder.decode(buffer, state);
         assertNotNull(pdus);
-        assertEquals(1, pdus.length);
-        assertEquals("localhost", ((HttpRequestImpl) pdus[0]).getHeader("host"));
+        assertEquals("localhost", ((HttpRequestImpl) pdus).getHeader("host"));
     }
 }

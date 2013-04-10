@@ -26,5 +26,6 @@ package org.apache.mina.http;
 public enum DecoderState {
     NEW, // waiting for a new HTTP requests, the session is new of last request was completed
     HEAD, // accumulating the HTTP request head (everything before the body)
-    BODY // receiving HTTP body slices
+    BODY, // receiving HTTP body slices
+    DONE // end of decoding
 }
