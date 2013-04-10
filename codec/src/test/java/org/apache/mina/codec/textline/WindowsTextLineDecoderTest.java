@@ -21,6 +21,7 @@ package org.apache.mina.codec.textline;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.nio.ByteBuffer;
 
@@ -39,10 +40,9 @@ public class WindowsTextLineDecoderTest {
         TextLineDecoder decoder = new TextLineDecoder(LineDelimiter.WINDOWS);
         Context context = decoder.createDecoderState();
         String[] results = decoder.decode(ByteBuffer.allocate(0), context);
-        assertNotNull(results);
-        assertEquals(0, results.length);
+        assertNull(results);
     }
-    
+
     @Test
     public void testThatNonLineTerminatedStringReturnsEmptyResult() {
         TextLineDecoder decoder = new TextLineDecoder(LineDelimiter.WINDOWS);
@@ -52,7 +52,7 @@ public class WindowsTextLineDecoderTest {
         assertEquals(0, results.length);
         assertEquals(8, context.getBuffer().position());
     }
-    
+
     @Test
     public void testThatUnixLineTerminatedStringReturnsEmptyResult() {
         TextLineDecoder decoder = new TextLineDecoder(LineDelimiter.WINDOWS);
@@ -62,7 +62,7 @@ public class WindowsTextLineDecoderTest {
         assertEquals(0, results.length);
         assertEquals(9, context.getBuffer().position());
     }
-    
+
     @Test
     public void testThatWindowsLineTerminatedStringReturnsNonEmptyResult() {
         TextLineDecoder decoder = new TextLineDecoder(LineDelimiter.WINDOWS);
@@ -73,7 +73,7 @@ public class WindowsTextLineDecoderTest {
         assertEquals("a string", results[0]);
         assertEquals(0, context.getBuffer().position());
     }
-    
+
     @Test
     public void testThatContextIsMaintainedBetweenMessages() {
         TextLineDecoder decoder = new TextLineDecoder(LineDelimiter.WINDOWS);
@@ -95,7 +95,7 @@ public class WindowsTextLineDecoderTest {
         TextLineDecoder decoder = new TextLineDecoder(LineDelimiter.WINDOWS);
         Context context = decoder.createDecoderState();
         StringBuffer sb = new StringBuffer();
-        for(int i=0; i < 100;++i) {
+        for (int i = 0; i < 100; ++i) {
             sb.append("a string");
         }
         String[] results = decoder.decode(ByteBuffer.wrap((sb.toString() + "\n").getBytes()), context);
@@ -103,13 +103,13 @@ public class WindowsTextLineDecoderTest {
         assertEquals(0, results.length);
         assertEquals(801, context.getBuffer().position());
     }
-    
+
     @Test
     public void testThatWindowsLineTerminatedLongStringReturnsNonEmptyResult() {
         TextLineDecoder decoder = new TextLineDecoder(LineDelimiter.WINDOWS);
         Context context = decoder.createDecoderState();
         StringBuffer sb = new StringBuffer();
-        for(int i=0; i < 100;++i) {
+        for (int i = 0; i < 100; ++i) {
             sb.append("a string");
         }
         String[] results = decoder.decode(ByteBuffer.wrap((sb.toString() + "\r\n").getBytes()), context);
