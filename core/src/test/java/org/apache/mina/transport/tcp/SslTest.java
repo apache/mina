@@ -19,6 +19,8 @@
  */
 package org.apache.mina.transport.tcp;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,6 +32,8 @@ import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -38,7 +42,9 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.transport.nio.tcp.NioTcpClient;
 import org.apache.mina.transport.nio.tcp.NioTcpServer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -165,5 +171,46 @@ public class SslTest {
         t.join();
         if (clientError != null)
             throw clientError;
+    }
+    
+    @Test
+    @Ignore("SslHelper needs more attention for big messages")
+    public void testBigMessage() throws IOException, GeneralSecurityException, InterruptedException {
+      final CountDownLatch counter = new CountDownLatch(1);
+      NioTcpServer server = new NioTcpServer();
+      final int messageSize = 1 * 1024 * 1024;
+      
+      /*
+       * Server
+       */
+      server.setReuseAddress(true);
+      server.getSessionConfig().setSslContext(createSSLContext());
+      server.setIoHandler(new AbstractIoHandler() {
+        private int receivedSize = 0;
+
+        /**
+         * {@inheritedDoc}
+         */
+        @Override
+        public void messageReceived(IoSession session, Object message) {
+          receivedSize += ((ByteBuffer)message).remaining();
+          if (receivedSize == 0) {
+            counter.countDown();
+          }
+        }
+      });
+      server.bind(new InetSocketAddress(0));
+      int port = server.getServerSocketChannel().socket().getLocalPort();
+      
+      /*
+       * Client
+       */
+      Socket socket = server.getSessionConfig().getSslContext().getSocketFactory().createSocket("localhost", port);
+      socket.getOutputStream().write(new byte[messageSize]);
+      socket.getOutputStream().flush();
+      socket.close();
+      assertTrue(counter.await(10, TimeUnit.SECONDS));
+
+      
     }
 }
