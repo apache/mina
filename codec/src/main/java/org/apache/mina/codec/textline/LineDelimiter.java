@@ -19,9 +19,6 @@
  */
 package org.apache.mina.codec.textline;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-
 /**
  * A delimiter which is appended to the end of a text line, such as
  * <tt>CR/LF</tt>. This class defines default delimiters for various
@@ -36,15 +33,7 @@ import java.io.PrintWriter;
  */
 public class LineDelimiter {
     /** the line delimiter constant of the current O/S. */
-    public static final LineDelimiter DEFAULT;
-
-    /** Compute the default delimiter on he current OS */
-    static {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        PrintWriter out = new PrintWriter(bout, true);
-        out.println();
-        DEFAULT = new LineDelimiter(new String(bout.toByteArray()));
-    }
+    public static final LineDelimiter DEFAULT = new LineDelimiter(System.getProperty("line.separator"));
 
     /**
      * A special line delimiter which is used for auto-detection of

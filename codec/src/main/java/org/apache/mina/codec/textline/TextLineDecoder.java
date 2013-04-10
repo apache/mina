@@ -95,7 +95,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
      */
     public TextLineDecoder(Charset charset, LineDelimiter delimiter) {
         if (charset == null) {
-            throw new IllegalArgumentException("charset parameter shuld not be null");
+            throw new IllegalArgumentException("charset parameter should not be null");
         }
 
         if (delimiter == null) {
@@ -169,6 +169,11 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
      * {@inheritDoc}
      */
     public String[] decode(ByteBuffer in, Context ctx) {
+        // Don't do anything if we don't have bytes in the buffer
+        if (!in.hasRemaining()) {
+            return null;
+        }
+
         if (LineDelimiter.AUTO.equals(delimiter)) {
             return decodeAuto(ctx, in);
         } else {
@@ -244,6 +249,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
                 } finally {
                     ctx.reset();
                 }
+
                 oldPos = pos;
                 matchCount = 0;
             }
@@ -254,6 +260,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
         ctx.append(in);
 
         ctx.setMatchCount(matchCount);
+
         return decoded.toArray(new String[decoded.size()]);
     }
 
@@ -305,7 +312,6 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
                     } finally {
                         ctx.reset();
                     }
-                    
 
                     oldPos = pos;
                     matchCount = 0;
@@ -341,7 +347,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
 
         /** The number of lines found so far */
         private int matchCount = 0;
-        
+
         /**
          * Overflow length
          */
@@ -368,7 +374,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
         public void setMatchCount(int matchCount) {
             this.matchCount = matchCount;
         }
-        
+
         public int getOverflowLength() {
             return overflowLength;
         }
@@ -388,6 +394,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
                 buf = b;
             }
         }
+
         public void append(ByteBuffer in) {
             if (buf.position() > maxLineLength - in.remaining()) {
                 overflowLength = buf.position() + in.remaining();
