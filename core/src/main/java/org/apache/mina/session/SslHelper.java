@@ -288,6 +288,7 @@ public class SslHelper {
                 session.enqueueWriteRequest(writeRequest);
             }
         }
+        session.close(false);
     }
 
     /**
