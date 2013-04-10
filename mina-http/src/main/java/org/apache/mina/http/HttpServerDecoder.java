@@ -71,7 +71,7 @@ public class HttpServerDecoder implements ProtocolDecoder {
     /** Regex to split cookie header following RFC6265 Section 5.4 */
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
 
-    public void decode(final IoSession session, final IoBuffer msg, final ProtocolDecoderOutput out) {
+    public void decode(IoSession session, IoBuffer msg, ProtocolDecoderOutput out) {
         DecoderState state = (DecoderState) session.getAttribute(DECODER_STATE_ATT);
         if (null == state) {
             session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
@@ -85,36 +85,37 @@ public class HttpServerDecoder implements ProtocolDecoder {
             // concat the old buffer and the new incoming one
             IoBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg).flip();
             // now let's decode like it was a new message
-
+            msg = IoBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg).flip();
         case NEW:
             LOG.debug("decoding NEW");
-            final HttpRequestImpl rq = parseHttpRequestHead(msg.buf());
+            HttpRequestImpl rq = parseHttpRequestHead(msg.buf());
 
             if (rq == null) {
                 // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
-                final ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
+                ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
                 partial.put(msg.buf());
                 partial.flip();
                 // no request decoded, we accumulate
                 session.setAttribute(PARTIAL_HEAD_ATT, partial);
                 session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
+                break;
             } else {
                 out.write(rq);
                 // is it a request with some body content ?
-                final String contentLen = rq.getHeader("content-length");
+                String contentLen = rq.getHeader("content-length");
 
                 if (contentLen != null) {
                     LOG.debug("found content len : {}", contentLen);
                     session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(contentLen));
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
+                    // fallthrough, process body immediately
                 } else {
                     LOG.debug("request without content");
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
                     out.write(new HttpEndOfContent());
+                    break;
                 }
             }
-
-            break;
 
         case BODY:
             LOG.debug("decoding BODY: {} bytes", msg.remaining());
