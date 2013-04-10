@@ -25,6 +25,8 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
@@ -36,11 +38,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.codec.textline.TextLineDecoder;
-import org.apache.mina.codec.textline.TextLineEncoder;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.nio.tcp.NioTcpServer;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -70,13 +68,13 @@ public class SslTest {
 
     private static class TestHandler extends AbstractIoHandler {
         public void messageReceived(IoSession session, Object message) {
-            String line = (String) message;
+            String line = Charset.defaultCharset().decode((ByteBuffer) message).toString();
 
             if (line.startsWith("hello")) {
                 System.out.println("Server got: 'hello', waiting for 'send'");
             } else if (line.startsWith("send")) {
                 System.out.println("Server got: 'send', sending 'data'");
-                session.write("data");
+                session.write(Charset.defaultCharset().encode("data\n"));
             }
         }
     }
@@ -90,7 +88,6 @@ public class SslTest {
 
         server.setReuseAddress(true);
         server.getSessionConfig().setSslContext(createSSLContext());
-        server.setFilters(new ProtocolCodecFilter(new TextLineEncoder(), new TextLineDecoder()));
         server.setIoHandler(new TestHandler());
         server.bind(new InetSocketAddress(0));
         return server.getServerSocketChannel().socket().getLocalPort();
