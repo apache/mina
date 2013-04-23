@@ -46,7 +46,8 @@ public class VarIntDecoder implements IntDecoder {
 				else if (i < 4 * 7)
 					size |= (tmp & 0x7f) << i;
 				else
-					throw new ProtocolDecoderException("a");
+					throw new ProtocolDecoderException(
+							"Not the varint representation of a signed int32");
 			}
 		} catch (BufferUnderflowException bue) {
 			input.position(origpos);

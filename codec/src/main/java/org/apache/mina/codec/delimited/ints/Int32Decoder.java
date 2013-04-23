@@ -21,6 +21,8 @@ package org.apache.mina.codec.delimited.ints;
 
 import java.nio.ByteBuffer;
 
+import org.apache.mina.codec.ProtocolDecoderException;
+
 public class Int32Decoder implements IntDecoder {
 	final private Endianness endianness;
 
@@ -31,18 +33,24 @@ public class Int32Decoder implements IntDecoder {
 
 	@Override
 	public Integer decode(ByteBuffer input, Void context)
-			{
+			throws ProtocolDecoderException {
 		if (input.remaining() < 4)
 			return null;
 
-		if (endianness == Endianness.BIG)
+		if (endianness == Endianness.BIG) {
+			if ((input.get(0) & 0x80) != 0)
+				throw new ProtocolDecoderException(
+						"Not the big endian representation of a signed int32");
 			return ((input.get() & 0xff) << 24) | ((input.get() & 0xff) << 16)
 					| ((input.get() & 0xff) << 8) | ((input.get() & 0xff));
-		else
+		} else {
+			if ((input.get(3) & 0x80) != 0)
+				throw new ProtocolDecoderException(
+						"Not the small endian representation of a signed int32");
 			return ((input.get() & 0xff)) | ((input.get() & 0xff) << 8)
 					| ((input.get() & 0xff) << 16)
 					| ((input.get() & 0xff) << 24);
-
+		}
 	}
 
 	@Override

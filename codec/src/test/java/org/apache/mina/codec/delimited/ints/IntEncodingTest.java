@@ -41,6 +41,8 @@ abstract public class IntEncodingTest {
 
 	public abstract Map<Integer, ByteBuffer> getEncodingSamples();
 
+	public abstract Iterable<ByteBuffer> getIllegalBuffers();
+
 	@Before
 	public void prepareDecoder() {
 		decoder = newDecoderInstance();
@@ -116,5 +118,24 @@ abstract public class IntEncodingTest {
 				fail("Should not throw exception");
 			}
 		}
+	}
+
+	@Test
+	public void testOverflow() {
+
+		for (ByteBuffer buffer : getIllegalBuffers())
+			try {
+				decoder.decode(buffer, null);
+				fail("Should throw an overflow exception");
+			} catch (ProtocolDecoderException e) {
+				// fine
+			}
+	}
+
+	@Test
+	public void testNegativeValues() {
+		ByteBuffer zero = encoder.encode(0, null);
+		for (int i : new int[] { -1, -127, Integer.MIN_VALUE })
+			assertEquals(zero, encoder.encode(i, null));
 	}
 }

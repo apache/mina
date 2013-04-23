@@ -1,13 +1,10 @@
 package org.apache.mina.codec.delimited.ints;
 
-import static org.junit.Assert.fail;
-
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-
-import org.apache.mina.codec.ProtocolDecoderException;
-import org.junit.Test;
 
 public class VarintEncodingTest extends IntEncodingTest {
 
@@ -32,16 +29,13 @@ public class VarintEncodingTest extends IntEncodingTest {
 		return map;
 	}
 
-	@Test
-	public void testOverflow() {		
-		ByteBuffer buffer = ByteBuffer.wrap(new byte[] { 0 | (byte) 0x80,
-				0 | (byte) 0x80, 0 | (byte) 0x80, 0 | (byte) 0x80, 1<<4 });
-
-		try {
-			decoder.decode(buffer, null);
-			fail("Should throw an overflow exception");
-		} catch (ProtocolDecoderException e) {
-			// fine
-		}
+	@Override
+	public Iterable<ByteBuffer> getIllegalBuffers() {
+		List<ByteBuffer> list = new LinkedList<ByteBuffer>();
+		list.add(ByteBuffer.wrap(new byte[] { 0 | (byte) 0x80, 0 | (byte) 0x80,
+				0 | (byte) 0x80, 0 | (byte) 0x80, 1 << 4 }));
+		return list;
 	}
+	
+	
 }

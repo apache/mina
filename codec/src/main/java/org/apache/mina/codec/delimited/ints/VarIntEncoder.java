@@ -29,16 +29,19 @@ public class VarIntEncoder implements IntEncoder {
 	}
 
 	@Override
-	public ByteBuffer encode(final Integer message, Void context) {
-		int value = message;
-		
+	public ByteBuffer encode(Integer message, Void context) {
+		int value;
+		if (message >= 0)
+			value = message;
+		else
+			value = 0;
+
 		ByteBuffer buffer = ByteBuffer.allocate(5);
 
 		while (value > 0x7f) {
 			buffer.put((byte) ((value & 0x7f) | 0x80));
 			value >>= 7;
 		}
-		
 
 		buffer.put((byte) value);
 		buffer.flip();

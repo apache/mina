@@ -2,13 +2,9 @@ package org.apache.mina.codec.delimited.ints;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-
-import org.apache.mina.codec.delimited.ints.Endianness;
-import org.apache.mina.codec.delimited.ints.Int32Decoder;
-import org.apache.mina.codec.delimited.ints.Int32Encoder;
-import org.apache.mina.codec.delimited.ints.IntDecoder;
-import org.apache.mina.codec.delimited.ints.IntEncoder;
 
 public class Int32BigEndianEncodingTest extends IntEncodingTest {
 
@@ -32,4 +28,10 @@ public class Int32BigEndianEncodingTest extends IntEncodingTest {
 		return map;
 	}
 
+	@Override
+	public Iterable<ByteBuffer> getIllegalBuffers() {
+		List<ByteBuffer> list = new LinkedList<ByteBuffer>();
+		list.add(ByteBuffer.wrap(new byte[] { (byte) 0x80, 0, 0, 0 }));
+		return list;
+	}
 }

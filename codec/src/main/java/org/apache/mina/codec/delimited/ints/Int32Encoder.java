@@ -39,7 +39,8 @@ public class Int32Encoder implements IntEncoder {
 
 	@Override
 	public ByteBuffer encode(Integer message, Void context) {
-
+		if (message < 0)
+			message = 0;
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 		if (endianness == Endianness.BIG) {
 			buffer.put((byte) (0xff & (message >> 24)));
@@ -54,7 +55,5 @@ public class Int32Encoder implements IntEncoder {
 		}
 		buffer.flip();
 		return buffer;
-
 	}
-
 }
