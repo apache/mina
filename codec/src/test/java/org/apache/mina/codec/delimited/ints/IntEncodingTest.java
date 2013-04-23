@@ -32,13 +32,13 @@ import org.junit.Test;
 
 abstract public class IntEncodingTest {
 
-    protected IntEncoder encoder;
+    protected IntTranscoder encoder;
 
-    protected IntDecoder decoder;
+    protected IntTranscoder decoder;
 
-    public abstract IntDecoder newDecoderInstance();
+    public abstract IntTranscoder newDecoderInstance();
 
-    public abstract IntEncoder newEncoderInstance();
+    public abstract IntTranscoder newEncoderInstance();
 
     public abstract Map<Integer, ByteBuffer> getEncodingSamples();
 

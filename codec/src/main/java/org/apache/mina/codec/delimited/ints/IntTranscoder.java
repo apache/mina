@@ -20,42 +20,46 @@
 package org.apache.mina.codec.delimited.ints;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
+import org.apache.mina.codec.*;
 
 /**
- * A {@link Int32Decoder} and {@link Int32Encoder} test in a little endian setup.
+ * A {@link ProtocolDecoder} which decodes a text line into a string.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class Int32LittleEndianEncodingTest extends IntEncodingTest {
+abstract public class IntTranscoder implements StatelessProtocolDecoder<ByteBuffer, Integer>,
+        StatelessProtocolEncoder<Integer, ByteBuffer> {
 
     @Override
-    public IntTranscoder newDecoderInstance() {
-        return new Int32Transcoder(Endianness.LITTLE);
+    final public Void createEncoderState() {
+        // stateless!
+        return null;
+    }
+
+    abstract public ByteBuffer encode(Integer message);
+
+    @Override
+    final public ByteBuffer encode(Integer message, Void context) {
+        return encode(message >= 0 ? message : 0);
     }
 
     @Override
-    public IntTranscoder newEncoderInstance() {
-        return new Int32Transcoder(Endianness.LITTLE);
+    final public Void createDecoderState() {
+        // stateless!
+        return null;
     }
 
     @Override
-    public Map<Integer, ByteBuffer> getEncodingSamples() {
-        Map<Integer, ByteBuffer> map = new HashMap<Integer, ByteBuffer>();
-
-        map.put(0, ByteBuffer.wrap(new byte[] { 0, 0, 0, 0 }));
-        map.put(1 | 2 << 8 | 3 << 16 | 4 << 24, ByteBuffer.wrap(new byte[] { 1, 2, 3, 4 }));
-        return map;
+    final public Integer decode(ByteBuffer input, Void context) throws ProtocolDecoderException {
+        return decode(input);
     }
+
+    abstract public Integer decode(ByteBuffer input) throws ProtocolDecoderException;
 
     @Override
-    public Iterable<ByteBuffer> getIllegalBuffers() {
-        List<ByteBuffer> list = new LinkedList<ByteBuffer>();
-        list.add(ByteBuffer.wrap(new byte[] { 0, 0, 0, (byte) 0x80 }));
-        return list;
+    final public void finishDecode(Void context) {
+        // stateless!
     }
+
 }
