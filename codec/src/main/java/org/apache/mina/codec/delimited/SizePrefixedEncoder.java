@@ -19,6 +19,56 @@
  */
 package org.apache.mina.codec.delimited;
 
-public class SizePrefixedEncoder {
+import java.nio.ByteBuffer;
+
+import org.apache.mina.codec.StatelessProtocolEncoder;
+import org.apache.mina.codec.delimited.ints.IntSizeTranscoder;
+
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class SizePrefixedEncoder implements StatelessProtocolEncoder<Object, ByteBuffer> {
+    public interface ByteBufferPromise {
+        public int requiredSize();
+
+        public void writeTo(ByteBuffer buffer);
+    }
+
+    final private IntSizeTranscoder transcoder;
+
+    public SizePrefixedEncoder(IntSizeTranscoder transcoder) {
+        super();
+        this.transcoder = transcoder;
+    }
+
+    @Override
+    public ByteBuffer encode(Object message, Void context) {
+        ByteBuffer buffer;
+        if (message instanceof ByteBuffer) {
+            ByteBuffer messageBuffer = (ByteBuffer) message;
+
+            buffer = ByteBuffer.allocate(transcoder.getEncodedSize(messageBuffer.remaining())
+                    + messageBuffer.remaining());
+            transcoder.encodeTo(messageBuffer.remaining(), buffer);
+            buffer.put(messageBuffer);
+        } else if (message instanceof ByteBufferPromise) {
+            ByteBufferPromise messagePromise = (ByteBufferPromise) message;
+            int payloadSize = messagePromise.requiredSize();
+            buffer = ByteBuffer.allocate(transcoder.getEncodedSize(payloadSize) + payloadSize);
+            transcoder.encodeTo(payloadSize, buffer);
+            messagePromise.writeTo(buffer);
+        } else {
+            throw new RuntimeException("Message of type " + message.getClass() + " not handled");
+        }
+        buffer.flip();
+        return buffer;
+    }
+
+    @Override
+    public Void createEncoderState() {
+        // stateless!
+        return null;
+    }
 
 }

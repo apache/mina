@@ -34,12 +34,12 @@ import java.util.Map;
 public class VarintEncodingTest extends IntEncodingTest {
 
     @Override
-    public IntTranscoder newDecoderInstance() {
+    public IntSizeTranscoder newDecoderInstance() {
         return new VarIntTranscoder();
     }
 
     @Override
-    public IntTranscoder newEncoderInstance() {
+    public IntSizeTranscoder newEncoderInstance() {
         return new VarIntTranscoder();
     }
 

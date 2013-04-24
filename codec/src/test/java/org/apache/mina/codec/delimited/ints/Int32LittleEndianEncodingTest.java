@@ -34,13 +34,13 @@ import java.util.Map;
 public class Int32LittleEndianEncodingTest extends IntEncodingTest {
 
     @Override
-    public IntTranscoder newDecoderInstance() {
-        return new Int32Transcoder(Endianness.LITTLE);
+    public IntSizeTranscoder newDecoderInstance() {
+        return new Int32Transcoder(Int32Transcoder.Endianness.LITTLE);
     }
 
     @Override
-    public IntTranscoder newEncoderInstance() {
-        return new Int32Transcoder(Endianness.LITTLE);
+    public IntSizeTranscoder newEncoderInstance() {
+        return new Int32Transcoder(Int32Transcoder.Endianness.LITTLE);
     }
 
     @Override

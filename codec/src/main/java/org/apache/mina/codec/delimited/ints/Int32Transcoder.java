@@ -23,7 +23,94 @@ import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.ProtocolDecoderException;
 
-public class Int32Transcoder extends IntTranscoder {
+/**
+ * 
+ * A {@link IntSizeTranscoder} providing raw/canonical representation of integers
+ * 
+ * 
+ * <style type="text/css"> pre-fw { color: rgb(0, 0, 0); display: block;
+ * font-family:courier, "courier new", monospace; font-size: 13px; white-space:
+ * pre; } </style>
+ * 
+ * <h2>FlatInt32 serializer</h2>
+ * <p>
+ * This serializer provides a mechanism called canonical form serialization.
+ * 
+ * In this representations all 32-bits integer are encoded over 4 bytes.
+ * 
+ * 
+ * This library provides two variants <i>big-endian</i> and <i>small-endian</i>.
+ * 
+ * 
+ * In both cases, the inner bits of each byte are ordered from the most to the
+ * least significant bit.
+ * 
+ * The difference between the two variants is the ordering of the four bytes.
+ * 
+ * <ul>
+ * <li>Big-endian: <i>The bytes are ordered from the most to the least
+ * significant one</i></li>
+ * <li>Little-endian: <i>The bytes are ordered from the least to the most
+ * significant one</i></li>
+ * </ul>
+ * 
+ * <p>
+ * This representation is often used since it is used internally in CPUs,
+ * therefore programmers using a low level languages (assembly, C, ...)
+ * appreciate using it (for ease of use or performance reasons). When integers
+ * are directly copied from memory, it is required to ensure this serializer
+ * uses the appropriate endianness on both ends.
+ * <ul>
+ * <li>Big-endian: 68k, MIPS, Alpha, SPARC</li>
+ * <li>Little-endian: x86, x86-64, ARM</li>
+ * <li><i>Bi-</i>endian (depends of the operating system): PowerPC, Itanium</li>
+ * </ul>
+ * </p>
+ * 
+ * <p>
+ * More details availabile on the Wikipedia
+ * "<a href="http://en.wikipedia.org/wiki/Endianness">Endianness page</a>".
+ * </p>
+ * 
+ * <h2>On-wire representation</h2>
+ * <p>
+ * Encoding of the value 67305985
+ * </p>
+ * <i>Big-Endian variant:</i>
+ * 
+ * <pre-fw>
+ * 0000 0100  0000 0011  0000 0010  0000 0001
+ * ‾‾‾‾↓‾‾‾‾  ‾‾‾‾↓‾‾‾‾  ‾‾‾‾↓‾‾‾‾  ‾‾‾‾↓‾‾‾‾
+ *     4          3          2          1      // 4·2<sup>24</sup> + 3·2<sup>16</sup> + 2·2<sup>8</sup> + 1·2<sup>0</sup>  = 67305985
+ * 
+ * </pre-fw>
+ * 
+ * <i>Little-Endian variant:</i>
+ * 
+ * <pre-fw>
+ * 0000 0001  0000 0010  0000 0011  0000 0100
+ * ‾‾‾‾↓‾‾‾‾  ‾‾‾‾↓‾‾‾‾  ‾‾‾‾↓‾‾‾‾  ‾‾‾‾↓‾‾‾‾
+ *     1          2          3          4      // 1·2<sup>0</sup> + 2·2<sup>8</sup> + 3·2<sup>16</sup> + 4·2<sup>24</sup>  = 67305985
+ * </pre-fw>
+ * 
+ * </p>
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class Int32Transcoder extends IntSizeTranscoder {
+    /**
+     * 
+     * This enumeration is used to select the endianness of the
+     * FlatInt32Serializer class {@linkplain Int32Transcoder (see
+     * documentation)}.
+     * 
+     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+     */
+
+    public enum Endianness {
+        BIG, LITTLE
+    }
+
     final private Endianness endianness;
 
     public Int32Transcoder(Endianness endianness) {
@@ -50,9 +137,8 @@ public class Int32Transcoder extends IntTranscoder {
     }
 
     @Override
-    public ByteBuffer encode(Integer message) {
-       
-        ByteBuffer buffer = ByteBuffer.allocate(4);
+    public void encodeTo(Integer message, ByteBuffer buffer) {
+
         if (endianness == Endianness.BIG) {
             buffer.put((byte) (0xff & (message >> 24)));
             buffer.put((byte) (0xff & (message >> 16)));
@@ -65,7 +151,12 @@ public class Int32Transcoder extends IntTranscoder {
             buffer.put((byte) (0xff & (message >> 24)));
         }
         buffer.flip();
-        return buffer;
+
+    }
+
+    @Override
+    public int getEncodedSize(Integer message) {
+        return 4;
     }
 
 }

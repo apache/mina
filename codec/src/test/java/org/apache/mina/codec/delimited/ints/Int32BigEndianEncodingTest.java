@@ -33,13 +33,13 @@ import java.util.Map;
 public class Int32BigEndianEncodingTest extends IntEncodingTest {
 
     @Override
-    public IntTranscoder newDecoderInstance() {
-        return new Int32Transcoder(Endianness.BIG);
+    public IntSizeTranscoder newDecoderInstance() {
+        return new Int32Transcoder(Int32Transcoder.Endianness.BIG);
     }
 
     @Override
-    public IntTranscoder newEncoderInstance() {
-        return new Int32Transcoder(Endianness.BIG);
+    public IntSizeTranscoder newEncoderInstance() {
+        return new Int32Transcoder(Int32Transcoder.Endianness.BIG);
     }
 
     @Override

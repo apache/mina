@@ -22,14 +22,15 @@ package org.apache.mina.codec.delimited.ints;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.*;
+import org.apache.mina.codec.delimited.StatelessPredictibleProtocolEncoder;
 
 /**
  * A {@link ProtocolDecoder} which decodes a text line into a string.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-abstract public class IntTranscoder implements StatelessProtocolDecoder<ByteBuffer, Integer>,
-        StatelessProtocolEncoder<Integer, ByteBuffer> {
+abstract public class IntSizeTranscoder implements StatelessProtocolDecoder<ByteBuffer, Integer>,
+        StatelessPredictibleProtocolEncoder<Integer> {
 
     @Override
     final public Void createEncoderState() {
@@ -37,7 +38,11 @@ abstract public class IntTranscoder implements StatelessProtocolDecoder<ByteBuff
         return null;
     }
 
-    abstract public ByteBuffer encode(Integer message);
+    public ByteBuffer encode(Integer message) {
+        ByteBuffer buffer = ByteBuffer.allocate(getEncodedSize(message));
+        encodeTo(message, buffer);
+        return buffer;
+    }
 
     @Override
     final public ByteBuffer encode(Integer message, Void context) {

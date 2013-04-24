@@ -30,15 +30,19 @@ import org.apache.mina.codec.ProtocolDecoderException;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 abstract public class IntEncodingTest {
 
-    protected IntTranscoder encoder;
+    protected IntSizeTranscoder encoder;
 
-    protected IntTranscoder decoder;
+    protected IntSizeTranscoder decoder;
 
-    public abstract IntTranscoder newDecoderInstance();
+    public abstract IntSizeTranscoder newDecoderInstance();
 
-    public abstract IntTranscoder newEncoderInstance();
+    public abstract IntSizeTranscoder newEncoderInstance();
 
     public abstract Map<Integer, ByteBuffer> getEncodingSamples();
 

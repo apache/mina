@@ -24,65 +24,66 @@ import java.nio.ByteBuffer;
 import org.apache.mina.codec.ProtocolDecoder;
 import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.codec.StatelessProtocolDecoder;
+import org.apache.mina.codec.delimited.ints.IntSizeTranscoder;
 
-public class SizePrefixedDecoder
-		implements
-		ProtocolDecoder<ByteBuffer, ByteBuffer, SizePrefixedDecoder.IntRef> {
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class SizePrefixedDecoder implements ProtocolDecoder<ByteBuffer, ByteBuffer, SizePrefixedDecoder.IntRef> {
 
-	final static protected class IntRef {
-		private Integer value = null;
+    final static protected class IntRef {
+        private Integer value = null;
 
-		public Integer get() {
-			return value;
-		}
+        public Integer get() {
+            return value;
+        }
 
-		public void reset() {
-			value = null;
-		}
+        public void reset() {
+            value = null;
+        }
 
-		public boolean isDefined() {
-			return value != null;
-		}
+        public boolean isDefined() {
+            return value != null;
+        }
 
-		public void set(Integer value) {
-			this.value = value;
-		}
-	}
+        public void set(Integer value) {
+            this.value = value;
+        }
+    }
 
-	final private StatelessProtocolDecoder<ByteBuffer, Integer> intDecoder;
+    final private StatelessProtocolDecoder<ByteBuffer, Integer> transcoder;
 
-	public SizePrefixedDecoder(
-			StatelessProtocolDecoder<ByteBuffer, Integer> intDecoder) {
-		super();
-		this.intDecoder = intDecoder;
-	}
+    public SizePrefixedDecoder(IntSizeTranscoder transcoder) {
+        super();
+        this.transcoder = transcoder;
+    }
 
-	@Override
-	public IntRef createDecoderState() {
-		return new IntRef();
-	}
+    @Override
+    public IntRef createDecoderState() {
+        return new IntRef();
+    }
 
-	@Override
-	public ByteBuffer decode(ByteBuffer input, IntRef nextBlockSize)
-			throws ProtocolDecoderException {
-		ByteBuffer output = null;
-		if (nextBlockSize.get() == null) {
-			nextBlockSize.set(intDecoder.decode(input, null));
-		}
+    @Override
+    public ByteBuffer decode(ByteBuffer input, IntRef nextBlockSize) throws ProtocolDecoderException {
+        ByteBuffer output = null;
+        if (nextBlockSize.get() == null) {
+            nextBlockSize.set(transcoder.decode(input, null));
+        }
 
-		if (nextBlockSize.isDefined()) {
-			if (input.remaining() >= nextBlockSize.get()) {
-				output = input.slice();
-				output.limit(output.position() + nextBlockSize.get());
-				nextBlockSize.reset();
-			}
-		}
-		return output;
-	}
+        if (nextBlockSize.isDefined()) {
+            if (input.remaining() >= nextBlockSize.get()) {
+                output = input.slice();
+                output.limit(output.position() + nextBlockSize.get());
+                nextBlockSize.reset();
+            }
+        }
+        return output;
+    }
 
-	@Override
-	public void finishDecode(IntRef context) {
-		//
-	}
+    @Override
+    public void finishDecode(IntRef context) {
+        //
+    }
 
 }
