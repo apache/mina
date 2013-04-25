@@ -25,7 +25,7 @@ package org.apache.mina.codec;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @SuppressWarnings("serial")
-public class ProtocolDecoderException extends Exception {
+public class ProtocolDecoderException extends RuntimeException {
 
     public ProtocolDecoderException() {
         super();
