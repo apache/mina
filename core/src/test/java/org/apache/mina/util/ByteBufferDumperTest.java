@@ -81,4 +81,15 @@ public class ByteBufferDumperTest {
         assertEquals("ByteBuffer[len=9,bytes='0x01 0x8F 0x04 0x7A 0xC2 0x23 0xA0 0x08 0x44']",
                 ByteBufferDumper.dump(bb, -1, false));
     }
+
+    @Test
+    public void toHex() {
+        ByteBuffer bb = ByteBuffer.allocate(4);
+        bb.put((byte) 0);
+        bb.put((byte) 1);
+        bb.put((byte) 2);
+        bb.put((byte) 254);
+        bb.flip();
+        assertEquals("000102FE", ByteBufferDumper.toHex(bb));
+    }
 }

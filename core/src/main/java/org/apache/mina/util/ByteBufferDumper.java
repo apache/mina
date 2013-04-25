@@ -102,4 +102,38 @@ public class ByteBufferDumper {
     public static String dump(ByteBuffer buffer) {
         return dump(buffer, -1, true);
     }
+
+    /**
+     * Dump a byte buffer remaining bytes as a hex-decimal string. The current buffer position will remain unchanged.
+     * 
+     * @param buffer the buffer to dump
+     * @return a hex string
+     */
+    public static String toHex(ByteBuffer buffer) {
+        StringBuilder out = new StringBuilder(buffer.remaining() * 2);
+        int pos = buffer.position();
+        while (buffer.hasRemaining()) {
+            int byteValue = buffer.get() & 0xFF;
+            out.append((char) (HEX_CHAR[(byteValue & 0x00F0) >> 4]))
+                    .append((char) ((HEX_CHAR[byteValue & 0x000F]) - 0));
+        }
+        buffer.position(pos);
+        return out.toString();
+    }
+
+    public static ByteBuffer fromHexString(String hex) {
+        if (hex.length() % 2 != 0) {
+            throw new IllegalArgumentException("the hexa-decimal string length cannot be odd");
+        }
+        int size = hex.length() / 2;
+        ByteBuffer res = ByteBuffer.allocate(size);
+
+        for (int i = 0; i < size; i++) {
+            int b = ((Character.digit(hex.charAt(i * 2), 16) << 4) | (Character.digit(hex.charAt(i * 2 + 1), 16)));
+            res.put((byte) b);
+        }
+
+        res.flip();
+        return res;
+    }
 }

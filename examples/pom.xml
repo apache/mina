@@ -38,7 +38,8 @@
   </properties>
 
   <dependencies>
-    <dependency>
+    
+      <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
       <version>${project.version}</version>
@@ -50,7 +51,13 @@
       <artifactId>mina-http</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-coap</artifactId>
+      <version>${project.version}</version>
+  </dependency>
+
     <dependency>
       <groupId>org.apache.logging.log4j.adapters</groupId>
       <artifactId>slf4j-impl</artifactId>
