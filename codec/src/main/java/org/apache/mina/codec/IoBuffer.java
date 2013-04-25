@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.mina.util;
+package org.apache.mina.codec;
 
 import java.nio.Buffer;
 import java.nio.BufferUnderflowException;
@@ -26,11 +26,9 @@ import java.nio.InvalidMarkException;
 import java.nio.ReadOnlyBufferException;
 
 /**
- * A proxy class used to manage ByteBuffers as if they were just a big ByteBuffer. We can
- * add as many buffers as needed, when accumulating data. From the user PoV, the methods
- * are the very same than what we can get from ByteBuffer.
- * <br/>
- * IoBuffer instances are *not* thred safe.
+ * A proxy class used to manage ByteBuffers as if they were just a big ByteBuffer. We can add as many buffers as needed,
+ * when accumulating data. From the user PoV, the methods are the very same than what we can get from ByteBuffer. <br/>
+ * IoBuffer instances are *not* thread safe.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -91,8 +89,9 @@ public class IoBuffer {
     }
 
     /**
-     * Construct a IoBuffer with some ByteBuffers. The IoBuffer type will be selected
-     * from the first ByteBuffer type, so will the order.
+     * Construct a IoBuffer with some ByteBuffers. The IoBuffer type will be selected from the first ByteBuffer type, so
+     * will the order.
+     * 
      * @param byteBuffers the ByteBuffers added to the IoBuffer list
      */
     public IoBuffer(ByteBuffer... byteBuffers) {
@@ -117,6 +116,7 @@ public class IoBuffer {
 
     /**
      * Construct a IoBuffer from an existing IoBuffer.
+     * 
      * @param ioBuffer the IoBuffer we want to copy
      */
     public IoBuffer(IoBuffer ioBuffer) {
@@ -158,6 +158,7 @@ public class IoBuffer {
 
     /**
      * Allocate a Heap IoBuffer with a defined capacity
+     * 
      * @param capacity The number of bytes to store
      * @return The allocated IoBuffer
      */
@@ -173,6 +174,7 @@ public class IoBuffer {
 
     /**
      * Allocate a Direct IoBuffer with a defined capacity
+     * 
      * @param capacity The number of bytes to store
      * @return The allocated IoBuffer
      */
@@ -187,11 +189,10 @@ public class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#array()
-     * Returns the byte array which this IoBuffer is based on, up to the sum of each 
-     * contained ByteBuffer's limit().<br/>
-     * This array can be modified, but this won't modify the content of the underlying
-     * ByteBuffer instances, contrary to the ByteBuffer.array() method.
+     * @see ByteBuffer#array() Returns the byte array which this IoBuffer is based on, up to the sum of each contained
+     *      ByteBuffer's limit().<br/>
+     *      This array can be modified, but this won't modify the content of the underlying ByteBuffer instances,
+     *      contrary to the ByteBuffer.array() method.
      * 
      * @return the byte array which this IoBuffer is based on.
      * @exception ReadOnlyBufferException if this IoBuffer is based on a read-only array.
@@ -225,13 +226,11 @@ public class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#arrayOffset()
-     * Returns the offset of the byte array which this IoBuffer is based on, if
-     * there is one.
-     * <p>
-     * The offset is the index of the array which corresponds to the zero
-     * position of the IoBuffer.
-     *
+     * @see ByteBuffer#arrayOffset() Returns the offset of the byte array which this IoBuffer is based on, if there is
+     *      one.
+     *      <p>
+     *      The offset is the index of the array which corresponds to the zero position of the IoBuffer.
+     * 
      * @return the offset of the byte array which this IoBuffer is based on.
      * @exception ReadOnlyBufferException if this IoBuffer is based on a read-only array.
      * @exception UnsupportedOperationException if this IoBuffer is not based on an array.
@@ -261,18 +260,17 @@ public class IoBuffer {
     }
 
     /**
-     * @see Buffer#clear()
-     * Clears this IoBuffer.
-     * <p>
-     * the following internal changes take place: 
-     * <ul>
-     * <li>the current position is reset back to the start of the buffer</li> 
-     * <li>the value of the buffer limit is made equal to the capacity</li>
-     * <li>and mark is cleared</li>
-     * </ul>
-     * Note that the resulting IoBuffer might be wider than the original one, simply
-     * because we will extent the ByteBuffers limit to their capacity.
-     *
+     * @see Buffer#clear() Clears this IoBuffer.
+     *      <p>
+     *      the following internal changes take place:
+     *      <ul>
+     *      <li>the current position is reset back to the start of the buffer</li>
+     *      <li>the value of the buffer limit is made equal to the capacity</li>
+     *      <li>and mark is cleared</li>
+     *      </ul>
+     *      Note that the resulting IoBuffer might be wider than the original one, simply because we will extent the
+     *      ByteBuffers limit to their capacity.
+     * 
      * @return this buffer.
      */
     public IoBuffer clear() {
@@ -323,20 +321,19 @@ public class IoBuffer {
     /**
      * @see ByteBuffer#equals(Object)
      */
+    @Override
     public boolean equals(Object object) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
 
     /**
-     * @see Buffer#flip()
-     * Flips this buffer.
-     * <p>
-     * The limit is set to the current position, then the position is set to
-     * zero, and the mark is cleared.
-     * <p>
-     * The content of this IoBuffer is not changed.
-     *
+     * @see Buffer#flip() Flips this buffer.
+     *      <p>
+     *      The limit is set to the current position, then the position is set to zero, and the mark is cleared.
+     *      <p>
+     *      The content of this IoBuffer is not changed.
+     * 
      * @return this IoBuffer.
      */
     public IoBuffer flip() {
@@ -349,6 +346,7 @@ public class IoBuffer {
 
     /**
      * Get a single byte for the IoBuffer at the current position. Increment the current position.
+     * 
      * @return The byte found a the current position.
      */
     public byte get() {
@@ -384,13 +382,11 @@ public class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#get(byte[])
-     * Reads bytes from the current position into the specified byte array and
-     * increases the position by the number of bytes read.
-     * <p>
-     * Calling this method has the same effect as
-     * {@code get(dest, 0, dest.length)}.
-     *
+     * @see ByteBuffer#get(byte[]) Reads bytes from the current position into the specified byte array and increases the
+     *      position by the number of bytes read.
+     *      <p>
+     *      Calling this method has the same effect as {@code get(dest, 0, dest.length)}.
+     * 
      * @param dest the destination byte array.
      * @return this IoBuffer.
      * @exception BufferUnderflowException if {@code dest.length} is greater than {@code remaining()}.
@@ -423,8 +419,7 @@ public class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#get(int)
-     * Returns the byte at the specified index and does not change the position.
+     * @see ByteBuffer#get(int) Returns the byte at the specified index and does not change the position.
      * 
      * @param index the index, must not be negative and less than limit.
      * @return the byte at the specified index.
@@ -507,12 +502,11 @@ public class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#getInt()
-     * Returns the int at the current position and increases the position by 4.
-     * <p>
-     * The 4 bytes starting at the current position are composed into a int
-     * according to the current byte order and returned.
-     *
+     * @see ByteBuffer#getInt() Returns the int at the current position and increases the position by 4.
+     *      <p>
+     *      The 4 bytes starting at the current position are composed into a int according to the current byte order and
+     *      returned.
+     * 
      * @return the int at the current position.
      * @exception BufferUnderflowException if the position is greater than {@code limit - 4}.
      */
@@ -593,26 +587,24 @@ public class IoBuffer {
     /**
      * @see ByteBuffer#hashCode()
      */
+    @Override
     public int hashCode() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
 
     /**
-     * @see Buffer#hasRemaining()
-     * Indicates if there are elements remaining in this IoBuffer, that is if
-     * {@code position < limit}.
-     *
-     * @return {@code true} if there are elements remaining in this IoBuffer,
-     * {@code false} otherwise.
+     * @see Buffer#hasRemaining() Indicates if there are elements remaining in this IoBuffer, that is if
+     *      {@code position < limit}.
+     * 
+     * @return {@code true} if there are elements remaining in this IoBuffer, {@code false} otherwise.
      */
     public boolean hasRemaining() {
         return position < limit;
     }
 
     /**
-     * @see ByteBuffer#isDirect()
-     * Tells if the stored ByteBuffers are Direct buffers or Heap Buffers
+     * @see ByteBuffer#isDirect() Tells if the stored ByteBuffers are Direct buffers or Heap Buffers
      * @return <code>true</code> if we are storing Direct buffers, <code>false</code> otherwise.
      */
     public boolean isDirect() {
@@ -620,11 +612,9 @@ public class IoBuffer {
     }
 
     /**
-     * @see Buffer#isReadOnly()
-     * Indicates whether this IoBuffer is read-only.
-     *
-     * @return {@code true} if this IoBuffer is read-only, {@code false}
-     * otherwise.
+     * @see Buffer#isReadOnly() Indicates whether this IoBuffer is read-only.
+     * 
+     * @return {@code true} if this IoBuffer is read-only, {@code false} otherwise.
      */
     public boolean isReadOnly() {
         return readOnly;
@@ -638,10 +628,9 @@ public class IoBuffer {
     }
 
     /**
-     * @see Buffer#mark()
-     * Marks the current position, so that the position may return to this point
-     * later by calling <code>reset()</code>.
-     *
+     * @see Buffer#mark() Marks the current position, so that the position may return to this point later by calling
+     *      <code>reset()</code>.
+     * 
      * @return this IoBuffer.
      */
     public IoBuffer mark() {
@@ -651,27 +640,22 @@ public class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#order()
-     * Returns the byte order used by this Iouffer when converting bytes from/to
-     * other primitive types.
-     * <p>
-     * The default byte order of byte buffer is always
-     * {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}
-     *
-     * @return the byte order used by this IoBuffer when converting bytes from/to
-     * other primitive types.
-
+     * @see ByteBuffer#order() Returns the byte order used by this Iouffer when converting bytes from/to other primitive
+     *      types.
+     *      <p>
+     *      The default byte order of byte buffer is always {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}
+     * 
+     * @return the byte order used by this IoBuffer when converting bytes from/to other primitive types.
      */
     public ByteOrder order() {
         return order;
     }
 
     /**
-     * @see ByteBuffer#order(ByteOrder)
-     * Sets the byte order of this IoBuffer.
+     * @see ByteBuffer#order(ByteOrder) Sets the byte order of this IoBuffer.
      * 
-     * @param byteOrder the byte order to set. If {@code null} then the order
-     * will be {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}.
+     * @param byteOrder the byte order to set. If {@code null} then the order will be {@link ByteOrder#LITTLE_ENDIAN
+     *        LITTLE_ENDIAN}.
      * @return this IoBuffer.
      * @see ByteOrder
      */
@@ -694,14 +678,11 @@ public class IoBuffer {
     }
 
     /**
-     * @see Buffer#position(int)
-     * Sets the position in the IoBuffer.
-     * <p>
-     * If the mark is set and it is greater than the new position, then it is
-     * cleared.
-     *
-     * @param newPosition the new position, must be not negative and not greater than
-     * limit.
+     * @see Buffer#position(int) Sets the position in the IoBuffer.
+     *      <p>
+     *      If the mark is set and it is greater than the new position, then it is cleared.
+     * 
+     * @param newPosition the new position, must be not negative and not greater than limit.
      * @return this IoBuffer.
      * @exception IllegalArgumentException if <code>newPosition</code> is invalid.
      */
@@ -750,10 +731,9 @@ public class IoBuffer {
     }
 
     /**
-     * @see Buffer#remaining()
-     * Returns the number of remaining elements in this IoBuffer, that is
-     * {@code limit - position}.
-     *
+     * @see Buffer#remaining() Returns the number of remaining elements in this IoBuffer, that is
+     *      {@code limit - position}.
+     * 
      * @return the number of remaining elements in this IoBuffer.
      */
     public int remaining() {
@@ -762,8 +742,7 @@ public class IoBuffer {
     }
 
     /**
-     * @see Buffer#reset()
-     * Resets the position of this IoBuffer to the <code>mark</code>.
+     * @see Buffer#reset() Resets the position of this IoBuffer to the <code>mark</code>.
      * 
      * @return this IoBuffer.
      * @exception InvalidMarkException if the mark is not set.
@@ -774,12 +753,10 @@ public class IoBuffer {
     }
 
     /**
-     * @see Buffer#rewind()
-     * Rewinds this IoBuffer.
-     * <p>
-     * The position is set to zero, and the mark is cleared. The content of this
-     * IoBuffer is not changed.
-     *
+     * @see Buffer#rewind() Rewinds this IoBuffer.
+     *      <p>
+     *      The position is set to zero, and the mark is cleared. The content of this IoBuffer is not changed.
+     * 
      * @return this IoBuffer.
      */
     public IoBuffer rewind() {
@@ -813,15 +790,17 @@ public class IoBuffer {
 
     /**
      * Returns a string representing the IoBuffer.
+     * 
      * @return a String representation of the IoBuffer
      */
+    @Override
     public String toString() {
         return "IoBuffer[pos=" + position + " lim=" + limit + " mrk=" + mark + "]";
     }
 
-    //------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------
     // private inner data structure
-    //------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------
     /**
      * A container for ByterBuffers stored in the buffers list
      */
@@ -837,12 +816,14 @@ public class IoBuffer {
 
         /**
          * Creates a new entry in the list
+         * 
          * @param entry The added ByteBuffer
          */
         private BufferNode(ByteBuffer byteBuffer) {
             this.buffer = byteBuffer;
         }
 
+        @Override
         public String toString() {
             return buffer.toString() + ", Offset:" + offset + (next != null ? " --> \n  " : "");
         }
@@ -882,6 +863,7 @@ public class IoBuffer {
 
         /**
          * Creates a list with one ByteBuffer
+         * 
          * @param byteBuffer The added ByteBuffer
          */
         private BufferList(ByteBuffer byteBuffer) {
@@ -894,6 +876,7 @@ public class IoBuffer {
 
         /**
          * Adds a new ByteBuffer in the list
+         * 
          * @param byteBuffer The added ByteBuffer
          */
         private void add(ByteBuffer byteBuffer) {
@@ -936,8 +919,9 @@ public class IoBuffer {
         }
 
         /**
-         * Get the first BufferNode in the list. The current pointer will move
-         * forward, after having be reset to the beginning of the list
+         * Get the first BufferNode in the list. The current pointer will move forward, after having be reset to the
+         * beginning of the list
+         * 
          * @return The first BufferNode in the list
          */
         private BufferNode getFirst() {
@@ -952,8 +936,9 @@ public class IoBuffer {
         }
 
         /**
-         * Get the next BufferNode from the list. If this is the first time this method
-         * is called, it will return the same value than a getFirst().
+         * Get the next BufferNode from the list. If this is the first time this method is called, it will return the
+         * same value than a getFirst().
+         * 
          * @return The next BufferNode in the list, moving forward in the list at the same time
          */
         private BufferNode getNext() {
@@ -978,6 +963,7 @@ public class IoBuffer {
 
         /**
          * Gets the current BufferNode from the list, if we aren't already past the tail.
+         * 
          * @return The current BufferNode
          */
         private BufferNode getCurrent() {
@@ -988,6 +974,7 @@ public class IoBuffer {
             return current;
         }
 
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
 
