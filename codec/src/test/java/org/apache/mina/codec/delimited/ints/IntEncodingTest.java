@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import org.apache.mina.codec.ProtocolDecoderException;
+import org.apache.mina.codec.delimited.Transcoder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,13 +37,13 @@ import org.junit.Test;
  */
 abstract public class IntEncodingTest {
 
-    protected IntSizeTranscoder encoder;
+    protected Transcoder<Integer> encoder;
 
-    protected IntSizeTranscoder decoder;
+    protected Transcoder<Integer> decoder;
 
-    public abstract IntSizeTranscoder newDecoderInstance();
+    public abstract Transcoder<Integer> newDecoderInstance();
 
-    public abstract IntSizeTranscoder newEncoderInstance();
+    public abstract Transcoder<Integer> newEncoderInstance();
 
     public abstract Map<Integer, ByteBuffer> getEncodingSamples();
 

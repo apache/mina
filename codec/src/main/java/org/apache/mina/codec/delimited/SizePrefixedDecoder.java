@@ -23,8 +23,6 @@ import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.ProtocolDecoder;
 import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.StatelessProtocolDecoder;
-import org.apache.mina.codec.delimited.ints.IntSizeTranscoder;
 
 /**
  * 
@@ -52,9 +50,9 @@ public class SizePrefixedDecoder implements ProtocolDecoder<ByteBuffer, ByteBuff
         }
     }
 
-    final private StatelessProtocolDecoder<ByteBuffer, Integer> transcoder;
+    final private Transcoder<Integer> transcoder;
 
-    public SizePrefixedDecoder(IntSizeTranscoder transcoder) {
+    public SizePrefixedDecoder(Transcoder<Integer> transcoder) {
         super();
         this.transcoder = transcoder;
     }

@@ -22,17 +22,18 @@ package org.apache.mina.codec.delimited.ints;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.ProtocolDecoderException;
+import org.apache.mina.codec.delimited.Transcoder;
 
 /**
  * 
- * A {@link IntSizeTranscoder} providing raw/canonical representation of integers
+ * A {@link Transcoder} providing raw/canonical representation of integers
  * 
  * 
  * <style type="text/css"> pre-fw { color: rgb(0, 0, 0); display: block;
  * font-family:courier, "courier new", monospace; font-size: 13px; white-space:
  * pre; } </style>
  * 
- * <h2>FlatInt32 serializer</h2>
+ * <h2>RawInt32 transcoder</h2>
  * <p>
  * This serializer provides a mechanism called canonical form serialization.
  * 
@@ -95,13 +96,19 @@ import org.apache.mina.codec.ProtocolDecoderException;
  * 
  * </p>
  * 
+ * <p>
+ * n.b. This class doesn't have any dependency against Apache Thrift or
+ * any other library in order to provide this convenient integer serialization
+ * module to any software using FramedMINA.
+ * </p>
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class Int32Transcoder extends IntSizeTranscoder {
+public class RawInt32Transcoder extends Transcoder<Integer> {
     /**
      * 
-     * This enumeration is used to select the endianness of the
-     * FlatInt32Serializer class {@linkplain Int32Transcoder (see
+     * This enumeration is used to select the endianness of the outer
+     * RawInt32 transcoder class {@link RawInt32Transcoder (see
      * documentation)}.
      * 
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -113,7 +120,7 @@ public class Int32Transcoder extends IntSizeTranscoder {
 
     final private Endianness endianness;
 
-    public Int32Transcoder(Endianness endianness) {
+    public RawInt32Transcoder(Endianness endianness) {
         super();
         this.endianness = endianness;
     }
@@ -137,8 +144,10 @@ public class Int32Transcoder extends IntSizeTranscoder {
     }
 
     @Override
-    public void encodeTo(Integer message, ByteBuffer buffer) {
-
+    public void writeTo(Integer message, ByteBuffer buffer) {
+        // VarInts don't support negative values
+        if(message<0)
+            message=0;
         if (endianness == Endianness.BIG) {
             buffer.put((byte) (0xff & (message >> 24)));
             buffer.put((byte) (0xff & (message >> 16)));

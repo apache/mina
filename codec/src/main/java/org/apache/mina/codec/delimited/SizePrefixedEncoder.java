@@ -22,7 +22,6 @@ package org.apache.mina.codec.delimited;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.StatelessProtocolEncoder;
-import org.apache.mina.codec.delimited.ints.IntSizeTranscoder;
 
 /**
  * 
@@ -35,9 +34,9 @@ public class SizePrefixedEncoder implements StatelessProtocolEncoder<Object, Byt
         public void writeTo(ByteBuffer buffer);
     }
 
-    final private IntSizeTranscoder transcoder;
+    final private Transcoder<Integer> transcoder;
 
-    public SizePrefixedEncoder(IntSizeTranscoder transcoder) {
+    public SizePrefixedEncoder(Transcoder<Integer> transcoder) {
         super();
         this.transcoder = transcoder;
     }
@@ -50,13 +49,13 @@ public class SizePrefixedEncoder implements StatelessProtocolEncoder<Object, Byt
 
             buffer = ByteBuffer.allocate(transcoder.getEncodedSize(messageBuffer.remaining())
                     + messageBuffer.remaining());
-            transcoder.encodeTo(messageBuffer.remaining(), buffer);
+            transcoder.writeTo(messageBuffer.remaining(), buffer);
             buffer.put(messageBuffer);
         } else if (message instanceof ByteBufferPromise) {
             ByteBufferPromise messagePromise = (ByteBufferPromise) message;
             int payloadSize = messagePromise.requiredSize();
             buffer = ByteBuffer.allocate(transcoder.getEncodedSize(payloadSize) + payloadSize);
-            transcoder.encodeTo(payloadSize, buffer);
+            transcoder.writeTo(payloadSize, buffer);
             messagePromise.writeTo(buffer);
         } else {
             throw new RuntimeException("Message of type " + message.getClass() + " not handled");

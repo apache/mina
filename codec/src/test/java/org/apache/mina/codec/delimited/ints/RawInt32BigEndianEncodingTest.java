@@ -25,21 +25,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.codec.delimited.Transcoder;
+
 /**
  * A {@link Int32Decoder} and {@link Int32Encoder} test in a big endian setup.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class Int32BigEndianEncodingTest extends IntEncodingTest {
+public class RawInt32BigEndianEncodingTest extends IntEncodingTest {
 
     @Override
-    public IntSizeTranscoder newDecoderInstance() {
-        return new Int32Transcoder(Int32Transcoder.Endianness.BIG);
+    public Transcoder<Integer> newDecoderInstance() {
+        return new RawInt32Transcoder(RawInt32Transcoder.Endianness.BIG);
     }
 
     @Override
-    public IntSizeTranscoder newEncoderInstance() {
-        return new Int32Transcoder(Int32Transcoder.Endianness.BIG);
+    public Transcoder<Integer> newEncoderInstance() {
+        return new RawInt32Transcoder(RawInt32Transcoder.Endianness.BIG);
     }
 
     @Override

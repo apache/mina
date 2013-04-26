@@ -25,21 +25,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.mina.codec.delimited.Transcoder;
+
 
 /**
  * A {@link VarIntDecoder} and {@link VarIntEncoder} test.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class VarintEncodingTest extends IntEncodingTest {
+public class VarIntEncodingTest extends IntEncodingTest {
 
     @Override
-    public IntSizeTranscoder newDecoderInstance() {
+    public Transcoder<Integer> newDecoderInstance() {
         return new VarIntTranscoder();
     }
 
     @Override
-    public IntSizeTranscoder newEncoderInstance() {
+    public Transcoder<Integer> newEncoderInstance() {
         return new VarIntTranscoder();
     }
 
