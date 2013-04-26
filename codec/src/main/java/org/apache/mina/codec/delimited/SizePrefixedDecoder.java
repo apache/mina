@@ -37,12 +37,12 @@ public class SizePrefixedDecoder implements ProtocolDecoder<ByteBuffer, ByteBuff
             return value;
         }
 
-        public void reset() {
-            value = null;
-        }
-
         public boolean isDefined() {
             return value != null;
+        }
+
+        public void reset() {
+            value = null;
         }
 
         public void set(Integer value) {
