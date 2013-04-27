@@ -17,13 +17,11 @@
  *  under the License.
  *
  */
-package org.apache.mina.codec.delimited;
 
 /**
+ * Utilities used in the MINA
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class PrefixedDelimiter {
-
-}
+package org.apache.mina.util;

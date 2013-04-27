@@ -17,13 +17,32 @@
  *  under the License.
  *
  */
-package org.apache.mina.codec.delimited;
+package org.apache.mina.codec.delimited.serialization;
+
+import java.nio.ByteBuffer;
+
+import org.apache.mina.codec.ProtocolDecoderException;
+import org.apache.mina.codec.delimited.Transcoder;
 
 /**
- * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class PrefixedDelimiter {
+public class ByteBuffersTranscoder extends Transcoder<ByteBuffer,ByteBuffer> {
+
+    @Override
+    public ByteBuffer decode(ByteBuffer input) throws ProtocolDecoderException {
+        return input;
+    }
+
+    @Override
+    public int getEncodedSize(ByteBuffer message) {
+        return message.remaining();
+    }
+
+    @Override
+    public void writeTo(ByteBuffer message, ByteBuffer buffer) {
+        buffer.put(message);
+    }
 
 }

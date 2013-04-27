@@ -37,13 +37,13 @@ import org.junit.Test;
  */
 abstract public class IntEncodingTest {
 
-    protected Transcoder<Integer> encoder;
+    protected Transcoder<Integer,Integer> encoder;
 
-    protected Transcoder<Integer> decoder;
+    protected Transcoder<Integer,Integer> decoder;
 
-    public abstract Transcoder<Integer> newDecoderInstance();
+    public abstract Transcoder<Integer,Integer> newDecoderInstance();
 
-    public abstract Transcoder<Integer> newEncoderInstance();
+    public abstract Transcoder<Integer,Integer> newEncoderInstance();
 
     public abstract Map<Integer, ByteBuffer> getEncodingSamples();
 

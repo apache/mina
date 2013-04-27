@@ -36,12 +36,12 @@ import org.apache.mina.codec.delimited.Transcoder;
 public class RawInt32LittleEndianEncodingTest extends IntEncodingTest {
 
     @Override
-    public Transcoder<Integer> newDecoderInstance() {
+    public Transcoder<Integer,Integer> newDecoderInstance() {
         return new RawInt32Transcoder(RawInt32Transcoder.Endianness.LITTLE);
     }
 
     @Override
-    public Transcoder<Integer> newEncoderInstance() {
+    public Transcoder<Integer,Integer> newEncoderInstance() {
         return new RawInt32Transcoder(RawInt32Transcoder.Endianness.LITTLE);
     }
 

@@ -26,12 +26,13 @@ import org.apache.mina.codec.StatelessProtocolEncoder;
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ * 
  */
 public class SizePrefixedEncoder<IN> implements StatelessProtocolEncoder<IN, ByteBuffer> {
 
-    final private Transcoder<Integer> transcoder;
+    final private Transcoder<Integer, Integer> transcoder;
 
-    public SizePrefixedEncoder(Transcoder<Integer> transcoder) {
+    public SizePrefixedEncoder(Transcoder<Integer, Integer> transcoder) {
         super();
         this.transcoder = transcoder;
     }
@@ -52,7 +53,7 @@ public class SizePrefixedEncoder<IN> implements StatelessProtocolEncoder<IN, Byt
                     + messageBuffer.remaining());
             transcoder.writeTo(messageBuffer.remaining(), buffer);
             buffer.put(messageBuffer);
-        }  else {
+        } else {
             throw new RuntimeException("Message of type " + message.getClass() + " not handled");
         }
         buffer.flip();

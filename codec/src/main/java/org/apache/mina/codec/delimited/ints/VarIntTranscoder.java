@@ -25,9 +25,8 @@ import java.nio.ByteBuffer;
 import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.codec.delimited.Transcoder;
 
-
 /**
- * A {@link Transcoder} providing a variable length representation of integers
+ * A {@link Transcoder} providing a variable length representation of integers.
  * 
  * <style type="text/css"> pre-fw { color: rgb(0, 0, 0); display: block;
  * font-family:courier, "courier new", monospace; font-size: 13px; white-space:
@@ -79,8 +78,9 @@ import org.apache.mina.codec.delimited.Transcoder;
  * </p>
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ * 
  */
-public class VarIntTranscoder extends Transcoder<Integer> {
+public class VarIntTranscoder extends Transcoder<Integer, Integer> {
     @Override
     public Integer decode(ByteBuffer input) throws ProtocolDecoderException {
         int origpos = input.position();
@@ -106,8 +106,8 @@ public class VarIntTranscoder extends Transcoder<Integer> {
     @Override
     public void writeTo(Integer message, ByteBuffer buffer) {
         // VarInts don't support negative values
-        if(message<0)
-            message=0;
+        if (message < 0)
+            message = 0;
         int value = message;
 
         while (value > 0x7f) {
@@ -117,7 +117,7 @@ public class VarIntTranscoder extends Transcoder<Integer> {
 
         buffer.put((byte) value);
         buffer.flip();
-    }    
+    }
 
     @Override
     public int getEncodedSize(Integer message) {

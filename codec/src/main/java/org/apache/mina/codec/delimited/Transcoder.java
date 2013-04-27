@@ -29,7 +29,7 @@ import org.apache.mina.codec.delimited.ints.RawInt32Transcoder;
 import org.apache.mina.codec.delimited.ints.VarIntTranscoder;
 
 /**
- * Abstract class providing both encoding and decoding methods between a given type and ByteBuffers
+ * Abstract class providing both encoding and decoding methods between a given type and ByteBuffers.
  * 
  * <p>
  * Transcoder is stateless class providing encoding and decoding facilities.
@@ -40,9 +40,10 @@ import org.apache.mina.codec.delimited.ints.VarIntTranscoder;
  * @param <TYPE> the type of the messages which will be encoded in ByteBuffers and decoded from ByteBuffers.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ * 
  */
-public abstract class Transcoder<TYPE> implements StatelessProtocolDecoder<ByteBuffer, TYPE>,
-        StatelessProtocolEncoder<TYPE, ByteBuffer> {
+public abstract class Transcoder<INPUT, OUTPUT> implements StatelessProtocolDecoder<ByteBuffer, INPUT>,
+        StatelessProtocolEncoder<OUTPUT, ByteBuffer> {
     /**
      * Being stateless, this method is left empty
      * @see ProtocolDecoder#createDecoderState()
@@ -81,7 +82,7 @@ public abstract class Transcoder<TYPE> implements StatelessProtocolDecoder<ByteB
      * 
      * @throws ProtocolDecoderException
      */
-    abstract public TYPE decode(ByteBuffer input) throws ProtocolDecoderException;
+    abstract public INPUT decode(ByteBuffer input) throws ProtocolDecoderException;
 
     /**
      * Decodes a message from a {@link ByteBuffer}
@@ -90,7 +91,7 @@ public abstract class Transcoder<TYPE> implements StatelessProtocolDecoder<ByteB
      * </p>
      */
     @Override
-    final public TYPE decode(ByteBuffer input, Void context) throws ProtocolDecoderException {
+    final public INPUT decode(ByteBuffer input, Void context) throws ProtocolDecoderException {
         return decode(input);
     }
 
@@ -100,9 +101,10 @@ public abstract class Transcoder<TYPE> implements StatelessProtocolDecoder<ByteB
      * @param message a message to be encoded
      * @return the buffer containing {@link ByteBuffer} representation of the message
      */
-    public ByteBuffer encode(TYPE message) {
+    public ByteBuffer encode(OUTPUT message) {
         ByteBuffer buffer = ByteBuffer.allocate(getEncodedSize(message));
         writeTo(message, buffer);
+        buffer.position(0);
         return buffer;
     }
 
@@ -114,7 +116,7 @@ public abstract class Transcoder<TYPE> implements StatelessProtocolDecoder<ByteB
      */
 
     @Override
-    final public ByteBuffer encode(TYPE message, Void context) {
+    final public ByteBuffer encode(OUTPUT message, Void context) {
         return encode(message);
     }
 
@@ -135,7 +137,7 @@ public abstract class Transcoder<TYPE> implements StatelessProtocolDecoder<ByteB
      * @param message a message to be encoded 
      * @return the size of the serialized form of the message
      */
-    abstract public int getEncodedSize(TYPE message);
+    abstract public int getEncodedSize(OUTPUT message);
 
     /**
      * Writes a message on a {@link ByteBuffer}.
@@ -148,6 +150,6 @@ public abstract class Transcoder<TYPE> implements StatelessProtocolDecoder<ByteB
      * @param message a message to be encoded
      * @param buffer a target {@link ByteBuffer}
      */
-    abstract public void writeTo(TYPE message, ByteBuffer buffer);
+    abstract public void writeTo(OUTPUT message, ByteBuffer buffer);
 
 }

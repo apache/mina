@@ -17,13 +17,8 @@
  *  under the License.
  *
  */
-package org.apache.mina.codec.delimited;
-
 /**
- * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
+ *
  */
-public class PrefixedDelimiter {
-
-}
+package org.apache.mina.codec.delimited.serialization;

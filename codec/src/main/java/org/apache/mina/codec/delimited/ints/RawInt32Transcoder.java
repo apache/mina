@@ -26,7 +26,7 @@ import org.apache.mina.codec.delimited.Transcoder;
 
 /**
  * 
- * A {@link Transcoder} providing raw/canonical representation of integers
+ * A {@link Transcoder} providing raw/canonical representation of integers.
  * 
  * 
  * <style type="text/css"> pre-fw { color: rgb(0, 0, 0); display: block;
@@ -103,8 +103,9 @@ import org.apache.mina.codec.delimited.Transcoder;
  * </p>
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ * 
  */
-public class RawInt32Transcoder extends Transcoder<Integer> {
+public class RawInt32Transcoder extends Transcoder<Integer, Integer> {
     /**
      * 
      * This enumeration is used to select the endianness of the outer
@@ -146,8 +147,8 @@ public class RawInt32Transcoder extends Transcoder<Integer> {
     @Override
     public void writeTo(Integer message, ByteBuffer buffer) {
         // VarInts don't support negative values
-        if(message<0)
-            message=0;
+        if (message < 0)
+            message = 0;
         if (endianness == Endianness.BIG) {
             buffer.put((byte) (0xff & (message >> 24)));
             buffer.put((byte) (0xff & (message >> 16)));

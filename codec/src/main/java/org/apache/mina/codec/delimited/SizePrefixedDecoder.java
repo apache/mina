@@ -27,52 +27,92 @@ import org.apache.mina.codec.ProtocolDecoderException;
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ * 
  */
-public class SizePrefixedDecoder implements ProtocolDecoder<ByteBuffer, ByteBuffer, SizePrefixedDecoder.IntRef> {
+public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT, SizePrefixedDecoder.MutableInt> {
 
-    final static protected class IntRef {
+    /**
+     * A mutable {@link Integer} wrapper.
+     * 
+     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+     * 
+     */
+    final static protected class MutableInt {
+
         private Integer value = null;
 
-        public Integer get() {
+        /**
+         * Private constructor to avoid use of this class from other places.
+         */
+        private MutableInt() {
+
+        }
+
+        /**
+         * 
+         * Gets the value as a Integer instance.
+         * 
+         * @return the value as a Integer.
+         */
+        public Integer getValue() {
             return value;
         }
 
+        /**
+         * Returns the existence (or not) of an integer in this mutable. 
+         * 
+         * @return true if it contains a value, false otherwise.
+         */
         public boolean isDefined() {
             return value != null;
         }
 
+        /**
+         * Remove the value.
+         */
         public void reset() {
             value = null;
         }
 
-        public void set(Integer value) {
+        /**
+         * Set the value.
+         * 
+         * @param value the value to set
+         */
+        public void setValue(Integer value) {
             this.value = value;
         }
     }
 
-    final private Transcoder<Integer> transcoder;
+    final private Transcoder<Integer, Integer> transcoder;
 
-    public SizePrefixedDecoder(Transcoder<Integer> transcoder) {
+    final private Transcoder<OUT, ?> packetTranscoder;
+
+    public SizePrefixedDecoder(Transcoder<Integer, Integer> transcoder, Transcoder<OUT, ?> packetTranscoder) {
         super();
         this.transcoder = transcoder;
+        this.packetTranscoder = packetTranscoder;
     }
 
     @Override
-    public IntRef createDecoderState() {
-        return new IntRef();
+    public MutableInt createDecoderState() {
+
+        return new MutableInt();
     }
 
     @Override
-    public ByteBuffer decode(ByteBuffer input, IntRef nextBlockSize) throws ProtocolDecoderException {
-        ByteBuffer output = null;
-        if (nextBlockSize.get() == null) {
-            nextBlockSize.set(transcoder.decode(input, null));
+    public OUT decode(ByteBuffer input, MutableInt nextBlockSize) throws ProtocolDecoderException {
+        OUT output = null;
+        if (nextBlockSize.getValue() == null) {
+            nextBlockSize.setValue(transcoder.decode(input));
         }
 
         if (nextBlockSize.isDefined()) {
-            if (input.remaining() >= nextBlockSize.get()) {
-                output = input.slice();
-                output.limit(output.position() + nextBlockSize.get());
+            if (input.remaining() >= nextBlockSize.getValue()) {
+                ByteBuffer buffer = input.slice();
+                buffer.limit(buffer.position() + nextBlockSize.getValue());
+
+                output = packetTranscoder.decode(buffer);
                 nextBlockSize.reset();
             }
         }
@@ -80,7 +120,7 @@ public class SizePrefixedDecoder implements ProtocolDecoder<ByteBuffer, ByteBuff
     }
 
     @Override
-    public void finishDecode(IntRef context) {
+    public void finishDecode(MutableInt context) {
         //
     }
 
