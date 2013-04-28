@@ -22,19 +22,46 @@ package org.apache.mina.codec.delimited.serialization;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
+import org.apache.thrift.TBase;
+import org.apache.thrift.TException;
+import org.apache.thrift.TSerializer;
+import org.apache.thrift.protocol.TBinaryProtocol;
 
-import com.google.protobuf.GeneratedMessage;
+public class ThriftMessageEncoder<OUT extends TBase<?, ?>> extends ByteBufferEncoder<OUT> {
+    final private TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
 
-public class ProtobufEncoder<OUT extends GeneratedMessage> extends ByteBufferEncoder<OUT> {
+    private OUT lastMessage;
+
+    private byte[] lastBuffer;
+
+    static public <L extends TBase<?, ?>> ThriftMessageEncoder<L> newInstance(Class<L> clazz) {
+        return new ThriftMessageEncoder<L>();
+    }
+
+    private byte[] prepareBuffer(OUT message) throws TException {
+        if (message != lastMessage) {
+            lastBuffer = serializer.serialize(message);
+            this.lastMessage = message;
+        }
+        return lastBuffer;
+    }
 
     @Override
     public int getEncodedSize(OUT message) {
-        return message.getSerializedSize();
+        try {
+            return prepareBuffer(message).length;
+        } catch (TException e) {
+            return 0;
+        }
     }
 
     @Override
     public void writeTo(OUT message, ByteBuffer buffer) {
-        buffer.put(message.toByteArray());
+        try {
+            buffer.put(prepareBuffer(message));
+        } catch (TException e) {
+            //
+        }
     }
 
 }

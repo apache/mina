@@ -79,8 +79,8 @@ import org.apache.mina.codec.delimited.ByteBufferEncoder;
  * </p>
  * 
  * <p>
- * n.b. This class doesn't have any dependency against Apache Thrift or
- * any other library in order to provide this convenient integer serialization
+ * n.b. This class doesn't have any dependency against Apache Thrift or any
+ * other library in order to provide this convenient integer serialization
  * module to any software using FramedMINA.
  * </p>
  * 
@@ -96,7 +96,7 @@ public class RawInt32 {
      * Documentation available in the {@link RawInt32} enclosing class.
      * 
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
-     *
+     * 
      */
     static public class Decoder extends ByteBufferDecoder<Integer> {
 
@@ -130,7 +130,7 @@ public class RawInt32 {
      * Documentation available in the {@link RawInt32} enclosing class.
      * 
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
-     *
+     * 
      */
     static public class Encoder extends ByteBufferEncoder<Integer> {
 
@@ -170,8 +170,8 @@ public class RawInt32 {
 
     /**
      * 
-     * This enumeration is used to select the endianness of the dncoder and
-     * the decoder class.
+     * This enumeration is used to select the endianness of the dncoder and the
+     * decoder class.
      * 
      * Documentation available in the {@link RawInt32} enclosing class.
      * 

@@ -38,7 +38,8 @@ public class ByteBufferInputStream extends InputStream {
 
     /**
      * 
-     * @param buffer a buffer to be wrapped
+     * @param buffer
+     *            a buffer to be wrapped
      */
     public ByteBufferInputStream(ByteBuffer buffer) {
         super();
@@ -106,9 +107,10 @@ public class ByteBufferInputStream extends InputStream {
 
     /**
      * 
-     * @param n the number of bytes to skip (values bigger than {@link Integer#MAX_VALUE}
-     *  push the reading head to the end). 
-     *
+     * @param n
+     *            the number of bytes to skip (values bigger than
+     *            {@link Integer#MAX_VALUE} push the reading head to the end).
+     * 
      * @see InputStream#skip(long)
      */
     @Override

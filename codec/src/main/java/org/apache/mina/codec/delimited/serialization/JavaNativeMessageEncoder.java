@@ -33,7 +33,7 @@ import org.apache.mina.util.ByteBufferOutputStream;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class JavaNativeEncoder<OUT extends Serializable> extends ByteBufferEncoder<OUT> {
+public class JavaNativeMessageEncoder<OUT extends Serializable> extends ByteBufferEncoder<OUT> {
     @Override
     public ByteBuffer encode(OUT message) {
         // avoid the copy done in Transcoder

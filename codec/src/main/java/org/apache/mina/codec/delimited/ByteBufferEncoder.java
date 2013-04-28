@@ -25,15 +25,19 @@ import org.apache.mina.codec.ProtocolDecoder;
 import org.apache.mina.codec.StatelessProtocolEncoder;
 
 /**
- * Abstract class providing both encoding and decoding methods between a given type and ByteBuffers.
+ * Abstract class providing both encoding and decoding methods between a given
+ * type and ByteBuffers.
  * 
  * <p>
  * Transcoder is stateless class providing encoding and decoding facilities.
- * Additionally this abstract requires two methods which allows to determine the size of a given message and 
- * to write it directly to a previously allocated ByteBuffer.
+ * Additionally this abstract requires two methods which allows to determine the
+ * size of a given message and to write it directly to a previously allocated
+ * ByteBuffer.
  * </p>
- *
- * @param <OUTPUT> the type of the messages which will be encoded in ByteBuffers and decoded from ByteBuffers.
+ * 
+ * @param <OUTPUT>
+ *            the type of the messages which will be encoded in ByteBuffers and
+ *            decoded from ByteBuffers.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -42,6 +46,7 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
 
     /**
      * Being stateless, this method is left empty
+     * 
      * @see ProtocolDecoder#createDecoderState()
      */
     @Override
@@ -53,8 +58,10 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
     /**
      * Encodes a message to a {@link ByteBuffer}
      * 
-     * @param message a message to be encoded
-     * @return the buffer containing {@link ByteBuffer} representation of the message
+     * @param message
+     *            a message to be encoded
+     * @return the buffer containing {@link ByteBuffer} representation of the
+     *         message
      */
     public ByteBuffer encode(OUTPUT message) {
         ByteBuffer buffer = ByteBuffer.allocate(getEncodedSize(message));
@@ -66,7 +73,8 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
     /**
      * Encodes a message to a {@link ByteBuffer}
      * <p>
-     * The actual encoding needs to be implemented in the abstract method {@link ByteBufferEncoder#encode(Object)}
+     * The actual encoding needs to be implemented in the abstract method
+     * {@link ByteBufferEncoder#encode(Object)}
      * </p>
      */
 
@@ -79,7 +87,8 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      * 
      * Computes the size of the serialized form of a message in bytes.
      * 
-     * @param message a message to be encoded 
+     * @param message
+     *            a message to be encoded
      * @return the size of the serialized form of the message
      */
     abstract public int getEncodedSize(OUTPUT message);
@@ -88,12 +97,14 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      * Writes a message on a {@link ByteBuffer}.
      * 
      * <p>
-     * n.b. The buffer is expected to have at least a sufficient capacity to handle the serialized form 
-     * of the message. 
+     * n.b. The buffer is expected to have at least a sufficient capacity to
+     * handle the serialized form of the message.
      * </p>
      * 
-     * @param message a message to be encoded
-     * @param buffer a target {@link ByteBuffer}
+     * @param message
+     *            a message to be encoded
+     * @param buffer
+     *            a target {@link ByteBuffer}
      */
     abstract public void writeTo(OUTPUT message, ByteBuffer buffer);
 

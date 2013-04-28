@@ -9,7 +9,7 @@ import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 import org.junit.Test;
 
-abstract public class GenericSerializerTest<T, U> {
+abstract public class GenericSerializerTest<T> {
 
     abstract public ByteBufferDecoder<T> getDecoder() throws Exception;
 

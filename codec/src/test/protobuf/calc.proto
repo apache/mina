@@ -1,0 +1,25 @@
+// See README.txt for information and build instructions.
+
+package tutorial;
+
+option java_package = "ch.fever.code.mina.gpb";
+option java_outer_classname = "Calc";
+
+message Computation {
+  required double x = 1;
+  required double y = 2;
+
+  required Operator operator = 3;
+
+  enum Operator {
+    PLUS = 0;
+    MINUS = 1;
+    TIMES = 2;
+    DIVIDE = 3;
+  }
+
+}
+
+message Result {
+  required double z = 1;
+}

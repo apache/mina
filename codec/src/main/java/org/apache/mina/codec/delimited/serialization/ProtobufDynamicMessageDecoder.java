@@ -29,39 +29,47 @@ import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.util.ByteBufferInputStream;
 
 import com.google.protobuf.ExtensionRegistryLite;
+import com.google.protobuf.GeneratedMessage;
 
 /**
  * An alternative decoder for protobuf which allows the use various target
  * classes with the same decoder.
  * 
- * This decoder converts incoming {@link ByteBuffer} into {@link SerializedMessage}. 
+ * This decoder converts incoming {@link ByteBuffer} into
+ * {@link ProtobufSerializedMessage}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class ProtobufDynamicDecoder extends ByteBufferDecoder<ProtobufDynamicDecoder.SerializedMessage> {
+public class ProtobufDynamicMessageDecoder extends
+        ByteBufferDecoder<ProtobufDynamicMessageDecoder.ProtobufSerializedMessage> {
 
-    @Override
-    public SerializedMessage decode(ByteBuffer input) throws ProtocolDecoderException {
-        return new SerializedMessage(input);
+    static public ProtobufDynamicMessageDecoder newInstance() {
+        return new ProtobufDynamicMessageDecoder();
     }
 
-    final static public class SerializedMessage {
+    @Override
+    public ProtobufSerializedMessage decode(ByteBuffer input) throws ProtocolDecoderException {
+        return new ProtobufSerializedMessage(input);
+    }
+
+    final static public class ProtobufSerializedMessage {
         final private ByteBuffer input;
 
-        public SerializedMessage(ByteBuffer input) {
+        public ProtobufSerializedMessage(ByteBuffer input) {
             this.input = input;
         }
 
         @SuppressWarnings("unchecked")
-        public <L> L get(Class<L> clazz, ExtensionRegistryLite registry) throws SecurityException,
-                NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        public <L extends GeneratedMessage> L get(Class<L> clazz, ExtensionRegistryLite registry)
+                throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException,
+                InvocationTargetException {
             Method parseMethod = clazz.getDeclaredMethod("parseFrom", InputStream.class, ExtensionRegistryLite.class);
             return (L) parseMethod.invoke(null, new ByteBufferInputStream(input.duplicate()), registry);
         }
 
-        public <L> L get(Class<L> clazz) throws SecurityException, NoSuchMethodException, IllegalArgumentException,
-                IllegalAccessException, InvocationTargetException {
+        public <L extends GeneratedMessage> L get(Class<L> clazz) throws SecurityException, NoSuchMethodException,
+                IllegalArgumentException, IllegalAccessException, InvocationTargetException {
             return get(clazz, ExtensionRegistryLite.getEmptyRegistry());
         }
     }

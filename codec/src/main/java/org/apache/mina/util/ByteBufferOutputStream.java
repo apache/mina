@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
  * <p>
  * <i>Currently this class is only used and available in MINA's codec module</i>
  * </p>
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
@@ -62,7 +63,7 @@ public class ByteBufferOutputStream extends OutputStream {
 
     private void needSpace(int len) {
         if (elastic && buffer.capacity() - buffer.position() < len) {
-            ByteBuffer newBuffer = ByteBuffer.allocate(Math.max(buffer.capacity() * 2, buffer.position()+len));
+            ByteBuffer newBuffer = ByteBuffer.allocate(Math.max(buffer.capacity() * 2, buffer.position() + len));
             buffer.limit(buffer.position());
             newBuffer.put(buffer);
             buffer = newBuffer;

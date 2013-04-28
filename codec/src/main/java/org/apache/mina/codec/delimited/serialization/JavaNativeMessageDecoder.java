@@ -19,7 +19,6 @@
  */
 package org.apache.mina.codec.delimited.serialization;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -34,7 +33,7 @@ import org.apache.mina.util.ByteBufferInputStream;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class JavaNativeDecoder<IN extends Serializable> extends ByteBufferDecoder<IN> {
+public class JavaNativeMessageDecoder<IN extends Serializable> extends ByteBufferDecoder<IN> {
 
     @SuppressWarnings("unchecked")
     @Override
@@ -44,10 +43,8 @@ public class JavaNativeDecoder<IN extends Serializable> extends ByteBufferDecode
             IN s = (IN) ois.readObject();
             ois.close();
             return s;
-        } catch (ClassNotFoundException cnfe) {
-            throw new ProtocolDecoderException(cnfe);
-        } catch (IOException ioe) {
-            throw new ProtocolDecoderException(ioe);
+        } catch (Exception ex) {
+            throw new ProtocolDecoderException(ex);
         }
     }
 }

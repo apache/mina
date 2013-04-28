@@ -32,24 +32,25 @@ import com.google.protobuf.GeneratedMessage;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- *
+ * 
  */
-public class ProtobufDecoder<IN extends GeneratedMessage> extends ByteBufferDecoder<IN> {
+public class ProtobufMessageDecoder<IN extends GeneratedMessage> extends ByteBufferDecoder<IN> {
     final private Method parseMethod;
 
     final private ExtensionRegistryLite registry;
 
-    public static <TYPE extends GeneratedMessage> ProtobufDecoder<TYPE> newInstance(Class<TYPE> c) throws SecurityException,
-            NoSuchMethodException {
+    public static <TYPE extends GeneratedMessage> ProtobufMessageDecoder<TYPE> newInstance(Class<TYPE> c)
+            throws SecurityException, NoSuchMethodException {
         return newInstance(c, ExtensionRegistryLite.getEmptyRegistry());
     }
 
-    public static <TYPE extends GeneratedMessage> ProtobufDecoder<TYPE> newInstance(Class<TYPE> c, ExtensionRegistryLite registry)
-            throws SecurityException, NoSuchMethodException {
-        return new ProtobufDecoder<TYPE>(c, registry);
+    public static <TYPE extends GeneratedMessage> ProtobufMessageDecoder<TYPE> newInstance(Class<TYPE> c,
+            ExtensionRegistryLite registry) throws SecurityException, NoSuchMethodException {
+        return new ProtobufMessageDecoder<TYPE>(c, registry);
     }
 
-    private ProtobufDecoder(Class<IN> clazz, ExtensionRegistryLite registry) throws SecurityException, NoSuchMethodException {
+    private ProtobufMessageDecoder(Class<IN> clazz, ExtensionRegistryLite registry) throws SecurityException,
+            NoSuchMethodException {
         super();
         parseMethod = clazz.getDeclaredMethod("parseFrom", InputStream.class, ExtensionRegistryLite.class);
         this.registry = registry;
