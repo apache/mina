@@ -65,8 +65,9 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      */
     public ByteBuffer encode(OUTPUT message) {
         ByteBuffer buffer = ByteBuffer.allocate(getEncodedSize(message));
+        int oldPos=buffer.position();
         writeTo(message, buffer);
-        buffer.position(0);
+        buffer.position(oldPos);
         return buffer;
     }
 

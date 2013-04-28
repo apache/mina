@@ -60,13 +60,13 @@ abstract public class IntEncodingTest {
     public void testTruncatedValues() {
         for (int value : new int[] { 0, 1, 127, 128, 65536, 198649, Integer.MAX_VALUE }) {
 
-            ByteBuffer buffer = encoder.encode(value, null);
+            ByteBuffer buffer = encoder.encode(value);
 
             for (int i = 0; i < buffer.remaining(); i++) {
                 ByteBuffer partialBuffer = buffer.slice();
                 partialBuffer.limit(partialBuffer.position() + i);
                 try {
-                    assertNull(decoder.decode(partialBuffer, null));
+                    assertNull(decoder.decode(partialBuffer));
                 } catch (ProtocolDecoderException e) {
                     fail("Should not throw exception");
                 }
@@ -77,10 +77,10 @@ abstract public class IntEncodingTest {
     @Test
     public void testSizedValues() {
         for (int value : new int[] { 0, 1, 127, 128, 65536, 198649, Integer.MAX_VALUE }) {
-            ByteBuffer buffer = encoder.encode(value, null);
+            ByteBuffer buffer = encoder.encode(value);
 
             try {
-                assertEquals(value, decoder.decode(buffer, null).intValue());
+                assertEquals(value, decoder.decode(buffer).intValue());
             } catch (ProtocolDecoderException e) {
                 fail("Should not throw exception");
             }
@@ -91,7 +91,7 @@ abstract public class IntEncodingTest {
     public void testExtendedValues() {
         for (int value : new int[] { 0, 1, 127, 128, 65536, 198649, Integer.MAX_VALUE }) {
 
-            ByteBuffer buffer = encoder.encode(value, null);
+            ByteBuffer buffer = encoder.encode(value);
 
             for (int i = 1; i < 5; i++) {
                 int size = buffer.remaining() + i;
@@ -102,7 +102,7 @@ abstract public class IntEncodingTest {
                 extendedBuffer.limit(start + size);
 
                 try {
-                    decoder.decode(extendedBuffer, null);
+                    decoder.decode(extendedBuffer);
                     assertEquals(i, extendedBuffer.remaining());
                 } catch (ProtocolDecoderException e) {
                     fail("Should not throw exception");
@@ -115,9 +115,9 @@ abstract public class IntEncodingTest {
     public void testSamples() {
         Map<Integer, ByteBuffer> samples = getEncodingSamples();
         for (Integer val : samples.keySet()) {
-            assertEquals(samples.get(val), encoder.encode(val, null));
+            assertEquals(samples.get(val), encoder.encode(val));
             try {
-                assertEquals(val, decoder.decode(samples.get(val), null));
+                assertEquals(val, decoder.decode(samples.get(val)));
             } catch (ProtocolDecoderException e) {
                 fail("Should not throw exception");
             }
@@ -129,7 +129,7 @@ abstract public class IntEncodingTest {
 
         for (ByteBuffer buffer : getIllegalBuffers())
             try {
-                decoder.decode(buffer, null);
+                decoder.decode(buffer);
                 fail("Should throw an overflow exception");
             } catch (ProtocolDecoderException e) {
                 // fine
@@ -138,8 +138,8 @@ abstract public class IntEncodingTest {
 
     @Test
     public void testNegativeValues() {
-        ByteBuffer zero = encoder.encode(0, null);
+        ByteBuffer zero = encoder.encode(0);
         for (int i : new int[] { -1, -127, Integer.MIN_VALUE })
-            assertEquals(zero, encoder.encode(i, null));
+            assertEquals(zero, encoder.encode(i));
     }
 }

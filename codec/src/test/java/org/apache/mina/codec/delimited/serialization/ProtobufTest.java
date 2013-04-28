@@ -1,6 +1,5 @@
 package org.apache.mina.codec.delimited.serialization;
 
-
 import static org.junit.Assert.assertEquals;
 
 import java.util.LinkedList;
@@ -8,40 +7,41 @@ import java.util.List;
 
 import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
-import org.apache.mina.codec.delimited.serialization.ProtobufDynamicDecoder.SerializedMessage;
+import org.apache.mina.codec.delimited.serialization.ProtobufDynamicMessageDecoder.ProtobufSerializedMessage;
 import org.junit.Test;
 
-import com.google.protobuf.DescriptorProtos.DescriptorProto;
+import ch.fever.code.mina.gpb.AddressBookProtos.Person;
 
-
-public class ProtobufTest extends GenericSerializerTest<DescriptorProto, DescriptorProto> {
+public class ProtobufTest extends GenericSerializerTest<Person> {
 
     @Override
-    public List<DescriptorProto> getObjects() {
-        List<DescriptorProto> list = new LinkedList<DescriptorProto>();
-        list.add(DescriptorProto.newBuilder().setName("HELLO").build());
-        list.add(DescriptorProto.newBuilder().setName("WORLD").build());
+    public List<Person> getObjects() {
+        List<Person> list = new LinkedList<Person>();
+
+        list.add(Person.newBuilder().setId(1).setName("Jean Dupond").setEmail("john.white@bigcorp.com").build());
+        list.add(Person.newBuilder().setId(2).setName("Marie Blanc").setEmail("marie.blanc@bigcorp.com").build());
+
         return list;
     }
 
     @Override
-    public ByteBufferDecoder<DescriptorProto> getDecoder() throws Exception {
-        return ProtobufDecoder.newInstance(DescriptorProto.class);
+    public ByteBufferDecoder<Person> getDecoder() throws Exception {
+        return ProtobufMessageDecoder.newInstance(Person.class);
     }
 
     @Override
-    public ByteBufferEncoder<DescriptorProto> getEncoder() throws Exception {
-        return new ProtobufEncoder<DescriptorProto>();
+    public ByteBufferEncoder<Person> getEncoder() throws Exception {
+        return new ProtobufMessageEncoder<Person>();
     }
 
     @Test
     public void testDynamic() throws Exception {
-        ByteBufferEncoder<DescriptorProto> encoder = getEncoder();
-        ProtobufDynamicDecoder decoder = new ProtobufDynamicDecoder();
+        ByteBufferEncoder<Person> encoder = getEncoder();
+        ProtobufDynamicMessageDecoder decoder = new ProtobufDynamicMessageDecoder();
 
-        for (DescriptorProto object : getObjects()) {
-            SerializedMessage message=decoder.decode(encoder.encode(object));
-            assertEquals(object,message.get(DescriptorProto.class));
+        for (Person object : getObjects()) {
+            ProtobufSerializedMessage message = decoder.decode(encoder.encode(object));
+            assertEquals(object, message.get(Person.class));
         }
     }
 }

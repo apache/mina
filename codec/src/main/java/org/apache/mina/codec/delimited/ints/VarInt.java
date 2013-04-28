@@ -137,13 +137,12 @@ public class VarInt {
                 value >>= 7;
             }
 
-            buffer.put((byte) value);
-            buffer.flip();
+            buffer.put((byte) value);            
         }
 
         @Override
         public int getEncodedSize(Integer message) {
-            if (message == 0)
+            if (message < 1)
                 return 1;
             else {
                 int log2 = 32 - Integer.numberOfLeadingZeros(message);
