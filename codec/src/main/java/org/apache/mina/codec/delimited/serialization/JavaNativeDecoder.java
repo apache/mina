@@ -21,43 +21,27 @@ package org.apache.mina.codec.delimited.serialization;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.delimited.Transcoder;
+import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.util.ByteBufferInputStream;
-import org.apache.mina.util.ByteBufferOutputStream;
 
 /**
- * Transcoder providing the built-in Java-serialization.
+ * Decoder providing the built-in Java-deserialization.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class JavaNativeTranscoder<S extends Serializable> extends Transcoder<S,S> {
-
-    public static <TYPE extends Serializable> JavaNativeTranscoder<TYPE> newInstance(Class<TYPE> cl) {
-        return new JavaNativeTranscoder<TYPE>();
-    }
-
-    @Override
-    public ByteBuffer encode(S message) {
-        // avoid the copy done in Transcoder
-        return serialize(message);
-    }
-
-    private S lastObject;
-
-    private ByteBuffer lastSerialized;
+public class JavaNativeDecoder<IN extends Serializable> extends ByteBufferDecoder<IN> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public S decode(final ByteBuffer input) throws ProtocolDecoderException {
+    public IN decode(final ByteBuffer input) throws ProtocolDecoderException {
         try {
             ObjectInputStream ois = new ObjectInputStream(new ByteBufferInputStream(input));
-            S s = (S) ois.readObject();
+            IN s = (IN) ois.readObject();
             ois.close();
             return s;
         } catch (ClassNotFoundException cnfe) {
@@ -66,32 +50,4 @@ public class JavaNativeTranscoder<S extends Serializable> extends Transcoder<S,S
             throw new ProtocolDecoderException(ioe);
         }
     }
-
-    @Override
-    public int getEncodedSize(S message) {
-        return serialize(message).remaining();
-    }
-
-    private ByteBuffer serialize(S message) {
-        if (message != lastObject) {
-            ByteBufferOutputStream ebbosa = new ByteBufferOutputStream();
-            ebbosa.setElastic(true);
-            try {
-                ObjectOutputStream oos = new ObjectOutputStream(ebbosa);
-                oos.writeObject(message);
-                oos.close();
-                lastObject = message;
-                lastSerialized = ebbosa.getByteBuffer();
-            } catch (IOException e) {
-                throw new RuntimeException("");
-            }
-        }
-        return lastSerialized;
-    }
-
-    @Override
-    public void writeTo(S message, ByteBuffer buffer) {
-        buffer.put(serialize(message));
-    }
-
 }

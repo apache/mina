@@ -59,7 +59,7 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
         }
 
         /**
-         * Returns the existence (or not) of an integer in this mutable. 
+         * Returns the existence (or not) of an integer in this mutable.
          * 
          * @return true if it contains a value, false otherwise.
          */
@@ -77,21 +77,22 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
         /**
          * Set the value.
          * 
-         * @param value the value to set
+         * @param value
+         *            the value to set
          */
         public void setValue(Integer value) {
             this.value = value;
         }
     }
 
-    final private Transcoder<Integer, Integer> transcoder;
+    final private ByteBufferDecoder<Integer> sizeDecoder;
 
-    final private Transcoder<OUT, ?> packetTranscoder;
+    final private ByteBufferDecoder<OUT> payloadDecoder;
 
-    public SizePrefixedDecoder(Transcoder<Integer, Integer> transcoder, Transcoder<OUT, ?> packetTranscoder) {
+    public SizePrefixedDecoder(ByteBufferDecoder<Integer> sizeDecoder, ByteBufferDecoder<OUT> payloadDecoder) {
         super();
-        this.transcoder = transcoder;
-        this.packetTranscoder = packetTranscoder;
+        this.sizeDecoder = sizeDecoder;
+        this.payloadDecoder = payloadDecoder;
     }
 
     @Override
@@ -104,7 +105,7 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
     public OUT decode(ByteBuffer input, MutableInt nextBlockSize) throws ProtocolDecoderException {
         OUT output = null;
         if (nextBlockSize.getValue() == null) {
-            nextBlockSize.setValue(transcoder.decode(input));
+            nextBlockSize.setValue(sizeDecoder.decode(input));
         }
 
         if (nextBlockSize.isDefined()) {
@@ -112,7 +113,7 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
                 ByteBuffer buffer = input.slice();
                 buffer.limit(buffer.position() + nextBlockSize.getValue());
 
-                output = packetTranscoder.decode(buffer);
+                output = payloadDecoder.decode(buffer);
                 nextBlockSize.reset();
             }
         }

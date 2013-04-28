@@ -30,11 +30,14 @@ import org.apache.mina.codec.StatelessProtocolEncoder;
  */
 public class SizePrefixedEncoder<IN> implements StatelessProtocolEncoder<IN, ByteBuffer> {
 
-    final private Transcoder<Integer, Integer> transcoder;
+    final private ByteBufferEncoder<Integer> sizeEncoder;
 
-    public SizePrefixedEncoder(Transcoder<Integer, Integer> transcoder) {
+    final private ByteBufferEncoder<IN> payloadEncoder;
+
+    public SizePrefixedEncoder(ByteBufferEncoder<Integer> sizeEncoder, ByteBufferEncoder<IN> payloadEncoder) {
         super();
-        this.transcoder = transcoder;
+        this.sizeEncoder = sizeEncoder;
+        this.payloadEncoder = payloadEncoder;
     }
 
     @Override
@@ -45,17 +48,12 @@ public class SizePrefixedEncoder<IN> implements StatelessProtocolEncoder<IN, Byt
 
     @Override
     public ByteBuffer encode(IN message, Void context) {
-        ByteBuffer buffer;
-        if (message instanceof ByteBuffer) {
-            ByteBuffer messageBuffer = (ByteBuffer) message;
+        int messageSize = payloadEncoder.getEncodedSize(message);
+        ByteBuffer buffer = ByteBuffer.allocate(sizeEncoder.getEncodedSize(messageSize) + messageSize);
 
-            buffer = ByteBuffer.allocate(transcoder.getEncodedSize(messageBuffer.remaining())
-                    + messageBuffer.remaining());
-            transcoder.writeTo(messageBuffer.remaining(), buffer);
-            buffer.put(messageBuffer);
-        } else {
-            throw new RuntimeException("Message of type " + message.getClass() + " not handled");
-        }
+        sizeEncoder.writeTo(messageSize, buffer);
+        payloadEncoder.writeTo(message, buffer);
+
         buffer.flip();
         return buffer;
     }

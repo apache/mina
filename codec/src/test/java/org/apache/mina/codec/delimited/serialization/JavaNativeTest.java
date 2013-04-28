@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.mina.codec.delimited.Transcoder;
+import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
-public class JavaNativeTranscoderTest extends TranscoderTest<JavaNativeTranscoderTest.TestBean,JavaNativeTranscoderTest.TestBean> {
+public class JavaNativeTest extends
+        GenericSerializerTest<JavaNativeTest.TestBean, JavaNativeTest.TestBean> {
     static public class TestBean implements Serializable {
         private static final long serialVersionUID = 1L;
 
@@ -57,31 +59,26 @@ public class JavaNativeTranscoderTest extends TranscoderTest<JavaNativeTranscode
         private double c;
     }
 
-//    @Test
-//    public void testSerialization() {
-//        Transcoder<TestBean> transcoder = new JavaNativeTranscoder<TestBean>();
-//        TestBean bean1 = new TestBean("Hello", 86, 12.34);
-//        TestBean bean2 = new TestBean("MINA", 94, 67.89);
-//        assertEquals(bean1, transcoder.decode(transcoder.encode(bean1)));
-//        assertEquals(bean2, transcoder.decode(transcoder.encode(bean2)));
-//    }
-//
-//    @Test
-//    public void testEncodedSize() {
-//        Transcoder<TestBean> transcoder = new JavaNativeTranscoder<TestBean>();
-//        TestBean bean = new TestBean("Hello", 86, 12.34);
-//        int size = transcoder.getEncodedSize(bean);
-//        ByteBuffer out = ByteBuffer.allocate(size);
-//        transcoder.writeTo(bean, out);
-//        assertEquals(size, out.position());
-//        out.position(0);
-//        assertEquals(bean, transcoder.decode(out));
-//    }
-
-    @Override
-    public Transcoder<TestBean,TestBean> getTranscoderInstance() {
-        return JavaNativeTranscoder.newInstance(TestBean.class);
-    }
+    //    @Test
+    //    public void testSerialization() {
+    //        Transcoder<TestBean> transcoder = new JavaNativeTranscoder<TestBean>();
+    //        TestBean bean1 = new TestBean("Hello", 86, 12.34);
+    //        TestBean bean2 = new TestBean("MINA", 94, 67.89);
+    //        assertEquals(bean1, transcoder.decode(transcoder.encode(bean1)));
+    //        assertEquals(bean2, transcoder.decode(transcoder.encode(bean2)));
+    //    }
+    //
+    //    @Test
+    //    public void testEncodedSize() {
+    //        Transcoder<TestBean> transcoder = new JavaNativeTranscoder<TestBean>();
+    //        TestBean bean = new TestBean("Hello", 86, 12.34);
+    //        int size = transcoder.getEncodedSize(bean);
+    //        ByteBuffer out = ByteBuffer.allocate(size);
+    //        transcoder.writeTo(bean, out);
+    //        assertEquals(size, out.position());
+    //        out.position(0);
+    //        assertEquals(bean, transcoder.decode(out));
+    //    }
 
     @Override
     public List<TestBean> getObjects() {
@@ -89,6 +86,16 @@ public class JavaNativeTranscoderTest extends TranscoderTest<JavaNativeTranscode
         list.add(new TestBean("Hello", 86, 12.34));
         list.add(new TestBean("MINA", 94, 67.89));
         return list;
+    }
+
+    @Override
+    public ByteBufferDecoder<TestBean> getDecoder() throws Exception {
+        return new JavaNativeDecoder<TestBean>();
+    }
+
+    @Override
+    public ByteBufferEncoder<TestBean> getEncoder() throws Exception {
+        return new JavaNativeEncoder<TestBean>();
     }
 
 }

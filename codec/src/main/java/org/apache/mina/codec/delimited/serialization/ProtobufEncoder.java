@@ -21,28 +21,20 @@ package org.apache.mina.codec.delimited.serialization;
 
 import java.nio.ByteBuffer;
 
-import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.delimited.Transcoder;
+import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
-/**
- * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
- */
-public class ByteBuffersTranscoder extends Transcoder<ByteBuffer,ByteBuffer> {
+import com.google.protobuf.GeneratedMessage;
+
+public class ProtobufEncoder<OUT extends GeneratedMessage> extends ByteBufferEncoder<OUT> {
 
     @Override
-    public ByteBuffer decode(ByteBuffer input) throws ProtocolDecoderException {
-        return input;
+    public int getEncodedSize(OUT message) {
+        return message.getSerializedSize();
     }
 
     @Override
-    public int getEncodedSize(ByteBuffer message) {
-        return message.remaining();
-    }
-
-    @Override
-    public void writeTo(ByteBuffer message, ByteBuffer buffer) {
-        buffer.put(message);
+    public void writeTo(OUT message, ByteBuffer buffer) {
+        buffer.put(message.toByteArray());
     }
 
 }

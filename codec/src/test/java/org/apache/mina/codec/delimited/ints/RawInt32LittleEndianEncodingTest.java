@@ -25,7 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.codec.delimited.Transcoder;
+import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
 
 /**
@@ -36,13 +37,13 @@ import org.apache.mina.codec.delimited.Transcoder;
 public class RawInt32LittleEndianEncodingTest extends IntEncodingTest {
 
     @Override
-    public Transcoder<Integer,Integer> newDecoderInstance() {
-        return new RawInt32Transcoder(RawInt32Transcoder.Endianness.LITTLE);
+    public ByteBufferDecoder<Integer> newDecoderInstance() {
+        return new RawInt32.Decoder(RawInt32.Endianness.LITTLE);
     }
 
     @Override
-    public Transcoder<Integer,Integer> newEncoderInstance() {
-        return new RawInt32Transcoder(RawInt32Transcoder.Endianness.LITTLE);
+    public ByteBufferEncoder<Integer> newEncoderInstance() {
+        return new RawInt32.Encoder(RawInt32.Endianness.LITTLE);
     }
 
     @Override

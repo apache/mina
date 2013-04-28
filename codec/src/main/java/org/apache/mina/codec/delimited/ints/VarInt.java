@@ -23,10 +23,11 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.delimited.Transcoder;
+import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
 /**
- * A {@link Transcoder} providing a variable length representation of integers.
+ * Class providing a variable length representation of integers.
  * 
  * <style type="text/css"> pre-fw { color: rgb(0, 0, 0); display: block;
  * font-family:courier, "courier new", monospace; font-size: 13px; white-space:
@@ -40,7 +41,7 @@ import org.apache.mina.codec.delimited.Transcoder;
  * <p>
  * The average memory usage overall the range 0 to
  * {@link java.lang.Integer#MAX_VALUE} is 4.87 bytes per number which is not far
- * from the canonical form ({@link RawInt32Transcoder}), however varints are an
+ * from the canonical form ({@link RawInt32}), however varints are an
  * interesting solution since the small values (which are supposed to be more
  * frequent) are using less bytes.
  * </p>
@@ -80,52 +81,74 @@ import org.apache.mina.codec.delimited.Transcoder;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class VarIntTranscoder extends Transcoder<Integer, Integer> {
-    @Override
-    public Integer decode(ByteBuffer input) throws ProtocolDecoderException {
-        int origpos = input.position();
-        int size = 0;
+public class VarInt {
+    // this class should not be instanciated
+    private VarInt() {
+    }
 
-        try {
-            for (int i = 0;; i += 7) {
-                byte tmp = input.get();
+    /**
+     * Documentation available in the {@link VarInt} enclosing class.
+     * 
+     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+     * 
+     */
+    static public class Decoder extends ByteBufferDecoder<Integer> {
 
-                if ((tmp & 0x80) == 0 && (i != 4 * 7 || tmp < 1 << 3))
-                    return size | (tmp << i);
-                else if (i < 4 * 7)
-                    size |= (tmp & 0x7f) << i;
-                else
-                    throw new ProtocolDecoderException("Not the varint representation of a signed int32");
+        @Override
+        public Integer decode(ByteBuffer input) throws ProtocolDecoderException {
+            int origpos = input.position();
+            int size = 0;
+
+            try {
+                for (int i = 0;; i += 7) {
+                    byte tmp = input.get();
+
+                    if ((tmp & 0x80) == 0 && (i != 4 * 7 || tmp < 1 << 3))
+                        return size | (tmp << i);
+                    else if (i < 4 * 7)
+                        size |= (tmp & 0x7f) << i;
+                    else
+                        throw new ProtocolDecoderException("Not the varint representation of a signed int32");
+                }
+            } catch (BufferUnderflowException bue) {
+                input.position(origpos);
             }
-        } catch (BufferUnderflowException bue) {
-            input.position(origpos);
+            return null;
         }
-        return null;
     }
 
-    @Override
-    public void writeTo(Integer message, ByteBuffer buffer) {
-        // VarInts don't support negative values
-        if (message < 0)
-            message = 0;
-        int value = message;
+    /**
+     * Documentation available in the {@link VarInt} enclosing class.
+     * 
+     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+     * 
+     */
+    static public class Encoder extends ByteBufferEncoder<Integer> {
 
-        while (value > 0x7f) {
-            buffer.put((byte) ((value & 0x7f) | 0x80));
-            value >>= 7;
+        @Override
+        public void writeTo(Integer message, ByteBuffer buffer) {
+            // VarInts don't support negative values
+            if (message < 0)
+                message = 0;
+            int value = message;
+
+            while (value > 0x7f) {
+                buffer.put((byte) ((value & 0x7f) | 0x80));
+                value >>= 7;
+            }
+
+            buffer.put((byte) value);
+            buffer.flip();
         }
 
-        buffer.put((byte) value);
-        buffer.flip();
-    }
-
-    @Override
-    public int getEncodedSize(Integer message) {
-        if (message == 0)
-            return 1;
-        else {
-            int log2 = 32 - Integer.numberOfLeadingZeros(message);
-            return (log2 + 6) / 7;
+        @Override
+        public int getEncodedSize(Integer message) {
+            if (message == 0)
+                return 1;
+            else {
+                int log2 = 32 - Integer.numberOfLeadingZeros(message);
+                return (log2 + 6) / 7;
+            }
         }
     }
 }

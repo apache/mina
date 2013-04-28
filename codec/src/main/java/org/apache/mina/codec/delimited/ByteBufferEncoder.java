@@ -22,11 +22,7 @@ package org.apache.mina.codec.delimited;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.ProtocolDecoder;
-import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.StatelessProtocolDecoder;
 import org.apache.mina.codec.StatelessProtocolEncoder;
-import org.apache.mina.codec.delimited.ints.RawInt32Transcoder;
-import org.apache.mina.codec.delimited.ints.VarIntTranscoder;
 
 /**
  * Abstract class providing both encoding and decoding methods between a given type and ByteBuffers.
@@ -37,22 +33,12 @@ import org.apache.mina.codec.delimited.ints.VarIntTranscoder;
  * to write it directly to a previously allocated ByteBuffer.
  * </p>
  *
- * @param <TYPE> the type of the messages which will be encoded in ByteBuffers and decoded from ByteBuffers.
+ * @param <OUTPUT> the type of the messages which will be encoded in ByteBuffers and decoded from ByteBuffers.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public abstract class Transcoder<INPUT, OUTPUT> implements StatelessProtocolDecoder<ByteBuffer, INPUT>,
-        StatelessProtocolEncoder<OUTPUT, ByteBuffer> {
-    /**
-     * Being stateless, this method is left empty
-     * @see ProtocolDecoder#createDecoderState()
-     */
-    @Override
-    final public Void createDecoderState() {
-        // stateless !
-        return null;
-    }
+public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEncoder<OUTPUT, ByteBuffer> {
 
     /**
      * Being stateless, this method is left empty
@@ -62,37 +48,6 @@ public abstract class Transcoder<INPUT, OUTPUT> implements StatelessProtocolDeco
     final public Void createEncoderState() {
         // stateless !
         return null;
-    }
-
-    /**
-     * Decodes a message from a {@link ByteBuffer}
-     * 
-     * <p>
-     * When a truncated input is given to this method it <b>may</b> return null. Not all transcoder will be
-     * able to detect this issue and report it that way. Thanks to prefixing of messages, transcoder will
-     * only receive appropriately sized ByteBuffers.
-     * </p>
-     * 
-     * <p>
-     * n.b. The transcoders used for the prefixing (i.e. {@link RawInt32Transcoder} and {@link VarIntTranscoder}) <b>have</b> to detect truncated ByteBuffers. 
-     * </p>
-     * 
-     * @param input data to be decoded as a TYPE message
-     * @return the decoded message on success, null otherwise
-     * 
-     * @throws ProtocolDecoderException
-     */
-    abstract public INPUT decode(ByteBuffer input) throws ProtocolDecoderException;
-
-    /**
-     * Decodes a message from a {@link ByteBuffer}
-     * <p>
-     * The actual decoding needs to be implemented in the abstract method {@link Transcoder#decode(ByteBuffer)}
-     * </p>
-     */
-    @Override
-    final public INPUT decode(ByteBuffer input, Void context) throws ProtocolDecoderException {
-        return decode(input);
     }
 
     /**
@@ -111,23 +66,13 @@ public abstract class Transcoder<INPUT, OUTPUT> implements StatelessProtocolDeco
     /**
      * Encodes a message to a {@link ByteBuffer}
      * <p>
-     * The actual encoding needs to be implemented in the abstract method {@link Transcoder#encode(Object)}
+     * The actual encoding needs to be implemented in the abstract method {@link ByteBufferEncoder#encode(Object)}
      * </p>
      */
 
     @Override
     final public ByteBuffer encode(OUTPUT message, Void context) {
         return encode(message);
-    }
-
-    /**
-     * Being stateless, this method is left empty
-     * 
-     * @see ProtocolDecoder#finishDecode(Object)
-     */
-    @Override
-    final public void finishDecode(Void context) {
-        // stateless !
     }
 
     /**
@@ -143,7 +88,7 @@ public abstract class Transcoder<INPUT, OUTPUT> implements StatelessProtocolDeco
      * Writes a message on a {@link ByteBuffer}.
      * 
      * <p>
-     * Nb. The buffer is expected to have at least a sufficient capacity to handle the serialized form 
+     * n.b. The buffer is expected to have at least a sufficient capacity to handle the serialized form 
      * of the message. 
      * </p>
      * 

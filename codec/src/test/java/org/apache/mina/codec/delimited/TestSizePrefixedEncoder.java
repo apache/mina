@@ -2,7 +2,7 @@ package org.apache.mina.codec.delimited;
 
 import java.nio.ByteBuffer;
 
-import org.apache.mina.codec.delimited.ints.VarIntTranscoder;
+import org.apache.mina.codec.delimited.ints.VarInt;
 import org.junit.Test;
 
 public class TestSizePrefixedEncoder {
