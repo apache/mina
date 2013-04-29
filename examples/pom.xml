@@ -52,12 +52,6 @@
     </dependency>
     
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mina-ldap</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
-    <dependency>
       <groupId>org.apache.logging.log4j.adapters</groupId>
       <artifactId>slf4j-impl</artifactId>
       <scope>runtime</scope>
