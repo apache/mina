@@ -1,22 +1,16 @@
 package org.apache.mina.codec.delimited;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.mina.util.ByteBufferOutputStream;
-import org.apache.thrift.transport.TFastFramedTransport;
-import org.junit.Test;
 
 import ch.fever.code.mina.gpb.AddressBookProtos.Person;
 
-public class ProtobufTest {
-    public void t() {
-        TFastFramedTransport t;
-    }
+public class ProtobufTest extends DelimitTest<Person> {
+  
 
     public List<Person> getObjects() {
 
@@ -28,7 +22,7 @@ public class ProtobufTest {
         return list;
     }
 
-    protected ByteBuffer delimitWithProtobuf() throws IOException {
+    protected ByteBuffer delimitWithOriginal() throws IOException {
         ByteBufferOutputStream bbos = new ByteBufferOutputStream();
         bbos.setElastic(true);
         for (Person p : getObjects())
@@ -36,26 +30,10 @@ public class ProtobufTest {
         return bbos.getByteBuffer();
     }
 
-    protected ByteBuffer delimitWithMina() {
-        ProtobufEncoder<Person> pe = ProtobufEncoder.newInstance(Person.class);
-
-        List<ByteBuffer> buffers = new LinkedList<ByteBuffer>();
-        for (Person p : getObjects())
-            buffers.add(pe.encode(p, null));
-
-        int size = 0;
-        for (ByteBuffer b : buffers)
-            size += b.remaining();
-
-        ByteBuffer buffer = ByteBuffer.allocate(size);
-        for (ByteBuffer b : buffers)
-            buffer.put(b);
-        buffer.flip();
-        return buffer;
+    public SizePrefixedEncoder<Person> getSerializer() {
+        return ProtobufEncoder.newInstance(Person.class);
     }
 
-    @Test
-    public void testDelimit() throws IOException {
-        assertEquals(delimitWithProtobuf(), delimitWithMina());
-    }
+  
+
 }

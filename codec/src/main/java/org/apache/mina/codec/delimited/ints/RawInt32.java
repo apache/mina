@@ -157,7 +157,7 @@ public class RawInt32 {
                 buffer.put((byte) (0xff & (message >> 16)));
                 buffer.put((byte) (0xff & (message >> 24)));
             }
-            buffer.flip();
+      
 
         }
 

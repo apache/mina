@@ -19,7 +19,8 @@
  */
 package org.apache.mina.codec.delimited;
 
-import org.apache.mina.codec.delimited.ints.VarInt;
+import org.apache.mina.codec.delimited.ints.RawInt32;
+import org.apache.mina.codec.delimited.ints.RawInt32.Endianness;
 import org.apache.mina.codec.delimited.serialization.ThriftMessageEncoder;
 import org.apache.thrift.TBase;
 
@@ -31,6 +32,6 @@ public class ThriftEncoder<OUT extends TBase<?, ?>> extends SizePrefixedEncoder<
     }
 
     public ThriftEncoder(Class<OUT> clazz) throws SecurityException, NoSuchMethodException {
-        super(new VarInt.Encoder(), ThriftMessageEncoder.newInstance(clazz));
+        super(new RawInt32.Encoder(Endianness.BIG), ThriftMessageEncoder.newInstance(clazz));
     }
 }
