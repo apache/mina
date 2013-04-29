@@ -33,7 +33,4 @@ public class ProtobufTest extends DelimitTest<Person> {
     public SizePrefixedEncoder<Person> getSerializer() {
         return ProtobufEncoder.newInstance(Person.class);
     }
-
-  
-
 }
