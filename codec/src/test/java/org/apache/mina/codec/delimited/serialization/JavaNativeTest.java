@@ -49,22 +49,29 @@ public class JavaNativeTest extends GenericSerializerTest<JavaNativeTest.TestBea
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             TestBean other = (TestBean) obj;
             if (a == null) {
-                if (other.a != null)
+                if (other.a != null) {
                     return false;
-            } else if (!a.equals(other.a))
+                }
+            } else if (!a.equals(other.a)) {
                 return false;
-            if (b != other.b)
+            }
+            if (b != other.b) {
                 return false;
-            if (Double.doubleToLongBits(c) != Double.doubleToLongBits(other.c))
+            }
+            if (Double.doubleToLongBits(c) != Double.doubleToLongBits(other.c)) {
                 return false;
+            }
             return true;
         }
 
@@ -75,34 +82,13 @@ public class JavaNativeTest extends GenericSerializerTest<JavaNativeTest.TestBea
             this.c = c;
         }
 
-        private String a;
+        private final String a;
 
-        private int b;
+        private final int b;
 
-        private double c;
+        private final double c;
     }
-
-    // @Test
-    // public void testSerialization() {
-    // Transcoder<TestBean> transcoder = new JavaNativeTranscoder<TestBean>();
-    // TestBean bean1 = new TestBean("Hello", 86, 12.34);
-    // TestBean bean2 = new TestBean("MINA", 94, 67.89);
-    // assertEquals(bean1, transcoder.decode(transcoder.encode(bean1)));
-    // assertEquals(bean2, transcoder.decode(transcoder.encode(bean2)));
-    // }
-    //
-    // @Test
-    // public void testEncodedSize() {
-    // Transcoder<TestBean> transcoder = new JavaNativeTranscoder<TestBean>();
-    // TestBean bean = new TestBean("Hello", 86, 12.34);
-    // int size = transcoder.getEncodedSize(bean);
-    // ByteBuffer out = ByteBuffer.allocate(size);
-    // transcoder.writeTo(bean, out);
-    // assertEquals(size, out.position());
-    // out.position(0);
-    // assertEquals(bean, transcoder.decode(out));
-    // }
-
+ 
     @Override
     public List<TestBean> getObjects() {
         List<TestBean> list = new LinkedList<TestBean>();

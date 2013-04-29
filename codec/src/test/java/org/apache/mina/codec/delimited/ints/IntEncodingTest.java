@@ -128,19 +128,21 @@ abstract public class IntEncodingTest {
     @Test
     public void testOverflow() {
 
-        for (ByteBuffer buffer : getIllegalBuffers())
+        for (ByteBuffer buffer : getIllegalBuffers()) {
             try {
                 decoder.decode(buffer);
                 fail("Should throw an overflow exception");
             } catch (ProtocolDecoderException e) {
                 // fine
             }
+        }
     }
 
     @Test
     public void testNegativeValues() {
         ByteBuffer zero = encoder.encode(0);
-        for (int i : new int[] { -1, -127, Integer.MIN_VALUE })
+        for (int i : new int[] { -1, -127, Integer.MIN_VALUE }) {
             assertEquals(zero, encoder.encode(i));
+        }
     }
 }

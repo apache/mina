@@ -24,8 +24,6 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.mina.codec.delimited.serialization.ProtobufMessageDecoder;
-import org.apache.mina.codec.delimited.serialization.ProtobufMessageEncoder;
 import org.apache.mina.util.ByteBufferOutputStream;
 
 import ch.fever.code.mina.gpb.AddressBookProtos.Person;
@@ -38,6 +36,7 @@ import ch.fever.code.mina.gpb.AddressBookProtos.Person;
 public class ProtobufTest extends DelimitTest<Person> {
   
 
+    @Override
     public List<Person> getObjects() {
 
         List<Person> list = new LinkedList<Person>();
@@ -48,14 +47,17 @@ public class ProtobufTest extends DelimitTest<Person> {
         return list;
     }
 
+    @Override
     protected ByteBuffer delimitWithOriginal() throws IOException {
         ByteBufferOutputStream bbos = new ByteBufferOutputStream();
         bbos.setElastic(true);
-        for (Person p : getObjects())
+        for (Person p : getObjects()) {
             p.writeDelimitedTo(bbos);
+        }
         return bbos.getByteBuffer();
     }
 
+    @Override
     public SizePrefixedEncoder<Person> getSerializer() {
         return ProtobufEncoder.newInstance(Person.class);
     }

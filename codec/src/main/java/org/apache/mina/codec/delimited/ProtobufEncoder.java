@@ -24,6 +24,7 @@ import org.apache.mina.codec.delimited.serialization.ProtobufMessageEncoder;
 
 import com.google.protobuf.GeneratedMessage;
 
+
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

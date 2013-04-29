@@ -47,7 +47,7 @@ public class ProtobufTest extends GenericSerializerTest<Person> {
 
         return list;
     }
-
+ 
     @Override
     public ByteBufferDecoder<Person> getDecoder() throws Exception {
         return ProtobufMessageDecoder.newInstance(Person.class);

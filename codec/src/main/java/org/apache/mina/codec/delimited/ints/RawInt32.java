@@ -127,17 +127,20 @@ public class RawInt32 {
 
         @Override
         public Integer decode(ByteBuffer input) throws ProtocolDecoderException {
-            if (input.remaining() < 4)
+            if (input.remaining() < 4) {
                 return null;
+            }
 
             if (endianness == Endianness.BIG) {
-                if ((input.get(0) & 0x80) != 0)
+                if ((input.get(0) & 0x80) != 0) {
                     throw new ProtocolDecoderException("Not the big endian representation of a signed int32");
+                }
                 return ((input.get() & 0xff) << 24) | ((input.get() & 0xff) << 16) | ((input.get() & 0xff) << 8)
                         | ((input.get() & 0xff));
             } else {
-                if ((input.get(3) & 0x80) != 0)
+                if ((input.get(3) & 0x80) != 0) {
                     throw new ProtocolDecoderException("Not the small endian representation of a signed int32");
+                }
                 return ((input.get() & 0xff)) | ((input.get() & 0xff) << 8) | ((input.get() & 0xff) << 16)
                         | ((input.get() & 0xff) << 24);
             }
@@ -162,8 +165,9 @@ public class RawInt32 {
         @Override
         public void writeTo(Integer message, ByteBuffer buffer) {
             // VarInts don't support negative values
-            if (message < 0)
+            if (message < 0) {
                 message = 0;
+            }
             if (endianness == Endianness.BIG) {
                 buffer.put((byte) (0xff & (message >> 24)));
                 buffer.put((byte) (0xff & (message >> 16)));
@@ -175,7 +179,6 @@ public class RawInt32 {
                 buffer.put((byte) (0xff & (message >> 16)));
                 buffer.put((byte) (0xff & (message >> 24)));
             }
-      
 
         }
 

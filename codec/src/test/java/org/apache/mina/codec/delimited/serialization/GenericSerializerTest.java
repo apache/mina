@@ -45,8 +45,9 @@ abstract public class GenericSerializerTest<T> {
     public void testSerialization() throws Exception {
         ByteBufferDecoder<T> decoder = getDecoder();
         ByteBufferEncoder<T> encoder = getEncoder();
-        for (T object : getObjects())
+        for (T object : getObjects()) {
             assertEquals(object, decoder.decode(encoder.encode(object)));
+        }
     }
 
     @Test

@@ -44,17 +44,20 @@ abstract public class DelimitTest<T> {
         SizePrefixedEncoder<T> pe = getSerializer();
 
         List<ByteBuffer> buffers = new LinkedList<ByteBuffer>();
-        for (T p : getObjects())
+        for (T p : getObjects()) {
             buffers.add(pe.encode(p, null));
+        }
 
         int size = 0;
-        for (ByteBuffer b : buffers)
+        for (ByteBuffer b : buffers) {
             size += b.remaining();
+        }
 
         ByteBuffer buffer = ByteBuffer.allocate(size);
-        for (ByteBuffer b : buffers)
+        for (ByteBuffer b : buffers) {
             buffer.put(b);
-        buffer.flip();
+        }
+        buffer.flip();        
         return buffer;
     }
 
