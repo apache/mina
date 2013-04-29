@@ -41,7 +41,7 @@ public class WindowsTextLineEncoderTest {
         assertNotNull(result);
         assertEquals(2, result.remaining());
     }
-
+    
     @Test
     public void testThatNonEmptyBufferReturnsDataAndDelimiter() {
         TextLineEncoder encoder = new TextLineEncoder(LineDelimiter.WINDOWS);
