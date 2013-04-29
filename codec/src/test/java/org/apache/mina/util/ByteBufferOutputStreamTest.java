@@ -10,6 +10,11 @@ import java.util.List;
 
 import org.junit.Test;
 
+/**
+ * A {@link ByteBufferOutputStream} test.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ByteBufferOutputStreamTest {
     @Test
     public void testEmpty() throws IOException {

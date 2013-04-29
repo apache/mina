@@ -31,6 +31,11 @@ import org.junit.Test;
 
 import ch.fever.code.mina.gpb.AddressBookProtos.Person;
 
+/**
+ * A {@link ProtobufMessageEncoder} and {@link ProtobufMessageDecoder} test.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ProtobufTest extends GenericSerializerTest<Person> {
 
     @Override

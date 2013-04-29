@@ -28,6 +28,11 @@ import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 import org.junit.Test;
 
+/**
+ * A {@link ByteBufferEncoder} and {@link ByteBufferDecoder} test. 
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 abstract public class GenericSerializerTest<T> {
 
     abstract public ByteBufferDecoder<T> getDecoder() throws Exception;

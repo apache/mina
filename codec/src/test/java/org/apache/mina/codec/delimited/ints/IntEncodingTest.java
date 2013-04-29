@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * A generic test class for {@link ByteBufferEncoder} and {@link ByteBufferDecoder}
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

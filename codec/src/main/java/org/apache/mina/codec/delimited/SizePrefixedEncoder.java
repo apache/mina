@@ -26,7 +26,6 @@ import org.apache.mina.codec.StatelessProtocolEncoder;
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public class SizePrefixedEncoder<IN> implements StatelessProtocolEncoder<IN, ByteBuffer> {
 

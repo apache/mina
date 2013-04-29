@@ -22,7 +22,6 @@
  * Set of tools for delimited buffers. 
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 package org.apache.mina.codec.delimited;
 

@@ -29,8 +29,7 @@ import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
 /**
- * A {@link Int32Decoder} and {@link Int32Encoder} test in a little endian
- * setup.
+ * A {@link RawInt32.Encoder} and {@link RawInt32.Decoder} test in a little endian setup.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

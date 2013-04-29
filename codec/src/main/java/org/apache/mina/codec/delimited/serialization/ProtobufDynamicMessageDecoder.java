@@ -39,7 +39,6 @@ import com.google.protobuf.GeneratedMessage;
  * {@link ProtobufSerializedMessage}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public class ProtobufDynamicMessageDecoder extends
         ByteBufferDecoder<ProtobufDynamicMessageDecoder.ProtobufSerializedMessage> {

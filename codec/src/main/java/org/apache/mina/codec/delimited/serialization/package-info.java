@@ -17,8 +17,10 @@
  *  under the License.
  *
  */
+
 /**
+ * Serialization mechanisms
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- *
  */
 package org.apache.mina.codec.delimited.serialization;

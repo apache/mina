@@ -24,6 +24,9 @@ import org.apache.mina.codec.delimited.serialization.ProtobufDynamicMessageDecod
 
 import com.google.protobuf.GeneratedMessage;
 
+/**
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ProtobufDynamicDecoder extends
         SizePrefixedDecoder<ProtobufDynamicMessageDecoder.ProtobufSerializedMessage> {
     static public <L extends GeneratedMessage> ProtobufDynamicDecoder newInstance() throws SecurityException,

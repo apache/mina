@@ -26,6 +26,11 @@ import java.util.List;
 import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
+/**
+ * A {@link JavaNativeMessageEncoder} and {@link JavaNativeMessageDecoder} test.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class JavaNativeTest extends GenericSerializerTest<JavaNativeTest.TestBean> {
     static public class TestBean implements Serializable {
         private static final long serialVersionUID = 1L;

@@ -7,6 +7,11 @@ import java.nio.ByteBuffer;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+/**
+ * A {@link ByteBufferInputStream} test.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ByteBufferInputStreamTest {
     @Test
     public void testEmpty() throws IOException {

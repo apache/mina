@@ -27,7 +27,6 @@ import org.apache.mina.codec.ProtocolDecoderException;
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT, SizePrefixedDecoder.MutableInt> {
 

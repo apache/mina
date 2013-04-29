@@ -24,10 +24,17 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.mina.codec.delimited.serialization.ProtobufMessageDecoder;
+import org.apache.mina.codec.delimited.serialization.ProtobufMessageEncoder;
 import org.apache.mina.util.ByteBufferOutputStream;
 
 import ch.fever.code.mina.gpb.AddressBookProtos.Person;
 
+/**
+ * A {@link ProtobufEncoder} and {@link ProtobufDecoder} test.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ProtobufTest extends DelimitTest<Person> {
   
 

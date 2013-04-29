@@ -27,6 +27,11 @@ import java.util.List;
 
 import org.junit.Test;
 
+/**
+ * An abstract {@link SizePrefixedEncoder} and {@link SizePrefixedDecoder} test.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 abstract public class DelimitTest<T> {
 
     abstract public List<T> getObjects();

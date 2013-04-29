@@ -30,6 +30,11 @@ import org.junit.Test;
 
 import ch.fever.code.mina.thrift.UserProfile;
 
+/**
+ * A {@link ThriftMessageEncoder} and {@link ThriftMessageDecoder} test.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ThriftTest extends GenericSerializerTest<UserProfile> {
 
     @Override

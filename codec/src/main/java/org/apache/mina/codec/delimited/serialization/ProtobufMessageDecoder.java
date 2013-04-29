@@ -32,7 +32,6 @@ import com.google.protobuf.GeneratedMessage;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public class ProtobufMessageDecoder<IN extends GeneratedMessage> extends ByteBufferDecoder<IN> {
     final private Method parseMethod;

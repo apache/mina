@@ -35,29 +35,30 @@ import org.apache.mina.codec.delimited.ByteBufferEncoder;
  */
 public class RawInt32BigEndianEncodingTest extends IntEncodingTest {
 
-    @Override
-    public ByteBufferDecoder<Integer> newDecoderInstance() {
-        return new RawInt32.Decoder(RawInt32.Endianness.BIG);
-    }
+	@Override
+	public ByteBufferDecoder<Integer> newDecoderInstance() {
+		return new RawInt32.Decoder(RawInt32.Endianness.BIG);
+	}
 
-    @Override
-    public ByteBufferEncoder<Integer> newEncoderInstance() {
-        return new RawInt32.Encoder(RawInt32.Endianness.BIG);
-    }
+	@Override
+	public ByteBufferEncoder<Integer> newEncoderInstance() {
+		return new RawInt32.Encoder(RawInt32.Endianness.BIG);
+	}
 
-    @Override
-    public Map<Integer, ByteBuffer> getEncodingSamples() {
-        Map<Integer, ByteBuffer> map = new HashMap<Integer, ByteBuffer>();
+	@Override
+	public Map<Integer, ByteBuffer> getEncodingSamples() {
+		Map<Integer, ByteBuffer> map = new HashMap<Integer, ByteBuffer>();
 
-        map.put(0, ByteBuffer.wrap(new byte[] { 0, 0, 0, 0 }));
-        map.put(1 << 24 | 2 << 16 | 3 << 8 | 4, ByteBuffer.wrap(new byte[] { 1, 2, 3, 4 }));
-        return map;
-    }
+		map.put(0, ByteBuffer.wrap(new byte[] { 0, 0, 0, 0 }));
+		map.put(1 << 24 | 2 << 16 | 3 << 8 | 4,
+				ByteBuffer.wrap(new byte[] { 1, 2, 3, 4 }));
+		return map;
+	}
 
-    @Override
-    public Iterable<ByteBuffer> getIllegalBuffers() {
-        List<ByteBuffer> list = new LinkedList<ByteBuffer>();
-        list.add(ByteBuffer.wrap(new byte[] { (byte) 0x80, 0, 0, 0 }));
-        return list;
-    }
+	@Override
+	public Iterable<ByteBuffer> getIllegalBuffers() {
+		List<ByteBuffer> list = new LinkedList<ByteBuffer>();
+		list.add(ByteBuffer.wrap(new byte[] { (byte) 0x80, 0, 0, 0 }));
+		return list;
+	}
 }

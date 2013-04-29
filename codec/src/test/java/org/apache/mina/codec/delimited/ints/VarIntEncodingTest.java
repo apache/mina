@@ -28,8 +28,9 @@ import java.util.Map;
 import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
+
 /**
- * A {@link VarIntDecoder} and {@link VarIntEncoder} test.
+ * A {@link VarInt.Encoder} and {@link VarInt.Decoder} test.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

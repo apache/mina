@@ -40,7 +40,6 @@ import org.apache.mina.codec.StatelessProtocolEncoder;
  *            decoded from ByteBuffers.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEncoder<OUTPUT, ByteBuffer> {
 

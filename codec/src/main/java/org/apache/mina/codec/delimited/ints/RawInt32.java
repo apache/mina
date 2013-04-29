@@ -104,7 +104,6 @@ import org.apache.mina.codec.delimited.ByteBufferEncoder;
  * </p>
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public class RawInt32 {
     // this class should not be instanciated

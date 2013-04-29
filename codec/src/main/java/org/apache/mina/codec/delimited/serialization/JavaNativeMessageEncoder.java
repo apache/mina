@@ -31,7 +31,6 @@ import org.apache.mina.util.ByteBufferOutputStream;
  * Encoder providing the built-in Java-serialization.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public class JavaNativeMessageEncoder<OUT extends Serializable> extends ByteBufferEncoder<OUT> {
     @Override

@@ -25,6 +25,9 @@ import org.apache.mina.codec.delimited.serialization.ProtobufMessageDecoder;
 import com.google.protobuf.ExtensionRegistryLite;
 import com.google.protobuf.GeneratedMessage;
 
+/**
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ProtobufDecoder<M extends GeneratedMessage> extends SizePrefixedDecoder<M> {
     static public <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz,
             ExtensionRegistryLite registry) throws SecurityException, NoSuchMethodException {

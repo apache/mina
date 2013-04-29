@@ -31,7 +31,6 @@ import org.apache.mina.util.ByteBufferInputStream;
  * Decoder providing the built-in Java-deserialization.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public class JavaNativeMessageDecoder<IN extends Serializable> extends ByteBufferDecoder<IN> {
 

@@ -43,7 +43,6 @@ import org.apache.mina.codec.delimited.ints.VarInt;
  *            decoded from ByteBuffers.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * 
  */
 public abstract class ByteBufferDecoder<INPUT> implements StatelessProtocolDecoder<ByteBuffer, INPUT> {
     /**

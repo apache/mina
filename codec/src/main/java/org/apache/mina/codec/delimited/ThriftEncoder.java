@@ -24,6 +24,9 @@ import org.apache.mina.codec.delimited.ints.RawInt32.Endianness;
 import org.apache.mina.codec.delimited.serialization.ThriftMessageEncoder;
 import org.apache.thrift.TBase;
 
+/**
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ThriftEncoder<OUT extends TBase<?, ?>> extends SizePrefixedEncoder<OUT> {
 
     static public <L extends TBase<?, ?>> ThriftEncoder<L> newInstance(Class<L> clazz) throws SecurityException,

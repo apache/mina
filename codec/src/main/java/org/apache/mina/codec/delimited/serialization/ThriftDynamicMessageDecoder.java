@@ -28,6 +28,9 @@ import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 
+/**
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ThriftDynamicMessageDecoder extends ByteBufferDecoder<ThriftDynamicMessageDecoder.ThriftSerializedMessage> {
     private TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
 

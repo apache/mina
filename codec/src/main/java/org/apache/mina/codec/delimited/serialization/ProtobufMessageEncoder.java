@@ -25,6 +25,9 @@ import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
 import com.google.protobuf.GeneratedMessage;
 
+/**
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ProtobufMessageEncoder<OUT extends GeneratedMessage> extends ByteBufferEncoder<OUT> {
 
     static public <T extends GeneratedMessage> ProtobufMessageEncoder<T> newInstance(Class<T> clazz) {
