@@ -290,9 +290,6 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
         try {
             LOG.debug("readable session : {}", this);
 
-            // First reset the buffer from what it contained before
-            readBuffer.clear();
-
             // Read everything we can up to the buffer size
             final int readCount = ((SocketChannel) channel).read(readBuffer);
 
@@ -318,9 +315,14 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
                     }
 
                     sslHelper.processRead(this, readBuffer);
+
+                    // We don't clear the buffer. It has been done by the sslHelper
                 } else {
                     // Plain message, not encrypted : go directly to the chain
                     processMessageReceived(readBuffer);
+
+                    // And now, clear the buffer
+                    readBuffer.clear();
                 }
 
                 // Update the session idle status
