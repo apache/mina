@@ -19,7 +19,7 @@
  */
 
 /**
- * Serialization mechanisms
+ * Serialization mechanisms.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

@@ -17,11 +17,24 @@
  *  under the License.
  *
  */
+package org.apache.mina.codec.delimited;
+
+import org.apache.mina.codec.delimited.ints.VarInt;
+import org.apache.mina.codec.delimited.serialization.ThriftDynamicMessageDecoder;
+import org.apache.thrift.TBase;
+
 
 /**
- * Integer encoder and decoders used for delimited buffers.
- * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-package org.apache.mina.codec.delimited.ints;
+public class ThriftDynamicDecoder extends
+        SizePrefixedDecoder<ThriftDynamicMessageDecoder.ThriftSerializedMessage> {
+    static public <L extends TBase<?,?>> ThriftDynamicDecoder newInstance() throws SecurityException,
+            NoSuchMethodException {
+        return new ThriftDynamicDecoder();
+    }
 
+    public ThriftDynamicDecoder() throws SecurityException, NoSuchMethodException {
+        super(new VarInt.Decoder(), ThriftDynamicMessageDecoder.newInstance());
+    }
+}

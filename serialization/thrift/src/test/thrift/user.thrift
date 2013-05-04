@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
  
-namespace java ch.fever.code.mina.thrift
+namespace java org.apache.mina.generated.thrift
 
 struct UserProfile {
   1: i32 uid,

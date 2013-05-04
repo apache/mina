@@ -24,9 +24,8 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.mina.generated.protoc.AddressBookProtos.Person;
 import org.apache.mina.util.ByteBufferOutputStream;
-
-import ch.fever.code.mina.gpb.AddressBookProtos.Person;
 
 /**
  * A {@link ProtobufEncoder} and {@link ProtobufDecoder} test.

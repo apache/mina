@@ -26,45 +26,45 @@ import java.util.List;
 
 import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
+import org.apache.mina.codec.delimited.serialization.ProtobufDynamicMessageDecoder.ProtobufSerializedMessage;
+import org.apache.mina.generated.protoc.AddressBookProtos.Person;
 import org.junit.Test;
 
-import ch.fever.code.mina.thrift.UserProfile;
-
 /**
- * A {@link ThriftMessageEncoder} and {@link ThriftMessageDecoder} test.
+ * A {@link ProtobufMessageEncoder} and {@link ProtobufMessageDecoder} test.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ThriftTest extends GenericSerializerTest<UserProfile> {
+public class ProtobufTest extends GenericSerializerTest<Person> {
 
     @Override
-    public List<UserProfile> getObjects() {
-        List<UserProfile> list = new LinkedList<UserProfile>();
+    public List<Person> getObjects() {
+        List<Person> list = new LinkedList<Person>();
 
-        list.add(new UserProfile().setUid(1).setName("Jean Dupond"));
-        list.add(new UserProfile().setUid(2).setName("Marie Blanc"));
+        list.add(Person.newBuilder().setId(1).setName("Jean Dupond").setEmail("john.white@bigcorp.com").build());
+        list.add(Person.newBuilder().setId(2).setName("Marie Blanc").setEmail("marie.blanc@bigcorp.com").build());
 
         return list;
     }
-
+ 
     @Override
-    public ByteBufferDecoder<UserProfile> getDecoder() throws Exception {
-        return ThriftMessageDecoder.newInstance(UserProfile.class);
+    public ByteBufferDecoder<Person> getDecoder() throws Exception {
+        return ProtobufMessageDecoder.newInstance(Person.class);
     }
 
     @Override
-    public ByteBufferEncoder<UserProfile> getEncoder() throws Exception {
-        return ThriftMessageEncoder.newInstance(UserProfile.class);
+    public ByteBufferEncoder<Person> getEncoder() throws Exception {
+        return new ProtobufMessageEncoder<Person>();
     }
 
     @Test
     public void testDynamic() throws Exception {
-        ByteBufferEncoder<UserProfile> encoder = getEncoder();
-        ThriftDynamicMessageDecoder decoder = new ThriftDynamicMessageDecoder();
+        ByteBufferEncoder<Person> encoder = getEncoder();
+        ProtobufDynamicMessageDecoder decoder = new ProtobufDynamicMessageDecoder();
 
-        for (UserProfile object : getObjects()) {
-            ThriftDynamicMessageDecoder.ThriftSerializedMessage message = decoder.decode(encoder.encode(object));
-            assertEquals(object, message.get(UserProfile.class));
+        for (Person object : getObjects()) {
+            ProtobufSerializedMessage message = decoder.decode(encoder.encode(object));
+            assertEquals(object, message.get(Person.class));
         }
     }
 }

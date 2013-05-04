@@ -2,7 +2,7 @@
 
 package tutorial;
 
-option java_package = "ch.fever.code.mina.gpb";
+option java_package = "org.apache.mina.generated.protoc";
 option java_outer_classname = "Calc";
 
 message Computation {

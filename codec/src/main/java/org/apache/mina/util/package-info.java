@@ -19,7 +19,7 @@
  */
 
 /**
- * Utilities used in the MINA
+ * Various utilities.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 

@@ -1,3 +1,4 @@
+package org.apache.mina.codec.delimited;
 /*
  *  Licensed to the Apache Software Foundation (ASF) under one
  *  or more contributor license agreements.  See the NOTICE file
@@ -17,17 +18,16 @@
  *  under the License.
  *
  */
-package org.apache.mina.codec.delimited;
+
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.mina.generated.thrift.UserProfile;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TMemoryBuffer;
-
-import ch.fever.code.mina.thrift.UserProfile;
 
 
 /**
