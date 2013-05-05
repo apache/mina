@@ -29,13 +29,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
-import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.mina.api.IoClient;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.api.IoSession.SessionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +81,8 @@ public class SslHelper {
 
     /** An empty buffer used during the handshake phase */
     private static final ByteBuffer HANDSHAKE_BUFFER = ByteBuffer.allocate(1024);
+    
+    private ByteBuffer previous = null;
 
     /**
      * Create a new SSL Handler.
@@ -108,6 +108,10 @@ public class SslHelper {
         return sslEngine;
     }
 
+    boolean isHanshaking() {
+        return sslEngine.getHandshakeStatus() != HandshakeStatus.NOT_HANDSHAKING;
+    }
+    
     /**
      * Initialize the SSL handshake.
      *
@@ -155,68 +159,43 @@ public class SslHelper {
     }
 
     /**
-     * Process the NEED_TASK action.
+     * Duplicate a byte buffer for storing it into this context for future
+     * use.
      * 
-     * @param engine The SSLEngine instance
-     * @return The resulting HandshakeStatus
-     * @throws SSLException If we've got an error while processing the tasks
+     * @param buffer the buffer to duplicate
+     * @return the newly allocated buffer
      */
-    private HandshakeStatus processTasks(SSLEngine engine) throws SSLException {
-        Runnable runnable;
-
-        while ((runnable = engine.getDelegatedTask()) != null) {
-            // TODO : we may have to use a thread pool here to improve the
-            // performances
-            runnable.run();
-        }
-
-        HandshakeStatus hsStatus = engine.getHandshakeStatus();
-
-        return hsStatus;
+    private ByteBuffer duplicate(ByteBuffer buffer) {
+        ByteBuffer newBuffer = ByteBuffer.allocateDirect(buffer.remaining() * 2);
+        newBuffer.put(buffer);
+        newBuffer.flip();
+        return newBuffer;
     }
-
+    
     /**
-     * Process the NEED_UNWRAP action. We have to read the incoming buffer, and to feed
-     * the application buffer.
+     * Accumulate the given buffer into the current context. Allocation is performed only
+     * if needed.
+     * 
+     * @param buffer the buffer to accumulate
+     * @return the accumulated buffer
      */
-    private SSLEngineResult unwrap(ByteBuffer inBuffer, ByteBuffer appBuffer) throws SSLException {
-        // First work with either the new incoming buffer, or the accumulating buffer
-        ByteBuffer tempBuffer = inBuffer;
-
-        // Loop until we have processed the entire incoming buffer,
-        // or until we have to stop
-        while (true) {
-            // Do the unwrapping
-            SSLEngineResult result = sslEngine.unwrap(tempBuffer, appBuffer);
-
-            switch (result.getStatus()) {
-            case OK:
-                // Ok, we have unwrapped a message, return.
-                return result;
-
-            case BUFFER_UNDERFLOW:
-                // We need to read some more data from the channel.
-
-                inBuffer.clear();
-
-                return result;
-
-            case CLOSED:
-                // We have received a Close message, we can exit now
-                if (session.isConnectedSecured()) {
-                    return result;
-                } else {
-                    throw new IllegalStateException();
-                }
-
-            case BUFFER_OVERFLOW:
-                // We have to increase the appBuffer size. In any case
-                // we aren't processing an handshake here. Read again.
-                appBuffer = ByteBuffer.allocate(appBuffer.capacity() + 4096);
-            }
+    private ByteBuffer accumulate(ByteBuffer buffer) {
+        if (previous.capacity() - previous.remaining() > buffer.remaining()) {
+            int oldPosition = previous.position();
+            previous.position(previous.limit());
+            previous.limit(previous.limit() + buffer.remaining());
+            previous.put(buffer);
+            previous.position(oldPosition);
+        } else {
+            ByteBuffer newPrevious = ByteBuffer.allocateDirect((previous.remaining() + buffer.remaining() ) * 2);
+            newPrevious.put(previous);
+            newPrevious.put(buffer);
+            newPrevious.flip();
+            previous = newPrevious;
         }
+        return previous;
     }
-
+    
     /**
      * Process a read ByteBuffer over a secured connection, or during the SSL/TLS
      * Handshake.
@@ -226,159 +205,80 @@ public class SslHelper {
      * @throws SSLException If the unwrapping or handshaking failed
      */
     public void processRead(AbstractIoSession session, ByteBuffer readBuffer) throws SSLException {
-        if (session.isConnectedSecured()) {
-            // Unwrap the incoming data
-            while (readBuffer.hasRemaining()) {
-                processUnwrap(session, readBuffer);
-            }
+        ByteBuffer tempBuffer;
+        
+        if (previous != null) {
+            tempBuffer = accumulate(readBuffer);
         } else {
-            // Process the SSL handshake now
-            processHandShake(session, readBuffer);
+            tempBuffer = readBuffer;
         }
-    }
+        
+        
+        boolean done = false;
+        SSLEngineResult result;
+        ByteBuffer appBuffer = ByteBuffer.allocateDirect(sslEngine.getSession().getApplicationBufferSize());
+        
+        HandshakeStatus handshakeStatus = sslEngine.getHandshakeStatus();
+        while (!done) {
+            switch (handshakeStatus) {
+            case NEED_UNWRAP:
+            case NOT_HANDSHAKING:
+            case FINISHED:
+              result = sslEngine.unwrap(tempBuffer, appBuffer);
+              handshakeStatus = result.getHandshakeStatus();
 
-    /**
-     * Unwrap a SSL/TLS message. The message might not be encrypted (if we are processing
-     * a Handshake message or an Alert message).
-     */
-    private void processUnwrap(AbstractIoSession session, ByteBuffer inBuffer) throws SSLException {
-        // Blind guess : once uncompressed, the resulting buffer will be 3 times bigger
-        ByteBuffer appBuffer = ByteBuffer.allocate(inBuffer.limit() * 3);
-        SSLEngineResult result = unwrap(inBuffer, appBuffer);
-
-        switch (result.getStatus()) {
-        case OK:
-            // Ok, go through the chain now
-            appBuffer.flip();
-            session.processMessageReceived(appBuffer);
-            break;
-
-        case CLOSED:
-            // This was a Alert Closure message. Process it
-            processClosed(result);
-
-            break;
-        }
-    }
-
-    /**
-     * Process the SSL/TLS Alert Closure message
-     */
-    private void processClosed(SSLEngineResult result) throws SSLException {
-        // We have received a Alert_CLosure message, we will have to do a wrap
-        HandshakeStatus hsStatus = result.getHandshakeStatus();
-
-        if (hsStatus == HandshakeStatus.NEED_WRAP) {
-            // We need to send back the Alert Closure message
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("{} processing the NEED_WRAP state", session);
-            }
-
-            int capacity = sslEngine.getSession().getPacketBufferSize();
-            ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
-            session.changeState(SessionState.CONNECTED);
-
-            // Loop until the SSLEngine has nothing more to produce
-            while (!sslEngine.isOutboundDone()) {
-                sslEngine.wrap(EMPTY_BUFFER, outBuffer);
-                outBuffer.flip();
-
-                // Get out of the Connected state
-                WriteRequest writeRequest = new DefaultWriteRequest(outBuffer);
-                session.enqueueWriteRequest(writeRequest);
-            }
-        }
-        session.close(false);
-    }
-
-    /**
-     * Process the SLL/TLS Handshake. We may enter in this method more than once,
-     * as the handshake is a dialogue between the client and the server.
-     */
-    private void processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
-        // Start the Handshake if we aren't already processing a HandShake
-        // and switch to the SECURING state
-        HandshakeStatus hsStatus = sslEngine.getHandshakeStatus();
-
-        // Initilize the session status when we enter into the Handshake process.
-        // Not that we don't call the SSLEngine.beginHandshake() method  :
-        // It's implicitely done internally by the unwrap() method.
-        if (hsStatus == HandshakeStatus.NOT_HANDSHAKING) {
-            session.changeState(SessionState.SECURING);
-        }
-
-        SSLEngineResult result = null;
-
-        // If the SSLEngine has not be started, then the status will be NOT_HANDSHAKING
-        // We loop until we reach the FINISHED state
-        while (hsStatus != HandshakeStatus.FINISHED) {
-            if (hsStatus == HandshakeStatus.NEED_TASK) {
-                hsStatus = processTasks(sslEngine);
-            } else if (hsStatus == HandshakeStatus.NEED_WRAP) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} processing the NEED_WRAP state", session);
+              switch (result.getStatus()) {
+              case BUFFER_UNDERFLOW:
+                  /* we need more data */
+                  done = true;
+                  break;
+              case BUFFER_OVERFLOW:
+                  /* resize output buffer */
+                  appBuffer = ByteBuffer.allocateDirect(appBuffer.capacity() * 2);
+                  break;
+              case OK:
+                  if ((handshakeStatus == HandshakeStatus.NOT_HANDSHAKING) &&
+                      (result.bytesProduced() > 0)) {
+                      appBuffer.flip();
+                      session.processMessageReceived(appBuffer);
+                  }
+              }
+              break;
+            case NEED_TASK:
+                Runnable task;
+                
+                while ((task = sslEngine.getDelegatedTask()) != null) {
+                    task.run();
                 }
-
-                // Create an insanely wide buffer, as the SSLEngine requires it
-                int capacity = sslEngine.getSession().getPacketBufferSize();
-                ByteBuffer outBuffer = ByteBuffer.allocate(capacity);
-
-                boolean completed = false;
-
-                // Loop until we are able to wrap the message (we may have
-                // to increase the buffer size more than once.
-                while (!completed) {
-                    result = sslEngine.wrap(EMPTY_BUFFER, outBuffer);
-
-                    switch (result.getStatus()) {
-                    case OK:
-                    case CLOSED:
-                        completed = true;
-                        break;
-
-                    case BUFFER_OVERFLOW:
-                        // Increase the target buffer size
-                        outBuffer = ByteBuffer.allocate(outBuffer.capacity() + 4096);
-                        break;
-                    }
-                }
-
-                // Done. We can now push this buffer into the write queue.
-                outBuffer.flip();
-                WriteRequest writeRequest = new DefaultWriteRequest(inBuffer);
-                writeRequest.setMessage(outBuffer);
-                session.enqueueWriteRequest(writeRequest);
-                hsStatus = result.getHandshakeStatus();
-
-                // Nothing more to wrap : get out.
-                // Note to self : we can probably use only one ByteBuffer for the
-                // multiple wrapped messages. (see https://issues.apache.org/jira/browse/DIRMINA-878)
-                if (hsStatus != HandshakeStatus.NEED_WRAP) {
+                handshakeStatus = sslEngine.getHandshakeStatus();
+                break;
+            case NEED_WRAP:
+                result = sslEngine.wrap(EMPTY_BUFFER, appBuffer);
+                handshakeStatus = result.getHandshakeStatus();
+                switch (result.getStatus()) {
+                case  BUFFER_OVERFLOW:
+                    appBuffer = ByteBuffer.allocateDirect(appBuffer.capacity() * 2);
+                    break;
+                case BUFFER_UNDERFLOW:
+                    done = true;
+                    break;
+                case CLOSED:
+                case OK:
+                    appBuffer.flip();
+                    WriteRequest writeRequest = new DefaultWriteRequest(readBuffer);
+                    writeRequest.setMessage(appBuffer);
+                    session.enqueueWriteRequest(writeRequest);
                     break;
                 }
-            } else if ((hsStatus == HandshakeStatus.NEED_UNWRAP) || (hsStatus == HandshakeStatus.NOT_HANDSHAKING)) {
-                // We cover the ongoing handshake (NEED_UNWRAP) and
-                // the initial call to the handshake (NOT_HANDSHAKING)
-                result = unwrap(inBuffer, HANDSHAKE_BUFFER);
-
-                if (result.getStatus() == Status.BUFFER_UNDERFLOW) {
-                    // Read more data
-                    break;
-                } else {
-                    hsStatus = result.getHandshakeStatus();
-                }
             }
         }
-
-        if (hsStatus == HandshakeStatus.FINISHED) {
-            // The handshake has been completed. We can change the session's state.
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("{} processing the FINISHED state", session);
-            }
-
-            session.changeState(SessionState.SECURED);
+        if (tempBuffer.remaining() > 0) {
+            previous = duplicate(tempBuffer);
+        } else {
+            previous = null;
         }
-    }
+        readBuffer.clear();
+     }
 
     /**
      * Process the application data encryption for a session.
