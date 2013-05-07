@@ -110,6 +110,7 @@
       <module>http</module>
       <module>examples</module>
       <module>coap</module>
+      <module>serialization</module>
   </modules>
 
   <dependencyManagement>
