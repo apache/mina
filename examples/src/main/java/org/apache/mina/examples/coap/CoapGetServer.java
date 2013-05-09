@@ -35,7 +35,9 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.nio.udp.NioUdpServer;
 
 /**
- * A simple coap UDP server answering to GET requests
+ * A simple CoAP UDP server answering to GET requests
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CoapGetServer {
 
