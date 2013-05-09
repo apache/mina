@@ -29,14 +29,13 @@
 
     <artifactId>mina-protobuf</artifactId>
     <name>Apache MINA Serialization::Protobuf ${project.version}</name>
+    <packaging>bundle</packaging>
 
     <properties>
         <symbolicName>${project.groupId}.protobuf</symbolicName>
         <exportedPackage>${project.groupId}</exportedPackage>
         <protobuf.version>2.5.0</protobuf.version>
     </properties>
-
-
 
     <dependencies>
         <dependency>
@@ -57,6 +56,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>mina-codec</artifactId>
             <version>${project.version}</version>
+            <type>bundle</type>
         </dependency>
         
         <dependency>
