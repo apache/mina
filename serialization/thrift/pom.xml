@@ -54,7 +54,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>mina-codec</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
