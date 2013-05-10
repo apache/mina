@@ -78,5 +78,5 @@ public interface IoHandler {
      * @param session the session related to the exception
      * @param cause the caught exception
      */
-    void exceptionCaught(IoSession session, Throwable cause);
+    void exceptionCaught(IoSession session, Exception cause);
 }

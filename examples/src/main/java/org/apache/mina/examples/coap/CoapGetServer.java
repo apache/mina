@@ -97,7 +97,7 @@ public class CoapGetServer {
             }
 
             @Override
-            public void exceptionCaught(IoSession session, Throwable cause) {
+            public void exceptionCaught(IoSession session, Exception cause) {
                 System.err.println("exception : ");
                 cause.printStackTrace();
                 session.close(false);

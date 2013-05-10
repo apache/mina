@@ -18,12 +18,17 @@
  */
 package org.apache.mina.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A convenient {@link IoHandler} implementation to be sub-classed for easier {@link IoHandler} implementation.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoHandler implements IoHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractIoHandler.class);
 
     /**
      * {@inheritDoc}
@@ -78,6 +83,8 @@ public abstract class AbstractIoHandler implements IoHandler {
      * {@inheritDoc}
      */
     @Override
-    public void exceptionCaught(final IoSession session, final Throwable cause) {
+    public void exceptionCaught(final IoSession session, final Exception cause) {
+        LOG.error("Unexpected exception : ", cause);
+        session.close(true);
     }
 }
