@@ -57,9 +57,9 @@ import org.slf4j.LoggerFactory;
  */
 public class IndexedIdleChecker implements IdleChecker {
 
-    private static int MAX_IDLE_TIME_IN_SEC = 60 * 60; // 1 hour max idle
+    private static final int MAX_IDLE_TIME_IN_SEC = 60 * 60; // 1 hour max idle
 
-    private static long MAX_IDLE_TIME_IN_MS = MAX_IDLE_TIME_IN_SEC * 1000L; // 1 hour max idle
+    private static final long MAX_IDLE_TIME_IN_MS = MAX_IDLE_TIME_IN_SEC * 1000L; // 1 hour max idle
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexedIdleChecker.class);
 
@@ -180,7 +180,7 @@ public class IndexedIdleChecker implements IdleChecker {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("checking idle time, last = {}, now = {}, delta = {}", new Object[] { lastCheckTimeMs, timeMs,
-                                    delta });
+                    delta });
         }
 
         if (delta < 1000) {
