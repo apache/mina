@@ -50,10 +50,10 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
     private final ProtocolDecoder<ENCODED, MESSAGE, DECODING_STATE> decoder;
 
     /** key for session attribute holding the encoder */
-    private final AttributeKey<Object> ENCODER = new AttributeKey<Object>(Object.class, "internal_encoder");
+    private static final AttributeKey<Object> ENCODER = new AttributeKey<Object>(Object.class, "internal_encoder");
 
     /** key for session attribute holding the decoder */
-    private final AttributeKey<Object> DECODER = new AttributeKey<Object>(Object.class, "internal_decoder");
+    private static final AttributeKey<Object> DECODER = new AttributeKey<Object>(Object.class, "internal_decoder");
 
     /**
      * Creates a new instance of ProtocolCodecFilter, with the specified encoder and decoder.
