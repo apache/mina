@@ -39,6 +39,9 @@ public enum MessageType {
         this.code = code;
     }
 
+    /**
+     * @return the numeric code for this message type
+     */
     public int getCode() {
         return code;
     }

@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Decoder CoAP messages from the ByteBuffer of a received UDP Datagram.
  * 
+ * Decode {@link ByteBuffer} into {@link CoapMessage}.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMessage> {
@@ -125,7 +127,7 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
         if (input.hasRemaining()) {
             throw new ProtocolDecoderException("trailling " + input.remaining() + " bytes in the UDP datagram");
         }
-        return new CoapMessage(version, type, code, id, token, payload, options.toArray(EMPTY_OPTION));
+        return new CoapMessage(version, type, code, id, token, options.toArray(EMPTY_OPTION), payload);
     }
 
     /**

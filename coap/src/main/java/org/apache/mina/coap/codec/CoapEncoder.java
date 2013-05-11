@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Encode a CoAP message following the RFC.
  * 
+ * Encode {@link CoapMessage} into {@link ByteBuffer}
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CoapEncoder implements StatelessProtocolEncoder<CoapMessage, ByteBuffer> {

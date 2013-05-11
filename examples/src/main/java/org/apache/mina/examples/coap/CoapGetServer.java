@@ -90,8 +90,8 @@ public class CoapGetServer {
 
                     // let's confirm it
                     CoapMessage response = new CoapMessage(1, MessageType.ACK, CoapCode.CONTENT.getCode(), msg.getId(),
-                            msg.getToken(), "hello coap !".getBytes(), new CoapOption[] { new CoapOption(
-                                    CoapOptionType.CONTENT_FORMAT, new byte[] { 0 }) });
+                            msg.getToken(), new CoapOption[] { new CoapOption(
+                                    CoapOptionType.CONTENT_FORMAT, new byte[] { 0 }) }, "hello coap !".getBytes());
                     session.write(response);
                 }
             }

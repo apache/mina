@@ -31,10 +31,16 @@ public class CoapOption {
     private final CoapOptionType type;
     private final byte[] data;
 
+    /**
+     * Create a CoAP option
+     * 
+     * @param type the type of the option
+     * @param data the content of the option
+     */
     public CoapOption(CoapOptionType type, byte[] data) {
         super();
         this.type = type;
-        this.data = data;
+        this.data = Arrays.copyOf(data, data.length);
     }
 
     public CoapOptionType getType() {
@@ -45,6 +51,9 @@ public class CoapOption {
         return data;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -52,6 +61,9 @@ public class CoapOption {
         return builder.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -61,6 +73,9 @@ public class CoapOption {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
