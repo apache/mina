@@ -29,7 +29,7 @@ import org.apache.mina.session.AbstractIoSessionConfig;
  */
 public class DefaultUdpSessionConfig extends AbstractIoSessionConfig implements UdpSessionConfig {
     // The Broadcast flag and field 
-    private static boolean DEFAULT_BROADCAST = false;
+    private static final boolean DEFAULT_BROADCAST = false;
 
     /** The SO_BROADCAST socket option. It tells whether the socket is allowed
      * to send packets to and from a brodcast address (like 192.168.1.255) */
