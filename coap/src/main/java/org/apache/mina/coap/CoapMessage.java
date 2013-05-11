@@ -110,6 +110,7 @@ public class CoapMessage {
                 .append(code).append(", id=").append(id).append(", token=").append(Arrays.toString(token))
                 .append(", payload=").append(Arrays.toString(payload)).append(", options=")
                 .append(Arrays.toString(options)).append("]");
+        
         return builder.toString();
     }
 
@@ -127,6 +128,7 @@ public class CoapMessage {
         result = prime * result + Arrays.hashCode(token);
         result = prime * result + ((type == null) ? 0 : type.hashCode());
         result = prime * result + version;
+        
         return result;
     }
 
@@ -135,27 +137,48 @@ public class CoapMessage {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        
+        if (getClass() != obj.getClass()) {
             return false;
+        }
+        
         CoapMessage other = (CoapMessage) obj;
-        if (code != other.code)
+        
+        if (code != other.code) {
             return false;
-        if (id != other.id)
+        }
+        
+        if (id != other.id) {
             return false;
-        if (!Arrays.equals(options, other.options))
+        }
+        
+        if (!Arrays.equals(options, other.options)) {
             return false;
-        if (!Arrays.equals(payload, other.payload))
+        }
+        
+        if (!Arrays.equals(payload, other.payload)) {
             return false;
-        if (!Arrays.equals(token, other.token))
+        }
+        
+        if (!Arrays.equals(token, other.token)) {
             return false;
-        if (type != other.type)
+        }
+        
+        if (type != other.type) {
             return false;
-        if (version != other.version)
+        }
+        
+        if (version != other.version) {
             return false;
+        }
+        
         return true;
     }
 

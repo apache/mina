@@ -75,6 +75,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
         if (listener != null) {
             LOG.debug("future is done calling listener");
             Object object = result.get();
+
             if (object instanceof Throwable) {
                 scheduleException(listener, (Throwable) object);
             } else {
@@ -103,6 +104,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
             } else {
                 LOG.debug("Unable to cancel");
             }
+
             latch.countDown();
         }
 
@@ -141,10 +143,12 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
         latch.await();
         LOG.trace("Wait completed");
 
-        if (isCancelled())
+        if (isCancelled()) {
             throw new CancellationException();
+        }
 
         Object object = result.get();
+
         if (object instanceof ExecutionException) {
             throw (ExecutionException) object;
         } else {
@@ -159,14 +163,19 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 
         LOG.trace("Entering wait");
-        if (!latch.await(timeout, unit))
+
+        if (!latch.await(timeout, unit)) {
             throw new TimeoutException();
+        }
+
         LOG.trace("Wait completed");
 
-        if (isCancelled())
+        if (isCancelled()) {
             throw new CancellationException();
+        }
 
         Object object = result.get();
+
         if (object instanceof ExecutionException) {
             throw (ExecutionException) object;
         } else {
@@ -209,6 +218,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
      */
     protected void scheduleResult(IoFutureListener<V> listener, V result) {
         LOG.debug("Calling the default result scheduler");
+
         try {
             listener.completed(result);
         } catch (Throwable t) {
@@ -226,6 +236,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
      */
     protected void scheduleException(IoFutureListener<V> listener, Throwable throwable) {
         LOG.debug("Calling the default exception scheduler");
+
         try {
             listener.exception(throwable);
         } catch (Throwable t) {

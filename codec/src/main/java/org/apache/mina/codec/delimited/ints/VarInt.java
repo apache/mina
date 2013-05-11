@@ -102,16 +102,18 @@ public class VarInt {
                 for (int i = 0;; i += 7) {
                     byte tmp = input.get();
 
-                    if ((tmp & 0x80) == 0 && (i != 4 * 7 || tmp < 1 << 3))
+                    if ((tmp & 0x80) == 0 && (i != 4 * 7 || tmp < 1 << 3)) {
                         return size | (tmp << i);
-                    else if (i < 4 * 7)
+                    } else if (i < 4 * 7) {
                         size |= (tmp & 0x7f) << i;
-                    else
+                    } else {
                         throw new ProtocolDecoderException("Not the varint representation of a signed int32");
+                    }
                 }
             } catch (BufferUnderflowException bue) {
                 input.position(origpos);
             }
+
             return null;
         }
     }
@@ -127,8 +129,10 @@ public class VarInt {
         @Override
         public void writeTo(Integer message, ByteBuffer buffer) {
             // VarInts don't support negative values
-            if (message < 0)
+            if (message < 0) {
                 message = 0;
+            }
+
             int value = message;
 
             while (value > 0x7f) {
@@ -136,14 +140,14 @@ public class VarInt {
                 value >>= 7;
             }
 
-            buffer.put((byte) value);            
+            buffer.put((byte) value);
         }
 
         @Override
         public int getEncodedSize(Integer message) {
-            if (message < 1)
+            if (message < 1) {
                 return 1;
-            else {
+            } else {
                 int log2 = 32 - Integer.numberOfLeadingZeros(message);
                 return (log2 + 6) / 7;
             }
