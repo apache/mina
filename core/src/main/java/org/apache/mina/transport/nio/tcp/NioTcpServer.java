@@ -155,11 +155,11 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * 
      * @return
      */
-    public ServerSocketChannel getServerSocketChannel() {
+    public synchronized ServerSocketChannel getServerSocketChannel() {
         return this.serverChannel;
     }
 
-    public void setServerSocketChannel(final ServerSocketChannel serverChannel) {
+    public synchronized void setServerSocketChannel(final ServerSocketChannel serverChannel) {
         this.serverChannel = serverChannel;
     }
 
