@@ -34,6 +34,9 @@ public enum CoapOptionType {
         this.code = code;
     }
 
+    /**
+     * @return the numeric code for this option type
+     */
     public int getCode() {
         return code;
     }

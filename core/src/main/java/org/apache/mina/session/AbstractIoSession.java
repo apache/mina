@@ -537,8 +537,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     }
 
     /**
-     * Writes the message immediately. If we can't write all the message, we will get back the number of
-     * written bytes.
+     * Writes the message immediately. If we can't write all the message, we will get back the number of written bytes.
      * 
      * @param message the message to write
      * @return the number of written bytes
@@ -709,7 +708,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     // ------------------------------------------------------------------------
 
     /** send a caught exception to the {@link IoHandler} (if any) */
-    protected void processException(final Throwable t) {
+    protected void processException(final Exception t) {
         LOG.debug("caught session exception ", t);
         final IoHandler handler = getService().getIoHandler();
         if (handler != null) {
@@ -892,7 +891,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         LOG.debug("processing message '{}' writing event for session {}", writeRequest, this);
 
         try {
-            //lastWriteRequest = null;
+            // lastWriteRequest = null;
 
             if (chain.length < 1) {
                 enqueueWriteRequest(writeRequest);

@@ -22,9 +22,15 @@ package org.apache.mina.coap;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * A representation of CoAP message following the CoAP RFC.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class CoapMessage {
 
-    private final static byte[] EMPTY_BYTE_ARRAY = new byte[] {};
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[] {};
+
     private final int version;
     private final MessageType type;
     private final int code;
@@ -33,8 +39,19 @@ public class CoapMessage {
     private final byte[] payload;
     private final CoapOption[] options;
 
-    public CoapMessage(int version, MessageType type, int code, int id, byte[] token, byte[] payload,
-            CoapOption[] options) {
+    /**
+     * Create a CoAP message
+     * 
+     * @param version the version (you probably want 1 here)
+     * @param type the type of CoAP message
+     * @param code the message code : {@link CoapCode}
+     * @param id the identifier for this message
+     * @param token the message token (can be <code>null</code>)
+     * @param options list of options for this message (can be <code>null</code>)
+     * @param payload the payload of the message (can be <code>null</code>
+     */
+    public CoapMessage(int version, MessageType type, int code, int id, byte[] token, CoapOption[] options,
+            byte[] payload) {
         super();
         this.version = version;
         this.type = type;
@@ -83,6 +100,9 @@ public class CoapMessage {
         return type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -93,6 +113,9 @@ public class CoapMessage {
         return builder.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -107,6 +130,9 @@ public class CoapMessage {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

@@ -52,9 +52,6 @@ public class NioTcpClient extends AbstractTcpClient {
     /** A logger for this class */
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpClient.class);
 
-    /** the bound address */
-    private SocketAddress address = null;
-
     /** the SelectorLoop for connecting the sessions */
     // This is final, so that we know if it's not initialized
     private final SelectorLoop connectSelectorLoop;
@@ -115,7 +112,6 @@ public class NioTcpClient extends AbstractTcpClient {
     public IoFuture<IoSession> connect(SocketAddress remoteAddress) throws IOException {
         Assert.assertNotNull(remoteAddress, "remoteAddress");
 
-        address = remoteAddress;
         SocketChannel clientSocket = SocketChannel.open();
 
         clientSocket.socket().setSoTimeout(getConnectTimeoutMillis());
@@ -187,7 +183,7 @@ public class NioTcpClient extends AbstractTcpClient {
             session.initSecure(config.getSslContext());
         }
 
-        // connect to a running server. We get an immediate result if 
+        // connect to a running server. We get an immediate result if
         // the socket is blocking, and either true or false if it's non blocking
         boolean connected = clientSocket.connect(remoteAddress);
 
@@ -225,18 +221,13 @@ public class NioTcpClient extends AbstractTcpClient {
      * {@inheritDoc}
      */
     public synchronized void disconnect() throws IOException {
-        LOG.info("Disconnecting {}", address);
-
-        if (this.address == null) {
-            throw new IllegalStateException("server not bound");
-        }
+        LOG.info("Disconnecting sessions");
 
         // Close all the existing sessions
         for (IoSession session : getManagedSessions().values()) {
             session.close(true);
         }
 
-        address = null;
         fireServiceInactivated();
 
         // will stop the idle processor if we are the last service
