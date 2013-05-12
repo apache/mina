@@ -33,17 +33,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An abstract implementation of {@link IoFuture}.  Owners of this future
- * must implement {@link #cancelOwner(boolean)} to receive notifications of
- * when the future should be canceled.
+ * An abstract implementation of {@link IoFuture}. Owners of this future must implement {@link #cancelOwner(boolean)} to
+ * receive notifications of when the future should be canceled.
  * <p>
- * Concrete implementations of this abstract class should consider overriding
- * the two methods {@link #scheduleResult(org.apache.mina.api.IoFutureListener, Object)}
- * and {@link #scheduleException(org.apache.mina.api.IoFutureListener, Throwable)}
- * so that listeners are called in a separate thread.  The default
- * implementations may end up calling the listener in the same thread that is
- * registering the listener, before the registration has completed.
- *
+ * Concrete implementations of this abstract class should consider overriding the two methods
+ * {@link #scheduleResult(org.apache.mina.api.IoFutureListener, Object)} and
+ * {@link #scheduleException(org.apache.mina.api.IoFutureListener, Throwable)} so that listeners are called in a
+ * separate thread. The default implementations may end up calling the listener in the same thread that is registering
+ * the listener, before the registration has completed.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoFuture<V> implements IoFuture<V> {
@@ -59,6 +57,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings({ "unchecked" })
     public IoFuture<V> register(IoFutureListener<V> listener) {
 
@@ -89,6 +88,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
 
         LOG.debug("Attempting to cancel");
@@ -122,6 +122,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isCancelled() {
         return result.get() instanceof CancellationException;
     }
@@ -129,6 +130,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isDone() {
         return latch.getCount() == 0;
     }
@@ -136,6 +138,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings({ "unchecked" })
     public V get() throws InterruptedException, ExecutionException {
 
@@ -159,6 +162,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings({ "unchecked" })
     public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 
@@ -184,54 +188,47 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     }
 
     /**
-     * Notify the owner of this future that a client is attempting to cancel.
-     * This attempt will fail if the task has already completed, has already
-     * been cancelled, or could not be cancelled for some other reason. If
-     * successful, and this task has not started when <tt>cancel</tt> is called,
-     * this task should never run.  If the task has already started,
-     * then the <tt>mayInterruptIfRunning</tt> parameter determines
-     * whether the thread executing this task should be interrupted in
-     * an attempt to stop the task.
+     * Notify the owner of this future that a client is attempting to cancel. This attempt will fail if the task has
+     * already completed, has already been cancelled, or could not be cancelled for some other reason. If successful,
+     * and this task has not started when <tt>cancel</tt> is called, this task should never run. If the task has already
+     * started, then the <tt>mayInterruptIfRunning</tt> parameter determines whether the thread executing this task
+     * should be interrupted in an attempt to stop the task.
      * <p/>
-     * <p>After this method returns, subsequent calls to {@link #isDone} will
-     * always return <tt>true</tt>.  Subsequent calls to {@link #isCancelled}
-     * will always return <tt>true</tt> if this method returned <tt>true</tt>.
+     * <p>
+     * After this method returns, subsequent calls to {@link #isDone} will always return <tt>true</tt>. Subsequent calls
+     * to {@link #isCancelled} will always return <tt>true</tt> if this method returned <tt>true</tt>.
      * <p/>
      * <b>Note:</b> implementations must never throw an exception.
-     *
-     * @param mayInterruptIfRunning <tt>true</tt> if the owner executing this
-     *                              task should be interrupted; otherwise,
-     *                              in-progress tasks are allowed to complete
-     * @return <tt>false</tt> if the task could not be cancelled,
-     *         typically because it has already completed normally;
+     * 
+     * @param mayInterruptIfRunning <tt>true</tt> if the owner executing this task should be interrupted; otherwise,
+     *        in-progress tasks are allowed to complete
+     * @return <tt>false</tt> if the task could not be cancelled, typically because it has already completed normally;
      *         <tt>true</tt> otherwise
      */
     abstract protected boolean cancelOwner(boolean mayInterruptIfRunning);
 
     /**
-     * Default implementation to call a listener's {@link IoFutureListener#completed(Object)}
-     * method.  Owners may override this method so that the listener is called
-     * from a thread pool.
-     *
+     * Default implementation to call a listener's {@link IoFutureListener#completed(Object)} method. Owners may
+     * override this method so that the listener is called from a thread pool.
+     * 
      * @param listener the listener to call
-     * @param result   the result to pass to the listener
+     * @param result the result to pass to the listener
      */
     protected void scheduleResult(IoFutureListener<V> listener, V result) {
         LOG.debug("Calling the default result scheduler");
 
         try {
             listener.completed(result);
-        } catch (Throwable t) {
-            LOG.warn("Listener threw an exception", t);
+        } catch (Exception e) {
+            LOG.warn("Listener threw an exception", e);
         }
     }
 
     /**
-     * Default implementation to call a listener's {@link IoFutureListener#exception(Throwable)}
-     * method.  Owners may override this method so that the listener is called
-     * from a thread pool.
-     *
-     * @param listener  the listener to call
+     * Default implementation to call a listener's {@link IoFutureListener#exception(Throwable)} method. Owners may
+     * override this method so that the listener is called from a thread pool.
+     * 
+     * @param listener the listener to call
      * @param throwable the exception to pass to the listener
      */
     protected void scheduleException(IoFutureListener<V> listener, Throwable throwable) {
@@ -239,15 +236,14 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
 
         try {
             listener.exception(throwable);
-        } catch (Throwable t) {
-            LOG.warn("Listener threw an exception", t);
+        } catch (Exception e) {
+            LOG.warn("Listener threw an exception", e);
         }
     }
 
     /**
-     * Set the future result of the executing task.  Any {@link IoFutureListener}s
-     * are notified of the
-     *
+     * Set the future result of the executing task. Any {@link IoFutureListener}s are notified of the
+     * 
      * @param value the value returned by the executing task.
      */
     protected final void setResult(V value) {
@@ -266,12 +262,11 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
     }
 
     /**
-     * Set the future result as a {@link Throwable}, indicating that a
-     * throwable was thrown while executing the task.  This value is usually
-     * set by the future result owner.
+     * Set the future result as a {@link Throwable}, indicating that a throwable was thrown while executing the task.
+     * This value is usually set by the future result owner.
      * <p/>
      * Any {@link IoFutureListener}s are notified of the exception.
-     *
+     * 
      * @param t the throwable that was thrown while executing the task.
      */
     protected final void setException(Throwable t) {
