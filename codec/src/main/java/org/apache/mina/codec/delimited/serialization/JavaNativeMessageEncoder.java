@@ -59,7 +59,7 @@ public class JavaNativeMessageEncoder<OUT extends Serializable> extends ByteBuff
                 lastObject = message;
                 lastSerialized = ebbosa.getByteBuffer();
             } catch (IOException e) {
-                throw new RuntimeException("");
+                throw new IllegalStateException("Serialization exception", e);
             }
         }
         return lastSerialized;
