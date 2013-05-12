@@ -26,6 +26,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.codec.ProtocolDecoder;
+import org.apache.mina.codec.ProtocolDecoderException;
 
 /**
  * A {@link ProtocolDecoder} which decodes a text line into a string.
@@ -227,7 +228,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
                         throw new IllegalStateException("Line is too long: " + overflowPosition);
                     }
                 } catch (CharacterCodingException cce) {
-                    throw new RuntimeException(cce);
+                    throw new ProtocolDecoderException(cce);
                 } finally {
                     ctx.reset();
                 }
@@ -288,7 +289,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
                             throw new IllegalStateException("Line is too long: " + overflowLength);
                         }
                     } catch (CharacterCodingException cce) {
-                        throw new RuntimeException(cce);
+                        throw new ProtocolDecoderException(cce);
                     } finally {
                         ctx.reset();
                     }

@@ -25,15 +25,15 @@ import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoSessionConfig;
 
 /**
- * Base class for session configuration.
- * Implements session configuration properties commons to all the different transports.
+ * Base class for session configuration. Implements session configuration properties commons to all the different
+ * transports.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoSessionConfig implements IoSessionConfig {
-    //=====================
+    // =====================
     // idle management
-    //=====================    
+    // =====================
     /** The delay we wait for a read before we consider the session is staled */
     private long idleTimeRead = -1;
 
@@ -66,7 +66,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
         case WRITE_IDLE:
             return idleTimeWrite;
         default:
-            throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
+            throw new IllegalStateException("unexpected excetion, unknown idle status : " + status);
         }
     }
 
@@ -83,13 +83,14 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
             this.idleTimeWrite = ildeTimeInMilli;
             break;
         default:
-            throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
+            throw new IllegalStateException("unexpected excetion, unknown idle status : " + status);
         }
     }
 
     /**
-    * {@inheritDoc}
-    */
+     * {@inheritDoc}
+     */
+    @Override
     public Integer getReadBufferSize() {
         return readBufferSize;
     }
@@ -97,6 +98,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setReadBufferSize(int readBufferSize) {
         if (readBufferSize <= 0) {
             throw new IllegalArgumentException("readBufferSize: " + readBufferSize + " (expected: 1+)");
@@ -107,6 +109,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Integer getSendBufferSize() {
         return sendBufferSize;
     }
@@ -114,6 +117,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setSendBufferSize(int sendBufferSize) {
         this.sendBufferSize = sendBufferSize;
     }
@@ -121,6 +125,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getTrafficClass() {
         return trafficClass.getValue();
     }
@@ -128,6 +133,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTrafficClass(TrafficClassEnum trafficClass) {
         this.trafficClass = trafficClass;
     }
@@ -135,6 +141,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTrafficClass(int trafficClass) {
         this.trafficClass = TrafficClassEnum.valueOf(trafficClass);
     }
@@ -142,6 +149,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean isReuseAddress() {
         return reuseAddress;
     }
@@ -149,6 +157,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
     }
@@ -156,6 +165,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Integer getTimeout() {
         return timeout;
     }
@@ -163,6 +173,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }

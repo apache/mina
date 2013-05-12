@@ -59,12 +59,13 @@ public abstract class AbstractUdpServer extends AbstractIoServer {
      * {@inheritDoc}
      */
     public void initSecured(IoSession session) throws SSLException {
-        throw new RuntimeException("SSL is not supported for UDP");
+        throw new IllegalStateException("SSL is not supported for UDP");
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public UdpSessionConfig getSessionConfig() {
         return (UdpSessionConfig) config;
     }

@@ -27,17 +27,16 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.api.IoService;
-import org.apache.mina.api.IoSession;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
+import org.apache.mina.transport.nio.ConnectFuture;
 import org.apache.mina.transport.nio.RegistrationCallback;
 import org.apache.mina.transport.nio.SelectorListener;
 import org.apache.mina.transport.nio.SelectorLoop;
 import org.apache.mina.transport.tcp.ProxyTcpSessionConfig;
 import org.apache.mina.transport.tcp.TcpSessionConfig;
-import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -385,27 +384,5 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
 
     void setSelectionKey(SelectionKey key) {
         this.selectionKey = key;
-    }
-
-    static class ConnectFuture extends AbstractIoFuture<IoSession> {
-
-        @Override
-        protected boolean cancelOwner(boolean mayInterruptIfRunning) {
-            return false;
-        }
-
-        /**
-         * session connected
-         */
-        public void complete(IoSession session) {
-            setResult(session);
-        }
-
-        /**
-         * connection error
-         */
-        public void error(Exception e) {
-            setException(e);
-        }
     }
 }

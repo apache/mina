@@ -31,6 +31,7 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
+import org.apache.mina.transport.nio.ConnectFuture;
 import org.apache.mina.transport.nio.FixedSelectorLoopPool;
 import org.apache.mina.transport.nio.NioSelectorLoop;
 import org.apache.mina.transport.nio.RegistrationCallback;
@@ -187,7 +188,7 @@ public class NioTcpClient extends AbstractTcpClient {
         // the socket is blocking, and either true or false if it's non blocking
         boolean connected = clientSocket.connect(remoteAddress);
 
-        NioTcpSession.ConnectFuture connectFuture = new NioTcpSession.ConnectFuture();
+        ConnectFuture connectFuture = new ConnectFuture();
         session.setConnectFuture(connectFuture);
 
         if (!connected) {
