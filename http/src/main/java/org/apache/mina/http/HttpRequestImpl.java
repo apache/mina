@@ -144,20 +144,19 @@ public class HttpRequestImpl implements HttpRequest {
      */
     @Override
     public String toString() {
-        String result = "HTTP REQUEST METHOD: " + method + "\n";
-        result += "VERSION: " + version + "\n";
-        result += "PATH: " + requestedPath + "\n";
+        StringBuilder sb = new StringBuilder();
 
-        result += "--- HEADER --- \n";
+        sb.append("HTTP REQUEST METHOD: ").append(method).append('\n');
+        sb.append("VERSION: ").append(version).append('\n');
+        sb.append("PATH: ").append(requestedPath).append('\n');
+
+        sb.append("--- HEADER --- \n");
+
         for (String key : headers.keySet()) {
             String value = headers.get(key);
-            result += key + ":" + value + "\n";
+            sb.append(key).append(':').append(value).append('\n');
         }
 
-        /*
-         * result += "--- PARAMETERS --- \n"; for (String key : parameters.keySet()) { Collection<String> values =
-         * parameters.get(key); for (String value : values) { result += key + ":" + value + "\n"; } }
-         */
-        return result;
+        return sb.toString();
     }
 }
