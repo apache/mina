@@ -59,7 +59,7 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
         case WRITE_IDLE:
             return idleTimeWrite;
         default:
-            throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
+            throw new IllegalStateException("unexpected excetion, unknown idle status : " + status);
         }
     }
 
@@ -76,7 +76,7 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
             this.idleTimeWrite = ildeTimeInMilli;
             break;
         default:
-            throw new RuntimeException("unexpected excetion, unknown idle status : " + status);
+            throw new IllegalStateException("unexpected excetion, unknown idle status : " + status);
         }
     }
 
@@ -313,6 +313,7 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Integer getTimeout() {
         try {
             return socket.getSoTimeout();
@@ -324,6 +325,7 @@ public class ProxyTcpSessionConfig implements TcpSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTimeout(int timeout) {
         try {
             socket.setSoTimeout(timeout);

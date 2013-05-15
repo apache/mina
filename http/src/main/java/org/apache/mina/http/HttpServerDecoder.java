@@ -126,7 +126,7 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu, H
         case DONE:
             return new HttpEndOfContent();
         default:
-            throw new RuntimeException("Unknonwn decoder state : " + context.getState());
+            throw new IllegalStateException("Unknonwn decoder state : " + context.getState());
         }
 
         return null;
