@@ -33,23 +33,46 @@ import java.util.regex.Pattern;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DateUtil {
+    /** A thread local is used to protect the DateFormat against concurrent access */
+    private static ThreadLocal<DateFormat> RFC_1123_FORMAT = new ThreadLocal<DateFormat>() {
+        /**
+         * Gets the formatter
+         */
+        public DateFormat get() {
+            return super.get();
+        }
 
-    private final static Locale LOCALE = Locale.US;
+        /**
+         * Get rid of the formatter
+         */
+        public void remove() {
+            super.remove();
+        }
 
-    private final static TimeZone GMT_ZONE;
+        /**
+         * Set a new formatter
+         */
+        public void set(DateFormat value) {
+            super.set(value);
+        }
 
+        /**
+         * Initialize the formatter
+         */
+        protected DateFormat initialValue() {
+            DateFormat dateFormat = new SimpleDateFormat(RFC_1123_PATTERN, Locale.US);
+            TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+            dateFormat.setTimeZone(gmtZone);
+
+            return dateFormat;
+        }
+    };
+
+    /** The format of an HTTP date */
     private final static String RFC_1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss zzz";
-
-    private final static DateFormat RFC_1123_FORMAT;
 
     /** Pattern to find digits only. */
     private final static Pattern DIGIT_PATTERN = Pattern.compile("^\\d+$");
-
-    static {
-        RFC_1123_FORMAT = new SimpleDateFormat(DateUtil.RFC_1123_PATTERN, DateUtil.LOCALE);
-        GMT_ZONE = TimeZone.getTimeZone("GMT");
-        DateUtil.RFC_1123_FORMAT.setTimeZone(DateUtil.GMT_ZONE);
-    }
 
     /**
      * Returns the current date as String
@@ -57,7 +80,7 @@ public class DateUtil {
      * @return Current Date as String, in the format <i>EEE, dd MMM yyyy HH:mm:ss zzz</i>
      */
     public static String getCurrentAsString() {
-        return DateUtil.RFC_1123_FORMAT.format(new Date());
+        return RFC_1123_FORMAT.get().format(new Date());
     }
 
     /**
@@ -72,7 +95,7 @@ public class DateUtil {
     private static long parseDateStringToMilliseconds(final String dateString) {
 
         try {
-            return DateUtil.RFC_1123_FORMAT.parse(dateString).getTime();
+            return RFC_1123_FORMAT.get().parse(dateString).getTime();
         } catch (final ParseException e) {
             return 0;
         }
@@ -92,7 +115,7 @@ public class DateUtil {
 
         long ms = 0;
 
-        if (DateUtil.DIGIT_PATTERN.matcher(dateValue).matches()) {
+        if (DIGIT_PATTERN.matcher(dateValue).matches()) {
             ms = Long.parseLong(dateValue);
         } else {
             ms = parseDateStringToMilliseconds(dateValue);
@@ -109,11 +132,10 @@ public class DateUtil {
      * @return a <code>String</code> representation of the date.
      */
     public static String parseToRFC1123(final long dateValue) {
-
         final Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(dateValue);
 
-        return DateUtil.RFC_1123_FORMAT.format(calendar.getTime());
+        return RFC_1123_FORMAT.get().format(calendar.getTime());
     }
 
     /**
@@ -124,7 +146,6 @@ public class DateUtil {
      * @return a <code>String</code> representation of the date.
      */
     public static String getDateAsString(Date date) {
-        return RFC_1123_FORMAT.format(date);
+        return RFC_1123_FORMAT.get().format(date);
     }
-
 }
