@@ -42,7 +42,6 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.transport.nio.tcp.NioTcpClient;
 import org.apache.mina.transport.nio.tcp.NioTcpServer;
 import org.junit.Ignore;
 import org.junit.Test;

@@ -19,16 +19,15 @@
  */
 package org.apache.mina.transport.tcp;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import junit.framework.Assert;
 
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
@@ -199,10 +198,10 @@ public class NioTcpServerHandlerTest {
             LOG.debug("** message received {}", message);
             msgReadLatch.countDown();
             if (message instanceof ByteBuffer) {
-                final ByteBuffer msg = (ByteBuffer) message;
+                ByteBuffer msg = (ByteBuffer) message;
                 session.write(ByteBuffer.allocate(msg.remaining()).put(msg).flip());
             } else {
-                Assert.fail("non bytebuffer received??");
+                fail("non bytebuffer received??");
             }
         }
 

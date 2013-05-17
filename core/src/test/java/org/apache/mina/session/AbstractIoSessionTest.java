@@ -18,10 +18,11 @@
  */
 package org.apache.mina.session;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -31,8 +32,6 @@ import static org.mockito.Mockito.when;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-
-import junit.framework.Assert;
 
 import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoFilter;
@@ -172,7 +171,7 @@ public class AbstractIoSessionTest {
     @Test
     public void testGetId() {
 
-        Assert.assertNotSame((new DummySession(service)).getId(), (new DummySession(service)).getId());
+        assertNotSame((new DummySession(service)).getId(), (new DummySession(service)).getId());
 
     }
 
@@ -181,8 +180,8 @@ public class AbstractIoSessionTest {
         final long before = System.currentTimeMillis();
         final long creation = (new DummySession(service)).getCreationTime();
         final long after = System.currentTimeMillis();
-        Assert.assertTrue(creation <= after);
-        Assert.assertTrue(creation >= before);
+        assertTrue(creation <= after);
+        assertTrue(creation >= before);
     }
 
     @Test
