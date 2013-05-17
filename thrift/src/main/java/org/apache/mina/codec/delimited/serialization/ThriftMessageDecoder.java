@@ -30,9 +30,9 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 public class ThriftMessageDecoder<IN extends TBase<?, ?>> extends ByteBufferDecoder<IN> {
     private TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
 
-    final private Class<IN> clazz;
+    private final Class<IN> clazz;
 
-    static public <L extends TBase<?, ?>> ThriftMessageDecoder<L> newInstance(Class<L> clazz) {
+    public static <L extends TBase<?, ?>> ThriftMessageDecoder<L> newInstance(Class<L> clazz) {
         return new ThriftMessageDecoder<L>(clazz);
     }
 

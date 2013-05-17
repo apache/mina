@@ -24,19 +24,16 @@ import org.apache.mina.codec.delimited.serialization.ProtobufMessageEncoder;
 
 import com.google.protobuf.GeneratedMessage;
 
-
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProtobufEncoder<OUT extends GeneratedMessage> extends
-		SizePrefixedEncoder<OUT> {
+public class ProtobufEncoder<OUT extends GeneratedMessage> extends SizePrefixedEncoder<OUT> {
 
-	static public <L extends GeneratedMessage> ProtobufEncoder<L> newInstance(
-			Class<L> clazz) {
-		return new ProtobufEncoder<L>(clazz);
-	}
+    public static <L extends GeneratedMessage> ProtobufEncoder<L> newInstance(Class<L> clazz) {
+        return new ProtobufEncoder<L>(clazz);
+    }
 
-	public ProtobufEncoder(Class<OUT> clazz) {
-		super(new VarInt.Encoder(), ProtobufMessageEncoder.newInstance(clazz));
-	}
+    public ProtobufEncoder(Class<OUT> clazz) {
+        super(new VarInt.Encoder(), ProtobufMessageEncoder.newInstance(clazz));
+    }
 }

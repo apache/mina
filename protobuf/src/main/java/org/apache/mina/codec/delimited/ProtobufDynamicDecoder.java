@@ -29,7 +29,7 @@ import com.google.protobuf.GeneratedMessage;
  */
 public class ProtobufDynamicDecoder extends
         SizePrefixedDecoder<ProtobufDynamicMessageDecoder.ProtobufSerializedMessage> {
-    static public <L extends GeneratedMessage> ProtobufDynamicDecoder newInstance() throws SecurityException,
+    public static <L extends GeneratedMessage> ProtobufDynamicDecoder newInstance() throws SecurityException,
             NoSuchMethodException {
         return new ProtobufDynamicDecoder();
     }

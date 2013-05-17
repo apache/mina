@@ -43,7 +43,7 @@ import com.google.protobuf.GeneratedMessage;
 public class ProtobufDynamicMessageDecoder extends
         ByteBufferDecoder<ProtobufDynamicMessageDecoder.ProtobufSerializedMessage> {
 
-    static public ProtobufDynamicMessageDecoder newInstance() {
+    public static ProtobufDynamicMessageDecoder newInstance() {
         return new ProtobufDynamicMessageDecoder();
     }
 
@@ -52,7 +52,7 @@ public class ProtobufDynamicMessageDecoder extends
         return new ProtobufSerializedMessage(input);
     }
 
-    final static public class ProtobufSerializedMessage {
+    public final static class ProtobufSerializedMessage {
         final private ByteBuffer input;
 
         public ProtobufSerializedMessage(ByteBuffer input) {
@@ -72,5 +72,4 @@ public class ProtobufDynamicMessageDecoder extends
             return get(clazz, ExtensionRegistryLite.getEmptyRegistry());
         }
     }
-
 }

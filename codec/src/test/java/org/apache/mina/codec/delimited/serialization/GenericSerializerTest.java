@@ -33,13 +33,13 @@ import org.junit.Test;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-abstract public class GenericSerializerTest<T> {
+public abstract class GenericSerializerTest<T> {
 
-    abstract public ByteBufferDecoder<T> getDecoder() throws Exception;
+    public abstract ByteBufferDecoder<T> getDecoder() throws Exception;
 
-    abstract public ByteBufferEncoder<T> getEncoder() throws Exception;
+    public abstract ByteBufferEncoder<T> getEncoder() throws Exception;
 
-    abstract public List<T> getObjects();
+    public abstract List<T> getObjects();
 
     @Test
     public void testSerialization() throws Exception {

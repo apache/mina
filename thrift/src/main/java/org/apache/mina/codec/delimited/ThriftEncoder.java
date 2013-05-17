@@ -29,7 +29,7 @@ import org.apache.thrift.TBase;
  */
 public class ThriftEncoder<OUT extends TBase<?, ?>> extends SizePrefixedEncoder<OUT> {
 
-    static public <L extends TBase<?, ?>> ThriftEncoder<L> newInstance(Class<L> clazz) throws SecurityException,
+    public static <L extends TBase<?, ?>> ThriftEncoder<L> newInstance(Class<L> clazz) throws SecurityException,
             NoSuchMethodException {
         return new ThriftEncoder<L>(clazz);
     }

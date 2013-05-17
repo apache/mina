@@ -32,13 +32,13 @@ import org.junit.Test;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-abstract public class DelimitTest<T> {
+public abstract class DelimitTest<T> {
 
-    abstract public List<T> getObjects();
+    public abstract List<T> getObjects();
 
-    abstract protected ByteBuffer delimitWithOriginal() throws Exception;
+    protected abstract ByteBuffer delimitWithOriginal() throws Exception;
 
-    abstract public SizePrefixedEncoder<T> getSerializer() throws Exception;
+    public abstract SizePrefixedEncoder<T> getSerializer() throws Exception;
 
     final protected ByteBuffer delimitWithMina() throws Exception {
         SizePrefixedEncoder<T> pe = getSerializer();
@@ -57,7 +57,7 @@ abstract public class DelimitTest<T> {
         for (ByteBuffer b : buffers) {
             buffer.put(b);
         }
-        buffer.flip();        
+        buffer.flip();
         return buffer;
     }
 

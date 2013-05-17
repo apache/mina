@@ -91,7 +91,7 @@ public class VarInt {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    static public class Decoder extends ByteBufferDecoder<Integer> {
+    public static class Decoder extends ByteBufferDecoder<Integer> {
 
         @Override
         public Integer decode(ByteBuffer input) throws ProtocolDecoderException {
@@ -124,7 +124,7 @@ public class VarInt {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    static public class Encoder extends ByteBufferEncoder<Integer> {
+    public static class Encoder extends ByteBufferEncoder<Integer> {
 
         @Override
         public void writeTo(Integer message, ByteBuffer buffer) {

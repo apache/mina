@@ -29,12 +29,12 @@ import com.google.protobuf.GeneratedMessage;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtobufDecoder<M extends GeneratedMessage> extends SizePrefixedDecoder<M> {
-    static public <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz,
+    public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz,
             ExtensionRegistryLite registry) throws SecurityException, NoSuchMethodException {
         return new ProtobufDecoder<L>(clazz, registry);
     }
 
-    static public <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz) throws SecurityException,
+    public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz) throws SecurityException,
             NoSuchMethodException {
         return newInstance(clazz, ExtensionRegistryLite.getEmptyRegistry());
     }

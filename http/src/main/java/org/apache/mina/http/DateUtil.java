@@ -69,10 +69,10 @@ public class DateUtil {
     };
 
     /** The format of an HTTP date */
-    private final static String RFC_1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss zzz";
+    private static final String RFC_1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     /** Pattern to find digits only. */
-    private final static Pattern DIGIT_PATTERN = Pattern.compile("^\\d+$");
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("^\\d+$");
 
     /**
      * Returns the current date as String

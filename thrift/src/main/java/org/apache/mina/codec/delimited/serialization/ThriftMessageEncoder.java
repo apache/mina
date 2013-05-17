@@ -28,13 +28,13 @@ import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
 
 public class ThriftMessageEncoder<OUT extends TBase<?, ?>> extends ByteBufferEncoder<OUT> {
-    final private TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
+    private final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
 
     private OUT lastMessage;
 
     private byte[] lastBuffer;
 
-    static public <L extends TBase<?, ?>> ThriftMessageEncoder<L> newInstance(Class<L> clazz) {
+    public static <L extends TBase<?, ?>> ThriftMessageEncoder<L> newInstance(Class<L> clazz) {
         return new ThriftMessageEncoder<L>();
     }
 
@@ -63,5 +63,4 @@ public class ThriftMessageEncoder<OUT extends TBase<?, ?>> extends ByteBufferEnc
             //
         }
     }
-
 }

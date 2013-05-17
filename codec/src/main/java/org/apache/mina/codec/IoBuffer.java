@@ -18,14 +18,12 @@
  */
 package org.apache.mina.codec;
 
-
 import java.nio.Buffer;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.InvalidMarkException;
 import java.nio.ReadOnlyBufferException;
-
 
 /**
  * A proxy class used to manage ByteBuffers as if they were just a big ByteBuffer. We can add as many buffers as needed,
@@ -34,8 +32,7 @@ import java.nio.ReadOnlyBufferException;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class IoBuffer
-{
+public class IoBuffer {
     /** The list of ByteBuffers were we store the data */
     private BufferList buffers = new BufferList();
 
@@ -58,24 +55,20 @@ public class IoBuffer
     private ByteOrder order = ByteOrder.BIG_ENDIAN;
 
     /** The two types of buffer we handle */
-    public enum BufferType
-    {
+    public enum BufferType {
         HEAP, DIRECT;
     }
 
     /** A empty bytes array */
-    private final static byte[] EMPTY_BYTES = new byte[]
-        {};
+    private static final byte[] EMPTY_BYTES = new byte[] {};
 
     /** <code>UNSET_MARK</code> means the mark has not been set. */
-    private final static int UNSET_MARK = -1;
-
+    private static final int UNSET_MARK = -1;
 
     /**
      * Construct a IoBuffer, with no buffer in it
      */
-    public IoBuffer()
-    {
+    public IoBuffer() {
         position = 0;
         mark = 0;
         limit = 0;
@@ -83,20 +76,17 @@ public class IoBuffer
         order = null;
     }
 
-
     /**
      * Construct an empty IoBuffer with a defined type (either HEAP or DIRECT)
      * 
      * @param bufferType the type of buffer to use : BufferType.HEAP or BufferType.DIRECT
      */
-    public IoBuffer( BufferType bufferType )
-    {
+    public IoBuffer(BufferType bufferType) {
         position = 0;
         mark = 0;
         limit = 0;
         type = bufferType;
     }
-
 
     /**
      * Construct a IoBuffer with some ByteBuffers. The IoBuffer type will be selected from the first ByteBuffer type, so
@@ -104,55 +94,42 @@ public class IoBuffer
      * 
      * @param byteBuffers the ByteBuffers added to the IoBuffer list
      */
-    public IoBuffer( ByteBuffer... byteBuffers )
-    {
-        if ( ( byteBuffers == null ) || ( byteBuffers.length == 0 ) )
-        {
+    public IoBuffer(ByteBuffer... byteBuffers) {
+        if ((byteBuffers == null) || (byteBuffers.length == 0)) {
             position = 0;
             mark = 0;
             limit = 0;
             type = null;
             order = null;
-        }
-        else
-        {
-            for ( ByteBuffer byteBuffer : byteBuffers )
-            {
-                if ( type == null )
-                {
+        } else {
+            for (ByteBuffer byteBuffer : byteBuffers) {
+                if (type == null) {
                     type = byteBuffer.isDirect() ? BufferType.DIRECT : BufferType.HEAP;
                 }
 
-                if ( byteBuffer.limit() > 0 )
-                {
-                    buffers.add( byteBuffer );
+                if (byteBuffer.limit() > 0) {
+                    buffers.add(byteBuffer);
                 }
             }
         }
     }
-
 
     /**
      * Construct a IoBuffer from an existing IoBuffer.
      * 
      * @param ioBuffer the IoBuffer we want to copy
      */
-    public IoBuffer( IoBuffer ioBuffer )
-    {
+    public IoBuffer(IoBuffer ioBuffer) {
         // Find the position to start with
         BufferNode node = ioBuffer.buffers.getFirst();
         int pos = 0;
 
-        while ( node != null )
-        {
-            if ( node.offset + node.buffer.limit() < position )
-            {
+        while (node != null) {
+            if (node.offset + node.buffer.limit() < position) {
                 node = buffers.getNext();
                 pos = node.offset + node.buffer.limit();
-            }
-            else
-            {
-                buffers.add( node.buffer );
+            } else {
+                buffers.add(node.buffer);
             }
         }
 
@@ -163,26 +140,21 @@ public class IoBuffer
         order = ioBuffer.order();
     }
 
-
     /**
      * Adds a new ByteBuffer at the end of the list of buffers.
      * 
      * @param byteBuffer The added ByteBuffer
      * @return The modified IoBuffer
      */
-    public IoBuffer add( ByteBuffer... byteBuffers )
-    {
-        for ( ByteBuffer byteBuffer : byteBuffers )
-        {
-            if ( byteBuffer.limit() > 0 )
-            {
-                buffers.add( byteBuffer );
+    public IoBuffer add(ByteBuffer... byteBuffers) {
+        for (ByteBuffer byteBuffer : byteBuffers) {
+            if (byteBuffer.limit() > 0) {
+                buffers.add(byteBuffer);
             }
         }
 
         return this;
     }
-
 
     /**
      * Allocate a Heap IoBuffer with a defined capacity
@@ -190,20 +162,15 @@ public class IoBuffer
      * @param capacity The number of bytes to store
      * @return The allocated IoBuffer
      */
-    public static IoBuffer allocate( int capacity )
-    {
-        if ( capacity >= 0 )
-        {
-            ByteBuffer byteBuffer = ByteBuffer.allocate( capacity );
+    public static IoBuffer allocate(int capacity) {
+        if (capacity >= 0) {
+            ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
 
-            return new IoBuffer( byteBuffer );
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Cannot allocate an IoBuffer with a negative value : " + capacity );
+            return new IoBuffer(byteBuffer);
+        } else {
+            throw new IllegalArgumentException("Cannot allocate an IoBuffer with a negative value : " + capacity);
         }
     }
-
 
     /**
      * Allocate a Direct IoBuffer with a defined capacity
@@ -211,20 +178,15 @@ public class IoBuffer
      * @param capacity The number of bytes to store
      * @return The allocated IoBuffer
      */
-    public static IoBuffer allocateDirect( int capacity )
-    {
-        if ( capacity >= 0 )
-        {
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect( capacity );
+    public static IoBuffer allocateDirect(int capacity) {
+        if (capacity >= 0) {
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(capacity);
 
-            return new IoBuffer( byteBuffer );
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Cannot allocate an IoBuffer with a negative value : " + capacity );
+            return new IoBuffer(byteBuffer);
+        } else {
+            throw new IllegalArgumentException("Cannot allocate an IoBuffer with a negative value : " + capacity);
         }
     }
-
 
     /**
      * @see ByteBuffer#array() Returns the byte array which this IoBuffer is based on, up to the sum of each contained
@@ -236,15 +198,12 @@ public class IoBuffer
      * @exception ReadOnlyBufferException if this IoBuffer is based on a read-only array.
      * @exception UnsupportedOperationException if this IoBuffer is not based on an array.
      */
-    public byte[] array()
-    {
-        if ( isReadOnly() )
-        {
+    public byte[] array() {
+        if (isReadOnly()) {
             throw new ReadOnlyBufferException();
         }
 
-        if ( buffers.size == 0 )
-        {
+        if (buffers.size == 0) {
             return EMPTY_BYTES;
         }
 
@@ -252,13 +211,12 @@ public class IoBuffer
         BufferNode node = buffers.getFirst();
         int pos = 0;
 
-        while ( node != null )
-        {
+        while (node != null) {
             ByteBuffer buffer = node.buffer;
             byte[] src = buffer.array();
             int length = buffer.limit();
 
-            System.arraycopy( src, 0, array, pos, length );
+            System.arraycopy(src, 0, array, pos, length);
             pos += length;
 
             node = buffers.getNext();
@@ -266,7 +224,6 @@ public class IoBuffer
 
         return array;
     }
-
 
     /**
      * @see ByteBuffer#arrayOffset() Returns the offset of the byte array which this IoBuffer is based on, if there is
@@ -278,10 +235,8 @@ public class IoBuffer
      * @exception ReadOnlyBufferException if this IoBuffer is based on a read-only array.
      * @exception UnsupportedOperationException if this IoBuffer is not based on an array.
      */
-    public int arrayOffset()
-    {
-        if ( isReadOnly() )
-        {
+    public int arrayOffset() {
+        if (isReadOnly()) {
             throw new ReadOnlyBufferException();
         }
 
@@ -289,25 +244,20 @@ public class IoBuffer
         return 0;
     }
 
-
     /**
      * @see ByteBuffer#asReadOnlyBuffer()
      */
-    public IoBuffer asReadOnlyBuffer()
-    {
+    public IoBuffer asReadOnlyBuffer() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
 
-
     /**
      * @return the IoBuffer total capacity
      */
-    public int capacity()
-    {
+    public int capacity() {
         return limit;
     }
-
 
     /**
      * @see Buffer#clear() Clears this IoBuffer.
@@ -323,16 +273,14 @@ public class IoBuffer
      * 
      * @return this buffer.
      */
-    public IoBuffer clear()
-    {
+    public IoBuffer clear() {
         position = 0;
         mark = UNSET_MARK;
 
         BufferNode node = buffers.head;
         int offset = 0;
 
-        while ( node != null )
-        {
+        while (node != null) {
             node.buffer.clear();
             node.offset = offset;
             offset += node.buffer.limit();
@@ -346,47 +294,38 @@ public class IoBuffer
         return this;
     }
 
-
     /**
      * @see ByteBuffer#compact()
      */
-    public IoBuffer compact()
-    {
+    public IoBuffer compact() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#compareTo(ByteBuffer)
      */
-    public int compareTo( IoBuffer buffer )
-    {
+    public int compareTo(IoBuffer buffer) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#duplicate()
      */
-    public IoBuffer duplicate()
-    {
+    public IoBuffer duplicate() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#equals(Object)
      */
     @Override
-    public boolean equals( Object object )
-    {
+    public boolean equals(Object object) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see Buffer#flip() Flips this buffer.
@@ -397,8 +336,7 @@ public class IoBuffer
      * 
      * @return this IoBuffer.
      */
-    public IoBuffer flip()
-    {
+    public IoBuffer flip() {
         limit = position;
         position = 0;
         mark = UNSET_MARK;
@@ -406,16 +344,13 @@ public class IoBuffer
         return this;
     }
 
-
     /**
      * Get a single byte for the IoBuffer at the current position. Increment the current position.
      * 
      * @return The byte found a the current position.
      */
-    public byte get()
-    {
-        if ( position >= limit )
-        {
+    public byte get() {
+        if (position >= limit) {
             // No more byte to read
             throw new BufferUnderflowException();
         }
@@ -426,32 +361,25 @@ public class IoBuffer
         // If the position is within the current buffer, then get the data from it
         int bufferPosition = position - currentNode.offset;
 
-        if ( bufferPosition < currentNode.buffer.limit() )
-        {
+        if (bufferPosition < currentNode.buffer.limit()) {
             position++;
 
             return currentNode.buffer.get();
-        }
-        else
-        {
+        } else {
             // We have exhausted the current buffer, let's see if we have one more
             currentNode = buffers.getNext();
 
-            if ( currentNode == null )
-            {
+            if (currentNode == null) {
                 // No more buffers
                 throw new BufferUnderflowException();
-            }
-            else
-            {
+            } else {
                 position++;
-                currentNode.buffer.position( 0 );
+                currentNode.buffer.position(0);
 
                 return currentNode.buffer.get();
             }
         }
     }
-
 
     /**
      * @see ByteBuffer#get(byte[]) Reads bytes from the current position into the specified byte array and increases the
@@ -463,10 +391,8 @@ public class IoBuffer
      * @return this IoBuffer.
      * @exception BufferUnderflowException if {@code dest.length} is greater than {@code remaining()}.
      */
-    public IoBuffer get( byte[] dst )
-    {
-        if ( dst.length > remaining() )
-        {
+    public IoBuffer get(byte[] dst) {
+        if (dst.length > remaining()) {
             throw new BufferUnderflowException();
         }
 
@@ -474,10 +400,9 @@ public class IoBuffer
         int destPos = 0;
         BufferNode node = buffers.current;
 
-        while ( size > 0 )
-        {
+        while (size > 0) {
             int length = node.buffer.limit() - node.buffer.position();
-            System.arraycopy( node.buffer.array(), node.buffer.position(), dst, destPos, length );
+            System.arraycopy(node.buffer.array(), node.buffer.position(), dst, destPos, length);
             destPos += length;
             node = buffers.getNext();
             size -= length;
@@ -486,16 +411,13 @@ public class IoBuffer
         return this;
     }
 
-
     /**
      * @see ByteBuffer#get(byte[],int,int)
      */
-    public IoBuffer get( byte[] dst, int offset, int length )
-    {
+    public IoBuffer get(byte[] dst, int offset, int length) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#get(int) Returns the byte at the specified index and does not change the position.
@@ -504,29 +426,23 @@ public class IoBuffer
      * @return the byte at the specified index.
      * @exception IndexOutOfBoundsException if index is invalid.
      */
-    public byte get( int index )
-    {
-        if ( ( index < 0 ) || ( index >= limit ) )
-        {
+    public byte get(int index) {
+        if ((index < 0) || (index >= limit)) {
             throw new IndexOutOfBoundsException();
         }
 
         BufferNode currentNode = buffers.current;
         BufferNode node = buffers.getFirst();
 
-        while ( node != null )
-        {
-            if ( node.offset + node.buffer.limit() > index )
-            {
-                byte result = node.buffer.get( index - node.offset );
+        while (node != null) {
+            if (node.offset + node.buffer.limit() > index) {
+                byte result = node.buffer.get(index - node.offset);
 
                 // Reset the initial position before returning
                 buffers.current = currentNode;
 
                 return result;
-            }
-            else
-            {
+            } else {
                 node = buffers.getNext();
             }
         }
@@ -538,66 +454,53 @@ public class IoBuffer
         throw new IndexOutOfBoundsException();
     }
 
-
     /**
      * @see ByteBuffer#getChar()
      */
-    public IoBuffer getChar()
-    {
+    public IoBuffer getChar() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getChar(int)
      */
-    public IoBuffer getChar( int index )
-    {
+    public IoBuffer getChar(int index) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getDouble()
      */
-    public IoBuffer getDouble()
-    {
+    public IoBuffer getDouble() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getDouble(int)
      */
-    public IoBuffer getDouble( int index )
-    {
+    public IoBuffer getDouble(int index) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getFloat()
      */
-    public IoBuffer getFloat()
-    {
+    public IoBuffer getFloat() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getFloat(int)
      */
-    public IoBuffer getFloat( int index )
-    {
+    public IoBuffer getFloat(int index) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getInt() Returns the int at the current position and increases the position by 4.
@@ -608,110 +511,88 @@ public class IoBuffer
      * @return the int at the current position.
      * @exception BufferUnderflowException if the position is greater than {@code limit - 4}.
      */
-    public int getInt()
-    {
+    public int getInt() {
         int newPosition = position + 4;
 
-        if ( newPosition > limit )
-        {
+        if (newPosition > limit) {
             throw new BufferUnderflowException();
         }
 
-        int result = loadInt( position );
+        int result = loadInt(position);
         position = newPosition;
 
         return result;
     }
 
-
     /**
      * Load an int from the underlying byteBuffers, taking the order into account.
      */
-    private final int loadInt( int index )
-    {
+    private final int loadInt(int index) {
         int bytes = 0;
 
-        if ( order == ByteOrder.BIG_ENDIAN )
-        {
-            for ( int i = 0; i < 4; i++ )
-            {
+        if (order == ByteOrder.BIG_ENDIAN) {
+            for (int i = 0; i < 4; i++) {
                 bytes = bytes << 8;
-                bytes = bytes | ( get() & 0xFF );
+                bytes = bytes | (get() & 0xFF);
             }
-        }
-        else
-        {
-            for ( int i = 0; i < 4; i++ )
-            {
+        } else {
+            for (int i = 0; i < 4; i++) {
                 int val = get() & 0xFF;
-                bytes = bytes | ( val << ( i << 3 ) );
+                bytes = bytes | (val << (i << 3));
             }
         }
 
         return bytes;
     }
 
-
     /**
      * @see ByteBuffer#getInt(int)
      */
-    public IoBuffer getInt( int index )
-    {
+    public IoBuffer getInt(int index) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getLong()
      */
-    public IoBuffer getLong()
-    {
+    public IoBuffer getLong() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getLong(int)
      */
-    public IoBuffer getLong( int index )
-    {
+    public IoBuffer getLong(int index) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getShort()
      */
-    public IoBuffer getShort()
-    {
+    public IoBuffer getShort() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#getShort(int)
      */
-    public IoBuffer getShort( int index )
-    {
+    public IoBuffer getShort(int index) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#hashCode()
      */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see Buffer#hasRemaining() Indicates if there are elements remaining in this IoBuffer, that is if
@@ -719,41 +600,33 @@ public class IoBuffer
      * 
      * @return {@code true} if there are elements remaining in this IoBuffer, {@code false} otherwise.
      */
-    public boolean hasRemaining()
-    {
+    public boolean hasRemaining() {
         return position < limit;
     }
-
 
     /**
      * @see ByteBuffer#isDirect() Tells if the stored ByteBuffers are Direct buffers or Heap Buffers
      * @return <code>true</code> if we are storing Direct buffers, <code>false</code> otherwise.
      */
-    public boolean isDirect()
-    {
+    public boolean isDirect() {
         return type == BufferType.DIRECT;
     }
-
 
     /**
      * @see Buffer#isReadOnly() Indicates whether this IoBuffer is read-only.
      * 
      * @return {@code true} if this IoBuffer is read-only, {@code false} otherwise.
      */
-    public boolean isReadOnly()
-    {
+    public boolean isReadOnly() {
         return readOnly;
     }
-
 
     /**
      * @return the IoBuffer limit
      */
-    public int limit()
-    {
+    public int limit() {
         return limit;
     }
-
 
     /**
      * @see Buffer#mark() Marks the current position, so that the position may return to this point later by calling
@@ -761,13 +634,11 @@ public class IoBuffer
      * 
      * @return this IoBuffer.
      */
-    public IoBuffer mark()
-    {
+    public IoBuffer mark() {
         mark = position;
 
         return this;
     }
-
 
     /**
      * @see ByteBuffer#order() Returns the byte order used by this Iouffer when converting bytes from/to other primitive
@@ -777,11 +648,9 @@ public class IoBuffer
      * 
      * @return the byte order used by this IoBuffer when converting bytes from/to other primitive types.
      */
-    public ByteOrder order()
-    {
+    public ByteOrder order() {
         return order;
     }
-
 
     /**
      * @see ByteBuffer#order(ByteOrder) Sets the byte order of this IoBuffer.
@@ -791,30 +660,23 @@ public class IoBuffer
      * @return this IoBuffer.
      * @see ByteOrder
      */
-    public IoBuffer order( ByteOrder bo )
-    {
-        if ( bo == null )
-        {
+    public IoBuffer order(ByteOrder bo) {
+        if (bo == null) {
             order = ByteOrder.LITTLE_ENDIAN;
-        }
-        else
-        {
+        } else {
             order = bo;
         }
 
         return this;
     }
 
-
     /**
      * @see Buffer#position()
      * @return The current position across all the ByteBuffers contained in the IoBuffer
      */
-    public int position()
-    {
+    public int position() {
         return position;
     }
-
 
     /**
      * @see Buffer#position(int) Sets the position in the IoBuffer.
@@ -825,59 +687,49 @@ public class IoBuffer
      * @return this IoBuffer.
      * @exception IllegalArgumentException if <code>newPosition</code> is invalid.
      */
-    public IoBuffer position( int newPosition )
-    {
-        if ( newPosition < 0 )
-        {
-            throw new IllegalArgumentException( "The new position(" + newPosition + ") is negative" );
+    public IoBuffer position(int newPosition) {
+        if (newPosition < 0) {
+            throw new IllegalArgumentException("The new position(" + newPosition + ") is negative");
         }
 
-        if ( newPosition >= limit )
-        {
-            throw new IllegalArgumentException( "The new position(" + newPosition
-                + ") is larger than this buffer limit (" + limit() );
+        if (newPosition >= limit) {
+            throw new IllegalArgumentException("The new position(" + newPosition
+                    + ") is larger than this buffer limit (" + limit());
         }
 
-        if ( buffers.head == null )
-        {
-            throw new IllegalArgumentException( "Cannot set a position over an empty buffer" );
+        if (buffers.head == null) {
+            throw new IllegalArgumentException("Cannot set a position over an empty buffer");
         }
 
         // Find the right current buffer
         BufferNode currentNode = buffers.getCurrent();
 
         // The new position might not be on the current buffer.
-        if ( ( newPosition < currentNode.offset ) || ( newPosition >= currentNode.offset + currentNode.buffer.limit() ) )
-        {
+        if ((newPosition < currentNode.offset) || (newPosition >= currentNode.offset + currentNode.buffer.limit())) {
             // Ok, we aren't on the current buffer. Find the new current buffer
             BufferNode node = buffers.head;
             int counter = 0;
 
-            while ( node != null )
-            {
+            while (node != null) {
                 int limit = node.buffer.limit();
                 counter += limit;
 
-                if ( counter >= newPosition )
-                {
+                if (counter >= newPosition) {
                     // Found
                     currentNode = node;
                     break;
-                }
-                else
-                {
+                } else {
                     node = node.next;
                 }
             }
         }
 
         position = newPosition;
-        currentNode.buffer.position( position - currentNode.offset );
+        currentNode.buffer.position(position - currentNode.offset);
         buffers.current = currentNode;
 
         return this;
     }
-
 
     /**
      * @see Buffer#remaining() Returns the number of remaining elements in this IoBuffer, that is
@@ -885,12 +737,10 @@ public class IoBuffer
      * 
      * @return the number of remaining elements in this IoBuffer.
      */
-    public int remaining()
-    {
+    public int remaining() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see Buffer#reset() Resets the position of this IoBuffer to the <code>mark</code>.
@@ -898,12 +748,10 @@ public class IoBuffer
      * @return this IoBuffer.
      * @exception InvalidMarkException if the mark is not set.
      */
-    public IoBuffer reset()
-    {
+    public IoBuffer reset() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see Buffer#rewind() Rewinds this IoBuffer.
@@ -912,42 +760,34 @@ public class IoBuffer
      * 
      * @return this IoBuffer.
      */
-    public IoBuffer rewind()
-    {
+    public IoBuffer rewind() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#slice()
      */
-    public IoBuffer slice()
-    {
+    public IoBuffer slice() {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#wrap(byte[])
      */
-    public IoBuffer wrap( byte[] array )
-    {
+    public IoBuffer wrap(byte[] array) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * @see ByteBuffer#wrap(byte[], int, int)
      */
-    public IoBuffer wrap( byte[] array, int offset, int length )
-    {
+    public IoBuffer wrap(byte[] array, int offset, int length) {
         // TODO code me !
         throw new UnsupportedOperationException();
     }
-
 
     /**
      * Returns a string representing the IoBuffer.
@@ -955,8 +795,7 @@ public class IoBuffer
      * @return a String representation of the IoBuffer
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "IoBuffer[pos=" + position + " lim=" + limit + " mrk=" + mark + "]";
     }
 
@@ -966,8 +805,7 @@ public class IoBuffer
     /**
      * A container for ByterBuffers stored in the buffers list
      */
-    private class BufferNode
-    {
+    private class BufferNode {
         /** The stored buffer */
         private ByteBuffer buffer;
 
@@ -977,30 +815,25 @@ public class IoBuffer
         /** The position of this buffer in the IoBuffer list of bytes */
         private int offset;
 
-
         /**
          * Creates a new entry in the list
          * 
          * @param entry The added ByteBuffer
          */
-        private BufferNode( ByteBuffer byteBuffer )
-        {
+        private BufferNode(ByteBuffer byteBuffer) {
             this.buffer = byteBuffer;
         }
 
-
         @Override
-        public String toString()
-        {
-            return buffer.toString() + ", Offset:" + offset + ( next != null ? " --> \n  " : "" );
+        public String toString() {
+            return buffer.toString() + ", Offset:" + offset + (next != null ? " --> \n  " : "");
         }
     }
 
     /**
      * A LinkedList storing all the ByteBuffers. It can only be browsed forward.
      */
-    private class BufferList
-    {
+    private class BufferList {
         /** The first ByteBuffer in the list */
         private BufferNode head;
 
@@ -1019,82 +852,63 @@ public class IoBuffer
         /** A flag used to indicate that we already have navigated past the tail of the list. */
         private boolean pastTail;
 
-
         /**
          * Creates an empty list
          */
-        private BufferList()
-        {
+        private BufferList() {
             head = tail = current = null;
             size = 0;
             length = 0;
             pastTail = false;
         }
 
-
         /**
          * Creates a list with one ByteBuffer
          * 
          * @param byteBuffer The added ByteBuffer
          */
-        private BufferList( ByteBuffer byteBuffer )
-        {
-            BufferNode node = new BufferNode( byteBuffer );
+        private BufferList(ByteBuffer byteBuffer) {
+            BufferNode node = new BufferNode(byteBuffer);
             head = tail = current = node;
             size = 1;
             length = byteBuffer.limit();
             pastTail = false;
         }
 
-
         /**
          * Adds a new ByteBuffer in the list
          * 
          * @param byteBuffer The added ByteBuffer
          */
-        private void add( ByteBuffer byteBuffer )
-        {
-            assert ( byteBuffer != null );
+        private void add(ByteBuffer byteBuffer) {
+            assert (byteBuffer != null);
 
             // Check the buffer type
-            if ( type == null )
-            {
-                if ( byteBuffer.isDirect() )
-                {
+            if (type == null) {
+                if (byteBuffer.isDirect()) {
                     type = BufferType.DIRECT;
-                }
-                else
-                {
+                } else {
                     type = BufferType.HEAP;
                 }
-            }
-            else
-            {
-                if ( isDirect() != byteBuffer.isDirect() )
-                {
+            } else {
+                if (isDirect() != byteBuffer.isDirect()) {
                     throw new RuntimeException();
                 }
             }
 
             // Check the ByteOrder
-            if ( size == 0 )
-            {
+            if (size == 0) {
                 order = byteBuffer.order();
-            }
-            else if ( order != byteBuffer.order() )
-            {
+            } else if (order != byteBuffer.order()) {
                 throw new RuntimeException();
             }
 
-            BufferNode newNode = new BufferNode( byteBuffer );
+            BufferNode newNode = new BufferNode(byteBuffer);
             newNode.offset = length;
 
-            if ( size == 0 )
-            {
+            if (size == 0) {
                 head = tail = current = newNode;
-            }
-            else
-            {
+            } else {
                 tail.next = newNode;
                 tail = newNode;
             }
@@ -1105,17 +919,14 @@ public class IoBuffer
             pastTail = false;
         }
 
-
         /**
          * Get the first BufferNode in the list. The current pointer will move forward, after having be reset to the
          * beginning of the list
          * 
          * @return The first BufferNode in the list
          */
-        private BufferNode getFirst()
-        {
-            if ( head == null )
-            {
+        private BufferNode getFirst() {
+            if (head == null) {
                 return null;
             }
 
@@ -1125,73 +936,57 @@ public class IoBuffer
             return head;
         }
 
-
         /**
          * Get the next BufferNode from the list. If this is the first time this method is called, it will return the
          * same value than a getFirst().
          * 
          * @return The next BufferNode in the list, moving forward in the list at the same time
          */
-        private BufferNode getNext()
-        {
-            if ( current == null )
-            {
+        private BufferNode getNext() {
+            if (current == null) {
                 return null;
             }
 
-            if ( current == tail )
-            {
-                if ( pastTail )
-                {
+            if (current == tail) {
+                if (pastTail) {
                     return null;
-                }
-                else
-                {
+                } else {
                     pastTail = true;
 
                     return current;
                 }
-            }
-            else
-            {
+            } else {
                 current = current.next;
 
                 return current;
             }
         }
 
-
         /**
          * Gets the current BufferNode from the list, if we aren't already past the tail.
          * 
          * @return The current BufferNode
          */
-        private BufferNode getCurrent()
-        {
-            if ( pastTail )
-            {
+        private BufferNode getCurrent() {
+            if (pastTail) {
                 return null;
             }
 
             return current;
         }
 
-
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder sb = new StringBuilder();
 
             BufferNode node = head;
 
-            while ( node != null )
-            {
-                if ( node == current )
-                {
-                    sb.append( "**" );
+            while (node != null) {
+                if (node == current) {
+                    sb.append("**");
                 }
 
-                sb.append( node );
+                sb.append(node);
                 node = node.next;
             }
 

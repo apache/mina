@@ -26,7 +26,7 @@ import org.apache.thrift.TBase;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ThriftDecoder<M extends TBase<?, ?>> extends SizePrefixedDecoder<M> {
-    static public <L extends TBase<?, ?>> ThriftDecoder<L> newInstance(Class<L> clazz) throws SecurityException,
+    public static <L extends TBase<?, ?>> ThriftDecoder<L> newInstance(Class<L> clazz) throws SecurityException,
             NoSuchMethodException {
         return new ThriftDecoder<L>(clazz);
     }

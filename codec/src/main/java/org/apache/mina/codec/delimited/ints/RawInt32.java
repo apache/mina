@@ -116,7 +116,7 @@ public class RawInt32 {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    static public class Decoder extends ByteBufferDecoder<Integer> {
+    public static class Decoder extends ByteBufferDecoder<Integer> {
 
         final private Endianness endianness;
 
@@ -153,9 +153,9 @@ public class RawInt32 {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    static public class Encoder extends ByteBufferEncoder<Integer> {
+    public static class Encoder extends ByteBufferEncoder<Integer> {
 
-        final private Endianness endianness;
+        private final Endianness endianness;
 
         public Encoder(Endianness endianness) {
             super();
@@ -201,5 +201,4 @@ public class RawInt32 {
     public enum Endianness {
         BIG, LITTLE
     }
-
 }

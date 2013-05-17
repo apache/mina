@@ -29,8 +29,7 @@ import com.google.protobuf.GeneratedMessage;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtobufMessageEncoder<OUT extends GeneratedMessage> extends ByteBufferEncoder<OUT> {
-
-    static public <T extends GeneratedMessage> ProtobufMessageEncoder<T> newInstance(Class<T> clazz) {
+    public static <T extends GeneratedMessage> ProtobufMessageEncoder<T> newInstance(Class<T> clazz) {
         return new ProtobufMessageEncoder<T>();
     }
 

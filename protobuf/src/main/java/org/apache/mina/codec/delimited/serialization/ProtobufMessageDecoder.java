@@ -34,9 +34,9 @@ import com.google.protobuf.GeneratedMessage;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtobufMessageDecoder<IN extends GeneratedMessage> extends ByteBufferDecoder<IN> {
-    final private Method parseMethod;
+    private final Method parseMethod;
 
-    final private ExtensionRegistryLite registry;
+    private final ExtensionRegistryLite registry;
 
     public static <TYPE extends GeneratedMessage> ProtobufMessageDecoder<TYPE> newInstance(Class<TYPE> c)
             throws SecurityException, NoSuchMethodException {

@@ -49,7 +49,7 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      * @see ProtocolDecoder#createDecoderState()
      */
     @Override
-    final public Void createEncoderState() {
+    public final Void createEncoderState() {
         // stateless !
         return null;
     }
@@ -64,7 +64,7 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      */
     public ByteBuffer encode(OUTPUT message) {
         ByteBuffer buffer = ByteBuffer.allocate(getEncodedSize(message));
-        int oldPos=buffer.position();
+        int oldPos = buffer.position();
         writeTo(message, buffer);
         buffer.position(oldPos);
         return buffer;
@@ -79,7 +79,7 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      */
 
     @Override
-    final public ByteBuffer encode(OUTPUT message, Void context) {
+    public final ByteBuffer encode(OUTPUT message, Void context) {
         return encode(message);
     }
 
@@ -91,7 +91,7 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      *            a message to be encoded
      * @return the size of the serialized form of the message
      */
-    abstract public int getEncodedSize(OUTPUT message);
+    public abstract int getEncodedSize(OUTPUT message);
 
     /**
      * Writes a message on a {@link ByteBuffer}.
@@ -106,6 +106,6 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      * @param buffer
      *            a target {@link ByteBuffer}
      */
-    abstract public void writeTo(OUTPUT message, ByteBuffer buffer);
+    public abstract void writeTo(OUTPUT message, ByteBuffer buffer);
 
 }

@@ -1,4 +1,5 @@
 package org.apache.mina.codec.delimited;
+
 /*
  *  Licensed to the Apache Software Foundation (ASF) under one
  *  or more contributor license agreements.  See the NOTICE file
@@ -19,7 +20,6 @@ package org.apache.mina.codec.delimited;
  *
  */
 
-
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +29,6 @@ import org.apache.thrift.TSerializer;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TMemoryBuffer;
 
-
 /**
  * A {@link ThriftEncoder} and {@link ThriftDecoder} test.
  * 
@@ -37,35 +36,34 @@ import org.apache.thrift.transport.TMemoryBuffer;
  */
 public class ThriftTest extends DelimitTest<UserProfile> {
 
-	@Override
+    @Override
     public List<UserProfile> getObjects() {
 
-		List<UserProfile> list = new LinkedList<UserProfile>();
+        List<UserProfile> list = new LinkedList<UserProfile>();
 
-		list.add(new UserProfile().setUid(1).setName("Jean Dupond"));
-		list.add(new UserProfile().setUid(2).setName("Marie Blanc"));
+        list.add(new UserProfile().setUid(1).setName("Jean Dupond"));
+        list.add(new UserProfile().setUid(2).setName("Marie Blanc"));
 
-		return list;
-	}
+        return list;
+    }
 
-	@Override
+    @Override
     protected ByteBuffer delimitWithOriginal() throws Exception {
 
-		TMemoryBuffer m = new TMemoryBuffer(1000000);
-		TFramedTransport t = new TFramedTransport(m);
-		TSerializer tt = new TSerializer();
-		for (UserProfile up : getObjects()) {
-			t.write(tt.serialize(up));
-			t.flush();
-		}
-		return ByteBuffer.wrap(m.getArray(), 0, m.length());
+        TMemoryBuffer m = new TMemoryBuffer(1000000);
+        TFramedTransport t = new TFramedTransport(m);
+        TSerializer tt = new TSerializer();
+        for (UserProfile up : getObjects()) {
+            t.write(tt.serialize(up));
+            t.flush();
+        }
+        return ByteBuffer.wrap(m.getArray(), 0, m.length());
 
-	}
+    }
 
-	@Override
-    public SizePrefixedEncoder<UserProfile> getSerializer()
-			throws SecurityException, NoSuchMethodException {
-		return ThriftEncoder.newInstance(UserProfile.class);
-	}
+    @Override
+    public SizePrefixedEncoder<UserProfile> getSerializer() throws SecurityException, NoSuchMethodException {
+        return ThriftEncoder.newInstance(UserProfile.class);
+    }
 
 }

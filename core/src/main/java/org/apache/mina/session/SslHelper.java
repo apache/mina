@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SslHelper {
     /** A logger for this class */
-    private final static Logger LOGGER = LoggerFactory.getLogger(SslHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SslHelper.class);
 
     /** The SSL engine instance */
     private SSLEngine sslEngine;

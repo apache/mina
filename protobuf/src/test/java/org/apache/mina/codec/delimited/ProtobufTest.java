@@ -33,7 +33,6 @@ import org.apache.mina.util.ByteBufferOutputStream;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtobufTest extends DelimitTest<Person> {
-  
 
     @Override
     public List<Person> getObjects() {
@@ -50,6 +49,7 @@ public class ProtobufTest extends DelimitTest<Person> {
     protected ByteBuffer delimitWithOriginal() throws IOException {
         ByteBufferOutputStream bbos = new ByteBufferOutputStream();
         bbos.setElastic(true);
+
         for (Person p : getObjects()) {
             p.writeDelimitedTo(bbos);
         }

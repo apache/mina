@@ -205,7 +205,7 @@ public abstract class AbstractIoFuture<V> implements IoFuture<V> {
      * @return <tt>false</tt> if the task could not be cancelled, typically because it has already completed normally;
      *         <tt>true</tt> otherwise
      */
-    abstract protected boolean cancelOwner(boolean mayInterruptIfRunning);
+    protected abstract boolean cancelOwner(boolean mayInterruptIfRunning);
 
     /**
      * Default implementation to call a listener's {@link IoFutureListener#completed(Object)} method. Owners may

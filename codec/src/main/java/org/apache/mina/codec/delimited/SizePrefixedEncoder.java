@@ -29,9 +29,9 @@ import org.apache.mina.codec.StatelessProtocolEncoder;
  */
 public class SizePrefixedEncoder<IN> implements StatelessProtocolEncoder<IN, ByteBuffer> {
 
-    final private ByteBufferEncoder<Integer> sizeEncoder;
+    private final ByteBufferEncoder<Integer> sizeEncoder;
 
-    final private ByteBufferEncoder<IN> payloadEncoder;
+    private final ByteBufferEncoder<IN> payloadEncoder;
 
     public SizePrefixedEncoder(ByteBufferEncoder<Integer> sizeEncoder, ByteBufferEncoder<IN> payloadEncoder) {
         super();

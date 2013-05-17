@@ -23,13 +23,11 @@ import org.apache.mina.codec.delimited.ints.VarInt;
 import org.apache.mina.codec.delimited.serialization.ThriftDynamicMessageDecoder;
 import org.apache.thrift.TBase;
 
-
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ThriftDynamicDecoder extends
-        SizePrefixedDecoder<ThriftDynamicMessageDecoder.ThriftSerializedMessage> {
-    static public <L extends TBase<?,?>> ThriftDynamicDecoder newInstance() throws SecurityException,
+public class ThriftDynamicDecoder extends SizePrefixedDecoder<ThriftDynamicMessageDecoder.ThriftSerializedMessage> {
+    public static <L extends TBase<?, ?>> ThriftDynamicDecoder newInstance() throws SecurityException,
             NoSuchMethodException {
         return new ThriftDynamicDecoder();
     }

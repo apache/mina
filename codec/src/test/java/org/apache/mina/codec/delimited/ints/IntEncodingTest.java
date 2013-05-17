@@ -37,7 +37,7 @@ import org.junit.Test;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-abstract public class IntEncodingTest {
+public abstract class IntEncodingTest {
 
     protected ByteBufferEncoder<Integer> encoder;
 

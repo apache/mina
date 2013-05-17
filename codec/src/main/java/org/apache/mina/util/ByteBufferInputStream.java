@@ -34,7 +34,7 @@ import java.nio.ByteBuffer;
  */
 public class ByteBufferInputStream extends InputStream {
 
-    final private ByteBuffer buffer;
+    private final ByteBuffer buffer;
 
     /**
      * 
