@@ -29,12 +29,11 @@ import org.apache.thrift.TBase;
  */
 public class ThriftEncoder<OUT extends TBase<?, ?>> extends SizePrefixedEncoder<OUT> {
 
-    public static <L extends TBase<?, ?>> ThriftEncoder<L> newInstance(Class<L> clazz) throws SecurityException,
-            NoSuchMethodException {
+    public static <L extends TBase<?, ?>> ThriftEncoder<L> newInstance(Class<L> clazz) throws NoSuchMethodException {
         return new ThriftEncoder<L>(clazz);
     }
 
-    public ThriftEncoder(Class<OUT> clazz) throws SecurityException, NoSuchMethodException {
+    public ThriftEncoder(Class<OUT> clazz) throws NoSuchMethodException {
         super(new RawInt32.Encoder(Endianness.BIG), ThriftMessageEncoder.newInstance(clazz));
     }
 }

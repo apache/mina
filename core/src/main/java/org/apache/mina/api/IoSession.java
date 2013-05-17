@@ -56,7 +56,7 @@ import org.apache.mina.transport.nio.SelectorLoop;
  */
 public interface IoSession {
     /** The SslHelper instance name, stored in the session's attributes */
-    static final AttributeKey<SslHelper> SSL_HELPER = new AttributeKey<SslHelper>(SslHelper.class, "internal_sslHelper");
+    final AttributeKey<SslHelper> SSL_HELPER = new AttributeKey<SslHelper>(SslHelper.class, "internal_sslHelper");
 
     /**
      * The unique identifier of this session.
@@ -151,7 +151,7 @@ public interface IoSession {
      * 
      * @param newState The final SessionState
      */
-    void changeState(SessionState newState) throws IllegalStateException;
+    void changeState(SessionState newState);
 
     /**
      * Initializes the SSL/TLS environment for this session.
@@ -326,7 +326,7 @@ public interface IoSession {
      * @return the removed value, <code>null</code> if this container doesn't contain the specified attribute
      * @exception IllegalArgumentException if <code>key==null</code>
      */
-    public <T> T removeAttribute(AttributeKey<T> key);
+    <T> T removeAttribute(AttributeKey<T> key);
 
     /**
      * State of a {@link IoSession}
@@ -334,7 +334,7 @@ public interface IoSession {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    public enum SessionState {
+    enum SessionState {
         CREATED, CONNECTED, CLOSING, CLOSED, SECURING, SECURED
     }
 
@@ -344,7 +344,7 @@ public interface IoSession {
      * filter chain and wrote to socket by the {@link SelectorLoop}
      * 
      */
-    public void write(Object message);
+    void write(Object message);
 
     /**
      * Same as {@link IoSession#write(Object)}, but provide a {@link IoFuture} for tracking the completion of this
@@ -353,7 +353,7 @@ public interface IoSession {
      * @param message the message to be processed and written
      * @return the {@link IoFuture} for tracking this asynchronous operation
      */
-    public IoFuture<Void> writeWithFuture(Object message);
+    IoFuture<Void> writeWithFuture(Object message);
 
     /**
      * Internal method for enqueue write request after filter chain processing
@@ -361,12 +361,12 @@ public interface IoSession {
      * @param writeRequest the message to put in the write request
      * @return the created write request
      */
-    public WriteRequest enqueueWriteRequest(WriteRequest writeRequest);
+    WriteRequest enqueueWriteRequest(WriteRequest writeRequest);
 
     /**
      * Get the {@link Queue} of this session. The write queue contains the pending writes.
      * 
      * @return the write queue of this session
      */
-    public Queue<WriteRequest> getWriteQueue();
+    Queue<WriteRequest> getWriteQueue();
 }

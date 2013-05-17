@@ -77,7 +77,7 @@ public abstract class ByteBufferDecoder<INPUT> implements StatelessProtocolDecod
      * 
      * @throws ProtocolDecoderException
      */
-    public abstract INPUT decode(ByteBuffer input) throws ProtocolDecoderException;
+    public abstract INPUT decode(ByteBuffer input);
 
     /**
      * Decodes a message from a {@link ByteBuffer}
@@ -87,7 +87,7 @@ public abstract class ByteBufferDecoder<INPUT> implements StatelessProtocolDecod
      * </p>
      */
     @Override
-    public final INPUT decode(ByteBuffer input, Void context) throws ProtocolDecoderException {
+    public final INPUT decode(ByteBuffer input, Void context) {
         return decode(input);
     }
 

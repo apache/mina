@@ -94,7 +94,7 @@ public class VarInt {
     public static class Decoder extends ByteBufferDecoder<Integer> {
 
         @Override
-        public Integer decode(ByteBuffer input) throws ProtocolDecoderException {
+        public Integer decode(ByteBuffer input) {
             int origpos = input.position();
             int size = 0;
 

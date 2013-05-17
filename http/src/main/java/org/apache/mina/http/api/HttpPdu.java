@@ -28,6 +28,6 @@ import java.nio.ByteBuffer;
  */
 public interface HttpPdu {
 
-    public ByteBuffer encode(HttpPduEncodingVisitor visitor);
+    ByteBuffer encode(HttpPduEncodingVisitor visitor);
 
 }

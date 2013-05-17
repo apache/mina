@@ -36,5 +36,5 @@ public interface IoFuture<V> extends Future<V> {
      * @param listener the listener to asynchronously receive the results of the future computation
      * @return the instance of the future to allow "chaining" of registrations
      */
-    public IoFuture<V> register(IoFutureListener<V> listener);
+    IoFuture<V> register(IoFutureListener<V> listener);
 }

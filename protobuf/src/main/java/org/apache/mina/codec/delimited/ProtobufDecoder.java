@@ -30,17 +30,16 @@ import com.google.protobuf.GeneratedMessage;
  */
 public class ProtobufDecoder<M extends GeneratedMessage> extends SizePrefixedDecoder<M> {
     public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz,
-            ExtensionRegistryLite registry) throws SecurityException, NoSuchMethodException {
+            ExtensionRegistryLite registry) throws NoSuchMethodException {
         return new ProtobufDecoder<L>(clazz, registry);
     }
 
-    public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz) throws SecurityException,
-            NoSuchMethodException {
+    public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz)
+            throws NoSuchMethodException {
         return newInstance(clazz, ExtensionRegistryLite.getEmptyRegistry());
     }
 
-    public ProtobufDecoder(Class<M> clazz, ExtensionRegistryLite registry) throws SecurityException,
-            NoSuchMethodException {
+    public ProtobufDecoder(Class<M> clazz, ExtensionRegistryLite registry) throws NoSuchMethodException {
         super(new VarInt.Decoder(), ProtobufMessageDecoder.newInstance(clazz, registry));
     }
 }

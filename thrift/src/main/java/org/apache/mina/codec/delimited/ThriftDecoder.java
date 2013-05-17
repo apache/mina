@@ -26,12 +26,11 @@ import org.apache.thrift.TBase;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ThriftDecoder<M extends TBase<?, ?>> extends SizePrefixedDecoder<M> {
-    public static <L extends TBase<?, ?>> ThriftDecoder<L> newInstance(Class<L> clazz) throws SecurityException,
-            NoSuchMethodException {
+    public static <L extends TBase<?, ?>> ThriftDecoder<L> newInstance(Class<L> clazz) throws NoSuchMethodException {
         return new ThriftDecoder<L>(clazz);
     }
 
-    public ThriftDecoder(Class<M> clazz) throws SecurityException, NoSuchMethodException {
+    public ThriftDecoder(Class<M> clazz) throws NoSuchMethodException {
         super(new RawInt32.Decoder(RawInt32.Endianness.BIG), null);
     }
 }

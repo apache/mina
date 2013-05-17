@@ -21,7 +21,6 @@ package org.apache.mina.codec.delimited.serialization;
 
 import java.nio.ByteBuffer;
 
-import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
@@ -37,7 +36,7 @@ public class ThriftMessageDecoder<IN extends TBase<?, ?>> extends ByteBufferDeco
     }
 
     @Override
-    public IN decode(ByteBuffer input) throws ProtocolDecoderException {
+    public IN decode(ByteBuffer input) {
         IN object;
         try {
             byte array[] = new byte[input.remaining()];

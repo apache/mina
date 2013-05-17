@@ -126,7 +126,7 @@ public class RawInt32 {
         }
 
         @Override
-        public Integer decode(ByteBuffer input) throws ProtocolDecoderException {
+        public Integer decode(ByteBuffer input) {
             if (input.remaining() < 4) {
                 return null;
             }

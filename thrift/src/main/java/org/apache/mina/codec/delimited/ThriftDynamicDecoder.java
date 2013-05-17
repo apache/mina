@@ -27,12 +27,11 @@ import org.apache.thrift.TBase;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ThriftDynamicDecoder extends SizePrefixedDecoder<ThriftDynamicMessageDecoder.ThriftSerializedMessage> {
-    public static <L extends TBase<?, ?>> ThriftDynamicDecoder newInstance() throws SecurityException,
-            NoSuchMethodException {
+    public static <L extends TBase<?, ?>> ThriftDynamicDecoder newInstance() throws NoSuchMethodException {
         return new ThriftDynamicDecoder();
     }
 
-    public ThriftDynamicDecoder() throws SecurityException, NoSuchMethodException {
+    public ThriftDynamicDecoder() throws NoSuchMethodException {
         super(new VarInt.Decoder(), ThriftDynamicMessageDecoder.newInstance());
     }
 }

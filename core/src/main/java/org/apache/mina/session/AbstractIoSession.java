@@ -262,7 +262,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void changeState(final SessionState to) throws IllegalStateException {
+    public void changeState(final SessionState to) {
         try {
             stateWriteLock.lock();
 

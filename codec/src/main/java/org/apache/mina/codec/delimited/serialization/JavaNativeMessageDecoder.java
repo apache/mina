@@ -36,7 +36,7 @@ public class JavaNativeMessageDecoder<IN extends Serializable> extends ByteBuffe
 
     @SuppressWarnings("unchecked")
     @Override
-    public IN decode(final ByteBuffer input) throws ProtocolDecoderException {
+    public IN decode(final ByteBuffer input) {
         try {
             ObjectInputStream ois = new ObjectInputStream(new ByteBufferInputStream(input));
             IN s = (IN) ois.readObject();

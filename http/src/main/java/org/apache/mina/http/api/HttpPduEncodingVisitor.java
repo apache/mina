@@ -28,11 +28,11 @@ import java.nio.ByteBuffer;
  */
 public interface HttpPduEncodingVisitor {
 
-    public ByteBuffer visit(HttpRequest msg);
+    ByteBuffer visit(HttpRequest msg);
 
-    public ByteBuffer visit(HttpResponse msg);
+    ByteBuffer visit(HttpResponse msg);
 
-    public ByteBuffer visit(HttpContentChunk msg);
+    ByteBuffer visit(HttpContentChunk msg);
 
-    public ByteBuffer visit(HttpEndOfContent msg);
+    ByteBuffer visit(HttpEndOfContent msg);
 }

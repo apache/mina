@@ -22,7 +22,6 @@ package org.apache.mina.codec.delimited;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.codec.ProtocolDecoder;
-import org.apache.mina.codec.ProtocolDecoderException;
 
 /**
  * 
@@ -101,7 +100,7 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
     }
 
     @Override
-    public OUT decode(ByteBuffer input, MutableInt nextBlockSize) throws ProtocolDecoderException {
+    public OUT decode(ByteBuffer input, MutableInt nextBlockSize) {
         OUT output = null;
 
         if (nextBlockSize.getValue() == null) {

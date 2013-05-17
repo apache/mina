@@ -60,7 +60,7 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
      * {@inheritDoc}
      */
     @Override
-    public CoapMessage decode(ByteBuffer input, Void context) throws ProtocolDecoderException {
+    public CoapMessage decode(ByteBuffer input, Void context) {
         LOG.debug("decode");
 
         if (input.remaining() <= 0) {

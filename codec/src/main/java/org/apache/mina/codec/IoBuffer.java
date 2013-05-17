@@ -527,7 +527,7 @@ public class IoBuffer {
     /**
      * Load an int from the underlying byteBuffers, taking the order into account.
      */
-    private final int loadInt(int index) {
+    private int loadInt(int index) {
         int bytes = 0;
 
         if (order == ByteOrder.BIG_ENDIAN) {

@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.util.ByteBufferInputStream;
 
@@ -48,7 +47,7 @@ public class ProtobufDynamicMessageDecoder extends
     }
 
     @Override
-    public ProtobufSerializedMessage decode(ByteBuffer input) throws ProtocolDecoderException {
+    public ProtobufSerializedMessage decode(ByteBuffer input) {
         return new ProtobufSerializedMessage(input);
     }
 
@@ -61,14 +60,13 @@ public class ProtobufDynamicMessageDecoder extends
 
         @SuppressWarnings("unchecked")
         public <L extends GeneratedMessage> L get(Class<L> clazz, ExtensionRegistryLite registry)
-                throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException,
-                InvocationTargetException {
+                throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
             Method parseMethod = clazz.getDeclaredMethod("parseFrom", InputStream.class, ExtensionRegistryLite.class);
             return (L) parseMethod.invoke(null, new ByteBufferInputStream(input.duplicate()), registry);
         }
 
-        public <L extends GeneratedMessage> L get(Class<L> clazz) throws SecurityException, NoSuchMethodException,
-                IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        public <L extends GeneratedMessage> L get(Class<L> clazz) throws NoSuchMethodException, IllegalAccessException,
+                InvocationTargetException {
             return get(clazz, ExtensionRegistryLite.getEmptyRegistry());
         }
     }

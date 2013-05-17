@@ -39,17 +39,16 @@ public class ProtobufMessageDecoder<IN extends GeneratedMessage> extends ByteBuf
     private final ExtensionRegistryLite registry;
 
     public static <TYPE extends GeneratedMessage> ProtobufMessageDecoder<TYPE> newInstance(Class<TYPE> c)
-            throws SecurityException, NoSuchMethodException {
+            throws NoSuchMethodException {
         return newInstance(c, ExtensionRegistryLite.getEmptyRegistry());
     }
 
     public static <TYPE extends GeneratedMessage> ProtobufMessageDecoder<TYPE> newInstance(Class<TYPE> c,
-            ExtensionRegistryLite registry) throws SecurityException, NoSuchMethodException {
+            ExtensionRegistryLite registry) throws NoSuchMethodException {
         return new ProtobufMessageDecoder<TYPE>(c, registry);
     }
 
-    private ProtobufMessageDecoder(Class<IN> clazz, ExtensionRegistryLite registry) throws SecurityException,
-            NoSuchMethodException {
+    private ProtobufMessageDecoder(Class<IN> clazz, ExtensionRegistryLite registry) throws NoSuchMethodException {
         super();
         parseMethod = clazz.getDeclaredMethod("parseFrom", InputStream.class, ExtensionRegistryLite.class);
         this.registry = registry;
@@ -57,7 +56,7 @@ public class ProtobufMessageDecoder<IN extends GeneratedMessage> extends ByteBuf
 
     @SuppressWarnings("unchecked")
     @Override
-    public IN decode(ByteBuffer input) throws ProtocolDecoderException {
+    public IN decode(ByteBuffer input) {
         try {
             return (IN) parseMethod.invoke(null, new ByteBufferInputStream(input), registry);
         } catch (Exception e) {

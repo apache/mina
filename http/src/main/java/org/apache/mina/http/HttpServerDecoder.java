@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.mina.codec.ProtocolDecoder;
-import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.http.api.HttpContentChunk;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpMethod;
@@ -79,7 +78,7 @@ public class HttpServerDecoder implements ProtocolDecoder<ByteBuffer, HttpPdu, H
      * {@inheritDoc}
      */
     @Override
-    public HttpPdu decode(ByteBuffer msg, HttpDecoderState context) throws ProtocolDecoderException {
+    public HttpPdu decode(ByteBuffer msg, HttpDecoderState context) {
         LOG.debug("decode : {}", msg);
         if (msg.remaining() <= 0) {
             return null;
