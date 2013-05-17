@@ -32,11 +32,17 @@ public class CoapMessage {
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[] {};
 
     private final int version;
+
     private final MessageType type;
+
     private final int code;
+
     private final int id;
+
     private final byte[] token;
+
     private final byte[] payload;
+
     private final CoapOption[] options;
 
     /**
@@ -110,7 +116,7 @@ public class CoapMessage {
                 .append(code).append(", id=").append(id).append(", token=").append(Arrays.toString(token))
                 .append(", payload=").append(Arrays.toString(payload)).append(", options=")
                 .append(Arrays.toString(options)).append("]");
-        
+
         return builder.toString();
     }
 
@@ -128,7 +134,7 @@ public class CoapMessage {
         result = prime * result + Arrays.hashCode(token);
         result = prime * result + ((type == null) ? 0 : type.hashCode());
         result = prime * result + version;
-        
+
         return result;
     }
 
@@ -140,45 +146,45 @@ public class CoapMessage {
         if (this == obj) {
             return true;
         }
-        
+
         if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         CoapMessage other = (CoapMessage) obj;
-        
+
         if (code != other.code) {
             return false;
         }
-        
+
         if (id != other.id) {
             return false;
         }
-        
+
         if (!Arrays.equals(options, other.options)) {
             return false;
         }
-        
+
         if (!Arrays.equals(payload, other.payload)) {
             return false;
         }
-        
+
         if (!Arrays.equals(token, other.token)) {
             return false;
         }
-        
+
         if (type != other.type) {
             return false;
         }
-        
+
         if (version != other.version) {
             return false;
         }
-        
+
         return true;
     }
 

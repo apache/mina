@@ -28,6 +28,7 @@ import org.apache.mina.api.IoSession;
  */
 public class SentEvent implements Event {
     private final IoSession session;
+
     private final Object message;
 
     public SentEvent(final IoSession session, final Object message) {

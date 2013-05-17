@@ -20,7 +20,6 @@
 
 package org.apache.mina.examples.echoserver;
 
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -38,110 +37,86 @@ import org.apache.mina.transport.nio.tcp.NioTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * A basic Server test
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class NioEchoServer
-{
+public class NioEchoServer {
 
-    static final private Logger LOG = LoggerFactory.getLogger( NioEchoServer.class );
+    static final private Logger LOG = LoggerFactory.getLogger(NioEchoServer.class);
 
-
-    public static void main( final String[] args )
-    {
-        LOG.info( "starting echo server" );
+    public static void main(final String[] args) {
+        LOG.info("starting echo server");
 
         final NioTcpServer acceptor = new NioTcpServer();
 
         // create the fitler chain for this service
-        acceptor.setFilters( new LoggingFilter( "LoggingFilter1" ), new IoFilter()
-        {
+        acceptor.setFilters(new LoggingFilter("LoggingFilter1"), new IoFilter() {
 
             @Override
-            public void sessionOpened( final IoSession session )
-            {
-                LOG.info( "session {} open", session );
+            public void sessionOpened(final IoSession session) {
+                LOG.info("session {} open", session);
             }
 
-
             @Override
-            public void sessionIdle( final IoSession session, final IdleStatus status )
-            {
-                LOG.info( "session {} idle", session );
+            public void sessionIdle(final IoSession session, final IdleStatus status) {
+                LOG.info("session {} idle", session);
             }
 
-
             @Override
-            public void sessionClosed( final IoSession session )
-            {
-                LOG.info( "session {} open", session );
+            public void sessionClosed(final IoSession session) {
+                LOG.info("session {} open", session);
             }
 
-
             @Override
-            public void messageWriting( final IoSession session, WriteRequest message,
-                final WriteFilterChainController controller )
-            {
+            public void messageWriting(final IoSession session, WriteRequest message,
+                    final WriteFilterChainController controller) {
                 // we just push the message in the chain
-                controller.callWriteNextFilter( message );
+                controller.callWriteNextFilter(message);
             }
 
-
             @Override
-            public void messageReceived( final IoSession session, final Object message,
-                final ReadFilterChainController controller )
-            {
+            public void messageReceived(final IoSession session, final Object message,
+                    final ReadFilterChainController controller) {
 
-                if ( message instanceof ByteBuffer )
-                {
-                    LOG.info( "echoing" );
-                    session.write( message );
+                if (message instanceof ByteBuffer) {
+                    LOG.info("echoing");
+                    session.write(message);
                 }
             }
 
-
             @Override
-            public void messageSent( final IoSession session, final Object message )
-            {
-                LOG.info( "message {} sent", message );
+            public void messageSent(final IoSession session, final Object message) {
+                LOG.info("message {} sent", message);
             }
-        } );
+        });
 
-        acceptor.setIoHandler( new AbstractIoHandler()
-        {
+        acceptor.setIoHandler(new AbstractIoHandler() {
             @Override
-            public void sessionOpened( final IoSession session )
-            {
-                LOG.info( "session opened {}", session );
+            public void sessionOpened(final IoSession session) {
+                LOG.info("session opened {}", session);
 
                 final String welcomeStr = "welcome\n";
-                final ByteBuffer bf = ByteBuffer.allocate( welcomeStr.length() );
-                bf.put( welcomeStr.getBytes() );
+                final ByteBuffer bf = ByteBuffer.allocate(welcomeStr.length());
+                bf.put(welcomeStr.getBytes());
                 bf.flip();
-                session.write( bf );
+                session.write(bf);
 
             }
-        } );
-        try
-        {
-            final SocketAddress address = new InetSocketAddress( 9999 );
-            acceptor.bind( address );
-            LOG.debug( "Running the server for 25 sec" );
-            Thread.sleep( 25000 );
-            LOG.debug( "Unbinding the TCP port" );
+        });
+        try {
+            final SocketAddress address = new InetSocketAddress(9999);
+            acceptor.bind(address);
+            LOG.debug("Running the server for 25 sec");
+            Thread.sleep(25000);
+            LOG.debug("Unbinding the TCP port");
             acceptor.unbind();
-        }
-        catch ( final IOException e )
-        {
-            LOG.error( "I/O exception", e );
-        }
-        catch ( final InterruptedException e )
-        {
-            LOG.error( "Interrupted exception", e );
+        } catch (final IOException e) {
+            LOG.error("I/O exception", e);
+        } catch (final InterruptedException e) {
+            LOG.error("Interrupted exception", e);
         }
     }
 }

@@ -28,7 +28,6 @@ import java.nio.charset.CharsetEncoder;
 import org.apache.mina.codec.ProtocolEncoder;
 import org.apache.mina.codec.StatelessProtocolEncoder;
 
-
 /**
  * A {@link ProtocolEncoder} which encodes a string into a text line
  * which ends with the delimiter.
@@ -134,7 +133,7 @@ public class TextLineEncoder implements StatelessProtocolEncoder<String, ByteBuf
     public ByteBuffer encode(String message, Void context) {
         try {
             String value = (message == null ? "" : message);
-            
+
             if (value.length() > maxLineLength) {
                 throw new IllegalArgumentException("Line length: " + message.length());
             }

@@ -88,7 +88,7 @@ public class JavaNativeTest extends GenericSerializerTest<JavaNativeTest.TestBea
 
         private final double c;
     }
- 
+
     @Override
     public List<TestBean> getObjects() {
         List<TestBean> list = new LinkedList<TestBean>();

@@ -28,7 +28,6 @@ import java.util.Map;
 import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
-
 /**
  * A {@link VarInt.Encoder} and {@link VarInt.Decoder} test.
  * 

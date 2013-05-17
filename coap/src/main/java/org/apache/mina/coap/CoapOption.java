@@ -29,6 +29,7 @@ import java.util.Arrays;
 public class CoapOption {
 
     private final CoapOptionType type;
+
     private final byte[] data;
 
     /**
@@ -81,25 +82,25 @@ public class CoapOption {
         if (this == obj) {
             return true;
         }
-        
+
         if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         CoapOption other = (CoapOption) obj;
-        
+
         if (!Arrays.equals(data, other.data)) {
             return false;
         }
-        
+
         if (type != other.type) {
             return false;
         }
-        
+
         return true;
     }
 }

@@ -4,1157 +4,1194 @@
 package org.apache.mina.generated.protoc;
 
 public final class Calc {
-  private Calc() {}
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
-  }
-  public interface ComputationOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-
-    // required double x = 1;
-    /**
-     * <code>required double x = 1;</code>
-     */
-    boolean hasX();
-    /**
-     * <code>required double x = 1;</code>
-     */
-    double getX();
-
-    // required double y = 2;
-    /**
-     * <code>required double y = 2;</code>
-     */
-    boolean hasY();
-    /**
-     * <code>required double y = 2;</code>
-     */
-    double getY();
-
-    // required .tutorial.Computation.Operator operator = 3;
-    /**
-     * <code>required .tutorial.Computation.Operator operator = 3;</code>
-     */
-    boolean hasOperator();
-    /**
-     * <code>required .tutorial.Computation.Operator operator = 3;</code>
-     */
-    org.apache.mina.generated.protoc.Calc.Computation.Operator getOperator();
-  }
-  /**
-   * Protobuf type {@code tutorial.Computation}
-   */
-  public static final class Computation extends
-      com.google.protobuf.GeneratedMessage
-      implements ComputationOrBuilder {
-    // Use Computation.newBuilder() to construct.
-    private Computation(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private Computation(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Computation defaultInstance;
-    public static Computation getDefaultInstance() {
-      return defaultInstance;
+    private Calc() {
     }
 
-    public Computation getDefaultInstanceForType() {
-      return defaultInstance;
+    public static void registerAllExtensions(com.google.protobuf.ExtensionRegistry registry) {
     }
 
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private Computation(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 9: {
-              bitField0_ |= 0x00000001;
-              x_ = input.readDouble();
-              break;
-            }
-            case 17: {
-              bitField0_ |= 0x00000002;
-              y_ = input.readDouble();
-              break;
-            }
-            case 24: {
-              int rawValue = input.readEnum();
-              org.apache.mina.generated.protoc.Calc.Computation.Operator value = org.apache.mina.generated.protoc.Calc.Computation.Operator.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(3, rawValue);
-              } else {
-                bitField0_ |= 0x00000004;
-                operator_ = value;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_descriptor;
+    public interface ComputationOrBuilder extends com.google.protobuf.MessageOrBuilder {
+
+        // required double x = 1;
+        /**
+         * <code>required double x = 1;</code>
+         */
+        boolean hasX();
+
+        /**
+         * <code>required double x = 1;</code>
+         */
+        double getX();
+
+        // required double y = 2;
+        /**
+         * <code>required double y = 2;</code>
+         */
+        boolean hasY();
+
+        /**
+         * <code>required double y = 2;</code>
+         */
+        double getY();
+
+        // required .tutorial.Computation.Operator operator = 3;
+        /**
+         * <code>required .tutorial.Computation.Operator operator = 3;</code>
+         */
+        boolean hasOperator();
+
+        /**
+         * <code>required .tutorial.Computation.Operator operator = 3;</code>
+         */
+        org.apache.mina.generated.protoc.Calc.Computation.Operator getOperator();
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.apache.mina.generated.protoc.Calc.Computation.class, org.apache.mina.generated.protoc.Calc.Computation.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<Computation> PARSER =
-        new com.google.protobuf.AbstractParser<Computation>() {
-      public Computation parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Computation(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Computation> getParserForType() {
-      return PARSER;
-    }
-
-    /**
-     * Protobuf enum {@code tutorial.Computation.Operator}
-     */
-    public enum Operator
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>PLUS = 0;</code>
-       */
-      PLUS(0, 0),
-      /**
-       * <code>MINUS = 1;</code>
-       */
-      MINUS(1, 1),
-      /**
-       * <code>TIMES = 2;</code>
-       */
-      TIMES(2, 2),
-      /**
-       * <code>DIVIDE = 3;</code>
-       */
-      DIVIDE(3, 3),
-      ;
-
-      /**
-       * <code>PLUS = 0;</code>
-       */
-      public static final int PLUS_VALUE = 0;
-      /**
-       * <code>MINUS = 1;</code>
-       */
-      public static final int MINUS_VALUE = 1;
-      /**
-       * <code>TIMES = 2;</code>
-       */
-      public static final int TIMES_VALUE = 2;
-      /**
-       * <code>DIVIDE = 3;</code>
-       */
-      public static final int DIVIDE_VALUE = 3;
-
-
-      public final int getNumber() { return value; }
-
-      public static Operator valueOf(int value) {
-        switch (value) {
-          case 0: return PLUS;
-          case 1: return MINUS;
-          case 2: return TIMES;
-          case 3: return DIVIDE;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<Operator>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static com.google.protobuf.Internal.EnumLiteMap<Operator>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Operator>() {
-              public Operator findValueByNumber(int number) {
-                return Operator.valueOf(number);
-              }
-            };
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return org.apache.mina.generated.protoc.Calc.Computation.getDescriptor().getEnumTypes().get(0);
-      }
-
-      private static final Operator[] VALUES = values();
-
-      public static Operator valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      private final int index;
-      private final int value;
-
-      private Operator(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      // @@protoc_insertion_point(enum_scope:tutorial.Computation.Operator)
-    }
-
-    private int bitField0_;
-    // required double x = 1;
-    public static final int X_FIELD_NUMBER = 1;
-    private double x_;
-    /**
-     * <code>required double x = 1;</code>
-     */
-    public boolean hasX() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>required double x = 1;</code>
-     */
-    public double getX() {
-      return x_;
-    }
-
-    // required double y = 2;
-    public static final int Y_FIELD_NUMBER = 2;
-    private double y_;
-    /**
-     * <code>required double y = 2;</code>
-     */
-    public boolean hasY() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>required double y = 2;</code>
-     */
-    public double getY() {
-      return y_;
-    }
-
-    // required .tutorial.Computation.Operator operator = 3;
-    public static final int OPERATOR_FIELD_NUMBER = 3;
-    private org.apache.mina.generated.protoc.Calc.Computation.Operator operator_;
-    /**
-     * <code>required .tutorial.Computation.Operator operator = 3;</code>
-     */
-    public boolean hasOperator() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>required .tutorial.Computation.Operator operator = 3;</code>
-     */
-    public org.apache.mina.generated.protoc.Calc.Computation.Operator getOperator() {
-      return operator_;
-    }
-
-    private void initFields() {
-      x_ = 0D;
-      y_ = 0D;
-      operator_ = org.apache.mina.generated.protoc.Calc.Computation.Operator.PLUS;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-
-      if (!hasX()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasY()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasOperator()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeDouble(1, x_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeDouble(2, y_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeEnum(3, operator_.getNumber());
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(1, x_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(2, y_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(3, operator_.getNumber());
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.apache.mina.generated.protoc.Calc.Computation prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
     /**
      * Protobuf type {@code tutorial.Computation}
      */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.apache.mina.generated.protoc.Calc.ComputationOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.apache.mina.generated.protoc.Calc.Computation.class, org.apache.mina.generated.protoc.Calc.Computation.Builder.class);
-      }
-
-      // Construct using org.apache.mina.generated.protoc.Calc.Computation.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+    public static final class Computation extends com.google.protobuf.GeneratedMessage implements ComputationOrBuilder {
+        // Use Computation.newBuilder() to construct.
+        private Computation(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+            super(builder);
+            this.unknownFields = builder.getUnknownFields();
         }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
 
-      public Builder clear() {
-        super.clear();
-        x_ = 0D;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        y_ = 0D;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        operator_ = org.apache.mina.generated.protoc.Calc.Computation.Operator.PLUS;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_descriptor;
-      }
-
-      public org.apache.mina.generated.protoc.Calc.Computation getDefaultInstanceForType() {
-        return org.apache.mina.generated.protoc.Calc.Computation.getDefaultInstance();
-      }
-
-      public org.apache.mina.generated.protoc.Calc.Computation build() {
-        org.apache.mina.generated.protoc.Calc.Computation result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
+        private Computation(boolean noInit) {
+            this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
         }
-        return result;
-      }
 
-      public org.apache.mina.generated.protoc.Calc.Computation buildPartial() {
-        org.apache.mina.generated.protoc.Calc.Computation result = new org.apache.mina.generated.protoc.Calc.Computation(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
+        private static final Computation defaultInstance;
+
+        public static Computation getDefaultInstance() {
+            return defaultInstance;
         }
-        result.x_ = x_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
+
+        public Computation getDefaultInstanceForType() {
+            return defaultInstance;
         }
-        result.y_ = y_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
+
+        private final com.google.protobuf.UnknownFieldSet unknownFields;
+
+        @java.lang.Override
+        public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
+            return this.unknownFields;
         }
-        result.operator_ = operator_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
 
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.apache.mina.generated.protoc.Calc.Computation) {
-          return mergeFrom((org.apache.mina.generated.protoc.Calc.Computation)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(org.apache.mina.generated.protoc.Calc.Computation other) {
-        if (other == org.apache.mina.generated.protoc.Calc.Computation.getDefaultInstance()) return this;
-        if (other.hasX()) {
-          setX(other.getX());
-        }
-        if (other.hasY()) {
-          setY(other.getY());
-        }
-        if (other.hasOperator()) {
-          setOperator(other.getOperator());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-
-      public final boolean isInitialized() {
-        if (!hasX()) {
-          
-          return false;
-        }
-        if (!hasY()) {
-          
-          return false;
-        }
-        if (!hasOperator()) {
-          
-          return false;
-        }
-        return true;
-      }
-
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        org.apache.mina.generated.protoc.Calc.Computation parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (org.apache.mina.generated.protoc.Calc.Computation) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
-
-      // required double x = 1;
-      private double x_ ;
-      /**
-       * <code>required double x = 1;</code>
-       */
-      public boolean hasX() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>required double x = 1;</code>
-       */
-      public double getX() {
-        return x_;
-      }
-      /**
-       * <code>required double x = 1;</code>
-       */
-      public Builder setX(double value) {
-        bitField0_ |= 0x00000001;
-        x_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required double x = 1;</code>
-       */
-      public Builder clearX() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        x_ = 0D;
-        onChanged();
-        return this;
-      }
-
-      // required double y = 2;
-      private double y_ ;
-      /**
-       * <code>required double y = 2;</code>
-       */
-      public boolean hasY() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>required double y = 2;</code>
-       */
-      public double getY() {
-        return y_;
-      }
-      /**
-       * <code>required double y = 2;</code>
-       */
-      public Builder setY(double value) {
-        bitField0_ |= 0x00000002;
-        y_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required double y = 2;</code>
-       */
-      public Builder clearY() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        y_ = 0D;
-        onChanged();
-        return this;
-      }
-
-      // required .tutorial.Computation.Operator operator = 3;
-      private org.apache.mina.generated.protoc.Calc.Computation.Operator operator_ = org.apache.mina.generated.protoc.Calc.Computation.Operator.PLUS;
-      /**
-       * <code>required .tutorial.Computation.Operator operator = 3;</code>
-       */
-      public boolean hasOperator() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      /**
-       * <code>required .tutorial.Computation.Operator operator = 3;</code>
-       */
-      public org.apache.mina.generated.protoc.Calc.Computation.Operator getOperator() {
-        return operator_;
-      }
-      /**
-       * <code>required .tutorial.Computation.Operator operator = 3;</code>
-       */
-      public Builder setOperator(org.apache.mina.generated.protoc.Calc.Computation.Operator value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        bitField0_ |= 0x00000004;
-        operator_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required .tutorial.Computation.Operator operator = 3;</code>
-       */
-      public Builder clearOperator() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        operator_ = org.apache.mina.generated.protoc.Calc.Computation.Operator.PLUS;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:tutorial.Computation)
-    }
-
-    static {
-      defaultInstance = new Computation(true);
-      defaultInstance.initFields();
-    }
-
-    // @@protoc_insertion_point(class_scope:tutorial.Computation)
-  }
-
-  public interface ResultOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-
-    // required double z = 1;
-    /**
-     * <code>required double z = 1;</code>
-     */
-    boolean hasZ();
-    /**
-     * <code>required double z = 1;</code>
-     */
-    double getZ();
-  }
-  /**
-   * Protobuf type {@code tutorial.Result}
-   */
-  public static final class Result extends
-      com.google.protobuf.GeneratedMessage
-      implements ResultOrBuilder {
-    // Use Result.newBuilder() to construct.
-    private Result(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private Result(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Result defaultInstance;
-    public static Result getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public Result getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private Result(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
+        private Computation(com.google.protobuf.CodedInputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            initFields();
+            int mutable_bitField0_ = 0;
+            com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
+                    .newBuilder();
+            try {
+                boolean done = false;
+                while (!done) {
+                    int tag = input.readTag();
+                    switch (tag) {
+                    case 0:
+                        done = true;
+                        break;
+                    default: {
+                        if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
+                            done = true;
+                        }
+                        break;
+                    }
+                    case 9: {
+                        bitField0_ |= 0x00000001;
+                        x_ = input.readDouble();
+                        break;
+                    }
+                    case 17: {
+                        bitField0_ |= 0x00000002;
+                        y_ = input.readDouble();
+                        break;
+                    }
+                    case 24: {
+                        int rawValue = input.readEnum();
+                        org.apache.mina.generated.protoc.Calc.Computation.Operator value = org.apache.mina.generated.protoc.Calc.Computation.Operator
+                                .valueOf(rawValue);
+                        if (value == null) {
+                            unknownFields.mergeVarintField(3, rawValue);
+                        } else {
+                            bitField0_ |= 0x00000004;
+                            operator_ = value;
+                        }
+                        break;
+                    }
+                    }
+                }
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                throw e.setUnfinishedMessage(this);
+            } catch (java.io.IOException e) {
+                throw new com.google.protobuf.InvalidProtocolBufferException(e.getMessage()).setUnfinishedMessage(this);
+            } finally {
+                this.unknownFields = unknownFields.build();
+                makeExtensionsImmutable();
             }
-            case 9: {
-              bitField0_ |= 0x00000001;
-              z_ = input.readDouble();
-              break;
-            }
-          }
         }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_descriptor;
+
+        public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+            return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_descriptor;
+        }
+
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+            return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_fieldAccessorTable
+                    .ensureFieldAccessorsInitialized(org.apache.mina.generated.protoc.Calc.Computation.class,
+                            org.apache.mina.generated.protoc.Calc.Computation.Builder.class);
+        }
+
+        public static com.google.protobuf.Parser<Computation> PARSER = new com.google.protobuf.AbstractParser<Computation>() {
+            public Computation parsePartialFrom(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return new Computation(input, extensionRegistry);
+            }
+        };
+
+        @java.lang.Override
+        public com.google.protobuf.Parser<Computation> getParserForType() {
+            return PARSER;
+        }
+
+        /**
+         * Protobuf enum {@code tutorial.Computation.Operator}
+         */
+        public enum Operator implements com.google.protobuf.ProtocolMessageEnum {
+            /**
+             * <code>PLUS = 0;</code>
+             */
+            PLUS(0, 0),
+            /**
+             * <code>MINUS = 1;</code>
+             */
+            MINUS(1, 1),
+            /**
+             * <code>TIMES = 2;</code>
+             */
+            TIMES(2, 2),
+            /**
+             * <code>DIVIDE = 3;</code>
+             */
+            DIVIDE(3, 3), ;
+
+            /**
+             * <code>PLUS = 0;</code>
+             */
+            public static final int PLUS_VALUE = 0;
+
+            /**
+             * <code>MINUS = 1;</code>
+             */
+            public static final int MINUS_VALUE = 1;
+
+            /**
+             * <code>TIMES = 2;</code>
+             */
+            public static final int TIMES_VALUE = 2;
+
+            /**
+             * <code>DIVIDE = 3;</code>
+             */
+            public static final int DIVIDE_VALUE = 3;
+
+            public final int getNumber() {
+                return value;
+            }
+
+            public static Operator valueOf(int value) {
+                switch (value) {
+                case 0:
+                    return PLUS;
+                case 1:
+                    return MINUS;
+                case 2:
+                    return TIMES;
+                case 3:
+                    return DIVIDE;
+                default:
+                    return null;
+                }
+            }
+
+            public static com.google.protobuf.Internal.EnumLiteMap<Operator> internalGetValueMap() {
+                return internalValueMap;
+            }
+
+            private static com.google.protobuf.Internal.EnumLiteMap<Operator> internalValueMap = new com.google.protobuf.Internal.EnumLiteMap<Operator>() {
+                public Operator findValueByNumber(int number) {
+                    return Operator.valueOf(number);
+                }
+            };
+
+            public final com.google.protobuf.Descriptors.EnumValueDescriptor getValueDescriptor() {
+                return getDescriptor().getValues().get(index);
+            }
+
+            public final com.google.protobuf.Descriptors.EnumDescriptor getDescriptorForType() {
+                return getDescriptor();
+            }
+
+            public static final com.google.protobuf.Descriptors.EnumDescriptor getDescriptor() {
+                return org.apache.mina.generated.protoc.Calc.Computation.getDescriptor().getEnumTypes().get(0);
+            }
+
+            private static final Operator[] VALUES = values();
+
+            public static Operator valueOf(com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+                if (desc.getType() != getDescriptor()) {
+                    throw new java.lang.IllegalArgumentException("EnumValueDescriptor is not for this type.");
+                }
+                return VALUES[desc.getIndex()];
+            }
+
+            private final int index;
+
+            private final int value;
+
+            private Operator(int index, int value) {
+                this.index = index;
+                this.value = value;
+            }
+
+            // @@protoc_insertion_point(enum_scope:tutorial.Computation.Operator)
+        }
+
+        private int bitField0_;
+
+        // required double x = 1;
+        public static final int X_FIELD_NUMBER = 1;
+
+        private double x_;
+
+        /**
+         * <code>required double x = 1;</code>
+         */
+        public boolean hasX() {
+            return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+
+        /**
+         * <code>required double x = 1;</code>
+         */
+        public double getX() {
+            return x_;
+        }
+
+        // required double y = 2;
+        public static final int Y_FIELD_NUMBER = 2;
+
+        private double y_;
+
+        /**
+         * <code>required double y = 2;</code>
+         */
+        public boolean hasY() {
+            return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+
+        /**
+         * <code>required double y = 2;</code>
+         */
+        public double getY() {
+            return y_;
+        }
+
+        // required .tutorial.Computation.Operator operator = 3;
+        public static final int OPERATOR_FIELD_NUMBER = 3;
+
+        private org.apache.mina.generated.protoc.Calc.Computation.Operator operator_;
+
+        /**
+         * <code>required .tutorial.Computation.Operator operator = 3;</code>
+         */
+        public boolean hasOperator() {
+            return ((bitField0_ & 0x00000004) == 0x00000004);
+        }
+
+        /**
+         * <code>required .tutorial.Computation.Operator operator = 3;</code>
+         */
+        public org.apache.mina.generated.protoc.Calc.Computation.Operator getOperator() {
+            return operator_;
+        }
+
+        private void initFields() {
+            x_ = 0D;
+            y_ = 0D;
+            operator_ = org.apache.mina.generated.protoc.Calc.Computation.Operator.PLUS;
+        }
+
+        private byte memoizedIsInitialized = -1;
+
+        public final boolean isInitialized() {
+            byte isInitialized = memoizedIsInitialized;
+            if (isInitialized != -1)
+                return isInitialized == 1;
+
+            if (!hasX()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            if (!hasY()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            if (!hasOperator()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            memoizedIsInitialized = 1;
+            return true;
+        }
+
+        public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+            getSerializedSize();
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                output.writeDouble(1, x_);
+            }
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                output.writeDouble(2, y_);
+            }
+            if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                output.writeEnum(3, operator_.getNumber());
+            }
+            getUnknownFields().writeTo(output);
+        }
+
+        private int memoizedSerializedSize = -1;
+
+        public int getSerializedSize() {
+            int size = memoizedSerializedSize;
+            if (size != -1)
+                return size;
+
+            size = 0;
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                size += com.google.protobuf.CodedOutputStream.computeDoubleSize(1, x_);
+            }
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                size += com.google.protobuf.CodedOutputStream.computeDoubleSize(2, y_);
+            }
+            if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                size += com.google.protobuf.CodedOutputStream.computeEnumSize(3, operator_.getNumber());
+            }
+            size += getUnknownFields().getSerializedSize();
+            memoizedSerializedSize = size;
+            return size;
+        }
+
+        private static final long serialVersionUID = 0L;
+
+        @java.lang.Override
+        protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
+            return super.writeReplace();
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(com.google.protobuf.ByteString data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(com.google.protobuf.ByteString data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(byte[] data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(byte[] data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+            return PARSER.parseFrom(input, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseDelimitedFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return PARSER.parseDelimitedFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseDelimitedFrom(java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+            return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(
+                com.google.protobuf.CodedInputStream input) throws java.io.IOException {
+            return PARSER.parseFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Computation parseFrom(
+                com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input, extensionRegistry);
+        }
+
+        public static Builder newBuilder() {
+            return Builder.create();
+        }
+
+        public Builder newBuilderForType() {
+            return newBuilder();
+        }
+
+        public static Builder newBuilder(org.apache.mina.generated.protoc.Calc.Computation prototype) {
+            return newBuilder().mergeFrom(prototype);
+        }
+
+        public Builder toBuilder() {
+            return newBuilder(this);
+        }
+
+        @java.lang.Override
+        protected Builder newBuilderForType(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+            Builder builder = new Builder(parent);
+            return builder;
+        }
+
+        /**
+         * Protobuf type {@code tutorial.Computation}
+         */
+        public static final class Builder extends com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                org.apache.mina.generated.protoc.Calc.ComputationOrBuilder {
+            public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+                return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_descriptor;
+            }
+
+            protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+                return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(org.apache.mina.generated.protoc.Calc.Computation.class,
+                                org.apache.mina.generated.protoc.Calc.Computation.Builder.class);
+            }
+
+            // Construct using org.apache.mina.generated.protoc.Calc.Computation.newBuilder()
+            private Builder() {
+                maybeForceBuilderInitialization();
+            }
+
+            private Builder(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                super(parent);
+                maybeForceBuilderInitialization();
+            }
+
+            private void maybeForceBuilderInitialization() {
+                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+                }
+            }
+
+            private static Builder create() {
+                return new Builder();
+            }
+
+            public Builder clear() {
+                super.clear();
+                x_ = 0D;
+                bitField0_ = (bitField0_ & ~0x00000001);
+                y_ = 0D;
+                bitField0_ = (bitField0_ & ~0x00000002);
+                operator_ = org.apache.mina.generated.protoc.Calc.Computation.Operator.PLUS;
+                bitField0_ = (bitField0_ & ~0x00000004);
+                return this;
+            }
+
+            public Builder clone() {
+                return create().mergeFrom(buildPartial());
+            }
+
+            public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+                return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Computation_descriptor;
+            }
+
+            public org.apache.mina.generated.protoc.Calc.Computation getDefaultInstanceForType() {
+                return org.apache.mina.generated.protoc.Calc.Computation.getDefaultInstance();
+            }
+
+            public org.apache.mina.generated.protoc.Calc.Computation build() {
+                org.apache.mina.generated.protoc.Calc.Computation result = buildPartial();
+                if (!result.isInitialized()) {
+                    throw newUninitializedMessageException(result);
+                }
+                return result;
+            }
+
+            public org.apache.mina.generated.protoc.Calc.Computation buildPartial() {
+                org.apache.mina.generated.protoc.Calc.Computation result = new org.apache.mina.generated.protoc.Calc.Computation(
+                        this);
+                int from_bitField0_ = bitField0_;
+                int to_bitField0_ = 0;
+                if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+                    to_bitField0_ |= 0x00000001;
+                }
+                result.x_ = x_;
+                if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+                    to_bitField0_ |= 0x00000002;
+                }
+                result.y_ = y_;
+                if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+                    to_bitField0_ |= 0x00000004;
+                }
+                result.operator_ = operator_;
+                result.bitField0_ = to_bitField0_;
+                onBuilt();
+                return result;
+            }
+
+            public Builder mergeFrom(com.google.protobuf.Message other) {
+                if (other instanceof org.apache.mina.generated.protoc.Calc.Computation) {
+                    return mergeFrom((org.apache.mina.generated.protoc.Calc.Computation) other);
+                } else {
+                    super.mergeFrom(other);
+                    return this;
+                }
+            }
+
+            public Builder mergeFrom(org.apache.mina.generated.protoc.Calc.Computation other) {
+                if (other == org.apache.mina.generated.protoc.Calc.Computation.getDefaultInstance())
+                    return this;
+                if (other.hasX()) {
+                    setX(other.getX());
+                }
+                if (other.hasY()) {
+                    setY(other.getY());
+                }
+                if (other.hasOperator()) {
+                    setOperator(other.getOperator());
+                }
+                this.mergeUnknownFields(other.getUnknownFields());
+                return this;
+            }
+
+            public final boolean isInitialized() {
+                if (!hasX()) {
+
+                    return false;
+                }
+                if (!hasY()) {
+
+                    return false;
+                }
+                if (!hasOperator()) {
+
+                    return false;
+                }
+                return true;
+            }
+
+            public Builder mergeFrom(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+                org.apache.mina.generated.protoc.Calc.Computation parsedMessage = null;
+                try {
+                    parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    parsedMessage = (org.apache.mina.generated.protoc.Calc.Computation) e.getUnfinishedMessage();
+                    throw e;
+                } finally {
+                    if (parsedMessage != null) {
+                        mergeFrom(parsedMessage);
+                    }
+                }
+                return this;
+            }
+
+            private int bitField0_;
+
+            // required double x = 1;
+            private double x_;
+
+            /**
+             * <code>required double x = 1;</code>
+             */
+            public boolean hasX() {
+                return ((bitField0_ & 0x00000001) == 0x00000001);
+            }
+
+            /**
+             * <code>required double x = 1;</code>
+             */
+            public double getX() {
+                return x_;
+            }
+
+            /**
+             * <code>required double x = 1;</code>
+             */
+            public Builder setX(double value) {
+                bitField0_ |= 0x00000001;
+                x_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required double x = 1;</code>
+             */
+            public Builder clearX() {
+                bitField0_ = (bitField0_ & ~0x00000001);
+                x_ = 0D;
+                onChanged();
+                return this;
+            }
+
+            // required double y = 2;
+            private double y_;
+
+            /**
+             * <code>required double y = 2;</code>
+             */
+            public boolean hasY() {
+                return ((bitField0_ & 0x00000002) == 0x00000002);
+            }
+
+            /**
+             * <code>required double y = 2;</code>
+             */
+            public double getY() {
+                return y_;
+            }
+
+            /**
+             * <code>required double y = 2;</code>
+             */
+            public Builder setY(double value) {
+                bitField0_ |= 0x00000002;
+                y_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required double y = 2;</code>
+             */
+            public Builder clearY() {
+                bitField0_ = (bitField0_ & ~0x00000002);
+                y_ = 0D;
+                onChanged();
+                return this;
+            }
+
+            // required .tutorial.Computation.Operator operator = 3;
+            private org.apache.mina.generated.protoc.Calc.Computation.Operator operator_ = org.apache.mina.generated.protoc.Calc.Computation.Operator.PLUS;
+
+            /**
+             * <code>required .tutorial.Computation.Operator operator = 3;</code>
+             */
+            public boolean hasOperator() {
+                return ((bitField0_ & 0x00000004) == 0x00000004);
+            }
+
+            /**
+             * <code>required .tutorial.Computation.Operator operator = 3;</code>
+             */
+            public org.apache.mina.generated.protoc.Calc.Computation.Operator getOperator() {
+                return operator_;
+            }
+
+            /**
+             * <code>required .tutorial.Computation.Operator operator = 3;</code>
+             */
+            public Builder setOperator(org.apache.mina.generated.protoc.Calc.Computation.Operator value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000004;
+                operator_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required .tutorial.Computation.Operator operator = 3;</code>
+             */
+            public Builder clearOperator() {
+                bitField0_ = (bitField0_ & ~0x00000004);
+                operator_ = org.apache.mina.generated.protoc.Calc.Computation.Operator.PLUS;
+                onChanged();
+                return this;
+            }
+
+            // @@protoc_insertion_point(builder_scope:tutorial.Computation)
+        }
+
+        static {
+            defaultInstance = new Computation(true);
+            defaultInstance.initFields();
+        }
+
+        // @@protoc_insertion_point(class_scope:tutorial.Computation)
     }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.apache.mina.generated.protoc.Calc.Result.class, org.apache.mina.generated.protoc.Calc.Result.Builder.class);
+    public interface ResultOrBuilder extends com.google.protobuf.MessageOrBuilder {
+
+        // required double z = 1;
+        /**
+         * <code>required double z = 1;</code>
+         */
+        boolean hasZ();
+
+        /**
+         * <code>required double z = 1;</code>
+         */
+        double getZ();
     }
 
-    public static com.google.protobuf.Parser<Result> PARSER =
-        new com.google.protobuf.AbstractParser<Result>() {
-      public Result parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Result(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Result> getParserForType() {
-      return PARSER;
-    }
-
-    private int bitField0_;
-    // required double z = 1;
-    public static final int Z_FIELD_NUMBER = 1;
-    private double z_;
-    /**
-     * <code>required double z = 1;</code>
-     */
-    public boolean hasZ() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>required double z = 1;</code>
-     */
-    public double getZ() {
-      return z_;
-    }
-
-    private void initFields() {
-      z_ = 0D;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-
-      if (!hasZ()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeDouble(1, z_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(1, z_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static org.apache.mina.generated.protoc.Calc.Result parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.Calc.Result parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.apache.mina.generated.protoc.Calc.Result prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
     /**
      * Protobuf type {@code tutorial.Result}
      */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.apache.mina.generated.protoc.Calc.ResultOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.apache.mina.generated.protoc.Calc.Result.class, org.apache.mina.generated.protoc.Calc.Result.Builder.class);
-      }
-
-      // Construct using org.apache.mina.generated.protoc.Calc.Result.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+    public static final class Result extends com.google.protobuf.GeneratedMessage implements ResultOrBuilder {
+        // Use Result.newBuilder() to construct.
+        private Result(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+            super(builder);
+            this.unknownFields = builder.getUnknownFields();
         }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
 
-      public Builder clear() {
-        super.clear();
-        z_ = 0D;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_descriptor;
-      }
-
-      public org.apache.mina.generated.protoc.Calc.Result getDefaultInstanceForType() {
-        return org.apache.mina.generated.protoc.Calc.Result.getDefaultInstance();
-      }
-
-      public org.apache.mina.generated.protoc.Calc.Result build() {
-        org.apache.mina.generated.protoc.Calc.Result result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
+        private Result(boolean noInit) {
+            this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
         }
-        return result;
-      }
 
-      public org.apache.mina.generated.protoc.Calc.Result buildPartial() {
-        org.apache.mina.generated.protoc.Calc.Result result = new org.apache.mina.generated.protoc.Calc.Result(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
+        private static final Result defaultInstance;
+
+        public static Result getDefaultInstance() {
+            return defaultInstance;
         }
-        result.z_ = z_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
 
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.apache.mina.generated.protoc.Calc.Result) {
-          return mergeFrom((org.apache.mina.generated.protoc.Calc.Result)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
+        public Result getDefaultInstanceForType() {
+            return defaultInstance;
         }
-      }
 
-      public Builder mergeFrom(org.apache.mina.generated.protoc.Calc.Result other) {
-        if (other == org.apache.mina.generated.protoc.Calc.Result.getDefaultInstance()) return this;
-        if (other.hasZ()) {
-          setZ(other.getZ());
+        private final com.google.protobuf.UnknownFieldSet unknownFields;
+
+        @java.lang.Override
+        public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
+            return this.unknownFields;
         }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
 
-      public final boolean isInitialized() {
-        if (!hasZ()) {
-          
-          return false;
+        private Result(com.google.protobuf.CodedInputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            initFields();
+            int mutable_bitField0_ = 0;
+            com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
+                    .newBuilder();
+            try {
+                boolean done = false;
+                while (!done) {
+                    int tag = input.readTag();
+                    switch (tag) {
+                    case 0:
+                        done = true;
+                        break;
+                    default: {
+                        if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
+                            done = true;
+                        }
+                        break;
+                    }
+                    case 9: {
+                        bitField0_ |= 0x00000001;
+                        z_ = input.readDouble();
+                        break;
+                    }
+                    }
+                }
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                throw e.setUnfinishedMessage(this);
+            } catch (java.io.IOException e) {
+                throw new com.google.protobuf.InvalidProtocolBufferException(e.getMessage()).setUnfinishedMessage(this);
+            } finally {
+                this.unknownFields = unknownFields.build();
+                makeExtensionsImmutable();
+            }
         }
-        return true;
-      }
 
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        org.apache.mina.generated.protoc.Calc.Result parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (org.apache.mina.generated.protoc.Calc.Result) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
+        public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+            return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_descriptor;
         }
-        return this;
-      }
-      private int bitField0_;
 
-      // required double z = 1;
-      private double z_ ;
-      /**
-       * <code>required double z = 1;</code>
-       */
-      public boolean hasZ() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>required double z = 1;</code>
-       */
-      public double getZ() {
-        return z_;
-      }
-      /**
-       * <code>required double z = 1;</code>
-       */
-      public Builder setZ(double value) {
-        bitField0_ |= 0x00000001;
-        z_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required double z = 1;</code>
-       */
-      public Builder clearZ() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        z_ = 0D;
-        onChanged();
-        return this;
-      }
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+            return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_fieldAccessorTable
+                    .ensureFieldAccessorsInitialized(org.apache.mina.generated.protoc.Calc.Result.class,
+                            org.apache.mina.generated.protoc.Calc.Result.Builder.class);
+        }
 
-      // @@protoc_insertion_point(builder_scope:tutorial.Result)
+        public static com.google.protobuf.Parser<Result> PARSER = new com.google.protobuf.AbstractParser<Result>() {
+            public Result parsePartialFrom(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return new Result(input, extensionRegistry);
+            }
+        };
+
+        @java.lang.Override
+        public com.google.protobuf.Parser<Result> getParserForType() {
+            return PARSER;
+        }
+
+        private int bitField0_;
+
+        // required double z = 1;
+        public static final int Z_FIELD_NUMBER = 1;
+
+        private double z_;
+
+        /**
+         * <code>required double z = 1;</code>
+         */
+        public boolean hasZ() {
+            return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+
+        /**
+         * <code>required double z = 1;</code>
+         */
+        public double getZ() {
+            return z_;
+        }
+
+        private void initFields() {
+            z_ = 0D;
+        }
+
+        private byte memoizedIsInitialized = -1;
+
+        public final boolean isInitialized() {
+            byte isInitialized = memoizedIsInitialized;
+            if (isInitialized != -1)
+                return isInitialized == 1;
+
+            if (!hasZ()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            memoizedIsInitialized = 1;
+            return true;
+        }
+
+        public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+            getSerializedSize();
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                output.writeDouble(1, z_);
+            }
+            getUnknownFields().writeTo(output);
+        }
+
+        private int memoizedSerializedSize = -1;
+
+        public int getSerializedSize() {
+            int size = memoizedSerializedSize;
+            if (size != -1)
+                return size;
+
+            size = 0;
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                size += com.google.protobuf.CodedOutputStream.computeDoubleSize(1, z_);
+            }
+            size += getUnknownFields().getSerializedSize();
+            memoizedSerializedSize = size;
+            return size;
+        }
+
+        private static final long serialVersionUID = 0L;
+
+        @java.lang.Override
+        protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
+            return super.writeReplace();
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseFrom(com.google.protobuf.ByteString data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseFrom(com.google.protobuf.ByteString data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseFrom(byte[] data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseFrom(byte[] data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseFrom(java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+            return PARSER.parseFrom(input, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseDelimitedFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return PARSER.parseDelimitedFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseDelimitedFrom(java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+            return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseFrom(com.google.protobuf.CodedInputStream input)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.Calc.Result parseFrom(
+                com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input, extensionRegistry);
+        }
+
+        public static Builder newBuilder() {
+            return Builder.create();
+        }
+
+        public Builder newBuilderForType() {
+            return newBuilder();
+        }
+
+        public static Builder newBuilder(org.apache.mina.generated.protoc.Calc.Result prototype) {
+            return newBuilder().mergeFrom(prototype);
+        }
+
+        public Builder toBuilder() {
+            return newBuilder(this);
+        }
+
+        @java.lang.Override
+        protected Builder newBuilderForType(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+            Builder builder = new Builder(parent);
+            return builder;
+        }
+
+        /**
+         * Protobuf type {@code tutorial.Result}
+         */
+        public static final class Builder extends com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                org.apache.mina.generated.protoc.Calc.ResultOrBuilder {
+            public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+                return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_descriptor;
+            }
+
+            protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+                return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(org.apache.mina.generated.protoc.Calc.Result.class,
+                                org.apache.mina.generated.protoc.Calc.Result.Builder.class);
+            }
+
+            // Construct using org.apache.mina.generated.protoc.Calc.Result.newBuilder()
+            private Builder() {
+                maybeForceBuilderInitialization();
+            }
+
+            private Builder(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                super(parent);
+                maybeForceBuilderInitialization();
+            }
+
+            private void maybeForceBuilderInitialization() {
+                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+                }
+            }
+
+            private static Builder create() {
+                return new Builder();
+            }
+
+            public Builder clear() {
+                super.clear();
+                z_ = 0D;
+                bitField0_ = (bitField0_ & ~0x00000001);
+                return this;
+            }
+
+            public Builder clone() {
+                return create().mergeFrom(buildPartial());
+            }
+
+            public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+                return org.apache.mina.generated.protoc.Calc.internal_static_tutorial_Result_descriptor;
+            }
+
+            public org.apache.mina.generated.protoc.Calc.Result getDefaultInstanceForType() {
+                return org.apache.mina.generated.protoc.Calc.Result.getDefaultInstance();
+            }
+
+            public org.apache.mina.generated.protoc.Calc.Result build() {
+                org.apache.mina.generated.protoc.Calc.Result result = buildPartial();
+                if (!result.isInitialized()) {
+                    throw newUninitializedMessageException(result);
+                }
+                return result;
+            }
+
+            public org.apache.mina.generated.protoc.Calc.Result buildPartial() {
+                org.apache.mina.generated.protoc.Calc.Result result = new org.apache.mina.generated.protoc.Calc.Result(
+                        this);
+                int from_bitField0_ = bitField0_;
+                int to_bitField0_ = 0;
+                if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+                    to_bitField0_ |= 0x00000001;
+                }
+                result.z_ = z_;
+                result.bitField0_ = to_bitField0_;
+                onBuilt();
+                return result;
+            }
+
+            public Builder mergeFrom(com.google.protobuf.Message other) {
+                if (other instanceof org.apache.mina.generated.protoc.Calc.Result) {
+                    return mergeFrom((org.apache.mina.generated.protoc.Calc.Result) other);
+                } else {
+                    super.mergeFrom(other);
+                    return this;
+                }
+            }
+
+            public Builder mergeFrom(org.apache.mina.generated.protoc.Calc.Result other) {
+                if (other == org.apache.mina.generated.protoc.Calc.Result.getDefaultInstance())
+                    return this;
+                if (other.hasZ()) {
+                    setZ(other.getZ());
+                }
+                this.mergeUnknownFields(other.getUnknownFields());
+                return this;
+            }
+
+            public final boolean isInitialized() {
+                if (!hasZ()) {
+
+                    return false;
+                }
+                return true;
+            }
+
+            public Builder mergeFrom(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+                org.apache.mina.generated.protoc.Calc.Result parsedMessage = null;
+                try {
+                    parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    parsedMessage = (org.apache.mina.generated.protoc.Calc.Result) e.getUnfinishedMessage();
+                    throw e;
+                } finally {
+                    if (parsedMessage != null) {
+                        mergeFrom(parsedMessage);
+                    }
+                }
+                return this;
+            }
+
+            private int bitField0_;
+
+            // required double z = 1;
+            private double z_;
+
+            /**
+             * <code>required double z = 1;</code>
+             */
+            public boolean hasZ() {
+                return ((bitField0_ & 0x00000001) == 0x00000001);
+            }
+
+            /**
+             * <code>required double z = 1;</code>
+             */
+            public double getZ() {
+                return z_;
+            }
+
+            /**
+             * <code>required double z = 1;</code>
+             */
+            public Builder setZ(double value) {
+                bitField0_ |= 0x00000001;
+                z_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required double z = 1;</code>
+             */
+            public Builder clearZ() {
+                bitField0_ = (bitField0_ & ~0x00000001);
+                z_ = 0D;
+                onChanged();
+                return this;
+            }
+
+            // @@protoc_insertion_point(builder_scope:tutorial.Result)
+        }
+
+        static {
+            defaultInstance = new Result(true);
+            defaultInstance.initFields();
+        }
+
+        // @@protoc_insertion_point(class_scope:tutorial.Result)
     }
 
+    private static com.google.protobuf.Descriptors.Descriptor internal_static_tutorial_Computation_descriptor;
+
+    private static com.google.protobuf.GeneratedMessage.FieldAccessorTable internal_static_tutorial_Computation_fieldAccessorTable;
+
+    private static com.google.protobuf.Descriptors.Descriptor internal_static_tutorial_Result_descriptor;
+
+    private static com.google.protobuf.GeneratedMessage.FieldAccessorTable internal_static_tutorial_Result_fieldAccessorTable;
+
+    public static com.google.protobuf.Descriptors.FileDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    private static com.google.protobuf.Descriptors.FileDescriptor descriptor;
     static {
-      defaultInstance = new Result(true);
-      defaultInstance.initFields();
+        java.lang.String[] descriptorData = { "\n\034src/test/protobuf/calc.proto\022\010tutorial"
+                + "\"\215\001\n\013Computation\022\t\n\001x\030\001 \002(\001\022\t\n\001y\030\002 \002(\001\0220"
+                + "\n\010operator\030\003 \002(\0162\036.tutorial.Computation."
+                + "Operator\"6\n\010Operator\022\010\n\004PLUS\020\000\022\t\n\005MINUS\020"
+                + "\001\022\t\n\005TIMES\020\002\022\n\n\006DIVIDE\020\003\"\023\n\006Result\022\t\n\001z\030"
+                + "\001 \002(\001B(\n org.apache.mina.generated.proto" + "cB\004Calc" };
+        com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner = new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+            public com.google.protobuf.ExtensionRegistry assignDescriptors(
+                    com.google.protobuf.Descriptors.FileDescriptor root) {
+                descriptor = root;
+                internal_static_tutorial_Computation_descriptor = getDescriptor().getMessageTypes().get(0);
+                internal_static_tutorial_Computation_fieldAccessorTable = new com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                        internal_static_tutorial_Computation_descriptor,
+                        new java.lang.String[] { "X", "Y", "Operator", });
+                internal_static_tutorial_Result_descriptor = getDescriptor().getMessageTypes().get(1);
+                internal_static_tutorial_Result_fieldAccessorTable = new com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                        internal_static_tutorial_Result_descriptor, new java.lang.String[] { "Z", });
+                return null;
+            }
+        };
+        com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(descriptorData,
+                new com.google.protobuf.Descriptors.FileDescriptor[] {}, assigner);
     }
 
-    // @@protoc_insertion_point(class_scope:tutorial.Result)
-  }
-
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_tutorial_Computation_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_tutorial_Computation_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_tutorial_Result_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_tutorial_Result_fieldAccessorTable;
-
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
-    return descriptor;
-  }
-  private static com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
-  static {
-    java.lang.String[] descriptorData = {
-      "\n\034src/test/protobuf/calc.proto\022\010tutorial" +
-      "\"\215\001\n\013Computation\022\t\n\001x\030\001 \002(\001\022\t\n\001y\030\002 \002(\001\0220" +
-      "\n\010operator\030\003 \002(\0162\036.tutorial.Computation." +
-      "Operator\"6\n\010Operator\022\010\n\004PLUS\020\000\022\t\n\005MINUS\020" +
-      "\001\022\t\n\005TIMES\020\002\022\n\n\006DIVIDE\020\003\"\023\n\006Result\022\t\n\001z\030" +
-      "\001 \002(\001B(\n org.apache.mina.generated.proto" +
-      "cB\004Calc"
-    };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_tutorial_Computation_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_tutorial_Computation_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_tutorial_Computation_descriptor,
-              new java.lang.String[] { "X", "Y", "Operator", });
-          internal_static_tutorial_Result_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_tutorial_Result_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_tutorial_Result_descriptor,
-              new java.lang.String[] { "Z", });
-          return null;
-        }
-      };
-    com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
-  }
-
-  // @@protoc_insertion_point(outer_class_scope)
+    // @@protoc_insertion_point(outer_class_scope)
 }

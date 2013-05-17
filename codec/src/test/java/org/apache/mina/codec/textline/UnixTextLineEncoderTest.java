@@ -41,7 +41,7 @@ public class UnixTextLineEncoderTest {
         assertNotNull(result);
         assertEquals(1, result.remaining());
     }
-    
+
     @Test
     public void testThatNonEmptyBufferReturnsDataAndDelimiter() {
         TextLineEncoder encoder = new TextLineEncoder(LineDelimiter.UNIX);

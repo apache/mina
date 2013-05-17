@@ -55,8 +55,9 @@ public class NioTcpClientReleaseTest {
      * different IoFilters.
      */
     @Test
-    public void checkSessionsAreClosedWhenClientIsDisconnected() throws IOException, InterruptedException, ExecutionException {
-        
+    public void checkSessionsAreClosedWhenClientIsDisconnected() throws IOException, InterruptedException,
+            ExecutionException {
+
         NioTcpServer server = new NioTcpServer();
         server.setIoHandler(new Handler());
         server.bind(0);
@@ -64,7 +65,7 @@ public class NioTcpClientReleaseTest {
         NioTcpClient client = new NioTcpClient();
         client.setIoHandler(new AbstractIoHandler() {
         });
-        for(int i=0; i < CLIENT_COUNT;++i) {
+        for (int i = 0; i < CLIENT_COUNT; ++i) {
             client.connect(new InetSocketAddress(server.getServerSocketChannel().socket().getLocalPort())).get();
         }
         client.disconnect();

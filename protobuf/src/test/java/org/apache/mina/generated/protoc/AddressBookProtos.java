@@ -4,2084 +4,1899 @@
 package org.apache.mina.generated.protoc;
 
 public final class AddressBookProtos {
-  private AddressBookProtos() {}
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
-  }
-  public interface PersonOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-
-    // required string name = 1;
-    /**
-     * <code>required string name = 1;</code>
-     */
-    boolean hasName();
-    /**
-     * <code>required string name = 1;</code>
-     */
-    java.lang.String getName();
-    /**
-     * <code>required string name = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getNameBytes();
-
-    // required int32 id = 2;
-    /**
-     * <code>required int32 id = 2;</code>
-     *
-     * <pre>
-     * Unique ID number for this person.
-     * </pre>
-     */
-    boolean hasId();
-    /**
-     * <code>required int32 id = 2;</code>
-     *
-     * <pre>
-     * Unique ID number for this person.
-     * </pre>
-     */
-    int getId();
-
-    // optional string email = 3;
-    /**
-     * <code>optional string email = 3;</code>
-     */
-    boolean hasEmail();
-    /**
-     * <code>optional string email = 3;</code>
-     */
-    java.lang.String getEmail();
-    /**
-     * <code>optional string email = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getEmailBytes();
-
-    // repeated .tutorial.Person.PhoneNumber phone = 4;
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> 
-        getPhoneList();
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber getPhone(int index);
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    int getPhoneCount();
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> 
-        getPhoneOrBuilderList();
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder getPhoneOrBuilder(
-        int index);
-  }
-  /**
-   * Protobuf type {@code tutorial.Person}
-   */
-  public static final class Person extends
-      com.google.protobuf.GeneratedMessage
-      implements PersonOrBuilder {
-    // Use Person.newBuilder() to construct.
-    private Person(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private Person(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Person defaultInstance;
-    public static Person getDefaultInstance() {
-      return defaultInstance;
+    private AddressBookProtos() {
     }
 
-    public Person getDefaultInstanceForType() {
-      return defaultInstance;
+    public static void registerAllExtensions(com.google.protobuf.ExtensionRegistry registry) {
     }
 
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private Person(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 10: {
-              bitField0_ |= 0x00000001;
-              name_ = input.readBytes();
-              break;
-            }
-            case 16: {
-              bitField0_ |= 0x00000002;
-              id_ = input.readInt32();
-              break;
-            }
-            case 26: {
-              bitField0_ |= 0x00000004;
-              email_ = input.readBytes();
-              break;
-            }
-            case 34: {
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-                phone_ = new java.util.ArrayList<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber>();
-                mutable_bitField0_ |= 0x00000008;
-              }
-              phone_.add(input.readMessage(org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.PARSER, extensionRegistry));
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-          phone_ = java.util.Collections.unmodifiableList(phone_);
-        }
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_descriptor;
-    }
+    public interface PersonOrBuilder extends com.google.protobuf.MessageOrBuilder {
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.apache.mina.generated.protoc.AddressBookProtos.Person.class, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<Person> PARSER =
-        new com.google.protobuf.AbstractParser<Person>() {
-      public Person parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Person(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Person> getParserForType() {
-      return PARSER;
-    }
-
-    /**
-     * Protobuf enum {@code tutorial.Person.PhoneType}
-     */
-    public enum PhoneType
-        implements com.google.protobuf.ProtocolMessageEnum {
-      /**
-       * <code>MOBILE = 0;</code>
-       */
-      MOBILE(0, 0),
-      /**
-       * <code>HOME = 1;</code>
-       */
-      HOME(1, 1),
-      /**
-       * <code>WORK = 2;</code>
-       */
-      WORK(2, 2),
-      ;
-
-      /**
-       * <code>MOBILE = 0;</code>
-       */
-      public static final int MOBILE_VALUE = 0;
-      /**
-       * <code>HOME = 1;</code>
-       */
-      public static final int HOME_VALUE = 1;
-      /**
-       * <code>WORK = 2;</code>
-       */
-      public static final int WORK_VALUE = 2;
-
-
-      public final int getNumber() { return value; }
-
-      public static PhoneType valueOf(int value) {
-        switch (value) {
-          case 0: return MOBILE;
-          case 1: return HOME;
-          case 2: return WORK;
-          default: return null;
-        }
-      }
-
-      public static com.google.protobuf.Internal.EnumLiteMap<PhoneType>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static com.google.protobuf.Internal.EnumLiteMap<PhoneType>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<PhoneType>() {
-              public PhoneType findValueByNumber(int number) {
-                return PhoneType.valueOf(number);
-              }
-            };
-
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.Person.getDescriptor().getEnumTypes().get(0);
-      }
-
-      private static final PhoneType[] VALUES = values();
-
-      public static PhoneType valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-
-      private final int index;
-      private final int value;
-
-      private PhoneType(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-
-      // @@protoc_insertion_point(enum_scope:tutorial.Person.PhoneType)
-    }
-
-    public interface PhoneNumberOrBuilder
-        extends com.google.protobuf.MessageOrBuilder {
-
-      // required string number = 1;
-      /**
-       * <code>required string number = 1;</code>
-       */
-      boolean hasNumber();
-      /**
-       * <code>required string number = 1;</code>
-       */
-      java.lang.String getNumber();
-      /**
-       * <code>required string number = 1;</code>
-       */
-      com.google.protobuf.ByteString
-          getNumberBytes();
-
-      // optional .tutorial.Person.PhoneType type = 2 [default = HOME];
-      /**
-       * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
-       */
-      boolean hasType();
-      /**
-       * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
-       */
-      org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType getType();
-    }
-    /**
-     * Protobuf type {@code tutorial.Person.PhoneNumber}
-     */
-    public static final class PhoneNumber extends
-        com.google.protobuf.GeneratedMessage
-        implements PhoneNumberOrBuilder {
-      // Use PhoneNumber.newBuilder() to construct.
-      private PhoneNumber(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-        super(builder);
-        this.unknownFields = builder.getUnknownFields();
-      }
-      private PhoneNumber(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final PhoneNumber defaultInstance;
-      public static PhoneNumber getDefaultInstance() {
-        return defaultInstance;
-      }
-
-      public PhoneNumber getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
-      @java.lang.Override
-      public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
-        return this.unknownFields;
-      }
-      private PhoneNumber(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
-        int mutable_bitField0_ = 0;
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-            com.google.protobuf.UnknownFieldSet.newBuilder();
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              default: {
-                if (!parseUnknownField(input, unknownFields,
-                                       extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-              case 10: {
-                bitField0_ |= 0x00000001;
-                number_ = input.readBytes();
-                break;
-              }
-              case 16: {
-                int rawValue = input.readEnum();
-                org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType value = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.valueOf(rawValue);
-                if (value == null) {
-                  unknownFields.mergeVarintField(2, rawValue);
-                } else {
-                  bitField0_ |= 0x00000002;
-                  type_ = value;
-                }
-                break;
-              }
-            }
-          }
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(this);
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
-        } finally {
-          this.unknownFields = unknownFields.build();
-          makeExtensionsImmutable();
-        }
-      }
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.class, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder.class);
-      }
-
-      public static com.google.protobuf.Parser<PhoneNumber> PARSER =
-          new com.google.protobuf.AbstractParser<PhoneNumber>() {
-        public PhoneNumber parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PhoneNumber(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<PhoneNumber> getParserForType() {
-        return PARSER;
-      }
-
-      private int bitField0_;
-      // required string number = 1;
-      public static final int NUMBER_FIELD_NUMBER = 1;
-      private java.lang.Object number_;
-      /**
-       * <code>required string number = 1;</code>
-       */
-      public boolean hasNumber() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>required string number = 1;</code>
-       */
-      public java.lang.String getNumber() {
-        java.lang.Object ref = number_;
-        if (ref instanceof java.lang.String) {
-          return (java.lang.String) ref;
-        } else {
-          com.google.protobuf.ByteString bs = 
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            number_ = s;
-          }
-          return s;
-        }
-      }
-      /**
-       * <code>required string number = 1;</code>
-       */
-      public com.google.protobuf.ByteString
-          getNumberBytes() {
-        java.lang.Object ref = number_;
-        if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          number_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-
-      // optional .tutorial.Person.PhoneType type = 2 [default = HOME];
-      public static final int TYPE_FIELD_NUMBER = 2;
-      private org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType type_;
-      /**
-       * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
-       */
-      public boolean hasType() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType getType() {
-        return type_;
-      }
-
-      private void initFields() {
-        number_ = "";
-        type_ = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.HOME;
-      }
-      private byte memoizedIsInitialized = -1;
-      public final boolean isInitialized() {
-        byte isInitialized = memoizedIsInitialized;
-        if (isInitialized != -1) return isInitialized == 1;
-
-        if (!hasNumber()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-        memoizedIsInitialized = 1;
-        return true;
-      }
-
-      public void writeTo(com.google.protobuf.CodedOutputStream output)
-                          throws java.io.IOException {
-        getSerializedSize();
-        if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          output.writeBytes(1, getNumberBytes());
-        }
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          output.writeEnum(2, type_.getNumber());
-        }
-        getUnknownFields().writeTo(output);
-      }
-
-      private int memoizedSerializedSize = -1;
-      public int getSerializedSize() {
-        int size = memoizedSerializedSize;
-        if (size != -1) return size;
-
-        size = 0;
-        if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          size += com.google.protobuf.CodedOutputStream
-            .computeBytesSize(1, getNumberBytes());
-        }
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          size += com.google.protobuf.CodedOutputStream
-            .computeEnumSize(2, type_.getNumber());
-        }
-        size += getUnknownFields().getSerializedSize();
-        memoizedSerializedSize = size;
-        return size;
-      }
-
-      private static final long serialVersionUID = 0L;
-      @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
-      }
-
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
-          com.google.protobuf.ByteString data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
-          com.google.protobuf.ByteString data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data, extensionRegistry);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(byte[] data)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
-          byte[] data,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return PARSER.parseFrom(data, extensionRegistry);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(java.io.InputStream input)
-          throws java.io.IOException {
-        return PARSER.parseFrom(input);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseDelimitedFrom(java.io.InputStream input)
-          throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseDelimitedFrom(
-          java.io.InputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
-          com.google.protobuf.CodedInputStream input)
-          throws java.io.IOException {
-        return PARSER.parseFrom(input);
-      }
-      public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
-      }
-
-      public static Builder newBuilder() { return Builder.create(); }
-      public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber prototype) {
-        return newBuilder().mergeFrom(prototype);
-      }
-      public Builder toBuilder() { return newBuilder(this); }
-
-      @java.lang.Override
-      protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        Builder builder = new Builder(parent);
-        return builder;
-      }
-      /**
-       * Protobuf type {@code tutorial.Person.PhoneNumber}
-       */
-      public static final class Builder extends
-          com.google.protobuf.GeneratedMessage.Builder<Builder>
-         implements org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder {
-        public static final com.google.protobuf.Descriptors.Descriptor
-            getDescriptor() {
-          return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_descriptor;
-        }
-
-        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-            internalGetFieldAccessorTable() {
-          return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_fieldAccessorTable
-              .ensureFieldAccessorsInitialized(
-                  org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.class, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder.class);
-        }
-
-        // Construct using org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.newBuilder()
-        private Builder() {
-          maybeForceBuilderInitialization();
-        }
-
-        private Builder(
-            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-          super(parent);
-          maybeForceBuilderInitialization();
-        }
-        private void maybeForceBuilderInitialization() {
-          if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          }
-        }
-        private static Builder create() {
-          return new Builder();
-        }
-
-        public Builder clear() {
-          super.clear();
-          number_ = "";
-          bitField0_ = (bitField0_ & ~0x00000001);
-          type_ = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.HOME;
-          bitField0_ = (bitField0_ & ~0x00000002);
-          return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
-        }
-
-        public com.google.protobuf.Descriptors.Descriptor
-            getDescriptorForType() {
-          return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_descriptor;
-        }
-
-        public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber getDefaultInstanceForType() {
-          return org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.getDefaultInstance();
-        }
-
-        public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber build() {
-          org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber result = buildPartial();
-          if (!result.isInitialized()) {
-            throw newUninitializedMessageException(result);
-          }
-          return result;
-        }
-
-        public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber buildPartial() {
-          org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber result = new org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber(this);
-          int from_bitField0_ = bitField0_;
-          int to_bitField0_ = 0;
-          if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-            to_bitField0_ |= 0x00000001;
-          }
-          result.number_ = number_;
-          if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-            to_bitField0_ |= 0x00000002;
-          }
-          result.type_ = type_;
-          result.bitField0_ = to_bitField0_;
-          onBuilt();
-          return result;
-        }
-
-        public Builder mergeFrom(com.google.protobuf.Message other) {
-          if (other instanceof org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber) {
-            return mergeFrom((org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber)other);
-          } else {
-            super.mergeFrom(other);
-            return this;
-          }
-        }
-
-        public Builder mergeFrom(org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber other) {
-          if (other == org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.getDefaultInstance()) return this;
-          if (other.hasNumber()) {
-            bitField0_ |= 0x00000001;
-            number_ = other.number_;
-            onChanged();
-          }
-          if (other.hasType()) {
-            setType(other.getType());
-          }
-          this.mergeUnknownFields(other.getUnknownFields());
-          return this;
-        }
-
-        public final boolean isInitialized() {
-          if (!hasNumber()) {
-            
-            return false;
-          }
-          return true;
-        }
-
-        public Builder mergeFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws java.io.IOException {
-          org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parsedMessage = null;
-          try {
-            parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-            parsedMessage = (org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber) e.getUnfinishedMessage();
-            throw e;
-          } finally {
-            if (parsedMessage != null) {
-              mergeFrom(parsedMessage);
-            }
-          }
-          return this;
-        }
-        private int bitField0_;
-
-        // required string number = 1;
-        private java.lang.Object number_ = "";
+        // required string name = 1;
         /**
-         * <code>required string number = 1;</code>
+         * <code>required string name = 1;</code>
          */
-        public boolean hasNumber() {
-          return ((bitField0_ & 0x00000001) == 0x00000001);
-        }
+        boolean hasName();
+
         /**
-         * <code>required string number = 1;</code>
+         * <code>required string name = 1;</code>
          */
-        public java.lang.String getNumber() {
-          java.lang.Object ref = number_;
-          if (!(ref instanceof java.lang.String)) {
-            java.lang.String s = ((com.google.protobuf.ByteString) ref)
-                .toStringUtf8();
-            number_ = s;
-            return s;
-          } else {
-            return (java.lang.String) ref;
-          }
-        }
+        java.lang.String getName();
+
         /**
-         * <code>required string number = 1;</code>
+         * <code>required string name = 1;</code>
          */
-        public com.google.protobuf.ByteString
-            getNumberBytes() {
-          java.lang.Object ref = number_;
-          if (ref instanceof String) {
-            com.google.protobuf.ByteString b = 
-                com.google.protobuf.ByteString.copyFromUtf8(
-                    (java.lang.String) ref);
-            number_ = b;
-            return b;
-          } else {
-            return (com.google.protobuf.ByteString) ref;
-          }
-        }
+        com.google.protobuf.ByteString getNameBytes();
+
+        // required int32 id = 2;
         /**
-         * <code>required string number = 1;</code>
+         * <code>required int32 id = 2;</code>
+         *
+         * <pre>
+         * Unique ID number for this person.
+         * </pre>
          */
-        public Builder setNumber(
-            java.lang.String value) {
-          if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-          number_ = value;
-          onChanged();
-          return this;
-        }
+        boolean hasId();
+
         /**
-         * <code>required string number = 1;</code>
+         * <code>required int32 id = 2;</code>
+         *
+         * <pre>
+         * Unique ID number for this person.
+         * </pre>
          */
-        public Builder clearNumber() {
-          bitField0_ = (bitField0_ & ~0x00000001);
-          number_ = getDefaultInstance().getNumber();
-          onChanged();
-          return this;
-        }
+        int getId();
+
+        // optional string email = 3;
         /**
-         * <code>required string number = 1;</code>
+         * <code>optional string email = 3;</code>
          */
-        public Builder setNumberBytes(
-            com.google.protobuf.ByteString value) {
-          if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-          number_ = value;
-          onChanged();
-          return this;
-        }
+        boolean hasEmail();
 
-        // optional .tutorial.Person.PhoneType type = 2 [default = HOME];
-        private org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType type_ = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.HOME;
         /**
-         * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+         * <code>optional string email = 3;</code>
          */
-        public boolean hasType() {
-          return ((bitField0_ & 0x00000002) == 0x00000002);
-        }
+        java.lang.String getEmail();
+
         /**
-         * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+         * <code>optional string email = 3;</code>
          */
-        public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType getType() {
-          return type_;
-        }
+        com.google.protobuf.ByteString getEmailBytes();
+
+        // repeated .tutorial.Person.PhoneNumber phone = 4;
         /**
-         * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
          */
-        public Builder setType(org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType value) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          bitField0_ |= 0x00000002;
-          type_ = value;
-          onChanged();
-          return this;
-        }
+        java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> getPhoneList();
+
         /**
-         * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
          */
-        public Builder clearType() {
-          bitField0_ = (bitField0_ & ~0x00000002);
-          type_ = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.HOME;
-          onChanged();
-          return this;
-        }
+        org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber getPhone(int index);
 
-        // @@protoc_insertion_point(builder_scope:tutorial.Person.PhoneNumber)
-      }
+        /**
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+         */
+        int getPhoneCount();
 
-      static {
-        defaultInstance = new PhoneNumber(true);
-        defaultInstance.initFields();
-      }
+        /**
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+         */
+        java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> getPhoneOrBuilderList();
 
-      // @@protoc_insertion_point(class_scope:tutorial.Person.PhoneNumber)
-    }
-
-    private int bitField0_;
-    // required string name = 1;
-    public static final int NAME_FIELD_NUMBER = 1;
-    private java.lang.Object name_;
-    /**
-     * <code>required string name = 1;</code>
-     */
-    public boolean hasName() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>required string name = 1;</code>
-     */
-    public java.lang.String getName() {
-      java.lang.Object ref = name_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          name_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>required string name = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getNameBytes() {
-      java.lang.Object ref = name_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        name_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+        /**
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+         */
+        org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder getPhoneOrBuilder(int index);
     }
 
-    // required int32 id = 2;
-    public static final int ID_FIELD_NUMBER = 2;
-    private int id_;
-    /**
-     * <code>required int32 id = 2;</code>
-     *
-     * <pre>
-     * Unique ID number for this person.
-     * </pre>
-     */
-    public boolean hasId() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>required int32 id = 2;</code>
-     *
-     * <pre>
-     * Unique ID number for this person.
-     * </pre>
-     */
-    public int getId() {
-      return id_;
-    }
-
-    // optional string email = 3;
-    public static final int EMAIL_FIELD_NUMBER = 3;
-    private java.lang.Object email_;
-    /**
-     * <code>optional string email = 3;</code>
-     */
-    public boolean hasEmail() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>optional string email = 3;</code>
-     */
-    public java.lang.String getEmail() {
-      java.lang.Object ref = email_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          email_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string email = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEmailBytes() {
-      java.lang.Object ref = email_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        email_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    // repeated .tutorial.Person.PhoneNumber phone = 4;
-    public static final int PHONE_FIELD_NUMBER = 4;
-    private java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> phone_;
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> getPhoneList() {
-      return phone_;
-    }
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    public java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> 
-        getPhoneOrBuilderList() {
-      return phone_;
-    }
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    public int getPhoneCount() {
-      return phone_.size();
-    }
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber getPhone(int index) {
-      return phone_.get(index);
-    }
-    /**
-     * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-     */
-    public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder getPhoneOrBuilder(
-        int index) {
-      return phone_.get(index);
-    }
-
-    private void initFields() {
-      name_ = "";
-      id_ = 0;
-      email_ = "";
-      phone_ = java.util.Collections.emptyList();
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-
-      if (!hasName()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasId()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      for (int i = 0; i < getPhoneCount(); i++) {
-        if (!getPhone(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getNameBytes());
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, id_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getEmailBytes());
-      }
-      for (int i = 0; i < phone_.size(); i++) {
-        output.writeMessage(4, phone_.get(i));
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getNameBytes());
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, id_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getEmailBytes());
-      }
-      for (int i = 0; i < phone_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, phone_.get(i));
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.apache.mina.generated.protoc.AddressBookProtos.Person prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
     /**
      * Protobuf type {@code tutorial.Person}
      */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.apache.mina.generated.protoc.AddressBookProtos.Person.class, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder.class);
-      }
-
-      // Construct using org.apache.mina.generated.protoc.AddressBookProtos.Person.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getPhoneFieldBuilder();
+    public static final class Person extends com.google.protobuf.GeneratedMessage implements PersonOrBuilder {
+        // Use Person.newBuilder() to construct.
+        private Person(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+            super(builder);
+            this.unknownFields = builder.getUnknownFields();
         }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
 
-      public Builder clear() {
-        super.clear();
-        name_ = "";
-        bitField0_ = (bitField0_ & ~0x00000001);
-        id_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        email_ = "";
-        bitField0_ = (bitField0_ & ~0x00000004);
-        if (phoneBuilder_ == null) {
-          phone_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000008);
-        } else {
-          phoneBuilder_.clear();
+        private Person(boolean noInit) {
+            this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
         }
-        return this;
-      }
 
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
+        private static final Person defaultInstance;
 
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_descriptor;
-      }
+        public static Person getDefaultInstance() {
+            return defaultInstance;
+        }
 
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person getDefaultInstanceForType() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.Person.getDefaultInstance();
-      }
+        public Person getDefaultInstanceForType() {
+            return defaultInstance;
+        }
 
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person build() {
-        org.apache.mina.generated.protoc.AddressBookProtos.Person result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
+        private final com.google.protobuf.UnknownFieldSet unknownFields;
 
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person buildPartial() {
-        org.apache.mina.generated.protoc.AddressBookProtos.Person result = new org.apache.mina.generated.protoc.AddressBookProtos.Person(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
+        @java.lang.Override
+        public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
+            return this.unknownFields;
         }
-        result.name_ = name_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.id_ = id_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.email_ = email_;
-        if (phoneBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008)) {
-            phone_ = java.util.Collections.unmodifiableList(phone_);
-            bitField0_ = (bitField0_ & ~0x00000008);
-          }
-          result.phone_ = phone_;
-        } else {
-          result.phone_ = phoneBuilder_.build();
-        }
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
 
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.apache.mina.generated.protoc.AddressBookProtos.Person) {
-          return mergeFrom((org.apache.mina.generated.protoc.AddressBookProtos.Person)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
+        private Person(com.google.protobuf.CodedInputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            initFields();
+            int mutable_bitField0_ = 0;
+            com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
+                    .newBuilder();
+            try {
+                boolean done = false;
+                while (!done) {
+                    int tag = input.readTag();
+                    switch (tag) {
+                    case 0:
+                        done = true;
+                        break;
+                    default: {
+                        if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
+                            done = true;
+                        }
+                        break;
+                    }
+                    case 10: {
+                        bitField0_ |= 0x00000001;
+                        name_ = input.readBytes();
+                        break;
+                    }
+                    case 16: {
+                        bitField0_ |= 0x00000002;
+                        id_ = input.readInt32();
+                        break;
+                    }
+                    case 26: {
+                        bitField0_ |= 0x00000004;
+                        email_ = input.readBytes();
+                        break;
+                    }
+                    case 34: {
+                        if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+                            phone_ = new java.util.ArrayList<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber>();
+                            mutable_bitField0_ |= 0x00000008;
+                        }
+                        phone_.add(input.readMessage(
+                                org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.PARSER,
+                                extensionRegistry));
+                        break;
+                    }
+                    }
+                }
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                throw e.setUnfinishedMessage(this);
+            } catch (java.io.IOException e) {
+                throw new com.google.protobuf.InvalidProtocolBufferException(e.getMessage()).setUnfinishedMessage(this);
+            } finally {
+                if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+                    phone_ = java.util.Collections.unmodifiableList(phone_);
+                }
+                this.unknownFields = unknownFields.build();
+                makeExtensionsImmutable();
+            }
         }
-      }
 
-      public Builder mergeFrom(org.apache.mina.generated.protoc.AddressBookProtos.Person other) {
-        if (other == org.apache.mina.generated.protoc.AddressBookProtos.Person.getDefaultInstance()) return this;
-        if (other.hasName()) {
-          bitField0_ |= 0x00000001;
-          name_ = other.name_;
-          onChanged();
+        public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+            return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_descriptor;
         }
-        if (other.hasId()) {
-          setId(other.getId());
+
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+            return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_fieldAccessorTable
+                    .ensureFieldAccessorsInitialized(org.apache.mina.generated.protoc.AddressBookProtos.Person.class,
+                            org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder.class);
         }
-        if (other.hasEmail()) {
-          bitField0_ |= 0x00000004;
-          email_ = other.email_;
-          onChanged();
+
+        public static com.google.protobuf.Parser<Person> PARSER = new com.google.protobuf.AbstractParser<Person>() {
+            public Person parsePartialFrom(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return new Person(input, extensionRegistry);
+            }
+        };
+
+        @java.lang.Override
+        public com.google.protobuf.Parser<Person> getParserForType() {
+            return PARSER;
         }
-        if (phoneBuilder_ == null) {
-          if (!other.phone_.isEmpty()) {
-            if (phone_.isEmpty()) {
-              phone_ = other.phone_;
-              bitField0_ = (bitField0_ & ~0x00000008);
+
+        /**
+         * Protobuf enum {@code tutorial.Person.PhoneType}
+         */
+        public enum PhoneType implements com.google.protobuf.ProtocolMessageEnum {
+            /**
+             * <code>MOBILE = 0;</code>
+             */
+            MOBILE(0, 0),
+            /**
+             * <code>HOME = 1;</code>
+             */
+            HOME(1, 1),
+            /**
+             * <code>WORK = 2;</code>
+             */
+            WORK(2, 2), ;
+
+            /**
+             * <code>MOBILE = 0;</code>
+             */
+            public static final int MOBILE_VALUE = 0;
+
+            /**
+             * <code>HOME = 1;</code>
+             */
+            public static final int HOME_VALUE = 1;
+
+            /**
+             * <code>WORK = 2;</code>
+             */
+            public static final int WORK_VALUE = 2;
+
+            public final int getNumber() {
+                return value;
+            }
+
+            public static PhoneType valueOf(int value) {
+                switch (value) {
+                case 0:
+                    return MOBILE;
+                case 1:
+                    return HOME;
+                case 2:
+                    return WORK;
+                default:
+                    return null;
+                }
+            }
+
+            public static com.google.protobuf.Internal.EnumLiteMap<PhoneType> internalGetValueMap() {
+                return internalValueMap;
+            }
+
+            private static com.google.protobuf.Internal.EnumLiteMap<PhoneType> internalValueMap = new com.google.protobuf.Internal.EnumLiteMap<PhoneType>() {
+                public PhoneType findValueByNumber(int number) {
+                    return PhoneType.valueOf(number);
+                }
+            };
+
+            public final com.google.protobuf.Descriptors.EnumValueDescriptor getValueDescriptor() {
+                return getDescriptor().getValues().get(index);
+            }
+
+            public final com.google.protobuf.Descriptors.EnumDescriptor getDescriptorForType() {
+                return getDescriptor();
+            }
+
+            public static final com.google.protobuf.Descriptors.EnumDescriptor getDescriptor() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.Person.getDescriptor().getEnumTypes().get(0);
+            }
+
+            private static final PhoneType[] VALUES = values();
+
+            public static PhoneType valueOf(com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+                if (desc.getType() != getDescriptor()) {
+                    throw new java.lang.IllegalArgumentException("EnumValueDescriptor is not for this type.");
+                }
+                return VALUES[desc.getIndex()];
+            }
+
+            private final int index;
+
+            private final int value;
+
+            private PhoneType(int index, int value) {
+                this.index = index;
+                this.value = value;
+            }
+
+            // @@protoc_insertion_point(enum_scope:tutorial.Person.PhoneType)
+        }
+
+        public interface PhoneNumberOrBuilder extends com.google.protobuf.MessageOrBuilder {
+
+            // required string number = 1;
+            /**
+             * <code>required string number = 1;</code>
+             */
+            boolean hasNumber();
+
+            /**
+             * <code>required string number = 1;</code>
+             */
+            java.lang.String getNumber();
+
+            /**
+             * <code>required string number = 1;</code>
+             */
+            com.google.protobuf.ByteString getNumberBytes();
+
+            // optional .tutorial.Person.PhoneType type = 2 [default = HOME];
+            /**
+             * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+             */
+            boolean hasType();
+
+            /**
+             * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+             */
+            org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType getType();
+        }
+
+        /**
+         * Protobuf type {@code tutorial.Person.PhoneNumber}
+         */
+        public static final class PhoneNumber extends com.google.protobuf.GeneratedMessage implements
+                PhoneNumberOrBuilder {
+            // Use PhoneNumber.newBuilder() to construct.
+            private PhoneNumber(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+                super(builder);
+                this.unknownFields = builder.getUnknownFields();
+            }
+
+            private PhoneNumber(boolean noInit) {
+                this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+            }
+
+            private static final PhoneNumber defaultInstance;
+
+            public static PhoneNumber getDefaultInstance() {
+                return defaultInstance;
+            }
+
+            public PhoneNumber getDefaultInstanceForType() {
+                return defaultInstance;
+            }
+
+            private final com.google.protobuf.UnknownFieldSet unknownFields;
+
+            @java.lang.Override
+            public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
+                return this.unknownFields;
+            }
+
+            private PhoneNumber(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                initFields();
+                int mutable_bitField0_ = 0;
+                com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
+                        .newBuilder();
+                try {
+                    boolean done = false;
+                    while (!done) {
+                        int tag = input.readTag();
+                        switch (tag) {
+                        case 0:
+                            done = true;
+                            break;
+                        default: {
+                            if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
+                                done = true;
+                            }
+                            break;
+                        }
+                        case 10: {
+                            bitField0_ |= 0x00000001;
+                            number_ = input.readBytes();
+                            break;
+                        }
+                        case 16: {
+                            int rawValue = input.readEnum();
+                            org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType value = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType
+                                    .valueOf(rawValue);
+                            if (value == null) {
+                                unknownFields.mergeVarintField(2, rawValue);
+                            } else {
+                                bitField0_ |= 0x00000002;
+                                type_ = value;
+                            }
+                            break;
+                        }
+                        }
+                    }
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    throw e.setUnfinishedMessage(this);
+                } catch (java.io.IOException e) {
+                    throw new com.google.protobuf.InvalidProtocolBufferException(e.getMessage())
+                            .setUnfinishedMessage(this);
+                } finally {
+                    this.unknownFields = unknownFields.build();
+                    makeExtensionsImmutable();
+                }
+            }
+
+            public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_descriptor;
+            }
+
+            protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(
+                                org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.class,
+                                org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder.class);
+            }
+
+            public static com.google.protobuf.Parser<PhoneNumber> PARSER = new com.google.protobuf.AbstractParser<PhoneNumber>() {
+                public PhoneNumber parsePartialFrom(com.google.protobuf.CodedInputStream input,
+                        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                        throws com.google.protobuf.InvalidProtocolBufferException {
+                    return new PhoneNumber(input, extensionRegistry);
+                }
+            };
+
+            @java.lang.Override
+            public com.google.protobuf.Parser<PhoneNumber> getParserForType() {
+                return PARSER;
+            }
+
+            private int bitField0_;
+
+            // required string number = 1;
+            public static final int NUMBER_FIELD_NUMBER = 1;
+
+            private java.lang.Object number_;
+
+            /**
+             * <code>required string number = 1;</code>
+             */
+            public boolean hasNumber() {
+                return ((bitField0_ & 0x00000001) == 0x00000001);
+            }
+
+            /**
+             * <code>required string number = 1;</code>
+             */
+            public java.lang.String getNumber() {
+                java.lang.Object ref = number_;
+                if (ref instanceof java.lang.String) {
+                    return (java.lang.String) ref;
+                } else {
+                    com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+                    java.lang.String s = bs.toStringUtf8();
+                    if (bs.isValidUtf8()) {
+                        number_ = s;
+                    }
+                    return s;
+                }
+            }
+
+            /**
+             * <code>required string number = 1;</code>
+             */
+            public com.google.protobuf.ByteString getNumberBytes() {
+                java.lang.Object ref = number_;
+                if (ref instanceof java.lang.String) {
+                    com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                            .copyFromUtf8((java.lang.String) ref);
+                    number_ = b;
+                    return b;
+                } else {
+                    return (com.google.protobuf.ByteString) ref;
+                }
+            }
+
+            // optional .tutorial.Person.PhoneType type = 2 [default = HOME];
+            public static final int TYPE_FIELD_NUMBER = 2;
+
+            private org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType type_;
+
+            /**
+             * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+             */
+            public boolean hasType() {
+                return ((bitField0_ & 0x00000002) == 0x00000002);
+            }
+
+            /**
+             * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType getType() {
+                return type_;
+            }
+
+            private void initFields() {
+                number_ = "";
+                type_ = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.HOME;
+            }
+
+            private byte memoizedIsInitialized = -1;
+
+            public final boolean isInitialized() {
+                byte isInitialized = memoizedIsInitialized;
+                if (isInitialized != -1)
+                    return isInitialized == 1;
+
+                if (!hasNumber()) {
+                    memoizedIsInitialized = 0;
+                    return false;
+                }
+                memoizedIsInitialized = 1;
+                return true;
+            }
+
+            public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+                getSerializedSize();
+                if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                    output.writeBytes(1, getNumberBytes());
+                }
+                if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                    output.writeEnum(2, type_.getNumber());
+                }
+                getUnknownFields().writeTo(output);
+            }
+
+            private int memoizedSerializedSize = -1;
+
+            public int getSerializedSize() {
+                int size = memoizedSerializedSize;
+                if (size != -1)
+                    return size;
+
+                size = 0;
+                if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                    size += com.google.protobuf.CodedOutputStream.computeBytesSize(1, getNumberBytes());
+                }
+                if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                    size += com.google.protobuf.CodedOutputStream.computeEnumSize(2, type_.getNumber());
+                }
+                size += getUnknownFields().getSerializedSize();
+                memoizedSerializedSize = size;
+                return size;
+            }
+
+            private static final long serialVersionUID = 0L;
+
+            @java.lang.Override
+            protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
+                return super.writeReplace();
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
+                    com.google.protobuf.ByteString data) throws com.google.protobuf.InvalidProtocolBufferException {
+                return PARSER.parseFrom(data);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
+                    com.google.protobuf.ByteString data, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return PARSER.parseFrom(data, extensionRegistry);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(byte[] data)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return PARSER.parseFrom(data);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(byte[] data,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return PARSER.parseFrom(data, extensionRegistry);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
+                    java.io.InputStream input) throws java.io.IOException {
+                return PARSER.parseFrom(input);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
+                    java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws java.io.IOException {
+                return PARSER.parseFrom(input, extensionRegistry);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseDelimitedFrom(
+                    java.io.InputStream input) throws java.io.IOException {
+                return PARSER.parseDelimitedFrom(input);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseDelimitedFrom(
+                    java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws java.io.IOException {
+                return PARSER.parseDelimitedFrom(input, extensionRegistry);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
+                    com.google.protobuf.CodedInputStream input) throws java.io.IOException {
+                return PARSER.parseFrom(input);
+            }
+
+            public static org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parseFrom(
+                    com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+                return PARSER.parseFrom(input, extensionRegistry);
+            }
+
+            public static Builder newBuilder() {
+                return Builder.create();
+            }
+
+            public Builder newBuilderForType() {
+                return newBuilder();
+            }
+
+            public static Builder newBuilder(
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber prototype) {
+                return newBuilder().mergeFrom(prototype);
+            }
+
+            public Builder toBuilder() {
+                return newBuilder(this);
+            }
+
+            @java.lang.Override
+            protected Builder newBuilderForType(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                Builder builder = new Builder(parent);
+                return builder;
+            }
+
+            /**
+             * Protobuf type {@code tutorial.Person.PhoneNumber}
+             */
+            public static final class Builder extends com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder {
+                public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+                    return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_descriptor;
+                }
+
+                protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+                    return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_fieldAccessorTable
+                            .ensureFieldAccessorsInitialized(
+                                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.class,
+                                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder.class);
+                }
+
+                // Construct using org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.newBuilder()
+                private Builder() {
+                    maybeForceBuilderInitialization();
+                }
+
+                private Builder(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                    super(parent);
+                    maybeForceBuilderInitialization();
+                }
+
+                private void maybeForceBuilderInitialization() {
+                    if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+                    }
+                }
+
+                private static Builder create() {
+                    return new Builder();
+                }
+
+                public Builder clear() {
+                    super.clear();
+                    number_ = "";
+                    bitField0_ = (bitField0_ & ~0x00000001);
+                    type_ = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.HOME;
+                    bitField0_ = (bitField0_ & ~0x00000002);
+                    return this;
+                }
+
+                public Builder clone() {
+                    return create().mergeFrom(buildPartial());
+                }
+
+                public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+                    return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_PhoneNumber_descriptor;
+                }
+
+                public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber getDefaultInstanceForType() {
+                    return org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.getDefaultInstance();
+                }
+
+                public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber build() {
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber result = buildPartial();
+                    if (!result.isInitialized()) {
+                        throw newUninitializedMessageException(result);
+                    }
+                    return result;
+                }
+
+                public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber buildPartial() {
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber result = new org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber(
+                            this);
+                    int from_bitField0_ = bitField0_;
+                    int to_bitField0_ = 0;
+                    if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+                        to_bitField0_ |= 0x00000001;
+                    }
+                    result.number_ = number_;
+                    if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+                        to_bitField0_ |= 0x00000002;
+                    }
+                    result.type_ = type_;
+                    result.bitField0_ = to_bitField0_;
+                    onBuilt();
+                    return result;
+                }
+
+                public Builder mergeFrom(com.google.protobuf.Message other) {
+                    if (other instanceof org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber) {
+                        return mergeFrom((org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber) other);
+                    } else {
+                        super.mergeFrom(other);
+                        return this;
+                    }
+                }
+
+                public Builder mergeFrom(org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber other) {
+                    if (other == org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber
+                            .getDefaultInstance())
+                        return this;
+                    if (other.hasNumber()) {
+                        bitField0_ |= 0x00000001;
+                        number_ = other.number_;
+                        onChanged();
+                    }
+                    if (other.hasType()) {
+                        setType(other.getType());
+                    }
+                    this.mergeUnknownFields(other.getUnknownFields());
+                    return this;
+                }
+
+                public final boolean isInitialized() {
+                    if (!hasNumber()) {
+
+                        return false;
+                    }
+                    return true;
+                }
+
+                public Builder mergeFrom(com.google.protobuf.CodedInputStream input,
+                        com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber parsedMessage = null;
+                    try {
+                        parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+                    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                        parsedMessage = (org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber) e
+                                .getUnfinishedMessage();
+                        throw e;
+                    } finally {
+                        if (parsedMessage != null) {
+                            mergeFrom(parsedMessage);
+                        }
+                    }
+                    return this;
+                }
+
+                private int bitField0_;
+
+                // required string number = 1;
+                private java.lang.Object number_ = "";
+
+                /**
+                 * <code>required string number = 1;</code>
+                 */
+                public boolean hasNumber() {
+                    return ((bitField0_ & 0x00000001) == 0x00000001);
+                }
+
+                /**
+                 * <code>required string number = 1;</code>
+                 */
+                public java.lang.String getNumber() {
+                    java.lang.Object ref = number_;
+                    if (!(ref instanceof java.lang.String)) {
+                        java.lang.String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+                        number_ = s;
+                        return s;
+                    } else {
+                        return (java.lang.String) ref;
+                    }
+                }
+
+                /**
+                 * <code>required string number = 1;</code>
+                 */
+                public com.google.protobuf.ByteString getNumberBytes() {
+                    java.lang.Object ref = number_;
+                    if (ref instanceof String) {
+                        com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                                .copyFromUtf8((java.lang.String) ref);
+                        number_ = b;
+                        return b;
+                    } else {
+                        return (com.google.protobuf.ByteString) ref;
+                    }
+                }
+
+                /**
+                 * <code>required string number = 1;</code>
+                 */
+                public Builder setNumber(java.lang.String value) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    bitField0_ |= 0x00000001;
+                    number_ = value;
+                    onChanged();
+                    return this;
+                }
+
+                /**
+                 * <code>required string number = 1;</code>
+                 */
+                public Builder clearNumber() {
+                    bitField0_ = (bitField0_ & ~0x00000001);
+                    number_ = getDefaultInstance().getNumber();
+                    onChanged();
+                    return this;
+                }
+
+                /**
+                 * <code>required string number = 1;</code>
+                 */
+                public Builder setNumberBytes(com.google.protobuf.ByteString value) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    bitField0_ |= 0x00000001;
+                    number_ = value;
+                    onChanged();
+                    return this;
+                }
+
+                // optional .tutorial.Person.PhoneType type = 2 [default = HOME];
+                private org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType type_ = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.HOME;
+
+                /**
+                 * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+                 */
+                public boolean hasType() {
+                    return ((bitField0_ & 0x00000002) == 0x00000002);
+                }
+
+                /**
+                 * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+                 */
+                public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType getType() {
+                    return type_;
+                }
+
+                /**
+                 * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+                 */
+                public Builder setType(org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType value) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    bitField0_ |= 0x00000002;
+                    type_ = value;
+                    onChanged();
+                    return this;
+                }
+
+                /**
+                 * <code>optional .tutorial.Person.PhoneType type = 2 [default = HOME];</code>
+                 */
+                public Builder clearType() {
+                    bitField0_ = (bitField0_ & ~0x00000002);
+                    type_ = org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneType.HOME;
+                    onChanged();
+                    return this;
+                }
+
+                // @@protoc_insertion_point(builder_scope:tutorial.Person.PhoneNumber)
+            }
+
+            static {
+                defaultInstance = new PhoneNumber(true);
+                defaultInstance.initFields();
+            }
+
+            // @@protoc_insertion_point(class_scope:tutorial.Person.PhoneNumber)
+        }
+
+        private int bitField0_;
+
+        // required string name = 1;
+        public static final int NAME_FIELD_NUMBER = 1;
+
+        private java.lang.Object name_;
+
+        /**
+         * <code>required string name = 1;</code>
+         */
+        public boolean hasName() {
+            return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+
+        /**
+         * <code>required string name = 1;</code>
+         */
+        public java.lang.String getName() {
+            java.lang.Object ref = name_;
+            if (ref instanceof java.lang.String) {
+                return (java.lang.String) ref;
             } else {
-              ensurePhoneIsMutable();
-              phone_.addAll(other.phone_);
+                com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                if (bs.isValidUtf8()) {
+                    name_ = s;
+                }
+                return s;
             }
-            onChanged();
-          }
-        } else {
-          if (!other.phone_.isEmpty()) {
-            if (phoneBuilder_.isEmpty()) {
-              phoneBuilder_.dispose();
-              phoneBuilder_ = null;
-              phone_ = other.phone_;
-              bitField0_ = (bitField0_ & ~0x00000008);
-              phoneBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getPhoneFieldBuilder() : null;
+        }
+
+        /**
+         * <code>required string name = 1;</code>
+         */
+        public com.google.protobuf.ByteString getNameBytes() {
+            java.lang.Object ref = name_;
+            if (ref instanceof java.lang.String) {
+                com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
+                name_ = b;
+                return b;
             } else {
-              phoneBuilder_.addAllMessages(other.phone_);
+                return (com.google.protobuf.ByteString) ref;
             }
-          }
         }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
 
-      public final boolean isInitialized() {
-        if (!hasName()) {
-          
-          return false;
-        }
-        if (!hasId()) {
-          
-          return false;
-        }
-        for (int i = 0; i < getPhoneCount(); i++) {
-          if (!getPhone(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        return true;
-      }
+        // required int32 id = 2;
+        public static final int ID_FIELD_NUMBER = 2;
 
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        org.apache.mina.generated.protoc.AddressBookProtos.Person parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (org.apache.mina.generated.protoc.AddressBookProtos.Person) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
+        private int id_;
 
-      // required string name = 1;
-      private java.lang.Object name_ = "";
-      /**
-       * <code>required string name = 1;</code>
-       */
-      public boolean hasName() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>required string name = 1;</code>
-       */
-      public java.lang.String getName() {
-        java.lang.Object ref = name_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          name_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
+        /**
+         * <code>required int32 id = 2;</code>
+         *
+         * <pre>
+         * Unique ID number for this person.
+         * </pre>
+         */
+        public boolean hasId() {
+            return ((bitField0_ & 0x00000002) == 0x00000002);
         }
-      }
-      /**
-       * <code>required string name = 1;</code>
-       */
-      public com.google.protobuf.ByteString
-          getNameBytes() {
-        java.lang.Object ref = name_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          name_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>required string name = 1;</code>
-       */
-      public Builder setName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-        name_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required string name = 1;</code>
-       */
-      public Builder clearName() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        name_ = getDefaultInstance().getName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required string name = 1;</code>
-       */
-      public Builder setNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-        name_ = value;
-        onChanged();
-        return this;
-      }
 
-      // required int32 id = 2;
-      private int id_ ;
-      /**
-       * <code>required int32 id = 2;</code>
-       *
-       * <pre>
-       * Unique ID number for this person.
-       * </pre>
-       */
-      public boolean hasId() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>required int32 id = 2;</code>
-       *
-       * <pre>
-       * Unique ID number for this person.
-       * </pre>
-       */
-      public int getId() {
-        return id_;
-      }
-      /**
-       * <code>required int32 id = 2;</code>
-       *
-       * <pre>
-       * Unique ID number for this person.
-       * </pre>
-       */
-      public Builder setId(int value) {
-        bitField0_ |= 0x00000002;
-        id_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 id = 2;</code>
-       *
-       * <pre>
-       * Unique ID number for this person.
-       * </pre>
-       */
-      public Builder clearId() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        id_ = 0;
-        onChanged();
-        return this;
-      }
+        /**
+         * <code>required int32 id = 2;</code>
+         *
+         * <pre>
+         * Unique ID number for this person.
+         * </pre>
+         */
+        public int getId() {
+            return id_;
+        }
 
-      // optional string email = 3;
-      private java.lang.Object email_ = "";
-      /**
-       * <code>optional string email = 3;</code>
-       */
-      public boolean hasEmail() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      /**
-       * <code>optional string email = 3;</code>
-       */
-      public java.lang.String getEmail() {
-        java.lang.Object ref = email_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          email_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string email = 3;</code>
-       */
-      public com.google.protobuf.ByteString
-          getEmailBytes() {
-        java.lang.Object ref = email_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          email_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string email = 3;</code>
-       */
-      public Builder setEmail(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
-        email_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string email = 3;</code>
-       */
-      public Builder clearEmail() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        email_ = getDefaultInstance().getEmail();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string email = 3;</code>
-       */
-      public Builder setEmailBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000004;
-        email_ = value;
-        onChanged();
-        return this;
-      }
+        // optional string email = 3;
+        public static final int EMAIL_FIELD_NUMBER = 3;
 
-      // repeated .tutorial.Person.PhoneNumber phone = 4;
-      private java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> phone_ =
-        java.util.Collections.emptyList();
-      private void ensurePhoneIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
-          phone_ = new java.util.ArrayList<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber>(phone_);
-          bitField0_ |= 0x00000008;
-         }
-      }
+        private java.lang.Object email_;
 
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> phoneBuilder_;
+        /**
+         * <code>optional string email = 3;</code>
+         */
+        public boolean hasEmail() {
+            return ((bitField0_ & 0x00000004) == 0x00000004);
+        }
 
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> getPhoneList() {
-        if (phoneBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(phone_);
-        } else {
-          return phoneBuilder_.getMessageList();
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public int getPhoneCount() {
-        if (phoneBuilder_ == null) {
-          return phone_.size();
-        } else {
-          return phoneBuilder_.getCount();
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber getPhone(int index) {
-        if (phoneBuilder_ == null) {
-          return phone_.get(index);
-        } else {
-          return phoneBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder setPhone(
-          int index, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber value) {
-        if (phoneBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePhoneIsMutable();
-          phone_.set(index, value);
-          onChanged();
-        } else {
-          phoneBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder setPhone(
-          int index, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder builderForValue) {
-        if (phoneBuilder_ == null) {
-          ensurePhoneIsMutable();
-          phone_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          phoneBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder addPhone(org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber value) {
-        if (phoneBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePhoneIsMutable();
-          phone_.add(value);
-          onChanged();
-        } else {
-          phoneBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder addPhone(
-          int index, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber value) {
-        if (phoneBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePhoneIsMutable();
-          phone_.add(index, value);
-          onChanged();
-        } else {
-          phoneBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder addPhone(
-          org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder builderForValue) {
-        if (phoneBuilder_ == null) {
-          ensurePhoneIsMutable();
-          phone_.add(builderForValue.build());
-          onChanged();
-        } else {
-          phoneBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder addPhone(
-          int index, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder builderForValue) {
-        if (phoneBuilder_ == null) {
-          ensurePhoneIsMutable();
-          phone_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          phoneBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder addAllPhone(
-          java.lang.Iterable<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> values) {
-        if (phoneBuilder_ == null) {
-          ensurePhoneIsMutable();
-          super.addAll(values, phone_);
-          onChanged();
-        } else {
-          phoneBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder clearPhone() {
-        if (phoneBuilder_ == null) {
-          phone_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000008);
-          onChanged();
-        } else {
-          phoneBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public Builder removePhone(int index) {
-        if (phoneBuilder_ == null) {
-          ensurePhoneIsMutable();
-          phone_.remove(index);
-          onChanged();
-        } else {
-          phoneBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder getPhoneBuilder(
-          int index) {
-        return getPhoneFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder getPhoneOrBuilder(
-          int index) {
-        if (phoneBuilder_ == null) {
-          return phone_.get(index);  } else {
-          return phoneBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> 
-           getPhoneOrBuilderList() {
-        if (phoneBuilder_ != null) {
-          return phoneBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(phone_);
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder addPhoneBuilder() {
-        return getPhoneFieldBuilder().addBuilder(
-            org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder addPhoneBuilder(
-          int index) {
-        return getPhoneFieldBuilder().addBuilder(
-            index, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
-       */
-      public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder> 
-           getPhoneBuilderList() {
-        return getPhoneFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> 
-          getPhoneFieldBuilder() {
-        if (phoneBuilder_ == null) {
-          phoneBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder>(
-                  phone_,
-                  ((bitField0_ & 0x00000008) == 0x00000008),
-                  getParentForChildren(),
-                  isClean());
-          phone_ = null;
-        }
-        return phoneBuilder_;
-      }
-
-      // @@protoc_insertion_point(builder_scope:tutorial.Person)
-    }
-
-    static {
-      defaultInstance = new Person(true);
-      defaultInstance.initFields();
-    }
-
-    // @@protoc_insertion_point(class_scope:tutorial.Person)
-  }
-
-  public interface AddressBookOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-
-    // repeated .tutorial.Person person = 1;
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> 
-        getPersonList();
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    org.apache.mina.generated.protoc.AddressBookProtos.Person getPerson(int index);
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    int getPersonCount();
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> 
-        getPersonOrBuilderList();
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder getPersonOrBuilder(
-        int index);
-  }
-  /**
-   * Protobuf type {@code tutorial.AddressBook}
-   *
-   * <pre>
-   * Our address book file is just one of these.
-   * </pre>
-   */
-  public static final class AddressBook extends
-      com.google.protobuf.GeneratedMessage
-      implements AddressBookOrBuilder {
-    // Use AddressBook.newBuilder() to construct.
-    private AddressBook(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private AddressBook(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final AddressBook defaultInstance;
-    public static AddressBook getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public AddressBook getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private AddressBook(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
+        /**
+         * <code>optional string email = 3;</code>
+         */
+        public java.lang.String getEmail() {
+            java.lang.Object ref = email_;
+            if (ref instanceof java.lang.String) {
+                return (java.lang.String) ref;
+            } else {
+                com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                if (bs.isValidUtf8()) {
+                    email_ = s;
+                }
+                return s;
             }
-            case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                person_ = new java.util.ArrayList<org.apache.mina.generated.protoc.AddressBookProtos.Person>();
-                mutable_bitField0_ |= 0x00000001;
-              }
-              person_.add(input.readMessage(org.apache.mina.generated.protoc.AddressBookProtos.Person.PARSER, extensionRegistry));
-              break;
+        }
+
+        /**
+         * <code>optional string email = 3;</code>
+         */
+        public com.google.protobuf.ByteString getEmailBytes() {
+            java.lang.Object ref = email_;
+            if (ref instanceof java.lang.String) {
+                com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
+                email_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
             }
-          }
         }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-          person_ = java.util.Collections.unmodifiableList(person_);
+
+        // repeated .tutorial.Person.PhoneNumber phone = 4;
+        public static final int PHONE_FIELD_NUMBER = 4;
+
+        private java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> phone_;
+
+        /**
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+         */
+        public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> getPhoneList() {
+            return phone_;
         }
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_descriptor;
-    }
 
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.class, org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<AddressBook> PARSER =
-        new com.google.protobuf.AbstractParser<AddressBook>() {
-      public AddressBook parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new AddressBook(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<AddressBook> getParserForType() {
-      return PARSER;
-    }
-
-    // repeated .tutorial.Person person = 1;
-    public static final int PERSON_FIELD_NUMBER = 1;
-    private java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> person_;
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> getPersonList() {
-      return person_;
-    }
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    public java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> 
-        getPersonOrBuilderList() {
-      return person_;
-    }
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    public int getPersonCount() {
-      return person_.size();
-    }
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    public org.apache.mina.generated.protoc.AddressBookProtos.Person getPerson(int index) {
-      return person_.get(index);
-    }
-    /**
-     * <code>repeated .tutorial.Person person = 1;</code>
-     */
-    public org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder getPersonOrBuilder(
-        int index) {
-      return person_.get(index);
-    }
-
-    private void initFields() {
-      person_ = java.util.Collections.emptyList();
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-
-      for (int i = 0; i < getPersonCount(); i++) {
-        if (!getPerson(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
+        /**
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+         */
+        public java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> getPhoneOrBuilderList() {
+            return phone_;
         }
-      }
-      memoizedIsInitialized = 1;
-      return true;
+
+        /**
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+         */
+        public int getPhoneCount() {
+            return phone_.size();
+        }
+
+        /**
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+         */
+        public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber getPhone(int index) {
+            return phone_.get(index);
+        }
+
+        /**
+         * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+         */
+        public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder getPhoneOrBuilder(
+                int index) {
+            return phone_.get(index);
+        }
+
+        private void initFields() {
+            name_ = "";
+            id_ = 0;
+            email_ = "";
+            phone_ = java.util.Collections.emptyList();
+        }
+
+        private byte memoizedIsInitialized = -1;
+
+        public final boolean isInitialized() {
+            byte isInitialized = memoizedIsInitialized;
+            if (isInitialized != -1)
+                return isInitialized == 1;
+
+            if (!hasName()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            if (!hasId()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            for (int i = 0; i < getPhoneCount(); i++) {
+                if (!getPhone(i).isInitialized()) {
+                    memoizedIsInitialized = 0;
+                    return false;
+                }
+            }
+            memoizedIsInitialized = 1;
+            return true;
+        }
+
+        public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+            getSerializedSize();
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                output.writeBytes(1, getNameBytes());
+            }
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                output.writeInt32(2, id_);
+            }
+            if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                output.writeBytes(3, getEmailBytes());
+            }
+            for (int i = 0; i < phone_.size(); i++) {
+                output.writeMessage(4, phone_.get(i));
+            }
+            getUnknownFields().writeTo(output);
+        }
+
+        private int memoizedSerializedSize = -1;
+
+        public int getSerializedSize() {
+            int size = memoizedSerializedSize;
+            if (size != -1)
+                return size;
+
+            size = 0;
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                size += com.google.protobuf.CodedOutputStream.computeBytesSize(1, getNameBytes());
+            }
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                size += com.google.protobuf.CodedOutputStream.computeInt32Size(2, id_);
+            }
+            if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                size += com.google.protobuf.CodedOutputStream.computeBytesSize(3, getEmailBytes());
+            }
+            for (int i = 0; i < phone_.size(); i++) {
+                size += com.google.protobuf.CodedOutputStream.computeMessageSize(4, phone_.get(i));
+            }
+            size += getUnknownFields().getSerializedSize();
+            memoizedSerializedSize = size;
+            return size;
+        }
+
+        private static final long serialVersionUID = 0L;
+
+        @java.lang.Override
+        protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
+            return super.writeReplace();
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
+                com.google.protobuf.ByteString data) throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
+                com.google.protobuf.ByteString data, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(byte[] data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(byte[] data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(java.io.InputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+            return PARSER.parseFrom(input, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseDelimitedFrom(
+                java.io.InputStream input) throws java.io.IOException {
+            return PARSER.parseDelimitedFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseDelimitedFrom(
+                java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
+                com.google.protobuf.CodedInputStream input) throws java.io.IOException {
+            return PARSER.parseFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.Person parseFrom(
+                com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input, extensionRegistry);
+        }
+
+        public static Builder newBuilder() {
+            return Builder.create();
+        }
+
+        public Builder newBuilderForType() {
+            return newBuilder();
+        }
+
+        public static Builder newBuilder(org.apache.mina.generated.protoc.AddressBookProtos.Person prototype) {
+            return newBuilder().mergeFrom(prototype);
+        }
+
+        public Builder toBuilder() {
+            return newBuilder(this);
+        }
+
+        @java.lang.Override
+        protected Builder newBuilderForType(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+            Builder builder = new Builder(parent);
+            return builder;
+        }
+
+        /**
+         * Protobuf type {@code tutorial.Person}
+         */
+        public static final class Builder extends com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder {
+            public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_descriptor;
+            }
+
+            protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(
+                                org.apache.mina.generated.protoc.AddressBookProtos.Person.class,
+                                org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder.class);
+            }
+
+            // Construct using org.apache.mina.generated.protoc.AddressBookProtos.Person.newBuilder()
+            private Builder() {
+                maybeForceBuilderInitialization();
+            }
+
+            private Builder(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                super(parent);
+                maybeForceBuilderInitialization();
+            }
+
+            private void maybeForceBuilderInitialization() {
+                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+                    getPhoneFieldBuilder();
+                }
+            }
+
+            private static Builder create() {
+                return new Builder();
+            }
+
+            public Builder clear() {
+                super.clear();
+                name_ = "";
+                bitField0_ = (bitField0_ & ~0x00000001);
+                id_ = 0;
+                bitField0_ = (bitField0_ & ~0x00000002);
+                email_ = "";
+                bitField0_ = (bitField0_ & ~0x00000004);
+                if (phoneBuilder_ == null) {
+                    phone_ = java.util.Collections.emptyList();
+                    bitField0_ = (bitField0_ & ~0x00000008);
+                } else {
+                    phoneBuilder_.clear();
+                }
+                return this;
+            }
+
+            public Builder clone() {
+                return create().mergeFrom(buildPartial());
+            }
+
+            public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_Person_descriptor;
+            }
+
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person getDefaultInstanceForType() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.Person.getDefaultInstance();
+            }
+
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person build() {
+                org.apache.mina.generated.protoc.AddressBookProtos.Person result = buildPartial();
+                if (!result.isInitialized()) {
+                    throw newUninitializedMessageException(result);
+                }
+                return result;
+            }
+
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person buildPartial() {
+                org.apache.mina.generated.protoc.AddressBookProtos.Person result = new org.apache.mina.generated.protoc.AddressBookProtos.Person(
+                        this);
+                int from_bitField0_ = bitField0_;
+                int to_bitField0_ = 0;
+                if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+                    to_bitField0_ |= 0x00000001;
+                }
+                result.name_ = name_;
+                if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+                    to_bitField0_ |= 0x00000002;
+                }
+                result.id_ = id_;
+                if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+                    to_bitField0_ |= 0x00000004;
+                }
+                result.email_ = email_;
+                if (phoneBuilder_ == null) {
+                    if (((bitField0_ & 0x00000008) == 0x00000008)) {
+                        phone_ = java.util.Collections.unmodifiableList(phone_);
+                        bitField0_ = (bitField0_ & ~0x00000008);
+                    }
+                    result.phone_ = phone_;
+                } else {
+                    result.phone_ = phoneBuilder_.build();
+                }
+                result.bitField0_ = to_bitField0_;
+                onBuilt();
+                return result;
+            }
+
+            public Builder mergeFrom(com.google.protobuf.Message other) {
+                if (other instanceof org.apache.mina.generated.protoc.AddressBookProtos.Person) {
+                    return mergeFrom((org.apache.mina.generated.protoc.AddressBookProtos.Person) other);
+                } else {
+                    super.mergeFrom(other);
+                    return this;
+                }
+            }
+
+            public Builder mergeFrom(org.apache.mina.generated.protoc.AddressBookProtos.Person other) {
+                if (other == org.apache.mina.generated.protoc.AddressBookProtos.Person.getDefaultInstance())
+                    return this;
+                if (other.hasName()) {
+                    bitField0_ |= 0x00000001;
+                    name_ = other.name_;
+                    onChanged();
+                }
+                if (other.hasId()) {
+                    setId(other.getId());
+                }
+                if (other.hasEmail()) {
+                    bitField0_ |= 0x00000004;
+                    email_ = other.email_;
+                    onChanged();
+                }
+                if (phoneBuilder_ == null) {
+                    if (!other.phone_.isEmpty()) {
+                        if (phone_.isEmpty()) {
+                            phone_ = other.phone_;
+                            bitField0_ = (bitField0_ & ~0x00000008);
+                        } else {
+                            ensurePhoneIsMutable();
+                            phone_.addAll(other.phone_);
+                        }
+                        onChanged();
+                    }
+                } else {
+                    if (!other.phone_.isEmpty()) {
+                        if (phoneBuilder_.isEmpty()) {
+                            phoneBuilder_.dispose();
+                            phoneBuilder_ = null;
+                            phone_ = other.phone_;
+                            bitField0_ = (bitField0_ & ~0x00000008);
+                            phoneBuilder_ = com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ? getPhoneFieldBuilder()
+                                    : null;
+                        } else {
+                            phoneBuilder_.addAllMessages(other.phone_);
+                        }
+                    }
+                }
+                this.mergeUnknownFields(other.getUnknownFields());
+                return this;
+            }
+
+            public final boolean isInitialized() {
+                if (!hasName()) {
+
+                    return false;
+                }
+                if (!hasId()) {
+
+                    return false;
+                }
+                for (int i = 0; i < getPhoneCount(); i++) {
+                    if (!getPhone(i).isInitialized()) {
+
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            public Builder mergeFrom(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+                org.apache.mina.generated.protoc.AddressBookProtos.Person parsedMessage = null;
+                try {
+                    parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    parsedMessage = (org.apache.mina.generated.protoc.AddressBookProtos.Person) e
+                            .getUnfinishedMessage();
+                    throw e;
+                } finally {
+                    if (parsedMessage != null) {
+                        mergeFrom(parsedMessage);
+                    }
+                }
+                return this;
+            }
+
+            private int bitField0_;
+
+            // required string name = 1;
+            private java.lang.Object name_ = "";
+
+            /**
+             * <code>required string name = 1;</code>
+             */
+            public boolean hasName() {
+                return ((bitField0_ & 0x00000001) == 0x00000001);
+            }
+
+            /**
+             * <code>required string name = 1;</code>
+             */
+            public java.lang.String getName() {
+                java.lang.Object ref = name_;
+                if (!(ref instanceof java.lang.String)) {
+                    java.lang.String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+                    name_ = s;
+                    return s;
+                } else {
+                    return (java.lang.String) ref;
+                }
+            }
+
+            /**
+             * <code>required string name = 1;</code>
+             */
+            public com.google.protobuf.ByteString getNameBytes() {
+                java.lang.Object ref = name_;
+                if (ref instanceof String) {
+                    com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                            .copyFromUtf8((java.lang.String) ref);
+                    name_ = b;
+                    return b;
+                } else {
+                    return (com.google.protobuf.ByteString) ref;
+                }
+            }
+
+            /**
+             * <code>required string name = 1;</code>
+             */
+            public Builder setName(java.lang.String value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000001;
+                name_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required string name = 1;</code>
+             */
+            public Builder clearName() {
+                bitField0_ = (bitField0_ & ~0x00000001);
+                name_ = getDefaultInstance().getName();
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required string name = 1;</code>
+             */
+            public Builder setNameBytes(com.google.protobuf.ByteString value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000001;
+                name_ = value;
+                onChanged();
+                return this;
+            }
+
+            // required int32 id = 2;
+            private int id_;
+
+            /**
+             * <code>required int32 id = 2;</code>
+             *
+             * <pre>
+             * Unique ID number for this person.
+             * </pre>
+             */
+            public boolean hasId() {
+                return ((bitField0_ & 0x00000002) == 0x00000002);
+            }
+
+            /**
+             * <code>required int32 id = 2;</code>
+             *
+             * <pre>
+             * Unique ID number for this person.
+             * </pre>
+             */
+            public int getId() {
+                return id_;
+            }
+
+            /**
+             * <code>required int32 id = 2;</code>
+             *
+             * <pre>
+             * Unique ID number for this person.
+             * </pre>
+             */
+            public Builder setId(int value) {
+                bitField0_ |= 0x00000002;
+                id_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required int32 id = 2;</code>
+             *
+             * <pre>
+             * Unique ID number for this person.
+             * </pre>
+             */
+            public Builder clearId() {
+                bitField0_ = (bitField0_ & ~0x00000002);
+                id_ = 0;
+                onChanged();
+                return this;
+            }
+
+            // optional string email = 3;
+            private java.lang.Object email_ = "";
+
+            /**
+             * <code>optional string email = 3;</code>
+             */
+            public boolean hasEmail() {
+                return ((bitField0_ & 0x00000004) == 0x00000004);
+            }
+
+            /**
+             * <code>optional string email = 3;</code>
+             */
+            public java.lang.String getEmail() {
+                java.lang.Object ref = email_;
+                if (!(ref instanceof java.lang.String)) {
+                    java.lang.String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+                    email_ = s;
+                    return s;
+                } else {
+                    return (java.lang.String) ref;
+                }
+            }
+
+            /**
+             * <code>optional string email = 3;</code>
+             */
+            public com.google.protobuf.ByteString getEmailBytes() {
+                java.lang.Object ref = email_;
+                if (ref instanceof String) {
+                    com.google.protobuf.ByteString b = com.google.protobuf.ByteString
+                            .copyFromUtf8((java.lang.String) ref);
+                    email_ = b;
+                    return b;
+                } else {
+                    return (com.google.protobuf.ByteString) ref;
+                }
+            }
+
+            /**
+             * <code>optional string email = 3;</code>
+             */
+            public Builder setEmail(java.lang.String value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000004;
+                email_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>optional string email = 3;</code>
+             */
+            public Builder clearEmail() {
+                bitField0_ = (bitField0_ & ~0x00000004);
+                email_ = getDefaultInstance().getEmail();
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>optional string email = 3;</code>
+             */
+            public Builder setEmailBytes(com.google.protobuf.ByteString value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000004;
+                email_ = value;
+                onChanged();
+                return this;
+            }
+
+            // repeated .tutorial.Person.PhoneNumber phone = 4;
+            private java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> phone_ = java.util.Collections
+                    .emptyList();
+
+            private void ensurePhoneIsMutable() {
+                if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+                    phone_ = new java.util.ArrayList<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber>(
+                            phone_);
+                    bitField0_ |= 0x00000008;
+                }
+            }
+
+            private com.google.protobuf.RepeatedFieldBuilder<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> phoneBuilder_;
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> getPhoneList() {
+                if (phoneBuilder_ == null) {
+                    return java.util.Collections.unmodifiableList(phone_);
+                } else {
+                    return phoneBuilder_.getMessageList();
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public int getPhoneCount() {
+                if (phoneBuilder_ == null) {
+                    return phone_.size();
+                } else {
+                    return phoneBuilder_.getCount();
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber getPhone(int index) {
+                if (phoneBuilder_ == null) {
+                    return phone_.get(index);
+                } else {
+                    return phoneBuilder_.getMessage(index);
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder setPhone(int index,
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber value) {
+                if (phoneBuilder_ == null) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    ensurePhoneIsMutable();
+                    phone_.set(index, value);
+                    onChanged();
+                } else {
+                    phoneBuilder_.setMessage(index, value);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder setPhone(int index,
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder builderForValue) {
+                if (phoneBuilder_ == null) {
+                    ensurePhoneIsMutable();
+                    phone_.set(index, builderForValue.build());
+                    onChanged();
+                } else {
+                    phoneBuilder_.setMessage(index, builderForValue.build());
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder addPhone(org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber value) {
+                if (phoneBuilder_ == null) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    ensurePhoneIsMutable();
+                    phone_.add(value);
+                    onChanged();
+                } else {
+                    phoneBuilder_.addMessage(value);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder addPhone(int index,
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber value) {
+                if (phoneBuilder_ == null) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    ensurePhoneIsMutable();
+                    phone_.add(index, value);
+                    onChanged();
+                } else {
+                    phoneBuilder_.addMessage(index, value);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder addPhone(
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder builderForValue) {
+                if (phoneBuilder_ == null) {
+                    ensurePhoneIsMutable();
+                    phone_.add(builderForValue.build());
+                    onChanged();
+                } else {
+                    phoneBuilder_.addMessage(builderForValue.build());
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder addPhone(int index,
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder builderForValue) {
+                if (phoneBuilder_ == null) {
+                    ensurePhoneIsMutable();
+                    phone_.add(index, builderForValue.build());
+                    onChanged();
+                } else {
+                    phoneBuilder_.addMessage(index, builderForValue.build());
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder addAllPhone(
+                    java.lang.Iterable<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber> values) {
+                if (phoneBuilder_ == null) {
+                    ensurePhoneIsMutable();
+                    super.addAll(values, phone_);
+                    onChanged();
+                } else {
+                    phoneBuilder_.addAllMessages(values);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder clearPhone() {
+                if (phoneBuilder_ == null) {
+                    phone_ = java.util.Collections.emptyList();
+                    bitField0_ = (bitField0_ & ~0x00000008);
+                    onChanged();
+                } else {
+                    phoneBuilder_.clear();
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public Builder removePhone(int index) {
+                if (phoneBuilder_ == null) {
+                    ensurePhoneIsMutable();
+                    phone_.remove(index);
+                    onChanged();
+                } else {
+                    phoneBuilder_.remove(index);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder getPhoneBuilder(
+                    int index) {
+                return getPhoneFieldBuilder().getBuilder(index);
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder getPhoneOrBuilder(
+                    int index) {
+                if (phoneBuilder_ == null) {
+                    return phone_.get(index);
+                } else {
+                    return phoneBuilder_.getMessageOrBuilder(index);
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> getPhoneOrBuilderList() {
+                if (phoneBuilder_ != null) {
+                    return phoneBuilder_.getMessageOrBuilderList();
+                } else {
+                    return java.util.Collections.unmodifiableList(phone_);
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder addPhoneBuilder() {
+                return getPhoneFieldBuilder().addBuilder(
+                        org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.getDefaultInstance());
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder addPhoneBuilder(
+                    int index) {
+                return getPhoneFieldBuilder().addBuilder(index,
+                        org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.getDefaultInstance());
+            }
+
+            /**
+             * <code>repeated .tutorial.Person.PhoneNumber phone = 4;</code>
+             */
+            public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder> getPhoneBuilderList() {
+                return getPhoneFieldBuilder().getBuilderList();
+            }
+
+            private com.google.protobuf.RepeatedFieldBuilder<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder> getPhoneFieldBuilder() {
+                if (phoneBuilder_ == null) {
+                    phoneBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumber.Builder, org.apache.mina.generated.protoc.AddressBookProtos.Person.PhoneNumberOrBuilder>(
+                            phone_, ((bitField0_ & 0x00000008) == 0x00000008), getParentForChildren(), isClean());
+                    phone_ = null;
+                }
+                return phoneBuilder_;
+            }
+
+            // @@protoc_insertion_point(builder_scope:tutorial.Person)
+        }
+
+        static {
+            defaultInstance = new Person(true);
+            defaultInstance.initFields();
+        }
+
+        // @@protoc_insertion_point(class_scope:tutorial.Person)
     }
 
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      for (int i = 0; i < person_.size(); i++) {
-        output.writeMessage(1, person_.get(i));
-      }
-      getUnknownFields().writeTo(output);
+    public interface AddressBookOrBuilder extends com.google.protobuf.MessageOrBuilder {
+
+        // repeated .tutorial.Person person = 1;
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> getPersonList();
+
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        org.apache.mina.generated.protoc.AddressBookProtos.Person getPerson(int index);
+
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        int getPersonCount();
+
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> getPersonOrBuilderList();
+
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder getPersonOrBuilder(int index);
     }
 
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      for (int i = 0; i < person_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, person_.get(i));
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.apache.mina.generated.protoc.AddressBookProtos.AddressBook prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
     /**
      * Protobuf type {@code tutorial.AddressBook}
      *
@@ -2089,475 +1904,736 @@ public final class AddressBookProtos {
      * Our address book file is just one of these.
      * </pre>
      */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.apache.mina.generated.protoc.AddressBookProtos.AddressBookOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.class, org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.Builder.class);
-      }
-
-      // Construct using org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getPersonFieldBuilder();
+    public static final class AddressBook extends com.google.protobuf.GeneratedMessage implements AddressBookOrBuilder {
+        // Use AddressBook.newBuilder() to construct.
+        private AddressBook(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+            super(builder);
+            this.unknownFields = builder.getUnknownFields();
         }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
 
-      public Builder clear() {
-        super.clear();
-        if (personBuilder_ == null) {
-          person_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000001);
-        } else {
-          personBuilder_.clear();
+        private AddressBook(boolean noInit) {
+            this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
         }
-        return this;
-      }
 
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
+        private static final AddressBook defaultInstance;
 
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_descriptor;
-      }
-
-      public org.apache.mina.generated.protoc.AddressBookProtos.AddressBook getDefaultInstanceForType() {
-        return org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.getDefaultInstance();
-      }
-
-      public org.apache.mina.generated.protoc.AddressBookProtos.AddressBook build() {
-        org.apache.mina.generated.protoc.AddressBookProtos.AddressBook result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
+        public static AddressBook getDefaultInstance() {
+            return defaultInstance;
         }
-        return result;
-      }
 
-      public org.apache.mina.generated.protoc.AddressBookProtos.AddressBook buildPartial() {
-        org.apache.mina.generated.protoc.AddressBookProtos.AddressBook result = new org.apache.mina.generated.protoc.AddressBookProtos.AddressBook(this);
-        int from_bitField0_ = bitField0_;
-        if (personBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
-            person_ = java.util.Collections.unmodifiableList(person_);
-            bitField0_ = (bitField0_ & ~0x00000001);
-          }
-          result.person_ = person_;
-        } else {
-          result.person_ = personBuilder_.build();
+        public AddressBook getDefaultInstanceForType() {
+            return defaultInstance;
         }
-        onBuilt();
-        return result;
-      }
 
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.apache.mina.generated.protoc.AddressBookProtos.AddressBook) {
-          return mergeFrom((org.apache.mina.generated.protoc.AddressBookProtos.AddressBook)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
+        private final com.google.protobuf.UnknownFieldSet unknownFields;
+
+        @java.lang.Override
+        public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
+            return this.unknownFields;
         }
-      }
 
-      public Builder mergeFrom(org.apache.mina.generated.protoc.AddressBookProtos.AddressBook other) {
-        if (other == org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.getDefaultInstance()) return this;
-        if (personBuilder_ == null) {
-          if (!other.person_.isEmpty()) {
-            if (person_.isEmpty()) {
-              person_ = other.person_;
-              bitField0_ = (bitField0_ & ~0x00000001);
-            } else {
-              ensurePersonIsMutable();
-              person_.addAll(other.person_);
+        private AddressBook(com.google.protobuf.CodedInputStream input,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            initFields();
+            int mutable_bitField0_ = 0;
+            com.google.protobuf.UnknownFieldSet.Builder unknownFields = com.google.protobuf.UnknownFieldSet
+                    .newBuilder();
+            try {
+                boolean done = false;
+                while (!done) {
+                    int tag = input.readTag();
+                    switch (tag) {
+                    case 0:
+                        done = true;
+                        break;
+                    default: {
+                        if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
+                            done = true;
+                        }
+                        break;
+                    }
+                    case 10: {
+                        if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                            person_ = new java.util.ArrayList<org.apache.mina.generated.protoc.AddressBookProtos.Person>();
+                            mutable_bitField0_ |= 0x00000001;
+                        }
+                        person_.add(input.readMessage(org.apache.mina.generated.protoc.AddressBookProtos.Person.PARSER,
+                                extensionRegistry));
+                        break;
+                    }
+                    }
+                }
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                throw e.setUnfinishedMessage(this);
+            } catch (java.io.IOException e) {
+                throw new com.google.protobuf.InvalidProtocolBufferException(e.getMessage()).setUnfinishedMessage(this);
+            } finally {
+                if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                    person_ = java.util.Collections.unmodifiableList(person_);
+                }
+                this.unknownFields = unknownFields.build();
+                makeExtensionsImmutable();
             }
-            onChanged();
-          }
-        } else {
-          if (!other.person_.isEmpty()) {
-            if (personBuilder_.isEmpty()) {
-              personBuilder_.dispose();
-              personBuilder_ = null;
-              person_ = other.person_;
-              bitField0_ = (bitField0_ & ~0x00000001);
-              personBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getPersonFieldBuilder() : null;
-            } else {
-              personBuilder_.addAllMessages(other.person_);
+        }
+
+        public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+            return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_descriptor;
+        }
+
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+            return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_fieldAccessorTable
+                    .ensureFieldAccessorsInitialized(
+                            org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.class,
+                            org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.Builder.class);
+        }
+
+        public static com.google.protobuf.Parser<AddressBook> PARSER = new com.google.protobuf.AbstractParser<AddressBook>() {
+            public AddressBook parsePartialFrom(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                    throws com.google.protobuf.InvalidProtocolBufferException {
+                return new AddressBook(input, extensionRegistry);
             }
-          }
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
+        };
 
-      public final boolean isInitialized() {
-        for (int i = 0; i < getPersonCount(); i++) {
-          if (!getPerson(i).isInitialized()) {
-            
-            return false;
-          }
+        @java.lang.Override
+        public com.google.protobuf.Parser<AddressBook> getParserForType() {
+            return PARSER;
         }
-        return true;
-      }
 
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (org.apache.mina.generated.protoc.AddressBookProtos.AddressBook) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
+        // repeated .tutorial.Person person = 1;
+        public static final int PERSON_FIELD_NUMBER = 1;
 
-      // repeated .tutorial.Person person = 1;
-      private java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> person_ =
-        java.util.Collections.emptyList();
-      private void ensurePersonIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          person_ = new java.util.ArrayList<org.apache.mina.generated.protoc.AddressBookProtos.Person>(person_);
-          bitField0_ |= 0x00000001;
-         }
-      }
+        private java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> person_;
 
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.apache.mina.generated.protoc.AddressBookProtos.Person, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder, org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> personBuilder_;
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> getPersonList() {
+            return person_;
+        }
 
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> getPersonList() {
-        if (personBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(person_);
-        } else {
-          return personBuilder_.getMessageList();
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        public java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> getPersonOrBuilderList() {
+            return person_;
         }
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public int getPersonCount() {
-        if (personBuilder_ == null) {
-          return person_.size();
-        } else {
-          return personBuilder_.getCount();
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person getPerson(int index) {
-        if (personBuilder_ == null) {
-          return person_.get(index);
-        } else {
-          return personBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder setPerson(
-          int index, org.apache.mina.generated.protoc.AddressBookProtos.Person value) {
-        if (personBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePersonIsMutable();
-          person_.set(index, value);
-          onChanged();
-        } else {
-          personBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder setPerson(
-          int index, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder builderForValue) {
-        if (personBuilder_ == null) {
-          ensurePersonIsMutable();
-          person_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          personBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder addPerson(org.apache.mina.generated.protoc.AddressBookProtos.Person value) {
-        if (personBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePersonIsMutable();
-          person_.add(value);
-          onChanged();
-        } else {
-          personBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder addPerson(
-          int index, org.apache.mina.generated.protoc.AddressBookProtos.Person value) {
-        if (personBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePersonIsMutable();
-          person_.add(index, value);
-          onChanged();
-        } else {
-          personBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder addPerson(
-          org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder builderForValue) {
-        if (personBuilder_ == null) {
-          ensurePersonIsMutable();
-          person_.add(builderForValue.build());
-          onChanged();
-        } else {
-          personBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder addPerson(
-          int index, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder builderForValue) {
-        if (personBuilder_ == null) {
-          ensurePersonIsMutable();
-          person_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          personBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder addAllPerson(
-          java.lang.Iterable<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person> values) {
-        if (personBuilder_ == null) {
-          ensurePersonIsMutable();
-          super.addAll(values, person_);
-          onChanged();
-        } else {
-          personBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder clearPerson() {
-        if (personBuilder_ == null) {
-          person_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000001);
-          onChanged();
-        } else {
-          personBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public Builder removePerson(int index) {
-        if (personBuilder_ == null) {
-          ensurePersonIsMutable();
-          person_.remove(index);
-          onChanged();
-        } else {
-          personBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder getPersonBuilder(
-          int index) {
-        return getPersonFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder getPersonOrBuilder(
-          int index) {
-        if (personBuilder_ == null) {
-          return person_.get(index);  } else {
-          return personBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> 
-           getPersonOrBuilderList() {
-        if (personBuilder_ != null) {
-          return personBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(person_);
-        }
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder addPersonBuilder() {
-        return getPersonFieldBuilder().addBuilder(
-            org.apache.mina.generated.protoc.AddressBookProtos.Person.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder addPersonBuilder(
-          int index) {
-        return getPersonFieldBuilder().addBuilder(
-            index, org.apache.mina.generated.protoc.AddressBookProtos.Person.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .tutorial.Person person = 1;</code>
-       */
-      public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder> 
-           getPersonBuilderList() {
-        return getPersonFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.apache.mina.generated.protoc.AddressBookProtos.Person, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder, org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> 
-          getPersonFieldBuilder() {
-        if (personBuilder_ == null) {
-          personBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              org.apache.mina.generated.protoc.AddressBookProtos.Person, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder, org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder>(
-                  person_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
-                  getParentForChildren(),
-                  isClean());
-          person_ = null;
-        }
-        return personBuilder_;
-      }
 
-      // @@protoc_insertion_point(builder_scope:tutorial.AddressBook)
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        public int getPersonCount() {
+            return person_.size();
+        }
+
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        public org.apache.mina.generated.protoc.AddressBookProtos.Person getPerson(int index) {
+            return person_.get(index);
+        }
+
+        /**
+         * <code>repeated .tutorial.Person person = 1;</code>
+         */
+        public org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder getPersonOrBuilder(int index) {
+            return person_.get(index);
+        }
+
+        private void initFields() {
+            person_ = java.util.Collections.emptyList();
+        }
+
+        private byte memoizedIsInitialized = -1;
+
+        public final boolean isInitialized() {
+            byte isInitialized = memoizedIsInitialized;
+            if (isInitialized != -1)
+                return isInitialized == 1;
+
+            for (int i = 0; i < getPersonCount(); i++) {
+                if (!getPerson(i).isInitialized()) {
+                    memoizedIsInitialized = 0;
+                    return false;
+                }
+            }
+            memoizedIsInitialized = 1;
+            return true;
+        }
+
+        public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+            getSerializedSize();
+            for (int i = 0; i < person_.size(); i++) {
+                output.writeMessage(1, person_.get(i));
+            }
+            getUnknownFields().writeTo(output);
+        }
+
+        private int memoizedSerializedSize = -1;
+
+        public int getSerializedSize() {
+            int size = memoizedSerializedSize;
+            if (size != -1)
+                return size;
+
+            size = 0;
+            for (int i = 0; i < person_.size(); i++) {
+                size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, person_.get(i));
+            }
+            size += getUnknownFields().getSerializedSize();
+            memoizedSerializedSize = size;
+            return size;
+        }
+
+        private static final long serialVersionUID = 0L;
+
+        @java.lang.Override
+        protected java.lang.Object writeReplace() throws java.io.ObjectStreamException {
+            return super.writeReplace();
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
+                com.google.protobuf.ByteString data) throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
+                com.google.protobuf.ByteString data, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(byte[] data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(byte[] data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return PARSER.parseFrom(data, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(java.io.InputStream input)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
+                java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseDelimitedFrom(
+                java.io.InputStream input) throws java.io.IOException {
+            return PARSER.parseDelimitedFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseDelimitedFrom(
+                java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
+                com.google.protobuf.CodedInputStream input) throws java.io.IOException {
+            return PARSER.parseFrom(input);
+        }
+
+        public static org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parseFrom(
+                com.google.protobuf.CodedInputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws java.io.IOException {
+            return PARSER.parseFrom(input, extensionRegistry);
+        }
+
+        public static Builder newBuilder() {
+            return Builder.create();
+        }
+
+        public Builder newBuilderForType() {
+            return newBuilder();
+        }
+
+        public static Builder newBuilder(org.apache.mina.generated.protoc.AddressBookProtos.AddressBook prototype) {
+            return newBuilder().mergeFrom(prototype);
+        }
+
+        public Builder toBuilder() {
+            return newBuilder(this);
+        }
+
+        @java.lang.Override
+        protected Builder newBuilderForType(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+            Builder builder = new Builder(parent);
+            return builder;
+        }
+
+        /**
+         * Protobuf type {@code tutorial.AddressBook}
+         *
+         * <pre>
+         * Our address book file is just one of these.
+         * </pre>
+         */
+        public static final class Builder extends com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+                org.apache.mina.generated.protoc.AddressBookProtos.AddressBookOrBuilder {
+            public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_descriptor;
+            }
+
+            protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(
+                                org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.class,
+                                org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.Builder.class);
+            }
+
+            // Construct using org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.newBuilder()
+            private Builder() {
+                maybeForceBuilderInitialization();
+            }
+
+            private Builder(com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+                super(parent);
+                maybeForceBuilderInitialization();
+            }
+
+            private void maybeForceBuilderInitialization() {
+                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+                    getPersonFieldBuilder();
+                }
+            }
+
+            private static Builder create() {
+                return new Builder();
+            }
+
+            public Builder clear() {
+                super.clear();
+                if (personBuilder_ == null) {
+                    person_ = java.util.Collections.emptyList();
+                    bitField0_ = (bitField0_ & ~0x00000001);
+                } else {
+                    personBuilder_.clear();
+                }
+                return this;
+            }
+
+            public Builder clone() {
+                return create().mergeFrom(buildPartial());
+            }
+
+            public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.internal_static_tutorial_AddressBook_descriptor;
+            }
+
+            public org.apache.mina.generated.protoc.AddressBookProtos.AddressBook getDefaultInstanceForType() {
+                return org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.getDefaultInstance();
+            }
+
+            public org.apache.mina.generated.protoc.AddressBookProtos.AddressBook build() {
+                org.apache.mina.generated.protoc.AddressBookProtos.AddressBook result = buildPartial();
+                if (!result.isInitialized()) {
+                    throw newUninitializedMessageException(result);
+                }
+                return result;
+            }
+
+            public org.apache.mina.generated.protoc.AddressBookProtos.AddressBook buildPartial() {
+                org.apache.mina.generated.protoc.AddressBookProtos.AddressBook result = new org.apache.mina.generated.protoc.AddressBookProtos.AddressBook(
+                        this);
+                int from_bitField0_ = bitField0_;
+                if (personBuilder_ == null) {
+                    if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                        person_ = java.util.Collections.unmodifiableList(person_);
+                        bitField0_ = (bitField0_ & ~0x00000001);
+                    }
+                    result.person_ = person_;
+                } else {
+                    result.person_ = personBuilder_.build();
+                }
+                onBuilt();
+                return result;
+            }
+
+            public Builder mergeFrom(com.google.protobuf.Message other) {
+                if (other instanceof org.apache.mina.generated.protoc.AddressBookProtos.AddressBook) {
+                    return mergeFrom((org.apache.mina.generated.protoc.AddressBookProtos.AddressBook) other);
+                } else {
+                    super.mergeFrom(other);
+                    return this;
+                }
+            }
+
+            public Builder mergeFrom(org.apache.mina.generated.protoc.AddressBookProtos.AddressBook other) {
+                if (other == org.apache.mina.generated.protoc.AddressBookProtos.AddressBook.getDefaultInstance())
+                    return this;
+                if (personBuilder_ == null) {
+                    if (!other.person_.isEmpty()) {
+                        if (person_.isEmpty()) {
+                            person_ = other.person_;
+                            bitField0_ = (bitField0_ & ~0x00000001);
+                        } else {
+                            ensurePersonIsMutable();
+                            person_.addAll(other.person_);
+                        }
+                        onChanged();
+                    }
+                } else {
+                    if (!other.person_.isEmpty()) {
+                        if (personBuilder_.isEmpty()) {
+                            personBuilder_.dispose();
+                            personBuilder_ = null;
+                            person_ = other.person_;
+                            bitField0_ = (bitField0_ & ~0x00000001);
+                            personBuilder_ = com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ? getPersonFieldBuilder()
+                                    : null;
+                        } else {
+                            personBuilder_.addAllMessages(other.person_);
+                        }
+                    }
+                }
+                this.mergeUnknownFields(other.getUnknownFields());
+                return this;
+            }
+
+            public final boolean isInitialized() {
+                for (int i = 0; i < getPersonCount(); i++) {
+                    if (!getPerson(i).isInitialized()) {
+
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            public Builder mergeFrom(com.google.protobuf.CodedInputStream input,
+                    com.google.protobuf.ExtensionRegistryLite extensionRegistry) throws java.io.IOException {
+                org.apache.mina.generated.protoc.AddressBookProtos.AddressBook parsedMessage = null;
+                try {
+                    parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+                } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+                    parsedMessage = (org.apache.mina.generated.protoc.AddressBookProtos.AddressBook) e
+                            .getUnfinishedMessage();
+                    throw e;
+                } finally {
+                    if (parsedMessage != null) {
+                        mergeFrom(parsedMessage);
+                    }
+                }
+                return this;
+            }
+
+            private int bitField0_;
+
+            // repeated .tutorial.Person person = 1;
+            private java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> person_ = java.util.Collections
+                    .emptyList();
+
+            private void ensurePersonIsMutable() {
+                if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+                    person_ = new java.util.ArrayList<org.apache.mina.generated.protoc.AddressBookProtos.Person>(
+                            person_);
+                    bitField0_ |= 0x00000001;
+                }
+            }
+
+            private com.google.protobuf.RepeatedFieldBuilder<org.apache.mina.generated.protoc.AddressBookProtos.Person, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder, org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> personBuilder_;
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person> getPersonList() {
+                if (personBuilder_ == null) {
+                    return java.util.Collections.unmodifiableList(person_);
+                } else {
+                    return personBuilder_.getMessageList();
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public int getPersonCount() {
+                if (personBuilder_ == null) {
+                    return person_.size();
+                } else {
+                    return personBuilder_.getCount();
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person getPerson(int index) {
+                if (personBuilder_ == null) {
+                    return person_.get(index);
+                } else {
+                    return personBuilder_.getMessage(index);
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder setPerson(int index, org.apache.mina.generated.protoc.AddressBookProtos.Person value) {
+                if (personBuilder_ == null) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    ensurePersonIsMutable();
+                    person_.set(index, value);
+                    onChanged();
+                } else {
+                    personBuilder_.setMessage(index, value);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder setPerson(int index,
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder builderForValue) {
+                if (personBuilder_ == null) {
+                    ensurePersonIsMutable();
+                    person_.set(index, builderForValue.build());
+                    onChanged();
+                } else {
+                    personBuilder_.setMessage(index, builderForValue.build());
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder addPerson(org.apache.mina.generated.protoc.AddressBookProtos.Person value) {
+                if (personBuilder_ == null) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    ensurePersonIsMutable();
+                    person_.add(value);
+                    onChanged();
+                } else {
+                    personBuilder_.addMessage(value);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder addPerson(int index, org.apache.mina.generated.protoc.AddressBookProtos.Person value) {
+                if (personBuilder_ == null) {
+                    if (value == null) {
+                        throw new NullPointerException();
+                    }
+                    ensurePersonIsMutable();
+                    person_.add(index, value);
+                    onChanged();
+                } else {
+                    personBuilder_.addMessage(index, value);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder addPerson(org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder builderForValue) {
+                if (personBuilder_ == null) {
+                    ensurePersonIsMutable();
+                    person_.add(builderForValue.build());
+                    onChanged();
+                } else {
+                    personBuilder_.addMessage(builderForValue.build());
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder addPerson(int index,
+                    org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder builderForValue) {
+                if (personBuilder_ == null) {
+                    ensurePersonIsMutable();
+                    person_.add(index, builderForValue.build());
+                    onChanged();
+                } else {
+                    personBuilder_.addMessage(index, builderForValue.build());
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder addAllPerson(
+                    java.lang.Iterable<? extends org.apache.mina.generated.protoc.AddressBookProtos.Person> values) {
+                if (personBuilder_ == null) {
+                    ensurePersonIsMutable();
+                    super.addAll(values, person_);
+                    onChanged();
+                } else {
+                    personBuilder_.addAllMessages(values);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder clearPerson() {
+                if (personBuilder_ == null) {
+                    person_ = java.util.Collections.emptyList();
+                    bitField0_ = (bitField0_ & ~0x00000001);
+                    onChanged();
+                } else {
+                    personBuilder_.clear();
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public Builder removePerson(int index) {
+                if (personBuilder_ == null) {
+                    ensurePersonIsMutable();
+                    person_.remove(index);
+                    onChanged();
+                } else {
+                    personBuilder_.remove(index);
+                }
+                return this;
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder getPersonBuilder(int index) {
+                return getPersonFieldBuilder().getBuilder(index);
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder getPersonOrBuilder(int index) {
+                if (personBuilder_ == null) {
+                    return person_.get(index);
+                } else {
+                    return personBuilder_.getMessageOrBuilder(index);
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public java.util.List<? extends org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> getPersonOrBuilderList() {
+                if (personBuilder_ != null) {
+                    return personBuilder_.getMessageOrBuilderList();
+                } else {
+                    return java.util.Collections.unmodifiableList(person_);
+                }
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder addPersonBuilder() {
+                return getPersonFieldBuilder().addBuilder(
+                        org.apache.mina.generated.protoc.AddressBookProtos.Person.getDefaultInstance());
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder addPersonBuilder(int index) {
+                return getPersonFieldBuilder().addBuilder(index,
+                        org.apache.mina.generated.protoc.AddressBookProtos.Person.getDefaultInstance());
+            }
+
+            /**
+             * <code>repeated .tutorial.Person person = 1;</code>
+             */
+            public java.util.List<org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder> getPersonBuilderList() {
+                return getPersonFieldBuilder().getBuilderList();
+            }
+
+            private com.google.protobuf.RepeatedFieldBuilder<org.apache.mina.generated.protoc.AddressBookProtos.Person, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder, org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder> getPersonFieldBuilder() {
+                if (personBuilder_ == null) {
+                    personBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<org.apache.mina.generated.protoc.AddressBookProtos.Person, org.apache.mina.generated.protoc.AddressBookProtos.Person.Builder, org.apache.mina.generated.protoc.AddressBookProtos.PersonOrBuilder>(
+                            person_, ((bitField0_ & 0x00000001) == 0x00000001), getParentForChildren(), isClean());
+                    person_ = null;
+                }
+                return personBuilder_;
+            }
+
+            // @@protoc_insertion_point(builder_scope:tutorial.AddressBook)
+        }
+
+        static {
+            defaultInstance = new AddressBook(true);
+            defaultInstance.initFields();
+        }
+
+        // @@protoc_insertion_point(class_scope:tutorial.AddressBook)
     }
 
+    private static com.google.protobuf.Descriptors.Descriptor internal_static_tutorial_Person_descriptor;
+
+    private static com.google.protobuf.GeneratedMessage.FieldAccessorTable internal_static_tutorial_Person_fieldAccessorTable;
+
+    private static com.google.protobuf.Descriptors.Descriptor internal_static_tutorial_Person_PhoneNumber_descriptor;
+
+    private static com.google.protobuf.GeneratedMessage.FieldAccessorTable internal_static_tutorial_Person_PhoneNumber_fieldAccessorTable;
+
+    private static com.google.protobuf.Descriptors.Descriptor internal_static_tutorial_AddressBook_descriptor;
+
+    private static com.google.protobuf.GeneratedMessage.FieldAccessorTable internal_static_tutorial_AddressBook_fieldAccessorTable;
+
+    public static com.google.protobuf.Descriptors.FileDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    private static com.google.protobuf.Descriptors.FileDescriptor descriptor;
     static {
-      defaultInstance = new AddressBook(true);
-      defaultInstance.initFields();
+        java.lang.String[] descriptorData = { "\n#src/test/protobuf/addressbook.proto\022\010t"
+                + "utorial\"\332\001\n\006Person\022\014\n\004name\030\001 \002(\t\022\n\n\002id\030\002"
+                + " \002(\005\022\r\n\005email\030\003 \001(\t\022+\n\005phone\030\004 \003(\0132\034.tut"
+                + "orial.Person.PhoneNumber\032M\n\013PhoneNumber\022"
+                + "\016\n\006number\030\001 \002(\t\022.\n\004type\030\002 \001(\0162\032.tutorial"
+                + ".Person.PhoneType:\004HOME\"+\n\tPhoneType\022\n\n\006"
+                + "MOBILE\020\000\022\010\n\004HOME\020\001\022\010\n\004WORK\020\002\"/\n\013AddressB"
+                + "ook\022 \n\006person\030\001 \003(\0132\020.tutorial.PersonB5\n"
+                + " org.apache.mina.generated.protocB\021Addre" + "ssBookProtos" };
+        com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner = new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+            public com.google.protobuf.ExtensionRegistry assignDescriptors(
+                    com.google.protobuf.Descriptors.FileDescriptor root) {
+                descriptor = root;
+                internal_static_tutorial_Person_descriptor = getDescriptor().getMessageTypes().get(0);
+                internal_static_tutorial_Person_fieldAccessorTable = new com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                        internal_static_tutorial_Person_descriptor, new java.lang.String[] { "Name", "Id", "Email",
+                                "Phone", });
+                internal_static_tutorial_Person_PhoneNumber_descriptor = internal_static_tutorial_Person_descriptor
+                        .getNestedTypes().get(0);
+                internal_static_tutorial_Person_PhoneNumber_fieldAccessorTable = new com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                        internal_static_tutorial_Person_PhoneNumber_descriptor, new java.lang.String[] { "Number",
+                                "Type", });
+                internal_static_tutorial_AddressBook_descriptor = getDescriptor().getMessageTypes().get(1);
+                internal_static_tutorial_AddressBook_fieldAccessorTable = new com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                        internal_static_tutorial_AddressBook_descriptor, new java.lang.String[] { "Person", });
+                return null;
+            }
+        };
+        com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(descriptorData,
+                new com.google.protobuf.Descriptors.FileDescriptor[] {}, assigner);
     }
 
-    // @@protoc_insertion_point(class_scope:tutorial.AddressBook)
-  }
-
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_tutorial_Person_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_tutorial_Person_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_tutorial_Person_PhoneNumber_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_tutorial_Person_PhoneNumber_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_tutorial_AddressBook_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_tutorial_AddressBook_fieldAccessorTable;
-
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
-    return descriptor;
-  }
-  private static com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
-  static {
-    java.lang.String[] descriptorData = {
-      "\n#src/test/protobuf/addressbook.proto\022\010t" +
-      "utorial\"\332\001\n\006Person\022\014\n\004name\030\001 \002(\t\022\n\n\002id\030\002" +
-      " \002(\005\022\r\n\005email\030\003 \001(\t\022+\n\005phone\030\004 \003(\0132\034.tut" +
-      "orial.Person.PhoneNumber\032M\n\013PhoneNumber\022" +
-      "\016\n\006number\030\001 \002(\t\022.\n\004type\030\002 \001(\0162\032.tutorial" +
-      ".Person.PhoneType:\004HOME\"+\n\tPhoneType\022\n\n\006" +
-      "MOBILE\020\000\022\010\n\004HOME\020\001\022\010\n\004WORK\020\002\"/\n\013AddressB" +
-      "ook\022 \n\006person\030\001 \003(\0132\020.tutorial.PersonB5\n" +
-      " org.apache.mina.generated.protocB\021Addre" +
-      "ssBookProtos"
-    };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_tutorial_Person_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_tutorial_Person_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_tutorial_Person_descriptor,
-              new java.lang.String[] { "Name", "Id", "Email", "Phone", });
-          internal_static_tutorial_Person_PhoneNumber_descriptor =
-            internal_static_tutorial_Person_descriptor.getNestedTypes().get(0);
-          internal_static_tutorial_Person_PhoneNumber_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_tutorial_Person_PhoneNumber_descriptor,
-              new java.lang.String[] { "Number", "Type", });
-          internal_static_tutorial_AddressBook_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_tutorial_AddressBook_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_tutorial_AddressBook_descriptor,
-              new java.lang.String[] { "Person", });
-          return null;
-        }
-      };
-    com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
-  }
-
-  // @@protoc_insertion_point(outer_class_scope)
+    // @@protoc_insertion_point(outer_class_scope)
 }

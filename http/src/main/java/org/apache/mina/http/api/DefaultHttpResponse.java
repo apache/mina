@@ -19,17 +19,14 @@
  */
 package org.apache.mina.http.api;
 
-
 import java.nio.ByteBuffer;
 import java.util.Map;
-
 
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DefaultHttpResponse implements HttpResponse
-{
+public class DefaultHttpResponse implements HttpResponse {
 
     private final HttpVersion version;
 
@@ -37,112 +34,91 @@ public class DefaultHttpResponse implements HttpResponse
 
     private final Map<String, String> headers;
 
-
-    public DefaultHttpResponse( HttpVersion version, HttpStatus status, Map<String, String> headers )
-    {
+    public DefaultHttpResponse(HttpVersion version, HttpStatus status, Map<String, String> headers) {
         this.version = version;
         this.status = status;
         this.headers = headers;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public HttpVersion getProtocolVersion()
-    {
+    public HttpVersion getProtocolVersion() {
         return version;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getContentType()
-    {
-        return headers.get( "content-type" );
+    public String getContentType() {
+        return headers.get("content-type");
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isKeepAlive()
-    {
+    public boolean isKeepAlive() {
         // TODO check header and version for keep alive
         return false;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getHeader( String name )
-    {
-        return headers.get( name );
+    public String getHeader(String name) {
+        return headers.get(name);
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean containsHeader( String name )
-    {
-        return headers.containsKey( name );
+    public boolean containsHeader(String name) {
+        return headers.containsKey(name);
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> getHeaders()
-    {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public HttpStatus getStatus()
-    {
+    public HttpStatus getStatus() {
         return status;
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public ByteBuffer encode( HttpPduEncodingVisitor visitor )
-    {
-        return visitor.visit( this );
+    public ByteBuffer encode(HttpPduEncodingVisitor visitor) {
+        return visitor.visit(this);
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append( "HTTP RESPONSE STATUS: " ).append( status ).append( '\n' );
-        sb.append( "VERSION: " ).append( version ).append( '\n' );
+        sb.append("HTTP RESPONSE STATUS: ").append(status).append('\n');
+        sb.append("VERSION: ").append(version).append('\n');
 
-        sb.append( "--- HEADER --- \n" );
+        sb.append("--- HEADER --- \n");
 
-        for ( String key : headers.keySet() )
-        {
-            String value = headers.get( key );
-            sb.append( key ).append( ':' ).append( value ).append( '\n' );
+        for (String key : headers.keySet()) {
+            String value = headers.get(key);
+            sb.append(key).append(':').append(value).append('\n');
         }
 
         return sb.toString();

@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
 public class ByteBufferDumper {
     /** Hex chars */
     private static final byte[] HEX_CHAR = new byte[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B',
-                            'C', 'D', 'E', 'F' };
+            'C', 'D', 'E', 'F' };
 
     /**
      * Dump the content of the given ByteBuffer, up to a number of bytes. If the toAscii flag is set to
@@ -77,7 +77,7 @@ public class ByteBufferDumper {
 
                 byteValue = data[i] & 0xFF;
                 out.append(new String(new byte[] { '0', 'x', HEX_CHAR[(byteValue & 0x00F0) >> 4],
-                                        HEX_CHAR[byteValue & 0x000F] }));
+                        HEX_CHAR[byteValue & 0x000F] }));
             }
 
             out.append("']");

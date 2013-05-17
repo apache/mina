@@ -19,7 +19,6 @@
  */
 package org.apache.mina.filterchain;
 
-
 /**
  * Chain controller used by a filter for calling the next filter in read order.
  *  

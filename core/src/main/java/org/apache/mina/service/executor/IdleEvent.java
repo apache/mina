@@ -30,6 +30,7 @@ import org.apache.mina.api.IoSession;
 public class IdleEvent implements Event {
 
     private final IoSession session;
+
     private final IdleStatus status;
 
     public IdleEvent(final IoSession session, final IdleStatus status) {
