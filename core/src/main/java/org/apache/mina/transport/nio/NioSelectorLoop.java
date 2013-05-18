@@ -46,9 +46,6 @@ public class NioSelectorLoop implements SelectorLoop {
     /** the selector managed by this class */
     private Selector selector;
 
-    /** the worker thread in charge of processing the events */
-    private final SelectorWorker worker;
-
     /** Read buffer for all the incoming bytes (default to 64Kb) */
     private final ByteBuffer readBuffer = ByteBuffer.allocate(64 * 1024);
 
@@ -81,7 +78,7 @@ public class NioSelectorLoop implements SelectorLoop {
         }
 
         logger = LoggerFactory.getLogger(name);
-        worker = new SelectorWorker(workerName);
+        SelectorWorker worker = new SelectorWorker(workerName);
 
         try {
             logger.debug("open a selector");
@@ -91,6 +88,7 @@ public class NioSelectorLoop implements SelectorLoop {
             throw new IllegalStateException("Impossible to open a new NIO selector, O/S is out of file descriptor ?",
                     ioe);
         }
+
         logger.debug("starting worker thread");
         worker.start();
 

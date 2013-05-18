@@ -56,10 +56,11 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IndexedIdleChecker implements IdleChecker {
+    /** Maximum idle time in second : default to 1 hour */
+    private static final int MAX_IDLE_TIME_IN_SEC = 60 * 60;
 
-    private static final int MAX_IDLE_TIME_IN_SEC = 60 * 60; // 1 hour max idle
-
-    private static final long MAX_IDLE_TIME_IN_MS = MAX_IDLE_TIME_IN_SEC * 1000L; // 1 hour max idle
+    /** Maximum idle time in milliseconds : default to 1 hour */
+    private static final long MAX_IDLE_TIME_IN_MS = MAX_IDLE_TIME_IN_SEC * 1000L;
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexedIdleChecker.class);
 
@@ -77,7 +78,8 @@ public class IndexedIdleChecker implements IdleChecker {
     @SuppressWarnings("unchecked")
     private final Set<AbstractIoSession>[] writeIdleSessionIndex = new Set[MAX_IDLE_TIME_IN_SEC];
 
-    private final int granularityInMs = 1000;
+    /** The elapsed period between two checks : 1 second */
+    private static final int GRANULARITY_IN_MS = 1000;
 
     private final Worker worker = new Worker();
 
@@ -246,7 +248,7 @@ public class IndexedIdleChecker implements IdleChecker {
         public void run() {
             while (running) {
                 try {
-                    sleep(granularityInMs);
+                    sleep(GRANULARITY_IN_MS);
                     processIdleSession(System.currentTimeMillis());
                 } catch (final InterruptedException e) {
                     break;

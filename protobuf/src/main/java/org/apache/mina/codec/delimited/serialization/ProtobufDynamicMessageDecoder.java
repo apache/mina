@@ -51,8 +51,8 @@ public class ProtobufDynamicMessageDecoder extends
         return new ProtobufSerializedMessage(input);
     }
 
-    public final static class ProtobufSerializedMessage {
-        final private ByteBuffer input;
+    public static final class ProtobufSerializedMessage {
+        private ByteBuffer input;
 
         public ProtobufSerializedMessage(ByteBuffer input) {
             this.input = input;

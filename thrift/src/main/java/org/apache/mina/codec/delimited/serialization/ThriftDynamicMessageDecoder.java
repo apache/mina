@@ -40,10 +40,10 @@ public class ThriftDynamicMessageDecoder extends ByteBufferDecoder<ThriftDynamic
         return new ThriftSerializedMessage(deserializer, array);
     }
 
-    public final static class ThriftSerializedMessage {
-        private final byte array[];
+    public static final class ThriftSerializedMessage {
+        private byte array[];
 
-        private final TDeserializer deserializer;
+        private TDeserializer deserializer;
 
         public ThriftSerializedMessage(TDeserializer deserializer, byte array[]) {
             this.array = array;

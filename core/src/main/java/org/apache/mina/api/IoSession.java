@@ -56,7 +56,7 @@ import org.apache.mina.transport.nio.SelectorLoop;
  */
 public interface IoSession {
     /** The SslHelper instance name, stored in the session's attributes */
-    final AttributeKey<SslHelper> SSL_HELPER = new AttributeKey<SslHelper>(SslHelper.class, "internal_sslHelper");
+    AttributeKey<SslHelper> SSL_HELPER = new AttributeKey<SslHelper>(SslHelper.class, "internal_sslHelper");
 
     /**
      * The unique identifier of this session.

@@ -20,12 +20,17 @@
 package org.apache.mina.http;
 
 /**
+ * The various HTTP decoder states.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum DecoderState {
-    NEW, // waiting for a new HTTP requests, the session is new of last request was completed
-    HEAD, // accumulating the HTTP request head (everything before the body)
-    BODY, // receiving HTTP body slices
-    DONE // end of decoding
+    /* waiting for a new HTTP requests, the session is new of last request was completed */
+    NEW,
+    /* accumulating the HTTP request head (everything before the body) */
+    HEAD,
+    /* receiving HTTP body slices */
+    BODY,
+    /* end of decoding */
+    DONE
 }

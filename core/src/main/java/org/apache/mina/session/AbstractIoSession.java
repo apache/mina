@@ -860,7 +860,8 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                         LOG.debug("copying bytebuffer before pushing to the executor");
                         ByteBuffer original = message;
                         ByteBuffer clone = ByteBuffer.allocate(original.capacity());
-                        original.rewind();// copy from the beginning
+                        // copy from the beginning
+                        original.rewind();
                         clone.put(original);
                         original.rewind();
                         clone.flip();
@@ -978,7 +979,8 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                         LOG.debug("copying bytebuffer before pushing to the executor");
                         ByteBuffer original = (ByteBuffer) message;
                         ByteBuffer clone = ByteBuffer.allocate(original.capacity());
-                        original.rewind();// copy from the beginning
+                        // copy from the beginning
+                        original.rewind();
                         clone.put(original);
                         original.rewind();
                         clone.flip();
@@ -1006,8 +1008,6 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         try {
             LOG.debug("ready for write");
             LOG.debug("writable session : {}", this);
-
-            Queue<WriteRequest> writeQueue = getWriteQueue();
 
             do {
                 // get a write request from the queue. We left it in the queue,

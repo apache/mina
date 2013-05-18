@@ -35,7 +35,7 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    protected final static class MutableInt {
+    protected static final class MutableInt {
 
         private Integer value = null;
 
@@ -107,15 +107,14 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
             nextBlockSize.setValue(sizeDecoder.decode(input));
         }
 
-        if (nextBlockSize.isDefined()) {
-            if (input.remaining() >= nextBlockSize.getValue()) {
-                ByteBuffer buffer = input.slice();
-                buffer.limit(buffer.position() + nextBlockSize.getValue());
+        if (nextBlockSize.isDefined() && (input.remaining() >= nextBlockSize.getValue())) {
+            ByteBuffer buffer = input.slice();
+            buffer.limit(buffer.position() + nextBlockSize.getValue());
 
-                output = payloadDecoder.decode(buffer);
-                nextBlockSize.reset();
-            }
+            output = payloadDecoder.decode(buffer);
+            nextBlockSize.reset();
         }
+
         return output;
     }
 

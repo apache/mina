@@ -34,28 +34,7 @@ import java.util.regex.Pattern;
  */
 public class DateUtil {
     /** A thread local is used to protect the DateFormat against concurrent access */
-    private static ThreadLocal<DateFormat> RFC_1123_FORMAT = new ThreadLocal<DateFormat>() {
-        /**
-         * Gets the formatter
-         */
-        public DateFormat get() {
-            return super.get();
-        }
-
-        /**
-         * Get rid of the formatter
-         */
-        public void remove() {
-            super.remove();
-        }
-
-        /**
-         * Set a new formatter
-         */
-        public void set(DateFormat value) {
-            super.set(value);
-        }
-
+    private static final ThreadLocal<DateFormat> RFC_1123_FORMAT = new ThreadLocal<DateFormat>() {
         /**
          * Initialize the formatter
          */

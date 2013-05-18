@@ -118,7 +118,7 @@ public class RawInt32 {
      */
     public static class Decoder extends ByteBufferDecoder<Integer> {
 
-        final private Endianness endianness;
+        private Endianness endianness;
 
         public Decoder(Endianness endianness) {
             super();

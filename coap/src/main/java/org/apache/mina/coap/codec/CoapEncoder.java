@@ -89,7 +89,8 @@ public class CoapEncoder implements StatelessProtocolEncoder<CoapMessage, ByteBu
 
         // if we have a payload, we place the marker and the payload
         if (message.getPayload() != null && message.getPayload().length > 0) {
-            size += 1; // payload marker
+            // payload marker
+            size += 1;
             size += message.getPayload().length;
         }
 

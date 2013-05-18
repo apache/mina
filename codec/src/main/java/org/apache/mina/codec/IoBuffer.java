@@ -711,8 +711,7 @@ public class IoBuffer {
             int counter = 0;
 
             while (node != null) {
-                int limit = node.buffer.limit();
-                counter += limit;
+                counter += node.buffer.limit();
 
                 if (counter >= newPosition) {
                     // Found

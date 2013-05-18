@@ -251,7 +251,8 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
 
         if (connectFuture != null) {
             connectFuture.complete(this);
-            connectFuture = null; // free some memory
+            // free some memory
+            connectFuture = null;
         }
 
         processSessionOpen();
