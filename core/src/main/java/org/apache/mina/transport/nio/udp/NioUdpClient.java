@@ -23,23 +23,31 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 
+import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.executor.IoHandlerExecutor;
+import org.apache.mina.service.idlechecker.IndexedIdleChecker;
+import org.apache.mina.transport.nio.ConnectFuture;
+import org.apache.mina.transport.nio.FixedSelectorLoopPool;
 import org.apache.mina.transport.nio.NioSelectorLoop;
-import org.apache.mina.transport.nio.SelectorLoop;
+import org.apache.mina.transport.nio.SelectorLoopPool;
 import org.apache.mina.transport.udp.AbstractUdpClient;
+import org.apache.mina.transport.udp.UdpSessionConfig;
+import org.apache.mina.util.Assert;
 
 /**
- * TODO
+ * This class implements a UDP NIO based client.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NioUdpClient extends AbstractUdpClient {
-    /** the SelectorLoop for connecting the sessions */
+
+    /** the SelectorLoop for handling read/write session events */
     // This is final, so that we know if it's not initialized
-    private final SelectorLoop connectSelectorLoop;
+    private final SelectorLoopPool readWriteSelectorPool;
+
+    private final IndexedIdleChecker idleChecker = new IndexedIdleChecker();
 
     /**
      * Create a new instance of NioUdpClient
@@ -53,30 +61,76 @@ public class NioUdpClient extends AbstractUdpClient {
      */
     public NioUdpClient(IoHandlerExecutor ioHandlerExecutor) {
         super(ioHandlerExecutor);
-        connectSelectorLoop = new NioSelectorLoop("connect", 0);
+        readWriteSelectorPool = new FixedSelectorLoopPool("Client", 2);
+        idleChecker.start();
     }
 
-    @Override
-    public IoSessionConfig getSessionConfig() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IoFuture<IoSession> connect(SocketAddress remoteAddress) throws IOException {
-        DatagramChannel ch = DatagramChannel.open();
+        Assert.assertNotNull(remoteAddress, "remoteAddress");
 
-        if (remoteAddress != null) {
-            ch.socket().bind(remoteAddress);
-            ch.connect(remoteAddress);
+        DatagramChannel ch = DatagramChannel.open();
+        ch.configureBlocking(false);
+
+        UdpSessionConfig config = getSessionConfig();
+
+        NioSelectorLoop loop = (NioSelectorLoop) readWriteSelectorPool.getSelectorLoop();
+
+        final NioUdpSession session = new NioUdpSession(this, idleChecker, ch, null, remoteAddress, loop);
+
+        session.setConnected();
+
+        // apply idle configuration
+        session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
+        session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE,
+                config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
+
+        // Manage the Idle status
+        idleChecker.sessionRead(session, System.currentTimeMillis());
+        idleChecker.sessionWritten(session, System.currentTimeMillis());
+
+        // apply the default service socket configuration
+
+        Boolean reuseAddress = config.isReuseAddress();
+
+        if (reuseAddress != null) {
+            session.getConfig().setReuseAddress(reuseAddress);
         }
 
-        return null;
+        Integer readBufferSize = config.getReadBufferSize();
+
+        if (readBufferSize != null) {
+            session.getConfig().setReadBufferSize(readBufferSize);
+        }
+
+        Integer sendBufferSize = config.getSendBufferSize();
+
+        if (sendBufferSize != null) {
+            session.getConfig().setSendBufferSize(sendBufferSize);
+        }
+
+        Integer trafficClass = config.getTrafficClass();
+
+        if (trafficClass != null) {
+            session.getConfig().setTrafficClass(trafficClass);
+        }
+
+        loop.register(false, false, true, false, session, ch, null);
+
+        ConnectFuture cf = new ConnectFuture();
+        cf.complete(session);
+        return cf;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IoFuture<IoSession> connect(SocketAddress remoteAddress, SocketAddress localAddress) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new IllegalStateException("not supported for UDP");
     }
+
 }

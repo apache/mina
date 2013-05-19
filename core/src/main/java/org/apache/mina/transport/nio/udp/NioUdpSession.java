@@ -23,14 +23,15 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.nio.channels.SelectionKey;
 
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.WriteRequest;
+import org.apache.mina.transport.nio.NioSelectorLoop;
 import org.apache.mina.transport.nio.SelectorListener;
+import org.apache.mina.transport.nio.SelectorLoop;
 import org.apache.mina.transport.udp.UdpSessionConfig;
 import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
@@ -49,6 +50,11 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
 
     private final SocketAddress remoteAddress;
 
+    /**
+     * The selector loop in charge of generating read/write events for this session Used only for UDP client session.
+     */
+    private SelectorLoop selectorLoop = null;
+
     /** the socket configuration */
     private final UdpSessionConfig configuration;
 
@@ -66,13 +72,24 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     };
 
     /**
-     * @param service
-     * @param writeProcessor
-     * @param idleChecker
+     * For server handled UDP sessions
      */
-    /* No qualifier*/NioUdpSession(IoService service, IdleChecker idleChecker, DatagramChannel datagramChannel,
+    /* No qualifier */NioUdpSession(IoService service, IdleChecker idleChecker, DatagramChannel datagramChannel,
             SocketAddress localAddress, SocketAddress remoteAddress) {
         super(service, datagramChannel, idleChecker);
+        this.localAddress = localAddress;
+        this.remoteAddress = remoteAddress;
+        this.config = service.getSessionConfig();
+        this.configuration = (UdpSessionConfig) this.config;
+    }
+
+    /**
+     * For client handled UDP sessions
+     */
+    /* No qualifier */NioUdpSession(IoService service, IdleChecker idleChecker, DatagramChannel datagramChannel,
+            SocketAddress localAddress, SocketAddress remoteAddress, NioSelectorLoop selectorLoop) {
+        super(service, datagramChannel, idleChecker);
+        this.selectorLoop = selectorLoop;
         this.localAddress = localAddress;
         this.remoteAddress = remoteAddress;
         this.config = service.getSessionConfig();
@@ -84,7 +101,17 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
      */
     @Override
     protected void channelClose() {
-        // No inner socket to close for UDP
+        LOG.debug("channelClose");
+        // No inner socket to close for UDP server, but some for UDP client
+        if (channel != null) {
+            try {
+                selectorLoop.unregister(this, channel);
+                channel.close();
+            } catch (final IOException e) {
+                LOG.error("Exception while closing the channel : ", e);
+                processException(e);
+            }
+        }
     }
 
     /**
@@ -114,29 +141,14 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     /**
      * {@inheritDoc}
      */
-    @Override
-    public IoFuture<Void> close(boolean immediately) {
-        switch (state) {
-        case CREATED:
-            LOG.error("Session {} not opened", this);
-            throw new IllegalStateException("cannot close an not opened session");
-        case CONNECTED:
-        case CLOSING:
-            if (immediately) {
-                state = SessionState.CLOSED;
-            } else {
-                // we wait for the write queue to be depleted
-                state = SessionState.CLOSING;
-            }
-            break;
-        case CLOSED:
-            LOG.warn("Already closed session {}", this);
-            break;
-        default:
-            throw new IllegalStateException("not implemented session state : " + state);
-        }
-        return closeFuture;
-    }
+    /*
+     * @Override public IoFuture<Void> close(boolean immediately) { switch (state) { case CREATED:
+     * LOG.error("Session {} not opened", this); throw new IllegalStateException("cannot close an not opened session");
+     * case CONNECTED: case CLOSING: if (immediately) { state = SessionState.CLOSED; } else { // we wait for the write
+     * queue to be depleted state = SessionState.CLOSING; } break; case CLOSED: LOG.warn("Already closed session {}",
+     * this); break; default: throw new IllegalStateException("not implemented session state : " + state); } return
+     * closeFuture; }
+     */
 
     /**
      * {@inheritDoc}
@@ -260,29 +272,55 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
         return message;
     }
 
-    void setSelectionKey(SelectionKey key) {
-        //this.selectionKey = key;
-    }
-
     /**
      * Set this session status as connected. To be called by the processor selecting/polling this session.
      */
     void setConnected() {
         if (!isCreated()) {
-            throw new RuntimeException("Trying to open a non created session");
+            throw new IllegalStateException("Trying to open a non created session");
         }
 
         state = SessionState.CONNECTED;
-
-        /*if (connectFuture != null) {
-            connectFuture.complete(this);
-            connectFuture = null; // free some memory
-        }*/
-
         processSessionOpen();
     }
 
     @Override
     public void ready(boolean accept, boolean connect, boolean read, ByteBuffer readBuffer, boolean write) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("session {} ready for accept={}, connect={}, read={}, write={}", new Object[] { this, accept,
+                                    connect, read, write });
+        }
+
+        if (read) {
+            LOG.debug("readable datagram for UDP service : {}", this);
+
+            // Read everything we can up to the buffer size
+            try {
+                ((DatagramChannel) channel).receive(readBuffer);
+                readBuffer.flip();
+
+                int readbytes = readBuffer.remaining();
+                LOG.debug("read {} bytes", readbytes);
+                if (readbytes <= 0) {
+                    // session closed by the remote peer
+                    LOG.debug("session closed by the remote peer");
+                    close(true);
+                } else {
+                    receivedDatagram(readBuffer);
+                }
+            } catch (IOException e) {
+                processException(e);
+            }
+
+        }
+
+        if (write) {
+            // no much to do here
+        }
+        if (accept) {
+            throw new IllegalStateException("accept event should never occur on NioUdpSession");
+        }
+
     }
+
 }

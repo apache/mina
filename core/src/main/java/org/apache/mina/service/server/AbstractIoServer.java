@@ -30,8 +30,6 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoServer extends AbstractIoService implements IoServer {
-    /** the default session configuration */
-    protected IoSessionConfig config;
 
     /**
      * Create an new AbstractIoServer instance

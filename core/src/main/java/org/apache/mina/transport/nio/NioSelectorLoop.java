@@ -134,7 +134,7 @@ public class NioSelectorLoop implements SelectorLoop {
     public void modifyRegistration(boolean accept, boolean read, boolean write, final SelectorListener listener,
             SelectableChannel channel, boolean wakeup) {
         logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}, channel : {}", new Object[] {
-                listener, accept, read, write, channel });
+                                listener, accept, read, write, channel });
 
         final SelectionKey key = channel.keyFor(selector);
         if (key == null) {
@@ -207,7 +207,6 @@ public class NioSelectorLoop implements SelectorLoop {
                         while (it.hasNext()) {
                             final SelectionKey key = it.next();
                             final SelectorListener listener = (SelectorListener) key.attachment();
-                            logger.debug("key : {}", key);
                             int ops = key.readyOps();
                             boolean isAcceptable = (ops & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT;
                             boolean isConnectable = (ops & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT;
@@ -215,7 +214,8 @@ public class NioSelectorLoop implements SelectorLoop {
                             boolean isWritable = (ops & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE;
                             listener.ready(isAcceptable, isConnectable, isReadable, isReadable ? readBuffer : null,
                                     isWritable);
-                            // if you don't remove the event of the set, the selector will present you this event again and
+                            // if you don't remove the event of the set, the selector will present you this event again
+                            // and
                             // again
                             logger.debug("remove");
                             it.remove();
@@ -270,6 +270,7 @@ public class NioSelectorLoop implements SelectorLoop {
             return callback;
         }
 
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
 

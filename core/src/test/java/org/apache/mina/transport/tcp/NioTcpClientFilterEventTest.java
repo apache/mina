@@ -19,10 +19,7 @@
  */
 package org.apache.mina.transport.tcp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -42,13 +39,12 @@ import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.nio.tcp.NioTcpClient;
-import org.apache.mina.transport.nio.tcp.NioTcpServer;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class test the event dispatching of {@link NioTcpServer}.
+ * This class test the event dispatching of {@link NioTcpClient}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

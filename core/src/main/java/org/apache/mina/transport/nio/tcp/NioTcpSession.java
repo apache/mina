@@ -69,7 +69,7 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
     /** The size of the buffer configured in the socket to send data */
     private int sendBufferSize;
 
-    /* No qualifier*/NioTcpSession(final IoService service, final SocketChannel channel,
+    /* No qualifier */NioTcpSession(final IoService service, final SocketChannel channel,
             final SelectorLoop selectorLoop, final IdleChecker idleChecker) {
         super(service, channel, idleChecker);
         this.selectorLoop = selectorLoop;
@@ -340,8 +340,10 @@ public class NioTcpSession extends AbstractIoSession implements SelectorListener
     @Override
     public void ready(final boolean accept, boolean connect, final boolean read, final ByteBuffer readBuffer,
             final boolean write) {
-        LOG.debug("session {} ready for accept={}, connect={}, read={}, write={}", new Object[] { this, accept,
-                connect, read, write });
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("session {} ready for accept={}, connect={}, read={}, write={}", new Object[] { this, accept,
+                                    connect, read, write });
+        }
         if (connect) {
             try {
 

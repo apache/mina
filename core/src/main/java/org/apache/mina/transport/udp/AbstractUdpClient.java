@@ -39,6 +39,7 @@ public abstract class AbstractUdpClient extends AbstractIoClient {
      */
     protected AbstractUdpClient(IoHandlerExecutor ioHandlerExecutor) {
         super(ioHandlerExecutor);
+        this.config = new DefaultUdpSessionConfig();
     }
 
     /**
@@ -58,4 +59,12 @@ public abstract class AbstractUdpClient extends AbstractIoClient {
      *         succeeds or fails.
      */
     public abstract IoFuture<IoSession> connect(SocketAddress remoteAddress, SocketAddress localAddress);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UdpSessionConfig getSessionConfig() {
+        return (UdpSessionConfig) config;
+    }
 }

@@ -26,6 +26,7 @@ import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoService implements IoService {
+
     /** A logger for this class */
     static final Logger LOG = LoggerFactory.getLogger(AbstractIoService.class);
 
@@ -44,6 +46,9 @@ public abstract class AbstractIoService implements IoService {
 
     /** The placeholder of managed open sessions */
     private final Map<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
+
+    /** the default session configuration */
+    protected IoSessionConfig config;
 
     /** The high level business logic */
     private IoHandler handler;

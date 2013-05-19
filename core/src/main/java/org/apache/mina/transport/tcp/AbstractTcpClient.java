@@ -29,9 +29,6 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
  */
 public abstract class AbstractTcpClient extends AbstractIoClient {
 
-    /** the default session configuration */
-    private TcpSessionConfig config;
-
     /** the connection timeout in milliseconds, after that delay the connection to remote server should fail. */
     private int connectTimeoutInMillis = 10000;
 
@@ -48,7 +45,7 @@ public abstract class AbstractTcpClient extends AbstractIoClient {
      */
     @Override
     public TcpSessionConfig getSessionConfig() {
-        return config;
+        return (TcpSessionConfig) config;
     }
 
     /**
