@@ -112,6 +112,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
                 processException(e);
             }
         }
+        processSessionClosed();
     }
 
     /**
@@ -119,7 +120,8 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
      */
     @Override
     public void flushWriteQueue() {
-        // TODO flush queue
+        // register for write
+        selectorLoop.modifyRegistration(false, !isReadSuspended(), true, this, channel, true);
     }
 
     /**
@@ -156,7 +158,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     @Override
     public void suspendRead() {
         // TODO
-        throw new RuntimeException("Not implemented");
+        throw new IllegalStateException("not implemented");
     }
 
     /**
@@ -165,7 +167,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     @Override
     public void suspendWrite() {
         // TODO
-        throw new RuntimeException("Not implemented");
+        throw new IllegalStateException("not implemented");
     }
 
     /**
@@ -174,7 +176,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     @Override
     public void resumeRead() {
         // TODO
-        throw new RuntimeException("Not implemented");
+        throw new IllegalStateException("not implemented");
     }
 
     /**
@@ -183,7 +185,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     @Override
     public void resumeWrite() {
         // TODO
-        throw new RuntimeException("Not implemented");
+        throw new IllegalStateException("not implemented");
     }
 
     /**
@@ -192,7 +194,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     @Override
     public boolean isReadSuspended() {
         // TODO
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
@@ -201,7 +203,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     @Override
     public boolean isWriteSuspended() {
         // TODO
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
@@ -240,7 +242,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
                 // or none
                 return ((DatagramChannel) channel).write((ByteBuffer) message);
             } else {
-                System.out.println("Cannot write");
+                LOG.debug("Cannot write");
                 return -1;
             }
         } catch (final IOException e) {
@@ -315,7 +317,7 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
         }
 
         if (write) {
-            // no much to do here
+            processWrite(selectorLoop);
         }
         if (accept) {
             throw new IllegalStateException("accept event should never occur on NioUdpSession");
