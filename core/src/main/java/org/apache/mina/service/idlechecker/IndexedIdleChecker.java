@@ -70,7 +70,7 @@ public class IndexedIdleChecker implements IdleChecker {
     private static final AttributeKey<Integer> WRITE_IDLE_INDEX = AttributeKey.createKey(Integer.class,
             "idle.write.index");
 
-    private long lastCheckTimeMs = 0L;
+    private long lastCheckTimeMs = System.currentTimeMillis();
 
     @SuppressWarnings("unchecked")
     private final Set<AbstractIoSession>[] readIdleSessionIndex = new Set[MAX_IDLE_TIME_IN_SEC];
@@ -128,8 +128,9 @@ public class IndexedIdleChecker implements IdleChecker {
         if (idleTimeInMs <= 0L) {
             LOG.debug("no read idle configuration");
         } else {
-            final int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L) + 1;
+            final int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L);
             final int index = nextIdleTimeInSeconds % MAX_IDLE_TIME_IN_SEC;
+            LOG.debug("computed index : {}", index);
             if (readIdleSessionIndex[index] == null) {
                 readIdleSessionIndex[index] = Collections
                         .newSetFromMap(new ConcurrentHashMap<AbstractIoSession, Boolean>());
@@ -160,7 +161,7 @@ public class IndexedIdleChecker implements IdleChecker {
         if (idleTimeInMs <= 0L) {
             LOG.debug("no write idle configuration");
         } else {
-            final int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L) + 1;
+            final int nextIdleTimeInSeconds = (int) ((timeInMs + idleTimeInMs) / 1000L);
             final int index = nextIdleTimeInSeconds % MAX_IDLE_TIME_IN_SEC;
             if (writeIdleSessionIndex[index] == null) {
                 writeIdleSessionIndex[index] = Collections
@@ -182,7 +183,7 @@ public class IndexedIdleChecker implements IdleChecker {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("checking idle time, last = {}, now = {}, delta = {}", new Object[] { lastCheckTimeMs, timeMs,
-                    delta });
+                                    delta });
         }
 
         if (delta < 1000) {
@@ -190,6 +191,10 @@ public class IndexedIdleChecker implements IdleChecker {
             return 0;
         }
 
+        // if (lastCheckTimeMs == 0) {
+        // LOG.debug("first check, we start now");
+        // lastCheckTimeMs = System.currentTimeMillis() - 1000;
+        // }
         final int startIdx = ((int) (Math.max(lastCheckTimeMs, timeMs - MAX_IDLE_TIME_IN_MS + 1) / 1000L))
                 % MAX_IDLE_TIME_IN_SEC;
         final int endIdx = ((int) (timeMs / 1000L)) % MAX_IDLE_TIME_IN_SEC;

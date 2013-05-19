@@ -19,8 +19,7 @@
  */
 package org.apache.mina.transport.tcp;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -56,7 +55,7 @@ public class IdleTcpServerTest {
         final CountDownLatch idleLatch = new CountDownLatch(CLIENT_COUNT);
 
         // 3 seconds idle time
-        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 3000);
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 2000);
 
         // start the server
         server.bind(new InetSocketAddress(0));
@@ -71,8 +70,11 @@ public class IdleTcpServerTest {
             clients[i] = new Socket("127.0.0.1", boundPort);
         }
 
+        long start = System.currentTimeMillis();
         try {
             assertTrue("idle event missing ! ", idleLatch.await(4, TimeUnit.SECONDS));
+            System.err.println((System.currentTimeMillis() - start));
+            assertTrue(2000 <= (System.currentTimeMillis() - start));
         } catch (final InterruptedException e) {
             fail(e.getMessage());
         }

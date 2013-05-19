@@ -55,6 +55,23 @@ public class IndexedIdleChekerTest {
     }
 
     @Test
+    public void dont_send_premature_events() {
+        IoService service = mock(IoService.class);
+        DummySession session = new DummySession(service, idleChecker);
+
+        session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 2000L);
+
+        idleChecker.sessionRead(session, now);
+
+        // should be idle in 2 second
+        assertEquals(0, idleChecker.processIdleSession(now));
+        assertEquals(0, session.readIdleCount);
+        assertEquals(0, session.writeIdleCount);
+        assertEquals(1, idleChecker.processIdleSession(now + 3001));
+
+    }
+
+    @Test
     public void read_event() {
         IoService service = mock(IoService.class);
         DummySession session = new DummySession(service, idleChecker);
@@ -64,10 +81,11 @@ public class IndexedIdleChekerTest {
         idleChecker.sessionRead(session, now);
 
         // should be idle in 1 second
-        assertEquals(1, idleChecker.processIdleSession(now));
-        assertEquals(1, session.readIdleCount);
+        assertEquals(0, idleChecker.processIdleSession(now));
+        assertEquals(0, session.readIdleCount);
         assertEquals(0, session.writeIdleCount);
-        assertEquals(0, idleChecker.processIdleSession(now + 2000));
+        assertEquals(1, idleChecker.processIdleSession(now + 2000));
+        assertEquals(1, session.readIdleCount);
 
     }
 
@@ -81,7 +99,7 @@ public class IndexedIdleChekerTest {
         idleChecker.sessionWritten(session, now);
 
         // should be idle in 1 second
-        assertEquals(1, idleChecker.processIdleSession(now + 1000));
+        assertEquals(1, idleChecker.processIdleSession(now + 12000));
         assertEquals(0, session.readIdleCount);
         assertEquals(1, session.writeIdleCount);
     }
