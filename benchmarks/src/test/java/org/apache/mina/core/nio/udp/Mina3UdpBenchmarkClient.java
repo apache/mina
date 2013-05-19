@@ -68,7 +68,7 @@ public class Mina3UdpBenchmarkClient implements BenchmarkClient {
                 }
             }
 
-            public void exceptionCaught(IoSession session, Throwable cause) {
+            public void exceptionCaught(IoSession session, Exception cause) {
                 cause.printStackTrace();
             }
 

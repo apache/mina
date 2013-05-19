@@ -118,7 +118,7 @@ public class Mina3TcpBenchmarkServer implements BenchmarkServer {
                 }
             }
 
-            public void exceptionCaught(IoSession session, Throwable cause) {
+            public void exceptionCaught(IoSession session, Exception cause) {
                 cause.printStackTrace();
             }
 
