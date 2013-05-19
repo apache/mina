@@ -56,8 +56,13 @@ public class BioClientVsMina3ServerUdpBenchmarkBinaryTest extends BenchmarkBinar
 
     @Parameters(name = "{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
-        Object[][] parameters = new Object[][] { { 1000000, 10, 2 * 60 }, { 1000000, 1 * 1024, 2 * 60 },
-                { 1000000, 10 * 1024, 2 * 60 }, { 1000000, 20 * 1024, 2 * 60 }, { 500000, 50 * 1024, 2 * 60 } }; // No need to test any further, the maximum size for an UDP message is 64Kb
+        // Note : depending on your OS, the maximum PDU you can send can vary. See sysctl net.inet.udp.maxdgram
+        Object[][] parameters = new Object[][] { 
+                { 1000000, 10, 2 * 60 }, 
+                { 1000000, 1 * 1024, 2 * 60 },
+                { 1000000, 2 * 1024, 2 * 60 }, 
+                { 1000000, 4 * 1024, 2 * 60 }, 
+                { 500000, 8 * 1024, 2 * 60 } }; // No need to test any further, the maximum size for an UDP message is 64Kb
         return Arrays.asList(parameters);
     }
 }
