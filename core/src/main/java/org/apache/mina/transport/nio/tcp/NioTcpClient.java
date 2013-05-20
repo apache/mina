@@ -159,12 +159,18 @@ public class NioTcpClient extends AbstractTcpClient {
 
         if (receiveBufferSize != null) {
             session.getConfig().setReadBufferSize(receiveBufferSize);
+        } else {
+            int rcvBufferSize = clientSocket.socket().getReceiveBufferSize();
+            session.getConfig().setReadBufferSize(rcvBufferSize);
         }
 
         Integer sendBufferSize = config.getSendBufferSize();
 
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
+        } else {
+            int sndBufferSize = clientSocket.socket().getSendBufferSize();
+            session.getConfig().setSendBufferSize(sndBufferSize);
         }
 
         Integer trafficClass = config.getTrafficClass();

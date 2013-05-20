@@ -79,7 +79,7 @@ public class NioUdpClient extends AbstractUdpClient {
 
         NioSelectorLoop loop = (NioSelectorLoop) readWriteSelectorPool.getSelectorLoop();
 
-        final NioUdpSession session = new NioUdpSession(this, idleChecker, ch, null, remoteAddress, loop);
+        NioUdpSession session = new NioUdpSession(this, idleChecker, ch, null, remoteAddress, loop);
 
         session.setConnected();
 
@@ -104,12 +104,18 @@ public class NioUdpClient extends AbstractUdpClient {
 
         if (readBufferSize != null) {
             session.getConfig().setReadBufferSize(readBufferSize);
+        } else {
+            int rcvBufferSize = ch.socket().getReceiveBufferSize();
+            session.getConfig().setReadBufferSize(rcvBufferSize);
         }
 
         Integer sendBufferSize = config.getSendBufferSize();
 
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
+        } else {
+            int sndBufferSize = ch.socket().getSendBufferSize();
+            session.getConfig().setSendBufferSize(sndBufferSize);
         }
 
         Integer trafficClass = config.getTrafficClass();
@@ -122,6 +128,7 @@ public class NioUdpClient extends AbstractUdpClient {
 
         ConnectFuture cf = new ConnectFuture();
         cf.complete(session);
+
         return cf;
     }
 
@@ -132,5 +139,4 @@ public class NioUdpClient extends AbstractUdpClient {
     public IoFuture<IoSession> connect(SocketAddress remoteAddress, SocketAddress localAddress) {
         throw new IllegalStateException("not supported for UDP");
     }
-
 }

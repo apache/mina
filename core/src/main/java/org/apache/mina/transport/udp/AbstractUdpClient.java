@@ -29,7 +29,7 @@ import org.apache.mina.service.client.AbstractIoClient;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 
 /**
- * TODO
+ * Base class for UDP based Clients
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
