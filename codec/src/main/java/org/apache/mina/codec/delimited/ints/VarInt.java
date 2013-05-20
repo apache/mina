@@ -128,12 +128,12 @@ public class VarInt {
 
         @Override
         public void writeTo(Integer message, ByteBuffer buffer) {
-            // VarInts don't support negative values
-            if (message < 0) {
-                message = 0;
-            }
-
             int value = message;
+
+            // VarInts don't support negative values
+            if (value < 0) {
+                value = 0;
+            }
 
             while (value > 0x7f) {
                 buffer.put((byte) ((value & 0x7f) | 0x80));
