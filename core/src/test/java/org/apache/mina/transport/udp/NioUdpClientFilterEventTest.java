@@ -64,6 +64,8 @@ public class NioUdpClientFilterEventTest {
 
     private final CountDownLatch openLatch = new CountDownLatch(CLIENT_COUNT);
 
+    private final CountDownLatch idleLatch = new CountDownLatch(CLIENT_COUNT);
+
     private final CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
 
     /**
@@ -122,6 +124,9 @@ public class NioUdpClientFilterEventTest {
 
         // test is message was received by the client
         assertTrue(msgReadLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // the session idled
+        assertEquals(CLIENT_COUNT, idleLatch.getCount());
 
         // close the session
         assertEquals(CLIENT_COUNT, closedLatch.getCount());
@@ -189,6 +194,7 @@ public class NioUdpClientFilterEventTest {
         @Override
         public void sessionIdle(IoSession session, IdleStatus status) {
             LOG.info("** session idle {}", session);
+            idleLatch.countDown();
             session.close(true);
         }
     }
