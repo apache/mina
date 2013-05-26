@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
@@ -111,7 +110,7 @@ public class IndexedIdleChekerTest {
         int writeIdleCount = 0;
 
         private DummySession(IoService service, IdleChecker checker) {
-            super(service, null, checker);
+            super(service, checker);
         }
 
         @Override
@@ -196,33 +195,8 @@ public class IndexedIdleChekerTest {
             return false;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
-        protected void channelClose() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void flushWriteQueue() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected int writeDirect(Object message) {
-            return 0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew) {
+        public WriteRequest enqueueWriteRequest(WriteRequest writeRequest) {
             return null;
         }
     }

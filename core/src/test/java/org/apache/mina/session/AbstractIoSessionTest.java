@@ -18,17 +18,9 @@
  */
 package org.apache.mina.session;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -52,7 +44,7 @@ public class AbstractIoSessionTest {
 
     private class DummySession extends AbstractIoSession {
         private DummySession(final IoService service) {
-            super(service, null, null);
+            super(service, null);
         }
 
         @Override
@@ -121,34 +113,8 @@ public class AbstractIoSessionTest {
             return false;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
-        protected void channelClose() {
-
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void flushWriteQueue() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected int writeDirect(Object message) {
-            return 0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew) {
+        public WriteRequest enqueueWriteRequest(WriteRequest writeRequest) {
             return null;
         }
     }
