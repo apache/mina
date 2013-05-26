@@ -60,10 +60,10 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
      */
     @Override
     public CoapMessage decode(ByteBuffer input, Void context) {
-        // LOG.debug("decode");
+        LOG.debug("decode");
 
         if (input.remaining() <= 0) {
-            // LOG.debug("nothing to decode");
+            LOG.debug("nothing to decode");
             return null;
         }
         int byte0 = input.get() & 0xFF;
@@ -142,7 +142,7 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
             return value;
         } else if (value == 13) {
             // if (LOG.isDebugEnabled()) {
-            int val = input.get(input.position()) & 0xFF;
+            // int val = input.get(input.position()) & 0xFF;
             // LOG.debug("byte : {}", val);
             // }
             return (input.get() & 0xFF) + 13;

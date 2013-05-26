@@ -55,7 +55,7 @@ public class CoapEncoder implements StatelessProtocolEncoder<CoapMessage, ByteBu
     @Override
     public ByteBuffer encode(CoapMessage message, Void context) {
 
-        // LOG.debug("encoding {}", message);
+        LOG.debug("encoding {}", message);
 
         // compute size of the needed buffer
         int size = HEADER_SIZE + message.getToken().length;
