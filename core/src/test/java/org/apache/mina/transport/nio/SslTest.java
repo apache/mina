@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.tcp;
+package org.apache.mina.transport.nio;
 
 import static org.junit.Assert.assertTrue;
 

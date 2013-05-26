@@ -23,10 +23,12 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.DatagramChannel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.mina.api.IdleStatus;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
@@ -60,12 +62,23 @@ public class BioUdpServer extends AbstractUdpServer {
     // list of all the sessions by remote socket address
     private final Map<SocketAddress /* remote socket address */, BioUdpSession> sessions = new ConcurrentHashMap<SocketAddress, BioUdpSession>();
 
+    /**
+     * Create an UDP server
+     */
+    public BioUdpServer() {
+        super(null);
+    }
+
     public BioUdpServer(IoHandlerExecutor executor) {
         super(executor);
     }
 
     public BioUdpServer(UdpSessionConfig config, IoHandlerExecutor executor) {
         super(config, executor);
+    }
+
+    public DatagramChannel getDatagramChannel() {
+        return channel;
     }
 
     @Override
@@ -109,6 +122,7 @@ public class BioUdpServer extends AbstractUdpServer {
         worker = new Worker();
         bound = true;
         worker.start();
+        idleChecker.start();
     }
 
     @Override
@@ -123,9 +137,10 @@ public class BioUdpServer extends AbstractUdpServer {
         }
         bound = false;
         try {
-            worker.join();
             channel.close();
             boundAddress = null;
+            idleChecker.destroy();
+            worker.join();
         } catch (InterruptedException e) {
             LOG.error("exception", e);
         }
@@ -133,6 +148,10 @@ public class BioUdpServer extends AbstractUdpServer {
     }
 
     private class Worker extends Thread {
+
+        public Worker() {
+            super("BioUdpServerWorker");
+        }
 
         @Override
         public void run() {
@@ -148,13 +167,22 @@ public class BioUdpServer extends AbstractUdpServer {
                         // create the session
                         session = new BioUdpSession(from, BioUdpServer.this, idleChecker);
                         sessions.put(from, session);
-
+                        session.getConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE,
+                                config.getIdleTimeInMillis(IdleStatus.READ_IDLE));
+                        session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE,
+                                config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
+                        idleChecker.sessionWritten(session, System.currentTimeMillis());
                         // fire open
                         session.processSessionOpen();
+
                     }
                     rcvdBuffer.flip();
                     session.processMessageReceived(rcvdBuffer);
-
+                    // Update the session idle status
+                    idleChecker.sessionRead(session, System.currentTimeMillis());
+                } catch (AsynchronousCloseException aec) {
+                    LOG.debug("closed service");
+                    break;
                 } catch (IOException e) {
                     LOG.error("Exception while reading", e);
                 }

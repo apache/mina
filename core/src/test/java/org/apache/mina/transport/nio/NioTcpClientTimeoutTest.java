@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.tcp;
+package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

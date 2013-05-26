@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.udp;
+package org.apache.mina.transport.bio;
 
 import static org.junit.Assert.*;
 
@@ -35,20 +35,18 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.NioUdpServer;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class test the event dispatching of {@link NioUdpServer}.
+ * This class test the event dispatching of {@link BioUdpServer}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioUdpServerFilterEventTest {
+public class BioUdpServerFilterEventTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NioUdpServerFilterEventTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BioUdpServerFilterEventTest.class);
 
     private static final int CLIENT_COUNT = 1;
 
@@ -62,10 +60,9 @@ public class NioUdpServerFilterEventTest {
 
     private CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
 
-    @Ignore
     @Test
     public void generate_all_kind_of_server_event() throws IOException, InterruptedException {
-        final NioUdpServer server = new NioUdpServer();
+        final BioUdpServer server = new BioUdpServer();
         server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 2000);
         server.setFilters(new MyCodec(), new Handler());
         server.bind(0);

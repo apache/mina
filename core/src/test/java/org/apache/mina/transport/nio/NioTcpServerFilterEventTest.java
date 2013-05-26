@@ -17,42 +17,40 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.tcp;
+package org.apache.mina.transport.nio;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.api.AbstractIoFilter;
-import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.NioTcpClient;
+import org.apache.mina.transport.nio.FixedSelectorLoopPool;
+import org.apache.mina.transport.nio.NioTcpServer;
+import org.apache.mina.transport.nio.SelectorLoopPool;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class test the event dispatching of {@link NioTcpClient}.
+ * This class test the event dispatching of {@link NioTcpServer}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioTcpClientFilterEventTest {
+public class NioTcpServerFilterEventTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NioTcpClientFilterEventTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerFilterEventTest.class);
 
-    private static final int CLIENT_COUNT = 10;
+    private static final int CLIENT_COUNT = 100;
 
     private static final int WAIT_TIME = 30000;
 
@@ -64,49 +62,37 @@ public class NioTcpClientFilterEventTest {
 
     private final CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
 
-    /**
-     * Create an old IO server and use a bunch of MINA client on it. Test if the events occurs correctly in the
-     * different IoFilters.
-     */
     @Test
-    public void generate_all_kind_of_client_event() throws IOException, InterruptedException, ExecutionException {
-        NioTcpClient client = new NioTcpClient();
-        client.setFilters(new MyCodec(), new Handler());
-
-        ServerSocket serverSocket = new ServerSocket();
-        serverSocket.bind(null);
-        int port = serverSocket.getLocalPort();
-
+    public void generate_all_kind_of_server_event() throws IOException, InterruptedException {
+        final NioTcpServer server = new NioTcpServer();
+        server.setFilters(new MyCodec(), new Handler());
+        server.bind(0);
         // warm up
         Thread.sleep(100);
-        final long t0 = System.currentTimeMillis();
 
-        // now connect the clients
+        long t0 = System.currentTimeMillis();
+        final int port = server.getServerSocketChannel().socket().getLocalPort();
 
-        List<IoFuture<IoSession>> cf = new ArrayList<IoFuture<IoSession>>();
+        final Socket[] clients = new Socket[CLIENT_COUNT];
+
+        // connect some clients
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            cf.add(client.connect(new InetSocketAddress("localhost", port)));
-        }
-
-        Socket[] clientSockets = new Socket[CLIENT_COUNT];
-        for (int i = 0; i < CLIENT_COUNT; i++) {
-            clientSockets[i] = serverSocket.accept();
+            // System.out.println("Creation client " + i);
+            try {
+                clients[i] = new Socket("127.0.0.1", port);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Creation client " + i + " failed");
+            }
         }
 
         // does the session open message was fired ?
         assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
-        // gather sessions from futures
-        IoSession[] sessions = new IoSession[CLIENT_COUNT];
-        for (int i = 0; i < CLIENT_COUNT; i++) {
-            sessions[i] = cf.get(i).get();
-            assertNotNull(sessions[i]);
-        }
-
         // write some messages
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            clientSockets[i].getOutputStream().write(("test:" + i).getBytes());
-            clientSockets[i].getOutputStream().flush();
+            clients[i].getOutputStream().write(("test:" + i).getBytes());
+            clients[i].getOutputStream().flush();
         }
 
         // test is message was received by the server
@@ -119,7 +105,7 @@ public class NioTcpClientFilterEventTest {
         final byte[] buffer = new byte[1024];
 
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            final int bytes = clientSockets[i].getInputStream().read(buffer);
+            final int bytes = clients[i].getInputStream().read(buffer);
             final String text = new String(buffer, 0, bytes);
             assertEquals("test:" + i, text);
         }
@@ -127,7 +113,7 @@ public class NioTcpClientFilterEventTest {
         // close the session
         assertEquals(CLIENT_COUNT, closedLatch.getCount());
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            clientSockets[i].close();
+            clients[i].close();
         }
 
         // does the session close event was fired ?
@@ -137,7 +123,72 @@ public class NioTcpClientFilterEventTest {
 
         System.out.println("Delta = " + (t1 - t0));
 
-        serverSocket.close();
+        server.unbind();
+    }
+
+    /**
+     * A test that creates 50 clients, each one of them writing one message. We will check that for each client we
+     * correctly process the sessionOpened, messageReceived, messageSent and sessionClosed events. We use only one
+     * selector to process all the OP events.
+     */
+    @Test
+    public void generateAllKindOfServerEventOneSelector() throws IOException, InterruptedException {
+        SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool("Server", 1);
+        final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool, null);
+        server.setFilters(new MyCodec(), new Handler());
+        server.bind(0);
+        // warm up
+        Thread.sleep(100);
+
+        long t0 = System.currentTimeMillis();
+        final int port = server.getServerSocketChannel().socket().getLocalPort();
+
+        final Socket[] clients = new Socket[CLIENT_COUNT];
+
+        // connect some clients
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            // System.out.println("Creation client 2 " + i);
+            clients[i] = new Socket("127.0.0.1", port);
+        }
+
+        // does the session open message was fired ?
+        assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // write some messages
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            clients[i].getOutputStream().write(("test:" + i).getBytes());
+            clients[i].getOutputStream().flush();
+        }
+
+        // test is message was received by the server
+        assertTrue(msgReadLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // does response was wrote and sent ?
+        assertTrue(msgSentLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        // read the echos
+        final byte[] buffer = new byte[1024];
+
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            final int bytes = clients[i].getInputStream().read(buffer);
+            final String text = new String(buffer, 0, bytes);
+            assertEquals("test:" + i, text);
+        }
+
+        // close the session
+        assertEquals(CLIENT_COUNT, closedLatch.getCount());
+        for (int i = 0; i < CLIENT_COUNT; i++) {
+            clients[i].close();
+        }
+
+        // does the session close event was fired ?
+        assertTrue(closedLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+
+        long t1 = System.currentTimeMillis();
+
+        System.out.println("Delta = " + (t1 - t0));
+
+        server.unbind();
     }
 
     private class MyCodec extends AbstractIoFilter {

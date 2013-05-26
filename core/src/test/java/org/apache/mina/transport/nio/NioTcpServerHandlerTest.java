@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.tcp;
+package org.apache.mina.transport.nio;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -29,11 +29,10 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.api.AbstractIoFilter;
+import org.apache.mina.api.AbstractIoHandler;
+import org.apache.mina.api.IdleStatus;
+import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.filterchain.ReadFilterChainController;
-import org.apache.mina.filterchain.WriteFilterChainController;
-import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.nio.FixedSelectorLoopPool;
 import org.apache.mina.transport.nio.NioTcpServer;
 import org.apache.mina.transport.nio.SelectorLoopPool;
@@ -42,17 +41,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class test the event dispatching of {@link NioTcpServer}.
+ * This class test the event dispatching of {@link NioTcpServer}. It tests if alls the {@link IoHandler} events are
+ * correctly generated.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioTcpServerFilterEventTest {
+public class NioTcpServerHandlerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerFilterEventTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerHandlerTest.class);
 
     private static final int CLIENT_COUNT = 100;
 
-    private static final int WAIT_TIME = 30000;
+    private static final int WAIT_TIME = 5000;
 
     private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 
@@ -62,28 +62,26 @@ public class NioTcpServerFilterEventTest {
 
     private final CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
 
+    private final CountDownLatch idleLatch = new CountDownLatch(CLIENT_COUNT);
+
     @Test
     public void generate_all_kind_of_server_event() throws IOException, InterruptedException {
         final NioTcpServer server = new NioTcpServer();
-        server.setFilters(new MyCodec(), new Handler());
+        server.setFilters();
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 1000);
+        server.setIoHandler(new Handler());
         server.bind(0);
+
         // warm up
         Thread.sleep(100);
 
-        long t0 = System.currentTimeMillis();
         final int port = server.getServerSocketChannel().socket().getLocalPort();
 
         final Socket[] clients = new Socket[CLIENT_COUNT];
 
         // connect some clients
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            // System.out.println("Creation client " + i);
-            try {
-                clients[i] = new Socket("127.0.0.1", port);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Creation client " + i + " failed");
-            }
+            clients[i] = new Socket("127.0.0.1", port);
         }
 
         // does the session open message was fired ?
@@ -110,6 +108,9 @@ public class NioTcpServerFilterEventTest {
             assertEquals("test:" + i, text);
         }
 
+        // does the session idle event was fired ?
+        assertTrue(idleLatch.await(5 * WAIT_TIME, TimeUnit.MILLISECONDS));
+
         // close the session
         assertEquals(CLIENT_COUNT, closedLatch.getCount());
         for (int i = 0; i < CLIENT_COUNT; i++) {
@@ -119,35 +120,26 @@ public class NioTcpServerFilterEventTest {
         // does the session close event was fired ?
         assertTrue(closedLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
-        long t1 = System.currentTimeMillis();
-
-        System.out.println("Delta = " + (t1 - t0));
-
         server.unbind();
     }
 
-    /**
-     * A test that creates 50 clients, each one of them writing one message. We will check that for each client we
-     * correctly process the sessionOpened, messageReceived, messageSent and sessionClosed events. We use only one
-     * selector to process all the OP events.
-     */
     @Test
     public void generateAllKindOfServerEventOneSelector() throws IOException, InterruptedException {
         SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool("Server", 1);
         final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool, null);
-        server.setFilters(new MyCodec(), new Handler());
+        server.setFilters();
+        server.setIoHandler(new Handler());
         server.bind(0);
+
         // warm up
         Thread.sleep(100);
 
-        long t0 = System.currentTimeMillis();
         final int port = server.getServerSocketChannel().socket().getLocalPort();
 
         final Socket[] clients = new Socket[CLIENT_COUNT];
 
         // connect some clients
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            // System.out.println("Creation client 2 " + i);
             clients[i] = new Socket("127.0.0.1", port);
         }
 
@@ -184,61 +176,47 @@ public class NioTcpServerFilterEventTest {
         // does the session close event was fired ?
         assertTrue(closedLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
-        long t1 = System.currentTimeMillis();
-
-        System.out.println("Delta = " + (t1 - t0));
-
         server.unbind();
     }
 
-    private class MyCodec extends AbstractIoFilter {
-
-        @Override
-        public void messageReceived(final IoSession session, final Object message,
-                final ReadFilterChainController controller) {
-            if (message instanceof ByteBuffer) {
-                final ByteBuffer in = (ByteBuffer) message;
-                final byte[] buffer = new byte[in.remaining()];
-                in.get(buffer);
-                controller.callReadNextFilter(new String(buffer));
-            } else {
-                fail();
-            }
-        }
-
-        @Override
-        public void messageWriting(IoSession session, WriteRequest writeRequest, WriteFilterChainController controller) {
-            writeRequest.setMessage(ByteBuffer.wrap(writeRequest.getMessage().toString().getBytes()));
-            controller.callWriteNextFilter(writeRequest);
-        }
-    }
-
-    private class Handler extends AbstractIoFilter {
+    private class Handler extends AbstractIoHandler {
 
         @Override
         public void sessionOpened(final IoSession session) {
-            LOG.info("** session open");
+            LOG.debug("** session open");
             openLatch.countDown();
         }
 
         @Override
         public void sessionClosed(final IoSession session) {
-            LOG.info("** session closed");
+            LOG.debug("** session closed");
             closedLatch.countDown();
         }
 
         @Override
-        public void messageReceived(final IoSession session, final Object message,
-                final ReadFilterChainController controller) {
-            LOG.info("** message received {}", message);
+        public void messageReceived(final IoSession session, final Object message) {
+            LOG.debug("** message received {}", message);
             msgReadLatch.countDown();
-            session.write(message.toString());
+            if (message instanceof ByteBuffer) {
+                ByteBuffer msg = (ByteBuffer) message;
+                session.write(ByteBuffer.allocate(msg.remaining()).put(msg).flip());
+            } else {
+                fail("non bytebuffer received??");
+            }
         }
 
         @Override
         public void messageSent(final IoSession session, final Object message) {
-            LOG.info("** message sent {}", message);
+            LOG.debug("** message sent {}", message);
             msgSentLatch.countDown();
         }
+
+        @Override
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            if (status == IdleStatus.READ_IDLE) {
+                idleLatch.countDown();
+            }
+        }
     }
+
 }

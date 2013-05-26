@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.mina.transport.tcp;
+package org.apache.mina.transport.nio;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,6 +33,7 @@ import java.net.SocketException;
 
 import org.apache.mina.api.ConfigurationException;
 import org.apache.mina.api.IdleStatus;
+import org.apache.mina.transport.tcp.ProxyTcpSessionConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
