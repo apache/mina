@@ -29,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.transport.nio.tcp.NioTcpClient;
-import org.apache.mina.transport.nio.tcp.NioTcpServer;
+import org.apache.mina.transport.nio.NioTcpClient;
+import org.apache.mina.transport.nio.NioTcpServer;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

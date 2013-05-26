@@ -17,16 +17,36 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.nio;
+package org.apache.mina.transport;
 
-import java.nio.channels.SelectionKey;
+import java.util.concurrent.Future;
+
+import org.apache.mina.api.IoSession;
+import org.apache.mina.util.AbstractIoFuture;
 
 /**
- * To be used with {@link NioSelectorLoop} for being informed when the {@link SelectionKey} was created and registered.
+ * {@link Future} for waiting session connection.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface RegistrationCallback {
+public class ConnectFuture extends AbstractIoFuture<IoSession> {
 
-    void done(SelectionKey selectionKey);
+    @Override
+    protected boolean cancelOwner(boolean mayInterruptIfRunning) {
+        return false;
+    }
+
+    /**
+     * session connected
+     */
+    public void complete(IoSession session) {
+        setResult(session);
+    }
+
+    /**
+     * connection error
+     */
+    public void error(Exception e) {
+        setException(e);
+    }
 }

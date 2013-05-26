@@ -32,7 +32,7 @@ import org.apache.mina.coap.MessageType;
 import org.apache.mina.coap.codec.CoapDecoder;
 import org.apache.mina.coap.codec.CoapEncoder;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.transport.nio.udp.NioUdpServer;
+import org.apache.mina.transport.nio.NioUdpServer;
 
 /**
  * A simple CoAP UDP server answering to GET requests
@@ -93,6 +93,9 @@ public class CoapGetServer {
                             msg.getToken(), new CoapOption[] { new CoapOption(CoapOptionType.CONTENT_FORMAT,
                                     new byte[] { 0 }) }, "hello coap !".getBytes());
                     session.write(response);
+                    System.err.println("closing");
+                    // session.close(false);
+                    System.err.println("done!");
                 }
             }
 

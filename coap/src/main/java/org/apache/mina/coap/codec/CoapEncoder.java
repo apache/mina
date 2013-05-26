@@ -55,7 +55,7 @@ public class CoapEncoder implements StatelessProtocolEncoder<CoapMessage, ByteBu
     @Override
     public ByteBuffer encode(CoapMessage message, Void context) {
 
-        LOG.debug("encoding {}", message);
+        // LOG.debug("encoding {}", message);
 
         // compute size of the needed buffer
         int size = HEADER_SIZE + message.getToken().length;
@@ -94,7 +94,7 @@ public class CoapEncoder implements StatelessProtocolEncoder<CoapMessage, ByteBu
             size += message.getPayload().length;
         }
 
-        LOG.debug("computed size : {}", size);
+        // LOG.debug("computed size : {}", size);
         ByteBuffer buffer = ByteBuffer.allocate(size);
 
         buffer.order(ByteOrder.BIG_ENDIAN);
@@ -110,14 +110,14 @@ public class CoapEncoder implements StatelessProtocolEncoder<CoapMessage, ByteBu
         int lastOptCode = 0;
 
         for (CoapOption opt : message.getOptions()) {
-            LOG.debug("encode option {}", opt);
+            // LOG.debug("encode option {}", opt);
             int optionDelta = opt.getType().getCode() - lastOptCode;
             int deltaQuartet = getQuartet(optionDelta);
             int optionLength = opt.getData().length;
 
             int optionQuartet = getQuartet(optionLength);
 
-            LOG.debug("optionQuartet : {}", optionQuartet);
+            // LOG.debug("optionQuartet : {}", optionQuartet);
 
             buffer.put((byte) ((deltaQuartet << 4) | optionQuartet));
 
@@ -128,11 +128,11 @@ public class CoapEncoder implements StatelessProtocolEncoder<CoapMessage, ByteBu
                 buffer.putShort((short) (optionDelta - 269));
             }
 
-            LOG.debug("option length : {}", optionLength);
+            // LOG.debug("option length : {}", optionLength);
             if (optionQuartet == 13) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("length byte : " + (optionLength - 13));
-                }
+                // if (LOG.isDebugEnabled()) {
+                // LOG.debug("length byte : " + (optionLength - 13));
+                // }
                 buffer.put((byte) (optionLength - 13));
             } else if (optionQuartet == 14) {
                 buffer.putShort((short) (optionLength - 269));

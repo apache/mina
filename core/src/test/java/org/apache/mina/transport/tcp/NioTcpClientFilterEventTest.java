@@ -38,7 +38,7 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.tcp.NioTcpClient;
+import org.apache.mina.transport.nio.NioTcpClient;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

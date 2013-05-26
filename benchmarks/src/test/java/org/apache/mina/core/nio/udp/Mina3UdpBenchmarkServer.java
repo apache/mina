@@ -29,7 +29,7 @@ import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
 import org.apache.mina.session.AttributeKey;
-import org.apache.mina.transport.nio.udp.NioUdpServer;
+import org.apache.mina.transport.nio.NioUdpServer;
 import org.apache.mina.transport.udp.DefaultUdpSessionConfig;
 import org.apache.mina.transport.udp.UdpSessionConfig;
 
@@ -60,15 +60,18 @@ public class Mina3UdpBenchmarkServer implements BenchmarkServer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void start(int port) throws IOException {
         UdpSessionConfig config = new DefaultUdpSessionConfig();
         config.setReadBufferSize(65536);
         udpServer = new NioUdpServer(config);
         udpServer.setIoHandler(new IoHandler() {
+            @Override
             public void sessionOpened(IoSession session) {
                 session.setAttribute(STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
             }
 
+            @Override
             public void messageReceived(IoSession session, Object message) {
                 //System.out.println("Server Message received : " + message);
                 if (message instanceof ByteBuffer) {
@@ -121,6 +124,7 @@ public class Mina3UdpBenchmarkServer implements BenchmarkServer {
                 }
             }
 
+            @Override
             public void exceptionCaught(IoSession session, Exception cause) {
                 cause.printStackTrace();
             }
@@ -153,6 +157,7 @@ public class Mina3UdpBenchmarkServer implements BenchmarkServer {
     /**
      * {@inheritedDoc}
      */
+    @Override
     public void stop() throws IOException {
         udpServer.unbind();
     }

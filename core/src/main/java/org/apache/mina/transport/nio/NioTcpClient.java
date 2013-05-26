@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.nio.tcp;
+package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -31,12 +31,7 @@ import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
-import org.apache.mina.transport.nio.ConnectFuture;
-import org.apache.mina.transport.nio.FixedSelectorLoopPool;
-import org.apache.mina.transport.nio.NioSelectorLoop;
-import org.apache.mina.transport.nio.RegistrationCallback;
-import org.apache.mina.transport.nio.SelectorLoop;
-import org.apache.mina.transport.nio.SelectorLoopPool;
+import org.apache.mina.transport.ConnectFuture;
 import org.apache.mina.transport.tcp.AbstractTcpClient;
 import org.apache.mina.transport.tcp.TcpSessionConfig;
 import org.apache.mina.util.Assert;

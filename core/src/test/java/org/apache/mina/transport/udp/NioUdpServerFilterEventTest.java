@@ -17,83 +17,84 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.tcp;
+package org.apache.mina.transport.udp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.api.AbstractIoFilter;
+import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.FixedSelectorLoopPool;
-import org.apache.mina.transport.nio.NioTcpServer;
-import org.apache.mina.transport.nio.SelectorLoopPool;
+import org.apache.mina.transport.nio.NioUdpServer;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class test the event dispatching of {@link NioTcpServer}.
+ * This class test the event dispatching of {@link NioUdpServer}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioTcpServerFilterEventTest {
+public class NioUdpServerFilterEventTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NioTcpServerFilterEventTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NioUdpServerFilterEventTest.class);
 
-    private static final int CLIENT_COUNT = 100;
+    private static final int CLIENT_COUNT = 1;
 
-    private static final int WAIT_TIME = 30000;
+    private static final int WAIT_TIME = 10000;
 
-    private final CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
+    private CountDownLatch msgSentLatch = new CountDownLatch(CLIENT_COUNT);
 
-    private final CountDownLatch msgReadLatch = new CountDownLatch(CLIENT_COUNT);
+    private CountDownLatch msgReadLatch = new CountDownLatch(CLIENT_COUNT);
 
-    private final CountDownLatch openLatch = new CountDownLatch(CLIENT_COUNT);
+    private CountDownLatch openLatch = new CountDownLatch(CLIENT_COUNT);
 
-    private final CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
+    private CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
 
     @Test
     public void generate_all_kind_of_server_event() throws IOException, InterruptedException {
-        final NioTcpServer server = new NioTcpServer();
+        final NioUdpServer server = new NioUdpServer();
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 2000);
         server.setFilters(new MyCodec(), new Handler());
         server.bind(0);
         // warm up
         Thread.sleep(100);
 
         long t0 = System.currentTimeMillis();
-        final int port = server.getServerSocketChannel().socket().getLocalPort();
+        final int port = server.getDatagramChannel().socket().getLocalPort();
 
-        final Socket[] clients = new Socket[CLIENT_COUNT];
+        System.err.println("port : " + port);
+        final DatagramSocket[] clients = new DatagramSocket[CLIENT_COUNT];
 
+        InetSocketAddress serverAddy = new InetSocketAddress("127.0.0.1", port);
         // connect some clients
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            // System.out.println("Creation client " + i);
             try {
-                clients[i] = new Socket("127.0.0.1", port);
+                clients[i] = new DatagramSocket();
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("Creation client " + i + " failed");
             }
         }
 
-        // does the session open message was fired ?
-        assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
-
         // write some messages
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            clients[i].getOutputStream().write(("test:" + i).getBytes());
-            clients[i].getOutputStream().flush();
+            byte[] data = ("test:" + i).getBytes();
+            clients[i].send(new DatagramPacket(data, data.length, serverAddy));
         }
+
+        // does the session open message was fired ?
+        assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
         // test is message was received by the server
         assertTrue(msgReadLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
@@ -105,75 +106,25 @@ public class NioTcpServerFilterEventTest {
         final byte[] buffer = new byte[1024];
 
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            final int bytes = clients[i].getInputStream().read(buffer);
-            final String text = new String(buffer, 0, bytes);
+            DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+            clients[i].receive(dp);
+            final String text = new String(buffer, 0, dp.getLength());
             assertEquals("test:" + i, text);
         }
 
-        // close the session
-        assertEquals(CLIENT_COUNT, closedLatch.getCount());
+        msgReadLatch = new CountDownLatch(CLIENT_COUNT);
+
+        // try again
+        // write some messages again
         for (int i = 0; i < CLIENT_COUNT; i++) {
-            clients[i].close();
-        }
-
-        // does the session close event was fired ?
-        assertTrue(closedLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
-
-        long t1 = System.currentTimeMillis();
-
-        System.out.println("Delta = " + (t1 - t0));
-
-        server.unbind();
-    }
-
-    /**
-     * A test that creates 50 clients, each one of them writing one message. We will check that for each client we
-     * correctly process the sessionOpened, messageReceived, messageSent and sessionClosed events. We use only one
-     * selector to process all the OP events.
-     */
-    @Test
-    public void generateAllKindOfServerEventOneSelector() throws IOException, InterruptedException {
-        SelectorLoopPool selectorLoopPool = new FixedSelectorLoopPool("Server", 1);
-        final NioTcpServer server = new NioTcpServer(selectorLoopPool.getSelectorLoop(), selectorLoopPool, null);
-        server.setFilters(new MyCodec(), new Handler());
-        server.bind(0);
-        // warm up
-        Thread.sleep(100);
-
-        long t0 = System.currentTimeMillis();
-        final int port = server.getServerSocketChannel().socket().getLocalPort();
-
-        final Socket[] clients = new Socket[CLIENT_COUNT];
-
-        // connect some clients
-        for (int i = 0; i < CLIENT_COUNT; i++) {
-            // System.out.println("Creation client 2 " + i);
-            clients[i] = new Socket("127.0.0.1", port);
-        }
-
-        // does the session open message was fired ?
-        assertTrue(openLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
-
-        // write some messages
-        for (int i = 0; i < CLIENT_COUNT; i++) {
-            clients[i].getOutputStream().write(("test:" + i).getBytes());
-            clients[i].getOutputStream().flush();
+            byte[] data = ("test:" + i).getBytes();
+            clients[i].send(new DatagramPacket(data, data.length, serverAddy));
         }
 
         // test is message was received by the server
         assertTrue(msgReadLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
 
-        // does response was wrote and sent ?
-        assertTrue(msgSentLatch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
-
-        // read the echos
-        final byte[] buffer = new byte[1024];
-
-        for (int i = 0; i < CLIENT_COUNT; i++) {
-            final int bytes = clients[i].getInputStream().read(buffer);
-            final String text = new String(buffer, 0, bytes);
-            assertEquals("test:" + i, text);
-        }
+        // wait echo
 
         // close the session
         assertEquals(CLIENT_COUNT, closedLatch.getCount());
@@ -239,6 +190,12 @@ public class NioTcpServerFilterEventTest {
         public void messageSent(final IoSession session, final Object message) {
             LOG.info("** message sent {}", message);
             msgSentLatch.countDown();
+        }
+
+        @Override
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            LOG.info("** sesssion idle {}", session);
+            session.close(false);
         }
     }
 }

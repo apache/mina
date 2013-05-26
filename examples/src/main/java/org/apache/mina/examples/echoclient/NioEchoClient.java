@@ -29,7 +29,7 @@ import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.examples.echoserver.NioEchoServer;
-import org.apache.mina.transport.nio.tcp.NioTcpClient;
+import org.apache.mina.transport.nio.NioTcpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

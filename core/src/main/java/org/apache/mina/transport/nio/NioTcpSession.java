@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.nio.tcp;
+package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -28,13 +28,8 @@ import java.nio.channels.SocketChannel;
 
 import org.apache.mina.api.IoService;
 import org.apache.mina.service.idlechecker.IdleChecker;
-import org.apache.mina.session.AbstractIoSession;
-import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.ConnectFuture;
-import org.apache.mina.transport.nio.RegistrationCallback;
-import org.apache.mina.transport.nio.SelectorListener;
-import org.apache.mina.transport.nio.SelectorLoop;
+import org.apache.mina.transport.ConnectFuture;
 import org.apache.mina.transport.tcp.ProxyTcpSessionConfig;
 import org.apache.mina.transport.tcp.TcpSessionConfig;
 import org.slf4j.Logger;
@@ -47,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class NioTcpSession extends AbstractIoSession implements SelectorListener {
+public class NioTcpSession extends AbstractNioSession implements SelectorListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioTcpSession.class);
 

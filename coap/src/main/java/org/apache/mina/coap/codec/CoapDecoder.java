@@ -29,7 +29,6 @@ import org.apache.mina.coap.CoapOptionType;
 import org.apache.mina.coap.MessageType;
 import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.codec.StatelessProtocolDecoder;
-import org.apache.mina.util.ByteBufferDumper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,27 +60,27 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
      */
     @Override
     public CoapMessage decode(ByteBuffer input, Void context) {
-        LOG.debug("decode");
+        // LOG.debug("decode");
 
         if (input.remaining() <= 0) {
-            LOG.debug("nothing to decode");
+            // LOG.debug("nothing to decode");
             return null;
         }
         int byte0 = input.get() & 0xFF;
         int version = (byte0 >> 6) & 0x3;
-        LOG.debug("version : {}", version);
+        // LOG.debug("version : {}", version);
         MessageType type = MessageType.fromCode((byte0 >> 4) & 0x3);
-        LOG.debug("type : {}", type);
+        // LOG.debug("type : {}", type);
         byte[] token = new byte[byte0 & 0xF];
         int code = input.get() & 0xFF;
-        LOG.debug("code : {}", code);
+        // LOG.debug("code : {}", code);
         int id = input.getShort() & 0xFFFF;
-        LOG.debug("id : {}", id);
+        // LOG.debug("id : {}", id);
         input.get(token);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("token : {}", ByteBufferDumper.toHex(ByteBuffer.wrap(token)));
-        }
+        // if (LOG.isDebugEnabled()) {
+        // LOG.debug("token : {}", ByteBufferDumper.toHex(ByteBuffer.wrap(token)));
+        // }
 
         // decode options
         int optionCode = 0;
@@ -92,28 +91,28 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
 
             // start of payload ?
             if (next == 0xFF) {
-                LOG.debug("start of payload");
+                // LOG.debug("start of payload");
                 payload = new byte[input.remaining()];
                 input.get(payload);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("payload : {}", ByteBufferDumper.dump(ByteBuffer.wrap(payload)));
-                }
+                // if (LOG.isDebugEnabled()) {
+                // LOG.debug("payload : {}", ByteBufferDumper.dump(ByteBuffer.wrap(payload)));
+                // }
                 break;
             } else {
                 int optionDeltaQuartet = (next >> 4) & 0xF;
 
                 // decode the option type
                 optionCode += optionFromQuartet(optionDeltaQuartet, input);
-                LOG.debug("optionCode : {}", optionCode);
+                // LOG.debug("optionCode : {}", optionCode);
 
                 // decode the option length
                 int optionLenQuartet = next & 0x0F;
                 int optionLength = optionFromQuartet(optionLenQuartet, input);
-                LOG.debug("optionLength : {}", optionLength);
+                // LOG.debug("optionLength : {}", optionLength);
 
                 // create the option DTO
                 CoapOptionType optType = CoapOptionType.fromCode(optionCode);
-                LOG.debug("option type : {}", optType);
+                // LOG.debug("option type : {}", optType);
 
                 // get the value
                 byte[] optionValue = new byte[optionLength];
@@ -138,14 +137,14 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
     }
 
     private int optionFromQuartet(int value, ByteBuffer input) {
-        LOG.debug("quartet value : {}", value);
+        // LOG.debug("quartet value : {}", value);
         if (value < 13) {
             return value;
         } else if (value == 13) {
-            if (LOG.isDebugEnabled()) {
-                int val = input.get(input.position()) & 0xFF;
-                LOG.debug("byte : {}", val);
-            }
+            // if (LOG.isDebugEnabled()) {
+            int val = input.get(input.position()) & 0xFF;
+            // LOG.debug("byte : {}", val);
+            // }
             return (input.get() & 0xFF) + 13;
         } else if (value == 14) {
             return (input.getShort() & 0xFFFF) + 269;

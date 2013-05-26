@@ -42,7 +42,7 @@ import org.apache.mina.http.api.HttpPdu;
 import org.apache.mina.http.api.HttpRequest;
 import org.apache.mina.http.api.HttpStatus;
 import org.apache.mina.http.api.HttpVersion;
-import org.apache.mina.transport.nio.tcp.NioTcpServer;
+import org.apache.mina.transport.nio.NioTcpServer;
 
 public class HttpsTest {
 

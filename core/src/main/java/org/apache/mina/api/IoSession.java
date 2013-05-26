@@ -21,16 +21,15 @@ package org.apache.mina.api;
 
 import java.net.SocketAddress;
 import java.util.Collections;
-import java.util.Queue;
 import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.session.AttributeKey;
-import org.apache.mina.session.SslHelper;
 import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.nio.SelectorLoop;
+import org.apache.mina.transport.nio.SslHelper;
 
 /**
  * A handle which represents a connection between two end-points regardless of transport types.
@@ -363,10 +362,4 @@ public interface IoSession {
      */
     WriteRequest enqueueWriteRequest(WriteRequest writeRequest);
 
-    /**
-     * Get the {@link Queue} of this session. The write queue contains the pending writes.
-     * 
-     * @return the write queue of this session
-     */
-    Queue<WriteRequest> getWriteQueue();
 }

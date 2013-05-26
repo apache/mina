@@ -31,19 +31,19 @@ public class CoapMessage {
 
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[] {};
 
-    private final int version;
+    private int version;
 
-    private final MessageType type;
+    private MessageType type;
 
-    private final int code;
+    private int code;
 
-    private final int id;
+    private int id;
 
-    private final byte[] token;
+    private byte[] token;
 
-    private final byte[] payload;
+    private byte[] payload;
 
-    private final CoapOption[] options;
+    private CoapOption[] options;
 
     /**
      * Create a CoAP message
@@ -186,6 +186,34 @@ public class CoapMessage {
         }
 
         return true;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public void setType(MessageType type) {
+        this.type = type;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setToken(byte[] token) {
+        this.token = token;
+    }
+
+    public void setPayload(byte[] payload) {
+        this.payload = payload;
+    }
+
+    public void setOptions(CoapOption[] options) {
+        this.options = options;
     }
 
 }

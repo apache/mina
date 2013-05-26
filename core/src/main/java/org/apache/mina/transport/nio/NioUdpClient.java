@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.transport.nio.udp;
+package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -28,10 +28,7 @@ import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
-import org.apache.mina.transport.nio.ConnectFuture;
-import org.apache.mina.transport.nio.FixedSelectorLoopPool;
-import org.apache.mina.transport.nio.NioSelectorLoop;
-import org.apache.mina.transport.nio.SelectorLoopPool;
+import org.apache.mina.transport.ConnectFuture;
 import org.apache.mina.transport.udp.AbstractUdpClient;
 import org.apache.mina.transport.udp.UdpSessionConfig;
 import org.apache.mina.util.Assert;

@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.session;
+package org.apache.mina.transport.nio;
 
 import static org.apache.mina.session.AttributeKey.createKey;
 
@@ -36,12 +36,15 @@ import javax.net.ssl.SSLSession;
 import org.apache.mina.api.IoClient;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.api.IoSession.SessionState;
+import org.apache.mina.session.AbstractIoSession;
+import org.apache.mina.session.AttributeKey;
+import org.apache.mina.session.DefaultWriteRequest;
+import org.apache.mina.session.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An helper class used to manage everything related to SSL/TLS establishment
- * and management.
+ * An helper class used to manage everything related to SSL/TLS establishment and management.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -59,15 +62,12 @@ public class SslHelper {
     private final IoSession session;
 
     /**
-     * A session attribute key that should be set to an {@link InetSocketAddress}.
-     * Setting this attribute causes
-     * {@link SSLContext#createSSLEngine(String, int)} to be called passing the
-     * hostname and port of the {@link InetSocketAddress} to get an
-     * {@link SSLEngine} instance. If not set {@link SSLContext#createSSLEngine()}
+     * A session attribute key that should be set to an {@link InetSocketAddress}. Setting this attribute causes
+     * {@link SSLContext#createSSLEngine(String, int)} to be called passing the hostname and port of the
+     * {@link InetSocketAddress} to get an {@link SSLEngine} instance. If not set {@link SSLContext#createSSLEngine()}
      * will be called.<br/>
-     * Using this feature {@link SSLSession} objects may be cached and reused
-     * when in client mode.
-     *
+     * Using this feature {@link SSLSession} objects may be cached and reused when in client mode.
+     * 
      * @see SSLContext#createSSLEngine(String, int)
      */
     public static final AttributeKey<InetSocketAddress> PEER_ADDRESS = createKey(InetSocketAddress.class,
@@ -86,7 +86,7 @@ public class SslHelper {
 
     /**
      * Create a new SSL Handler.
-     *
+     * 
      * @param session The associated session
      */
     public SslHelper(IoSession session, SSLContext sslContext) {
@@ -110,10 +110,10 @@ public class SslHelper {
 
     /**
      * Initialize the SSL handshake.
-     *
+     * 
      * @throws SSLException If the underlying SSLEngine handshake initialization failed
      */
-    /* no qualifier */void init() throws SSLException {
+    public void init() throws SSLException {
         if (sslEngine != null) {
             // We already have a SSL engine created, no need to create a new one
             return;
@@ -176,8 +176,7 @@ public class SslHelper {
     }
 
     /**
-     * Process the NEED_UNWRAP action. We have to read the incoming buffer, and to feed
-     * the application buffer.
+     * Process the NEED_UNWRAP action. We have to read the incoming buffer, and to feed the application buffer.
      */
     private SSLEngineResult unwrap(ByteBuffer inBuffer, ByteBuffer appBuffer) throws SSLException {
         // First work with either the new incoming buffer, or the accumulating buffer
@@ -218,8 +217,7 @@ public class SslHelper {
     }
 
     /**
-     * Process a read ByteBuffer over a secured connection, or during the SSL/TLS
-     * Handshake.
+     * Process a read ByteBuffer over a secured connection, or during the SSL/TLS Handshake.
      * 
      * @param session The session we are processing a read for
      * @param readBuffer The data we get from the channel
@@ -238,8 +236,8 @@ public class SslHelper {
     }
 
     /**
-     * Unwrap a SSL/TLS message. The message might not be encrypted (if we are processing
-     * a Handshake message or an Alert message).
+     * Unwrap a SSL/TLS message. The message might not be encrypted (if we are processing a Handshake message or an
+     * Alert message).
      */
     private void processUnwrap(AbstractIoSession session, ByteBuffer inBuffer) throws SSLException {
         // Blind guess : once uncompressed, the resulting buffer will be 3 times bigger
@@ -292,8 +290,8 @@ public class SslHelper {
     }
 
     /**
-     * Process the SLL/TLS Handshake. We may enter in this method more than once,
-     * as the handshake is a dialogue between the client and the server.
+     * Process the SLL/TLS Handshake. We may enter in this method more than once, as the handshake is a dialogue between
+     * the client and the server.
      */
     private void processHandShake(IoSession session, ByteBuffer inBuffer) throws SSLException {
         // Start the Handshake if we aren't already processing a HandShake
@@ -301,7 +299,7 @@ public class SslHelper {
         HandshakeStatus hsStatus = sslEngine.getHandshakeStatus();
 
         // Initilize the session status when we enter into the Handshake process.
-        // Not that we don't call the SSLEngine.beginHandshake() method  :
+        // Not that we don't call the SSLEngine.beginHandshake() method :
         // It's implicitely done internally by the unwrap() method.
         if (hsStatus == HandshakeStatus.NOT_HANDSHAKING) {
             session.changeState(SessionState.SECURING);
@@ -382,6 +380,7 @@ public class SslHelper {
 
     /**
      * Process the application data encryption for a session.
+     * 
      * @param session The session sending encrypted data to the peer.
      * @param message The message to encrypt
      * @param writeQueue The queue in which the encrypted buffer will be written

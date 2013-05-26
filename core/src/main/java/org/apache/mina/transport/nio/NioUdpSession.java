@@ -17,23 +17,17 @@
  * under the License.
  */
 
-package org.apache.mina.transport.nio.udp;
+package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
-import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.service.idlechecker.IdleChecker;
-import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.NioSelectorLoop;
-import org.apache.mina.transport.nio.SelectorListener;
-import org.apache.mina.transport.nio.SelectorLoop;
 import org.apache.mina.transport.udp.UdpSessionConfig;
-import org.apache.mina.util.AbstractIoFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioUdpSession extends AbstractIoSession implements SelectorListener {
+public class NioUdpSession extends AbstractNioSession implements SelectorListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NioUdpSession.class);
 
@@ -57,19 +51,6 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
 
     /** the socket configuration */
     private final UdpSessionConfig configuration;
-
-    /** we pre-allocate a close future for lock-less {@link #close(boolean)} */
-    private final IoFuture<Void> closeFuture = new AbstractIoFuture<Void>() {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected boolean cancelOwner(boolean mayInterruptIfRunning) {
-            // we don't cancel close
-            return false;
-        }
-    };
 
     /**
      * For server handled UDP sessions
@@ -121,7 +102,9 @@ public class NioUdpSession extends AbstractIoSession implements SelectorListener
     @Override
     public void flushWriteQueue() {
         // register for write
-        selectorLoop.modifyRegistration(false, !isReadSuspended(), true, this, channel, true);
+        if (selectorLoop != null) {
+            selectorLoop.modifyRegistration(false, !isReadSuspended(), true, this, channel, true);
+        }
     }
 
     /**

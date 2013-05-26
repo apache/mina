@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.transport.nio.tcp.NioTcpServer;
+import org.apache.mina.transport.nio.NioTcpServer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
