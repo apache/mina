@@ -34,6 +34,7 @@ import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoHandler;
+import org.apache.mina.api.IoServer;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.api.IoSessionConfig;
@@ -784,4 +785,52 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         readChainPosition--;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        if (isConnected() || isClosing()) {
+            String remote = null;
+            String local = null;
+
+            try {
+                remote = String.valueOf(getRemoteAddress());
+            } catch (Throwable t) {
+                remote = "Cannot get the remote address informations: " + t.getMessage();
+            }
+
+            try {
+                local = String.valueOf(getLocalAddress());
+            } catch (Throwable t) {
+                local = "Cannot get the local address informations: " + t.getMessage();
+            }
+
+            if (getService() instanceof IoServer) {
+                return "(" + getIdAsString() + ": " + getServiceName() + ", server, " + remote + " => " + local + ')';
+            }
+
+            return "(" + getIdAsString() + ": " + getServiceName() + ", client, " + local + " => " + remote + ')';
+        }
+
+        return "(" + getIdAsString() + ") Session disconnected ...";
+    }
+
+    private String getServiceName() {
+        return getService().getClass().getCanonicalName();
+    }
+
+    /** create string for session id padded with 0 */
+    private String getIdAsString() {
+        String id = Long.toHexString(getId()).toUpperCase();
+
+        // Somewhat inefficient, but it won't happen that often
+        // because an ID is often a big integer.
+        while (id.length() < 8) {
+            id = '0' + id; // padding
+        }
+        id = "0x" + id;
+
+        return id;
+    }
 }
