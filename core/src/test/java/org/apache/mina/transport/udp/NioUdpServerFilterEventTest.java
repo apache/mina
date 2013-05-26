@@ -36,6 +36,7 @@ import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.nio.NioUdpServer;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,7 @@ public class NioUdpServerFilterEventTest {
 
     private CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
 
+    @Ignore
     @Test
     public void generate_all_kind_of_server_event() throws IOException, InterruptedException {
         final NioUdpServer server = new NioUdpServer();
