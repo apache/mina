@@ -127,7 +127,7 @@ public class BioUdpServer extends AbstractUdpServer {
 
     @Override
     public void bind(int port) throws IOException {
-        bind(new InetSocketAddress(5683));
+        bind(new InetSocketAddress(port));
     }
 
     @Override
