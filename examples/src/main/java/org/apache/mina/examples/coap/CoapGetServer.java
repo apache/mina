@@ -19,6 +19,7 @@
  */
 package org.apache.mina.examples.coap;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.api.AbstractIoHandler;
@@ -28,92 +29,67 @@ import org.apache.mina.coap.CoapCode;
 import org.apache.mina.coap.CoapMessage;
 import org.apache.mina.coap.CoapOption;
 import org.apache.mina.coap.CoapOptionType;
-import org.apache.mina.coap.MessageType;
 import org.apache.mina.coap.codec.CoapDecoder;
 import org.apache.mina.coap.codec.CoapEncoder;
+import org.apache.mina.coap.resource.AbstractResourceHandler;
+import org.apache.mina.coap.resource.CoapResponse;
+import org.apache.mina.coap.resource.ResourceRegistry;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.transport.nio.NioUdpServer;
+import org.apache.mina.transport.bio.BioUdpServer;
 
 /**
- * A simple CoAP UDP server answering to GET requests
+ * A CoAP UDP server serving some resources.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CoapGetServer {
 
     public static void main(String[] args) {
-        NioUdpServer server = new NioUdpServer();
-        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 20000);
+
+        // create a CoAP resource registry
+        final ResourceRegistry reg = new ResourceRegistry();
+
+        reg.register(new AbstractResourceHandler() {
+
+            @Override
+            public String getPath() {
+                return "demo";
+            }
+
+            @Override
+            public CoapResponse handle(CoapMessage request) {
+                return new CoapResponse(CoapCode.CONTENT.getCode(), "niah niah niah niah niah\n niah niah niah\n"
+                        .getBytes(), new CoapOption(CoapOptionType.CONTENT_FORMAT, new byte[] { 0 }));
+            }
+
+            @Override
+            public String getTittle() {
+                return "Some demo resource";
+            }
+
+        });
+        BioUdpServer server = new BioUdpServer();
         server.setFilters(new ProtocolCodecFilter<CoapMessage, ByteBuffer, Void, Void>(new CoapEncoder(),
                 new CoapDecoder()));
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 20000);
         server.setIoHandler(new AbstractIoHandler() {
-
-            @Override
-            public void sessionOpened(IoSession session) {
-                System.err.println("open " + session);
-
-            }
-
-            @Override
-            public void sessionIdle(IoSession session, IdleStatus status) {
-                System.err.println("idle " + session);
-                session.close(false);
-            }
-
-            @Override
-            public void sessionClosed(IoSession session) {
-                System.err.println("closed");
-            }
-
-            @Override
-            public void messageSent(IoSession session, Object message) {
-                System.err.println("sent " + message + " to " + session);
-
-            }
-
             @Override
             public void messageReceived(IoSession session, Object message) {
-                System.err.println("receive " + message + " from " + session);
-                CoapMessage msg = (CoapMessage) message;
-                if (msg.getType() == MessageType.CONFIRMABLE && CoapCode.fromCode(msg.getCode()) == CoapCode.GET) {
-                    // it's a get!
-
-                    // find the URI
-                    String url = null;
-                    for (CoapOption opt : msg.getOptions()) {
-                        if (opt.getType() == CoapOptionType.URI_PATH) {
-                            url = new String(opt.getData());
-                        }
-                    }
-
-                    System.err.println("GET on path : " + url);
-
-                    // let's confirm it
-                    CoapMessage response = new CoapMessage(1, MessageType.ACK, CoapCode.CONTENT.getCode(), msg.getId(),
-                            msg.getToken(), new CoapOption[] { new CoapOption(CoapOptionType.CONTENT_FORMAT,
-                                    new byte[] { 0 }) }, "hello coap !".getBytes());
-                    session.write(response);
-                    System.err.println("closing");
-                    // session.close(false);
-                    System.err.println("done!");
-                }
-            }
-
-            @Override
-            public void exceptionCaught(IoSession session, Exception cause) {
-                System.err.println("exception : ");
-                cause.printStackTrace();
-                session.close(false);
+                System.err.println("rcv : " + message);
+                CoapMessage resp = reg.respond((CoapMessage) message);
+                System.err.println("resp : " + resp);
+                session.write(resp);
             }
         });
 
         try {
             server.bind(5683);
-
-            Thread.sleep(60000);
-
-            server.unbind();
-        } catch (Exception e) {
+            for (;;) {
+                Thread.sleep(1000);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

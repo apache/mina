@@ -49,7 +49,7 @@ public class ResourceRegistry {
                 if (urlBuilder.length() > 0) {
                     urlBuilder.append("/");
                 }
-                urlBuilder.append(opt.getData());
+                urlBuilder.append(new String(opt.getData()));
             }
         }
 
