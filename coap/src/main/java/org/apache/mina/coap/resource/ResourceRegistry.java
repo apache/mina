@@ -91,7 +91,7 @@ public class ResourceRegistry {
                 // 4.04 !
                 return new CoapMessage(1, MessageType.ACK, CoapCode.NOT_FOUND.getCode(), request.getId(),
                         request.getToken(), new CoapOption[] { new CoapOption(CoapOptionType.CONTENT_FORMAT,
-                                new byte[] { 0 }) }, "meh !".getBytes());
+                                new byte[] { 0 }) }, "not found !".getBytes());
             } else {
                 CoapResponse response = handler.handle(request);
                 return new CoapMessage(1, request.getType() == MessageType.CONFIRMABLE ? MessageType.ACK
