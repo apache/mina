@@ -54,7 +54,6 @@ public class Mina3UdpBenchmarkClient implements BenchmarkClient {
             }
 
             public void sessionOpened(IoSession session) {
-                System.out.println("Opened");
                 sendMessage(session, data);
             }
 
