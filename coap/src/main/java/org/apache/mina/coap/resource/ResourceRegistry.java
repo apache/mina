@@ -31,16 +31,34 @@ import org.apache.mina.coap.MessageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The resource registry for the different {@link ResourceHandler}.
+ * 
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ResourceRegistry {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceRegistry.class);
 
     private Map<String, ResourceHandler> handlers = new HashMap<String, ResourceHandler>();
 
+    /**
+     * Register a new resource handler.
+     * 
+     * @param handler the halder to register.
+     */
     public void register(ResourceHandler handler) {
         handlers.put(handler.getPath(), handler);
     }
 
+    /**
+     * Response to a request : delegate it to the correct handler for the requested path. If not found generate 4.04
+     * CoAP errors. if .well-know/core requested : generate a discover page.
+     * 
+     * @param request the request ot serve
+     * @return the response
+     */
     public CoapMessage respond(CoapMessage request) {
         // find the URI
         StringBuilder urlBuilder = new StringBuilder("");
