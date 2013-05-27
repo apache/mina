@@ -21,6 +21,7 @@ package org.apache.mina.core.nio.udp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -151,7 +152,8 @@ public class Netty3UdpBenchmarkServer implements BenchmarkServer {
                                         buffer.skipBytes(remaining);
                                     } else {
                                         buffer.skipBytes(length);
-                                        ctx.getChannel().write(ACK.slice());
+                                        SocketAddress remoteAddress = e.getRemoteAddress();
+                                        ctx.getChannel().write(ACK.slice(), remoteAddress);
                                         state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
                                         length = 0;
                                     }
@@ -182,6 +184,7 @@ public class Netty3UdpBenchmarkServer implements BenchmarkServer {
      */
     public void stop() throws IOException {
         allChannels.disconnect().awaitUninterruptibly();
+        factory.shutdown();
         factory.releaseExternalResources();
     }
 }

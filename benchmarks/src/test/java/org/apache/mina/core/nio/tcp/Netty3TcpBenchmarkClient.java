@@ -38,6 +38,7 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 
 /**
+ * A Netty 3 TCP CLient.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Netty3TcpBenchmarkClient implements BenchmarkClient {

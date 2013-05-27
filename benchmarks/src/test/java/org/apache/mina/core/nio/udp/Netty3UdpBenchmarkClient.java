@@ -98,6 +98,7 @@ public class Netty3UdpBenchmarkClient implements BenchmarkClient {
      * {@inheritedDoc}
      */
     public void stop() throws IOException {
+        factory.shutdown();
         factory.releaseExternalResources();
     }
 }

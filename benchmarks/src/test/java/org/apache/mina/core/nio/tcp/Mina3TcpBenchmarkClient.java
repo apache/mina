@@ -32,6 +32,7 @@ import org.apache.mina.core.BenchmarkClient;
 import org.apache.mina.transport.nio.NioTcpClient;
 
 /**
+ * A MINA 3 TCP CLient.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Mina3TcpBenchmarkClient implements BenchmarkClient {
@@ -58,6 +59,7 @@ public class Mina3TcpBenchmarkClient implements BenchmarkClient {
             public void messageReceived(IoSession session, Object message) {
                 if (message instanceof ByteBuffer) {
                     ByteBuffer buffer = (ByteBuffer) message;
+
                     for (int i = 0; i < buffer.remaining(); ++i) {
                         counter.countDown();
                         long count = counter.getCount();

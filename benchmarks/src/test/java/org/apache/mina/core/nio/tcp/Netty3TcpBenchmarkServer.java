@@ -43,6 +43,7 @@ import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 /**
+ * A Netty 3 TCP Server.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Netty3TcpBenchmarkServer implements BenchmarkServer {

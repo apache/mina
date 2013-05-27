@@ -32,6 +32,7 @@ import org.apache.mina.session.AttributeKey;
 import org.apache.mina.transport.nio.NioTcpServer;
 
 /**
+ * A MINA 3 TCP Server.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Mina3TcpBenchmarkServer implements BenchmarkServer {
