@@ -40,6 +40,8 @@ public class NioUdpSession extends AbstractNioSession implements SelectorListene
 
     private static final Logger LOG = LoggerFactory.getLogger(NioUdpSession.class);
 
+    private static final boolean IS_DEBUG = LOG.isDebugEnabled();
+
     private final SocketAddress localAddress;
 
     private final SocketAddress remoteAddress;
@@ -241,20 +243,8 @@ public class NioUdpSession extends AbstractNioSession implements SelectorListene
      */
     @Override
     protected ByteBuffer convertToDirectBuffer(WriteRequest writeRequest, boolean createNew) {
-        ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
-
-        if (!message.isDirect()) {
-            int remaining = message.remaining();
-
-            ByteBuffer directBuffer = ByteBuffer.allocateDirect(remaining);
-            directBuffer.put(message);
-            directBuffer.flip();
-            writeRequest.setMessage(directBuffer);
-
-            return directBuffer;
-        }
-
-        return message;
+        // Here, we don't create a new DirectBuffer. We let the underlying layer do the job for us
+        return (ByteBuffer) writeRequest.getMessage();
     }
 
     /**
@@ -271,13 +261,15 @@ public class NioUdpSession extends AbstractNioSession implements SelectorListene
 
     @Override
     public void ready(boolean accept, boolean connect, boolean read, ByteBuffer readBuffer, boolean write) {
-        if (LOG.isDebugEnabled()) {
+        if (IS_DEBUG) {
             LOG.debug("session {} ready for accept={}, connect={}, read={}, write={}", new Object[] { this, accept,
-                                    connect, read, write });
+                    connect, read, write });
         }
 
         if (read) {
-            LOG.debug("readable datagram for UDP service : {}", this);
+            if (IS_DEBUG) {
+                LOG.debug("readable datagram for UDP service : {}", this);
+            }
 
             // Read everything we can up to the buffer size
             try {
@@ -285,10 +277,17 @@ public class NioUdpSession extends AbstractNioSession implements SelectorListene
                 readBuffer.flip();
 
                 int readbytes = readBuffer.remaining();
-                LOG.debug("read {} bytes", readbytes);
+
+                if (IS_DEBUG) {
+                    LOG.debug("read {} bytes", readbytes);
+                }
+
                 if (readbytes <= 0) {
                     // session closed by the remote peer
-                    LOG.debug("session closed by the remote peer");
+                    if (IS_DEBUG) {
+                        LOG.debug("session closed by the remote peer");
+                    }
+
                     close(true);
                 } else {
                     receivedDatagram(readBuffer);

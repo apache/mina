@@ -45,8 +45,11 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractNioSession extends AbstractIoSession {
-
+    /** The logger for this class */
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNioSession.class);
+
+    // A speedup for logs
+    private static final boolean IS_DEBUG = LOG.isDebugEnabled();
 
     /** the NIO channel for this session */
     protected final SelectableChannel channel;
@@ -139,10 +142,13 @@ public abstract class AbstractNioSession extends AbstractIoSession {
      */
     @Override
     public WriteRequest enqueueWriteRequest(WriteRequest writeRequest) {
-        LOG.debug("enqueueWriteRequest {}", writeRequest);
+        if (IS_DEBUG) {
+            LOG.debug("enqueueWriteRequest {}", writeRequest);
+        }
+
         if (isConnectedSecured()) {
             // SSL/TLS : we have to encrypt the message
-            final SslHelper sslHelper = getAttribute(SSL_HELPER, null);
+            SslHelper sslHelper = getAttribute(SSL_HELPER, null);
 
             if (sslHelper == null) {
                 throw new IllegalStateException();
@@ -162,7 +168,9 @@ public abstract class AbstractNioSession extends AbstractIoSession {
                 // data in the channel immediately if we can
                 int written = writeDirect(writeRequest.getMessage());
 
-                LOG.debug("wrote {} bytes to {}", written, this);
+                if (IS_DEBUG) {
+                    LOG.debug("wrote {} bytes to {}", written, this);
+                }
 
                 if (written > 0) {
                     incrementWrittenBytes(written);
@@ -237,8 +245,10 @@ public abstract class AbstractNioSession extends AbstractIoSession {
      */
     public void processWrite(SelectorLoop selectorLoop) {
         try {
-            LOG.debug("ready for write");
-            LOG.debug("writable session : {}", this);
+            if (IS_DEBUG) {
+                LOG.debug("ready for write");
+                LOG.debug("writable session : {}", this);
+            }
 
             do {
                 // get a write request from the queue. We left it in the queue,
@@ -252,15 +262,18 @@ public abstract class AbstractNioSession extends AbstractIoSession {
                 }
 
                 // The message is necessarily a ByteBuffer at this point
-                final ByteBuffer buf = (ByteBuffer) writeRequest.getMessage();
+                ByteBuffer buf = (ByteBuffer) writeRequest.getMessage();
 
                 // Note that if the connection is secured, the buffer
                 // already contains encrypted data.
 
                 // Try to write the data, and get back the number of bytes
                 // actually written
-                final int written = ((SocketChannel) channel).write(buf);
-                LOG.debug("wrote {} bytes to {}", written, this);
+                int written = ((SocketChannel) channel).write(buf);
+
+                if (IS_DEBUG) {
+                    LOG.debug("wrote {} bytes to {}", written, this);
+                }
 
                 if (written > 0) {
                     incrementWrittenBytes(written);
@@ -307,7 +320,10 @@ public abstract class AbstractNioSession extends AbstractIoSession {
             synchronized (writeQueue) {
                 if (writeQueue.isEmpty()) {
                     if (isClosing()) {
-                        LOG.debug("closing session {} have empty write queue, so we close it", this);
+                        if (IS_DEBUG) {
+                            LOG.debug("closing session {} have empty write queue, so we close it", this);
+                        }
+
                         // we was flushing writes, now we to the close
                         channelClose();
                     } else {

@@ -47,6 +47,8 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
 
     static final Logger LOG = LoggerFactory.getLogger(NioUdpServer.class);
 
+    private static final boolean IS_DEBUG = LOG.isDebugEnabled();
+
     // the bound local address
     private SocketAddress address = null;
 
@@ -206,7 +208,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
             final boolean write) {
         // Process the reads first
         try {
-            System.err.println("remaining : " + readBuffer.remaining());
+            //System.err.println("remaining : " + readBuffer.remaining());
             final SocketAddress source = datagramChannel.receive(readBuffer);
             NioUdpSession session = null;
 
@@ -218,10 +220,15 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
                     session = createSession(source, datagramChannel);
                 }
                 if (read) {
-                    LOG.debug("readable datagram for UDP service : {}", this);
+                    if (IS_DEBUG) {
+                        LOG.debug("readable datagram for UDP service : {}", this);
+                    }
+
                     readBuffer.flip();
 
-                    LOG.debug("read {} bytes form {}", readBuffer.remaining(), source);
+                    if (IS_DEBUG) {
+                        LOG.debug("read {} bytes form {}", readBuffer.remaining(), source);
+                    }
 
                     session.receivedDatagram(readBuffer);
 
@@ -232,7 +239,9 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
                     session.processWrite(readSelectorLoop);
                 }
             } else {
-                LOG.debug("Do data to read");
+                if (IS_DEBUG) {
+                    LOG.debug("Do data to read");
+                }
             }
 
         } catch (final IOException ex) {

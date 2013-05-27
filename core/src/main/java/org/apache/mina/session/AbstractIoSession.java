@@ -61,6 +61,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /** The logger for this class */
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIoSession.class);
 
+    // A speedup for logs
+    private static final boolean IS_DEBUG = LOG.isDebugEnabled();
+
     /** unique identifier generator */
     private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
 
@@ -137,7 +140,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @param service the service this session is associated with
      * @param idleChecker the checker for idle session
      */
-    public AbstractIoSession(final IoService service, final IdleChecker idleChecker) {
+    public AbstractIoSession(IoService service, IdleChecker idleChecker) {
         // generated a unique id
         id = NEXT_ID.getAndIncrement();
         creationTime = System.currentTimeMillis();
@@ -146,7 +149,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
         this.idleChecker = idleChecker;
         this.config = service.getSessionConfig();
 
-        LOG.debug("Created new session with id : {}", id);
+        if (IS_DEBUG) {
+            LOG.debug("Created new session with id : {}", id);
+        }
 
         this.state = SessionState.CREATED;
         service.getManagedSessions().put(id, this);
@@ -243,7 +248,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void changeState(final SessionState to) {
+    public void changeState(SessionState to) {
         try {
             stateWriteLock.lock();
 
@@ -332,7 +337,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * {@inheritDoc}
      */
-    public void setSecured(final boolean secured) {
+    public void setSecured(boolean secured) {
         this.secured = secured;
     }
 
@@ -340,8 +345,8 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void initSecure(final SSLContext sslContext) throws SSLException {
-        final SslHelper sslHelper = new SslHelper(this, sslContext);
+    public void initSecure(SSLContext sslContext) throws SSLException {
+        SslHelper sslHelper = new SslHelper(this, sslContext);
         sslHelper.init();
 
         attributes.setAttribute(SSL_HELPER, sslHelper);
@@ -377,7 +382,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * 
      * @param bytesCount number of extra bytes written
      */
-    public void incrementWrittenBytes(final int bytesCount) {
+    public void incrementWrittenBytes(int bytesCount) {
         writtenBytes += bytesCount;
     }
 
@@ -428,7 +433,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @see #setAttribute(AttributeKey, Object)
      */
     @Override
-    public final <T> T getAttribute(final AttributeKey<T> key, final T defaultValue) {
+    public final <T> T getAttribute(AttributeKey<T> key, T defaultValue) {
         return attributes.getAttribute(key, defaultValue);
     }
 
@@ -439,7 +444,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @see #setAttribute(AttributeKey, Object)
      */
     @Override
-    public final <T> T getAttribute(final AttributeKey<T> key) {
+    public final <T> T getAttribute(AttributeKey<T> key) {
         return attributes.getAttribute(key);
     }
 
@@ -457,7 +462,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @see #getAttribute(AttributeKey)
      */
     @Override
-    public final <T> T setAttribute(final AttributeKey<? extends T> key, final T value) {
+    public final <T> T setAttribute(AttributeKey<? extends T> key, T value) {
         return attributes.setAttribute(key, value);
     };
 
@@ -477,7 +482,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * @exception IllegalArgumentException if <code>key==null</code>
      */
     @Override
-    public <T> T removeAttribute(final AttributeKey<T> key) {
+    public <T> T removeAttribute(AttributeKey<T> key) {
         return attributes.removeAttribute(key);
     }
 
@@ -489,7 +494,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void write(final Object message) {
+    public void write(Object message) {
         doWriteWithFuture(message, null);
     }
 
@@ -497,14 +502,17 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public IoFuture<Void> writeWithFuture(final Object message) {
-        final IoFuture<Void> future = new DefaultWriteFuture();
+    public IoFuture<Void> writeWithFuture(Object message) {
+        IoFuture<Void> future = new DefaultWriteFuture();
         doWriteWithFuture(message, future);
+
         return future;
     }
 
-    private void doWriteWithFuture(final Object message, final IoFuture<Void> future) {
-        LOG.debug("writing message {} to session {}", message, this);
+    private void doWriteWithFuture(Object message, IoFuture<Void> future) {
+        if (IS_DEBUG) {
+            LOG.debug("writing message {} to session {}", message, this);
+        }
 
         if ((state == SessionState.CLOSED) || (state == SessionState.CLOSING)) {
             LOG.error("writing to closed or closing session, the message is discarded");
@@ -522,9 +530,13 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     // ------------------------------------------------------------------------
 
     /** send a caught exception to the {@link IoHandler} (if any) */
-    protected void processException(final Exception t) {
-        LOG.debug("caught session exception ", t);
-        final IoHandler handler = getService().getIoHandler();
+    protected void processException(Exception t) {
+        if (IS_DEBUG) {
+            LOG.debug("caught session exception ", t);
+        }
+
+        IoHandler handler = getService().getIoHandler();
+
         if (handler != null) {
             handler.exceptionCaught(this, t);
         }
@@ -534,18 +546,21 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * process session open event using the filter chain. To be called by the session {@link SelectorLoop} .
      */
     public void processSessionOpen() {
-        LOG.debug("processing session open event");
+        if (IS_DEBUG) {
+            LOG.debug("processing session open event");
+        }
 
         try {
 
-            for (final IoFilter filter : chain) {
+            for (IoFilter filter : chain) {
                 filter.sessionOpened(this);
             }
 
-            final IoHandler handler = getService().getIoHandler();
+            IoHandler handler = getService().getIoHandler();
 
             if (handler != null) {
                 IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+
                 if (executor != null) {
                     // asynchronous event
                     executor.execute(new OpenEvent(this));
@@ -554,7 +569,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                     handler.sessionOpened(this);
                 }
             }
-        } catch (final RuntimeException e) {
+        } catch (RuntimeException e) {
             processException(e);
         }
     }
@@ -563,13 +578,17 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * process session closed event using the filter chain. To be called by the session {@link SelectorLoop} .
      */
     public void processSessionClosed() {
-        LOG.debug("processing session closed event");
+        if (IS_DEBUG) {
+            LOG.debug("processing session closed event");
+        }
+
         try {
-            for (final IoFilter filter : chain) {
+            for (IoFilter filter : chain) {
                 filter.sessionClosed(this);
             }
 
-            final IoHandler handler = getService().getIoHandler();
+            IoHandler handler = getService().getIoHandler();
+
             if (handler != null) {
                 IoHandlerExecutor executor = getService().getIoHandlerExecutor();
                 if (executor != null) {
@@ -580,7 +599,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                     handler.sessionClosed(this);
                 }
             }
-        } catch (final RuntimeException e) {
+        } catch (RuntimeException e) {
             processException(e);
         }
         service.getManagedSessions().remove(id);
@@ -589,16 +608,21 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     /**
      * process session idle event using the filter chain. To be called by the session {@link SelectorLoop} .
      */
-    public void processSessionIdle(final IdleStatus status) {
-        LOG.debug("processing session idle {} event for session {}", status, this);
+    public void processSessionIdle(IdleStatus status) {
+        if (IS_DEBUG) {
+            LOG.debug("processing session idle {} event for session {}", status, this);
+        }
 
         try {
-            for (final IoFilter filter : chain) {
+            for (IoFilter filter : chain) {
                 filter.sessionIdle(this, status);
             }
-            final IoHandler handler = getService().getIoHandler();
+
+            IoHandler handler = getService().getIoHandler();
+
             if (handler != null) {
                 IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+
                 if (executor != null) {
                     // asynchronous event
                     executor.execute(new IdleEvent(this, status));
@@ -607,7 +631,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                     handler.sessionIdle(this, status);
                 }
             }
-        } catch (final RuntimeException e) {
+        } catch (RuntimeException e) {
             processException(e);
         }
     }
@@ -625,8 +649,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * 
      * @param message the received message
      */
-    public void processMessageReceived(final ByteBuffer message) {
-        LOG.debug("processing message '{}' received event for session {}", message, this);
+    public void processMessageReceived(ByteBuffer message) {
+        if (IS_DEBUG) {
+            LOG.debug("processing message '{}' received event for session {}", message, this);
+        }
 
         tl.set(message);
         try {
@@ -635,14 +661,22 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             lastReadTime = System.currentTimeMillis();
 
             if (chain.length < 1) {
-                LOG.debug("Nothing to do, the chain is empty");
-                final IoHandler handler = getService().getIoHandler();
+                if (IS_DEBUG) {
+                    LOG.debug("Nothing to do, the chain is empty");
+                }
+
+                IoHandler handler = getService().getIoHandler();
+
                 if (handler != null) {
                     IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+
                     if (executor != null) {
                         // asynchronous event
                         // copy the bytebuffer
-                        LOG.debug("copying bytebuffer before pushing to the executor");
+                        if (IS_DEBUG) {
+                            LOG.debug("copying bytebuffer before pushing to the executor");
+                        }
+
                         ByteBuffer original = message;
                         ByteBuffer clone = ByteBuffer.allocate(original.capacity());
                         // copy from the beginning
@@ -662,7 +696,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                 // we call the first filter, it's supposed to call the next ones using the filter chain controller
                 chain[readChainPosition].messageReceived(this, message, this);
             }
-        } catch (final RuntimeException e) {
+        } catch (RuntimeException e) {
             processException(e);
         }
 
@@ -673,8 +707,10 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * 
      * @param message the wrote message, should be transformed into ByteBuffer at the end of the filter chain
      */
-    public void processMessageWriting(WriteRequest writeRequest, final IoFuture<Void> future) {
-        LOG.debug("processing message '{}' writing event for session {}", writeRequest, this);
+    public void processMessageWriting(WriteRequest writeRequest, IoFuture<Void> future) {
+        if (IS_DEBUG) {
+            LOG.debug("processing message '{}' writing event for session {}", writeRequest, this);
+        }
 
         try {
             // lastWriteRequest = null;
@@ -684,8 +720,8 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             } else {
                 writeChainPosition = chain.length - 1;
                 // we call the first filter, it's supposed to call the next ones using the filter chain controller
-                final int position = writeChainPosition;
-                final IoFilter nextFilter = chain[position];
+                int position = writeChainPosition;
+                IoFilter nextFilter = chain[position];
                 nextFilter.messageWriting(this, writeRequest, this);
             }
 
@@ -693,23 +729,29 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             if (future != null) {
                 writeRequest.setFuture(future);
             }
-        } catch (final RuntimeException e) {
+        } catch (RuntimeException e) {
             processException(e);
         }
 
     }
 
-    public void processMessageSent(final Object highLevelMessage) {
-        LOG.debug("processing message '{}' sent event for session {}", highLevelMessage, this);
+    public void processMessageSent(Object highLevelMessage) {
+        if (IS_DEBUG) {
+            LOG.debug("processing message '{}' sent event for session {}", highLevelMessage, this);
+        }
 
         try {
-            final int size = chain.length;
+            int size = chain.length;
+
             for (int i = size - 1; i >= 0; i--) {
                 chain[i].messageSent(this, highLevelMessage);
             }
-            final IoHandler handler = getService().getIoHandler();
+
+            IoHandler handler = getService().getIoHandler();
+
             if (handler != null) {
                 IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+
                 if (executor != null) {
                     // asynchronous event
                     executor.execute(new SentEvent(this, highLevelMessage));
@@ -718,7 +760,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                     handler.messageSent(this, highLevelMessage);
                 }
             }
-        } catch (final RuntimeException e) {
+        } catch (RuntimeException e) {
             processException(e);
         }
 
@@ -731,7 +773,9 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      */
     @Override
     public void callWriteNextFilter(WriteRequest message) {
-        LOG.debug("calling next filter for writing for message '{}' position : {}", message, writeChainPosition);
+        if (IS_DEBUG) {
+            LOG.debug("calling next filter for writing for message '{}' position : {}", message, writeChainPosition);
+        }
 
         writeChainPosition--;
 
@@ -749,19 +793,24 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void callReadNextFilter(final Object message) {
+    public void callReadNextFilter(Object message) {
         readChainPosition++;
 
         if (readChainPosition >= chain.length) {
             // end of chain processing
-            final IoHandler handler = getService().getIoHandler();
+            IoHandler handler = getService().getIoHandler();
+
             if (handler != null) {
                 IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+
                 if (executor != null) {
                     // asynchronous event
                     if (message == tl.get()) {
                         // copy the bytebuffer
-                        LOG.debug("copying bytebuffer before pushing to the executor");
+                        if (IS_DEBUG) {
+                            LOG.debug("copying bytebuffer before pushing to the executor");
+                        }
+
                         ByteBuffer original = (ByteBuffer) message;
                         ByteBuffer clone = ByteBuffer.allocate(original.capacity());
                         // copy from the beginning

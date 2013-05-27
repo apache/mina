@@ -41,7 +41,9 @@ import org.slf4j.LoggerFactory;
  */
 public class NioSelectorLoop implements SelectorLoop {
     /** The logger for this class */
-    private final Logger logger;
+    private static final Logger LOG = LoggerFactory.getLogger(NioSelectorLoop.class);
+
+    private static final boolean IS_DEBUG = LOG.isDebugEnabled();
 
     /** the selector managed by this class */
     private Selector selector;
@@ -77,19 +79,24 @@ public class NioSelectorLoop implements SelectorLoop {
             workerName += "-" + index;
         }
 
-        logger = LoggerFactory.getLogger(name);
         SelectorWorker worker = new SelectorWorker(workerName);
 
         try {
-            logger.debug("open a selector");
+            if (IS_DEBUG) {
+                LOG.debug("open a selector");
+            }
+
             selector = Selector.open();
         } catch (final IOException ioe) {
-            logger.error("Impossible to open a new NIO selector, O/S is out of file descriptor ?");
+            LOG.error("Impossible to open a new NIO selector, O/S is out of file descriptor ?");
             throw new IllegalStateException("Impossible to open a new NIO selector, O/S is out of file descriptor ?",
                     ioe);
         }
 
-        logger.debug("starting worker thread");
+        if (IS_DEBUG) {
+            LOG.debug("starting worker thread");
+        }
+
         worker.start();
 
     }
@@ -100,8 +107,11 @@ public class NioSelectorLoop implements SelectorLoop {
     @Override
     public void register(boolean accept, boolean connect, boolean read, boolean write, SelectorListener listener,
             SelectableChannel channel, RegistrationCallback callback) {
-        logger.debug("registering : {} for accept : {}, connect: {}, read : {}, write : {}, channel : {}",
-                new Object[] { listener, accept, connect, read, write, channel });
+        if (IS_DEBUG) {
+            LOG.debug("registering : {} for accept : {}, connect: {}, read : {}, write : {}, channel : {}",
+                    new Object[] { listener, accept, connect, read, write, channel });
+        }
+
         int ops = 0;
 
         if (accept) {
@@ -133,12 +143,15 @@ public class NioSelectorLoop implements SelectorLoop {
     @Override
     public void modifyRegistration(boolean accept, boolean read, boolean write, final SelectorListener listener,
             SelectableChannel channel, boolean wakeup) {
-        logger.debug("modifying registration : {} for accept : {}, read : {}, write : {}, channel : {}", new Object[] {
-                                listener, accept, read, write, channel });
+        if (IS_DEBUG) {
+            LOG.debug("modifying registration : {} for accept : {}, read : {}, write : {}, channel : {}", new Object[] {
+                    listener, accept, read, write, channel });
+        }
 
         final SelectionKey key = channel.keyFor(selector);
+
         if (key == null) {
-            logger.error("Trying to modify the registration of a not registered channel");
+            LOG.error("Trying to modify the registration of a not registered channel");
             return;
         }
 
@@ -169,16 +182,22 @@ public class NioSelectorLoop implements SelectorLoop {
      */
     @Override
     public void unregister(final SelectorListener listener, final SelectableChannel channel) {
-        logger.debug("unregistering : {}", listener);
+        if (IS_DEBUG) {
+            LOG.debug("unregistering : {}", listener);
+        }
+
         final SelectionKey key = channel.keyFor(selector);
+
         if (key == null) {
-            logger.error("Trying to modify the registration of a not registered channel");
+            LOG.error("Trying to modify the registration of a not registered channel");
             return;
         }
         key.cancel();
         key.attach(null);
-        logger.debug("unregistering : {} done !", listener);
 
+        if (IS_DEBUG) {
+            LOG.debug("unregistering : {} done !", listener);
+        }
     }
 
     /**
@@ -197,9 +216,15 @@ public class NioSelectorLoop implements SelectorLoop {
 
             for (;;) {
                 try {
-                    logger.debug("selecting...");
+                    if (IS_DEBUG) {
+                        LOG.debug("selecting...");
+                    }
+
                     final int readyCount = selector.select();
-                    logger.debug("... done selecting : {} events", readyCount);
+
+                    if (IS_DEBUG) {
+                        LOG.debug("... done selecting : {} events", readyCount);
+                    }
 
                     if (readyCount > 0) {
                         final Iterator<SelectionKey> it = selector.selectedKeys().iterator();
@@ -215,9 +240,11 @@ public class NioSelectorLoop implements SelectorLoop {
                             listener.ready(isAcceptable, isConnectable, isReadable, isReadable ? readBuffer : null,
                                     isWritable);
                             // if you don't remove the event of the set, the selector will present you this event again
-                            // and
-                            // again
-                            logger.debug("remove");
+                            // and again
+                            if (IS_DEBUG) {
+                                LOG.debug("remove");
+                            }
+
                             it.remove();
                         }
                     }
@@ -234,11 +261,11 @@ public class NioSelectorLoop implements SelectorLoop {
                             }
                         } catch (final ClosedChannelException ex) {
                             // dead session..
-                            logger.error("socket is already dead", ex);
+                            LOG.error("socket is already dead", ex);
                         }
                     }
                 } catch (final Exception e) {
-                    logger.error("Unexpected exception : ", e);
+                    LOG.error("Unexpected exception : ", e);
                 }
             }
         }
