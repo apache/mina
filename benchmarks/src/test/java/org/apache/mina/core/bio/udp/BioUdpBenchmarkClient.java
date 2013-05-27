@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.core.nio.udp;
+package org.apache.mina.core.bio.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

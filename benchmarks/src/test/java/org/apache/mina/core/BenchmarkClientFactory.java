@@ -19,9 +19,9 @@
  */
 package org.apache.mina.core;
 
+import org.apache.mina.core.bio.udp.BioUdpBenchmarkClient;
 import org.apache.mina.core.nio.tcp.Mina3TcpBenchmarkClient;
 import org.apache.mina.core.nio.tcp.Netty3TcpBenchmarkClient;
-import org.apache.mina.core.nio.udp.BioUdpBenchmarkClient;
 import org.apache.mina.core.nio.udp.Mina3UdpBenchmarkClient;
 import org.apache.mina.core.nio.udp.Netty3UdpBenchmarkClient;
 

@@ -58,7 +58,7 @@ public class Mina3ClientVsMina3ServerUdpBenchmarkBinaryTest extends BenchmarkBin
     public static Collection<Object[]> getParameters() {
         // Note : depending on your OS, the maximum PDU you can send can vary. See sysctl net.inet.udp.maxdgram
         Object[][] parameters = new Object[][] { 
-                { 1000000, 10, 2 * 60 }, 
+                { 1000000, 10, 2 * 60 },
                 { 1000000, 1 * 1024, 2 * 60 },
                 { 1000000, 2 * 1024, 2 * 60 }, 
                 { 1000000, 4 * 1024, 2 * 60 }, 

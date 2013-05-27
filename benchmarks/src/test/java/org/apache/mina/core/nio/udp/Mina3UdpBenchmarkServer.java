@@ -34,6 +34,8 @@ import org.apache.mina.transport.udp.DefaultUdpSessionConfig;
 import org.apache.mina.transport.udp.UdpSessionConfig;
 
 /**
+ * A MINA 3 based UDP server
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Mina3UdpBenchmarkServer implements BenchmarkServer {

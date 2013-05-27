@@ -43,6 +43,8 @@ import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 
 /**
+ * A Netty 3 based UDP server
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Netty3UdpBenchmarkServer implements BenchmarkServer {

@@ -34,6 +34,8 @@ import org.apache.mina.core.BenchmarkClient;
 import org.apache.mina.transport.nio.NioUdpClient;
 
 /**
+ * A MINA 3 based UDP client
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Mina3UdpBenchmarkClient implements BenchmarkClient {
@@ -52,6 +54,7 @@ public class Mina3UdpBenchmarkClient implements BenchmarkClient {
             }
 
             public void sessionOpened(IoSession session) {
+                System.out.println("Opened");
                 sendMessage(session, data);
             }
 

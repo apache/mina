@@ -38,6 +38,7 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 
 /**
+ * A Netty 3 based UDP client
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Netty3UdpBenchmarkClient implements BenchmarkClient {

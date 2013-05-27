@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core;
 
+import org.apache.mina.core.bio.udp.BioUdpBenchmarkServer;
 import org.apache.mina.core.nio.tcp.Mina3TcpBenchmarkServer;
 import org.apache.mina.core.nio.tcp.Netty3TcpBenchmarkServer;
 import org.apache.mina.core.nio.udp.Mina3UdpBenchmarkServer;
@@ -44,6 +45,10 @@ public class BenchmarkServerFactory implements BenchmarkFactory<BenchmarkServer>
             return new Netty3TcpBenchmarkServer();
         case Netty3_udp:
             return new Netty3UdpBenchmarkServer();
+        case Bio_udp:
+            return new BioUdpBenchmarkServer();
+        case Bio_tcp:
+            //return new BioUdpBenchmarkClient();
         default:
             throw new IllegalArgumentException("Invalid type " + type);
         }
