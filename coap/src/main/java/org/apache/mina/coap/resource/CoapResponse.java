@@ -21,6 +21,7 @@ package org.apache.mina.coap.resource;
 
 import java.util.Arrays;
 
+import org.apache.mina.coap.CoapCode;
 import org.apache.mina.coap.CoapOption;
 
 /**
@@ -35,6 +36,13 @@ public class CoapResponse {
 
     public CoapOption[] options;
 
+    /**
+     * Create the CoAP response for a resource request.
+     * 
+     * @param code the return code for this request see : {@link CoapCode}
+     * @param content the content for this resource request
+     * @param options the opetion to send (content-type, cacheability etc..)
+     */
     public CoapResponse(int code, byte[] content, CoapOption... options) {
         super();
         this.code = code;

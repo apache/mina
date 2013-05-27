@@ -20,6 +20,7 @@
 package org.apache.mina.coap.resource;
 
 /**
+ * A base implementation for {@link ResourceHandler} when you don't want to return all the resources meta-data.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -46,7 +47,6 @@ public abstract class AbstractResourceHandler implements ResourceHandler {
      */
     @Override
     public String getTittle() {
-        // TODO Auto-generated method stub
         return null;
     }
 
