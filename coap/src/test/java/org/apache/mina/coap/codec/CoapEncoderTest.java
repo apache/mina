@@ -64,6 +64,12 @@ public class CoapEncoderTest {
         CoapMessage message = PAYLOAD_AND_MULTIPLE_OPTION;
         ByteBuffer encoded = encoder.encode(message, null);
         Assert.assertEquals(PAYLOAD_AND_MULTIPLE_OPTION_HEX, ByteBufferDumper.toHex(encoded));
+    }
 
+    @Test
+    public void observe() {
+        CoapMessage message = OBSERVE;
+        ByteBuffer encoded = encoder.encode(message, null);
+        Assert.assertEquals(OBSERVE_HEX, ByteBufferDumper.toHex(encoded));
     }
 }

@@ -112,6 +112,9 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
 
                 // create the option DTO
                 CoapOptionType optType = CoapOptionType.fromCode(optionCode);
+                if (optType == null) {
+                    throw new ProtocolDecoderException("unknown option code : " + optionCode);
+                }
                 // LOG.debug("option type : {}", optType);
 
                 // get the value
