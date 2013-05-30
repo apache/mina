@@ -92,6 +92,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
             }
         } catch (ProtocolDecoderException e) {
             LOGGER.debug("decoding exception : ", e);
+            throw e;
         }
     }
 
