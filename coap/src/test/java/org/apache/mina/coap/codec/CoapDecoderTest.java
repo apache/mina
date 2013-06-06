@@ -54,4 +54,9 @@ public class CoapDecoderTest {
         Assert.assertEquals(PAYLOAD_AND_MULTIPLE_OPTION,
                 decoder.decode(ByteBufferDumper.fromHexString(PAYLOAD_AND_MULTIPLE_OPTION_HEX), null));
     }
+
+    @Test
+    public void observe_message() {
+        Assert.assertEquals(OBSERVE, decoder.decode(ByteBufferDumper.fromHexString(OBSERVE_HEX), null));
+    }
 }

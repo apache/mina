@@ -154,7 +154,7 @@ public class SslTest {
     }
 
     @Test
-    @Ignore("SslHelper needs more attention for big messages")
+    @Ignore("check for fragmentation")
     public void testSSL() throws Exception {
         final int port = startServer();
 
@@ -174,7 +174,6 @@ public class SslTest {
     }
 
     @Test
-    @Ignore("SslHelper needs more attention for big messages")
     public void testBigMessage() throws IOException, GeneralSecurityException, InterruptedException {
         final CountDownLatch counter = new CountDownLatch(1);
         NioTcpServer server = new NioTcpServer();
@@ -194,7 +193,7 @@ public class SslTest {
             @Override
             public void messageReceived(IoSession session, Object message) {
                 receivedSize += ((ByteBuffer) message).remaining();
-                if (receivedSize == 0) {
+                if (receivedSize == messageSize) {
                     counter.countDown();
                 }
             }

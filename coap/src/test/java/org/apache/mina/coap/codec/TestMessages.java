@@ -50,9 +50,14 @@ public interface TestMessages {
     public static final CoapMessage PAYLOAD_AND_MULTIPLE_OPTION = new CoapMessage(1, MessageType.NON_CONFIRMABLE, 1,
             1234, "toto".getBytes(), new CoapOption[] { //
             new CoapOption(CoapOptionType.URI_PATH, "coap://blabla".getBytes()), //
-                    new CoapOption(CoapOptionType.LOCATION_QUERY, "somewhere".getBytes()), //
-                    new CoapOption(CoapOptionType.PROXY_URI, "http://proxyuri".getBytes()), //
-                    new CoapOption(CoapOptionType.MAX_AGE, "bleh".getBytes()) }, new byte[] {});
+                                    new CoapOption(CoapOptionType.LOCATION_QUERY, "somewhere".getBytes()), //
+                                    new CoapOption(CoapOptionType.PROXY_URI, "http://proxyuri".getBytes()), //
+                                    new CoapOption(CoapOptionType.MAX_AGE, "bleh".getBytes()) }, new byte[] {});
 
     public static final String PAYLOAD_AND_MULTIPLE_OPTION_HEX = "540104D2746F746FBD00636F61703A2F2F626C61626C6134626C656869736F6D657768657265DD0202687474703A2F2F70726F7879757269";// "540104D2746F746FBD00636F61703A2F2F626C61626C6134626C656869736F6D657768657265DD02687474703A2F2F70726F7879757269";
+
+    public static final CoapMessage OBSERVE = new CoapMessage(1, MessageType.CONFIRMABLE, 1, 19950, new byte[] { -28,
+                            -91 }, new CoapOption[] { new CoapOption(CoapOptionType.OBSERVE, new byte[] {}),
+                            new CoapOption(CoapOptionType.URI_PATH, "demo".getBytes()) }, new byte[] {});
+    public static final String OBSERVE_HEX = "42014DEEE4A5605464656D6F";
 }
