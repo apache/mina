@@ -34,7 +34,6 @@ import javax.net.ssl.SSLSession;
 
 import org.apache.mina.api.IoClient;
 import org.apache.mina.api.IoSession;
-import org.apache.mina.api.IoSession.SessionState;
 import org.apache.mina.session.AbstractIoSession;
 import org.apache.mina.session.AttributeKey;
 import org.apache.mina.session.DefaultWriteRequest;
@@ -82,7 +81,7 @@ public class SslHelper {
 
     /** An empty buffer used during the handshake phase */
     private static final ByteBuffer HANDSHAKE_BUFFER = ByteBuffer.allocate(1024);
-    
+
     private ByteBuffer previous = null;
 
     /**
@@ -112,13 +111,12 @@ public class SslHelper {
     boolean isHanshaking() {
         return sslEngine.getHandshakeStatus() != HandshakeStatus.NOT_HANDSHAKING;
     }
-    
+
     /**
      * Initialize the SSL handshake.
      * 
-     * @throws SSLException If the underlying SSLEngine handshake initialization failed
      */
-    public void init() throws SSLException {
+    public void init() {
         if (sslEngine != null) {
             // We already have a SSL engine created, no need to create a new one
             return;
@@ -160,8 +158,7 @@ public class SslHelper {
     }
 
     /**
-     * Duplicate a byte buffer for storing it into this context for future
-     * use.
+     * Duplicate a byte buffer for storing it into this context for future use.
      * 
      * @param buffer the buffer to duplicate
      * @return the newly allocated buffer
@@ -172,10 +169,9 @@ public class SslHelper {
         newBuffer.flip();
         return newBuffer;
     }
-    
+
     /**
-     * Accumulate the given buffer into the current context. Allocation is performed only
-     * if needed.
+     * Accumulate the given buffer into the current context. Allocation is performed only if needed.
      * 
      * @param buffer the buffer to accumulate
      * @return the accumulated buffer
@@ -188,7 +184,7 @@ public class SslHelper {
             previous.put(buffer);
             previous.position(oldPosition);
         } else {
-            ByteBuffer newPrevious = ByteBuffer.allocateDirect((previous.remaining() + buffer.remaining() ) * 2);
+            ByteBuffer newPrevious = ByteBuffer.allocateDirect((previous.remaining() + buffer.remaining()) * 2);
             newPrevious.put(previous);
             newPrevious.put(buffer);
             newPrevious.flip();
@@ -196,7 +192,7 @@ public class SslHelper {
         }
         return previous;
     }
-    
+
     /**
      * Process a read ByteBuffer over a secured connection, or during the SSL/TLS Handshake.
      * 
@@ -206,47 +202,45 @@ public class SslHelper {
      */
     public void processRead(AbstractIoSession session, ByteBuffer readBuffer) throws SSLException {
         ByteBuffer tempBuffer;
-        
+
         if (previous != null) {
             tempBuffer = accumulate(readBuffer);
         } else {
             tempBuffer = readBuffer;
         }
-        
-        
+
         boolean done = false;
         SSLEngineResult result;
         ByteBuffer appBuffer = ByteBuffer.allocateDirect(sslEngine.getSession().getApplicationBufferSize());
-        
+
         HandshakeStatus handshakeStatus = sslEngine.getHandshakeStatus();
         while (!done) {
             switch (handshakeStatus) {
             case NEED_UNWRAP:
             case NOT_HANDSHAKING:
             case FINISHED:
-              result = sslEngine.unwrap(tempBuffer, appBuffer);
-              handshakeStatus = result.getHandshakeStatus();
+                result = sslEngine.unwrap(tempBuffer, appBuffer);
+                handshakeStatus = result.getHandshakeStatus();
 
-              switch (result.getStatus()) {
-              case BUFFER_UNDERFLOW:
-                  /* we need more data */
-                  done = true;
-                  break;
-              case BUFFER_OVERFLOW:
-                  /* resize output buffer */
-                  appBuffer = ByteBuffer.allocateDirect(appBuffer.capacity() * 2);
-                  break;
-              case OK:
-                  if ((handshakeStatus == HandshakeStatus.NOT_HANDSHAKING) &&
-                      (result.bytesProduced() > 0)) {
-                      appBuffer.flip();
-                      session.processMessageReceived(appBuffer);
-                  }
-              }
-              break;
+                switch (result.getStatus()) {
+                case BUFFER_UNDERFLOW:
+                    /* we need more data */
+                    done = true;
+                    break;
+                case BUFFER_OVERFLOW:
+                    /* resize output buffer */
+                    appBuffer = ByteBuffer.allocateDirect(appBuffer.capacity() * 2);
+                    break;
+                case OK:
+                    if ((handshakeStatus == HandshakeStatus.NOT_HANDSHAKING) && (result.bytesProduced() > 0)) {
+                        appBuffer.flip();
+                        session.processMessageReceived(appBuffer);
+                    }
+                }
+                break;
             case NEED_TASK:
                 Runnable task;
-                
+
                 while ((task = sslEngine.getDelegatedTask()) != null) {
                     task.run();
                 }
@@ -256,7 +250,7 @@ public class SslHelper {
                 result = sslEngine.wrap(EMPTY_BUFFER, appBuffer);
                 handshakeStatus = result.getHandshakeStatus();
                 switch (result.getStatus()) {
-                case  BUFFER_OVERFLOW:
+                case BUFFER_OVERFLOW:
                     appBuffer = ByteBuffer.allocateDirect(appBuffer.capacity() * 2);
                     break;
                 case BUFFER_UNDERFLOW:
@@ -278,7 +272,7 @@ public class SslHelper {
             previous = null;
         }
         readBuffer.clear();
-     }
+    }
 
     /**
      * Process the application data encryption for a session.

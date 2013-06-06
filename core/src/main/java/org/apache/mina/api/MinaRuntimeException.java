@@ -19,21 +19,28 @@
  */
 package org.apache.mina.api;
 
-import java.net.SocketAddress;
-
 /**
- * Connects to endpoint, communicates with the server, and fires events to {@link org.apache.mina.service.IoHandler}s.
+ * something very wrong happened in the low level part of I/O processing.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface IoClient {
+public class MinaRuntimeException extends RuntimeException {
 
-    /**
-     * Connects to the specified remote address.
-     * 
-     * @param remoteAddress Remote {@link SocketAddress} to connect
-     * @return the {@link IoFuture} instance which is completed when the connection attempt initiated by this call
-     *         succeeds or fails.
-     */
-    IoFuture<IoSession> connect(SocketAddress remoteAddress);
+    private static final long serialVersionUID = 1L;
+
+    public MinaRuntimeException() {
+        super();
+    }
+
+    public MinaRuntimeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public MinaRuntimeException(String message) {
+        super(message);
+    }
+
+    public MinaRuntimeException(Throwable cause) {
+        super(cause);
+    }
 }

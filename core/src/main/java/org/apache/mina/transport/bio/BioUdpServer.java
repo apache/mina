@@ -29,9 +29,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.api.IdleStatus;
+import org.apache.mina.api.IoFuture;
+import org.apache.mina.api.IoSession;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
+import org.apache.mina.transport.ConnectFuture;
 import org.apache.mina.transport.udp.AbstractUdpServer;
 import org.apache.mina.transport.udp.UdpSessionConfig;
 import org.slf4j.Logger;
@@ -145,6 +148,15 @@ public class BioUdpServer extends AbstractUdpServer {
             LOG.error("exception", e);
         }
 
+    }
+
+    @Override
+    public IoFuture<IoSession> connect(SocketAddress remoteAddress) {
+        BioUdpSession session = new BioUdpSession(remoteAddress, BioUdpServer.this, idleChecker);
+        sessions.put(remoteAddress, session);
+        ConnectFuture cf = new ConnectFuture();
+        cf.complete(session);
+        return cf;
     }
 
     private class Worker extends Thread {

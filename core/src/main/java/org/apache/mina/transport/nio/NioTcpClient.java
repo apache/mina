@@ -21,12 +21,14 @@ package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.MinaRuntimeException;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
@@ -105,15 +107,28 @@ public class NioTcpClient extends AbstractTcpClient {
      * {@inheritDoc}
      */
     @Override
-    public IoFuture<IoSession> connect(SocketAddress remoteAddress) throws IOException {
+    public IoFuture<IoSession> connect(SocketAddress remoteAddress) {
         Assert.assertNotNull(remoteAddress, "remoteAddress");
 
-        SocketChannel clientSocket = SocketChannel.open();
+        SocketChannel clientSocket;
+        try {
+            clientSocket = SocketChannel.open();
+        } catch (IOException e) {
+            throw new MinaRuntimeException("can't create a new socket, out of file descriptors ?", e);
+        }
 
-        clientSocket.socket().setSoTimeout(getConnectTimeoutMillis());
+        try {
+            clientSocket.socket().setSoTimeout(getConnectTimeoutMillis());
+        } catch (SocketException e) {
+            throw new MinaRuntimeException("can't set socket timeout", e);
+        }
 
         // non blocking
-        clientSocket.configureBlocking(false);
+        try {
+            clientSocket.configureBlocking(false);
+        } catch (IOException e) {
+            throw new MinaRuntimeException("can't configure socket as non-blocking", e);
+        }
 
         // apply idle configuration
         // Has to be final, as it's used in a inner class...
@@ -155,7 +170,12 @@ public class NioTcpClient extends AbstractTcpClient {
         if (receiveBufferSize != null) {
             session.getConfig().setReadBufferSize(receiveBufferSize);
         } else {
-            int rcvBufferSize = clientSocket.socket().getReceiveBufferSize();
+            int rcvBufferSize;
+            try {
+                rcvBufferSize = clientSocket.socket().getReceiveBufferSize();
+            } catch (SocketException e) {
+                throw new MinaRuntimeException("can't configure socket receive buffer size", e);
+            }
             session.getConfig().setReadBufferSize(rcvBufferSize);
         }
 
@@ -164,7 +184,12 @@ public class NioTcpClient extends AbstractTcpClient {
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
         } else {
-            int sndBufferSize = clientSocket.socket().getSendBufferSize();
+            int sndBufferSize;
+            try {
+                sndBufferSize = clientSocket.socket().getSendBufferSize();
+            } catch (SocketException e) {
+                throw new MinaRuntimeException("can't configure socket send buffe size", e);
+            }
             session.getConfig().setSendBufferSize(sndBufferSize);
         }
 
@@ -187,7 +212,14 @@ public class NioTcpClient extends AbstractTcpClient {
 
         // connect to a running server. We get an immediate result if
         // the socket is blocking, and either true or false if it's non blocking
-        boolean connected = clientSocket.connect(remoteAddress);
+        boolean connected;
+        try {
+            connected = clientSocket.connect(remoteAddress);
+        } catch (IOException e) {
+            ConnectFuture future = new ConnectFuture();
+            future.cannotConnect(e);
+            return future;
+        }
 
         ConnectFuture connectFuture = new ConnectFuture();
         session.setConnectFuture(connectFuture);

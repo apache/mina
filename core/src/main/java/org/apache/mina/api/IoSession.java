@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
 
 import org.apache.mina.session.AttributeKey;
 import org.apache.mina.session.WriteRequest;
@@ -156,9 +155,8 @@ public interface IoSession {
      * Initializes the SSL/TLS environment for this session.
      * 
      * @param sslContext The SLLCOntext instance to use.
-     * @throws SSLException If the SSL/TLS configuration can't be initialized
      */
-    void initSecure(SSLContext sslContext) throws SSLException;
+    void initSecure(SSLContext sslContext);
 
     /**
      * Tells if the session is using SSL/TLS.

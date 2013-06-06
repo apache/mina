@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.api.IdleStatus;
+import org.apache.mina.api.IoFuture;
+import org.apache.mina.api.IoSession;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
@@ -168,6 +170,11 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
         this.fireServiceActivated();
     }
 
+    @Override
+    public IoFuture<IoSession> connect(SocketAddress remoteAddress) {
+        throw new IllegalStateException("not supported");
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -208,7 +215,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
             final boolean write) {
         // Process the reads first
         try {
-            //System.err.println("remaining : " + readBuffer.remaining());
+            // System.err.println("remaining : " + readBuffer.remaining());
             final SocketAddress source = datagramChannel.receive(readBuffer);
             NioUdpSession session = null;
 

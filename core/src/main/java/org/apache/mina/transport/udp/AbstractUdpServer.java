@@ -21,16 +21,17 @@ package org.apache.mina.transport.udp;
 
 import javax.net.ssl.SSLException;
 
+import org.apache.mina.api.IoClient;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.server.AbstractIoServer;
 
 /**
- * TODO
+ * Base implementation for all the UDP servers.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractUdpServer extends AbstractIoServer {
+public abstract class AbstractUdpServer extends AbstractIoServer implements IoClient {
     /**
      * Create an new AbsractUdpServer instance
      * 

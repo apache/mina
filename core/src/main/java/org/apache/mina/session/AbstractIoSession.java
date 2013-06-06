@@ -28,7 +28,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
 
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFilter;
@@ -345,7 +344,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
-    public void initSecure(SSLContext sslContext) throws SSLException {
+    public void initSecure(SSLContext sslContext) {
         SslHelper sslHelper = new SslHelper(this, sslContext);
         sslHelper.init();
 

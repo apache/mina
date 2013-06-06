@@ -37,6 +37,14 @@ public class ConnectFuture extends AbstractIoFuture<IoSession> {
     }
 
     /**
+     * Can't connect
+     */
+
+    public void cannotConnect(Exception e) {
+        setException(e);
+    }
+
+    /**
      * session connected
      */
     public void complete(IoSession session) {

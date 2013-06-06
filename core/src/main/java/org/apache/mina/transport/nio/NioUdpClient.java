@@ -21,11 +21,13 @@ package org.apache.mina.transport.nio;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.MinaRuntimeException;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
 import org.apache.mina.transport.ConnectFuture;
@@ -66,11 +68,20 @@ public class NioUdpClient extends AbstractUdpClient {
      * {@inheritDoc}
      */
     @Override
-    public IoFuture<IoSession> connect(SocketAddress remoteAddress) throws IOException {
+    public IoFuture<IoSession> connect(SocketAddress remoteAddress) {
         Assert.assertNotNull(remoteAddress, "remoteAddress");
 
-        DatagramChannel ch = DatagramChannel.open();
-        ch.configureBlocking(false);
+        DatagramChannel ch;
+        try {
+            ch = DatagramChannel.open();
+        } catch (IOException e) {
+            throw new MinaRuntimeException("can't create a new socket, out of file descriptors ?", e);
+        }
+        try {
+            ch.configureBlocking(false);
+        } catch (IOException e) {
+            throw new MinaRuntimeException("can't configure socket as non-blocking", e);
+        }
 
         UdpSessionConfig config = getSessionConfig();
 
@@ -102,8 +113,14 @@ public class NioUdpClient extends AbstractUdpClient {
         if (readBufferSize != null) {
             session.getConfig().setReadBufferSize(readBufferSize);
         } else {
-            int rcvBufferSize = ch.socket().getReceiveBufferSize();
-            session.getConfig().setReadBufferSize(rcvBufferSize);
+            int rcvBufferSize;
+            try {
+                rcvBufferSize = ch.socket().getReceiveBufferSize();
+                session.getConfig().setReadBufferSize(rcvBufferSize);
+
+            } catch (SocketException e) {
+                throw new MinaRuntimeException("can't configure socket receive buffer size", e);
+            }
         }
 
         Integer sendBufferSize = config.getSendBufferSize();
@@ -111,8 +128,13 @@ public class NioUdpClient extends AbstractUdpClient {
         if (sendBufferSize != null) {
             session.getConfig().setSendBufferSize(sendBufferSize);
         } else {
-            int sndBufferSize = ch.socket().getSendBufferSize();
-            session.getConfig().setSendBufferSize(sndBufferSize);
+            int sndBufferSize;
+            try {
+                sndBufferSize = ch.socket().getSendBufferSize();
+                session.getConfig().setSendBufferSize(sndBufferSize);
+            } catch (SocketException e) {
+                throw new MinaRuntimeException("can't configure socket send buffe size", e);
+            }
         }
 
         Integer trafficClass = config.getTrafficClass();
