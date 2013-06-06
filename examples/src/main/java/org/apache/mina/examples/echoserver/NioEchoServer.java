@@ -20,7 +20,6 @@
 
 package org.apache.mina.examples.echoserver;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -113,8 +112,6 @@ public class NioEchoServer {
             Thread.sleep(25000);
             LOG.debug("Unbinding the TCP port");
             acceptor.unbind();
-        } catch (final IOException e) {
-            LOG.error("I/O exception", e);
         } catch (final InterruptedException e) {
             LOG.error("Interrupted exception", e);
         }

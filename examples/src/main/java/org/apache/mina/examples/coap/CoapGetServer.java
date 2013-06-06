@@ -19,7 +19,6 @@
  */
 package org.apache.mina.examples.coap;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.api.AbstractIoHandler;
@@ -69,16 +68,33 @@ public class CoapGetServer {
 
         });
         BioUdpServer server = new BioUdpServer();
-        server.setFilters(new ProtocolCodecFilter<CoapMessage, ByteBuffer, Void, Void>(new CoapEncoder(),
-                new CoapDecoder()));
+        server.setFilters(/* new LoggingFilter(), */new ProtocolCodecFilter<CoapMessage, ByteBuffer, Void, Void>(
+                new CoapEncoder(), new CoapDecoder()));
         server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 20000);
         server.setIoHandler(new AbstractIoHandler() {
+
+            long start = System.currentTimeMillis();
+            int count = 0;
+
             @Override
             public void messageReceived(IoSession session, Object message) {
-                System.err.println("rcv : " + message);
+                // System.err.println("rcv : " + message);
+
                 CoapMessage resp = reg.respond((CoapMessage) message);
-                System.err.println("resp : " + resp);
+                // System.err.println("resp : " + resp);
                 session.write(resp);
+                count++;
+                if (count >= 100000) {
+                    System.err.println("time for 100k msg : " + (System.currentTimeMillis() - start));
+                    count = 0;
+                    start = System.currentTimeMillis();
+                }
+            }
+
+            @Override
+            public void sessionIdle(IoSession session, IdleStatus status) {
+                System.err.println("idle closing");
+                session.close(false);
             }
         });
 
@@ -87,8 +103,6 @@ public class CoapGetServer {
             for (;;) {
                 Thread.sleep(1000);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

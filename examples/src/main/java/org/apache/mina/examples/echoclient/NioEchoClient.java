@@ -20,7 +20,6 @@
 
 package org.apache.mina.examples.echoclient;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
@@ -87,8 +86,6 @@ public class NioEchoClient {
 
             LOG.debug("Running the client for 25 sec");
             Thread.sleep(25000);
-        } catch (IOException e) {
-            LOG.error("connection error : {}", e);
         } catch (InterruptedException e) {
         }
     }
