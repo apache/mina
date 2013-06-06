@@ -38,6 +38,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
+ * Binary benchmark
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @RunWith(Parameterized.class)
@@ -66,13 +67,10 @@ public abstract class BenchmarkBinaryTest {
 
     public abstract Type getServerType();
 
-    @Parameters(name="{0} messages of size {1}")
+    @Parameters(name = "{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
-        Object[][] parameters = new Object[][] { 
-                { 100000, 10, 2 * 60 }, 
-                { 100000, 1 * 1024, 2 * 60 },
-                { 100000, 10 * 1024, 2 * 60 }, 
-                { 100, 64 * 1024 * 1024, 10 * 60 } };
+        Object[][] parameters = new Object[][] { { 100000, 10, 2 * 60 }, { 100000, 1 * 1024, 2 * 60 },
+                { 100000, 10 * 1024, 2 * 60 }, { 100, 64 * 1024 * 1024, 10 * 60 } };
         return Arrays.asList(parameters);
     }
 
@@ -119,9 +117,38 @@ public abstract class BenchmarkBinaryTest {
     @Test
     public void benchmark() throws IOException, InterruptedException {
         CountDownLatch counter = new CountDownLatch(numberOfMessages);
+        CounterFilter.messageSent.set(0);
 
+        boolean result = false;
+
+        System.out.println("-------------- Sending " + data.length + " bytes");
         client.start(port, counter, data);
-        boolean result = counter.await(timeout, TimeUnit.SECONDS);
-        assertTrue("Still " + counter.getCount() + " messages to send on a total of " + numberOfMessages, result);
+        long globalSent = 0;
+        long warmedUpSent = 0;
+        int nbSeconds = 0;
+
+        while ((counter.getCount() > 0) && (nbSeconds < 120)) {
+            result = counter.await(1, TimeUnit.SECONDS);
+
+            long nbSent = CounterFilter.messageSent.getAndSet(0);
+            nbSeconds++;
+
+            globalSent += nbSent;
+
+            if (nbSeconds > 5) {
+                warmedUpSent += nbSent;
+            }
+
+            System.out.println("Nb messages sent per second : " + nbSent);
+        }
+
+        if (nbSeconds < 120) {
+            System.out.println("Average : " + (warmedUpSent / (nbSeconds - 5)) + ", for " + globalSent
+                    + " messages sent in " + nbSeconds + "s");
+        } else {
+            System.out.println("Wasn't able to send all the messages : sent " + globalSent);
+        }
+
+        assertTrue("Still " + counter.getCount() + " messages to send of a total of " + numberOfMessages, result);
     }
 }
