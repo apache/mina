@@ -28,6 +28,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.api.IdleStatus;
+import org.apache.mina.api.MinaRuntimeException;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
@@ -161,7 +162,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void bind(final int port) throws IOException {
+    public void bind(final int port) {
         bind(new InetSocketAddress(port));
     }
 
@@ -169,21 +170,25 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public synchronized void bind(final SocketAddress localAddress) throws IOException {
+    public synchronized void bind(final SocketAddress localAddress) {
         Assert.assertNotNull(localAddress, "localAddress");
 
         // check if the address is already bound
         if (this.address != null) {
-            throw new IOException("address " + address + " already bound");
+            throw new IllegalStateException("address " + address + " already bound");
         }
 
         LOG.info("binding address {}", localAddress);
         this.address = localAddress;
 
-        serverChannel = ServerSocketChannel.open();
-        serverChannel.socket().setReuseAddress(isReuseAddress());
-        serverChannel.socket().bind(address);
-        serverChannel.configureBlocking(false);
+        try {
+            serverChannel = ServerSocketChannel.open();
+            serverChannel.socket().setReuseAddress(isReuseAddress());
+            serverChannel.socket().bind(address);
+            serverChannel.configureBlocking(false);
+        } catch (IOException e) {
+            throw new MinaRuntimeException("can't bind address" + address, e);
+        }
 
         acceptSelectorLoop.register(true, false, false, false, this, serverChannel, null);
 
@@ -206,13 +211,18 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public synchronized void unbind() throws IOException {
+    public synchronized void unbind() {
         LOG.info("unbinding {}", address);
         if (this.address == null) {
             throw new IllegalStateException("server not bound");
         }
-        serverChannel.socket().close();
-        serverChannel.close();
+        try {
+            serverChannel.socket().close();
+            serverChannel.close();
+        } catch (IOException e) {
+            throw new MinaRuntimeException("can't unbind server", e);
+        }
+
         acceptSelectorLoop.unregister(this, serverChannel);
 
         this.address = null;

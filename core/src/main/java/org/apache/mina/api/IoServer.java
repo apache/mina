@@ -19,7 +19,6 @@
  */
 package org.apache.mina.api;
 
-import java.io.IOException;
 import java.net.SocketAddress;
 
 /**
@@ -37,24 +36,20 @@ public interface IoServer {
 
     /**
      * Binds to the specified local addresses and start to accept incoming connections.
-     * 
-     * @throws IOException if failed to bind
      */
-    void bind(SocketAddress localAddress) throws IOException;
+    void bind(SocketAddress localAddress);
 
     /**
      * Binds the server to the specified port.
      * 
      * @param port the local TCP port to bind.
-     * @throws IOException if failed to bind.
      */
-    void bind(int port) throws IOException;
+    void bind(int port);
 
     /**
      * Unbinds from the local addresses that this service is bound to and stops to accept incoming connections. This
      * method returns silently if no local address is bound yet.
      * 
-     * @throws IOException if failed to unbind
      */
-    void unbind() throws IOException;
+    void unbind();
 }

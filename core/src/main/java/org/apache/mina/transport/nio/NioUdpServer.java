@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.MinaRuntimeException;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OrderedHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
@@ -136,7 +137,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void bind(final int port) throws IOException {
+    public void bind(final int port) {
         bind(new InetSocketAddress(port));
     }
 
@@ -144,7 +145,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void bind(final SocketAddress localAddress) throws IOException {
+    public void bind(final SocketAddress localAddress) {
         if (localAddress == null) {
             // We should at least have one address to bind on
             throw new IllegalArgumentException("LocalAdress cannot be null");
@@ -152,17 +153,20 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
 
         // check if the address is already bound
         if (this.address != null) {
-            throw new IOException("address " + address + " already bound");
+            throw new IllegalStateException("address " + address + " already bound");
         }
         address = localAddress;
 
         LOG.info("binding address {}", localAddress);
 
-        datagramChannel = DatagramChannel.open();
-
-        datagramChannel.socket().setReuseAddress(isReuseAddress());
-        datagramChannel.socket().bind(address);
-        datagramChannel.configureBlocking(false);
+        try {
+            datagramChannel = DatagramChannel.open();
+            datagramChannel.socket().setReuseAddress(isReuseAddress());
+            datagramChannel.socket().bind(address);
+            datagramChannel.configureBlocking(false);
+        } catch (IOException e) {
+            throw new MinaRuntimeException("can't open the address " + address, e);
+        }
 
         readSelectorLoop.register(false, false, true, false, this, datagramChannel, null);
 
@@ -179,7 +183,7 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public void unbind() throws IOException {
+    public void unbind() {
         LOG.info("unbinding {}", address);
         if (this.address == null) {
             throw new IllegalStateException("server not bound");
@@ -187,7 +191,11 @@ public class NioUdpServer extends AbstractUdpServer implements SelectorListener 
 
         readSelectorLoop.unregister(this, datagramChannel);
         datagramChannel.socket().close();
-        datagramChannel.close();
+        try {
+            datagramChannel.close();
+        } catch (IOException e) {
+            throw new MinaRuntimeException("can't close the datagram socket", e);
+        }
 
         this.address = null;
         this.fireServiceInactivated();

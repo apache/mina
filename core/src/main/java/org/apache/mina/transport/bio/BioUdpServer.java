@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.api.MinaRuntimeException;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.service.idlechecker.IndexedIdleChecker;
@@ -90,36 +91,40 @@ public class BioUdpServer extends AbstractUdpServer {
     }
 
     @Override
-    public void bind(SocketAddress localAddress) throws IOException {
+    public void bind(SocketAddress localAddress) {
         LOG.info("binding to address {}", localAddress);
         if (bound) {
             throw new IllegalStateException("already bound");
         }
         boundAddress = localAddress;
-        channel = DatagramChannel.open();
-        channel.socket().bind(localAddress);
-        Boolean reuseAddress = config.isReuseAddress();
+        try {
+            channel = DatagramChannel.open();
+            channel.socket().bind(localAddress);
+            Boolean reuseAddress = config.isReuseAddress();
 
-        if (reuseAddress != null) {
-            channel.socket().setReuseAddress(reuseAddress);
-        }
+            if (reuseAddress != null) {
+                channel.socket().setReuseAddress(reuseAddress);
+            }
 
-        Integer readBufferSize = config.getReadBufferSize();
+            Integer readBufferSize = config.getReadBufferSize();
 
-        if (readBufferSize != null) {
-            channel.socket().setReceiveBufferSize(readBufferSize);
-        }
+            if (readBufferSize != null) {
+                channel.socket().setReceiveBufferSize(readBufferSize);
+            }
 
-        Integer sendBufferSize = config.getSendBufferSize();
+            Integer sendBufferSize = config.getSendBufferSize();
 
-        if (sendBufferSize != null) {
-            channel.socket().setSendBufferSize(sendBufferSize);
-        }
+            if (sendBufferSize != null) {
+                channel.socket().setSendBufferSize(sendBufferSize);
+            }
 
-        Integer trafficClass = config.getTrafficClass();
+            Integer trafficClass = config.getTrafficClass();
 
-        if (trafficClass != null) {
-            channel.socket().setTrafficClass(trafficClass);
+            if (trafficClass != null) {
+                channel.socket().setTrafficClass(trafficClass);
+            }
+        } catch (IOException e) {
+            throw new MinaRuntimeException("Can't open and configure a new udp socket", e);
         }
 
         worker = new Worker();
@@ -129,18 +134,22 @@ public class BioUdpServer extends AbstractUdpServer {
     }
 
     @Override
-    public void bind(int port) throws IOException {
+    public void bind(int port) {
         bind(new InetSocketAddress(port));
     }
 
     @Override
-    public void unbind() throws IOException {
+    public void unbind() {
         if (!bound) {
             throw new IllegalStateException("not bound");
         }
         bound = false;
         try {
-            channel.close();
+            try {
+                channel.close();
+            } catch (IOException e) {
+                throw new MinaRuntimeException("can't unbind the udp channel", e);
+            }
             boundAddress = null;
             idleChecker.destroy();
             worker.join();
