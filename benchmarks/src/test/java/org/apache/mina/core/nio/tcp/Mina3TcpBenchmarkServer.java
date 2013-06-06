@@ -28,6 +28,7 @@ import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
+import org.apache.mina.core.CounterFilter;
 import org.apache.mina.session.AttributeKey;
 import org.apache.mina.transport.nio.NioTcpServer;
 
@@ -133,6 +134,7 @@ public class Mina3TcpBenchmarkServer implements BenchmarkServer {
 
             @Override
             public void messageSent(IoSession session, Object message) {
+                CounterFilter.messageSent.getAndIncrement();
             }
 
             @Override

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.mina.core.BenchmarkServer;
+import org.apache.mina.core.CounterFilter;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -38,6 +39,7 @@ import org.jboss.netty.channel.ChildChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.jboss.netty.channel.WriteCompletionEvent;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -111,6 +113,10 @@ public class Netty3TcpBenchmarkServer implements BenchmarkServer {
                         System.out.println("channelOpen");
                         setAttribute(ctx, STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
                         allChannels.add(ctx.getChannel());
+                    }
+
+                    public void writeComplete(ChannelHandlerContext ctx, WriteCompletionEvent e) throws Exception {
+                        CounterFilter.messageSent.getAndIncrement();
                     }
 
                     @Override
