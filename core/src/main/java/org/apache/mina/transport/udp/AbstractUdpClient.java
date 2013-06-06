@@ -21,8 +21,6 @@ package org.apache.mina.transport.udp;
 
 import java.net.SocketAddress;
 
-import javax.net.ssl.SSLException;
-
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.service.client.AbstractIoClient;
@@ -40,13 +38,6 @@ public abstract class AbstractUdpClient extends AbstractIoClient {
     protected AbstractUdpClient(IoHandlerExecutor ioHandlerExecutor) {
         super(ioHandlerExecutor);
         this.config = new DefaultUdpSessionConfig();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void initSecured(IoSession session) throws SSLException {
-        // Do nothing : UDP does not support SSL
     }
 
     /**
