@@ -157,7 +157,7 @@ public abstract class AbstractNioSession extends AbstractIoSession {
             writeRequest = sslHelper.processWrite(this, writeRequest.getMessage(), writeQueue);
         }
 
-        synchronized (writeQueue) {
+        /*synchronized (writeQueue)*/{
             ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
 
             if (writeQueue.isEmpty()) {

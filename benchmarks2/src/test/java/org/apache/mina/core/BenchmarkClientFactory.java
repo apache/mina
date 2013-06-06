@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core;
 
+import org.apache.mina.core.nio.tcp.Mina3TcpBenchmarkClient;
 import org.apache.mina.core.nio.tcp.Netty4TcpBenchmarkClient;
 import org.apache.mina.core.nio.udp.Netty4UdpBenchmarkClient;
 
@@ -35,6 +36,8 @@ public class BenchmarkClientFactory implements BenchmarkFactory<BenchmarkClient>
             return new Netty4TcpBenchmarkClient();
         case Netty4_udp:
             return new Netty4UdpBenchmarkClient();
+        case Mina3_tcp:
+            return new Mina3TcpBenchmarkClient();
         default:
             throw new IllegalArgumentException("Invalid type " + type);
         }

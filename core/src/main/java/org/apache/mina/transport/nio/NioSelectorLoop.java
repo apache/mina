@@ -49,7 +49,7 @@ public class NioSelectorLoop implements SelectorLoop {
     private Selector selector;
 
     /** Read buffer for all the incoming bytes (default to 64Kb) */
-    private final ByteBuffer readBuffer = ByteBuffer.allocate(64 * 1024);
+    private final ByteBuffer readBuffer = ByteBuffer.allocateDirect(64 * 1024);
 
     /** The queue containing the channels to register on the selector */
     private final Queue<Registration> registrationQueue = new ConcurrentLinkedQueue<Registration>();

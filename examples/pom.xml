@@ -38,11 +38,9 @@
   </properties>
 
   <dependencies>
-    
       <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
     

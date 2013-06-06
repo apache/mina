@@ -19,54 +19,50 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.apache.mina</groupId>
-        <artifactId>mina-parent</artifactId>
-        <version>3.0.0-M1-SNAPSHOT</version>
-    </parent>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.mina</groupId>
+    <artifactId>mina-parent</artifactId>
+    <version>3.0.0-M1-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>mina-protobuf</artifactId>
-    <name>Apache MINA Serialization::Protobuf ${project.version}</name>
-    <packaging>bundle</packaging>
+  <artifactId>mina-protobuf</artifactId>
+  <name>Apache MINA Serialization::Protobuf ${project.version}</name>
+  <packaging>bundle</packaging>
 
-    <properties>
-        <symbolicName>${project.groupId}.protobuf</symbolicName>
-        <exportedPackage>${project.groupId}</exportedPackage>
-        <protobuf.version>2.5.0</protobuf.version>
-    </properties>
+  <properties>
+    <symbolicName>${project.groupId}.protobuf</symbolicName>
+    <exportedPackage>${project.groupId}</exportedPackage>
+    <protobuf.version>2.5.0</protobuf.version>
+  </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>${protobuf.version}</version>
-            <scope>provided</scope>
-        </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
+    <dependency>
+      <groupId>org.apache.logging.log4j.adapters</groupId>
+      <artifactId>slf4j-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.logging.log4j.adapters</groupId>
-            <artifactId>slf4j-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mina-codec</artifactId>
-            <version>${project.version}</version>
-            <type>bundle</type>
-        </dependency>
-        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mina-codec</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <classifier>tests</classifier>
-        </dependency>
-        
-    </dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-codec</artifactId>
+      <type>bundle</type>
+    </dependency>
+    
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-codec</artifactId>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency>
+  </dependencies>
 </project>
 

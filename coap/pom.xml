@@ -41,14 +41,13 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mina-core</artifactId>
-      <version>${project.version}</version>
       <type>bundle</type>
     </dependency>
     
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mina-codec</artifactId>
-      <version>${project.version}</version>
+      <type>bundle</type>
     </dependency>
     
     <dependency>
@@ -56,6 +55,5 @@
       <artifactId>slf4j-impl</artifactId>
       <scope>runtime</scope>
     </dependency>
-    
   </dependencies>
 </project>

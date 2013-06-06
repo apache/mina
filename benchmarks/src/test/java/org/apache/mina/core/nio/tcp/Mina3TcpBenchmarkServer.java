@@ -30,6 +30,7 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
 import org.apache.mina.core.CounterFilter;
 import org.apache.mina.session.AttributeKey;
+import org.apache.mina.transport.nio.FixedSelectorLoopPool;
 import org.apache.mina.transport.nio.NioTcpServer;
 
 /**
@@ -61,7 +62,7 @@ public class Mina3TcpBenchmarkServer implements BenchmarkServer {
      * {@inheritDoc}
      */
     public void start(int port) throws IOException {
-        tcpServer = new NioTcpServer();
+        tcpServer = new NioTcpServer(new FixedSelectorLoopPool("Server", 1), null);
         tcpServer.getSessionConfig().setReadBufferSize(128 * 1024);
         tcpServer.getSessionConfig().setTcpNoDelay(true);
         tcpServer.setIoHandler(new IoHandler() {
