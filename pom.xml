@@ -85,11 +85,11 @@
 
   <properties>
     <!-- Dependencies versions ========================================== -->
-    <version.guava>10.0.1</version.guava>
+    <version.guava>14.0.1</version.guava>
     <version.junit>4.11</version.junit>
     <version.log4j>2.0-beta2</version.log4j>
     <version.mockito-core>1.9.5</version.mockito-core>
-    <version.slf4j.api>1.6.4</version.slf4j.api>
+    <version.slf4j.api>1.7.5</version.slf4j.api>
 
     <!-- Plugins versions =============================================== -->
     <version.findbugs.maven.plugin>2.3.2</version.findbugs.maven.plugin>
