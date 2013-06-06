@@ -33,6 +33,7 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
@@ -58,6 +59,7 @@ public class Netty3UdpBenchmarkClient implements BenchmarkClient {
         factory = new NioDatagramChannelFactory();
         ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(factory);
         bootstrap.setOption("sendBufferSize", 65536);
+        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(9000));
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             public ChannelPipeline getPipeline() throws Exception {
                 return Channels.pipeline(new SimpleChannelUpstreamHandler() {
