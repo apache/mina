@@ -19,10 +19,6 @@
  */
 
 /**
- * Base API for the MINA library. All those interface and API are the contract with the framework.
- * 
- * For running an {@link org.apache.mina.api.IoService} you need to choose a concrete implementation in
- * org.apache.mina.transport.
+ * Transport implementation base on blocking I/O {@link java.net.Socket}
  */
-package org.apache.mina.api;
-
+package org.apache.mina.transport.bio;

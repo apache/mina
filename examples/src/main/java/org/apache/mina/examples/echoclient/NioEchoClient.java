@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A basic client test
+ * A simple TCP client, write back to the client every received messages.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -51,7 +51,6 @@ public class NioEchoClient {
             @Override
             public void sessionOpened(final IoSession session) {
                 LOG.info("session opened {}", session);
-
             }
 
             @Override

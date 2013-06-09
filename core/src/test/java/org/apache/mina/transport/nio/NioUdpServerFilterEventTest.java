@@ -35,8 +35,6 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.NioUdpServer;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +57,7 @@ public class NioUdpServerFilterEventTest {
     private CountDownLatch msgReadLatch = new CountDownLatch(CLIENT_COUNT);
 
     private CountDownLatch openLatch = new CountDownLatch(CLIENT_COUNT);
-    
+
     @Test
     public void generate_all_kind_of_server_event() throws IOException, InterruptedException {
         final NioUdpServer server = new NioUdpServer();
@@ -67,9 +65,8 @@ public class NioUdpServerFilterEventTest {
         server.setFilters(new MyCodec(), new Handler());
         server.bind(0);
         // warm up
-        //Thread.sleep(100);
+        // Thread.sleep(100);
 
-        long t0 = System.currentTimeMillis();
         final int port = server.getDatagramChannel().socket().getLocalPort();
 
         final DatagramSocket[] clients = new DatagramSocket[CLIENT_COUNT];

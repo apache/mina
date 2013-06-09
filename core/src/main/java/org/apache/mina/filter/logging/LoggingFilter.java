@@ -39,9 +39,6 @@ import org.slf4j.LoggerFactory;
  */
 public class LoggingFilter implements IoFilter {
 
-    /** The logger name */
-    private final String name;
-
     /** The logger */
     private final Logger logger;
 
@@ -86,12 +83,10 @@ public class LoggingFilter implements IoFilter {
      */
     public LoggingFilter(final String name) {
         if (name == null) {
-            this.name = LoggingFilter.class.getName();
+            logger = LoggerFactory.getLogger(LoggingFilter.class.getName());
         } else {
-            this.name = name;
+            logger = LoggerFactory.getLogger(name);
         }
-
-        logger = LoggerFactory.getLogger(this.name);
     }
 
     /**

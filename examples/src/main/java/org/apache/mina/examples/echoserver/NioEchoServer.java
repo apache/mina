@@ -25,19 +25,14 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
 import org.apache.mina.api.AbstractIoHandler;
-import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
-import org.apache.mina.filterchain.ReadFilterChainController;
-import org.apache.mina.filterchain.WriteFilterChainController;
-import org.apache.mina.session.WriteRequest;
 import org.apache.mina.transport.nio.NioTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A basic Server test
+ * A simple TCP server, write back to the client every received messages.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -51,46 +46,8 @@ public class NioEchoServer {
 
         final NioTcpServer acceptor = new NioTcpServer();
 
-        // create the fitler chain for this service
-        acceptor.setFilters(new LoggingFilter("LoggingFilter1"), new IoFilter() {
-
-            @Override
-            public void sessionOpened(final IoSession session) {
-                LOG.info("session {} open", session);
-            }
-
-            @Override
-            public void sessionIdle(final IoSession session, final IdleStatus status) {
-                LOG.info("session {} idle", session);
-            }
-
-            @Override
-            public void sessionClosed(final IoSession session) {
-                LOG.info("session {} open", session);
-            }
-
-            @Override
-            public void messageWriting(final IoSession session, WriteRequest message,
-                    final WriteFilterChainController controller) {
-                // we just push the message in the chain
-                controller.callWriteNextFilter(message);
-            }
-
-            @Override
-            public void messageReceived(final IoSession session, final Object message,
-                    final ReadFilterChainController controller) {
-
-                if (message instanceof ByteBuffer) {
-                    LOG.info("echoing");
-                    session.write(message);
-                }
-            }
-
-            @Override
-            public void messageSent(final IoSession session, final Object message) {
-                LOG.info("message {} sent", message);
-            }
-        });
+        // create the filter chain for this service
+        acceptor.setFilters(new LoggingFilter("LoggingFilter1"));
 
         acceptor.setIoHandler(new AbstractIoHandler() {
             @Override
@@ -102,7 +59,14 @@ public class NioEchoServer {
                 bf.put(welcomeStr.getBytes());
                 bf.flip();
                 session.write(bf);
+            }
 
+            @Override
+            public void messageReceived(IoSession session, Object message) {
+                if (message instanceof ByteBuffer) {
+                    LOG.info("echoing");
+                    session.write(message);
+                }
             }
         });
         try {

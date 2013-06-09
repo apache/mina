@@ -19,10 +19,7 @@
  */
 
 /**
- * Base API for the MINA library. All those interface and API are the contract with the framework.
- * 
- * For running an {@link org.apache.mina.api.IoService} you need to choose a concrete implementation in
- * org.apache.mina.transport.
+ * Shared plumber UDP transport implementations.
  */
-package org.apache.mina.api;
+package org.apache.mina.transport.udp;
 
