@@ -19,6 +19,8 @@
  */
 package org.apache.mina.filter.codec;
 
+import java.nio.ByteBuffer;
+
 import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
@@ -37,6 +39,8 @@ import org.slf4j.LoggerFactory;
  * An {@link IoFilter} which translates binary or protocol specific data into message objects and vice versa using
  * {@link ProtocolCodecFactory}, {@link ProtocolEncoder}, or {@link ProtocolDecoder}.
  * 
+ * @param MESSAGE the kind of high level business message this filter will encode and decode.
+ * @param ENCODED the kind of low level message (most of time {@link ByteBuffer}) this filter will produce of consume.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STATE> extends AbstractIoFilter {

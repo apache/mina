@@ -71,11 +71,9 @@ public class NioSelectorLoop implements SelectorLoop {
      * @param index
      */
     public NioSelectorLoop(final String prefix, final int index) {
-        String name = NioSelectorLoop.class.getName() + ":" + prefix;
         String workerName = "SelectorWorker " + prefix;
 
         if (index >= 0) {
-            name += "-" + index;
             workerName += "-" + index;
         }
 
@@ -145,7 +143,7 @@ public class NioSelectorLoop implements SelectorLoop {
             SelectableChannel channel, boolean wakeup) {
         if (IS_DEBUG) {
             LOG.debug("modifying registration : {} for accept : {}, read : {}, write : {}, channel : {}", new Object[] {
-                    listener, accept, read, write, channel });
+                                    listener, accept, read, write, channel });
         }
 
         final SelectionKey key = channel.keyFor(selector);

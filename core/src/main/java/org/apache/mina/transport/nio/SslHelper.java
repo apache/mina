@@ -79,9 +79,6 @@ public class SslHelper {
     /** An empty buffer used during the handshake phase */
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
 
-    /** An empty buffer used during the handshake phase */
-    private static final ByteBuffer HANDSHAKE_BUFFER = ByteBuffer.allocate(1024);
-
     private ByteBuffer previous = null;
 
     /**

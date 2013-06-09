@@ -22,7 +22,8 @@ package org.apache.mina.api;
 import java.net.SocketAddress;
 
 /**
- * Connects to endpoint, communicates with the server, and fires events to {@link org.apache.mina.service.IoHandler}s.
+ * Connects to several end-points, communicates with the server, and fires events to
+ * {@link org.apache.mina.service.IoHandler}s.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

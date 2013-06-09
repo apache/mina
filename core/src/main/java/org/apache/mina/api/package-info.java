@@ -17,30 +17,12 @@
  *  under the License.
  *
  */
+
 package org.apache.mina.api;
 
 /**
- * Something very wrong happened in the low level part of I/O processing.
+ * Base API for the MINA library. All those interface and API are the contract with the framework.
  * 
- * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ * For running an {@link org.apache.mina.api.IoService} you need to choose a concrete implementation in
+ * org.apache.mina.transport.
  */
-public class MinaRuntimeException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-
-    public MinaRuntimeException() {
-        super();
-    }
-
-    public MinaRuntimeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public MinaRuntimeException(String message) {
-        super(message);
-    }
-
-    public MinaRuntimeException(Throwable cause) {
-        super(cause);
-    }
-}

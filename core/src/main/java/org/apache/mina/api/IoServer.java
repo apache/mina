@@ -23,7 +23,9 @@ import java.net.SocketAddress;
 
 /**
  * 
- * A network server bound to a local address
+ * A network server bound to a local address.
+ * <p>
+ * Will crate a new {@link IoSession} for each new incoming connection.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 

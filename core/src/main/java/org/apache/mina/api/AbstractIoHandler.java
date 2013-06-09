@@ -84,7 +84,7 @@ public abstract class AbstractIoHandler implements IoHandler {
      */
     @Override
     public void exceptionCaught(final IoSession session, final Exception cause) {
-        LOG.error("Unexpected exception : ", cause);
+        LOG.error("Unexpected exception, we close the session : ", cause);
         session.close(true);
     }
 }
