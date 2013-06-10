@@ -25,15 +25,19 @@ import org.apache.mina.codec.delimited.serialization.ProtobufMessageEncoder;
 import com.google.protobuf.GeneratedMessage;
 
 /**
+ * Encode for protocol buffer messages.
+ * 
+ * @param INPUT base type for the encoded messages
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProtobufEncoder<OUT extends GeneratedMessage> extends SizePrefixedEncoder<OUT> {
+public class ProtobufEncoder<INPUT extends GeneratedMessage> extends SizePrefixedEncoder<INPUT> {
 
     public static <L extends GeneratedMessage> ProtobufEncoder<L> newInstance(Class<L> clazz) {
         return new ProtobufEncoder<L>(clazz);
     }
 
-    public ProtobufEncoder(Class<OUT> clazz) {
+    public ProtobufEncoder(Class<INPUT> clazz) {
         super(new VarInt.Encoder(), ProtobufMessageEncoder.newInstance(clazz));
     }
 }

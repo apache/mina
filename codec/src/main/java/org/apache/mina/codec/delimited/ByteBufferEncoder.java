@@ -35,13 +35,13 @@ import org.apache.mina.codec.StatelessProtocolEncoder;
  * ByteBuffer.
  * </p>
  * 
- * @param <OUTPUT>
+ * @param <INPUT>
  *            the type of the messages which will be encoded in ByteBuffers and
  *            decoded from ByteBuffers.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEncoder<OUTPUT, ByteBuffer> {
+public abstract class ByteBufferEncoder<INPUT> implements StatelessProtocolEncoder<INPUT, ByteBuffer> {
 
     /**
      * Being stateless, this method is left empty
@@ -62,7 +62,7 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      * @return the buffer containing {@link ByteBuffer} representation of the
      *         message
      */
-    public ByteBuffer encode(OUTPUT message) {
+    public ByteBuffer encode(INPUT message) {
         ByteBuffer buffer = ByteBuffer.allocate(getEncodedSize(message));
         int oldPos = buffer.position();
         writeTo(message, buffer);
@@ -79,7 +79,7 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      */
 
     @Override
-    public final ByteBuffer encode(OUTPUT message, Void context) {
+    public final ByteBuffer encode(INPUT message, Void context) {
         return encode(message);
     }
 
@@ -91,7 +91,7 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      *            a message to be encoded
      * @return the size of the serialized form of the message
      */
-    public abstract int getEncodedSize(OUTPUT message);
+    public abstract int getEncodedSize(INPUT message);
 
     /**
      * Writes a message on a {@link ByteBuffer}.
@@ -106,6 +106,6 @@ public abstract class ByteBufferEncoder<OUTPUT> implements StatelessProtocolEnco
      * @param buffer
      *            a target {@link ByteBuffer}
      */
-    public abstract void writeTo(OUTPUT message, ByteBuffer buffer);
+    public abstract void writeTo(INPUT message, ByteBuffer buffer);
 
 }

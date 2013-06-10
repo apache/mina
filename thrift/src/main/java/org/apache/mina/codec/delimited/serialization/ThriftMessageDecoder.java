@@ -21,36 +21,58 @@ package org.apache.mina.codec.delimited.serialization;
 
 import java.nio.ByteBuffer;
 
+import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
+import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 
-public class ThriftMessageDecoder<IN extends TBase<?, ?>> extends ByteBufferDecoder<IN> {
+/**
+ * Decode {@link ByteBuffer} into Thrift messages.
+ * 
+ * @param <OUTPUT> the base type for decoded messages.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class ThriftMessageDecoder<OUTPUT extends TBase<?, ?>> extends ByteBufferDecoder<OUTPUT> {
     private TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
 
-    private final Class<IN> clazz;
+    private final Class<OUTPUT> clazz;
+
+    /**
+     * Create thrift message decoder
+     * 
+     * @param clazz the base class for decoded messages
+     */
+    public ThriftMessageDecoder(Class<OUTPUT> clazz) {
+        super();
+        this.clazz = clazz;
+    }
 
     public static <L extends TBase<?, ?>> ThriftMessageDecoder<L> newInstance(Class<L> clazz) {
         return new ThriftMessageDecoder<L>(clazz);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public IN decode(ByteBuffer input) {
-        IN object;
+    public OUTPUT decode(ByteBuffer input) {
+        OUTPUT object;
         try {
             byte array[] = new byte[input.remaining()];
             input.get(array);
             object = clazz.newInstance();
             deserializer.deserialize(object, array);
             return object;
-        } catch (Exception e) {
-            return null;
+        } catch (TException e) {
+            throw new ProtocolDecoderException(e);
+        } catch (InstantiationException e) {
+            throw new ProtocolDecoderException(e);
+        } catch (IllegalAccessException e) {
+            throw new ProtocolDecoderException(e);
         }
     }
 
-    public ThriftMessageDecoder(Class<IN> clazz) {
-        super();
-        this.clazz = clazz;
-    }
 }

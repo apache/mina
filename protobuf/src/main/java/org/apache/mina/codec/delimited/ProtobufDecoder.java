@@ -26,9 +26,11 @@ import com.google.protobuf.ExtensionRegistryLite;
 import com.google.protobuf.GeneratedMessage;
 
 /**
+ * Decode Protocol Buffer messages of type OUTPUT
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProtobufDecoder<M extends GeneratedMessage> extends SizePrefixedDecoder<M> {
+public class ProtobufDecoder<OUTPUT extends GeneratedMessage> extends SizePrefixedDecoder<OUTPUT> {
     public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz,
             ExtensionRegistryLite registry) throws NoSuchMethodException {
         return new ProtobufDecoder<L>(clazz, registry);
@@ -39,7 +41,7 @@ public class ProtobufDecoder<M extends GeneratedMessage> extends SizePrefixedDec
         return newInstance(clazz, ExtensionRegistryLite.getEmptyRegistry());
     }
 
-    public ProtobufDecoder(Class<M> clazz, ExtensionRegistryLite registry) throws NoSuchMethodException {
+    public ProtobufDecoder(Class<OUTPUT> clazz, ExtensionRegistryLite registry) throws NoSuchMethodException {
         super(new VarInt.Decoder(), ProtobufMessageDecoder.newInstance(clazz, registry));
     }
 }

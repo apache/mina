@@ -21,16 +21,24 @@ package org.apache.mina.codec.delimited.serialization;
 
 import java.nio.ByteBuffer;
 
+import org.apache.mina.codec.ProtocolEncoderException;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TBinaryProtocol;
 
-public class ThriftMessageEncoder<OUT extends TBase<?, ?>> extends ByteBufferEncoder<OUT> {
+/**
+ * Encode Thrift message into {@link ByteBuffer}
+ * 
+ * @param <INPUT> the base type for message to encode
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class ThriftMessageEncoder<INPUT extends TBase<?, ?>> extends ByteBufferEncoder<INPUT> {
     private final TSerializer serializer = new TSerializer(new TBinaryProtocol.Factory());
 
-    private OUT lastMessage;
+    private INPUT lastMessage;
 
     private byte[] lastBuffer;
 
@@ -38,7 +46,7 @@ public class ThriftMessageEncoder<OUT extends TBase<?, ?>> extends ByteBufferEnc
         return new ThriftMessageEncoder<L>();
     }
 
-    private byte[] prepareBuffer(OUT message) throws TException {
+    private byte[] prepareBuffer(INPUT message) throws TException {
         if (message != lastMessage) {
             lastBuffer = serializer.serialize(message);
             this.lastMessage = message;
@@ -46,8 +54,11 @@ public class ThriftMessageEncoder<OUT extends TBase<?, ?>> extends ByteBufferEnc
         return lastBuffer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public int getEncodedSize(OUT message) {
+    public int getEncodedSize(INPUT message) {
         try {
             return prepareBuffer(message).length;
         } catch (TException e) {
@@ -55,12 +66,15 @@ public class ThriftMessageEncoder<OUT extends TBase<?, ?>> extends ByteBufferEnc
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void writeTo(OUT message, ByteBuffer buffer) {
+    public void writeTo(INPUT message, ByteBuffer buffer) {
         try {
             buffer.put(prepareBuffer(message));
         } catch (TException e) {
-            //
+            throw new ProtocolEncoderException(e);
         }
     }
 }
