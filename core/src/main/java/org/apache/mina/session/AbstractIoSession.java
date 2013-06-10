@@ -844,14 +844,14 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
 
             try {
                 remote = String.valueOf(getRemoteAddress());
-            } catch (Throwable t) {
-                remote = "Cannot get the remote address informations: " + t.getMessage();
+            } catch (Exception e) {
+                remote = "Cannot get the remote address informations: " + e.getMessage();
             }
 
             try {
                 local = String.valueOf(getLocalAddress());
-            } catch (Throwable t) {
-                local = "Cannot get the local address informations: " + t.getMessage();
+            } catch (Exception e) {
+                local = "Cannot get the local address informations: " + e.getMessage();
             }
 
             if (getService() instanceof IoServer) {
