@@ -24,14 +24,14 @@ import org.apache.mina.util.AbstractIoFuture;
 
 /**
  * The default implementation for the {@link IoFuture} returned by {@link IoSession#writeWithFuture(Object)}
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultWriteFuture extends AbstractIoFuture<Void> {
 
     @Override
     protected boolean cancelOwner(boolean mayInterruptIfRunning) {
-        throw new RuntimeException("not implemented");
+        throw new IllegalStateException("not implemented");
     }
 
     /**
