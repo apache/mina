@@ -19,15 +19,44 @@
  */
 package org.apache.mina.coap;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import org.apache.mina.filter.query.Request;
+import org.apache.mina.filter.query.Response;
 
 /**
  * A representation of CoAP message following the CoAP RFC.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class CoapMessage {
+public class CoapMessage implements Request, Response {
+
+    public static final CoapMessage get(String url, boolean confimable) {
+
+        return new CoapMessage(1, confimable ? MessageType.CONFIRMABLE : MessageType.NON_CONFIRMABLE,
+                CoapCode.GET.getCode(), (int) (System.nanoTime() % 65536), null, optionsForUrl(url), null);
+    }
+
+    public static final CoapMessage post(String url, boolean confimable, byte[] payload) {
+
+        return new CoapMessage(1, confimable ? MessageType.CONFIRMABLE : MessageType.NON_CONFIRMABLE,
+                CoapCode.GET.getCode(), (int) (System.nanoTime() % 65536), null, optionsForUrl(url), payload);
+    }
+
+    private static final CoapOption[] optionsForUrl(String url) {
+        String[] paths = url.split("/");
+        CoapOption[] opt = new CoapOption[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            try {
+                opt[i] = new CoapOption(CoapOptionType.URI_PATH, paths[i].getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return opt;
+    }
 
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[] {};
 
@@ -77,6 +106,14 @@ public class CoapMessage {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object requestId() {
+        return id;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -112,8 +149,16 @@ public class CoapMessage {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
+        CoapCode c = CoapCode.fromCode(code);
+        String cstr;
+        if (c == null) {
+            cstr = String.valueOf(code);
+        } else {
+            cstr = c.getText();
+        }
+
         builder.append("CoapMessage [version=").append(version).append(", type=").append(type).append(", code=")
-                .append(code).append(", id=").append(id).append(", token=").append(Arrays.toString(token))
+                .append(cstr).append(", id=").append(id).append(", token=").append(Arrays.toString(token))
                 .append(", payload=").append(Arrays.toString(payload)).append(", options=")
                 .append(Arrays.toString(options)).append("]");
 
