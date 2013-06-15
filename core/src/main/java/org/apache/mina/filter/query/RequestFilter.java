@@ -57,10 +57,12 @@ import org.apache.mina.session.AttributeKey;
 public class RequestFilter<REQUEST extends Request, RESPONSE extends Response> extends AbstractIoFilter {
 
     /**
+     * Send a request message and provide a {@link IoFuture} for handling the response. WARNING : for now timeout
+     * doesn't work (WIP).
      * 
-     * @param session
-     * @param request
-     * @param timeoutInMs
+     * @param session the session where to write the request
+     * @param request the request to be issued
+     * @param timeoutInMs the timeout in milli-seconds (doesn't work Work-in-progress).
      * @return
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -102,15 +104,15 @@ public class RequestFilter<REQUEST extends Request, RESPONSE extends Response> e
             }
         }
 
-        // check for timeout
-        long now = System.currentTimeMillis();
-        if (lastTimeoutCheck + 1000 < now) {
-            lastTimeoutCheck = now;
-            Map<?, ?> inFlight = session.getAttribute(IN_FLIGHT_REQUESTS);
-            for (Object v : inFlight.values()) {
-                ((RequestFuture<?, ?>) v).timeoutIfNeeded(now);
-            }
-        }
+        // // check for timeout
+        // long now = System.currentTimeMillis();
+        // if (lastTimeoutCheck + 1000 < now) {
+        // lastTimeoutCheck = now;
+        // Map<?, ?> inFlight = session.getAttribute(IN_FLIGHT_REQUESTS);
+        // for (Object v : inFlight.values()) {
+        // ((RequestFuture<?, ?>) v).timeoutIfNeeded(now);
+        // }
+        // }
         // trigger the next filter
         super.messageReceived(session, message, controller);
     }
@@ -118,14 +120,14 @@ public class RequestFilter<REQUEST extends Request, RESPONSE extends Response> e
     @Override
     public void messageSent(IoSession session, Object message) {
         // check for timeout
-        long now = System.currentTimeMillis();
-        if (lastTimeoutCheck + 1000 < now) {
-            lastTimeoutCheck = now;
-            Map<?, ?> inFlight = session.getAttribute(IN_FLIGHT_REQUESTS);
-            for (Object v : inFlight.values()) {
-                ((RequestFuture<?, ?>) v).timeoutIfNeeded(now);
-            }
-        }
+        // long now = System.currentTimeMillis();
+        // if (lastTimeoutCheck + 1000 < now) {
+        // lastTimeoutCheck = now;
+        // Map<?, ?> inFlight = session.getAttribute(IN_FLIGHT_REQUESTS);
+        // for (Object v : inFlight.values()) {
+        // ((RequestFuture<?, ?>) v).timeoutIfNeeded(now);
+        // }
+        // }
     }
 
     /**

@@ -46,8 +46,16 @@ public class CoapMessage implements Request, Response {
     }
 
     private static final CoapOption[] optionsForUrl(String url) {
-        String[] paths = url.split("/");
-        CoapOption[] opt = new CoapOption[paths.length];
+        String[] parts = url.split("\\?");
+
+        String[] paths = parts[0].split("\\/");
+
+        String[] params = new String[] {};
+
+        if (parts.length > 1) {
+            params = parts[1].split("\\,");
+        }
+        CoapOption[] opt = new CoapOption[paths.length + params.length];
         for (int i = 0; i < paths.length; i++) {
             try {
                 opt[i] = new CoapOption(CoapOptionType.URI_PATH, paths[i].getBytes("UTF-8"));
@@ -55,6 +63,15 @@ public class CoapMessage implements Request, Response {
                 throw new IllegalStateException(e);
             }
         }
+
+        for (int i = 0; i < params.length; i++) {
+            try {
+                opt[paths.length + i] = new CoapOption(CoapOptionType.URI_QUERY, params[i].getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
         return opt;
     }
 

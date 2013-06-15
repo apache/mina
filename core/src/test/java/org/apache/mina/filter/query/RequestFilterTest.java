@@ -101,12 +101,10 @@ public class RequestFilterTest {
         rq.messageReceived(session, r, ctl);
 
         // verify
-        verify(session, times(2)).getAttribute(RequestFilter.IN_FLIGHT_REQUESTS);
+        verify(session).getAttribute(RequestFilter.IN_FLIGHT_REQUESTS);
         verify(m).remove("ID");
         verify(r).requestId();
         verify(f).complete(r);
-
-        verify(m).values();
 
         verify(ctl).callReadNextFilter(r);
         verifyNoMoreInteractions(r, m, session, f, ctl);

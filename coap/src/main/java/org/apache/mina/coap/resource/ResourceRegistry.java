@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.mina.api.IoSession;
 import org.apache.mina.coap.CoapCode;
 import org.apache.mina.coap.CoapMessage;
 import org.apache.mina.coap.CoapOption;
@@ -59,7 +60,7 @@ public class ResourceRegistry {
      * @param request the request ot serve
      * @return the response
      */
-    public CoapMessage respond(CoapMessage request) {
+    public CoapMessage respond(CoapMessage request, IoSession session) {
         // find the URI
         StringBuilder urlBuilder = new StringBuilder("");
         for (CoapOption opt : request.getOptions()) {
@@ -93,7 +94,7 @@ public class ResourceRegistry {
                         request.getToken(), new CoapOption[] { new CoapOption(CoapOptionType.CONTENT_FORMAT,
                                 new byte[] { 0 }) }, "not found !".getBytes());
             } else {
-                CoapResponse response = handler.handle(request);
+                CoapResponse response = handler.handle(request, session);
                 return new CoapMessage(1, request.getType() == MessageType.CONFIRMABLE ? MessageType.ACK
                         : MessageType.NON_CONFIRMABLE, response.getCode(), request.getId(), request.getToken(),
                         response.getOptions(), response.getContent());

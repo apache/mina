@@ -19,6 +19,7 @@
  */
 package org.apache.mina.coap.resource;
 
+import org.apache.mina.api.IoSession;
 import org.apache.mina.coap.CoapMessage;
 
 /**
@@ -53,7 +54,8 @@ public interface ResourceHandler {
      * Generate the response for this request.
      * 
      * @param request the request to serve
+     * @param session the session which receive the request
      * @return the response
      */
-    public CoapResponse handle(CoapMessage request);
+    public CoapResponse handle(CoapMessage request, IoSession session);
 }

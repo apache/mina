@@ -19,8 +19,12 @@
  */
 package org.apache.mina.examples.coap;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.mina.api.AbstractIoFutureListener;
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoSession;
@@ -34,6 +38,7 @@ import org.apache.mina.coap.resource.AbstractResourceHandler;
 import org.apache.mina.coap.resource.CoapResponse;
 import org.apache.mina.coap.resource.ResourceRegistry;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.query.RequestFilter;
 import org.apache.mina.transport.bio.BioUdpServer;
 
 /**
@@ -41,9 +46,11 @@ import org.apache.mina.transport.bio.BioUdpServer;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class CoapGetServer {
+public class CoapServer {
 
     public static void main(String[] args) {
+
+        final Map<String, IoSession> registration = new ConcurrentHashMap<String, IoSession>();
 
         // create a CoAP resource registry
         final ResourceRegistry reg = new ResourceRegistry();
@@ -56,7 +63,7 @@ public class CoapGetServer {
             }
 
             @Override
-            public CoapResponse handle(CoapMessage request) {
+            public CoapResponse handle(CoapMessage request, IoSession session) {
                 return new CoapResponse(CoapCode.CONTENT.getCode(), "niah niah niah niah niah\n niah niah niah\n"
                         .getBytes(), new CoapOption(CoapOptionType.CONTENT_FORMAT, new byte[] { 0 }));
             }
@@ -67,10 +74,45 @@ public class CoapGetServer {
             }
 
         });
+
+        reg.register(new AbstractResourceHandler() {
+
+            @Override
+            public CoapResponse handle(CoapMessage request, IoSession session) {
+                String device = null;
+                try {
+                    for (CoapOption o : request.getOptions()) {
+                        if (o.getType() == CoapOptionType.URI_QUERY) {
+                            String qr = new String(o.getData(), "UTF-8");
+                            if (qr.startsWith("id=")) {
+                                device = qr.substring(2);
+                            }
+                        }
+                    }
+                    if (device != null) {
+                        registration.put(device, session);
+                        return new CoapResponse(CoapCode.CREATED.getCode(), null);
+                    } else {
+                        return new CoapResponse(CoapCode.BAD_REQUEST.getCode(), "no id=xxx parameter".getBytes("UTF-8"));
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    throw new IllegalStateException("no UTF-8 in the JVM", e);
+                }
+            }
+
+            @Override
+            public String getPath() {
+                return "register";
+            }
+        });
+
         BioUdpServer server = new BioUdpServer();
+        final RequestFilter<CoapMessage, CoapMessage> rq = new RequestFilter<CoapMessage, CoapMessage>();
+
         server.setFilters(/* new LoggingFilter(), */new ProtocolCodecFilter<CoapMessage, ByteBuffer, Void, Void>(
-                new CoapEncoder(), new CoapDecoder()));
-        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 20000);
+                new CoapEncoder(), new CoapDecoder()), rq);
+        // idle in 10 minute
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 10 * 60 * 1000);
         server.setIoHandler(new AbstractIoHandler() {
 
             long start = System.currentTimeMillis();
@@ -78,10 +120,10 @@ public class CoapGetServer {
 
             @Override
             public void messageReceived(IoSession session, Object message) {
-                // System.err.println("rcv : " + message);
+                System.err.println("rcv : " + message);
 
-                CoapMessage resp = reg.respond((CoapMessage) message);
-                // System.err.println("resp : " + resp);
+                CoapMessage resp = reg.respond((CoapMessage) message, session);
+                System.err.println("resp : " + resp);
                 session.write(resp);
                 count++;
                 if (count >= 100000) {
@@ -89,6 +131,11 @@ public class CoapGetServer {
                     count = 0;
                     start = System.currentTimeMillis();
                 }
+            }
+
+            @Override
+            public void messageSent(IoSession session, Object message) {
+                System.err.println("sent : " + message);
             }
 
             @Override
@@ -100,6 +147,30 @@ public class CoapGetServer {
 
         try {
             server.bind(5683);
+            new Thread() {
+                @Override
+                public void run() {
+                    for (;;) {
+                        for (IoSession s : registration.values()) {
+                            rq.request(s, CoapMessage.get("st", true), 15000).register(
+                                    new AbstractIoFutureListener<CoapMessage>() {
+                                        @Override
+                                        public void completed(CoapMessage result) {
+                                            System.err.println("status : " + result);
+                                        }
+                                    });
+                        }
+
+                        try {
+                            // let's poll every 10 seconds
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                    }
+                }
+            }.start();
+
             for (;;) {
                 Thread.sleep(1000);
             }

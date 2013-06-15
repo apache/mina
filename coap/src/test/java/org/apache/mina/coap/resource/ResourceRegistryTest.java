@@ -21,6 +21,7 @@ package org.apache.mina.coap.resource;
 
 import static org.junit.Assert.*;
 
+import org.apache.mina.api.IoSession;
 import org.apache.mina.coap.CoapCode;
 import org.apache.mina.coap.CoapMessage;
 import org.apache.mina.coap.CoapOption;
@@ -39,7 +40,7 @@ public class ResourceRegistryTest {
         ResourceRegistry reg = new ResourceRegistry();
         CoapMessage msg = new CoapMessage(1, MessageType.CONFIRMABLE, CoapCode.GET.getCode(), 123, null,
                 new CoapOption[] { new CoapOption(CoapOptionType.URI_PATH, "test".getBytes()) }, new byte[] {});
-        CoapMessage resp = reg.respond(msg);
+        CoapMessage resp = reg.respond(msg, null);
         assertEquals(1, resp.getVersion());
         assertEquals(CoapCode.NOT_FOUND.getCode(), resp.getCode());
         assertArrayEquals(new CoapOption[] { new CoapOption(CoapOptionType.CONTENT_FORMAT, new byte[] { 0 }) },
@@ -53,7 +54,7 @@ public class ResourceRegistryTest {
         ResourceHandler handler = new AbstractResourceHandler() {
 
             @Override
-            public CoapResponse handle(CoapMessage request) {
+            public CoapResponse handle(CoapMessage request, IoSession session) {
                 return new CoapResponse(12345, "bla bla".getBytes(), new CoapOption[] {});
             }
 
@@ -67,14 +68,14 @@ public class ResourceRegistryTest {
         // 4.04 on bad path
         CoapMessage msg = new CoapMessage(1, MessageType.CONFIRMABLE, CoapCode.GET.getCode(), 123, null,
                 new CoapOption[] { new CoapOption(CoapOptionType.URI_PATH, "meh".getBytes()) }, new byte[] {});
-        CoapMessage resp = reg.respond(msg);
+        CoapMessage resp = reg.respond(msg, null);
         assertEquals(CoapCode.NOT_FOUND.getCode(), resp.getCode());
 
         // on correct path the 2.02 with the response
         msg = new CoapMessage(1, MessageType.CONFIRMABLE, CoapCode.GET.getCode(), 123, null, new CoapOption[] {
                                 new CoapOption(CoapOptionType.URI_PATH, "myTest".getBytes()),
                                 new CoapOption(CoapOptionType.URI_PATH, "Path".getBytes()) }, new byte[] {});
-        resp = reg.respond(msg);
+        resp = reg.respond(msg, null);
         assertEquals(1, resp.getVersion());
         assertEquals(12345, resp.getCode());
         assertArrayEquals(new CoapOption[] {}, resp.getOptions());
