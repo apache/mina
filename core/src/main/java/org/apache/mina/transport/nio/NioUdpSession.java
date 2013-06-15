@@ -263,7 +263,7 @@ public class NioUdpSession extends AbstractNioSession implements SelectorListene
     public void ready(boolean accept, boolean connect, boolean read, ByteBuffer readBuffer, boolean write) {
         if (IS_DEBUG) {
             LOG.debug("session {} ready for accept={}, connect={}, read={}, write={}", new Object[] { this, accept,
-                    connect, read, write });
+                                    connect, read, write });
         }
 
         if (read) {
@@ -273,6 +273,7 @@ public class NioUdpSession extends AbstractNioSession implements SelectorListene
 
             // Read everything we can up to the buffer size
             try {
+                readBuffer.clear();
                 ((DatagramChannel) channel).receive(readBuffer);
                 readBuffer.flip();
 
