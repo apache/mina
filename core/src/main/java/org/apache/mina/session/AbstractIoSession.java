@@ -599,7 +599,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
                 }
             }
         } catch (RuntimeException e) {
-            processException(e);
+            LOG.error("Exception while closing the session : ", e);
         }
         service.getManagedSessions().remove(id);
     }
