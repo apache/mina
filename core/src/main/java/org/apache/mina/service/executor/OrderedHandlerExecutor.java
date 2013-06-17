@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class OrderedHandlerExecutor implements IoHandlerExecutor {
+public final class OrderedHandlerExecutor implements IoHandlerExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrderedHandlerExecutor.class);
 
