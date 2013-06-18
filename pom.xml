@@ -432,6 +432,14 @@
               <!-- project excludes -->
               <exclude>**/resources/svn_ignore.txt</exclude>
               <exclude>**/resources/Reveal in Finder.launch</exclude>
+              <exclude>.git/**</exclude>
+              <exclude>**/.*</exclude>
+              <exclude>**/.classpath</exclude>
+              <exclude>**/.project</exclude>
+              <exclude>**/.settings/**</exclude>
+              <exclude>**/target/**</exclude>
+              <exclude>**/LICENSE.*</exclude>
+              <exclude>**/NOTICE-bin.txt</exclude>
             </excludes>
           </configuration>
         </plugin>
@@ -624,21 +632,6 @@
           <outputEncoding>UTF-8</outputEncoding>
           <windowTitle>Apache MINA ${project.version} Cross Reference</windowTitle>
           <docTitle>Apache MINA ${project.version} Cross Reference</docTitle>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rat-maven-plugin</artifactId>
-        <version>1.0-alpha-3</version>
-        <configuration>
-          <excludes>
-            <exclude>**/target/**/*</exclude>
-            <exclude>**/.*</exclude>
-            <exclude>**/NOTICE.txt</exclude>
-            <exclude>**/LICENSE*.txt</exclude>
-          </excludes>
-          <excludeSubProjects>false</excludeSubProjects>
         </configuration>
       </plugin>
     </plugins>
