@@ -439,7 +439,7 @@
               <exclude>**/.settings/**</exclude>
               <exclude>**/target/**</exclude>
               <exclude>**/LICENSE.*</exclude>
-              <exclude>**/NOTICE-bin.txt</exclude>
+              <exclude>**/NOTICE*.txt</exclude>
             </excludes>
           </configuration>
         </plugin>
