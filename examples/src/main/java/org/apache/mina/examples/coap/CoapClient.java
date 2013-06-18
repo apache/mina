@@ -50,7 +50,7 @@ public class CoapClient {
         final String status = "status message";
         System.err.println(status.length());
 
-        final RequestFilter<CoapMessage, CoapMessage> rq = new RequestFilter<CoapMessage, CoapMessage>();
+        final RequestFilter<CoapMessage, CoapMessage> rq = new RequestFilter<>();
 
         NioUdpClient client = new NioUdpClient();
         client.setFilters( //

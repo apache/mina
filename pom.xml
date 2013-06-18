@@ -175,13 +175,6 @@
           <scope>test</scope>
       </dependency>
 
-      <!--dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${version.slf4j.log4j12}</version>
-        <scope>test</scope>
-      </dependency-->
-
       <dependency>
         <groupId>org.apache.logging.log4j.adapters</groupId>
         <artifactId>slf4j-impl</artifactId>
@@ -203,11 +196,6 @@
     </dependency>
 
     <!-- logging implementation used for unit tests -->
-    <!--dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency-->
 
     <dependency>
       <groupId>junit</groupId>
@@ -543,8 +531,8 @@
         <version>${version.maven.compiler.plugin}</version>
         <configuration>
           <encoding>UTF-8</encoding>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
           <debug>true</debug>
           <optimize>true</optimize>
           <showDeprecations>true</showDeprecations>
