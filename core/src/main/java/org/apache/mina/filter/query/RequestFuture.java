@@ -20,6 +20,7 @@
 package org.apache.mina.filter.query;
 
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
 
 import org.apache.mina.api.IoSession;
 import org.apache.mina.util.AbstractIoFuture;
@@ -36,13 +37,12 @@ class RequestFuture<REQUEST extends Request, RESPONSE extends Response> extends 
 
     private final IoSession session;
 
-    private final long timeout;
-
     private final Object id;
 
-    public RequestFuture(IoSession session, long timeout, Object id) {
+    private ScheduledFuture<?> schedFuture;
+
+    public RequestFuture(IoSession session, Object id) {
         this.session = session;
-        this.timeout = timeout;
         this.id = id;
     }
 
@@ -52,15 +52,27 @@ class RequestFuture<REQUEST extends Request, RESPONSE extends Response> extends 
     }
 
     void complete(RESPONSE response) {
+        if (schedFuture != null) {
+            schedFuture.cancel(true);
+        }
         setResult(response);
     }
 
-    @SuppressWarnings("rawtypes")
-    void timeoutIfNeeded(long time) {
-        if (timeout < time) {
-            Map inFlight = session.getAttribute(RequestFilter.IN_FLIGHT_REQUESTS);
-            inFlight.remove(id);
-            setException(new RequestTimeoutException());
-        }
+    void setTimeoutFuture(ScheduledFuture<?> schedFuture) {
+        this.schedFuture = schedFuture;
     }
+
+    Runnable timeout = new Runnable() {
+
+        @SuppressWarnings("rawtypes")
+        @Override
+        public void run() {
+            Map inFlight = session.getAttribute(RequestFilter.IN_FLIGHT_REQUESTS);
+            if (inFlight != null) {
+                inFlight.remove(id);
+            }
+            setException(new RequestTimeoutException());
+
+        }
+    };
 }

@@ -21,6 +21,9 @@ package org.apache.mina.filter.query;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoFuture;
@@ -63,13 +66,15 @@ public class RequestFilter<REQUEST extends Request, RESPONSE extends Response> e
      * @param session the session where to write the request
      * @param request the request to be issued
      * @param timeoutInMs the timeout in milli-seconds (doesn't work Work-in-progress).
-     * @return
+     * @return the {@link IoFuture} for waiting or listening the completion of this request.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public IoFuture<RESPONSE> request(IoSession session, REQUEST request, long timeoutInMs) {
         Map inFlight = session.getAttribute(IN_FLIGHT_REQUESTS);
-        IoFuture<RESPONSE> future = new RequestFuture<REQUEST, RESPONSE>(session, System.currentTimeMillis()
-                + timeoutInMs, request.requestId());
+        RequestFuture<REQUEST, RESPONSE> future = new RequestFuture<REQUEST, RESPONSE>(session, request.requestId());
+
+        // schedule a timeout task
+        future.setTimeoutFuture(schedExec.schedule(future.timeout, timeoutInMs, TimeUnit.MILLISECONDS));
 
         // save the future for completion
         inFlight.put(request.requestId(), future);
@@ -80,8 +85,7 @@ public class RequestFilter<REQUEST extends Request, RESPONSE extends Response> e
     @SuppressWarnings("rawtypes")
     static final AttributeKey<Map> IN_FLIGHT_REQUESTS = new AttributeKey<Map>(Map.class, "request.in.flight");
 
-    // last time we checked the timeouts
-    private long lastTimeoutCheck = 0;
+    private ScheduledExecutorService schedExec = Executors.newScheduledThreadPool(1);
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -104,30 +108,7 @@ public class RequestFilter<REQUEST extends Request, RESPONSE extends Response> e
             }
         }
 
-        // // check for timeout
-        // long now = System.currentTimeMillis();
-        // if (lastTimeoutCheck + 1000 < now) {
-        // lastTimeoutCheck = now;
-        // Map<?, ?> inFlight = session.getAttribute(IN_FLIGHT_REQUESTS);
-        // for (Object v : inFlight.values()) {
-        // ((RequestFuture<?, ?>) v).timeoutIfNeeded(now);
-        // }
-        // }
-        // trigger the next filter
         super.messageReceived(session, message, controller);
-    }
-
-    @Override
-    public void messageSent(IoSession session, Object message) {
-        // check for timeout
-        // long now = System.currentTimeMillis();
-        // if (lastTimeoutCheck + 1000 < now) {
-        // lastTimeoutCheck = now;
-        // Map<?, ?> inFlight = session.getAttribute(IN_FLIGHT_REQUESTS);
-        // for (Object v : inFlight.values()) {
-        // ((RequestFuture<?, ?>) v).timeoutIfNeeded(now);
-        // }
-        // }
     }
 
     /**
