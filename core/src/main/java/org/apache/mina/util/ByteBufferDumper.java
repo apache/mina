@@ -40,24 +40,37 @@ public class ByteBufferDumper {
      * @return A dump of this ByteBuffer
      */
     public static String dump(ByteBuffer buffer, int nbBytes, boolean toAscii) {
-        int start = buffer.position();
+        byte data[];
+        int start;
         int size = Math.min(buffer.remaining(), nbBytes >= 0 ? nbBytes : Integer.MAX_VALUE);
         int length = buffer.remaining();
-        ByteBuffer slice = buffer.slice();
+
+        if (buffer.hasArray() && !buffer.isReadOnly()) {
+            start = buffer.position();
+            data = buffer.array();
+        } else {
+            data = new byte[size];
+
+            int oldpos = buffer.position();
+            buffer.get(data);
+            buffer.position(oldpos);
+
+            start = 0;
+            length = data.length;
+        }
 
         // is not ASCII printable ?
         boolean binaryContent = false;
 
         if (toAscii) {
-            while (slice.hasRemaining()) {
-                byte b = slice.get();
+            for (int i = start; i < start + size; i++) {
+                byte b = data[i];
 
                 if (((b < 32) || (b > 126)) && (b != 13) && (b != 10)) {
                     binaryContent = true;
                     break;
                 }
             }
-            slice.flip();
         }
 
         if (!toAscii || binaryContent) {
@@ -65,18 +78,18 @@ public class ByteBufferDumper {
             out.append("ByteBuffer[len=").append(length).append(",bytes='");
 
             // fill the first
-            int byteValue = slice.get(0) & 0xFF;
+            int byteValue = data[start] & 0xFF;
             boolean isFirst = true;
 
             // and the others, too
-            while (slice.hasRemaining()) {
+            for (int i = start; i < start + size; i++) {
                 if (isFirst) {
                     isFirst = false;
                 } else {
                     out.append(' ');
                 }
 
-                byteValue = slice.get() & 0xFF;
+                byteValue = data[i] & 0xFF;
                 out.append(new String(new byte[] { '0', 'x', HEX_CHAR[(byteValue & 0x00F0) >> 4],
                         HEX_CHAR[byteValue & 0x000F] }));
             }
@@ -87,10 +100,8 @@ public class ByteBufferDumper {
 
         } else {
             StringBuilder sb = new StringBuilder(size);
-            byte array[] = new byte[slice.remaining()];
-            buffer.get(array);
-
-            sb.append("ByteBuffer[len=").append(length).append(",str='").append(new String(array)).append("']");
+            sb.append("ByteBuffer[len=").append(length).append(",str='").append(new String(data, start, size))
+                    .append("']");
 
             return sb.toString();
         }
