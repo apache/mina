@@ -40,23 +40,24 @@ public class ByteBufferDumper {
      * @return A dump of this ByteBuffer
      */
     public static String dump(ByteBuffer buffer, int nbBytes, boolean toAscii) {
-        byte[] data = buffer.array();
         int start = buffer.position();
         int size = Math.min(buffer.remaining(), nbBytes >= 0 ? nbBytes : Integer.MAX_VALUE);
         int length = buffer.remaining();
+        ByteBuffer slice = buffer.slice();
 
         // is not ASCII printable ?
         boolean binaryContent = false;
 
         if (toAscii) {
-            for (int i = start; i < size; i++) {
-                byte b = data[i];
+            while (slice.hasRemaining()) {
+                byte b = slice.get();
 
                 if (((b < 32) || (b > 126)) && (b != 13) && (b != 10)) {
                     binaryContent = true;
                     break;
                 }
             }
+            slice.flip();
         }
 
         if (!toAscii || binaryContent) {
@@ -64,18 +65,18 @@ public class ByteBufferDumper {
             out.append("ByteBuffer[len=").append(length).append(",bytes='");
 
             // fill the first
-            int byteValue = data[start] & 0xFF;
+            int byteValue = slice.get(0) & 0xFF;
             boolean isFirst = true;
 
             // and the others, too
-            for (int i = start; i < size; i++) {
+            while (slice.hasRemaining()) {
                 if (isFirst) {
                     isFirst = false;
                 } else {
                     out.append(' ');
                 }
 
-                byteValue = data[i] & 0xFF;
+                byteValue = slice.get() & 0xFF;
                 out.append(new String(new byte[] { '0', 'x', HEX_CHAR[(byteValue & 0x00F0) >> 4],
                         HEX_CHAR[byteValue & 0x000F] }));
             }
@@ -86,8 +87,10 @@ public class ByteBufferDumper {
 
         } else {
             StringBuilder sb = new StringBuilder(size);
-            sb.append("ByteBuffer[len=").append(length).append(",str='").append(new String(data, start, size))
-                    .append("']");
+            byte array[] = new byte[slice.remaining()];
+            buffer.get(array);
+
+            sb.append("ByteBuffer[len=").append(length).append(",str='").append(new String(array)).append("']");
 
             return sb.toString();
         }
