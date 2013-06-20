@@ -334,10 +334,9 @@ public abstract class AbstractNioSession extends AbstractIoSession {
                         // Reset the flag in IoSession too
                         setNotRegisteredForWrite();
                     }
-                } else {
-                    // We have some more data to write : the channel OP_WRITE interest remains
-                    // as it was.
                 }
+                // if the queue is not empty, that means we have some more data to write : 
+                // the channel OP_WRITE interest remains as it was.
             }
         } catch (final IOException e) {
             LOG.error("Exception while writing : ", e);

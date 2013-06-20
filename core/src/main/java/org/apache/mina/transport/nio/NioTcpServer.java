@@ -151,7 +151,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * @return
      */
     public synchronized ServerSocketChannel getServerSocketChannel() {
-        return this.serverChannel;
+        return serverChannel;
     }
 
     public synchronized void setServerSocketChannel(final ServerSocketChannel serverChannel) {
@@ -170,16 +170,16 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
      * {@inheritDoc}
      */
     @Override
-    public synchronized void bind(final SocketAddress localAddress) {
+    public synchronized void bind(SocketAddress localAddress) {
         Assert.assertNotNull(localAddress, "localAddress");
 
         // check if the address is already bound
-        if (this.address != null) {
+        if (address != null) {
             throw new IllegalStateException("address " + address + " already bound");
         }
 
         LOG.info("binding address {}", localAddress);
-        this.address = localAddress;
+        address = localAddress;
 
         try {
             serverChannel = ServerSocketChannel.open();
@@ -196,7 +196,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         idleChecker.start();
 
         // it's the first address bound, let's fire the event
-        this.fireServiceActivated();
+        fireServiceActivated();
     }
 
     /**
@@ -270,7 +270,7 @@ public class NioTcpServer extends AbstractTcpServer implements SelectorListener 
         }
     }
 
-    private void createSession(SocketChannel clientSocket) throws IOException {
+    private synchronized void createSession(SocketChannel clientSocket) throws IOException {
         LOG.debug("create session");
         SocketChannel socketChannel = clientSocket;
         TcpSessionConfig config = getSessionConfig();
