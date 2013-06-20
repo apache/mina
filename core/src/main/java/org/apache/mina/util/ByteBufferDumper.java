@@ -40,16 +40,30 @@ public class ByteBufferDumper {
      * @return A dump of this ByteBuffer
      */
     public static String dump(ByteBuffer buffer, int nbBytes, boolean toAscii) {
-        byte[] data = buffer.array();
-        int start = buffer.position();
+        byte data[];
+        int start;
         int size = Math.min(buffer.remaining(), nbBytes >= 0 ? nbBytes : Integer.MAX_VALUE);
         int length = buffer.remaining();
+
+        if (buffer.hasArray() && !buffer.isReadOnly()) {
+            start = buffer.position();
+            data = buffer.array();
+        } else {
+            data = new byte[size];
+
+            int oldpos = buffer.position();
+            buffer.get(data);
+            buffer.position(oldpos);
+
+            start = 0;
+            length = data.length;
+        }
 
         // is not ASCII printable ?
         boolean binaryContent = false;
 
         if (toAscii) {
-            for (int i = start; i < size; i++) {
+            for (int i = start; i < start + size; i++) {
                 byte b = data[i];
 
                 if (((b < 32) || (b > 126)) && (b != 13) && (b != 10)) {
@@ -68,7 +82,7 @@ public class ByteBufferDumper {
             boolean isFirst = true;
 
             // and the others, too
-            for (int i = start; i < size; i++) {
+            for (int i = start; i < start + size; i++) {
                 if (isFirst) {
                     isFirst = false;
                 } else {

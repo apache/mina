@@ -775,17 +775,15 @@ public class IoBuffer {
     /**
      * @see ByteBuffer#wrap(byte[])
      */
-    public IoBuffer wrap(byte[] array) {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+    static public IoBuffer wrap(byte[] array) {
+        return new IoBuffer(ByteBuffer.wrap(array));
     }
 
     /**
      * @see ByteBuffer#wrap(byte[], int, int)
      */
     public IoBuffer wrap(byte[] array, int offset, int length) {
-        // TODO code me !
-        throw new UnsupportedOperationException();
+        return new IoBuffer(ByteBuffer.wrap(array, offset, length));
     }
 
     /**

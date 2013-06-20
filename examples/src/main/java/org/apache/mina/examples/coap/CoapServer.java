@@ -50,7 +50,7 @@ public class CoapServer {
 
     public static void main(String[] args) {
 
-        final Map<String, IoSession> registration = new ConcurrentHashMap<String, IoSession>();
+        final Map<String, IoSession> registration = new ConcurrentHashMap<>();
 
         // create a CoAP resource registry
         final ResourceRegistry reg = new ResourceRegistry();
@@ -107,12 +107,12 @@ public class CoapServer {
         });
 
         BioUdpServer server = new BioUdpServer();
-        final RequestFilter<CoapMessage, CoapMessage> rq = new RequestFilter<CoapMessage, CoapMessage>();
+        final RequestFilter<CoapMessage, CoapMessage> rq = new RequestFilter<>();
 
-        server.setFilters(/* new LoggingFilter(), */new ProtocolCodecFilter<CoapMessage, ByteBuffer, Void, Void>(
+        server.setFilters(new ProtocolCodecFilter<CoapMessage, ByteBuffer, Void, Void>(
                 new CoapEncoder(), new CoapDecoder()), rq);
         // idle in 10 minute
-        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 10 * 60 * 1000);
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 60 * 10_000);
         server.setIoHandler(new AbstractIoHandler() {
 
             long start = System.currentTimeMillis();
@@ -126,7 +126,7 @@ public class CoapServer {
                 System.err.println("resp : " + resp);
                 session.write(resp);
                 count++;
-                if (count >= 100000) {
+                if (count >= 100_000) {
                     System.err.println("time for 100k msg : " + (System.currentTimeMillis() - start));
                     count = 0;
                     start = System.currentTimeMillis();
@@ -152,7 +152,7 @@ public class CoapServer {
                 public void run() {
                     for (;;) {
                         for (IoSession s : registration.values()) {
-                            rq.request(s, CoapMessage.get("st", true), 15000).register(
+                            rq.request(s, CoapMessage.get("st", true), 15_000).register(
                                     new AbstractIoFutureListener<CoapMessage>() {
                                         @Override
                                         public void completed(CoapMessage result) {
@@ -163,7 +163,7 @@ public class CoapServer {
 
                         try {
                             // let's poll every 10 seconds
-                            Thread.sleep(10000);
+                            Thread.sleep(10_000);
                         } catch (InterruptedException e) {
                             break;
                         }
@@ -172,7 +172,7 @@ public class CoapServer {
             }.start();
 
             for (;;) {
-                Thread.sleep(1000);
+                Thread.sleep(1_000);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
