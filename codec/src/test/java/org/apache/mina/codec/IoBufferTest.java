@@ -29,7 +29,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-import org.apache.mina.codec.IoBuffer;
 import org.junit.Test;
 
 /**
@@ -114,7 +113,7 @@ public class IoBufferTest {
     /**
      * Test the addition of mixed type buffers
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testAddMixedTypeBuffers() {
         ByteBuffer bb1 = ByteBuffer.allocate(5);
         bb1.put("012".getBytes());
@@ -131,7 +130,7 @@ public class IoBufferTest {
     /**
      * Test the addition of mixed order buffers
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testAddMixedOrderBuffers() {
         ByteBuffer bb1 = ByteBuffer.allocate(5);
         bb1.order(ByteOrder.LITTLE_ENDIAN);
@@ -363,10 +362,9 @@ public class IoBufferTest {
 
         ioBuffer = new IoBuffer(bb1);
 
-        array = ioBuffer.array();
         assertNotNull(array);
-        assertEquals(3, array.length);
-        assertTrue(Arrays.equals(new byte[] { '0', '1', '2' }, array));
+        assertEquals(5, array.length);
+        assertTrue(Arrays.equals(new byte[] { '0', '1', '2', 0, 0 }, array));
     }
 
     /**
@@ -381,29 +379,6 @@ public class IoBufferTest {
         assertNotNull(array);
         assertEquals(3, array.length);
         assertTrue(Arrays.equals(new byte[] { 0x00, 0x00, 0x00 }, array));
-    }
-
-    /**
-     * Test the array method for a IoBuffer containing three ByteBuffers
-     */
-    @Test
-    public void testArrayThreeByteBuffers() {
-        ByteBuffer bb1 = ByteBuffer.allocate(5);
-        bb1.put("012".getBytes());
-        bb1.flip();
-
-        ByteBuffer bb2 = ByteBuffer.allocate(0);
-
-        ByteBuffer bb3 = ByteBuffer.allocate(5);
-        bb3.put("3456".getBytes());
-        bb3.flip();
-
-        IoBuffer ioBuffer = new IoBuffer(bb1, bb2, bb3);
-
-        byte[] array = ioBuffer.array();
-        assertNotNull(array);
-        assertEquals(7, array.length);
-        assertTrue(Arrays.equals(new byte[] { '0', '1', '2', '3', '4', '5', '6' }, array));
     }
 
     /**
@@ -457,6 +432,7 @@ public class IoBufferTest {
         bb2.flip();
 
         IoBuffer ioBuffer = new IoBuffer(bb1, bb2);
+        ioBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
         assertEquals(12345, ioBuffer.getInt());
         assertEquals(67890, ioBuffer.getInt());
@@ -588,6 +564,8 @@ public class IoBufferTest {
         // Move forward a bit
         ioBuffer.get();
         ioBuffer.get();
+        
+        ioBuffer.limit(3);
 
         // Clear
         ioBuffer.clear();
@@ -595,8 +573,8 @@ public class IoBufferTest {
         // We should be back to the origin
         assertEquals(0, ioBuffer.position());
 
-        // The limit must have grown
-        assertEquals(8, ioBuffer.limit());
+        // The limit must back to the available size
+        assertEquals(6, ioBuffer.limit());
     }
 
     /**
@@ -686,7 +664,7 @@ public class IoBufferTest {
     /**
      * Test the position method over an emptyIoBuffer
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testPositionIntEmptyBuffer() {
         IoBuffer ioBuffer = new IoBuffer();
 
@@ -735,7 +713,7 @@ public class IoBufferTest {
         // The resulting buffer will be seen as "0123456789"
         IoBuffer ioBuffer = new IoBuffer(bb1, bb2, bb3);
 
-        ioBuffer.position(10);
+        ioBuffer.position(11);
     }
 
     /**
@@ -792,6 +770,192 @@ public class IoBufferTest {
         for (int i = ioBuffer.limit() - 1; i >= 0; i--) {
             ioBuffer.position(i);
             assertEquals('0' + i, ioBuffer.get());
+        }
+    }
+
+    @Test
+    public void testSlice() {
+        ByteBuffer bb1 = ByteBuffer.allocate(5);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(5);
+        bb2.put("345".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(5);
+        bb3.put("6789".getBytes());
+        bb3.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2).add(bb3);
+
+        ioBuffer.position(2);
+        ioBuffer.limit(8);
+
+        IoBuffer slice = ioBuffer.slice();
+
+        assertEquals(6, slice.remaining());
+        assertEquals(0, slice.position());
+        assertEquals(6, slice.limit());
+
+        byte seg[] = "234567".getBytes();
+        for (int i = 0; i < 6; i++) {
+            assertEquals(seg[i], slice.get(i));
+        }
+    }
+
+    @Test
+    public void testShort() {
+        for (ByteOrder bo : new ByteOrder[] { ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN }) {
+            ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(3).order(bo).putShort((short) 12345).rewind();
+            IoBuffer ioBuffer = new IoBuffer(bb).order(bo);
+            assertEquals(3, ioBuffer.capacity());
+            ioBuffer.extend(1);
+            ioBuffer.position(2);
+            assertEquals(4, ioBuffer.capacity());
+            ioBuffer.putShort((short) -23456);
+            ioBuffer.rewind();
+            assertEquals(12345, ioBuffer.getShort());
+            assertEquals(-23456, ioBuffer.getShort());
+        }
+    }
+
+    @Test
+    public void testInt() {
+        for (ByteOrder bo : new ByteOrder[] { ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN }) {
+            ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(5).order(bo).putInt(123456).rewind();
+            IoBuffer ioBuffer = new IoBuffer(bb).order(bo);
+            assertEquals(5, ioBuffer.capacity());
+            ioBuffer.extend(3);
+            ioBuffer.position(4);
+            assertEquals(8, ioBuffer.capacity());
+            ioBuffer.putInt(-23456789);
+            ioBuffer.rewind();
+            assertEquals(123456, ioBuffer.getInt());
+            assertEquals(-23456789, ioBuffer.getInt());
+        }
+    }
+
+    @Test
+    public void testLong() {
+        for (ByteOrder bo : new ByteOrder[] { ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN }) {
+            ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(9).order(bo).putLong(123456789012l).rewind();
+            IoBuffer ioBuffer = new IoBuffer(bb).order(bo);
+            assertEquals(9, ioBuffer.capacity());
+            ioBuffer.extend(7);
+
+            ioBuffer.position(8);
+            assertEquals(16, ioBuffer.capacity());
+            ioBuffer.putLong(-23456789023l);
+            ioBuffer.rewind();
+            assertEquals(123456789012l, ioBuffer.getLong());
+            assertEquals(-23456789023l, ioBuffer.getLong());
+        }
+    }
+
+    @Test
+    public void testChar() {
+        for (ByteOrder bo : new ByteOrder[] { ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN }) {
+            ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(3).order(bo).putChar('ë').rewind();
+            IoBuffer ioBuffer = new IoBuffer(bb).order(bo);
+            
+            assertEquals(3, ioBuffer.capacity());
+            
+            ioBuffer.extend(1);
+            ioBuffer.order(bo);
+            ioBuffer.position(2);
+            assertEquals(4, ioBuffer.capacity());
+            ioBuffer.putChar('ü');
+            ioBuffer.rewind();
+            
+            assertEquals('ë', ioBuffer.getChar());
+            assertEquals('ü', ioBuffer.getChar());
+        }
+    }
+
+    @Test
+    public void testGet() {
+        ByteBuffer bb1 = ByteBuffer.allocate(5);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(5);
+        bb2.put("345".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(5);
+        bb3.put("6789".getBytes());
+        bb3.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2).add(bb3);
+
+        ioBuffer.position(2);
+        ioBuffer.limit(8);
+
+        byte block[] = new byte[6];
+        ioBuffer.get(block);
+        byte seg[] = "234567".getBytes();
+        for (int i = 0; i < 6; i++) {
+            assertEquals(seg[i], block[i]);
+        }
+    }
+
+    @Test
+    public void testPut() {
+        ByteBuffer bb1 = ByteBuffer.allocate(5);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(5);
+        bb2.put("345".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(5);
+        bb3.put("6789".getBytes());
+        bb3.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2).add(bb3);
+
+        byte seq[] = "abcdefghij".getBytes();
+        ioBuffer.position(2);
+        ioBuffer.put(seq, 3, 3);
+        ioBuffer.rewind();
+        byte expected[] = "01def56789".getBytes();
+        for (int i = 0; i < 6; i++) {
+            assertEquals(expected[i], ioBuffer.get(i));
+        }
+    }
+    
+    @Test
+    public void testCompact() {
+        ByteBuffer bb1 = ByteBuffer.allocate(5);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(5);
+        bb2.put("345".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(5);
+        bb3.put("6789".getBytes());
+        bb3.flip();
+
+        IoBuffer ioBuffer = new IoBuffer();
+        ioBuffer.add(bb1, bb2).add(bb3);
+
+        ioBuffer.position(2);
+        ioBuffer.limit(8);
+
+        ioBuffer.compact();
+        assertEquals(ioBuffer.capacity(),ioBuffer.limit());
+        assertEquals(6,ioBuffer.position());
+        
+        byte seg[] = "234567".getBytes();
+        for (int i = 0; i < 6; i++) {
+            assertEquals(seg[i], ioBuffer.get(i));
         }
     }
 }
