@@ -445,18 +445,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.apache.xbean</groupId>
-          <artifactId>maven-xbean-plugin</artifactId>
-          <version>3.8</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.xbean</groupId>
-          <artifactId>maven-xbean-plugin</artifactId>
-          <version>3.8</version>
-        </plugin>
-
-        <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
           <version>1.5</version>
