@@ -18,17 +18,22 @@
  */
 package org.apache.mina.codec;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -564,7 +569,7 @@ public class IoBufferTest {
         // Move forward a bit
         ioBuffer.get();
         ioBuffer.get();
-        
+
         ioBuffer.limit(3);
 
         // Clear
@@ -818,6 +823,23 @@ public class IoBufferTest {
             ioBuffer.rewind();
             assertEquals(12345, ioBuffer.getShort());
             assertEquals(-23456, ioBuffer.getShort());
+
+            ioBuffer.putShort(1, (short) 12345);
+            assertEquals((short) 12345, ioBuffer.getShort(1));
+
+            try {
+                ioBuffer.putShort(3, (short) 1);
+                fail("Not enough place on the buffer");
+            } catch (BufferUnderflowException e) {
+                // Should come here
+            }
+
+            try {
+                ioBuffer.getShort(3);
+                fail("Not enough place on the buffer");
+            } catch (BufferUnderflowException e) {
+                // Should come here
+            }
         }
     }
 
@@ -834,6 +856,23 @@ public class IoBufferTest {
             ioBuffer.rewind();
             assertEquals(123456, ioBuffer.getInt());
             assertEquals(-23456789, ioBuffer.getInt());
+
+            ioBuffer.putInt(2, 1234567890);
+            assertEquals(1234567890, ioBuffer.getInt(2));
+
+            try {
+                ioBuffer.putInt(5, 1);
+                fail("Not enough place on the buffer");
+            } catch (BufferUnderflowException e) {
+                // Should come here
+            }
+
+            try {
+                ioBuffer.getInt(5);
+                fail("Not enough place on the buffer");
+            } catch (BufferUnderflowException e) {
+                // Should come here
+            }
         }
     }
 
@@ -851,6 +890,61 @@ public class IoBufferTest {
             ioBuffer.rewind();
             assertEquals(123456789012l, ioBuffer.getLong());
             assertEquals(-23456789023l, ioBuffer.getLong());
+
+            ioBuffer.putLong(4, 1234567890);
+            assertEquals(1234567890, ioBuffer.getLong(4));
+
+            try {
+                ioBuffer.putLong(9, 1);
+                fail("Not enough place on the buffer");
+            } catch (BufferUnderflowException e) {
+                // Should come here
+            }
+
+            try {
+                ioBuffer.getLong(9);
+                fail("Not enough place on the buffer");
+            } catch (BufferUnderflowException e) {
+                // Should come here
+            }
+        }
+    }
+
+    @Test
+    public void testFloat() {
+        for (ByteOrder bo : new ByteOrder[] { ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN }) {
+            ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(5).order(bo).putFloat(-0.68f).rewind();
+            IoBuffer ioBuffer = IoBuffer.wrap(bb).order(bo);
+            assertEquals(5, ioBuffer.capacity());
+            ioBuffer.extend(3);
+            ioBuffer.position(4);
+            assertEquals(8, ioBuffer.capacity());
+            ioBuffer.putFloat(3.14f);
+            ioBuffer.rewind();
+            assertEquals(-0.68f, ioBuffer.getFloat(), 0.001f);
+            assertEquals(3.14f, ioBuffer.getFloat(), 0.001f);
+            ioBuffer.putFloat(2, -12.34f);
+            assertEquals(-12.34f, ioBuffer.getFloat(2), 0.001f);
+        }
+    }
+
+    @Test
+    public void testDouble() {
+        for (ByteOrder bo : new ByteOrder[] { ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN }) {
+            ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(9).order(bo).putDouble(Math.PI).rewind();
+            IoBuffer ioBuffer = IoBuffer.wrap(bb).order(bo);
+            assertEquals(9, ioBuffer.capacity());
+            ioBuffer.extend(7);
+
+            ioBuffer.position(8);
+            assertEquals(16, ioBuffer.capacity());
+            ioBuffer.putDouble(-Math.E);
+            ioBuffer.rewind();
+            assertEquals(Math.PI, ioBuffer.getDouble(), 1E-10);
+            assertEquals(-Math.E, ioBuffer.getDouble(), 1E-10);
+
+            ioBuffer.putDouble(4, 12.34);
+            assertEquals(12.34, ioBuffer.getDouble(4), 1E-10);
         }
     }
 
@@ -859,18 +953,35 @@ public class IoBufferTest {
         for (ByteOrder bo : new ByteOrder[] { ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN }) {
             ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(3).order(bo).putChar('ë').rewind();
             IoBuffer ioBuffer = IoBuffer.wrap(bb).order(bo);
-            
+
             assertEquals(3, ioBuffer.capacity());
-            
+
             ioBuffer.extend(1);
             ioBuffer.order(bo);
             ioBuffer.position(2);
             assertEquals(4, ioBuffer.capacity());
             ioBuffer.putChar('ü');
             ioBuffer.rewind();
-            
+
             assertEquals('ë', ioBuffer.getChar());
             assertEquals('ü', ioBuffer.getChar());
+            
+            ioBuffer.putChar(1, 'ç');
+            assertEquals('ç', ioBuffer.getChar(1));
+            
+            try {
+                ioBuffer.putChar(3, 'ñ');
+                fail("Not enough place on the buffer");
+            } catch (BufferUnderflowException e) {
+                // Should come here                
+            }
+
+            try {
+                ioBuffer.getChar(3);
+                fail("Not enough place on the buffer");
+            } catch (BufferUnderflowException e) {
+                // Should come here
+            }
         }
     }
 
@@ -928,7 +1039,7 @@ public class IoBufferTest {
             assertEquals(expected[i], ioBuffer.get(i));
         }
     }
-    
+
     @Test
     public void testCompact() {
         ByteBuffer bb1 = ByteBuffer.allocate(5);
@@ -950,12 +1061,54 @@ public class IoBufferTest {
         ioBuffer.limit(8);
 
         ioBuffer.compact();
-        assertEquals(ioBuffer.capacity(),ioBuffer.limit());
-        assertEquals(6,ioBuffer.position());
-        
+        assertEquals(ioBuffer.capacity(), ioBuffer.limit());
+        assertEquals(6, ioBuffer.position());
+
         byte seg[] = "234567".getBytes();
         for (int i = 0; i < 6; i++) {
             assertEquals(seg[i], ioBuffer.get(i));
         }
+    }
+
+    @Test
+    public void testInputStreamGetByte() throws IOException {
+        String hw = "HelloWorld";
+        IoBuffer bb = IoBuffer.wrap(hw.getBytes());
+        InputStream is = bb.asInputStream();
+        for (int i = 0; i < 10; i++) {
+            assertEquals(i, bb.position());
+            assertEquals(hw.getBytes()[i], is.read());
+        }
+        assertEquals(-1, is.read());
+    }
+
+    @Test
+    public void testInputStreamGetByteArray() throws IOException {
+        String hw = "HelloWorld";
+        IoBuffer bb = IoBuffer.wrap(hw.getBytes());
+        InputStream is = bb.asInputStream();
+        byte array[] = new byte[15];
+
+        assertEquals(5, is.read(array, 0, 5));
+        assertEquals(5, bb.position());
+        assertEquals(5, is.read(array, 5, 10));
+        assertEquals(10, bb.position());
+
+        for (int i = 0; i < 10; i++) {
+            assertEquals(hw.getBytes()[i], array[i]);
+        }
+    }
+
+    @Test
+    public void testEquals() {
+        String h = "Hello";
+        String w = "World";
+        IoBuffer hw1b = IoBuffer.wrap((h + w).getBytes());
+        IoBuffer wh1b = IoBuffer.wrap((w + h).getBytes());
+        IoBuffer hw2b = IoBuffer.newInstance();
+        hw2b.add(ByteBuffer.wrap(h.getBytes()));
+        hw2b.add(ByteBuffer.wrap(w.getBytes()));
+        assertEquals(hw2b, hw1b);
+        Assert.assertThat(wh1b, is(not(hw1b)));
     }
 }

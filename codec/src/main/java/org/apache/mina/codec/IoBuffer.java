@@ -168,6 +168,13 @@ public final class IoBuffer {
         return new InputStream() {
 
             @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                int toRead = Math.min(remaining(), len);
+                get(b, off, toRead);
+                return toRead;
+            }
+
+            @Override
             public int read() throws IOException {
                 return hasRemaining() ? get() & 0xff : -1;
             }
@@ -275,11 +282,17 @@ public final class IoBuffer {
             return false;
         }
         int p = this.position();
-        for (int i = this.limit() - 1, j = that.limit() - 1; i >= p; i--, j--) {
-            if (this.get(i) != that.get(j)) {
+        int q = that.position();
+        while (this.hasRemaining() && that.hasRemaining()) {
+            if (this.get() != that.get()) {
+                this.position(p);
+                that.position(q);
                 return false;
             }
+
         }
+        this.position(p);
+        that.position(q);
         return true;
     }
 
@@ -697,10 +710,6 @@ public final class IoBuffer {
      * @see ByteBuffer#putChar(char)
      */
     public IoBuffer putChar(char value) {
-        if (remaining() < 2) {
-            throw new BufferUnderflowException();
-        }
-
         putShort((short) value);
         return this;
     }
@@ -888,8 +897,22 @@ public final class IoBuffer {
         return out;
     }
 
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(getClass().getName());
+        sb.append("[pos=");
+        sb.append(position());
+        sb.append(" lim=");
+        sb.append(limit());
+        sb.append(" cap=");
+        sb.append(capacity());
+        sb.append("]");
+        return sb.toString();
+    }
+
     private void updatePosition() {
-        while (!position.getNode().getBuffer().hasRemaining()) {
+        while (!position.getNode().getBuffer().hasRemaining() && position.getNode().hasNext()) {
             position.setNode(position.getNode().getNext());
             position.getNode().getBuffer().rewind();
         }
@@ -970,7 +993,14 @@ public final class IoBuffer {
 
         @Override
         public String toString() {
-            return "Pointer [node=" + node + ", position=" + position + "]";
+            StringBuffer sb = new StringBuffer();
+            sb.append(getClass().getName());
+            sb.append("[node=");
+            sb.append(getNode());
+            sb.append(", pos=");
+            sb.append(getPosition());            
+            sb.append("]");
+            return sb.toString();           
         }
     }
 }
