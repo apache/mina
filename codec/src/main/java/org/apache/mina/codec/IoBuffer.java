@@ -36,16 +36,21 @@ public final class IoBuffer {
      * @see ByteBuffer#allocate(int)
      */
     public static IoBuffer allocate(int capacity) {
-        return new IoBuffer(ByteBuffer.allocate(capacity));
+        return wrap(ByteBuffer.allocate(capacity));
     }
 
     /**
      * @see ByteBuffer#allocateDirect(int)
      */
     public static IoBuffer allocateDirect(int capacity) {
-        return new IoBuffer(ByteBuffer.allocateDirect(capacity));
+        return wrap(ByteBuffer.allocateDirect(capacity));
     }
 
+    /**
+     * Build a new instance of {@link IoBuffer}
+     * 
+     * @return a new instance of {@link IoBuffer}
+     */
     public static IoBuffer newInstance() {
         return new IoBuffer();
     }
@@ -65,7 +70,7 @@ public final class IoBuffer {
      * @see ByteBuffer#wrap(byte[], int, int)
      */
     public static IoBuffer wrap(byte[] array, int offset, int length) {
-        return new IoBuffer(ByteBuffer.wrap(array, offset, length));
+        return wrap(ByteBuffer.wrap(array, offset, length));
     }
 
     public static IoBuffer wrap(ByteBuffer... buffers) {
@@ -102,15 +107,14 @@ public final class IoBuffer {
         mark = null;
     }
 
-    //TODO set this method deprecated
-    //    @Deprecated
-    public IoBuffer(ByteBuffer... buffers) {
-        this();
-        for (ByteBuffer b : buffers) {
-            add(b);
-        }
-    }
+    
 
+    /**
+     * Add one or more ByteBuffer to the current IoBuffer
+     * 
+     * @param buffers
+     * @return the current {@link IoBuffer}
+     */
     public IoBuffer add(ByteBuffer... buffers) {
         for (ByteBuffer buffer : buffers) {
             enqueue(buffer.slice());
