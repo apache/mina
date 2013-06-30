@@ -738,7 +738,7 @@ public final class IoBuffer {
      * @see ByteBuffer#putFloat(float)
      */
     public IoBuffer putFloat(float value) {
-        return putLong(Float.floatToIntBits(value));
+        return putInt(Float.floatToIntBits(value));
     }
 
     /**
