@@ -18,6 +18,8 @@
  */
 package org.apache.mina.codec;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -32,6 +34,7 @@ import java.nio.ReadOnlyBufferException;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class IoBuffer {
+
     /**
      * @see ByteBuffer#allocate(int)
      */
@@ -73,6 +76,12 @@ public final class IoBuffer {
         return wrap(ByteBuffer.wrap(array, offset, length));
     }
 
+    /**
+     * Build new IoBuffer containing 
+     * 
+     * @param buffers
+     * @return the new {@link IoBuffer}
+     */
     public static IoBuffer wrap(ByteBuffer... buffers) {
         IoBuffer ioBuffer = new IoBuffer();
         for (ByteBuffer b : buffers) {
@@ -106,8 +115,6 @@ public final class IoBuffer {
         position(0);
         mark = null;
     }
-
-    
 
     /**
      * Add one or more ByteBuffer to the current IoBuffer
@@ -149,6 +156,25 @@ public final class IoBuffer {
     }
 
     /**
+     * Provides an input stream which is actually reading the {@link IoBuffer}
+     * instance.
+     * <p>
+     * Further reads on the returned inputstream move the reading head of the {@link IoBuffer}
+     * instance used for it's creation</i>
+     *
+     * @return an input stream
+     */
+    public InputStream asInputStream() {
+        return new InputStream() {
+
+            @Override
+            public int read() throws IOException {
+                return hasRemaining() ? get() & 0xff : -1;
+            }
+        };
+    }
+
+    /**
      * @see ByteBuffer#asReadOnlyBuffer()
      */
     public IoBuffer asReadOnlyBuffer() {
@@ -187,6 +213,11 @@ public final class IoBuffer {
         return this;
     }
 
+    /**
+     * Returns a copy of the current {@link IoBuffer}, with an independent copy if the postion, limit and mark.
+     * 
+     * @return the copied {@link IoBuffer}
+     */
     public IoBuffer duplicate() {
         IoBuffer buffer = new IoBuffer();
 
@@ -228,6 +259,9 @@ public final class IoBuffer {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object ob) {
         if (this == ob) {
@@ -249,6 +283,12 @@ public final class IoBuffer {
         return true;
     }
 
+    /**
+     * Extends the current IoBuffer capacity.
+     * 
+     * @param size the number of bytes to extend the current IoBuffer 
+     * @return the current {@link IoBuffer}
+     */
     public IoBuffer extend(int size) {
         ByteBuffer extension = isDirect() ? ByteBuffer.allocateDirect(size) : ByteBuffer.allocate(size);
         add(extension);
@@ -486,6 +526,9 @@ public final class IoBuffer {
         return out;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = 0;
@@ -735,6 +778,17 @@ public final class IoBuffer {
     }
 
     /**
+     * @see ByteBuffer#putLong(int, int)
+     */
+    public IoBuffer putLong(int index, long value) {
+        int oldPos = position();
+        position(index);
+        putLong(value);
+        position(oldPos);
+        return this;
+    }
+
+    /**
      * @see ByteBuffer#putLong(long)
      */
     public IoBuffer putLong(long value) {
@@ -750,12 +804,12 @@ public final class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#putLong(int, int)
+     * @see ByteBuffer#putShort(int, short)
      */
-    public IoBuffer putLong(int index, long value) {
+    public IoBuffer putShort(int index, short value) {
         int oldPos = position();
         position(index);
-        putLong(value);
+        putShort(value);
         position(oldPos);
         return this;
     }
@@ -771,17 +825,6 @@ public final class IoBuffer {
         for (int i = 0; i < 16; i += 8) {
             put((byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 8 - i : i)));
         }
-        return this;
-    }
-
-    /**
-     * @see ByteBuffer#putShort(int, short)
-     */
-    public IoBuffer putShort(int index, short value) {
-        int oldPos = position();
-        position(index);
-        putShort(value);
-        position(oldPos);
         return this;
     }
 
@@ -917,11 +960,11 @@ public final class IoBuffer {
             return position - node.getOffset();
         }
 
-        public void setNode(BufferNode node) {
+        private void setNode(BufferNode node) {
             this.node = node;
         }
 
-        public void setPosition(int position) {
+        private void setPosition(int position) {
             this.position = position;
         }
 
