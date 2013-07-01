@@ -237,20 +237,7 @@
           <version>2.4.1</version>
         </plugin>
 
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.5.1</version>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-            <optimize>true</optimize>
-            <showDeprecations>true</showDeprecations>
-            <encoding>ISO-8859-1</encoding>
-          </configuration>
-        </plugin>
-
-        <plugin>
+       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>2.5</version>
