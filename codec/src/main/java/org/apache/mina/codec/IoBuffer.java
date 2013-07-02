@@ -37,6 +37,9 @@ import java.nio.ReadOnlyBufferException;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class IoBuffer {
+    private static final int BYTE_MASK = 0xff;
+
+    private static final long BYTE_MASK_L = 0xffl;
 
     /**
      * @see ByteBuffer#allocate(int)
@@ -172,7 +175,7 @@ public final class IoBuffer {
 
             @Override
             public int read() throws IOException {
-                return hasRemaining() ? get() & 0xff : -1;
+                return hasRemaining() ? get() & BYTE_MASK : -1;
             }
 
             @Override
@@ -451,13 +454,13 @@ public final class IoBuffer {
     }
 
     private int getInt(Pointer pos) {
-        if (pos.getPosition() > capacity - 4) {
+        if (pos.getPosition() > capacity - Integer.SIZE / Byte.SIZE) {
             throw new BufferUnderflowException();
         }
 
         int out = 0;
-        for (int i = 0; i < 32; i += 8) {
-            out |= (get(pos) & 0xff) << (bo == ByteOrder.BIG_ENDIAN ? 24 - i : i);
+        for (int i = 0; i < Integer.SIZE; i += Byte.SIZE) {
+            out |= (get(pos) & BYTE_MASK) << (bo == ByteOrder.BIG_ENDIAN ? (Integer.SIZE - Byte.SIZE) - i : i);
         }
         return out;
     }
@@ -477,13 +480,13 @@ public final class IoBuffer {
     }
 
     private long getLong(Pointer pos) {
-        if (pos.getPosition() > capacity - 8) {
+        if (pos.getPosition() > capacity - Long.SIZE / Byte.SIZE) {
             throw new BufferUnderflowException();
         }
 
         long out = 0;
-        for (int i = 0; i < 64; i += 8) {
-            out |= (get(pos) & 0xffl) << (bo == ByteOrder.BIG_ENDIAN ? 56 - i : i);
+        for (int i = 0; i < Long.SIZE; i += Byte.SIZE) {
+            out |= (get(pos) & BYTE_MASK_L) << (bo == ByteOrder.BIG_ENDIAN ? (Long.SIZE - Byte.SIZE) - i : i);
         }
         return out;
     }
@@ -507,13 +510,13 @@ public final class IoBuffer {
     }
 
     private short getShort(Pointer pos) {
-        if (pos.getPosition() > capacity - 2) {
+        if (pos.getPosition() > capacity - Short.SIZE / Byte.SIZE) {
             throw new BufferUnderflowException();
         }
         if (bo == ByteOrder.BIG_ENDIAN) {
-            return (short) ((get(pos) & 0xff) << 8 | (get(pos) & 0xff));
+            return (short) ((get(pos) & BYTE_MASK) << Byte.SIZE | (get(pos) & BYTE_MASK));
         } else {
-            return (short) ((get(pos) & 0xff) | (get(pos) & 0xff) << 8);
+            return (short) ((get(pos) & BYTE_MASK) | (get(pos) & BYTE_MASK) << Byte.SIZE);
         }
     }
 
@@ -525,7 +528,7 @@ public final class IoBuffer {
         int hash = 0;
         Pointer oldPos = position.duplicate();
         while (hasRemaining()) {
-            hash *= 31;
+            hash *= 31; // NOSONAR, standard way of hashing
             hash += get();
         }
         position = oldPos;
@@ -761,11 +764,12 @@ public final class IoBuffer {
     }
 
     private IoBuffer putInt(Pointer pointer, int value) {
-        if (position.getPosition() > pointer.getPosition() || pointer.getPosition() > limit.getPosition() - 4) {
+        if (position.getPosition() > pointer.getPosition()
+                || pointer.getPosition() > limit.getPosition() - Integer.SIZE / Byte.SIZE) {
             throw new BufferUnderflowException();
         }
-        for (int i = 0; i < 32; i += 8) {
-            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 24 - i : i)));
+        for (int i = 0; i < Integer.SIZE; i += Byte.SIZE) {
+            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? (Integer.SIZE - Byte.SIZE) - i : i)));
         }
         return this;
     }
@@ -785,11 +789,12 @@ public final class IoBuffer {
     }
 
     private IoBuffer putLong(Pointer pointer, long value) {
-        if (position.getPosition() > pointer.getPosition() || pointer.getPosition() > limit.getPosition() - 8) {
+        if (position.getPosition() > pointer.getPosition()
+                || pointer.getPosition() > limit.getPosition() - Long.SIZE / Byte.SIZE) {
             throw new BufferUnderflowException();
         }
-        for (int i = 0; i < 64; i += 8) {
-            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 56 - i : i)));
+        for (int i = 0; i < Long.SIZE; i += Byte.SIZE) {
+            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? (Long.SIZE - Byte.SIZE) - i : i)));
         }
 
         return this;
@@ -803,11 +808,12 @@ public final class IoBuffer {
     }
 
     private IoBuffer putShort(Pointer pointer, short value) {
-        if (position.getPosition() > pointer.getPosition() || pointer.getPosition() > limit.getPosition() - 2) {
+        if (position.getPosition() > pointer.getPosition()
+                || pointer.getPosition() > limit.getPosition() - Short.SIZE / Byte.SIZE) {
             throw new BufferUnderflowException();
         }
-        for (int i = 0; i < 16; i += 8) {
-            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 8 - i : i)));
+        for (int i = 0; i < Short.SIZE; i += Byte.SIZE) {
+            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? Byte.SIZE - i : i)));
         }
         return this;
     }
