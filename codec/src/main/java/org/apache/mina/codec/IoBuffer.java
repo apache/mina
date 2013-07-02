@@ -31,6 +31,9 @@ import java.nio.ReadOnlyBufferException;
  * when accumulating data. From the user PoV, the methods are the very same than what we can get from ByteBuffer. <br/>
  * IoBuffer instances are *not* thread safe.
  * 
+ * The IoBuffer uses a single-chained queue to handle the multiple Buffers. Thus, the sequential access is 
+ * very efficient and the random access is not. It fits well the common usage of IoBuffer.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class IoBuffer {
@@ -168,15 +171,15 @@ public final class IoBuffer {
         return new InputStream() {
 
             @Override
+            public int read() throws IOException {
+                return hasRemaining() ? get() & 0xff : -1;
+            }
+
+            @Override
             public int read(byte[] b, int off, int len) throws IOException {
                 int toRead = Math.min(remaining(), len);
                 get(b, off, toRead);
                 return toRead;
-            }
-
-            @Override
-            public int read() throws IOException {
-                return hasRemaining() ? get() & 0xff : -1;
             }
         };
     }
@@ -325,10 +328,7 @@ public final class IoBuffer {
             throw new BufferUnderflowException();
         }
 
-        updatePosition();
-        position.setPosition(position.getPosition() + 1);
-
-        return position.getNode().getBuffer().get();
+        return get(position);
     }
 
     /**
@@ -351,7 +351,7 @@ public final class IoBuffer {
         int currentOffset = offset;
 
         while (remainsToCopy > 0) {
-            updatePosition();
+            position.updatePos();
 
             ByteBuffer currentBuffer = position.getNode().getBuffer();
             int blocksize = Math.min(remainsToCopy, currentBuffer.remaining());
@@ -372,47 +372,32 @@ public final class IoBuffer {
         if (pos >= limit.getPosition()) {
             throw new IndexOutOfBoundsException();
         }
-        BufferNode node = getBufferNodeByPosition(pos);
-        return node.getBuffer().get(pos - node.getOffset());
+        return get(getPointerByPosition(pos));
     }
 
-    private BufferNode getBufferNodeByPosition(int pos) {
-        if (head == null) {
-            return null;
-        }
-        BufferNode currentNode = head;
-        int max = currentNode.getBuffer().capacity();
-
-        while (max <= pos && currentNode != null) {
-            currentNode = currentNode.getNext();
-            if (currentNode != null) {
-                max += currentNode.getBuffer().capacity();
-            }
-        }
-
-        return currentNode;
+    private byte get(Pointer pos) {
+        pos.updatePos();
+        byte b = pos.getNode().getBuffer().get(pos.getPositionInNode());
+        pos.incrPosition();
+        return b;
     }
 
     /**
      * @see ByteBuffer#getChar()
      */
     public char getChar() {
-        if (remaining() < 2) {
-            throw new BufferUnderflowException();
-        }
-        return (char) getShort();
+        return getChar(position);
     }
 
     /**
      * @see ByteBuffer#getChar(int)
      */
     public char getChar(int index) {
-        int oldPos = position();
-        position(index);
-        char out = getChar();
-        position(oldPos);
-        position.getNode().getBuffer().position(position.getPositionInNode());
-        return out;
+        return getChar(getPointerByPosition(index));
+    }
+
+    private char getChar(Pointer position) {
+        return (char) getShort(position);
     }
 
     /**
@@ -426,55 +411,54 @@ public final class IoBuffer {
      * @see ByteBuffer#getDouble(int)
      */
     public double getDouble(int index) {
-        int oldPos = position();
-        position(index);
-        double out = getDouble();
-        position(oldPos);
-        position.getNode().getBuffer().position(position.getPositionInNode());
-        return out;
+        return getDouble(getPointerByPosition(index));
+    }
+
+    private double getDouble(Pointer pos) {
+        return Double.longBitsToDouble(getLong(pos));
     }
 
     /**
      * @see ByteBuffer#getFloat()
      */
     public float getFloat() {
-        return Float.intBitsToFloat(getInt());
+        return getFloat(position);
     }
 
     /**
      * @see ByteBuffer#getFloat(int)
      */
     public float getFloat(int index) {
-        int oldPos = position();
-        position(index);
-        float out = getFloat();
-        position(oldPos);
-        return out;
+        return getFloat(getPointerByPosition(index));
+    }
+
+    private float getFloat(Pointer pos) {
+        return Float.intBitsToFloat(getInt(pos));
     }
 
     /**
      * @see ByteBuffer#getInt()
      */
     public int getInt() {
-        if (remaining() < 4) {
-            throw new BufferUnderflowException();
-        }
-
-        int out = 0;
-        for (int i = 0; i < 32; i += 8) {
-            out |= (get() & 0xff) << (bo == ByteOrder.BIG_ENDIAN ? 24 - i : i);
-        }
-        return out;
+        return getInt(position);
     }
 
     /**
      * @see ByteBuffer#getInt(int)
      */
     public int getInt(int index) {
-        int oldPos = position();
-        position(index);
-        int out = getInt();
-        position(oldPos);
+        return getInt(getPointerByPosition(index));
+    }
+
+    private int getInt(Pointer pos) {
+        if (pos.getPosition() > capacity - 4) {
+            throw new BufferUnderflowException();
+        }
+
+        int out = 0;
+        for (int i = 0; i < 32; i += 8) {
+            out |= (get(pos) & 0xff) << (bo == ByteOrder.BIG_ENDIAN ? 24 - i : i);
+        }
         return out;
     }
 
@@ -482,61 +466,55 @@ public final class IoBuffer {
      * @see ByteBuffer#getLong()
      */
     public long getLong() {
-        if (remaining() < 8) {
-            throw new BufferUnderflowException();
-        }
-
-        long out = 0;
-        for (int i = 0; i < 64; i += 8) {
-            out |= (get() & 0xffl) << (bo == ByteOrder.BIG_ENDIAN ? 56 - i : i);
-        }
-        return out;
+        return getLong(position);
     }
 
     /**
      * @see ByteBuffer#getLong(int)
      */
     public long getLong(int index) {
-        int oldPos = position();
-        position(index);
-        long out = getLong();
-        position(oldPos);
+        return getLong(getPointerByPosition(index));
+    }
+
+    private long getLong(Pointer pos) {
+        if (pos.getPosition() > capacity - 8) {
+            throw new BufferUnderflowException();
+        }
+
+        long out = 0;
+        for (int i = 0; i < 64; i += 8) {
+            out |= (get(pos) & 0xffl) << (bo == ByteOrder.BIG_ENDIAN ? 56 - i : i);
+        }
         return out;
     }
 
     private Pointer getPointerByPosition(int pos) {
-        if (pos == capacity) {
-            return new Pointer(tail, pos);
-        }
-
-        BufferNode currentNode = getBufferNodeByPosition(pos);
-        return new Pointer(currentNode, pos);
+        return new Pointer(pos);
     }
 
     /**
      * @see ByteBuffer#getShort()
      */
     public short getShort() {
-        if (remaining() < 2) {
-            throw new BufferUnderflowException();
-        }
-
-        if (bo == ByteOrder.BIG_ENDIAN) {
-            return (short) ((get() & 0xff) << 8 | (get() & 0xff));
-        } else {
-            return (short) ((get() & 0xff) | (get() & 0xff) << 8);
-        }
+        return getShort(position);
     }
 
     /**
      * @see ByteBuffer#getShort(int)
      */
     public long getShort(int index) {
-        int oldPos = position();
-        position(index);
-        short out = getShort();
-        position(oldPos);
-        return out;
+        return getShort(getPointerByPosition(index));
+    }
+
+    private short getShort(Pointer pos) {
+        if (pos.getPosition() > capacity - 2) {
+            throw new BufferUnderflowException();
+        }
+        if (bo == ByteOrder.BIG_ENDIAN) {
+            return (short) ((get(pos) & 0xff) << 8 | (get(pos) & 0xff));
+        } else {
+            return (short) ((get(pos) & 0xff) | (get(pos) & 0xff) << 8);
+        }
     }
 
     /**
@@ -587,6 +565,10 @@ public final class IoBuffer {
      */
     public void mark() {
         this.limit = position.duplicate();
+    }
+
+    public Pointer newPointer(BufferNode node, int position) {
+        return new Pointer(position);
     }
 
     /**
@@ -650,10 +632,7 @@ public final class IoBuffer {
             throw new BufferUnderflowException();
         }
 
-        updatePosition();
-        position.setPosition(position.getPosition() + 1);
-
-        position.getNode().getBuffer().put(b);
+        put(position, b);
         return this;
     }
 
@@ -680,7 +659,7 @@ public final class IoBuffer {
         int currentOffset = offset;
 
         while (remainsToCopy > 0) {
-            updatePosition();
+            position.updatePos();
 
             ByteBuffer currentBuffer = position.getNode().getBuffer();
             int blocksize = Math.min(remainsToCopy, currentBuffer.remaining());
@@ -701,8 +680,15 @@ public final class IoBuffer {
         if (pos >= limit.getPosition()) {
             throw new IndexOutOfBoundsException();
         }
-        BufferNode node = getBufferNodeByPosition(pos);
-        node.getBuffer().put(pos - node.getOffset(), value);
+        Pointer p = getPointerByPosition(pos);
+        put(p, value);
+        return this;
+    }
+
+    private IoBuffer put(Pointer pos, byte b) {
+        pos.updatePos();
+        pos.getNode().getBuffer().put(pos.getPositionInNode(), b);
+        pos.incrPosition();
         return this;
     }
 
@@ -710,79 +696,77 @@ public final class IoBuffer {
      * @see ByteBuffer#putChar(char)
      */
     public IoBuffer putChar(char value) {
-        putShort((short) value);
-        return this;
+        return putChar(position, value);
     }
 
     /**
      * @see ByteBuffer#putChar(int, char)
      */
     public IoBuffer putChar(int index, char value) {
-        Pointer oldPos = position.duplicate();
-        position(index);
-        putChar(value);
-        position = oldPos;
-        return this;
+        return putChar(getPointerByPosition(index), value);
+    }
+
+    private IoBuffer putChar(Pointer index, char value) {
+        return putShort(index, (short) value);
     }
 
     /**
      * @see ByteBuffer#putDouble(double)
      */
     public IoBuffer putDouble(double value) {
-        return putLong(Double.doubleToLongBits(value));
+        return putDouble(position, value);
     }
 
     /**
      * @see ByteBuffer#putDouble(int, double)
      */
     public IoBuffer putDouble(int index, double value) {
-        int oldPos = position();
-        position(index);
-        putDouble(value);
-        position(oldPos);
-        return this;
+        return putDouble(getPointerByPosition(index), value);
+    }
+
+    private IoBuffer putDouble(Pointer pos, double value) {
+        return putLong(pos, Double.doubleToLongBits(value));
     }
 
     /**
      * @see ByteBuffer#putFloat(float)
      */
     public IoBuffer putFloat(float value) {
-        return putInt(Float.floatToIntBits(value));
+        return putFloat(position, value);
     }
 
     /**
      * @see ByteBuffer#putFloat(int, float)
      */
     public IoBuffer putFloat(int index, float value) {
-        int oldPos = position();
-        position(index);
-        putFloat(value);
-        position(oldPos);
-        return this;
+        return putFloat(getPointerByPosition(index), value);
+    }
+
+    private IoBuffer putFloat(Pointer pointer, float value) {
+        return putInt(pointer, Float.floatToIntBits(value));
     }
 
     /**
      * @see ByteBuffer#putInt(int)
      */
     public IoBuffer putInt(int value) {
-        if (remaining() < 4) {
-            throw new BufferUnderflowException();
-        }
-
-        for (int i = 0; i < 32; i += 8) {
-            put((byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 24 - i : i)));
-        }
-        return this;
+        return putInt(position, value);
     }
 
     /**
      * @see ByteBuffer#putInt(int, int)
      */
     public IoBuffer putInt(int index, int value) {
-        int oldPos = position();
-        position(index);
-        putInt(value);
-        position(oldPos);
+        return putInt(getPointerByPosition(index), value);
+    }
+
+    private IoBuffer putInt(Pointer pointer, int value) {
+        if (position.getPosition() > pointer.getPosition() || pointer.getPosition() > limit.getPosition() - 4) {
+            throw new BufferUnderflowException();
+        }
+        for (int i = 0; i < 32; i += 8) {
+            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 24 - i : i)));
+        }
         return this;
     }
 
@@ -790,23 +774,22 @@ public final class IoBuffer {
      * @see ByteBuffer#putLong(int, int)
      */
     public IoBuffer putLong(int index, long value) {
-        int oldPos = position();
-        position(index);
-        putLong(value);
-        position(oldPos);
-        return this;
+        return putLong(getPointerByPosition(index), value);
     }
 
     /**
      * @see ByteBuffer#putLong(long)
      */
     public IoBuffer putLong(long value) {
-        if (remaining() < 8) {
+        return putLong(position, value);
+    }
+
+    private IoBuffer putLong(Pointer pointer, long value) {
+        if (position.getPosition() > pointer.getPosition() || pointer.getPosition() > limit.getPosition() - 8) {
             throw new BufferUnderflowException();
         }
-
         for (int i = 0; i < 64; i += 8) {
-            put((byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 56 - i : i)));
+            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 56 - i : i)));
         }
 
         return this;
@@ -816,10 +799,16 @@ public final class IoBuffer {
      * @see ByteBuffer#putShort(int, short)
      */
     public IoBuffer putShort(int index, short value) {
-        int oldPos = position();
-        position(index);
-        putShort(value);
-        position(oldPos);
+        return putShort(getPointerByPosition(index), value);
+    }
+
+    private IoBuffer putShort(Pointer pointer, short value) {
+        if (position.getPosition() > pointer.getPosition() || pointer.getPosition() > limit.getPosition() - 2) {
+            throw new BufferUnderflowException();
+        }
+        for (int i = 0; i < 16; i += 8) {
+            put(pointer, (byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 8 - i : i)));
+        }
         return this;
     }
 
@@ -827,14 +816,7 @@ public final class IoBuffer {
      * @see ByteBuffer#putShort(short)
      */
     public IoBuffer putShort(short value) {
-        if (remaining() < 2) {
-            throw new BufferUnderflowException();
-        }
-
-        for (int i = 0; i < 16; i += 8) {
-            put((byte) (value >> (bo == ByteOrder.BIG_ENDIAN ? 8 - i : i)));
-        }
-        return this;
+        return putShort(position, value);
     }
 
     /**
@@ -875,19 +857,19 @@ public final class IoBuffer {
      * @see ByteBuffer#slice()
      */
     public IoBuffer slice() {
-        updatePosition();
+        position.updatePos();
         IoBuffer out = new IoBuffer();
         out.order(order());
 
         if (hasRemaining()) {
             tail.getBuffer().limit(limit.getPositionInNode());
             for (BufferNode node = position.getNode(); node != limit.getNode(); node = node.getNext()) {
-                if (node != head) {
+                if (node != head) { //NOSONAR, check if instances are the same. 
                     node.getBuffer().position(0);
                 }
                 out.add(node.getBuffer());
             }
-            if (tail != head) {
+            if (tail != head) { //NOSONAR, check if instances are the same. 
                 tail.getBuffer().position(0);
             }
             out.add(tail.getBuffer().slice());
@@ -911,13 +893,6 @@ public final class IoBuffer {
         return sb.toString();
     }
 
-    private void updatePosition() {
-        while (!position.getNode().getBuffer().hasRemaining() && position.getNode().hasNext()) {
-            position.setNode(position.getNode().getNext());
-            position.getNode().getBuffer().rewind();
-        }
-    }
-
     private static final class BufferNode {
         private final ByteBuffer buffer;
 
@@ -938,10 +913,6 @@ public final class IoBuffer {
             return next;
         }
 
-        public int getOffset() {
-            return offset;
-        }
-
         public boolean hasNext() {
             return next != null;
         }
@@ -956,19 +927,38 @@ public final class IoBuffer {
         }
     }
 
-    private static final class Pointer {
+    private final class Pointer {
+
         private BufferNode node;
 
-        private int position;
+        private int positionInBuffer;
 
-        public Pointer(BufferNode node, int position) {
+        public Pointer(int position) {
             super();
-            this.node = node;
-            this.position = position;
+
+            node = getBufferNodeByPosition(position);
+
+            positionInBuffer = node == null ? 0 : position - node.offset;
+
         }
 
         public Pointer duplicate() {
-            return new Pointer(node, position);
+            return new Pointer(getPosition());
+        }
+
+        private BufferNode getBufferNodeByPosition(int pos) {
+            if (head == null) {
+                return null;
+            }
+            BufferNode currentNode = head;
+            int rpos = pos;
+            while (rpos >= currentNode.getBuffer().capacity() && currentNode.hasNext()) {
+
+                rpos -= currentNode.getBuffer().capacity();
+                currentNode = currentNode.getNext();
+            }
+
+            return currentNode;
         }
 
         public BufferNode getNode() {
@@ -976,19 +966,21 @@ public final class IoBuffer {
         }
 
         public int getPosition() {
-            return position;
+            return positionInBuffer + (node == null ? 0 : node.offset);
         }
 
         public int getPositionInNode() {
-            return position - node.getOffset();
+            return positionInBuffer;
         }
 
-        private void setNode(BufferNode node) {
-            this.node = node;
+        public void incrPosition() {
+            positionInBuffer++;
         }
 
-        private void setPosition(int position) {
-            this.position = position;
+        public void setPosition(int position) {
+            node = getBufferNodeByPosition(position);
+
+            positionInBuffer = node == null ? 0 : position - node.offset;
         }
 
         @Override
@@ -998,9 +990,16 @@ public final class IoBuffer {
             sb.append("[node=");
             sb.append(getNode());
             sb.append(", pos=");
-            sb.append(getPosition());            
+            sb.append(getPosition());
             sb.append("]");
-            return sb.toString();           
+            return sb.toString();
+        }
+
+        public void updatePos() {
+            while (positionInBuffer >= node.getBuffer().capacity() && node.hasNext()) {
+                positionInBuffer -= node.getBuffer().capacity();
+                node = node.getNext();
+            }
         }
     }
 }

@@ -823,7 +823,8 @@ public class IoBufferTest {
             ioBuffer.rewind();
             assertEquals(12345, ioBuffer.getShort());
             assertEquals(-23456, ioBuffer.getShort());
-
+            ioBuffer.rewind();
+            
             ioBuffer.putShort(1, (short) 12345);
             assertEquals((short) 12345, ioBuffer.getShort(1));
 
@@ -856,7 +857,8 @@ public class IoBufferTest {
             ioBuffer.rewind();
             assertEquals(123456, ioBuffer.getInt());
             assertEquals(-23456789, ioBuffer.getInt());
-
+            ioBuffer.rewind();
+            
             ioBuffer.putInt(2, 1234567890);
             assertEquals(1234567890, ioBuffer.getInt(2));
 
@@ -891,6 +893,7 @@ public class IoBufferTest {
             assertEquals(123456789012l, ioBuffer.getLong());
             assertEquals(-23456789023l, ioBuffer.getLong());
 
+            ioBuffer.rewind();            
             ioBuffer.putLong(4, 1234567890);
             assertEquals(1234567890, ioBuffer.getLong(4));
 
@@ -923,6 +926,8 @@ public class IoBufferTest {
             ioBuffer.rewind();
             assertEquals(-0.68f, ioBuffer.getFloat(), 0.001f);
             assertEquals(3.14f, ioBuffer.getFloat(), 0.001f);
+            ioBuffer.rewind();
+            
             ioBuffer.putFloat(2, -12.34f);
             assertEquals(-12.34f, ioBuffer.getFloat(2), 0.001f);
         }
@@ -943,6 +948,7 @@ public class IoBufferTest {
             assertEquals(Math.PI, ioBuffer.getDouble(), 1E-10);
             assertEquals(-Math.E, ioBuffer.getDouble(), 1E-10);
 
+            ioBuffer.rewind();            
             ioBuffer.putDouble(4, 12.34);
             assertEquals(12.34, ioBuffer.getDouble(4), 1E-10);
         }
@@ -965,6 +971,7 @@ public class IoBufferTest {
 
             assertEquals('ë', ioBuffer.getChar());
             assertEquals('ü', ioBuffer.getChar());
+            ioBuffer.rewind();
             
             ioBuffer.putChar(1, 'ç');
             assertEquals('ç', ioBuffer.getChar(1));
