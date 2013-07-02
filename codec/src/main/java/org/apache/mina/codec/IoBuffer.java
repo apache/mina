@@ -105,13 +105,13 @@ public final class IoBuffer {
     private BufferNode head, tail;
 
     /** The maximal position in the IoBuffer */
-    private Pointer limit;
+    private Pointer limit = new Pointer();
 
     /** The current position in the buffer */
-    private Pointer mark;
+    private Pointer mark = new Pointer();
 
     /** The marked position, for the next reset() */
-    private Pointer position;
+    private Pointer position = new Pointer();
 
     /** If the buffer is readonly */
     private boolean readonly = false;
@@ -363,7 +363,7 @@ public final class IoBuffer {
             currentOffset += blocksize;
             remainsToCopy -= blocksize;
 
-            position.setPosition(position.getPosition() + blocksize);
+            position.incrementPosition(blocksize);
         }
         position.getNode().getBuffer().position(0);
         return this;
@@ -372,11 +372,11 @@ public final class IoBuffer {
     /**
      * @see ByteBuffer#get(int)
      */
-    public byte get(int pos) {
-        if (pos >= limit.getPosition()) {
+    public byte get(int index) {
+        if (index >= limit.getPosition()) {
             throw new IndexOutOfBoundsException();
         }
-        return get(getPointerByPosition(pos));
+        return get(getPointerByPosition(index));
     }
 
     private byte get(Pointer pos) {
@@ -560,8 +560,8 @@ public final class IoBuffer {
     /**
      * @see ByteBuffer#limit(int)
      */
-    public void limit(int limit) {
-        this.limit = getPointerByPosition(limit);
+    public void limit(int newLimit) {
+        this.limit = getPointerByPosition(newLimit);
     }
 
     /**
@@ -569,10 +569,6 @@ public final class IoBuffer {
      */
     public void mark() {
         this.limit = position.duplicate();
-    }
-
-    public Pointer newPointer(BufferNode node, int position) {
-        return new Pointer(position);
     }
 
     /**
@@ -613,16 +609,16 @@ public final class IoBuffer {
     /**
      * @see ByteBuffer#position(int)
      */
-    public void position(int position) {
-        if (position > limit() || position < 0) {
+    public void position(int newPosition) {
+        if (newPosition > limit() || newPosition < 0) {
             throw new IllegalArgumentException();
         }
 
-        if (mark != null && mark.getPosition() > position) {
+        if (mark != null && mark.getPosition() > newPosition) {
             mark = null;
         }
 
-        setPosition(getPointerByPosition(position));
+        this.position.setPosition(newPosition);
     }
 
     /**
@@ -643,15 +639,15 @@ public final class IoBuffer {
     /**
      * @see ByteBuffer#put(byte[])
      */
-    public IoBuffer put(byte[] dst) {
-        put(dst, 0, dst.length);
+    public IoBuffer put(byte[] src) {
+        put(src, 0, src.length);
         return this;
     }
 
     /**
      * @see ByteBuffer#put(byte[], int, int)
      */
-    public IoBuffer put(byte[] dst, int offset, int length) {
+    public IoBuffer put(byte[] src, int offset, int length) {
         if (readonly) {
             throw new ReadOnlyBufferException();
         }
@@ -667,12 +663,12 @@ public final class IoBuffer {
 
             ByteBuffer currentBuffer = position.getNode().getBuffer();
             int blocksize = Math.min(remainsToCopy, currentBuffer.remaining());
-            position.getNode().getBuffer().put(dst, currentOffset, blocksize);
+            position.getNode().getBuffer().put(src, currentOffset, blocksize);
 
             currentOffset += blocksize;
             remainsToCopy -= blocksize;
 
-            position.setPosition(position.getPosition() + blocksize);
+            position.incrementPosition(blocksize);
         }
         position.getNode().getBuffer().position(0);
         return this;
@@ -681,11 +677,11 @@ public final class IoBuffer {
     /**
      * @see ByteBuffer#put(int, byte)
      */
-    public IoBuffer put(int pos, byte value) {
-        if (pos >= limit.getPosition()) {
+    public IoBuffer put(int index, byte value) {
+        if (index >= limit.getPosition()) {
             throw new IndexOutOfBoundsException();
         }
-        Pointer p = getPointerByPosition(pos);
+        Pointer p = getPointerByPosition(index);
         put(p, value);
         return this;
     }
@@ -854,10 +850,6 @@ public final class IoBuffer {
         return this;
     }
 
-    private void setPosition(Pointer position) {
-        this.position = position;
-    }
-
     /**
      * @see ByteBuffer#slice()
      */
@@ -865,6 +857,7 @@ public final class IoBuffer {
         position.updatePos();
         IoBuffer out = new IoBuffer();
         out.order(order());
+
         position.getNode().getBuffer().position(position.getPositionInNode());
         if (hasRemaining()) {
             tail.getBuffer().limit(limit.getPositionInNode());
@@ -881,6 +874,7 @@ public final class IoBuffer {
             tail.getBuffer().limit(tail.getBuffer().capacity());
         }
         position.getNode().getBuffer().position(0);
+
         return out;
     }
 
@@ -939,12 +933,12 @@ public final class IoBuffer {
         private int positionInBuffer;
 
         public Pointer(int position) {
-            super();
+            this();
 
-            node = getBufferNodeByPosition(position);
+            setPosition(position);
+        }
 
-            positionInBuffer = node == null ? 0 : position - node.offset;
-
+        public Pointer() {
         }
 
         public Pointer duplicate() {
@@ -979,13 +973,23 @@ public final class IoBuffer {
         }
 
         public void incrPosition() {
-            positionInBuffer++;
+            incrementPosition(1);
         }
 
-        public void setPosition(int position) {
-            node = getBufferNodeByPosition(position);
+        public void setPosition(int newPosition) {
+            if (node == null || node.offset < newPosition) {
 
-            positionInBuffer = node == null ? 0 : position - node.offset;
+                node = getBufferNodeByPosition(newPosition);
+
+            } else {
+                node = head;
+            }
+            positionInBuffer = node == null ? 0 : newPosition - node.offset;
+            updatePos();
+        }
+
+        public void incrementPosition(int positionIncrement) {
+            positionInBuffer += positionIncrement;
         }
 
         @Override
@@ -1001,7 +1005,7 @@ public final class IoBuffer {
         }
 
         public void updatePos() {
-            while (positionInBuffer >= node.getBuffer().capacity() && node.hasNext()) {
+            while (node != null && positionInBuffer >= node.getBuffer().capacity() && node.hasNext()) {
                 positionInBuffer -= node.getBuffer().capacity();
                 node = node.getNext();
             }
