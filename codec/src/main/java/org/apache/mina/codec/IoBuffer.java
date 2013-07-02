@@ -349,7 +349,7 @@ public final class IoBuffer {
         if (remaining() < length) {
             throw new BufferUnderflowException();
         }
-
+        position.getNode().getBuffer().position(position.getPositionInNode());
         int remainsToCopy = length;
         int currentOffset = offset;
 
@@ -365,6 +365,7 @@ public final class IoBuffer {
 
             position.setPosition(position.getPosition() + blocksize);
         }
+        position.getNode().getBuffer().position(0);
         return this;
     }
 
@@ -660,7 +661,7 @@ public final class IoBuffer {
 
         int remainsToCopy = length;
         int currentOffset = offset;
-
+        position.getNode().getBuffer().position(position.getPositionInNode());
         while (remainsToCopy > 0) {
             position.updatePos();
 
@@ -673,6 +674,7 @@ public final class IoBuffer {
 
             position.setPosition(position.getPosition() + blocksize);
         }
+        position.getNode().getBuffer().position(0);
         return this;
     }
 
@@ -854,9 +856,6 @@ public final class IoBuffer {
 
     private void setPosition(Pointer position) {
         this.position = position;
-        if (capacity > 0) {
-            position.getNode().getBuffer().position(position.getPositionInNode());
-        }
     }
 
     /**
@@ -866,7 +865,7 @@ public final class IoBuffer {
         position.updatePos();
         IoBuffer out = new IoBuffer();
         out.order(order());
-
+        position.getNode().getBuffer().position(position.getPositionInNode());
         if (hasRemaining()) {
             tail.getBuffer().limit(limit.getPositionInNode());
             for (BufferNode node = position.getNode(); node != limit.getNode(); node = node.getNext()) {
@@ -881,7 +880,7 @@ public final class IoBuffer {
             out.add(tail.getBuffer().slice());
             tail.getBuffer().limit(tail.getBuffer().capacity());
         }
-
+        position.getNode().getBuffer().position(0);
         return out;
     }
 
