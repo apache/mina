@@ -21,24 +21,23 @@ package org.apache.mina.codec.delimited.serialization;
 
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
-import org.apache.mina.util.ByteBufferInputStream;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 
 /**
  * Decoder providing the built-in Java-deserialization.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class JavaNativeMessageDecoder<IN extends Serializable> extends ByteBufferDecoder<IN> {
+public class JavaNativeMessageDecoder<IN extends Serializable> extends IoBufferDecoder<IN> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public IN decode(final ByteBuffer input) {
+    public IN decode(final IoBuffer input) {
         try {
-            ObjectInputStream ois = new ObjectInputStream(new ByteBufferInputStream(input));
+            ObjectInputStream ois = new ObjectInputStream(input.asInputStream());
             IN s = (IN) ois.readObject();
             ois.close();
             return s;

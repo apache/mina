@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
 /**
@@ -36,13 +36,13 @@ import org.apache.mina.codec.delimited.ByteBufferEncoder;
 public class VarIntEncodingTest extends IntEncodingTest {
 
     @Override
-    public ByteBufferDecoder<Integer> newDecoderInstance() {
-        return new VarInt.Decoder();
+    public IoBufferDecoder<Integer> newDecoderInstance() {
+        return new VarInt().getDecoder();
     }
 
     @Override
     public ByteBufferEncoder<Integer> newEncoderInstance() {
-        return new VarInt.Encoder();
+        return new VarInt().getEncoder();
     }
 
     @Override

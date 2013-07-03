@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 
 /**
@@ -98,7 +98,7 @@ public class JavaNativeTest extends GenericSerializerTest<JavaNativeTest.TestBea
     }
 
     @Override
-    public ByteBufferDecoder<TestBean> getDecoder() throws Exception {
+    public IoBufferDecoder<TestBean> getDecoder() throws Exception {
         return new JavaNativeMessageDecoder<TestBean>();
     }
 

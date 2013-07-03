@@ -21,6 +21,7 @@ package org.apache.mina.codec.delimited;
 
 import java.nio.ByteBuffer;
 
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.ProtocolDecoder;
 import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.codec.StatelessProtocolDecoder;
@@ -44,7 +45,7 @@ import org.apache.mina.codec.delimited.ints.VarInt;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class ByteBufferDecoder<INPUT> implements StatelessProtocolDecoder<ByteBuffer, INPUT> {
+public abstract class IoBufferDecoder<INPUT> implements StatelessProtocolDecoder<IoBuffer, INPUT> {
     /**
      * Being stateless, this method is left empty
      * 
@@ -57,7 +58,7 @@ public abstract class ByteBufferDecoder<INPUT> implements StatelessProtocolDecod
     }
 
     /**
-     * Decodes a message from a {@link ByteBuffer}
+     * Decodes a message from a {@link IoBuffer}
      * 
      * <p>
      * When a truncated input is given to this method it <b>may</b> return null.
@@ -77,17 +78,17 @@ public abstract class ByteBufferDecoder<INPUT> implements StatelessProtocolDecod
      * 
      * @throws ProtocolDecoderException
      */
-    public abstract INPUT decode(ByteBuffer input);
+    public abstract INPUT decode(IoBuffer input);
 
     /**
      * Decodes a message from a {@link ByteBuffer}
      * <p>
      * The actual decoding needs to be implemented in the abstract method
-     * {@link ByteBufferDecoder#decode(ByteBuffer)}
+     * {@link IoBufferDecoder#decode(ByteBuffer)}
      * </p>
      */
     @Override
-    public final INPUT decode(ByteBuffer input, Void context) {
+    public final INPUT decode(IoBuffer input, Void context) {
         return decode(input);
     }
 

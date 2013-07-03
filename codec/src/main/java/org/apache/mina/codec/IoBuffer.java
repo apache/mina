@@ -20,6 +20,7 @@ package org.apache.mina.codec;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -327,7 +328,7 @@ public final class IoBuffer {
      * @see ByteBuffer#get()
      */
     public byte get() {
-        if (position.getPosition() >= limit.getPosition()) {
+        if (!hasRemaining()) {
             throw new BufferUnderflowException();
         }
 
@@ -551,6 +552,13 @@ public final class IoBuffer {
     }
 
     /**
+     * @see ByteBuffer#isReadOnly()
+     */
+    public boolean isReadOnly() {
+        return readonly;
+    }
+
+    /**
      * @see ByteBuffer#limit()
      */
     public int limit() {
@@ -641,6 +649,48 @@ public final class IoBuffer {
      */
     public IoBuffer put(byte[] src) {
         put(src, 0, src.length);
+        return this;
+    }
+
+    /**
+     * @see ByteBuffer#put(ByteBuffer)
+     */
+    public IoBuffer put(ByteBuffer src) {
+
+        if (remaining() < src.remaining()) {
+            throw new BufferOverflowException();
+        }
+        if (isReadOnly()) {
+            throw new ReadOnlyBufferException();
+        }
+
+        while (src.hasRemaining()) {
+            put(src.get());
+        }
+
+        return this;
+    }
+    
+    
+    /**
+     * @see ByteBuffer#put(ByteBuffer)
+     */
+    public IoBuffer put(IoBuffer src) {
+        if(src==this){ // NOSONAR, checking the instance
+            throw new IllegalArgumentException();
+        }
+
+        if (remaining() < src.remaining()) {
+            throw new BufferOverflowException();
+        }
+        if (isReadOnly()) {
+            throw new ReadOnlyBufferException();
+        }
+
+        while (src.hasRemaining()) {
+            put(src.get());
+        }
+
         return this;
     }
 
@@ -996,10 +1046,10 @@ public final class IoBuffer {
         public String toString() {
             StringBuffer sb = new StringBuffer();
             sb.append(getClass().getName());
-            sb.append("[node=");
-            sb.append(getNode());
-            sb.append(", pos=");
+            sb.append("[pos=");
             sb.append(getPosition());
+            sb.append(", node=");
+            sb.append(getNode());
             sb.append("]");
             return sb.toString();
         }

@@ -24,18 +24,19 @@ import static org.junit.Assert.assertEquals;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 import org.junit.Test;
 
 /**
- * A {@link ByteBufferEncoder} and {@link ByteBufferDecoder} test. 
+ * A {@link ByteBufferEncoder} and {@link IoBufferDecoder} test. 
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class GenericSerializerTest<T> {
 
-    public abstract ByteBufferDecoder<T> getDecoder() throws Exception;
+    public abstract IoBufferDecoder<T> getDecoder() throws Exception;
 
     public abstract ByteBufferEncoder<T> getEncoder() throws Exception;
 
@@ -43,24 +44,24 @@ public abstract class GenericSerializerTest<T> {
 
     @Test
     public void testSerialization() throws Exception {
-        ByteBufferDecoder<T> decoder = getDecoder();
+        IoBufferDecoder<T> decoder = getDecoder();
         ByteBufferEncoder<T> encoder = getEncoder();
         for (T object : getObjects()) {
-            assertEquals(object, decoder.decode(encoder.encode(object)));
+            assertEquals(object, decoder.decode(IoBuffer.wrap(encoder.encode(object))));
         }
     }
 
     @Test
     public void testEncodedSize() throws Exception {
-        ByteBufferDecoder<T> decoder = getDecoder();
+        IoBufferDecoder<T> decoder = getDecoder();
         ByteBufferEncoder<T> encoder = getEncoder();
         for (T object : getObjects()) {
             int size = encoder.getEncodedSize(object);
             ByteBuffer out = ByteBuffer.allocate(size);
-            encoder.writeTo(object, out);
+            encoder.writeTo(object, out);            
             assertEquals(size, out.position());
             out.position(0);
-            assertEquals(object, decoder.decode(out));
+            assertEquals(object, decoder.decode(IoBuffer.wrap(out)));
         }
     }
 }

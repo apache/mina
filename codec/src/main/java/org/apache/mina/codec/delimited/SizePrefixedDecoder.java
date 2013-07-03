@@ -19,15 +19,14 @@
  */
 package org.apache.mina.codec.delimited;
 
-import java.nio.ByteBuffer;
-
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.ProtocolDecoder;
 
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT, SizePrefixedDecoder.MutableInt> {
+public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<IoBuffer, OUT, SizePrefixedDecoder.MutableInt> {
 
     /**
      * A mutable {@link Integer} wrapper.
@@ -83,11 +82,11 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
         }
     }
 
-    private final ByteBufferDecoder<Integer> sizeDecoder;
+    private final IoBufferDecoder<Integer> sizeDecoder;
 
-    private final ByteBufferDecoder<OUT> payloadDecoder;
+    private final IoBufferDecoder<OUT> payloadDecoder;
 
-    public SizePrefixedDecoder(ByteBufferDecoder<Integer> sizeDecoder, ByteBufferDecoder<OUT> payloadDecoder) {
+    public SizePrefixedDecoder(IoBufferDecoder<Integer> sizeDecoder, IoBufferDecoder<OUT> payloadDecoder) {
         super();
         this.sizeDecoder = sizeDecoder;
         this.payloadDecoder = payloadDecoder;
@@ -100,7 +99,7 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
     }
 
     @Override
-    public OUT decode(ByteBuffer input, MutableInt nextBlockSize) {
+    public OUT decode(IoBuffer input, MutableInt nextBlockSize) {
         OUT output = null;
 
         if (nextBlockSize.getValue() == null) {
@@ -108,7 +107,7 @@ public class SizePrefixedDecoder<OUT> implements ProtocolDecoder<ByteBuffer, OUT
         }
 
         if (nextBlockSize.isDefined() && (input.remaining() >= nextBlockSize.getValue())) {
-            ByteBuffer buffer = input.slice();
+            IoBuffer buffer = input.slice();
             buffer.limit(buffer.position() + nextBlockSize.getValue());
 
             output = payloadDecoder.decode(buffer);

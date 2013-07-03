@@ -22,9 +22,10 @@ package org.apache.mina.codec.delimited.ints;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 
 /**
  * Class providing a variable length representation of integers.
@@ -80,9 +81,26 @@ import org.apache.mina.codec.delimited.ByteBufferEncoder;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class VarInt {
-    // this class should not be instanciated
-    private VarInt() {
+/*
+ * About the suppression of warnings:
+ * This class contains a lot of bit-shifting, logical and/or operations order to handle
+ * VarInt conversions. The code contains a lot of hard-coded integer that tools like
+ * Sonar classify as "magic numbers". Using final static variables for all of them
+ * would have resulted in a code less readable.
+ * The "all" scope is too generic, but Sonar doesn't not handle properly others scopes 
+ * like "MagicNumber" (Sonar 3.6 - 03July2013)
+ */
+@SuppressWarnings("all")
+public final class VarInt implements IntTranscoder {
+    
+    @Override
+    public IoBufferDecoder<Integer> getDecoder() {
+        return new Decoder();
+    }
+
+    @Override
+    public ByteBufferEncoder<Integer> getEncoder() {
+        return new Encoder();
     }
 
     /**
@@ -91,29 +109,45 @@ public class VarInt {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    public static class Decoder extends ByteBufferDecoder<Integer> {
+    private class Decoder extends IoBufferDecoder<Integer> {
 
         @Override
-        public Integer decode(ByteBuffer input) {
+        public Integer decode(IoBuffer input) {
             int origpos = input.position();
-            int size = 0;
 
             try {
-                for (int i = 0;; i += 7) {
-                    byte tmp = input.get();
-
-                    if ((tmp & 0x80) == 0 && (i != 4 * 7 || tmp < 1 << 3)) {
-                        return size | (tmp << i);
-                    } else if (i < 4 * 7) {
-                        size |= (tmp & 0x7f) << i;
+                byte tmp = input.get();
+                if (tmp >= 0) {
+                    return (int) tmp;
+                }
+                int result = tmp & 0x7f;
+                if ((tmp = input.get()) >= 0) {
+                    result |= tmp << 7;
+                } else {
+                    result |= (tmp & 0x7f) << 7;                    
+                    if ((tmp = input.get()) >= 0) {
+                        result |= tmp << 14;
                     } else {
-                        throw new ProtocolDecoderException("Not the varint representation of a signed int32");
+                        result |= (tmp & 0x7f) << 14;               
+                        if ((tmp = input.get()) >= 0) {
+                            result |= tmp << 21;
+                        } else {
+                            result |= (tmp & 0x7f) << 21;
+                            
+                            // check that there are at most 3 significant bits available
+                            if (((tmp = input.get()) & ~0x7) == 0) {
+                                result |= tmp << 28;
+                            } else {
+                                throw new ProtocolDecoderException("Not the varint representation of a signed int32");
+                            }
+                        }
                     }
                 }
+                return result;
+
             } catch (BufferUnderflowException bue) {
                 input.position(origpos);
             }
-
             return null;
         }
     }
@@ -124,33 +158,41 @@ public class VarInt {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    public static class Encoder extends ByteBufferEncoder<Integer> {
+    private class Encoder extends ByteBufferEncoder<Integer> {
 
         @Override
         public void writeTo(Integer message, ByteBuffer buffer) {
-            int value = message;
-
             // VarInts don't support negative values
-            if (value < 0) {
-                value = 0;
+            int value = Math.max(0,message);            
+
+            while (true) {
+                if ((value & ~0x7F) == 0) {
+                    buffer.put((byte) value);
+                    return;
+                } else {
+                    buffer.put((byte) ((value & 0x7F) | 0x80));
+                    value >>>= 7;
+                }
             }
 
-            while (value > 0x7f) {
-                buffer.put((byte) ((value & 0x7f) | 0x80));
-                value >>= 7;
-            }
-
-            buffer.put((byte) value);
         }
 
         @Override
-        public int getEncodedSize(Integer message) {
-            if (message < 1) {
+        public int getEncodedSize(Integer value) {
+            if ((value & (0xffffffff << 7)) == 0) {
                 return 1;
-            } else {
-                int log2 = 32 - Integer.numberOfLeadingZeros(message);
-                return (log2 + 6) / 7;
             }
+            if ((value & (0xffffffff << 14)) == 0) {
+                return 2;
+            }
+            if ((value & (0xffffffff << 21)) == 0) {
+                return 3;
+            }
+            if ((value & (0xffffffff << 28)) == 0) {
+                return 4;
+            }
+            return 5;
         }
+
     }
 }

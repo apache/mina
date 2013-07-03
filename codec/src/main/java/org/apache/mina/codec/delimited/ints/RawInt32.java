@@ -19,11 +19,13 @@
  */
 package org.apache.mina.codec.delimited.ints;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 
 /**
  * 
@@ -105,10 +107,35 @@ import org.apache.mina.codec.delimited.ByteBufferEncoder;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class RawInt32 {
-    // this class should not be instanciated
-    private RawInt32() {
+/*
+ * About the suppression of warnings:
+ * This class contains a lot of bit-shifting, logical and/or operations order to handle
+ * VarInt conversions. The code contains a lot of hard-coded integer that tools like
+ * Sonar classify as "magic numbers". Using final static variables for all of them
+ * would have resulted in a code less readable.
+ * The "all" scope is too generic, but Sonar doesn't not handle properly others scopes 
+ * like "MagicNumber" (Sonar 3.6 - 03July2013)
+ */
+@SuppressWarnings("all")
+public final class RawInt32 implements IntTranscoder {
+    private final ByteOrder bo;
+
+    public RawInt32(ByteOrder bo) {
+        super();
+        this.bo = bo == null ? ByteOrder.BIG_ENDIAN : bo;
     }
+
+    @Override
+    public IoBufferDecoder<Integer> getDecoder() {
+        return new Decoder();
+    }
+
+    @Override
+    public ByteBufferEncoder<Integer> getEncoder() {
+        return new Encoder();
+    }
+
+    private static final int BYTE_MASK = 0xff;
 
     /**
      * Documentation available in the {@link RawInt32} enclosing class.
@@ -116,34 +143,19 @@ public class RawInt32 {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    public static class Decoder extends ByteBufferDecoder<Integer> {
-
-        private Endianness endianness;
-
-        public Decoder(Endianness endianness) {
-            super();
-            this.endianness = endianness;
-        }
+    private class Decoder extends IoBufferDecoder<Integer> {
 
         @Override
-        public Integer decode(ByteBuffer input) {
+        public Integer decode(IoBuffer input) {
             if (input.remaining() < 4) {
                 return null;
             }
 
-            if (endianness == Endianness.BIG) {
-                if ((input.get(0) & 0x80) != 0) {
-                    throw new ProtocolDecoderException("Not the big endian representation of a signed int32");
-                }
-                return ((input.get() & 0xff) << 24) | ((input.get() & 0xff) << 16) | ((input.get() & 0xff) << 8)
-                        | ((input.get() & 0xff));
-            } else {
-                if ((input.get(3) & 0x80) != 0) {
-                    throw new ProtocolDecoderException("Not the small endian representation of a signed int32");
-                }
-                return ((input.get() & 0xff)) | ((input.get() & 0xff) << 8) | ((input.get() & 0xff) << 16)
-                        | ((input.get() & 0xff) << 24);
+            int out = 0;
+            for (int i = 0; i < 32; i += 8) {
+                out |= (input.get() & 0xff) << (bo == ByteOrder.BIG_ENDIAN ? 24 - i : i);
             }
+            return out;
         }
     }
 
@@ -153,33 +165,17 @@ public class RawInt32 {
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      * 
      */
-    public static class Encoder extends ByteBufferEncoder<Integer> {
-
-        private final Endianness endianness;
-
-        public Encoder(Endianness endianness) {
-            super();
-            this.endianness = endianness;
-        }
+    private class Encoder extends ByteBufferEncoder<Integer> {
 
         @Override
         public void writeTo(Integer message, ByteBuffer buffer) {
-            // VarInts don't support negative values
-            if (message < 0) {
-                message = 0;
-            }
-            if (endianness == Endianness.BIG) {
-                buffer.put((byte) (0xff & (message >> 24)));
-                buffer.put((byte) (0xff & (message >> 16)));
-                buffer.put((byte) (0xff & (message >> 8)));
-                buffer.put((byte) (0xff & (message)));
-            } else {
-                buffer.put((byte) (0xff & (message)));
-                buffer.put((byte) (0xff & (message >> 8)));
-                buffer.put((byte) (0xff & (message >> 16)));
-                buffer.put((byte) (0xff & (message >> 24)));
-            }
 
+            if (buffer.remaining() < 4) {
+                throw new BufferUnderflowException();
+            }
+            for (int i = 0; i < 32; i += 8) {
+                buffer.put((byte) (message >> (bo == ByteOrder.BIG_ENDIAN ? 24 - i : i)));
+            }
         }
 
         @Override
@@ -187,18 +183,5 @@ public class RawInt32 {
             return 4;
         }
 
-    }
-
-    /**
-     * 
-     * This enumeration is used to select the endianness of the dncoder and the
-     * decoder class.
-     * 
-     * Documentation available in the {@link RawInt32} enclosing class.
-     * 
-     * @author <a href="http://mina.apache.org">Apache MINA Project</a>
-     */
-    public enum Endianness {
-        BIG, LITTLE
     }
 }

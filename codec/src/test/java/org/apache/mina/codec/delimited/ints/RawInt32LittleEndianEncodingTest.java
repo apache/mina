@@ -20,13 +20,14 @@
 package org.apache.mina.codec.delimited.ints;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 
 /**
  * A {@link RawInt32.Encoder} and {@link RawInt32.Decoder} test in a little endian setup.
@@ -36,13 +37,13 @@ import org.apache.mina.codec.delimited.ByteBufferEncoder;
 public class RawInt32LittleEndianEncodingTest extends IntEncodingTest {
 
     @Override
-    public ByteBufferDecoder<Integer> newDecoderInstance() {
-        return new RawInt32.Decoder(RawInt32.Endianness.LITTLE);
+    public IoBufferDecoder<Integer> newDecoderInstance() {
+        return new RawInt32(ByteOrder.LITTLE_ENDIAN).getDecoder();
     }
 
     @Override
     public ByteBufferEncoder<Integer> newEncoderInstance() {
-        return new RawInt32.Encoder(RawInt32.Endianness.LITTLE);
+        return new RawInt32(ByteOrder.LITTLE_ENDIAN).getEncoder();
     }
 
     @Override
@@ -57,7 +58,6 @@ public class RawInt32LittleEndianEncodingTest extends IntEncodingTest {
     @Override
     public Iterable<ByteBuffer> getIllegalBuffers() {
         List<ByteBuffer> list = new LinkedList<ByteBuffer>();
-        list.add(ByteBuffer.wrap(new byte[] { 0, 0, 0, (byte) 0x80 }));
         return list;
     }
 }
