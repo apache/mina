@@ -47,7 +47,7 @@ public class ThriftMessageEncoder<INPUT extends TBase<?, ?>> extends ByteBufferE
     }
 
     private byte[] prepareBuffer(INPUT message) throws TException {
-        if (message != lastMessage) {
+        if (message != lastMessage) { // NOSONAR, comparing the messages, not their content
             lastBuffer = serializer.serialize(message);
             this.lastMessage = message;
         }

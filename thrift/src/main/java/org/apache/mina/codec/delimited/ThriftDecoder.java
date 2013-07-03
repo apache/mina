@@ -19,7 +19,10 @@
  */
 package org.apache.mina.codec.delimited;
 
+import java.nio.ByteOrder;
+
 import org.apache.mina.codec.delimited.ints.RawInt32;
+import org.apache.mina.codec.delimited.serialization.ThriftMessageDecoder;
 import org.apache.thrift.TBase;
 
 /**
@@ -31,6 +34,6 @@ public class ThriftDecoder<M extends TBase<?, ?>> extends SizePrefixedDecoder<M>
     }
 
     public ThriftDecoder(Class<M> clazz) throws NoSuchMethodException {
-        super(new RawInt32.Decoder(RawInt32.Endianness.BIG), null);
+        super(new RawInt32(ByteOrder.BIG_ENDIAN).getDecoder(), new ThriftMessageDecoder<>(clazz));
     }
 }

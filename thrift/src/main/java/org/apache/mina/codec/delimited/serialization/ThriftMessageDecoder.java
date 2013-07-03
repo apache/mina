@@ -19,24 +19,24 @@
  */
 package org.apache.mina.codec.delimited.serialization;
 
-import java.nio.ByteBuffer;
 
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 
 /**
- * Decode {@link ByteBuffer} into Thrift messages.
+ * Decode {@link IoBuffer} into Thrift messages.
  * 
  * @param <OUTPUT> the base type for decoded messages.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ThriftMessageDecoder<OUTPUT extends TBase<?, ?>> extends ByteBufferDecoder<OUTPUT> {
-    private TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
+public class ThriftMessageDecoder<OUTPUT extends TBase<?, ?>> extends IoBufferDecoder<OUTPUT> {
+    private final TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
 
     private final Class<OUTPUT> clazz;
 
@@ -58,7 +58,7 @@ public class ThriftMessageDecoder<OUTPUT extends TBase<?, ?>> extends ByteBuffer
      * {@inheritDoc}
      */
     @Override
-    public OUTPUT decode(ByteBuffer input) {
+    public OUTPUT decode(IoBuffer input) {
         OUTPUT object;
         try {
             byte array[] = new byte[input.remaining()];

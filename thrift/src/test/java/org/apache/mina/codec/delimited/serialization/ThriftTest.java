@@ -24,8 +24,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 import org.apache.mina.generated.thrift.UserProfile;
 import org.junit.Test;
 
@@ -36,34 +37,35 @@ import org.junit.Test;
  */
 public class ThriftTest extends GenericSerializerTest<UserProfile> {
 
-    @Override
-    public List<UserProfile> getObjects() {
-        List<UserProfile> list = new LinkedList<UserProfile>();
+	@Override
+	public List<UserProfile> getObjects() {
+		List<UserProfile> list = new LinkedList<UserProfile>();
 
-        list.add(new UserProfile().setUid(1).setName("Jean Dupond"));
-        list.add(new UserProfile().setUid(2).setName("Marie Blanc"));
+		list.add(new UserProfile().setUid(1).setName("Jean Dupond"));
+		list.add(new UserProfile().setUid(2).setName("Marie Blanc"));
 
-        return list;
-    }
+		return list;
+	}
 
-    @Override
-    public ByteBufferDecoder<UserProfile> getDecoder() throws Exception {
-        return ThriftMessageDecoder.newInstance(UserProfile.class);
-    }
+	@Override
+	public IoBufferDecoder<UserProfile> getDecoder() throws Exception {
+		return ThriftMessageDecoder.newInstance(UserProfile.class);
+	}
 
-    @Override
-    public ByteBufferEncoder<UserProfile> getEncoder() throws Exception {
-        return ThriftMessageEncoder.newInstance(UserProfile.class);
-    }
+	@Override
+	public ByteBufferEncoder<UserProfile> getEncoder() throws Exception {
+		return ThriftMessageEncoder.newInstance(UserProfile.class);
+	}
 
-    @Test
-    public void testDynamic() throws Exception {
-        ByteBufferEncoder<UserProfile> encoder = getEncoder();
-        ThriftDynamicMessageDecoder decoder = new ThriftDynamicMessageDecoder();
+	@Test
+	public void testDynamic() throws Exception {
+		ByteBufferEncoder<UserProfile> encoder = getEncoder();
+		ThriftDynamicMessageDecoder decoder = new ThriftDynamicMessageDecoder();
 
-        for (UserProfile object : getObjects()) {
-            ThriftDynamicMessageDecoder.ThriftSerializedMessage message = decoder.decode(encoder.encode(object));
-            assertEquals(object, message.get(UserProfile.class));
-        }
-    }
+		for (UserProfile object : getObjects()) {
+			ThriftDynamicMessageDecoder.ThriftSerializedMessage message = decoder
+					.decode(IoBuffer.wrap(encoder.encode(object)));
+			assertEquals(object, message.get(UserProfile.class));
+		}
+	}
 }

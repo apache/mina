@@ -19,9 +19,8 @@
  */
 package org.apache.mina.codec.delimited.serialization;
 
-import java.nio.ByteBuffer;
-
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.IoBuffer;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
@@ -30,35 +29,39 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ThriftDynamicMessageDecoder extends ByteBufferDecoder<ThriftDynamicMessageDecoder.ThriftSerializedMessage> {
-    private TDeserializer deserializer = new TDeserializer(new TBinaryProtocol.Factory());
+public class ThriftDynamicMessageDecoder extends
+		IoBufferDecoder<ThriftDynamicMessageDecoder.ThriftSerializedMessage> {
+	private final TDeserializer deserializer = new TDeserializer(
+			new TBinaryProtocol.Factory());
 
-    @Override
-    public ThriftSerializedMessage decode(ByteBuffer input) {
-        byte array[] = new byte[input.remaining()];
-        input.get(array);
-        return new ThriftSerializedMessage(deserializer, array);
-    }
+	@Override
+	public ThriftSerializedMessage decode(IoBuffer buffer) {
+		return new ThriftSerializedMessage(deserializer, buffer);
+	}
 
-    public static final class ThriftSerializedMessage {
-        private byte array[];
+	public static final class ThriftSerializedMessage {
+		private final IoBuffer buffer;
 
-        private TDeserializer deserializer;
+		private final TDeserializer deserializer;
 
-        public ThriftSerializedMessage(TDeserializer deserializer, byte array[]) {
-            this.array = array;
-            this.deserializer = deserializer;
-        }
+		public ThriftSerializedMessage(TDeserializer deserializer,
+				IoBuffer buffer) {
+			this.buffer = buffer;
+			this.deserializer = deserializer;
+		}
 
-        public <L extends TBase<?, ?>> L get(Class<L> clazz) throws InstantiationException, IllegalAccessException,
-                TException {
-            L object = clazz.newInstance();
-            deserializer.deserialize(object, array);
-            return object;
-        }
-    }
+		public <L extends TBase<?, ?>> L get(Class<L> clazz)
+				throws InstantiationException, IllegalAccessException,
+				TException {
+			L object = clazz.newInstance();
+			byte array[] = new byte[buffer.remaining()];
+			buffer.get(array);
+			deserializer.deserialize(object, array);
+			return object;
+		}
+	}
 
-    public static ThriftDynamicMessageDecoder newInstance() {
-        return new ThriftDynamicMessageDecoder();
-    }
+	public static ThriftDynamicMessageDecoder newInstance() {
+		return new ThriftDynamicMessageDecoder();
+	}
 }
