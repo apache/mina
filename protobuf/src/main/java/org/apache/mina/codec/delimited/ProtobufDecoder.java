@@ -30,18 +30,22 @@ import com.google.protobuf.GeneratedMessage;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProtobufDecoder<OUTPUT extends GeneratedMessage> extends SizePrefixedDecoder<OUTPUT> {
-    public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz,
-            ExtensionRegistryLite registry) throws NoSuchMethodException {
-        return new ProtobufDecoder<L>(clazz, registry);
-    }
+public class ProtobufDecoder<OUTPUT extends GeneratedMessage> extends
+		SizePrefixedDecoder<OUTPUT> {
+	public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(
+			Class<L> clazz, ExtensionRegistryLite registry)
+			throws NoSuchMethodException {
+		return new ProtobufDecoder<L>(clazz, registry);
+	}
 
-    public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(Class<L> clazz)
-            throws NoSuchMethodException {
-        return newInstance(clazz, ExtensionRegistryLite.getEmptyRegistry());
-    }
+	public static <L extends GeneratedMessage> ProtobufDecoder<L> newInstance(
+			Class<L> clazz) throws NoSuchMethodException {
+		return newInstance(clazz, ExtensionRegistryLite.getEmptyRegistry());
+	}
 
-    public ProtobufDecoder(Class<OUTPUT> clazz, ExtensionRegistryLite registry) throws NoSuchMethodException {
-        super(new VarInt.Decoder(), ProtobufMessageDecoder.newInstance(clazz, registry));
-    }
+	public ProtobufDecoder(Class<OUTPUT> clazz, ExtensionRegistryLite registry)
+			throws NoSuchMethodException {
+		super(new VarInt().getDecoder(), ProtobufMessageDecoder.newInstance(
+				clazz, registry));
+	}
 }

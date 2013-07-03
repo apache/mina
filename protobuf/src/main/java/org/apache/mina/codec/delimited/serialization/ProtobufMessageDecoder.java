@@ -21,11 +21,10 @@ package org.apache.mina.codec.delimited.serialization;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.ProtocolDecoderException;
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
-import org.apache.mina.util.ByteBufferInputStream;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 
 import com.google.protobuf.ExtensionRegistryLite;
 import com.google.protobuf.GeneratedMessage;
@@ -33,7 +32,7 @@ import com.google.protobuf.GeneratedMessage;
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ProtobufMessageDecoder<IN extends GeneratedMessage> extends ByteBufferDecoder<IN> {
+public final class ProtobufMessageDecoder<IN extends GeneratedMessage> extends IoBufferDecoder<IN> {
     private final Method parseMethod;
 
     private final ExtensionRegistryLite registry;
@@ -56,9 +55,9 @@ public class ProtobufMessageDecoder<IN extends GeneratedMessage> extends ByteBuf
 
     @SuppressWarnings("unchecked")
     @Override
-    public IN decode(ByteBuffer input) {
+    public IN decode(IoBuffer input) {
         try {
-            return (IN) parseMethod.invoke(null, new ByteBufferInputStream(input), registry);
+            return (IN) parseMethod.invoke(null, input.asInputStream(), registry);
         } catch (Exception e) {
             throw new ProtocolDecoderException(e);
         }

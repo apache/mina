@@ -24,8 +24,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
+import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 import org.apache.mina.codec.delimited.serialization.ProtobufDynamicMessageDecoder.ProtobufSerializedMessage;
 import org.apache.mina.generated.protoc.AddressBookProtos.Person;
 import org.junit.Test;
@@ -37,34 +38,37 @@ import org.junit.Test;
  */
 public class ProtobufTest extends GenericSerializerTest<Person> {
 
-    @Override
-    public List<Person> getObjects() {
-        List<Person> list = new LinkedList<Person>();
+	@Override
+	public List<Person> getObjects() {
+		List<Person> list = new LinkedList<Person>();
 
-        list.add(Person.newBuilder().setId(1).setName("Jean Dupond").setEmail("john.white@bigcorp.com").build());
-        list.add(Person.newBuilder().setId(2).setName("Marie Blanc").setEmail("marie.blanc@bigcorp.com").build());
+		list.add(Person.newBuilder().setId(1).setName("Jean Dupond")
+				.setEmail("john.white@bigcorp.com").build());
+		list.add(Person.newBuilder().setId(2).setName("Marie Blanc")
+				.setEmail("marie.blanc@bigcorp.com").build());
 
-        return list;
-    }
+		return list;
+	}
 
-    @Override
-    public ByteBufferDecoder<Person> getDecoder() throws Exception {
-        return ProtobufMessageDecoder.newInstance(Person.class);
-    }
+	@Override
+	public IoBufferDecoder<Person> getDecoder() throws Exception {
+		return ProtobufMessageDecoder.newInstance(Person.class);
+	}
 
-    @Override
-    public ByteBufferEncoder<Person> getEncoder() throws Exception {
-        return new ProtobufMessageEncoder<Person>();
-    }
+	@Override
+	public ByteBufferEncoder<Person> getEncoder() throws Exception {
+		return new ProtobufMessageEncoder<Person>();
+	}
 
-    @Test
-    public void testDynamic() throws Exception {
-        ByteBufferEncoder<Person> encoder = getEncoder();
-        ProtobufDynamicMessageDecoder decoder = new ProtobufDynamicMessageDecoder();
+	@Test
+	public void testDynamic() throws Exception {
+		ByteBufferEncoder<Person> encoder = getEncoder();
+		ProtobufDynamicMessageDecoder decoder = new ProtobufDynamicMessageDecoder();
 
-        for (Person object : getObjects()) {
-            ProtobufSerializedMessage message = decoder.decode(encoder.encode(object));
-            assertEquals(object, message.get(Person.class));
-        }
-    }
+		for (Person object : getObjects()) {
+			ProtobufSerializedMessage message = decoder.decode(IoBuffer
+					.wrap(encoder.encode(object)));
+			assertEquals(object, message.get(Person.class));
+		}
+	}
 }

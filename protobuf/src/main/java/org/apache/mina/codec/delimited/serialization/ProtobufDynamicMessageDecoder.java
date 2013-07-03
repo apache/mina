@@ -22,10 +22,9 @@ package org.apache.mina.codec.delimited.serialization;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 
-import org.apache.mina.codec.delimited.ByteBufferDecoder;
-import org.apache.mina.util.ByteBufferInputStream;
+import org.apache.mina.codec.IoBuffer;
+import org.apache.mina.codec.delimited.IoBufferDecoder;
 
 import com.google.protobuf.ExtensionRegistryLite;
 import com.google.protobuf.GeneratedMessage;
@@ -34,27 +33,27 @@ import com.google.protobuf.GeneratedMessage;
  * An alternative decoder for protobuf which allows the use various target
  * classes with the same decoder.
  * 
- * This decoder converts incoming {@link ByteBuffer} into
+ * This decoder converts incoming {@link IoBuffer} into
  * {@link ProtobufSerializedMessage}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtobufDynamicMessageDecoder extends
-        ByteBufferDecoder<ProtobufDynamicMessageDecoder.ProtobufSerializedMessage> {
+        IoBufferDecoder<ProtobufDynamicMessageDecoder.ProtobufSerializedMessage> {
 
     public static ProtobufDynamicMessageDecoder newInstance() {
         return new ProtobufDynamicMessageDecoder();
     }
 
     @Override
-    public ProtobufSerializedMessage decode(ByteBuffer input) {
+    public ProtobufSerializedMessage decode(IoBuffer input) {
         return new ProtobufSerializedMessage(input);
     }
 
     public static final class ProtobufSerializedMessage {
-        private ByteBuffer input;
+        private final IoBuffer input;
 
-        public ProtobufSerializedMessage(ByteBuffer input) {
+        public ProtobufSerializedMessage(IoBuffer input) {
             this.input = input;
         }
 
@@ -62,7 +61,7 @@ public class ProtobufDynamicMessageDecoder extends
         public <L extends GeneratedMessage> L get(Class<L> clazz, ExtensionRegistryLite registry)
                 throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
             Method parseMethod = clazz.getDeclaredMethod("parseFrom", InputStream.class, ExtensionRegistryLite.class);
-            return (L) parseMethod.invoke(null, new ByteBufferInputStream(input.duplicate()), registry);
+            return (L) parseMethod.invoke(null, input.asInputStream(), registry);
         }
 
         public <L extends GeneratedMessage> L get(Class<L> clazz) throws NoSuchMethodException, IllegalAccessException,

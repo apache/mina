@@ -38,6 +38,6 @@ public class ProtobufEncoder<INPUT extends GeneratedMessage> extends SizePrefixe
     }
 
     public ProtobufEncoder(Class<INPUT> clazz) {
-        super(new VarInt.Encoder(), ProtobufMessageEncoder.newInstance(clazz));
+        super(new VarInt().getEncoder(), ProtobufMessageEncoder.newInstance(clazz));
     }
 }

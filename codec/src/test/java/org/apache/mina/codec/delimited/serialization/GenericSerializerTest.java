@@ -60,7 +60,7 @@ public abstract class GenericSerializerTest<T> {
             ByteBuffer out = ByteBuffer.allocate(size);
             encoder.writeTo(object, out);            
             assertEquals(size, out.position());
-            out.position(0);
+            out.rewind();
             assertEquals(object, decoder.decode(IoBuffer.wrap(out)));
         }
     }

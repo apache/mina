@@ -34,6 +34,6 @@ public class ProtobufDynamicDecoder extends
     }
 
     public ProtobufDynamicDecoder() throws NoSuchMethodException {
-        super(new VarInt.Decoder(), ProtobufDynamicMessageDecoder.newInstance());
+        super(new VarInt().getDecoder(), ProtobufDynamicMessageDecoder.newInstance());
     }
 }
