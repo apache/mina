@@ -181,6 +181,10 @@ public final class IoBuffer {
 
             @Override
             public int read(byte[] b, int off, int len) throws IOException {
+                if (!hasRemaining()) {
+                    return -1;
+                }
+
                 int toRead = Math.min(remaining(), len);
                 get(b, off, toRead);
                 return toRead;
@@ -350,13 +354,12 @@ public final class IoBuffer {
         if (remaining() < length) {
             throw new BufferUnderflowException();
         }
-        position.getNode().getBuffer().position(position.getPositionInNode());
         int remainsToCopy = length;
         int currentOffset = offset;
 
         while (remainsToCopy > 0) {
             position.updatePos();
-
+            position.getNode().getBuffer().position(position.getPositionInNode());
             ByteBuffer currentBuffer = position.getNode().getBuffer();
             int blocksize = Math.min(remainsToCopy, currentBuffer.remaining());
             position.getNode().getBuffer().get(dst, currentOffset, blocksize);
@@ -365,8 +368,9 @@ public final class IoBuffer {
             remainsToCopy -= blocksize;
 
             position.incrementPosition(blocksize);
+
+            position.getNode().getBuffer().position(0);
         }
-        position.getNode().getBuffer().position(0);
         return this;
     }
 
@@ -670,13 +674,12 @@ public final class IoBuffer {
 
         return this;
     }
-    
-    
+
     /**
      * @see ByteBuffer#put(ByteBuffer)
      */
     public IoBuffer put(IoBuffer src) {
-        if(src==this){ // NOSONAR, checking the instance
+        if (src == this) { // NOSONAR, checking the instance
             throw new IllegalArgumentException();
         }
 
