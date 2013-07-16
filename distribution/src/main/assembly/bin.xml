@@ -26,17 +26,12 @@
     <format>zip</format>
   </formats>
  
-  <!-- Copye an rename the NOTICE-bin and LICENSE-bin files --> 
+  <!-- Copy an rename the LICENSE-bin files --> 
   <files>
     <file>
-      <source>../NOTICE-bin.txt</source>
+      <source>../LICENSE-bin</source>
       <outputDirectory></outputDirectory>
-      <destName>NOTICE.txt</destName>
-    </file>
-    <file>
-      <source>../LICENSE-bin.txt</source>
-      <outputDirectory></outputDirectory>
-      <destName>LICENSE.txt</destName>
+      <destName>LICENSE</destName>
     </file>
   </files>
 
@@ -70,8 +65,8 @@
       </includes>
       <excludes>
         <exclude>KEYS</exclude>
-        <exclude>LICENSE.txt</exclude>
-        <exclude>NOTICE.txt</exclude>
+        <exclude>LICENSE</exclude>
+        <exclude>LICENSE-bin</exclude>
         <exclude>**/target</exclude>
         <exclude>**/target/**</exclude>
         <exclude>**/.settings</exclude>

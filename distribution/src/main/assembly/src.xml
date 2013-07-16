@@ -33,8 +33,8 @@
       <outputDirectory></outputDirectory>
       <includes>
         <include>README*</include>
-        <include>LICENSE*</include>
-        <include>NOTICE.txt</include>
+        <include>LICENSE</include>
+        <include>NOTICE</include>
       </includes>
     </fileSet>
     
@@ -58,8 +58,8 @@
       <excludes>
         <exclude>.git/**</exclude>
         <exclude>KEYS</exclude>
-        <exclude>LICENSE*.txt</exclude>
-        <exclude>NOTICE.txt</exclude>
+        <exclude>LICENSE-bin</exclude>
+        <exclude>NOTICE</exclude>
         <exclude>**/target</exclude>
         <exclude>**/target/**</exclude>
         <exclude>**/.settings</exclude>
