@@ -25,15 +25,29 @@
     <format>tar.bz2</format> 
     <format>zip</format>
   </formats>
-  
+ 
+  <!-- Copye an rename the NOTICE-bin and LICENSE-bin files --> 
+  <files>
+    <file>
+      <source>../NOTICE-bin.txt</source>
+      <outputDirectory></outputDirectory>
+      <destName>NOTICE.txt</destName>
+    </file>
+    <file>
+      <source>../LICENSE-bin.txt</source>
+      <outputDirectory></outputDirectory>
+      <destName>LICENSE.txt</destName>
+    </file>
+  </files>
+
+  <!-- Now copy the other files, excluding the files we don't want -->
   <fileSets>
-    <!-- Copy licenses into '/' -->
+    <!-- Copy README into '/' -->
     <fileSet>
       <directory>..</directory>
       <outputDirectory></outputDirectory>
       <includes>
         <include>README*</include>
-        <include>LICENSE*</include>
       </includes>
     </fileSet>
     
@@ -46,17 +60,35 @@
         <include>xref*/**</include>
       </includes>
     </fileSet>
-      
+
+    <!-- Exclude files we don't want -->
+    <fileSet>
+      <directory>..</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+      <excludes>
+        <exclude>KEYS</exclude>
+        <exclude>LICENSE.txt</exclude>
+        <exclude>NOTICE.txt</exclude>
+        <exclude>**/target</exclude>
+        <exclude>**/target/**</exclude>
+        <exclude>**/.settings</exclude>
+        <exclude>**/.settings/**</exclude>
+        <exclude>**/.classpath</exclude>
+        <exclude>**/.project</exclude>
+        <exclude>**/*.gen</exclude>
+        <exclude>**/.wtpmodules</exclude>
+        <exclude>**/surefire*</exclude>
+        <exclude>**/cobertura.ser</exclude>
+        <exclude>**/velocity.log</exclude>
+        <exclude>distribution</exclude>
+        <exclude>distribution/**</exclude>
+      </excludes>
+    </fileSet>
   </fileSets>
   
-  <files>
-    <file>
-      <source>../NOTICE-bin.txt</source>
-      <outputDirectory></outputDirectory>
-      <destName>NOTICE.txt</destName>
-    </file>
-  </files>
-
   <dependencySets>
     <!-- Copy Mina modules into '/dist' -->
     <dependencySet>
