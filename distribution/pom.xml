@@ -24,7 +24,7 @@
   <parent>
     <artifactId>mina-parent</artifactId>
     <groupId>org.apache.mina</groupId>
-    <version>3.0.0-M2-SNAPSHOT</version>
+    <version>3.0.0-M1</version>
   </parent>
 
   <artifactId>distribution</artifactId>
