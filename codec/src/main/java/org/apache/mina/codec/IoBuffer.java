@@ -28,19 +28,20 @@ import java.nio.InvalidMarkException;
 import java.nio.ReadOnlyBufferException;
 
 /**
- * A proxy class used to manage ByteBuffers as if they were just a big ByteBuffer. We can add as many buffers as needed,
- * when accumulating data. From the user PoV, the methods are the very same than what we can get from ByteBuffer. <br/>
- * IoBuffer instances are *not* thread safe.
- * 
- * The IoBuffer uses a single-chained queue to handle the multiple Buffers. Thus, the sequential access is 
- * very efficient and the random access is not. It fits well the common usage of IoBuffer.
- * 
+ * A proxy class used to manage ByteBuffers as if they were just a big ByteBuffer. We can add as many buffers as needed
+ * when accumulating data. From the user point of view, the methods are the very same as ByteBuffer provides.
+ *
+ * <p>IoBuffer instances are *not* thread safe.
+ *
+ * <p>The IoBuffer uses a singly linked list to handle the multiple Buffers. Thus sequential access is
+ * very efficient and random access is not. It fits well with the common usage patterns of IoBuffer.
+ *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class IoBuffer {
     private static final int BYTE_MASK = 0xff;
 
-    private static final long BYTE_MASK_L = 0xffl;
+    private static final long BYTE_MASK_L = 0xffL;
 
     /**
      * @see ByteBuffer#allocate(int)
@@ -84,9 +85,9 @@ public final class IoBuffer {
     }
 
     /**
-     * Build new IoBuffer containing 
+     * Wraps ByteBuffers into a new IoBuffer
      * 
-     * @param buffers
+     * @param buffers the ByteBuffers to wrap
      * @return the new {@link IoBuffer}
      */
     public static IoBuffer wrap(ByteBuffer... buffers) {
@@ -126,7 +127,7 @@ public final class IoBuffer {
     /**
      * Add one or more ByteBuffer to the current IoBuffer
      * 
-     * @param buffers
+     * @param buffers the ByteBuffers to add
      * @return the current {@link IoBuffer}
      */
     public IoBuffer add(ByteBuffer... buffers) {
@@ -166,8 +167,8 @@ public final class IoBuffer {
      * Provides an input stream which is actually reading the {@link IoBuffer}
      * instance.
      * <p>
-     * Further reads on the returned inputstream move the reading head of the {@link IoBuffer}
-     * instance used for it's creation</i>
+     * Further reads on the returned InputStream move the reading head of the {@link IoBuffer}
+     * instance used for it's creation
      *
      * @return an input stream
      */
@@ -232,7 +233,7 @@ public final class IoBuffer {
     }
 
     /**
-     * Returns a copy of the current {@link IoBuffer}, with an independent copy if the postion, limit and mark.
+     * Returns a copy of the current {@link IoBuffer}, with an independent copy of the position, limit and mark.
      * 
      * @return the copied {@link IoBuffer}
      */
@@ -580,11 +581,12 @@ public final class IoBuffer {
      * @see ByteBuffer#mark()
      */
     public void mark() {
+        // FIXME: this is broken and untested (it should set the mark instead of limit)
         this.limit = position.duplicate();
     }
 
     /**
-     * Returns the byte order used by this Iouffer when converting bytes from/to other primitive
+     * Returns the byte order used by this IoBuffer when converting bytes from/to other primitive
      * types.
      * <p>
      * The default byte order of byte buffer is always {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}
@@ -600,7 +602,7 @@ public final class IoBuffer {
     /**
      * Sets the byte order of this IoBuffer.
      * 
-     * @param byteOrder the byte order to set. If {@code null} then the order will be {@link ByteOrder#LITTLE_ENDIAN
+     * @param bo the byte order to set. If {@code null} then the order will be {@link ByteOrder#LITTLE_ENDIAN
      *        LITTLE_ENDIAN}.
      * @return this IoBuffer.
      * @see ByteBuffer#order(ByteOrder)
@@ -826,7 +828,7 @@ public final class IoBuffer {
     }
 
     /**
-     * @see ByteBuffer#putLong(int, int)
+     * @see ByteBuffer#putLong(int, long)
      */
     public IoBuffer putLong(int index, long value) {
         return putLong(getPointerByPosition(index), value);
@@ -933,7 +935,7 @@ public final class IoBuffer {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(getClass().getName());
         sb.append("[pos=");
         sb.append(position());
@@ -1028,7 +1030,7 @@ public final class IoBuffer {
 
         @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(getClass().getName());
             sb.append("[pos=");
             sb.append(getPosition());
