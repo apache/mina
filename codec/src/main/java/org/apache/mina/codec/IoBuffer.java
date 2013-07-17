@@ -998,21 +998,6 @@ public final class IoBuffer {
             return new Pointer(getPosition());
         }
 
-        private BufferNode getBufferNodeByPosition(int pos) {
-            if (head == null) {
-                return null;
-            }
-            BufferNode currentNode = head;
-            int rpos = pos;
-            while (rpos >= currentNode.getBuffer().capacity() && currentNode.hasNext()) {
-
-                rpos -= currentNode.getBuffer().capacity();
-                currentNode = currentNode.getNext();
-            }
-
-            return currentNode;
-        }
-
         public BufferNode getNode() {
             return node;
         }
@@ -1030,11 +1015,7 @@ public final class IoBuffer {
         }
 
         public void setPosition(int newPosition) {
-            if (node == null || node.offset < newPosition) {
-
-                node = getBufferNodeByPosition(newPosition);
-
-            } else {
+            if (node == null || newPosition < node.offset) {
                 node = head;
             }
             positionInBuffer = node == null ? 0 : newPosition - node.offset;
