@@ -37,12 +37,13 @@
 
   <!-- Now copy the other files, excluding the files we don't want -->
   <fileSets>
-    <!-- Copy README into '/' -->
+    <!-- Copy README and NOTICE into '/' -->
     <fileSet>
       <directory>..</directory>
       <outputDirectory></outputDirectory>
       <includes>
         <include>README*</include>
+        <include>NOTICE</include>
       </includes>
     </fileSet>
     
@@ -55,35 +56,8 @@
         <include>xref*/**</include>
       </includes>
     </fileSet>
-
-    <!-- Exclude files we don't want -->
-    <fileSet>
-      <directory>..</directory>
-      <outputDirectory></outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-      <excludes>
-        <exclude>KEYS</exclude>
-        <exclude>LICENSE</exclude>
-        <exclude>LICENSE-bin</exclude>
-        <exclude>**/target</exclude>
-        <exclude>**/target/**</exclude>
-        <exclude>**/.settings</exclude>
-        <exclude>**/.settings/**</exclude>
-        <exclude>**/.classpath</exclude>
-        <exclude>**/.project</exclude>
-        <exclude>**/*.gen</exclude>
-        <exclude>**/.wtpmodules</exclude>
-        <exclude>**/surefire*</exclude>
-        <exclude>**/cobertura.ser</exclude>
-        <exclude>**/velocity.log</exclude>
-        <exclude>distribution</exclude>
-        <exclude>distribution/**</exclude>
-      </excludes>
-    </fileSet>
   </fileSets>
-  
+
   <dependencySets>
     <!-- Copy Mina modules into '/dist' -->
     <dependencySet>
