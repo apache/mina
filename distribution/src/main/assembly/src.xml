@@ -71,8 +71,8 @@
         <exclude>**/surefire*</exclude>
         <exclude>**/cobertura.ser</exclude>
         <exclude>**/velocity.log</exclude>
-        <exclude>distribution</exclude>
-        <exclude>distribution/**</exclude>
+        <exclude>**/release.properties</exclude>
+        <exclude>**/pom.xml.releaseBackup</exclude>
       </excludes>
     </fileSet>
   </fileSets>

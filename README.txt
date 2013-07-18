@@ -19,4 +19,4 @@ Refer to the examples in the examples sub projet or the documentation at http://
 License
 =========
 
-See the LICENCE.txt file.
+See the LICENCE file.
