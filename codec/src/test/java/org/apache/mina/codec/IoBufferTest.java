@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.InvalidMarkException;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -583,6 +584,41 @@ public class IoBufferTest {
     }
 
     /**
+     * Test the mark() method
+     */
+    @Test
+    public void testMark() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("0123".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("4567".getBytes());
+        bb2.flip();
+
+        IoBuffer ioBuffer = IoBuffer.wrap(bb1, bb2);
+
+        ioBuffer.position(3);
+        ioBuffer.mark();
+
+        ioBuffer.position(6);
+        ioBuffer.reset();
+
+        ioBuffer.position(6);
+        ioBuffer.mark();
+
+        // we go backward, the mark should be discarded
+        ioBuffer.position(3);
+
+        try {
+            ioBuffer.reset();
+            fail("An InvalidMarkException should have been thrown");
+        } catch (InvalidMarkException ime) {
+            // 
+        }
+    }
+
+    /**
      * Test the flip() method
      */
     @Test
@@ -650,6 +686,33 @@ public class IoBufferTest {
         for (int i = 0; i < ioBuffer.limit(); i++) {
             assertEquals(i, ioBuffer.position());
             ioBuffer.get();
+        }
+    }
+
+    /**
+     * Test set position method over a buffer
+     */
+    @Test
+    public void testSetPositionBuffer() {
+        ByteBuffer bb1 = ByteBuffer.allocate(4);
+        bb1.put("012".getBytes());
+        bb1.flip();
+
+        ByteBuffer bb2 = ByteBuffer.allocate(4);
+        bb2.put("3456".getBytes());
+        bb2.flip();
+
+        ByteBuffer bb3 = ByteBuffer.allocate(4);
+        bb3.put("789".getBytes());
+        bb3.flip();
+
+        // The resulting buffer will be seen as "0123456789"
+        IoBuffer ioBuffer = IoBuffer.wrap(bb1, bb2, bb3);
+
+        // Check with random positions
+        for (int i : new int[] { 4, 6, 7, 8, 3, 9, 1, 5, 0, 2 }) {
+            ioBuffer.position(i);
+            assertEquals('0' + i, ioBuffer.get());
         }
     }
 
@@ -824,7 +887,7 @@ public class IoBufferTest {
             assertEquals(12345, ioBuffer.getShort());
             assertEquals(-23456, ioBuffer.getShort());
             ioBuffer.rewind();
-            
+
             ioBuffer.putShort(1, (short) 12345);
             assertEquals((short) 12345, ioBuffer.getShort(1));
 
@@ -858,7 +921,7 @@ public class IoBufferTest {
             assertEquals(123456, ioBuffer.getInt());
             assertEquals(-23456789, ioBuffer.getInt());
             ioBuffer.rewind();
-            
+
             ioBuffer.putInt(2, 1234567890);
             assertEquals(1234567890, ioBuffer.getInt(2));
 
@@ -893,7 +956,7 @@ public class IoBufferTest {
             assertEquals(123456789012l, ioBuffer.getLong());
             assertEquals(-23456789023l, ioBuffer.getLong());
 
-            ioBuffer.rewind();            
+            ioBuffer.rewind();
             ioBuffer.putLong(4, 1234567890);
             assertEquals(1234567890, ioBuffer.getLong(4));
 
@@ -927,7 +990,7 @@ public class IoBufferTest {
             assertEquals(-0.68f, ioBuffer.getFloat(), 0.001f);
             assertEquals(3.14f, ioBuffer.getFloat(), 0.001f);
             ioBuffer.rewind();
-            
+
             ioBuffer.putFloat(2, -12.34f);
             assertEquals(-12.34f, ioBuffer.getFloat(2), 0.001f);
         }
@@ -948,7 +1011,7 @@ public class IoBufferTest {
             assertEquals(Math.PI, ioBuffer.getDouble(), 1E-10);
             assertEquals(-Math.E, ioBuffer.getDouble(), 1E-10);
 
-            ioBuffer.rewind();            
+            ioBuffer.rewind();
             ioBuffer.putDouble(4, 12.34);
             assertEquals(12.34, ioBuffer.getDouble(4), 1E-10);
         }
@@ -972,10 +1035,10 @@ public class IoBufferTest {
             assertEquals('ë', ioBuffer.getChar());
             assertEquals('ü', ioBuffer.getChar());
             ioBuffer.rewind();
-            
+
             ioBuffer.putChar(1, 'ç');
             assertEquals('ç', ioBuffer.getChar(1));
-            
+
             try {
                 ioBuffer.putChar(3, 'ñ');
                 fail("Not enough place on the buffer");
