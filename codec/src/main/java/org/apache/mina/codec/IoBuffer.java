@@ -581,8 +581,7 @@ public final class IoBuffer {
      * @see ByteBuffer#mark()
      */
     public void mark() {
-        // FIXME: this is broken and untested (it should set the mark instead of limit)
-        this.limit = position.duplicate();
+        this.mark = position.duplicate();
     }
 
     /**
