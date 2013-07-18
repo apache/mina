@@ -30,7 +30,7 @@
     <!-- Copy licenses into '/' -->
     <fileSet>
       <directory>..</directory>
-      <outputDirectory></outputDirectory>
+      <outputDirectory/>
       <includes>
         <include>README*</include>
         <include>LICENSE</include>
@@ -51,7 +51,7 @@
     <!-- Copy sources into '/src' -->
     <fileSet>
       <directory>..</directory>
-      <outputDirectory>src</outputDirectory>
+      <outputDirectory/>
       <includes>
         <include>**/*</include>
       </includes>
