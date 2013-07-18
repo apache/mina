@@ -1008,6 +1008,7 @@ public final class IoBuffer {
         }
 
         public int getPositionInNode() {
+            updatePos();
             return positionInBuffer;
         }
 
@@ -1020,7 +1021,6 @@ public final class IoBuffer {
                 node = head;
             }
             positionInBuffer = node == null ? 0 : newPosition - node.offset;
-            updatePos();
         }
 
         public void incrementPosition(int positionIncrement) {
