@@ -103,6 +103,7 @@
     <version.maven.release.plugin>2.2.1</version.maven.release.plugin>
     <version.maven.source.plugin>2.1.2</version.maven.source.plugin>
     <version.maven.eclipse.plugin>2.8</version.maven.eclipse.plugin>
+    <benchmarks.skip>true</benchmarks.skip>
   </properties>
 
 
@@ -114,6 +115,7 @@
     <module>coap</module>
     <module>thrift</module>
     <module>protobuf</module>
+    <module>benchmarks</module>
   </modules>
 
   <dependencyManagement>
@@ -575,7 +577,7 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
-            <id>enforce-java</id>
+            <id>enforce-java-17</id>
             <goals>
               <goal>enforce</goal>
             </goals>
@@ -661,9 +663,9 @@
           <name>benchmarks</name>
         </property>
       </activation>
-      <modules>
-        <module>benchmarks</module>
-      </modules>
+      <properties>
+        <benchmarks.skip>false</benchmarks.skip>
+      </properties>
     </profile>
 
     <profile>

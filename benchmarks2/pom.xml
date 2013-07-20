@@ -58,4 +58,15 @@
      <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>${benchmarks.skip}</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
