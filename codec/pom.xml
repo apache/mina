@@ -28,7 +28,7 @@
 
   <artifactId>mina-codec</artifactId>
   <name>Apache MINA Codec ${project.version}</name>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <properties>
     <symbolicName>${project.groupId}.codec</symbolicName>

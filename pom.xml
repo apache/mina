@@ -8,9 +8,9 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License.  You may obtain a copy of the License at
-  
+
   http://www.apache.org/licenses/LICENSE-2.0
-  
+
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -73,9 +73,9 @@
   </ciManagement>
 
   <description>
-    Apache MINA is a network application framework which helps users 
-    develop high performance and highly scalable network applications easily. 
-    It provides an abstract event-driven asynchronous API over various 
+    Apache MINA is a network application framework which helps users
+    develop high performance and highly scalable network applications easily.
+    It provides an abstract event-driven asynchronous API over various
     transports such as TCP/IP and UDP/IP via Java NIO.
   </description>
 
@@ -126,14 +126,12 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>mina-core</artifactId>
         <version>${project.version}</version>
-        <type>bundle</type>
       </dependency>
 
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mina-codec</artifactId>
         <version>${project.version}</version>
-        <type>bundle</type>
       </dependency>
 
       <dependency>
@@ -524,7 +522,7 @@
           <showDeprecations>true</showDeprecations>
         </configuration>
       </plugin>
-  
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -695,7 +693,7 @@
             <configuration>
               <aggregate>true</aggregate>
             </configuration>
-            
+
             <executions>
               <execution>
                 <phase>install</phase>
@@ -709,7 +707,7 @@
           </plugin>
         </plugins>
       </build>
-      
+
       <modules>
         <module>distribution</module>
       </modules>

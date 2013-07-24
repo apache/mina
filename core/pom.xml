@@ -28,7 +28,7 @@
 
   <artifactId>mina-core</artifactId>
   <name>Apache MINA Core ${project.version}</name>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <properties>
     <symbolicName>${project.groupId}.core</symbolicName>
@@ -48,7 +48,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mina-codec</artifactId>
-      <type>bundle</type>
     </dependency>
 
     <dependency>
