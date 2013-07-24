@@ -21,16 +21,14 @@ package org.apache.mina.core.nio.tcp;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.MessageBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundByteHandlerAdapter;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
@@ -59,7 +57,9 @@ public class Netty4TcpBenchmarkServer implements BenchmarkServer {
 
     private static final AttributeKey<Integer> LENGTH_ATTRIBUTE = new AttributeKey<Integer>("length");
 
-    private class TestServerHandler extends ChannelInboundByteHandlerAdapter {
+    private ServerBootstrap bootstrap = null;
+
+    private class TestServerHandler extends ChannelInboundHandlerAdapter  {
         public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
             System.out.println("childChannelOpen");
             ctx.attr(STATE_ATTRIBUTE).set(State.WAIT_FOR_FIRST_BYTE_LENGTH);
@@ -75,12 +75,13 @@ public class Netty4TcpBenchmarkServer implements BenchmarkServer {
         }
 
         @Override
-        public void inboundBufferUpdated(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
+        public void channelRead(ChannelHandlerContext ctx, Object message) throws Exception {
+            ByteBuf buffer = (ByteBuf)message;
             State state = ctx.attr(STATE_ATTRIBUTE).get();
             int length = 0;
             Attribute<Integer> lengthAttribute = ctx.attr(LENGTH_ATTRIBUTE);
 
-            if (lengthAttribute != null) {
+            if (lengthAttribute.get() != null) {
                 length = lengthAttribute.get();
             }
 
@@ -106,9 +107,7 @@ public class Netty4TcpBenchmarkServer implements BenchmarkServer {
                     state = State.READING;
 
                     if ((length == 0) && (buffer.readableBytes() == 0)) {
-                        MessageBuf<Object> messageOut = ctx.nextOutboundMessageBuffer();
-                        messageOut.add(ACK.slice());
-                        ctx.flush();
+                        ctx.writeAndFlush(ACK.retain(1).resetReaderIndex());
                         state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
                     }
 
@@ -122,9 +121,7 @@ public class Netty4TcpBenchmarkServer implements BenchmarkServer {
                         buffer.skipBytes(remaining);
                     } else {
                         buffer.skipBytes(length);
-                        MessageBuf<Object> messageOut = ctx.nextOutboundMessageBuffer();
-                        messageOut.add(ACK.slice());
-                        ctx.flush();
+                        ctx.writeAndFlush(ACK.retain(1).resetReaderIndex());
                         state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
                         length = 0;
                     }
@@ -133,6 +130,7 @@ public class Netty4TcpBenchmarkServer implements BenchmarkServer {
 
             ctx.attr(STATE_ATTRIBUTE).set(state);
             ctx.attr(LENGTH_ATTRIBUTE).set(length);
+            buffer.release();
         }
     }
 
@@ -141,9 +139,6 @@ public class Netty4TcpBenchmarkServer implements BenchmarkServer {
      * @throws  
      */
     public void start(int port) throws IOException {
-        ServerBootstrap bootstrap = null;
-        ;
-
         try {
             bootstrap = new ServerBootstrap();
             bootstrap.option(ChannelOption.SO_RCVBUF, 128 * 1024);
@@ -158,15 +153,11 @@ public class Netty4TcpBenchmarkServer implements BenchmarkServer {
                 };
             });
             ChannelFuture bindFuture = bootstrap.bind();
-            bindFuture.sync();
-            Channel channel = bindFuture.channel();
-            ChannelFuture closeFuture = channel.closeFuture();
+            //bindFuture.sync();
+            //Channel channel = bindFuture.channel();
+            //ChannelFuture closeFuture = channel.closeFuture();
             //closeFuture.sync();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } finally {
-            bootstrap.shutdown();
         }
     }
 
@@ -174,5 +165,7 @@ public class Netty4TcpBenchmarkServer implements BenchmarkServer {
      * {@inheritedDoc}
      */
     public void stop() throws IOException {
+        bootstrap.childGroup().shutdownGracefully();
+        bootstrap.group().shutdownGracefully();
     }
 }

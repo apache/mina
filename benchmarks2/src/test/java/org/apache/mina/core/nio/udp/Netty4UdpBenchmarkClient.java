@@ -19,13 +19,19 @@
  */
 package org.apache.mina.core.nio.udp;
 
-import io.netty.bootstrap.ChannelFactory;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.socket.DatagramPacket;
+import io.netty.channel.socket.nio.NioDatagramChannel;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.Channels;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.mina.core.BenchmarkClient;
@@ -36,7 +42,7 @@ import org.apache.mina.core.BenchmarkClient;
  */
 public class Netty4UdpBenchmarkClient implements BenchmarkClient {
 
-    private ChannelFactory factory;
+    private Bootstrap bootstrap;
 
     /**
      * 
@@ -48,50 +54,47 @@ public class Netty4UdpBenchmarkClient implements BenchmarkClient {
      * {@inheritedDoc}
      */
     public void start(final int port, final CountDownLatch counter, final byte[] data) throws IOException {
-        factory = new NioDatagramChannelFactory();
-        ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(factory);
-        bootstrap.setOption("sendBufferSize", 65536);
-        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-            public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(new SimpleChannelUpstreamHandler() {
-                    private void sendMessage(ChannelHandlerContext ctx, byte[] data) {
-                        ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(data);
-                        ctx.getChannel().write(buffer);
+        bootstrap = new Bootstrap();
+        bootstrap.option(ChannelOption.SO_SNDBUF, 65536);
+        bootstrap.group(new NioEventLoopGroup());
+        bootstrap.channel(NioDatagramChannel.class);
+        bootstrap.handler(new ChannelInitializer<DatagramChannel>() {
+
+            @Override
+            protected void initChannel(DatagramChannel ch) throws Exception {
+                ch.pipeline().addLast(new SimpleChannelInboundHandler<DatagramPacket>() {
+                    private void sendMessage(ChannelHandlerContext ctx, byte[] data, InetSocketAddress address) {
+                        ByteBuf buf = ctx.alloc().buffer(data.length);
+                        buf.writeBytes(data);
+                        ctx.writeAndFlush(new DatagramPacket(buf, address));
+                    }
+                  
+                    @Override
+                    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                        sendMessage(ctx, data, new InetSocketAddress("localhost", port));
                     }
 
                     @Override
-                    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-                        if (e.getMessage() instanceof ChannelBuffer) {
-                            ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
-                            for (int i = 0; i < buffer.readableBytes(); ++i) {
-                                counter.countDown();
-                                if (counter.getCount() > 0) {
-                                    sendMessage(ctx, data);
-                                } else {
-                                    ctx.getChannel().close();
-                                }
+                    protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket message) throws Exception {
+                        for(int i=0; i < message.content().readableBytes();i++) {
+                            counter.countDown();
+                            if (counter.getCount() > 0) {
+                                sendMessage(ctx, data, message.sender());
+                            } else {
+                                ctx.channel().close();
                             }
-                        } else {
-                            throw new IllegalArgumentException(e.getMessage().getClass().getName());
                         }
                     }
-
-                    @Override
-                    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-                        sendMessage(ctx, data);
-                    }
-
                 });
             }
         });
-        bootstrap.connect(new InetSocketAddress(port));
+        bootstrap.bind(port+1);
     }
 
     /**
      * {@inheritedDoc}
      */
     public void stop() throws IOException {
-        factory.shutdown();
-        factory.releaseExternalResources();
+        bootstrap.group().shutdownGracefully();
     }
 }

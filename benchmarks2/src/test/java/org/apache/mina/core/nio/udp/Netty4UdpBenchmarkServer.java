@@ -19,22 +19,23 @@
  */
 package org.apache.mina.core.nio.udp;
 
-import io.netty.bootstrap.ChannelFactory;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.socket.DatagramPacket;
+import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.channels.Channels;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.mina.core.BenchmarkServer;
-
-import com.sun.jdi.event.ExceptionEvent;
 
 /**
  * A Netty 3 based UDP server
@@ -47,137 +48,102 @@ public class Netty4UdpBenchmarkServer implements BenchmarkServer {
         WAIT_FOR_FIRST_BYTE_LENGTH, WAIT_FOR_SECOND_BYTE_LENGTH, WAIT_FOR_THIRD_BYTE_LENGTH, WAIT_FOR_FOURTH_BYTE_LENGTH, READING
     }
 
-    private static final ChannelBuffer ACK = ChannelBuffers.buffer(1);
+    private static final ByteBuf ACK = Unpooled.buffer(1);
 
+    private static final AttributeKey<State> STATE_ATTRIBUTE = new AttributeKey<State>("state");
+
+    private static final AttributeKey<Integer> LENGTH_ATTRIBUTE = new AttributeKey<Integer>("length");
+    
     static {
-        ACK.writeByte(0);
-    }
+      ACK.writeByte(0);
+  }
 
-    private static final String STATE_ATTRIBUTE = Netty4UdpBenchmarkServer.class.getName() + ".state";
-
-    private static final String LENGTH_ATTRIBUTE = Netty4UdpBenchmarkServer.class.getName() + ".length";
-
-    private ChannelFactory factory;
-
-    private ChannelGroup allChannels = new DefaultChannelGroup();
-
-    /**
-     * Allocate a map as attachment for storing attributes.
-     * 
-     * @param ctx the channel context
-     * @return the map from the attachment
-     */
-    protected static Map<String, Object> getAttributesMap(ChannelHandlerContext ctx) {
-        Map<String, Object> map = (Map<String, Object>) ctx.getAttachment();
-        if (map == null) {
-            map = new HashMap<String, Object>();
-            ctx.setAttachment(map);
-        }
-        return map;
-    }
-
-    private static void setAttribute(ChannelHandlerContext ctx, String name, Object value) {
-        getAttributesMap(ctx).put(name, value);
-    }
-
-    private static Object getAttribute(ChannelHandlerContext ctx, String name) {
-        return getAttributesMap(ctx).get(name);
-    }
+    private Bootstrap bootstrap;
 
     /**
      * {@inheritDoc}
      */
     public void start(int port) throws IOException {
-        factory = new NioDatagramChannelFactory();
-        ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(factory);
-        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-            public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(new SimpleChannelUpstreamHandler() {
+        bootstrap = new Bootstrap();
+        bootstrap.group(new NioEventLoopGroup());
+        bootstrap.channel(NioDatagramChannel.class);
+        bootstrap.option(ChannelOption.SO_RCVBUF, 65536);
+        bootstrap.handler(new ChannelInitializer<DatagramChannel>() {
+
+            @Override
+            protected void initChannel(DatagramChannel ch) throws Exception {
+                ch.pipeline().addLast(new SimpleChannelInboundHandler<DatagramPacket>() {
                     @Override
-                    public void childChannelOpen(ChannelHandlerContext ctx, ChildChannelStateEvent e) throws Exception {
-                        System.out.println("childChannelOpen");
-                        setAttribute(ctx, STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
+                    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                        ctx.attr(STATE_ATTRIBUTE).set(State.WAIT_FOR_FIRST_BYTE_LENGTH);
                     }
 
                     @Override
-                    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-                        System.out.println("channelOpen");
-                        setAttribute(ctx, STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
-                        allChannels.add(ctx.getChannel());
-                    }
+                    protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket message) throws Exception {
+                        ByteBuf buffer = message.content();
+                        State state = ctx.attr(STATE_ATTRIBUTE).get();
+                        int length = 0;
+                        Attribute<Integer> lengthAttribute = ctx.attr(LENGTH_ATTRIBUTE);
 
-                    @Override
-                    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-                        if (e.getMessage() instanceof ChannelBuffer) {
-                            ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
+                        if (lengthAttribute.get() != null) {
+                            length = lengthAttribute.get();
+                        }
 
-                            State state = (State) getAttribute(ctx, STATE_ATTRIBUTE);
-                            int length = 0;
-                            if (getAttributesMap(ctx).containsKey(LENGTH_ATTRIBUTE)) {
-                                length = (Integer) getAttribute(ctx, LENGTH_ATTRIBUTE);
-                            }
-                            while (buffer.readableBytes() > 0) {
-                                switch (state) {
+                        while (buffer.readableBytes() > 0) {
+                            switch (state) {
                                 case WAIT_FOR_FIRST_BYTE_LENGTH:
                                     length = (buffer.readByte() & 255) << 24;
                                     state = State.WAIT_FOR_SECOND_BYTE_LENGTH;
                                     break;
+
                                 case WAIT_FOR_SECOND_BYTE_LENGTH:
                                     length += (buffer.readByte() & 255) << 16;
                                     state = State.WAIT_FOR_THIRD_BYTE_LENGTH;
                                     break;
+
                                 case WAIT_FOR_THIRD_BYTE_LENGTH:
                                     length += (buffer.readByte() & 255) << 8;
                                     state = State.WAIT_FOR_FOURTH_BYTE_LENGTH;
                                     break;
+
                                 case WAIT_FOR_FOURTH_BYTE_LENGTH:
                                     length += (buffer.readByte() & 255);
                                     state = State.READING;
+
                                     if ((length == 0) && (buffer.readableBytes() == 0)) {
-                                        ctx.getChannel().write(ACK.slice());
+                                        ctx.writeAndFlush(new DatagramPacket(ACK.retain(1).resetReaderIndex(), message.sender()));
                                         state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
                                     }
                                     break;
+
                                 case READING:
                                     int remaining = buffer.readableBytes();
+
                                     if (length > remaining) {
                                         length -= remaining;
                                         buffer.skipBytes(remaining);
                                     } else {
                                         buffer.skipBytes(length);
-                                        SocketAddress remoteAddress = e.getRemoteAddress();
-                                        ctx.getChannel().write(ACK.slice(), remoteAddress);
+                                        ctx.writeAndFlush(new DatagramPacket(ACK.retain(1).resetReaderIndex(), message.sender()));
                                         state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
                                         length = 0;
                                     }
-                                }
                             }
-                            setAttribute(ctx, STATE_ATTRIBUTE, state);
-                            setAttribute(ctx, LENGTH_ATTRIBUTE, length);
                         }
-                    }
 
-                    @Override
-                    public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-                        allChannels.remove(ctx.getChannel());
-                    }
-
-                    @Override
-                    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-                        e.getCause().printStackTrace();
-                    }
+                        ctx.attr(STATE_ATTRIBUTE).set(state);
+                        ctx.attr(LENGTH_ATTRIBUTE).set(length);
+                   }
                 });
             }
         });
-        allChannels.add(bootstrap.bind(new InetSocketAddress(port)));
+        bootstrap.bind(port);
     }
 
     /**
      * {@inheritedDoc}
      */
     public void stop() throws IOException {
-        allChannels.disconnect().awaitUninterruptibly();
-        factory.shutdown();
-        factory.releaseExternalResources();
+        bootstrap.group().shutdownGracefully();
     }
 }
