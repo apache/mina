@@ -31,10 +31,10 @@ import org.apache.mina.coap.CoapOption;
  */
 public class CoapResponse {
 
-    public int code;
-    public byte[] content;
+    private int code;
+    private byte[] content;
 
-    public CoapOption[] options;
+    private CoapOption[] options;
 
     /**
      * Create the CoAP response for a resource request.

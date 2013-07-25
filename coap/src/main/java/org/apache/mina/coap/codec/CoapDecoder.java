@@ -78,10 +78,6 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
         // LOG.debug("id : {}", id);
         input.get(token);
 
-        // if (LOG.isDebugEnabled()) {
-        // LOG.debug("token : {}", ByteBufferDumper.toHex(ByteBuffer.wrap(token)));
-        // }
-
         // decode options
         int optionCode = 0;
         byte[] payload = EMPTY_PAYLOAD;
@@ -94,9 +90,6 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
                 // LOG.debug("start of payload");
                 payload = new byte[input.remaining()];
                 input.get(payload);
-                // if (LOG.isDebugEnabled()) {
-                // LOG.debug("payload : {}", ByteBufferDumper.dump(ByteBuffer.wrap(payload)));
-                // }
                 break;
             } else {
                 int optionDeltaQuartet = (next >> 4) & 0xF;
@@ -122,7 +115,6 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
                 input.get(optionValue);
 
                 options.add(new CoapOption(optType, optionValue));
-                ;
             }
         }
 
@@ -144,10 +136,6 @@ public class CoapDecoder implements StatelessProtocolDecoder<ByteBuffer, CoapMes
         if (value < 13) {
             return value;
         } else if (value == 13) {
-            // if (LOG.isDebugEnabled()) {
-            // int val = input.get(input.position()) & 0xFF;
-            // LOG.debug("byte : {}", val);
-            // }
             return (input.get() & 0xFF) + 13;
         } else if (value == 14) {
             return (input.getShort() & 0xFFFF) + 269;
