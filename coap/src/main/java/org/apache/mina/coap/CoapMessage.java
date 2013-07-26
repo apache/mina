@@ -20,7 +20,11 @@
 package org.apache.mina.coap;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 
 import org.apache.mina.filter.query.Request;
@@ -53,7 +57,7 @@ public class CoapMessage implements Request, Response {
         String[] params = new String[] {};
 
         if (parts.length > 1) {
-            params = parts[1].split("\\,");
+            params = parts[1].split("\\&");
         }
         CoapOption[] opt = new CoapOption[paths.length + params.length];
         for (int i = 0; i < paths.length; i++) {
@@ -158,6 +162,131 @@ public class CoapMessage implements Request, Response {
 
     public MessageType getType() {
         return type;
+    }
+
+    /* Utility methods to rebuild some CoAP options */
+
+    /**
+     * @return all segments of the absolute path to the resource
+     */
+    public String[] getUriPath() {
+        return strArrayOptions(CoapOptionType.URI_PATH);
+    }
+
+    /**
+     * @return all arguments parameterizing the resource
+     */
+    public String[] getUriQuery() {
+        return strArrayOptions(CoapOptionType.URI_QUERY);
+    }
+
+    /**
+     * @return the Internet host of the resource being requested
+     */
+    public String getUriHost() {
+        return strOption(CoapOptionType.URI_HOST);
+    }
+
+    /**
+     * @return the transport layer port number of the resource
+     */
+    public Integer getUriPort() {
+        return intOption(CoapOptionType.URI_PORT);
+    }
+
+    /**
+     * return the absolute URI used to make a request to a forward-proxy
+     */
+    public String getProxyUri() {
+        return strOption(CoapOptionType.PROXY_URI);
+    }
+
+    /**
+     * @return the scheme to be used in the proxy URI
+     */
+    public String getProxyScheme() {
+        return strOption(CoapOptionType.PROXY_SCHEME);
+    }
+
+    /**
+     * @return the representation format of the message payload
+     */
+    public Integer getContentFormat() {
+        return intOption(CoapOptionType.CONTENT_FORMAT);
+    }
+
+    /**
+     * @return which Content-Format is acceptable to the client
+     */
+    public Integer getAccept() {
+        return intOption(CoapOptionType.ACCEPT);
+    }
+
+    /**
+     * @return the maximum time a response may be cached before it is considered not fresh
+     */
+    public Integer getMaxAge() {
+        return intOption(CoapOptionType.MAX_AGE);
+    }
+
+    /**
+     * @return all segments of the path to the created resource (as the result of a POST request)
+     */
+    public String[] getLocationPath() {
+        return strArrayOptions(CoapOptionType.LOCATION_PATH);
+    }
+
+    /**
+     * @return all arguments parameterizing the created resource (as the result of a POST request)
+     */
+    public String[] getLocationQuery() {
+        return strArrayOptions(CoapOptionType.LOCATION_QUERY);
+    }
+
+    private String strOption(CoapOptionType type) {
+        if (options != null) {
+            for (CoapOption option : options) {
+                if (type.equals(option.getType())) {
+                    try {
+                        return new String(option.getData(), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private String[] strArrayOptions(CoapOptionType type) {
+        Collection<String> opts = new ArrayList<>();
+
+        if (options != null) {
+            for (CoapOption option : options) {
+                if (type.equals(option.getType())) {
+                    try {
+                        opts.add(new String(option.getData(), "UTF-8"));
+                    } catch (UnsupportedEncodingException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
+        }
+
+        return opts.toArray(new String[0]);
+    }
+
+    private Integer intOption(CoapOptionType type) {
+        if (options != null) {
+            for (CoapOption option : options) {
+                if (type.equals(option.getType())) {
+                    ByteBuffer bb = ByteBuffer.wrap(option.getData());
+                    bb.order(ByteOrder.BIG_ENDIAN);
+                    return bb.getInt();
+                }
+            }
+        }
+        return null;
     }
 
     /**
