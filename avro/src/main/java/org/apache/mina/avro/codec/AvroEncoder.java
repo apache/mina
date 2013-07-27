@@ -19,6 +19,7 @@
  */
 package org.apache.mina.avro.codec;
 
+import org.apache.avro.generic.GenericContainer;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.mina.avro.codec.serialization.AvroMessageEncoder;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
@@ -28,8 +29,8 @@ import org.apache.mina.codec.delimited.ints.VarInt;
 /**
  *
  */
-public class AvroEncoder<IN extends GenericRecord> extends SizePrefixedEncoder<GenericRecord> {
-    public AvroEncoder(ByteBufferEncoder<Integer> sizeEncoder, ByteBufferEncoder<GenericRecord> payloadEncoder) {
-        super(new VarInt().getEncoder(), new AvroMessageEncoder<GenericRecord>());
+public class AvroEncoder<T extends GenericContainer> extends SizePrefixedEncoder<T> {
+    public AvroEncoder(ByteBufferEncoder<Integer> sizeEncoder, ByteBufferEncoder<T> payloadEncoder) {
+        super(new VarInt().getEncoder(), new AvroMessageEncoder<T>());
     }
 }

@@ -21,6 +21,7 @@
 package org.apache.mina.avro.codec;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericContainer;
 import org.apache.mina.avro.codec.serialization.AvroMessageDecoder;
 import org.apache.mina.codec.delimited.IoBufferDecoder;
 import org.apache.mina.codec.delimited.SizePrefixedDecoder;
@@ -29,12 +30,12 @@ import org.apache.mina.codec.delimited.ints.VarInt;
 /**
  *
  */
-public class AvroDecoder<GenericRecord> extends SizePrefixedDecoder<GenericRecord> {
+public class AvroDecoder<T extends GenericContainer> extends SizePrefixedDecoder<T> {
 
     private Schema schema;
 
-    public AvroDecoder(IoBufferDecoder<Integer> sizeDecoder, IoBufferDecoder<GenericRecord> payloadDecoder, Schema schema) {
-        super(new VarInt().getDecoder(), new AvroMessageDecoder<GenericRecord>(schema));
+    public AvroDecoder(IoBufferDecoder<Integer> sizeDecoder, IoBufferDecoder<T> payloadDecoder, Schema schema) {
+        super(new VarInt().getDecoder(), new AvroMessageDecoder<T>(schema));
         this.schema = schema;
     }
 }

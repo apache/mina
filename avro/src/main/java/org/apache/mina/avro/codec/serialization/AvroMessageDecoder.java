@@ -21,19 +21,29 @@
 package org.apache.mina.avro.codec.serialization;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericContainer;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.reflect.ReflectDatumReader;
 import org.apache.mina.codec.IoBuffer;
+import org.apache.mina.codec.ProtocolDecoderException;
 import org.apache.mina.codec.delimited.IoBufferDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 /**
+ * Avro Message Decoder
  *
+ * Uses ReflectDatumReader to read the data from the stream
  */
-public class AvroMessageDecoder<GenericRecord> extends IoBufferDecoder<GenericRecord> {
+public class AvroMessageDecoder<T extends GenericContainer> extends IoBufferDecoder<T> {
+
+    // Logger
+    public static final Logger LOG = LoggerFactory.getLogger(AvroMessageDecoder.class);
 
     private Schema schema;
 
@@ -42,18 +52,23 @@ public class AvroMessageDecoder<GenericRecord> extends IoBufferDecoder<GenericRe
      * @param schema
      */
     public AvroMessageDecoder(Schema schema) {
+        if(schema == null) {
+            LOG.error("Avro Schema passed cannot be null");
+            throw new IllegalArgumentException("Avro Schema cannot be null");
+        }
         this.schema = schema;
     }
 
     @Override
-    public GenericRecord decode(IoBuffer input) {
+    public T decode(IoBuffer input) {
         BinaryDecoder binaryDecoder = DecoderFactory.get().binaryDecoder(input.array(), null);
-        GenericDatumReader<GenericRecord> recordGenericDatumReader = new GenericDatumReader<GenericRecord>(schema);
-        GenericRecord result = null;
+        ReflectDatumReader<T> reader = new ReflectDatumReader<T>(schema);
+        T result = null;
         try {
-            result = recordGenericDatumReader.read(null, binaryDecoder);
+            result = reader.read(null, binaryDecoder);
         }catch (IOException ioEx) {
-            ioEx.printStackTrace();
+            LOG.error("Error while decoding", ioEx);
+            throw new ProtocolDecoderException(ioEx.getMessage());
         }
         return result;
     }

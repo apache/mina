@@ -23,6 +23,7 @@ package org.apache.mina.avro.codec.serialization;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.mina.avro.generated.User;
 import org.apache.mina.codec.IoBuffer;
 import org.apache.mina.codec.delimited.ByteBufferEncoder;
 import org.apache.mina.codec.delimited.IoBufferDecoder;
@@ -32,6 +33,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -59,26 +62,40 @@ public class AvroTest extends GenericSerializerTest {
     }
 
     @Override
-    public List<GenericRecord> getObjects() {
-        List<GenericRecord> genericRecordList = new ArrayList<GenericRecord>(1);
-        GenericRecord record1 = new GenericData.Record(SCHEMA);
-        record1.put("name", "Black Jack");
-        record1.put("favorite_number", 11);
-        record1.put("favorite_color", "Black");
-        genericRecordList.add(record1);
+    public List<User> getObjects() {
+        List<User> genericRecordList = new ArrayList<User>(1);
+        User user1 = new User("Red User", 11, "Red");
+        genericRecordList.add(user1);
 
         return genericRecordList;
     }
 
     @Test
-    public void testMessage() throws Exception {
-        ByteBufferEncoder<GenericRecord> encoder = getEncoder();
-        AvroMessageDecoder<GenericRecord> decoder = new AvroMessageDecoder<GenericRecord>(SCHEMA);
+    public void testUser() throws Exception {
+        ByteBufferEncoder<User> encoder = new AvroMessageEncoder<User>();
+        AvroMessageDecoder<User> decoder = new AvroMessageDecoder<User>(SCHEMA);
 
-        for (GenericRecord object : getObjects()) {
-            GenericRecord message = decoder.decode(IoBuffer
+        for (User object : getObjects()) {
+            User message = decoder.decode(IoBuffer
                     .wrap(encoder.encode(object)));
-            System.out.println(message);
+            assertEquals(getObjects().get(0), message);
         }
     }
+
+    @Test
+    public void testGenericMessage() throws Exception {
+        GenericRecord record1 = new GenericData.Record(SCHEMA);
+        record1.put("name", "Black Jack");
+        record1.put("favorite_number", 11);
+        record1.put("favorite_color", "Black");
+
+        ByteBufferEncoder<GenericRecord> encoder = new AvroMessageEncoder<GenericRecord>();
+        AvroMessageDecoder<User> decoder = new AvroMessageDecoder<User>(SCHEMA);
+
+        User message = decoder.decode(IoBuffer.wrap(encoder.encode(record1)));
+        assertEquals(record1.get("name"), message.getName());
+        assertEquals(record1.get("favorite_number"), message.getFavoriteNumber());
+        assertEquals(record1.get("favorite_color"), message.getFavoriteColor());
+    }
+
 }
