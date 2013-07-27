@@ -117,6 +117,7 @@
     <module>protobuf</module>
     <module>benchmarks</module>
     <module>benchmarks2</module>
+    <module>avro</module>
   </modules>
 
   <dependencyManagement>
