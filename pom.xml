@@ -33,7 +33,7 @@
   </organization>
 
   <groupId>org.apache.mina</groupId>
-  <version>3.0.0-M2-SNAPSHOT</version>
+  <version>3.0.0-M2</version>
   <artifactId>mina-parent</artifactId>
   <name>Apache MINA ${project.version}</name>
   <packaging>pom</packaging>
