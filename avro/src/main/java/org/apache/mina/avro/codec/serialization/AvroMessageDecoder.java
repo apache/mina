@@ -45,15 +45,16 @@ public class AvroMessageDecoder<T extends GenericContainer> extends IoBufferDeco
     // Logger
     public static final Logger LOG = LoggerFactory.getLogger(AvroMessageDecoder.class);
 
+    // Avro Schema used for decoding
     private Schema schema;
 
     /**
      * Default Constructor
-     * @param schema
+     * @param schema    Avro Schema to be used for decoding the messages
      */
     public AvroMessageDecoder(Schema schema) {
         if(schema == null) {
-            LOG.error("Avro Schema passed cannot be null");
+            LOG.error("Avro Schema cannot be null");
             throw new IllegalArgumentException("Avro Schema cannot be null");
         }
         this.schema = schema;

@@ -27,10 +27,29 @@ import org.apache.mina.codec.delimited.SizePrefixedEncoder;
 import org.apache.mina.codec.delimited.ints.VarInt;
 
 /**
+ * Avro Encoder
  *
+ * It used GenericContainer, parent class for Avro's GenericRecord and SpecificRecord
+ * User need to specify the type while creating the instance of the Encoder. The default
+ * Size encoder is {@code VarInt} encoder
  */
 public class AvroEncoder<T extends GenericContainer> extends SizePrefixedEncoder<T> {
+
+    /**
+     * Intializes the Avro Encoder
+     *
+     * @param sizeEncoder       Size Prefix encoder
+     * @param payloadEncoder    Avro Encoder to encode message into Avro format
+     */
     public AvroEncoder(ByteBufferEncoder<Integer> sizeEncoder, ByteBufferEncoder<T> payloadEncoder) {
+        super(sizeEncoder, payloadEncoder);
+    }
+
+    /**
+     * Intializes the Avro Encoder
+     * Default Encoder are VarInt encoder for Size and {@link AvroEncoder} for Avro encoding
+     */
+    public AvroEncoder() {
         super(new VarInt().getEncoder(), new AvroMessageEncoder<T>());
     }
 }

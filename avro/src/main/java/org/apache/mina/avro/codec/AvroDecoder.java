@@ -28,14 +28,26 @@ import org.apache.mina.codec.delimited.SizePrefixedDecoder;
 import org.apache.mina.codec.delimited.ints.VarInt;
 
 /**
- *
+ * Avro Decoder
  */
 public class AvroDecoder<T extends GenericContainer> extends SizePrefixedDecoder<T> {
 
-    private Schema schema;
+    /**
+     * Construct an Avro Decoder
+     *
+     * @param sizeDecoder       Size decoder to decode size prefix
+     * @param payloadDecoder    Avro Message decoder to decode Avro message received
+     */
+    public AvroDecoder(IoBufferDecoder<Integer> sizeDecoder, IoBufferDecoder<T> payloadDecoder) {
+        super(sizeDecoder, payloadDecoder);
+    }
 
-    public AvroDecoder(IoBufferDecoder<Integer> sizeDecoder, IoBufferDecoder<T> payloadDecoder, Schema schema) {
+    /**
+     * Construct an Avro Decoder
+     *
+     * @param schema            Avro Schema to be used
+     */
+    public AvroDecoder(Schema schema) {
         super(new VarInt().getDecoder(), new AvroMessageDecoder<T>(schema));
-        this.schema = schema;
     }
 }
