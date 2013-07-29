@@ -176,7 +176,7 @@ public class LoggingFilter implements IoFilter {
      */
     @Override
     public void messageSent(final IoSession session, final Object message) {
-        log(messageSentLevel, "IDLE");
+        log(messageSentLevel, "SENT");
     }
 
     /**
