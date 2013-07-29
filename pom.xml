@@ -118,6 +118,7 @@
     <module>benchmarks</module>
     <module>benchmarks2</module>
     <module>avro</module>
+    <module>monitoring</module>
   </modules>
 
   <dependencyManagement>
