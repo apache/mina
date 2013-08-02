@@ -229,7 +229,7 @@ public class IndexedIdleChecker implements IdleChecker {
                 % MAX_IDLE_TIME_IN_SEC;
         int endIdx = ((int) (timeMs / 1000L)) % MAX_IDLE_TIME_IN_SEC;
 
-        LOG.debug("scaning from index {} to index {}", startIdx, endIdx);
+        LOG.trace("scaning from index {} to index {}", startIdx, endIdx);
 
         int index = startIdx;
         do {
@@ -244,7 +244,7 @@ public class IndexedIdleChecker implements IdleChecker {
 
         // save last check time for next call
         lastCheckTimeMs = timeMs;
-        LOG.debug("detected {} idleing sessions", counter);
+        LOG.trace("detected {} idleing sessions", counter);
         return counter;
     }
 
