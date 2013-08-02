@@ -45,6 +45,20 @@ public class BioUdpSession extends AbstractIoSession {
         this.remoteAddress = remoteAddress;
     }
 
+    
+    /**
+     * Set this session status as connected. To be called by the processor selecting/polling this session.
+     */
+    void setConnected() {
+        if (!isCreated()) {
+            throw new IllegalStateException("Trying to open a non created session");
+        }
+
+        state = SessionState.CONNECTED;
+        processSessionOpen();
+    }
+
+
     /**
      * {@inheritDoc}
      */

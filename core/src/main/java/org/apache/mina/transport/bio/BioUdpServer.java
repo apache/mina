@@ -193,6 +193,8 @@ public class BioUdpServer extends AbstractUdpServer {
                         session.getConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE,
                                 config.getIdleTimeInMillis(IdleStatus.WRITE_IDLE));
                         idleChecker.sessionWritten(session, System.currentTimeMillis());
+                        session.setConnected();
+                        
                         // fire open
                         session.processSessionOpen();
 
