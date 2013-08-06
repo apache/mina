@@ -211,8 +211,8 @@ public class IndexedIdleChecker implements IdleChecker {
         int counter = 0;
         long delta = timeMs - lastCheckTimeMs;
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("checking idle time, last = {}, now = {}, delta = {}", new Object[] { lastCheckTimeMs, timeMs,
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("checking idle time, last = {}, now = {}, delta = {}", new Object[] { lastCheckTimeMs, timeMs,
                     delta });
         }
 
