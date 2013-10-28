@@ -27,5 +27,15 @@ package org.apache.mina.filterchain;
  */
 public interface ReadFilterChainController {
 
+    /**
+     * Push the message to the next filter. Transformed or not.
+     * @param message the message to push to the next filter.
+     */
     void callReadNextFilter(Object message);
+
+    /**
+     * Write a message according to the protocol implemented in the filter
+     * @param message the message to be written and sent to the previous mail
+     */
+    void callWriteMessageForRead(Object message);
 }

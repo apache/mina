@@ -18,9 +18,18 @@
  */
 package org.apache.mina.session;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -29,6 +38,7 @@ import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
+import org.apache.mina.api.IoSession;
 import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
@@ -127,6 +137,13 @@ public class AbstractIoSessionTest {
 
     private final IoFilter filter3 = spy(new PassthruFilter());
 
+    private final IoFilter filterWriteBack = spy(new PassthruFilter() {
+        @Override
+        public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
+            controller.callWriteMessageForRead(message);
+        }
+    });
+
     @Before
     public void setup() {
         service = mock(IoService.class);
@@ -182,6 +199,42 @@ public class AbstractIoSessionTest {
         assertEquals(1024L, session.getReadBytes());
         final long lastRead = session.getLastReadTime();
         assertTrue(lastRead - before < 100);
+    }
+
+    @Test
+    public void chain_reads_with_writeback() {
+        service = mock(IoService.class);
+        when(service.getFilters()).thenReturn(new IoFilter[] { filter1, filterWriteBack, filter3 });
+        final DummySession session = new DummySession(service);
+        final ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+        final long before = System.currentTimeMillis();
+        session.processMessageReceived(buffer);
+        verify(filter1).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
+        verify(filterWriteBack).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
+        verify(filter1).messageWriting(eq(session), any(WriteRequest.class), any(WriteFilterChainController.class));
+
+        assertEquals(1024L, session.getReadBytes());
+        final long lastRead = session.getLastReadTime();
+        assertTrue(lastRead - before < 100);
+        verifyNoMoreInteractions(filter1, filter2, filter3, filterWriteBack);
+    }
+
+    @Test
+    public void chain_reads_with_writeback_final() {
+        service = mock(IoService.class);
+        when(service.getFilters()).thenReturn(new IoFilter[] { filterWriteBack, filter2, filter3 });
+        final DummySession session = new DummySession(service);
+        final ByteBuffer buffer = ByteBuffer.allocate(1024);
+
+        final long before = System.currentTimeMillis();
+        session.processMessageReceived(buffer);
+        verify(filterWriteBack).messageReceived(eq(session), eq(buffer), any(ReadFilterChainController.class));
+
+        assertEquals(1024L, session.getReadBytes());
+        final long lastRead = session.getLastReadTime();
+        assertTrue(lastRead - before < 100);
+        verifyNoMoreInteractions(filter1, filter2, filter3, filterWriteBack);
     }
 
     @Test

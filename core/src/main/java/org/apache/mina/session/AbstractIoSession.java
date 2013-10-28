@@ -792,6 +792,20 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      * {@inheritDoc}
      */
     @Override
+    public void callWriteMessageForRead(Object message) {
+        if (IS_DEBUG) {
+            LOG.debug("calling filter for reading for message '{}' position : {} from a write event", message,
+                    readChainPosition);
+        }
+
+        writeChainPosition = readChainPosition;
+        callWriteNextFilter(new DefaultWriteRequest(message));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void callReadNextFilter(Object message) {
         readChainPosition++;
 
