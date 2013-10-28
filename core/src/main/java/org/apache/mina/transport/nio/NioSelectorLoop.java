@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class holds a Selector and handle all the incoming events for the sessions registered on this selector.ALl the
- * events will be processed by some dedicated thread, taken from a pool. It will loop forever, untill the instance is
+ * events will be processed by some dedicated thread, taken from a pool. It will loop forever, until the instance is
  * stopped.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -52,7 +52,13 @@ public class NioSelectorLoop implements SelectorLoop {
     private final ByteBuffer readBuffer = ByteBuffer.allocateDirect(64 * 1024);
 
     /** The queue containing the channels to register on the selector */
-    private final Queue<Registration> registrationQueue = new ConcurrentLinkedQueue<Registration>();
+    private final Queue<Registration> registrationQueue = new ConcurrentLinkedQueue<>();
+
+    /**
+     * Queue of runnable events to be run by the selector loop, used for running user code in the I/O loop and avoiding
+     * concurrency issues
+     */
+    private final Queue<Runnable> runnableQueue = new ConcurrentLinkedQueue<>();
 
     /**
      * Creates an instance of the SelectorLoop.
@@ -132,6 +138,15 @@ public class NioSelectorLoop implements SelectorLoop {
         registrationQueue.add(new Registration(ops, channel, listener, callback));
 
         // Now, wakeup the selector in order to let it update the selectionKey status
+        wakeup();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void runInLoop(Runnable task) {
+        runnableQueue.add(task);
         wakeup();
     }
 
@@ -261,6 +276,11 @@ public class NioSelectorLoop implements SelectorLoop {
                             // dead session..
                             LOG.error("socket is already dead", ex);
                         }
+                    }
+
+                    // tasks
+                    while (!runnableQueue.isEmpty()) {
+                        runnableQueue.poll().run();
                     }
                 } catch (final Exception e) {
                     LOG.error("Unexpected exception : ", e);

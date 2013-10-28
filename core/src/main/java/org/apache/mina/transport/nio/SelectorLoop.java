@@ -47,4 +47,11 @@ public interface SelectorLoop {
      * Wake up the selector
      */
     void wakeup();
+
+    /**
+     * Run a given runnable in the loop.
+     * 
+     * @param task the task to be run in the main working loop.
+     */
+    void runInLoop(Runnable task);
 }
