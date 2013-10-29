@@ -34,8 +34,8 @@ public interface ReadFilterChainController {
     void callReadNextFilter(Object message);
 
     /**
-     * Write a message according to the protocol implemented in the filter
-     * @param message the message to be written and sent to the previous mail
+     * Write a message back to the session starting from this filter instead of walking thru the whole filter chain.
+     * @param message the message to be written
      */
     void callWriteMessageForRead(Object message);
 }
