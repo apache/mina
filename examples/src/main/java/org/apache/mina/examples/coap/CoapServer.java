@@ -69,7 +69,7 @@ public class CoapServer {
             }
 
             @Override
-            public String getTittle() {
+            public String getTitle() {
                 return "Some demo resource";
             }
 

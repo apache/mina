@@ -120,8 +120,8 @@ public class ResourceRegistry {
             if (h.getResourceType() != null) {
                 b.append(";rt=\"").append(h.getResourceType()).append("\"");
             }
-            if (h.getTittle() != null) {
-                b.append(";title=\"").append(h.getTittle()).append("\"");
+            if (h.getTitle() != null) {
+                b.append(";title=\"").append(h.getTitle()).append("\"");
             }
         }
         try {

@@ -46,7 +46,7 @@ public abstract class AbstractResourceHandler implements ResourceHandler {
      * {@inheritDoc}
      */
     @Override
-    public String getTittle() {
+    public String getTitle() {
         return null;
     }
 

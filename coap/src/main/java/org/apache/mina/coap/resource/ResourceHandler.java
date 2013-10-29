@@ -37,7 +37,7 @@ public interface ResourceHandler {
     /**
      * Detailed title for this path (or <code>null</code>). See http://datatracker.ietf.org/doc/rfc6690/
      */
-    public String getTittle();
+    public String getTitle();
 
     /**
      * Interface name of this resource (or <code>null</code>), can be an URL to a WADL file. See

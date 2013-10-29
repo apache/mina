@@ -72,7 +72,7 @@ public class CoapClient {
             }
 
             @Override
-            public String getTittle() {
+            public String getTitle() {
                 return "Status report";
             }
 
