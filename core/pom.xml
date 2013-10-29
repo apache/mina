@@ -56,11 +56,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.logging.log4j.adapters</groupId>
-      <artifactId>slf4j-impl</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>
 
