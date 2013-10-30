@@ -19,12 +19,13 @@
  */
 package org.apache.mina.coap.retry;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A {@link Map} implementation backed with a {@link ConcurrentHashMap} providing entry expiration facilities.
@@ -50,28 +51,30 @@ public class ExpiringMap<K, V> implements Map<K, V> {
     private final int expirationPeriod;
     private final int checkerPeriod;
 
-    /** The worker in charge of expiring the entries */
-    private final Worker worker = new Worker();
-
-    private volatile boolean running = true;
+    /** For running expiration tasks */
+    private ScheduledExecutorService executor;
 
     /**
      * A new expiring map
      * 
      * @param expirationPeriod the expiration period for an entry
      * @param checkerPeriod the period between two checks of expired elements
+     * @param executor scheduled executor to be used for scheduling expiration tasks
      */
-    public ExpiringMap(int expirationPeriod, int checkerPeriod) {
+    public ExpiringMap(int expirationPeriod, int checkerPeriod, ScheduledExecutorService executor) {
         this.expirationPeriod = expirationPeriod;
         this.checkerPeriod = checkerPeriod;
+        this.executor = executor;
+        executor.scheduleAtFixedRate(new ExpirationTask(), checkerPeriod, checkerPeriod, TimeUnit.SECONDS);
     }
 
     /**
      * A map with an expiration period of 30 seconds. The worker in charge of expiring the map entries will run every 10
      * seconds.
+     * @param executor scheduled executor to be used for scheduling expiration tasks
      */
-    public ExpiringMap() {
-        this(EXPIRATION_PERIOD_IN_SEC, CHECKER_PERIOD_IN_SEC);
+    public ExpiringMap(ScheduledExecutorService executor) {
+        this(EXPIRATION_PERIOD_IN_SEC, CHECKER_PERIOD_IN_SEC, executor);
     }
 
     /**
@@ -198,48 +201,13 @@ public class ExpiringMap<K, V> implements Map<K, V> {
     }
 
     /**
-     * Start the thread in charge of expiring the elements
+     * Task in chage of expriring values, to be scheduled.
      */
-    public void start() {
-        worker.start();
-    }
-
-    /**
-     * Stop the cleaning thread
-     */
-    @Override
-    public void finalize() throws IOException {
-        running = false;
-        try {
-            // interrupt the sleep
-            worker.interrupt();
-            // wait for worker to stop
-            worker.join();
-        } catch (InterruptedException e) {
-            // interrupted, we don't care much
-        }
-    }
-
-    /**
-     * Thread in charge of removing the expired entries
-     */
-    private class Worker extends Thread {
-
-        public Worker() {
-            super("ExpiringMapChecker");
-            setDaemon(true);
-        }
+    private class ExpirationTask implements Runnable {
 
         @Override
         public void run() {
-            while (running) {
-                try {
-                    sleep(checkerPeriod);
-                    expire(System.currentTimeMillis());
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
+            expire(System.currentTimeMillis());
         }
     }
 

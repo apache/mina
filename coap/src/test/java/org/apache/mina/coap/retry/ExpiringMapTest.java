@@ -1,9 +1,16 @@
 package org.apache.mina.coap.retry;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -11,9 +18,22 @@ import org.junit.Test;
  */
 public class ExpiringMapTest {
 
+    private ScheduledExecutorService executor;
+
+    @Before
+    public void setup() {
+        executor = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    @After
+    public void dispose() {
+        executor.shutdown();
+    }
+
     @Test
     public void put_get() {
-        Map<String, String> map = new ExpiringMap<>();
+
+        Map<String, String> map = new ExpiringMap<>(executor);
         map.put("key1", "value1");
 
         assertTrue(map.containsKey("key1"));
@@ -25,7 +45,7 @@ public class ExpiringMapTest {
 
     @Test
     public void size() {
-        Map<String, String> map = new ExpiringMap<>();
+        Map<String, String> map = new ExpiringMap<>(executor);
         map.put("key1", "value1");
         map.put("key2", "value2");
 
@@ -34,7 +54,7 @@ public class ExpiringMapTest {
 
     @Test
     public void remove() {
-        Map<String, String> map = new ExpiringMap<>();
+        Map<String, String> map = new ExpiringMap<>(executor);
         map.put("key1", "value1");
         map.put("key2", "value2");
 
@@ -47,8 +67,7 @@ public class ExpiringMapTest {
 
     @Test
     public void expiring_element() throws InterruptedException {
-        ExpiringMap<String, String> map = new ExpiringMap<>(5, 1);
-        map.start();
+        ExpiringMap<String, String> map = new ExpiringMap<>(5, 1, executor);
 
         map.put("key1", "value1");
 

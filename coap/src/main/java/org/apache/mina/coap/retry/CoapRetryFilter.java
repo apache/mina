@@ -60,11 +60,7 @@ public class CoapRetryFilter extends AbstractIoFilter {
     private Map<Integer, CoapTransmission> inFlight = new ConcurrentHashMap<>();
 
     /** The list of processed messages used to handle duplicate copies of Confirmable messages */
-    private ExpiringMap<Integer, CoapMessage> processed = new ExpiringMap<Integer, CoapMessage>();
-
-    public CoapRetryFilter() {
-        processed.start();
-    }
+    private ExpiringMap<Integer, CoapMessage> processed = new ExpiringMap<Integer, CoapMessage>(retryExecutor);
 
     /**
      * {@inheritDoc}
@@ -162,5 +158,13 @@ public class CoapRetryFilter extends AbstractIoFilter {
             break;
         }
 
+    }
+
+    /**
+     * clear the running executor
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        retryExecutor.shutdown();
     }
 }
