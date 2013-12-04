@@ -19,12 +19,13 @@
  */
 package org.apache.mina.coap.retry;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+import org.apache.mina.api.IoSession;
 import org.apache.mina.coap.CoapMessage;
 import org.apache.mina.coap.MessageType;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * Unit tests for {@link CoapTransmission}
@@ -36,8 +37,12 @@ public class CoapTransmissionTest {
 
     @Test
     public void timeout() {
-        CoapTransmission transmission = new CoapTransmission(new CoapMessage(1, MessageType.CONFIRMABLE, 1, 1234,
-                "token".getBytes(), null, "payload".getBytes()));
+
+        IoSession session = Mockito.mock(IoSession.class);
+        Mockito.when(session.getId()).thenReturn(1L);
+
+        CoapTransmission transmission = new CoapTransmission(session, new CoapMessage(1, MessageType.CONFIRMABLE, 1,
+                1234, "token".getBytes(), null, "payload".getBytes()));
 
         assertTrue(transmission.getNextTimeout() > MIN_INIT_TIMEOUT);
         assertTrue(transmission.getNextTimeout() < MAX_INIT_TIMEOUT);

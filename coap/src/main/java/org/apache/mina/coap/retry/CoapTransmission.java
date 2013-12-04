@@ -22,6 +22,7 @@ package org.apache.mina.coap.retry;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 
+import org.apache.mina.api.IoSession;
 import org.apache.mina.coap.CoapMessage;
 
 /**
@@ -44,6 +45,11 @@ public class CoapTransmission {
     private static final int MAX_RETRANSMIT = 4;
 
     /**
+     * The unique transmission identifier
+     */
+    private String id;
+
+    /**
      * The CoAP message waiting to be acknowledged
      */
     private CoapMessage message;
@@ -64,7 +70,8 @@ public class CoapTransmission {
      */
     private long nextTimeout;
 
-    public CoapTransmission(CoapMessage message) {
+    public CoapTransmission(IoSession session, CoapMessage message) {
+        this.id = uniqueId(session, message);
         this.message = message;
 
         this.transmissionCount = 0;
@@ -88,6 +95,10 @@ public class CoapTransmission {
         return false;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public CoapMessage getMessage() {
         return message;
     }
@@ -102,6 +113,13 @@ public class CoapTransmission {
 
     public long getNextTimeout() {
         return nextTimeout;
+    }
+
+    /**
+     * @return the unique identifier for a given message in a session.
+     */
+    public static String uniqueId(IoSession session, CoapMessage message) {
+        return session.getId() + "#" + message.requestId();
     }
 
 }

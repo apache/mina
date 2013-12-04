@@ -57,10 +57,10 @@ public class CoapRetryFilter extends AbstractIoFilter {
     private ScheduledExecutorService retryExecutor = Executors.newSingleThreadScheduledExecutor();
 
     /** The confirmable messages waiting to be acknowledged */
-    private Map<Integer, CoapTransmission> inFlight = new ConcurrentHashMap<>();
+    private Map<String, CoapTransmission> inFlight = new ConcurrentHashMap<>();
 
     /** The list of processed messages used to handle duplicate copies of Confirmable messages */
-    private ExpiringMap<Integer, CoapMessage> processed = new ExpiringMap<Integer, CoapMessage>(retryExecutor);
+    private ExpiringMap<String, CoapMessage> processed = new ExpiringMap<String, CoapMessage>(retryExecutor);
 
     /**
      * {@inheritDoc}
@@ -70,6 +70,7 @@ public class CoapRetryFilter extends AbstractIoFilter {
         LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session);
 
         CoapMessage coapMsg = (CoapMessage) in;
+        String transmissionId = CoapTransmission.uniqueId(session, coapMsg);
 
         switch (coapMsg.getType()) {
         case NON_CONFIRMABLE:
@@ -78,10 +79,10 @@ public class CoapRetryFilter extends AbstractIoFilter {
             break;
         case CONFIRMABLE:
             // check if this is a duplicate of a message already processed
-            CoapMessage ack = processed.get(coapMsg.requestId());
+            CoapMessage ack = processed.get(transmissionId);
             if (ack != null) {
                 // stop the filter chain and send again the ack since it was probably lost
-                LOGGER.debug("Duplicated messages detected for ID {}", coapMsg.requestId());
+                LOGGER.debug("Duplicated messages detected with ID {} in session {}", coapMsg.requestId(), session);
                 controller.callWriteMessageForRead(ack);
             } else {
                 controller.callReadNextFilter(coapMsg);
@@ -90,11 +91,11 @@ public class CoapRetryFilter extends AbstractIoFilter {
             break;
         case ACK:
         case RESET:
-            CoapTransmission t = inFlight.get(coapMsg.requestId());
+            CoapTransmission t = inFlight.get(transmissionId);
             if (t != null) {
                 // cancel the scheduled retransmission
                 t.getRetryFuture().cancel(false);
-                inFlight.remove(coapMsg.requestId());
+                inFlight.remove(transmissionId);
             }
             controller.callReadNextFilter(coapMsg);
             break;
@@ -110,7 +111,7 @@ public class CoapRetryFilter extends AbstractIoFilter {
         LOGGER.debug("Processing a MESSAGE_WRITING for session {}", session);
 
         final CoapMessage coapMsg = (CoapMessage) message.getMessage();
-        final Integer coapMsgId = (Integer) coapMsg.requestId();
+        final String transmissionId = CoapTransmission.uniqueId(session, coapMsg);
 
         switch (coapMsg.getType()) {
 
@@ -120,17 +121,17 @@ public class CoapRetryFilter extends AbstractIoFilter {
         case RESET:
         case ACK:
             // let's keep track of the message to avoid processing it again in case of duplicate copy.
-            processed.put(coapMsgId, coapMsg);
+            processed.put(transmissionId, coapMsg);
 
             controller.callWriteNextFilter(message);
             break;
 
         case CONFIRMABLE:
             // initialize a transmission if this is not a retry
-            CoapTransmission t = inFlight.get(coapMsgId);
+            CoapTransmission t = inFlight.get(transmissionId);
             if (t == null) {
-                t = new CoapTransmission(coapMsg);
-                inFlight.put(coapMsgId, t);
+                t = new CoapTransmission(session, coapMsg);
+                inFlight.put(t.getId(), t);
             }
 
             // schedule a retry
@@ -138,15 +139,15 @@ public class CoapRetryFilter extends AbstractIoFilter {
 
                 @Override
                 public void run() {
-                    CoapTransmission t = inFlight.get(coapMsgId);
+                    CoapTransmission t = inFlight.get(transmissionId);
 
                     // send again the message if the maximum number of attempts is not reached
                     if (t != null && t.timeout()) {
-                        LOGGER.debug("Retry for message with ID {}", coapMsgId);
+                        LOGGER.debug("Retry for message with ID {}", coapMsg.requestId());
                         session.write(coapMsg);
                     } else {
                         // abort transmission
-                        LOGGER.debug("No more retry for message with ID {}", coapMsgId);
+                        LOGGER.debug("No more retry for message with ID {}", coapMsg.requestId());
                     }
                 }
             }, t.getNextTimeout(), TimeUnit.MILLISECONDS);

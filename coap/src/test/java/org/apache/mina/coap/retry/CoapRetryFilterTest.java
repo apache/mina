@@ -19,6 +19,7 @@
  */
 package org.apache.mina.coap.retry;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import org.apache.mina.api.IoSession;
@@ -130,7 +131,7 @@ public class CoapRetryFilterTest {
         verify(writeController).callWriteNextFilter(writeRequest);
 
         // no retry
-        Mockito.verifyZeroInteractions(session);
+        verify(session, Mockito.never()).write(any(CoapMessage.class));
     }
 
     @Test
@@ -152,7 +153,7 @@ public class CoapRetryFilterTest {
         verify(writeController).callWriteNextFilter(writeRequest);
 
         // no retry
-        Mockito.verifyZeroInteractions(session);
+        verify(session, Mockito.never()).write(any(CoapMessage.class));
     }
 
     @Test
