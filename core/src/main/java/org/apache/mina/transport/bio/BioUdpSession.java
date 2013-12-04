@@ -80,6 +80,8 @@ public class BioUdpSession extends AbstractIoSession {
      */
     @Override
     public IoFuture<Void> close(boolean immediately) {
+        // remove the session of the list of managed sessions
+        ((BioUdpServer) getService()).destroy(this);
         processSessionClosed();
         return null;
     }

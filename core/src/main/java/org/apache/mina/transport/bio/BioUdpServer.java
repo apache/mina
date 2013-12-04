@@ -212,4 +212,9 @@ public class BioUdpServer extends AbstractUdpServer {
             }
         }
     }
+
+    /** remove a closed session from the list on managed sessions */
+    void destroy(BioUdpSession bioUdpSession) {
+        sessions.remove(bioUdpSession);
+    }
 }
