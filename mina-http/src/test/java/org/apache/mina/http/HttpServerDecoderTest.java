@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.DummySession;
@@ -160,6 +161,83 @@ public class HttpServerDecoderTest {
         AbstractProtocolDecoderOutput out = executeRequest("DELETE", "body");
         assertEquals(3, out.getMessageQueue().size());
         assertTrue(out.getMessageQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getMessageQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+    }
+    
+    @Test
+    public void testDIRMINA965NoContent() throws Exception {
+        AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
+            public void flush(NextFilter nextFilter, IoSession session) {
+            }
+        };
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("dummy\r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getMessageQueue().size());
+        assertTrue(out.getMessageQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+    }
+
+    @Test
+    public void testDIRMINA965WithContent() throws Exception {
+        AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
+            public void flush(NextFilter nextFilter, IoSession session) {
+            }
+        };
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("dummy\r\nContent-Length: 1\r\n\r\nA", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(3, out.getMessageQueue().size());
+        assertTrue(out.getMessageQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getMessageQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+    }
+    @Test
+    public void testDIRMINA965WithContentOnTwoChunks() throws Exception {
+        AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
+            public void flush(NextFilter nextFilter, IoSession session) {
+            }
+        };
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("dummy\r\nContent-Length: 2\r\n\r\nA", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("B", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(4, out.getMessageQueue().size());
+        assertTrue(out.getMessageQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getMessageQueue().poll() instanceof IoBuffer);
         assertTrue(out.getMessageQueue().poll() instanceof IoBuffer);
         assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
     }

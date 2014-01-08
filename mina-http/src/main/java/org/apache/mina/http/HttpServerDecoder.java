@@ -83,7 +83,6 @@ public class HttpServerDecoder implements ProtocolDecoder {
             // grab the stored a partial HEAD request
             final ByteBuffer oldBuffer = (ByteBuffer) session.getAttribute(PARTIAL_HEAD_ATT);
             // concat the old buffer and the new incoming one
-            IoBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg).flip();
             // now let's decode like it was a new message
             msg = IoBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg).flip();
         case NEW:
