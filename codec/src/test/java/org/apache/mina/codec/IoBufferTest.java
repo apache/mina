@@ -1020,7 +1020,7 @@ public class IoBufferTest {
     @Test
     public void testChar() {
         for (ByteOrder bo : new ByteOrder[] { ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN }) {
-            ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(3).order(bo).putChar('ë').rewind();
+            ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(3).order(bo).putChar('\u00EB').rewind();
             IoBuffer ioBuffer = IoBuffer.wrap(bb).order(bo);
 
             assertEquals(3, ioBuffer.capacity());
@@ -1029,18 +1029,18 @@ public class IoBufferTest {
             ioBuffer.order(bo);
             ioBuffer.position(2);
             assertEquals(4, ioBuffer.capacity());
-            ioBuffer.putChar('ü');
+            ioBuffer.putChar('\u00FC');
             ioBuffer.rewind();
 
-            assertEquals('ë', ioBuffer.getChar());
-            assertEquals('ü', ioBuffer.getChar());
+            assertEquals('\u00EB', ioBuffer.getChar());
+            assertEquals('\u00FC', ioBuffer.getChar());
             ioBuffer.rewind();
 
-            ioBuffer.putChar(1, 'ç');
-            assertEquals('ç', ioBuffer.getChar(1));
+            ioBuffer.putChar(1, '\u00E7');
+            assertEquals('\u00E7', ioBuffer.getChar(1));
 
             try {
-                ioBuffer.putChar(3, 'ñ');
+                ioBuffer.putChar(3, '\u00F1');
                 fail("Not enough place on the buffer");
             } catch (BufferUnderflowException e) {
                 // Should come here                
