@@ -22,7 +22,8 @@ package org.apache.mina.core;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.mina.core.BenchmarkFactory.Type;
+import org.apache.mina.core.nio.tcp.Mina3TcpBenchmarkClient;
+import org.apache.mina.core.nio.tcp.Mina3TcpBenchmarkServer;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -42,16 +43,16 @@ public class Mina3ClientVsMina3ServerTcpBenchmarkBinaryTest extends BenchmarkBin
      * {@inheritDoc}
      */
     @Override
-    public Type getClientType() {
-        return Type.Mina3_tcp;
+    public BenchmarkClient getClient() {
+        return new Mina3TcpBenchmarkClient();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Type getServerType() {
-        return Type.Mina3_tcp;
+    public BenchmarkServer getServer() {
+        return new Mina3TcpBenchmarkServer();
     }
 
     @Parameters(name = "{0} messages of size {1}")

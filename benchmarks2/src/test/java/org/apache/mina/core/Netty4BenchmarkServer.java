@@ -19,24 +19,28 @@
  */
 package org.apache.mina.core;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.util.AttributeKey;
+
 /**
- * Common interface for client and server factories
- * 
+ * A Netty 4 Server.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface BenchmarkFactory<T> {
-    /**
-     * The different types of providers
-     */
-    public enum Type {
-        Mina3_udp, Mina3_tcp, Netty4_tcp, Netty4_udp
+public abstract class Netty4BenchmarkServer implements BenchmarkServer {
+
+    protected static final AttributeKey<State> STATE_ATTRIBUTE = new AttributeKey<State>("state");
+
+    protected static final AttributeKey<Integer> LENGTH_ATTRIBUTE = new AttributeKey<Integer>("length");
+
+    protected static enum State {
+        WAIT_FOR_FIRST_BYTE_LENGTH, WAIT_FOR_SECOND_BYTE_LENGTH, WAIT_FOR_THIRD_BYTE_LENGTH, WAIT_FOR_FOURTH_BYTE_LENGTH, READING
     }
 
-    /**
-     * Allocate a provider.
-     * 
-     * @param type the provider type
-     * @return the allocated provider
-     */
-    public T get(Type type);
+    protected static final ByteBuf ACK = Unpooled.buffer(1);
+
+    static {
+        ACK.writeByte(0);
+    }
+
 }

@@ -22,7 +22,8 @@ package org.apache.mina.core;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.mina.core.BenchmarkFactory.Type;
+import org.apache.mina.core.nio.udp.Netty4UdpBenchmarkClient;
+import org.apache.mina.core.nio.udp.Netty4UdpBenchmarkServer;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -43,15 +44,15 @@ public class Netty4ClientVsNetty4ServerUdpBenchmarkBinaryTest extends BenchmarkB
     /** {@inheritDoc}
      */
     @Override
-    public Type getClientType() {
-        return Type.Netty4_udp;
+    public BenchmarkClient getClient() {
+        return new Netty4UdpBenchmarkClient();
     }
 
     /** {@inheritDoc}
      */
     @Override
-    public Type getServerType() {
-        return Type.Netty4_udp;
+    public BenchmarkServer getServer() {
+        return new Netty4UdpBenchmarkServer();
     }
 
     @Parameters(name = "{0} messages of size {1}")

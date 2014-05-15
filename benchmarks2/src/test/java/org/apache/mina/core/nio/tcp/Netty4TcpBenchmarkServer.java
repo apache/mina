@@ -21,7 +21,6 @@ package org.apache.mina.core.nio.tcp;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -31,31 +30,16 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
 
 import java.io.IOException;
 
-import org.apache.mina.core.BenchmarkServer;
+import org.apache.mina.core.Netty4BenchmarkServer;
 
 /**
- * A Netty 3 TCP Server.
+ * A Netty 4 TCP Server.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class Netty4TcpBenchmarkServer implements BenchmarkServer {
-
-    private static enum State {
-        WAIT_FOR_FIRST_BYTE_LENGTH, WAIT_FOR_SECOND_BYTE_LENGTH, WAIT_FOR_THIRD_BYTE_LENGTH, WAIT_FOR_FOURTH_BYTE_LENGTH, READING
-    }
-
-    private static final ByteBuf ACK = Unpooled.buffer(1);
-
-    static {
-        ACK.writeByte(0);
-    }
-
-    private static final AttributeKey<State> STATE_ATTRIBUTE = new AttributeKey<State>("state");
-
-    private static final AttributeKey<Integer> LENGTH_ATTRIBUTE = new AttributeKey<Integer>("length");
+public class Netty4TcpBenchmarkServer extends Netty4BenchmarkServer {
 
     private ServerBootstrap bootstrap = null;
 

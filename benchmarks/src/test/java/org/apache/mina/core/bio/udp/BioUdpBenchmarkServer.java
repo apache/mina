@@ -28,6 +28,7 @@ import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
+import org.apache.mina.core.CounterFilter;
 import org.apache.mina.core.nio.udp.Mina3UdpBenchmarkServer;
 import org.apache.mina.session.AttributeKey;
 import org.apache.mina.transport.bio.BioUdpServer;
@@ -141,7 +142,7 @@ public class BioUdpBenchmarkServer implements BenchmarkServer {
 
             @Override
             public void messageSent(IoSession session, Object message) {
-                //System.out.println("Server message sent :" + message);
+                CounterFilter.messageSent.getAndIncrement();
             }
 
             @Override

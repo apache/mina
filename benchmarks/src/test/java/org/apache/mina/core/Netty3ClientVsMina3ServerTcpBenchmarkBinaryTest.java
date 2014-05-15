@@ -22,7 +22,8 @@ package org.apache.mina.core;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.mina.core.BenchmarkFactory.Type;
+import org.apache.mina.core.nio.tcp.Mina3TcpBenchmarkServer;
+import org.apache.mina.core.nio.tcp.Netty3TcpBenchmarkClient;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -41,15 +42,15 @@ public class Netty3ClientVsMina3ServerTcpBenchmarkBinaryTest extends BenchmarkBi
     /** {@inheritDoc}
      */
     @Override
-    public Type getClientType() {
-        return Type.Netty3_tcp;
+    public BenchmarkClient getClient() {
+        return new Netty3TcpBenchmarkClient();
     }
 
     /** {@inheritDoc}
      */
     @Override
-    public Type getServerType() {
-        return Type.Mina3_tcp;
+    public BenchmarkServer getServer() {
+        return new Mina3TcpBenchmarkServer();
     }
 
     //TODO: analyze with Netty is so slow on large message: last test lower to 100 messages

@@ -29,7 +29,6 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.core.BenchmarkFactory.Type;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,9 +61,9 @@ public abstract class BenchmarkBinaryTest {
         this.timeout = timeout;
     }
 
-    public abstract Type getClientType();
+    public abstract BenchmarkClient getClient();
 
-    public abstract Type getServerType();
+    public abstract BenchmarkServer getServer();
 
     @Parameters(name = "{0} messages of size {1}")
     public static Collection<Object[]> getParameters() {
@@ -93,9 +92,9 @@ public abstract class BenchmarkBinaryTest {
     @Before
     public void init() throws IOException {
         port = getNextAvailable();
-        server = BenchmarkServerFactory.INSTANCE.get(getServerType());
+        server = getServer();
         server.start(port);
-        client = BenchmarkClientFactory.INSTANCE.get(getClientType());
+        client = getClient();
         data = new byte[messageSize + 4];
         data[0] = (byte) (messageSize >>> 24 & 255);
         data[1] = (byte) (messageSize >>> 16 & 255);

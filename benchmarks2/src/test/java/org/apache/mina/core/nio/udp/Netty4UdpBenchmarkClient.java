@@ -37,7 +37,7 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.mina.core.BenchmarkClient;
 
 /**
- * A Netty 3 based UDP client
+ * A Netty 4 based UDP client
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Netty4UdpBenchmarkClient implements BenchmarkClient {

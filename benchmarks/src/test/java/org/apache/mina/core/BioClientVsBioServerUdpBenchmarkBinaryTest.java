@@ -22,7 +22,8 @@ package org.apache.mina.core;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.mina.core.BenchmarkFactory.Type;
+import org.apache.mina.core.bio.udp.BioUdpBenchmarkClient;
+import org.apache.mina.core.bio.udp.BioUdpBenchmarkServer;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -42,16 +43,16 @@ public class BioClientVsBioServerUdpBenchmarkBinaryTest extends BenchmarkBinaryT
      * {@inheritDoc}
      */
     @Override
-    public Type getClientType() {
-        return Type.Bio_udp;
+    public BenchmarkClient getClient() {
+        return new BioUdpBenchmarkClient();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Type getServerType() {
-        return Type.Bio_udp;
+    public BenchmarkServer getServer() {
+        return new BioUdpBenchmarkServer();
     }
 
     @Parameters(name = "{0} messages of size {1}")
