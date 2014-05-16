@@ -30,4 +30,18 @@
   <artifactId>mina-benchmarks-common</artifactId>
   <name>Apache MINA Benchmarks against JDK and MINA tests</name>
 
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
