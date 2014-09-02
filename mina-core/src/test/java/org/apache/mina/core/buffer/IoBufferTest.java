@@ -1415,4 +1415,38 @@ public class IoBufferTest {
         assertEquals(0x0000000000008181L, buf.getUnsignedInt());
         assertEquals(0x0000000000000080L, buf.getUnsignedInt());
     }
+
+    /**
+     * Test the getSlice method (even if we haven't flipped the buffer
+     */
+    @Test
+    public void testGetSlice() {
+        IoBuffer buf = IoBuffer.allocate(36);
+
+        for (byte i = 0; i < 36; i++) {
+            buf.put(i);
+        }
+
+        IoBuffer res = buf.getSlice(1, 3);
+
+        // The limit should be 3, the pos should be 0 and the bytes read
+        // should be 0x01, 0x02 and 0x03
+        assertEquals(0, res.position());
+        assertEquals(3, res.limit());
+        assertEquals(0x01, res.get());
+        assertEquals(0x02, res.get());
+        assertEquals(0x03, res.get());
+
+        // Now test after a flip
+        buf.flip();
+
+        res = buf.getSlice(1, 3);
+        // The limit should be 3, the pos should be 0 and the bytes read
+        // should be 0x01, 0x02 and 0x03
+        assertEquals(0, res.position());
+        assertEquals(3, res.limit());
+        assertEquals(0x01, res.get());
+        assertEquals(0x02, res.get());
+        assertEquals(0x03, res.get());
+    }
 }

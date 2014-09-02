@@ -1193,12 +1193,12 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         }
 
         clear();
-        position(index);
         limit(endIndex);
+        position(index);
 
         IoBuffer slice = slice();
-        position(pos);
         limit(limit);
+        position(pos);
 
         return slice;
     }
@@ -2232,8 +2232,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         putInt(newPos - oldPos - 4);
         position(newPos);
         return this;
-    } 
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -2319,40 +2319,40 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public IoBuffer fill(byte value, int size) {
         autoExpand(size);
         int q = size >>> 3;
-        int r = size & 7;
+            int r = size & 7;
 
-        if (q > 0) {
-            int intValue = value | value << 8 | value << 16 | value << 24;
-            long longValue = intValue;
-            longValue <<= 32;
-            longValue |= intValue;
+            if (q > 0) {
+                int intValue = value | value << 8 | value << 16 | value << 24;
+                long longValue = intValue;
+                longValue <<= 32;
+                longValue |= intValue;
 
-            for (int i = q; i > 0; i--) {
-                putLong(longValue);
+                for (int i = q; i > 0; i--) {
+                    putLong(longValue);
+                }
             }
-        }
 
-        q = r >>> 2;
-        r = r & 3;
+            q = r >>> 2;
+                r = r & 3;
 
-        if (q > 0) {
-            int intValue = value | value << 8 | value << 16 | value << 24;
-            putInt(intValue);
-        }
+                if (q > 0) {
+                    int intValue = value | value << 8 | value << 16 | value << 24;
+                    putInt(intValue);
+                }
 
-        q = r >> 1;
-        r = r & 1;
+                q = r >> 1;
+                    r = r & 1;
 
-        if (q > 0) {
-            short shortValue = (short) (value | value << 8);
-            putShort(shortValue);
-        }
+                    if (q > 0) {
+                        short shortValue = (short) (value | value << 8);
+                        putShort(shortValue);
+                    }
 
-        if (r > 0) {
-            put(value);
-        }
+                    if (r > 0) {
+                        put(value);
+                    }
 
-        return this;
+                    return this;
     }
 
     /**
@@ -2377,31 +2377,31 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public IoBuffer fill(int size) {
         autoExpand(size);
         int q = size >>> 3;
-        int r = size & 7;
+                    int r = size & 7;
 
-        for (int i = q; i > 0; i--) {
-            putLong(0L);
-        }
+                    for (int i = q; i > 0; i--) {
+                        putLong(0L);
+                    }
 
-        q = r >>> 2;
-        r = r & 3;
+                    q = r >>> 2;
+                r = r & 3;
 
-        if (q > 0) {
-            putInt(0);
-        }
+                if (q > 0) {
+                    putInt(0);
+                }
 
-        q = r >> 1;
-        r = r & 1;
+                q = r >> 1;
+            r = r & 1;
 
-        if (q > 0) {
-            putShort((short) 0);
-        }
+            if (q > 0) {
+                putShort((short) 0);
+            }
 
-        if (r > 0) {
-            put((byte) 0);
-        }
+            if (r > 0) {
+                put((byte) 0);
+            }
 
-        return this;
+            return this;
     }
 
     /**
