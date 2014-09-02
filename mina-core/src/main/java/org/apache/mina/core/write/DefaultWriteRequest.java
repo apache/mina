@@ -32,6 +32,10 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultWriteRequest implements WriteRequest {
+    /** An empty message */
+    public static final byte[] EMPTY_MESSAGE = new byte[] {};
+
+    /** An empty FUTURE */
     private static final WriteFuture UNUSED_FUTURE = new WriteFuture() {
         public boolean isWritten() {
             return false;

@@ -445,7 +445,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
             if (future == null) {
                 // Creates an empty writeRequest containing the destination
-                WriteRequest writeRequest = new DefaultWriteRequest(null, null, destination);
+                WriteRequest writeRequest = new DefaultWriteRequest(
+                    DefaultWriteRequest.EMPTY_MESSAGE, null, destination);
                 future = DefaultWriteFuture.newNotWrittenFuture(session, new NothingWrittenException(writeRequest));
             }
 
