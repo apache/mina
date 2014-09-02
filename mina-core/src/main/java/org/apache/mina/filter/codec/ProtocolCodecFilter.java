@@ -21,6 +21,7 @@ package org.apache.mina.filter.codec;
 
 import java.net.SocketAddress;
 import java.util.Queue;
+import java.util.concurrent.Semaphore;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
@@ -65,8 +66,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
 
+    private final Semaphore lock = new Semaphore(1, true);
+
     /**
-     * 
      * Creates a new instance of ProtocolCodecFilter, associating a factory
      * for the creation of the encoder and decoder.
      *
@@ -225,13 +227,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         // data in the buffer
         while (in.hasRemaining()) {
             int oldPos = in.position();
-
             try {
-                synchronized (decoderOut) {
-                    // Call the decoder with the read bytes
-                    decoder.decode(session, in, decoderOut);
-                }
-
+                lock.acquire();
+                // Call the decoder with the read bytes
+                decoder.decode(session, in, decoderOut);
                 // Finish decoding if no exception was thrown.
                 decoderOut.flush(nextFilter, session);
             } catch (Throwable t) {
@@ -241,7 +240,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 } else {
                     pde = new ProtocolDecoderException(t);
                 }
-
                 if (pde.getHexdump() == null) {
                     // Generate a message hex dump
                     int curPos = in.position();
@@ -249,11 +247,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                     pde.setHexdump(in.getHexDump());
                     in.position(curPos);
                 }
-
                 // Fire the exceptionCaught event.
                 decoderOut.flush(nextFilter, session);
                 nextFilter.exceptionCaught(session, pde);
-
                 // Retry only if the type of the caught exception is
                 // recoverable and the buffer position has changed.
                 // We check buffer position additionally to prevent an
@@ -261,6 +257,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 if (!(t instanceof RecoverableProtocolDecoderException) || (in.position() == oldPos)) {
                     break;
                 }
+            } finally {
+                lock.release();
             }
         }
     }
@@ -446,7 +444,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             if (future == null) {
                 // Creates an empty writeRequest containing the destination
                 WriteRequest writeRequest = new DefaultWriteRequest(
-                    DefaultWriteRequest.EMPTY_MESSAGE, null, destination);
+                        DefaultWriteRequest.EMPTY_MESSAGE, null, destination);
                 future = DefaultWriteFuture.newNotWrittenFuture(session, new NothingWrittenException(writeRequest));
             }
 

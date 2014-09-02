@@ -19,8 +19,8 @@
  */
 package org.apache.mina.filter.codec;
 
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A {@link ProtocolDecoderOutput} based on queue.
@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOutput {
-    private final Queue<Object> messageQueue = new ConcurrentLinkedQueue<Object>();
+    private final Queue<Object> messageQueue = new LinkedList<Object>();
 
     public AbstractProtocolDecoderOutput() {
         // Do nothing
