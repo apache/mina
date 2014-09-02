@@ -274,7 +274,7 @@ public class TextLineDecoder implements ProtocolDecoder {
                         CharsetDecoder decoder = ctx.getDecoder();
 
                         CharBuffer buffer = decoder.decode(ByteBuffer.wrap(data));
-                        String str = new String(buffer.array());
+                        String str = buffer.toString();
                         writeText(session, str, out);
                     } finally {
                         buf.clear();
@@ -372,7 +372,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     /**
-     * A Context used during the decoding of a lin. It stores the decoder, 
+     * A Context used during the decoding of a lin. It stores the decoder,
      * the temporary buffer containing the decoded line, and other status flags.
      *
      * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
