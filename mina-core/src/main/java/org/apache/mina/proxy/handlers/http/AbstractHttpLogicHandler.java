@@ -372,7 +372,7 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
         }
 
         // Status code is 3 digits
-        if (statusLine[1].matches("^\\d\\d\\d")) {
+        if (!statusLine[1].matches("^\\d\\d\\d")) {
             throw new Exception("Invalid response code (" + statusLine[1] + "). Response: " + response);
         }
 
