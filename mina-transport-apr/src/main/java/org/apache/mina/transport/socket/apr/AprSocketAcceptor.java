@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.apr;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -363,5 +364,10 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
      */
     private void throwException(int code) throws IOException {
         throw new IOException(org.apache.tomcat.jni.Error.strerror(-code) + " (code: " + code + ")");
+    }
+
+    @Override
+    protected void init(SelectorProvider selectorProvider) throws Exception {
+        init();
     }
 }

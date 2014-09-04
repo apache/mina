@@ -28,6 +28,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
@@ -51,6 +52,7 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     implements SocketAcceptor {
 
     private volatile Selector selector;
+    private volatile SelectorProvider selectorProvider = null;
 
     /**
      * Constructor for {@link NioSocketAcceptor} using default parameters (multiple thread model).
@@ -96,11 +98,40 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     }
 
     /**
+     * Constructor for {@link NioSocketAcceptor} using default parameters, and
+     * given number of {@link NioProcessor} for multithreading I/O operations, and
+     * a custom SelectorProvider for NIO
+     *
+     * @param processorCount the number of processor to create and place in a
+     * @param selectorProvider teh SelectorProvider to use
+     * {@link SimpleIoProcessorPool}
+     */
+    public NioSocketAcceptor(int processorCount, SelectorProvider selectorProvider) {
+        super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount, selectorProvider);
+        ((DefaultSocketSessionConfig) getSessionConfig()).init(this);
+        this.selectorProvider = selectorProvider;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected void init() throws Exception {
         selector = Selector.open();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void init(SelectorProvider selectorProvider) throws Exception {
+        this.selectorProvider = selectorProvider;
+
+        if (selectorProvider == null) {
+            selector = Selector.open();
+        } else {
+            selector = selectorProvider.openSelector();
+        }
     }
 
     /**
@@ -149,7 +180,11 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     @Override
     protected NioSession accept(IoProcessor<NioSession> processor, ServerSocketChannel handle) throws Exception {
 
-        SelectionKey key = handle.keyFor(selector);
+        SelectionKey key = null;
+
+        if (handle != null) {
+            key = handle.keyFor(selector);
+        }
 
         if ((key == null) || (!key.isValid()) || (!key.isAcceptable())) {
             return null;
@@ -171,7 +206,14 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     @Override
     protected ServerSocketChannel open(SocketAddress localAddress) throws Exception {
         // Creates the listening ServerSocket
-        ServerSocketChannel channel = ServerSocketChannel.open();
+
+        ServerSocketChannel channel = null;
+
+        if (selectorProvider != null) {
+            channel = selectorProvider.openServerSocketChannel();
+        } else {
+            channel = ServerSocketChannel.open();
+        }
 
         boolean success = false;
 

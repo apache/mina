@@ -26,6 +26,7 @@ import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -45,6 +46,8 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     /** The selector associated with this processor */
     private Selector selector;
 
+    private SelectorProvider selectorProvider = null;
+
     /**
      *
      * Creates a new instance of NioProcessor.
@@ -57,6 +60,28 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         try {
             // Open a new selector
             selector = Selector.open();
+        } catch (IOException e) {
+            throw new RuntimeIoException("Failed to open a selector.", e);
+        }
+    }
+
+    /**
+     *
+     * Creates a new instance of NioProcessor.
+     *
+     * @param executor
+     */
+    public NioProcessor(Executor executor, SelectorProvider selectorProvider) {
+        super(executor);
+
+        try {
+            // Open a new selector
+            if (selectorProvider == null) {
+                selector = Selector.open();
+            } else {
+                selector = selectorProvider.openSelector();
+            }
+
         } catch (IOException e) {
             throw new RuntimeIoException("Failed to open a selector.", e);
         }
@@ -127,7 +152,13 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             Set<SelectionKey> keys = selector.keys();
 
             // Open a new selector
-            Selector newSelector = Selector.open();
+            Selector newSelector = null;
+
+            if (selectorProvider == null) {
+               newSelector = Selector.open();
+            } else {
+                newSelector = selectorProvider.openSelector();
+            }
 
             // Loop on all the registered keys, and register them on the new selector
             for (SelectionKey key : keys) {

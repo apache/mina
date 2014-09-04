@@ -20,6 +20,7 @@
 package org.apache.mina.core.service;
 
 import java.lang.reflect.Constructor;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -111,7 +112,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
      * @param processorType The type of IoProcessor to use
      */
     public SimpleIoProcessorPool(Class<? extends IoProcessor<S>> processorType) {
-        this(processorType, null, DEFAULT_SIZE);
+        this(processorType, null, DEFAULT_SIZE, null);
     }
 
     /**
@@ -122,7 +123,19 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
      * @param size The number of IoProcessor in the pool
      */
     public SimpleIoProcessorPool(Class<? extends IoProcessor<S>> processorType, int size) {
-        this(processorType, null, size);
+        this(processorType, null, size, null);
+    }
+
+    /**
+     * Creates a new instance of SimpleIoProcessorPool with a defined
+     * number of IoProcessors in the pool
+     *
+     * @param processorType The type of IoProcessor to use
+     * @param size The number of IoProcessor in the pool
+     * @param selectorProvider The SelectorProvider to use
+     */
+    public SimpleIoProcessorPool(Class<? extends IoProcessor<S>> processorType, int size, SelectorProvider selectorProvider) {
+        this(processorType, null, size, selectorProvider);
     }
 
     /**
@@ -132,7 +145,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
      * @param executor The {@link Executor}
      */
     public SimpleIoProcessorPool(Class<? extends IoProcessor<S>> processorType, Executor executor) {
-        this(processorType, executor, DEFAULT_SIZE);
+        this(processorType, executor, DEFAULT_SIZE, null);
     }
 
     /**
@@ -143,7 +156,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
      * @param size The number of IoProcessor in the pool
      */
     @SuppressWarnings("unchecked")
-    public SimpleIoProcessorPool(Class<? extends IoProcessor<S>> processorType, Executor executor, int size) {
+    public SimpleIoProcessorPool(Class<? extends IoProcessor<S>> processorType, Executor executor, int size, SelectorProvider selectorProvider) {
         if (processorType == null) {
             throw new IllegalArgumentException("processorType");
         }
@@ -178,8 +191,13 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
                 } catch (NoSuchMethodException e1) {
                     // To the next step...
                     try {
-                        processorConstructor = processorType.getConstructor(Executor.class);
-                        pool[0] = processorConstructor.newInstance(this.executor);
+                        if(selectorProvider==null) {
+                            processorConstructor = processorType.getConstructor(Executor.class);
+                            pool[0] = processorConstructor.newInstance(this.executor);
+                        } else {
+                            processorConstructor = processorType.getConstructor(Executor.class, SelectorProvider.class);
+                            pool[0] = processorConstructor.newInstance(this.executor,selectorProvider);
+                        }
                     } catch (NoSuchMethodException e2) {
                         // To the next step...
                         try {
@@ -213,7 +231,11 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
             for (int i = 1; i < pool.length; i++) {
                 try {
                     if (usesExecutorArg) {
-                        pool[i] = processorConstructor.newInstance(this.executor);
+                        if(selectorProvider==null) {
+                            pool[i] = processorConstructor.newInstance(this.executor);
+                        } else {
+                            pool[i] = processorConstructor.newInstance(this.executor, selectorProvider);
+                        }
                     } else {
                         pool[i] = processorConstructor.newInstance();
                     }
