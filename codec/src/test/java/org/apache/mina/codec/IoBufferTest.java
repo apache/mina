@@ -152,12 +152,12 @@ public class IoBufferTest {
         ioBuffer.add(bb1, bb2);
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Test the allocate(int) method
     // 1) allocation with a negative value
     // 2) allocation with a 0 length
     // 3) allocation with a 1024 value
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     /**
      * Test the allocation of a new heap IoBuffer with a negative value
      */
@@ -194,12 +194,12 @@ public class IoBufferTest {
         assertTrue(ioBuffer.hasRemaining());
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Test the allocateDirect(int) method. We check :
     // 1) allocation with a negative value
     // 2) allocation with a 0 length
     // 3) allocation with a 1024 value
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     /**
      * Test the allocation of a new heap IoBuffer with a negative value
      */
@@ -237,7 +237,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the get() method on a IoBuffer containing one ByteBuffer with 3 bytes
+     * Test the get() method on a IoBuffer containing one ByteBuffer with 3
+     * bytes
      */
     @Test
     public void testGetOneBuffer3Bytes() {
@@ -267,7 +268,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the get() method on a IoBuffer containing one ByteBuffer with 0 bytes
+     * Test the get() method on a IoBuffer containing one ByteBuffer with 0
+     * bytes
      */
     @Test
     public void testGetOneBuffer0Bytes() {
@@ -288,7 +290,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the get() method on a IoBuffer containing two ByteBuffer with 3 bytes
+     * Test the get() method on a IoBuffer containing two ByteBuffer with 3
+     * bytes
      */
     @Test
     public void testGetTwoBuffer3Bytes() {
@@ -328,13 +331,13 @@ public class IoBufferTest {
         }
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Test the array() method. We will check those cases :
     // 1) array over an empty buffer: we should get an empty byte array
-    // 2) array over a buffer with one single empty ByteBuffer 
+    // 2) array over a buffer with one single empty ByteBuffer
     // 3) array over a buffer with one single ByteBuffer with data
-    // 4) array over a buffer containing many ByteBuffers 
-    //-------------------------------------------------------------------------
+    // 4) array over a buffer containing many ByteBuffers
+    // -------------------------------------------------------------------------
     /**
      * Test the array method for a IoBuffer containing one empty ByteBuffer
      */
@@ -349,7 +352,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the array method for a IoBuffer containing one ByteBuffer (cases 2 and 3)
+     * Test the array method for a IoBuffer containing one ByteBuffer (cases 2
+     * and 3)
      */
     @Test
     public void testArrayOneByteBuffer() {
@@ -374,7 +378,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the array method for a IoBuffer containing one ByteBuffer not initialized
+     * Test the array method for a IoBuffer containing one ByteBuffer not
+     * initialized
      */
     @Test
     public void testArrayByteBufferNotInitialized() {
@@ -403,7 +408,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the getInt() method, on a buffer containing 2 ints in two ByteBuffers
+     * Test the getInt() method, on a buffer containing 2 ints in two
+     * ByteBuffers
      */
     @Test
     public void testGetInt2Ints2BBs() {
@@ -422,8 +428,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the getInt() method, on a buffer containing 2 ints in two ByteBuffers
-     * with LittleInidan order
+     * Test the getInt() method, on a buffer containing 2 ints in two
+     * ByteBuffers with LittleInidan order
      */
     @Test
     public void testGetInt2Ints2BBsLittleIndian() {
@@ -445,7 +451,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the getInt() method, on a buffer containing 1 int spread in two ByteBuffers
+     * Test the getInt() method, on a buffer containing 1 int spread in two
+     * ByteBuffers
      */
     @Test
     public void testGetInt1Int2BBs() {
@@ -463,7 +470,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the getInt() method, on a buffer containing 1 incomplet int spread in two ByteBuffers
+     * Test the getInt() method, on a buffer containing 1 incomplet int spread
+     * in two ByteBuffers
      */
     @Test(expected = BufferUnderflowException.class)
     public void testGetIntIncompletInt2BBs() {
@@ -542,14 +550,14 @@ public class IoBufferTest {
         }
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // The the clear method. It will erase all the data in all the inner
     // ByteBuffer, thus the buffer size might increase.
     // We will check those case :
     // 1) clear an empty buffer
     // 2) clear a buffer with one ByteBuffer
     // 3) clear a buffer with numerous ByteBuffers
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     /**
      * Test the clear() method
      */
@@ -601,6 +609,18 @@ public class IoBufferTest {
         ioBuffer.position(3);
         ioBuffer.mark();
 
+        // check that we are at the right position
+        byte b = ioBuffer.get();
+        assertEquals(b, '3');
+
+        b = ioBuffer.get();
+        assertEquals(b, '4');
+
+        // Now reset to the mark
+        ioBuffer.reset();
+        b = ioBuffer.get();
+        assertEquals(b, '3');
+
         ioBuffer.position(6);
         ioBuffer.reset();
 
@@ -614,7 +634,7 @@ public class IoBufferTest {
             ioBuffer.reset();
             fail("An InvalidMarkException should have been thrown");
         } catch (InvalidMarkException ime) {
-            // 
+            //
         }
     }
 
@@ -645,13 +665,13 @@ public class IoBufferTest {
         assertEquals(8, ioBuffer.limit());
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Test the position() method
-    // We will test that the position() metho returns the correct result in 
+    // We will test that the position() metho returns the correct result in
     // those cases :
     // 1) the buffer is empty : must return 0
     // 2) must return a value between 0 and limit()
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     /**
      * Test the position method over an emptyIoBuffer
      */
@@ -716,19 +736,19 @@ public class IoBufferTest {
         }
     }
 
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Test the position(int) method
     // We will test many different cases
     // 1) a position() in an empty buffer
     // 2) a position() with a negative value
     // 3) a position() with a value above the limit
     // 4) a position() within the current buffer
-    //  4-1) at the beginning of the current buffer
-    //  4-2) at the end of the current buffer
-    //  4-3) in the middle of the current buffer
+    // 4-1) at the beginning of the current buffer
+    // 4-2) at the end of the current buffer
+    // 4-3) in the middle of the current buffer
     // 5) a position() before the current buffer
     // 6) a position() after the current buffer
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     /**
      * Test the position method over an emptyIoBuffer
      */
@@ -1043,7 +1063,7 @@ public class IoBufferTest {
                 ioBuffer.putChar(3, '\u00F1');
                 fail("Not enough place on the buffer");
             } catch (BufferUnderflowException e) {
-                // Should come here                
+                // Should come here
             }
 
             try {
