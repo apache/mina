@@ -28,14 +28,18 @@ import java.nio.InvalidMarkException;
 import java.nio.ReadOnlyBufferException;
 
 /**
- * A proxy class used to manage ByteBuffers as if they were just a big ByteBuffer. We can add as many buffers as needed
- * when accumulating data. From the user point of view, the methods are the very same as ByteBuffer provides.
- *
- * <p>IoBuffer instances are *not* thread safe.
- *
- * <p>The IoBuffer uses a singly linked list to handle the multiple Buffers. Thus sequential access is
- * very efficient and random access is not. It fits well with the common usage patterns of IoBuffer.
- *
+ * A proxy class used to manage ByteBuffers as if they were just a big
+ * ByteBuffer. We can add as many buffers as needed when accumulating data. From
+ * the user point of view, the methods are the very same as ByteBuffer provides.
+ * 
+ * <p>
+ * IoBuffer instances are *not* thread safe.
+ * 
+ * <p>
+ * The IoBuffer uses a singly linked list to handle the multiple Buffers. Thus
+ * sequential access is very efficient and random access is not. It fits well
+ * with the common usage patterns of IoBuffer.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class IoBuffer {
@@ -87,7 +91,8 @@ public final class IoBuffer {
     /**
      * Wraps ByteBuffers into a new IoBuffer
      * 
-     * @param buffers the ByteBuffers to wrap
+     * @param buffers
+     *            the ByteBuffers to wrap
      * @return the new {@link IoBuffer}
      */
     public static IoBuffer wrap(ByteBuffer... buffers) {
@@ -127,7 +132,8 @@ public final class IoBuffer {
     /**
      * Add one or more ByteBuffer to the current IoBuffer
      * 
-     * @param buffers the ByteBuffers to add
+     * @param buffers
+     *            the ByteBuffers to add
      * @return the current {@link IoBuffer}
      */
     public IoBuffer add(ByteBuffer... buffers) {
@@ -167,9 +173,9 @@ public final class IoBuffer {
      * Provides an input stream which is actually reading the {@link IoBuffer}
      * instance.
      * <p>
-     * Further reads on the returned InputStream move the reading head of the {@link IoBuffer}
-     * instance used for it's creation
-     *
+     * Further reads on the returned InputStream move the reading head of the
+     * {@link IoBuffer} instance used for it's creation
+     * 
      * @return an input stream
      */
     public InputStream asInputStream() {
@@ -233,7 +239,8 @@ public final class IoBuffer {
     }
 
     /**
-     * Returns a copy of the current {@link IoBuffer}, with an independent copy of the position, limit and mark.
+     * Returns a copy of the current {@link IoBuffer}, with an independent copy
+     * of the position, limit and mark.
      * 
      * @return the copied {@link IoBuffer}
      */
@@ -311,7 +318,8 @@ public final class IoBuffer {
     /**
      * Extends the current IoBuffer capacity.
      * 
-     * @param size the number of bytes to extend the current IoBuffer 
+     * @param size
+     *            the number of bytes to extend the current IoBuffer
      * @return the current {@link IoBuffer}
      */
     public IoBuffer extend(int size) {
@@ -411,8 +419,8 @@ public final class IoBuffer {
     }
 
     /**
-    * @see ByteBuffer#getDouble()
-    */
+     * @see ByteBuffer#getDouble()
+     */
     public double getDouble() {
         return Double.longBitsToDouble(getLong());
     }
@@ -585,12 +593,14 @@ public final class IoBuffer {
     }
 
     /**
-     * Returns the byte order used by this IoBuffer when converting bytes from/to other primitive
-     * types.
+     * Returns the byte order used by this IoBuffer when converting bytes
+     * from/to other primitive types.
      * <p>
-     * The default byte order of byte buffer is always {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}
+     * The default byte order of byte buffer is always
+     * {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}
      * 
-     * @return the byte order used by this IoBuffer when converting bytes from/to other primitive types.
+     * @return the byte order used by this IoBuffer when converting bytes
+     *         from/to other primitive types.
      * 
      * @see ByteBuffer#order()
      */
@@ -601,8 +611,9 @@ public final class IoBuffer {
     /**
      * Sets the byte order of this IoBuffer.
      * 
-     * @param bo the byte order to set. If {@code null} then the order will be {@link ByteOrder#LITTLE_ENDIAN
-     *        LITTLE_ENDIAN}.
+     * @param bo
+     *            the byte order to set. If {@code null} then the order will be
+     *            {@link ByteOrder#LITTLE_ENDIAN LITTLE_ENDIAN}.
      * @return this IoBuffer.
      * @see ByteBuffer#order(ByteOrder)
      */
@@ -916,12 +927,12 @@ public final class IoBuffer {
         if (hasRemaining()) {
             tail.getBuffer().limit(limit.getPositionInNode());
             for (BufferNode node = position.getNode(); node != limit.getNode(); node = node.getNext()) {
-                if (node != head) { //NOSONAR, check if instances are the same. 
+                if (node != head) { // NOSONAR, check if instances are the same.
                     node.getBuffer().position(0);
                 }
                 out.add(node.getBuffer());
             }
-            if (tail != head) { //NOSONAR, check if instances are the same. 
+            if (tail != head) { // NOSONAR, check if instances are the same.
                 tail.getBuffer().position(0);
             }
             out.add(tail.getBuffer().slice());
@@ -1017,9 +1028,10 @@ public final class IoBuffer {
         }
 
         public void setPosition(int newPosition) {
-            if (node == null || newPosition < node.offset) {
+            if ((node == null) || (newPosition < node.offset)) {
                 node = head;
             }
+
             positionInBuffer = node == null ? 0 : newPosition - node.offset;
         }
 
