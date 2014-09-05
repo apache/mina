@@ -209,21 +209,28 @@ public class SslFilter extends IoFilterAdapter {
      * @throws SSLException if failed to start the SSL session
      */
     public boolean startSsl(IoSession session) throws SSLException {
-        SslHandler handler = getSslSessionHandler(session);
+        SslHandler sslHandler = getSslSessionHandler(session);
         boolean started;
-        synchronized (handler) {
-            if (handler.isOutboundDone()) {
-                NextFilter nextFilter = (NextFilter) session.getAttribute(NEXT_FILTER);
-                handler.destroy();
-                handler.init();
-                handler.handshake(nextFilter);
-                started = true;
-            } else {
-                started = false;
+
+        try {
+            synchronized (sslHandler) {
+                if (sslHandler.isOutboundDone()) {
+                    NextFilter nextFilter = (NextFilter) session.getAttribute(NEXT_FILTER);
+                    sslHandler.destroy();
+                    sslHandler.init();
+                    sslHandler.handshake(nextFilter);
+                    started = true;
+                } else {
+                    started = false;
+                }
             }
+
+            sslHandler.flushScheduledEvents();
+        } catch (SSLException se) {
+            sslHandler.release();
+            throw se;
         }
 
-        handler.flushScheduledEvents();
         return started;
     }
 
@@ -244,12 +251,12 @@ public class SslFilter extends IoFilterAdapter {
 
         sb.append('[').append(session.getId()).append(']');
 
-        SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
+        SslHandler sslHandler = (SslHandler) session.getAttribute(SSL_HANDLER);
 
-        if (handler == null) {
+        if (sslHandler == null) {
             sb.append("(no sslEngine)");
         } else if (isSslStarted(session)) {
-            if (handler.isHandshakeComplete()) {
+            if (sslHandler.isHandshakeComplete()) {
                 sb.append("(SSL)");
             } else {
                 sb.append("(ssl...)");
@@ -266,14 +273,14 @@ public class SslFilter extends IoFilterAdapter {
      * is sent and any messages written after then is not going to get encrypted.
      */
     public boolean isSslStarted(IoSession session) {
-        SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
+        SslHandler sslHandler = (SslHandler) session.getAttribute(SSL_HANDLER);
 
-        if (handler == null) {
+        if (sslHandler == null) {
             return false;
         }
 
-        synchronized (handler) {
-            return !handler.isOutboundDone();
+        synchronized (sslHandler) {
+            return !sslHandler.isOutboundDone();
         }
     }
 
@@ -286,14 +293,20 @@ public class SslFilter extends IoFilterAdapter {
      * @throws IllegalArgumentException if this filter is not managing the specified session
      */
     public WriteFuture stopSsl(IoSession session) throws SSLException {
-        SslHandler handler = getSslSessionHandler(session);
+        SslHandler sslHandler = getSslSessionHandler(session);
         NextFilter nextFilter = (NextFilter) session.getAttribute(NEXT_FILTER);
         WriteFuture future;
-        synchronized (handler) {
-            future = initiateClosure(nextFilter, session);
-        }
 
-        handler.flushScheduledEvents();
+        try {
+            synchronized (sslHandler) {
+                future = initiateClosure(nextFilter, session);
+            }
+
+            sslHandler.flushScheduledEvents();
+        } catch (SSLException se) {
+            sslHandler.release();
+            throw se;
+        }
 
         return future;
     }
@@ -409,9 +422,9 @@ public class SslFilter extends IoFilterAdapter {
         session.setAttribute(NEXT_FILTER, nextFilter);
 
         // Create a SSL handler and start handshake.
-        SslHandler handler = new SslHandler(this, session);
-        handler.init();
-        session.setAttribute(SSL_HANDLER, handler);
+        SslHandler sslHandler = new SslHandler(this, session);
+        sslHandler.init();
+        session.setAttribute(SSL_HANDLER, sslHandler);
     }
 
     @Override
@@ -432,14 +445,15 @@ public class SslFilter extends IoFilterAdapter {
     // IoFilter impl.
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session) throws SSLException {
-        SslHandler handler = getSslSessionHandler(session);
+        SslHandler sslHandler = getSslSessionHandler(session);
+
         try {
-            synchronized (handler) {
+            synchronized (sslHandler) {
                 // release resources
-                handler.destroy();
+                sslHandler.destroy();
             }
 
-            handler.flushScheduledEvents();
+            sslHandler.flushScheduledEvents();
         } finally {
             // notify closed session
             nextFilter.sessionClosed(session);
@@ -452,41 +466,44 @@ public class SslFilter extends IoFilterAdapter {
             LOGGER.debug("{}: Message received : {}", getSessionInfo(session), message);
         }
 
-        SslHandler handler = getSslSessionHandler(session);
+        SslHandler sslHandler = getSslSessionHandler(session);
 
-        synchronized (handler) {
-            if (!isSslStarted(session) && handler.isInboundDone()) {
+        synchronized (sslHandler) {
+            if (!isSslStarted(session) && sslHandler.isInboundDone()) {
                 // The SSL session must be established first before we
                 // can push data to the application. Store the incoming
                 // data into a queue for a later processing
-                handler.scheduleMessageReceived(nextFilter, message);
+                sslHandler.scheduleMessageReceived(nextFilter, message);
             } else {
                 IoBuffer buf = (IoBuffer) message;
 
                 try {
                     // forward read encrypted data to SSL handler
-                    handler.messageReceived(nextFilter, buf.buf());
+                    sslHandler.messageReceived(nextFilter, buf.buf());
 
                     // Handle data to be forwarded to application or written to net
-                    handleSslData(nextFilter, handler);
+                    handleSslData(nextFilter, sslHandler);
 
-                    if (handler.isInboundDone()) {
-                        if (handler.isOutboundDone()) {
-                            handler.destroy();
+                    if (sslHandler.isInboundDone()) {
+                        if (sslHandler.isOutboundDone()) {
+                            sslHandler.destroy();
                         } else {
                             initiateClosure(nextFilter, session);
                         }
 
                         if (buf.hasRemaining()) {
                             // Forward the data received after closure.
-                            handler.scheduleMessageReceived(nextFilter, buf);
+                            sslHandler.scheduleMessageReceived(nextFilter, buf);
                         }
                     }
                 } catch (SSLException ssle) {
-                    if (!handler.isHandshakeComplete()) {
+                    if (!sslHandler.isHandshakeComplete()) {
                         SSLException newSsle = new SSLHandshakeException("SSL handshake failed.");
                         newSsle.initCause(ssle);
                         ssle = newSsle;
+                    } else {
+                        // Free the SSL Handler buffers
+                        sslHandler.release();
                     }
 
                     throw ssle;
@@ -494,7 +511,7 @@ public class SslFilter extends IoFilterAdapter {
             }
         }
 
-        handler.flushScheduledEvents();
+        sslHandler.flushScheduledEvents();
     }
 
     @Override
@@ -516,6 +533,7 @@ public class SslFilter extends IoFilterAdapter {
             WriteToClosedSessionException e = (WriteToClosedSessionException) cause;
             List<WriteRequest> failedRequests = e.getRequests();
             boolean containsCloseNotify = false;
+
             for (WriteRequest r : failedRequests) {
                 if (isCloseNotify(r.getMessage())) {
                     containsCloseNotify = true;
@@ -530,6 +548,7 @@ public class SslFilter extends IoFilterAdapter {
                 }
 
                 List<WriteRequest> newFailedRequests = new ArrayList<WriteRequest>(failedRequests.size() - 1);
+
                 for (WriteRequest r : failedRequests) {
                     if (!isCloseNotify(r.getMessage())) {
                         newFailedRequests.add(r);
@@ -555,13 +574,14 @@ public class SslFilter extends IoFilterAdapter {
 
         IoBuffer buf = (IoBuffer) message;
         int offset = buf.position();
+
         return (buf.get(offset + 0) == 0x15) /* Alert */
                 && (buf.get(offset + 1) == 0x03) /* TLS/SSL */
                 && ((buf.get(offset + 2) == 0x00) /* SSL 3.0 */
                         || (buf.get(offset + 2) == 0x01) /* TLS 1.0 */
                         || (buf.get(offset + 2) == 0x02) /* TLS 1.1 */
-                || (buf.get(offset + 2) == 0x03)) /* TLS 1.2 */
-                && (buf.get(offset + 3) == 0x00); /* close_notify */
+                        || (buf.get(offset + 2) == 0x03)) /* TLS 1.2 */
+                        && (buf.get(offset + 3) == 0x00); /* close_notify */
     }
 
     @Override
@@ -571,49 +591,58 @@ public class SslFilter extends IoFilterAdapter {
         }
 
         boolean needsFlush = true;
-        SslHandler handler = getSslSessionHandler(session);
-        synchronized (handler) {
-            if (!isSslStarted(session)) {
-                handler.scheduleFilterWrite(nextFilter, writeRequest);
-            }
-            // Don't encrypt the data if encryption is disabled.
-            else if (session.containsAttribute(DISABLE_ENCRYPTION_ONCE)) {
-                // Remove the marker attribute because it is temporary.
-                session.removeAttribute(DISABLE_ENCRYPTION_ONCE);
-                handler.scheduleFilterWrite(nextFilter, writeRequest);
-            } else {
-                // Otherwise, encrypt the buffer.
-                IoBuffer buf = (IoBuffer) writeRequest.getMessage();
+        SslHandler sslHandler = getSslSessionHandler(session);
 
-                if (handler.isWritingEncryptedData()) {
-                    // data already encrypted; simply return buffer
-                    handler.scheduleFilterWrite(nextFilter, writeRequest);
-                } else if (handler.isHandshakeComplete()) {
-                    // SSL encrypt
-                    int pos = buf.position();
-                    handler.encrypt(buf.buf());
-                    buf.position(pos);
-                    IoBuffer encryptedBuffer = handler.fetchOutNetBuffer();
-                    handler.scheduleFilterWrite(nextFilter, new EncryptedWriteRequest(writeRequest, encryptedBuffer));
+        try {
+            synchronized (sslHandler) {
+                if (!isSslStarted(session)) {
+                    sslHandler.scheduleFilterWrite(nextFilter, writeRequest);
+                }
+                // Don't encrypt the data if encryption is disabled.
+                else if (session.containsAttribute(DISABLE_ENCRYPTION_ONCE)) {
+                    // Remove the marker attribute because it is temporary.
+                    session.removeAttribute(DISABLE_ENCRYPTION_ONCE);
+                    sslHandler.scheduleFilterWrite(nextFilter, writeRequest);
                 } else {
-                    if (session.isConnected()) {
-                        // Handshake not complete yet.
-                        handler.schedulePreHandshakeWriteRequest(nextFilter, writeRequest);
+                    // Otherwise, encrypt the buffer.
+                    IoBuffer buf = (IoBuffer) writeRequest.getMessage();
+
+                    if (sslHandler.isWritingEncryptedData()) {
+                        // data already encrypted; simply return buffer
+                        sslHandler.scheduleFilterWrite(nextFilter, writeRequest);
+                    } else if (sslHandler.isHandshakeComplete()) {
+                        // SSL encrypt
+                        int pos = buf.position();
+                        sslHandler.encrypt(buf.buf());
+                        buf.position(pos);
+                        IoBuffer encryptedBuffer = sslHandler.fetchOutNetBuffer();
+                        sslHandler.scheduleFilterWrite(nextFilter, new EncryptedWriteRequest(writeRequest,
+                                encryptedBuffer));
+                    } else {
+                        if (session.isConnected()) {
+                            // Handshake not complete yet.
+                            sslHandler.schedulePreHandshakeWriteRequest(nextFilter, writeRequest);
+                        }
+
+                        needsFlush = false;
                     }
-                    needsFlush = false;
                 }
             }
-        }
 
-        if (needsFlush) {
-            handler.flushScheduledEvents();
+            if (needsFlush) {
+                sslHandler.flushScheduledEvents();
+            }
+        } catch (SSLException se) {
+            sslHandler.release();
+            throw se;
         }
     }
 
     @Override
     public void filterClose(final NextFilter nextFilter, final IoSession session) throws SSLException {
-        SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
-        if (handler == null) {
+        SslHandler sslHandler = (SslHandler) session.getAttribute(SSL_HANDLER);
+
+        if (sslHandler == null) {
             // The connection might already have closed, or
             // SSL might have not started yet.
             nextFilter.filterClose(session);
@@ -621,8 +650,9 @@ public class SslFilter extends IoFilterAdapter {
         }
 
         WriteFuture future = null;
+
         try {
-            synchronized (handler) {
+            synchronized (sslHandler) {
                 if (isSslStarted(session)) {
                     future = initiateClosure(nextFilter, session);
                     future.addListener(new IoFutureListener<IoFuture>() {
@@ -633,7 +663,10 @@ public class SslFilter extends IoFilterAdapter {
                 }
             }
 
-            handler.flushScheduledEvents();
+            sslHandler.flushScheduledEvents();
+        } catch (SSLException se) {
+            sslHandler.release();
+            throw se;
         } finally {
             if (future == null) {
                 nextFilter.filterClose(session);
@@ -643,81 +676,92 @@ public class SslFilter extends IoFilterAdapter {
 
     private void initiateHandshake(NextFilter nextFilter, IoSession session) throws SSLException {
         LOGGER.debug("{} : Starting the first handshake", getSessionInfo(session));
-        SslHandler handler = getSslSessionHandler(session);
+        SslHandler sslHandler = getSslSessionHandler(session);
 
-        synchronized (handler) {
-            handler.handshake(nextFilter);
+        try {
+            synchronized (sslHandler) {
+                sslHandler.handshake(nextFilter);
+            }
+
+            sslHandler.flushScheduledEvents();
+        } catch (SSLException se) {
+            sslHandler.release();
+            throw se;
         }
-
-        handler.flushScheduledEvents();
     }
 
     private WriteFuture initiateClosure(NextFilter nextFilter, IoSession session) throws SSLException {
-        SslHandler handler = getSslSessionHandler(session);
+        SslHandler sslHandler = getSslSessionHandler(session);
+        WriteFuture future = null;
 
         // if already shut down
-        if (!handler.closeOutbound()) {
-            return DefaultWriteFuture.newNotWrittenFuture(session, new IllegalStateException(
-                    "SSL session is shut down already."));
-        }
+        try {
+            if (!sslHandler.closeOutbound()) {
+                return DefaultWriteFuture.newNotWrittenFuture(session, new IllegalStateException(
+                        "SSL session is shut down already."));
+            }
 
-        // there might be data to write out here?
-        WriteFuture future = handler.writeNetBuffer(nextFilter);
+            // there might be data to write out here?
+            future = sslHandler.writeNetBuffer(nextFilter);
 
-        if (future == null) {
-            future = DefaultWriteFuture.newWrittenFuture(session);
-        }
+            if (future == null) {
+                future = DefaultWriteFuture.newWrittenFuture(session);
+            }
 
-        if (handler.isInboundDone()) {
-            handler.destroy();
-        }
+            if (sslHandler.isInboundDone()) {
+                sslHandler.destroy();
+            }
 
-        if (session.containsAttribute(USE_NOTIFICATION)) {
-            handler.scheduleMessageReceived(nextFilter, SESSION_UNSECURED);
+            if (session.containsAttribute(USE_NOTIFICATION)) {
+                sslHandler.scheduleMessageReceived(nextFilter, SESSION_UNSECURED);
+            }
+        } catch (SSLException se) {
+            sslHandler.release();
+            throw se;
         }
 
         return future;
     }
 
     // Utilities
-    private void handleSslData(NextFilter nextFilter, SslHandler handler) throws SSLException {
+    private void handleSslData(NextFilter nextFilter, SslHandler sslHandler) throws SSLException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{}: Processing the SSL Data ", getSessionInfo(handler.getSession()));
+            LOGGER.debug("{}: Processing the SSL Data ", getSessionInfo(sslHandler.getSession()));
         }
 
         // Flush any buffered write requests occurred before handshaking.
-        if (handler.isHandshakeComplete()) {
-            handler.flushPreHandshakeEvents();
+        if (sslHandler.isHandshakeComplete()) {
+            sslHandler.flushPreHandshakeEvents();
         }
 
         // Write encrypted data to be written (if any)
-        handler.writeNetBuffer(nextFilter);
+        sslHandler.writeNetBuffer(nextFilter);
 
         // handle app. data read (if any)
-        handleAppDataRead(nextFilter, handler);
+        handleAppDataRead(nextFilter, sslHandler);
     }
 
-    private void handleAppDataRead(NextFilter nextFilter, SslHandler handler) {
+    private void handleAppDataRead(NextFilter nextFilter, SslHandler sslHandler) {
         // forward read app data
-        IoBuffer readBuffer = handler.fetchAppBuffer();
+        IoBuffer readBuffer = sslHandler.fetchAppBuffer();
 
         if (readBuffer.hasRemaining()) {
-            handler.scheduleMessageReceived(nextFilter, readBuffer);
+            sslHandler.scheduleMessageReceived(nextFilter, readBuffer);
         }
     }
 
     private SslHandler getSslSessionHandler(IoSession session) {
-        SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
+        SslHandler sslHandler = (SslHandler) session.getAttribute(SSL_HANDLER);
 
-        if (handler == null) {
+        if (sslHandler == null) {
             throw new IllegalStateException();
         }
 
-        if (handler.getSslFilter() != this) {
+        if (sslHandler.getSslFilter() != this) {
             throw new IllegalArgumentException("Not managed by this filter.");
         }
 
-        return handler;
+        return sslHandler;
     }
 
     /**

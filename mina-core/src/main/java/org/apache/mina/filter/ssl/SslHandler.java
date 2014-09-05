@@ -26,14 +26,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.filterchain.IoFilterEvent;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
+import org.apache.mina.core.filterchain.IoFilterEvent;
 import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoEventType;
@@ -218,18 +218,14 @@ class SslHandler {
         } catch (SSLException e) {
             // Ignore.
         } finally {
-            destroyOutNetBuffer();
+            outNetBuffer.free();
+            outNetBuffer = null;
         }
 
         sslEngine.closeOutbound();
         sslEngine = null;
 
         preHandshakeEventQueue.clear();
-    }
-
-    private void destroyOutNetBuffer() {
-        outNetBuffer.free();
-        outNetBuffer = null;
     }
 
     /**
@@ -281,7 +277,7 @@ class SslHandler {
 
         while ((scheduledWrite = preHandshakeEventQueue.poll()) != null) {
             sslFilter
-                    .filterWrite(scheduledWrite.getNextFilter(), session, (WriteRequest) scheduledWrite.getParameter());
+            .filterWrite(scheduledWrite.getNextFilter(), session, (WriteRequest) scheduledWrite.getParameter());
         }
     }
 
@@ -363,6 +359,7 @@ class SslHandler {
             if (inNetBuffer.hasRemaining()) {
                 inNetBuffer.compact();
             } else {
+                inNetBuffer.free();
                 inNetBuffer = null;
             }
 
@@ -376,7 +373,11 @@ class SslHandler {
             // is finished.
             int inNetBufferPosition = inNetBuffer == null ? 0 : inNetBuffer.position();
             buf.position(buf.position() - inNetBufferPosition);
-            inNetBuffer = null;
+
+            if (inNetBuffer != null) {
+                inNetBuffer.free();
+                inNetBuffer = null;
+            }
         }
     }
 
@@ -465,6 +466,7 @@ class SslHandler {
 
         createOutNetBuffer(0);
         SSLEngineResult result;
+
         for (;;) {
             result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
             if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
@@ -478,7 +480,9 @@ class SslHandler {
         if (result.getStatus() != SSLEngineResult.Status.CLOSED) {
             throw new SSLException("Improper close state: " + result);
         }
+
         outNetBuffer.flip();
+
         return true;
     }
 
@@ -591,7 +595,7 @@ class SslHandler {
 
             default:
                 String msg = "Invalid Handshaking State" + handshakeStatus
-                        + " while processing the Handshake for session " + session.getId();
+                + " while processing the Handshake for session " + session.getId();
                 LOGGER.error(msg);
                 throw new IllegalStateException(msg);
             }
@@ -658,7 +662,7 @@ class SslHandler {
             inNetBuffer.flip();
         }
 
-        if (inNetBuffer == null || !inNetBuffer.hasRemaining()) {
+        if ((inNetBuffer == null) || !inNetBuffer.hasRemaining()) {
             // Need more data.
             return SSLEngineResult.Status.BUFFER_UNDERFLOW;
         }
@@ -670,7 +674,8 @@ class SslHandler {
 
         // If handshake finished, no data was produced, and the status is still
         // ok, try to unwrap more
-        if (handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED && res.getStatus() == SSLEngineResult.Status.OK
+        if ((handshakeStatus == SSLEngineResult.HandshakeStatus.FINISHED)
+                && (res.getStatus() == SSLEngineResult.Status.OK)
                 && inNetBuffer.hasRemaining()) {
             res = unwrap();
 
@@ -678,6 +683,7 @@ class SslHandler {
             if (inNetBuffer.hasRemaining()) {
                 inNetBuffer.compact();
             } else {
+                inNetBuffer.free();
                 inNetBuffer = null;
             }
 
@@ -687,6 +693,7 @@ class SslHandler {
             if (inNetBuffer.hasRemaining()) {
                 inNetBuffer.compact();
             } else {
+                inNetBuffer.free();
                 inNetBuffer = null;
             }
         }
@@ -791,7 +798,22 @@ class SslHandler {
         sb.append(", ");
         sb.append("HandshakeComplete :").append(handshakeComplete).append(", ");
         sb.append(">");
+
         return sb.toString();
     }
 
+    /**
+     * Free the allocated buffers
+     */
+    /* no qualifier */void release() {
+        if (inNetBuffer != null) {
+            inNetBuffer.free();
+            inNetBuffer = null;
+        }
+
+        if (outNetBuffer != null) {
+            outNetBuffer.free();
+            outNetBuffer = null;
+        }
+    }
 }
