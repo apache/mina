@@ -90,7 +90,7 @@
   <properties>
     <!-- Dependencies versions ========================================== -->
     <version.junit>4.11</version.junit>
-    <version.log4j>2.0-beta9</version.log4j>
+    <version.log4j>2.0-rc1</version.log4j>
     <version.mockito-core>1.9.5</version.mockito-core>
     <version.slf4j.api>1.7.5</version.slf4j.api>
 
@@ -115,10 +115,9 @@
     <module>coap</module>
     <module>thrift</module>
     <module>protobuf</module>
-    <module>benchmarks</module>
-    <module>benchmarks2</module>
     <module>avro</module>
     <module>monitoring</module>
+    <module>benchmarks</module>
   </modules>
 
   <dependencyManagement>
@@ -154,6 +153,14 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>mina-coap</artifactId>
         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mina-benchmarks-common</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
       </dependency>
 
       <!-- Logging -->

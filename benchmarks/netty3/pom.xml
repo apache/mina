@@ -23,49 +23,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.mina</groupId>
-    <artifactId>mina-parent</artifactId>
+    <artifactId>mina-benchmarks</artifactId>
     <version>3.0.0-M3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>mina-benchmarks</artifactId>
-  <name>Apache MINA Benchmarks tests</name>
-  <packaging>pom</packaging>
-
-  <properties>
-     <!-- defined in order to run against a different MINA version -->
-     <mina.version>${project.version}</mina.version>
-     <netty3.version>3.6.6.Final</netty3.version>
-     <netty4.version>4.0.4.Final</netty4.version>
-  </properties>
-
-  <modules>
-    <module>common</module>
-    <module>netty3</module>
-    <module>netty4</module>
-  </modules>
+  <artifactId>mina-benchmarks-netty3</artifactId>
+  <name>Apache MINA Benchmarks against Netty3 tests</name>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mina-core</artifactId>
+      <artifactId>mina-benchmarks-common</artifactId>
       <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
 
     <dependency>
-     <groupId>org.slf4j</groupId>
-     <artifactId>slf4j-api</artifactId>
-     <scope>test</scope>
+      <groupId>io.netty</groupId>
+      <artifactId>netty</artifactId>
+      <version>${netty3.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <skip>${benchmarks.skip}</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
