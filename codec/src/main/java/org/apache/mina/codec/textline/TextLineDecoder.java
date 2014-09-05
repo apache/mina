@@ -49,42 +49,48 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
     private int bufferLength = 128;
 
     /**
-     * Creates a new instance with the current default {@link Charset} and {@link LineDelimiter#AUTO} delimiter.
+     * Creates a new instance with the current default {@link Charset} and
+     * {@link LineDelimiter#AUTO} delimiter.
      */
     public TextLineDecoder() {
         this(LineDelimiter.AUTO);
     }
 
     /**
-     * Creates a new instance with the current default {@link Charset} and the specified <tt>delimiter</tt>.
+     * Creates a new instance with the current default {@link Charset} and the
+     * specified <tt>delimiter</tt>.
      */
     public TextLineDecoder(String delimiter) {
         this(new LineDelimiter(delimiter));
     }
 
     /**
-     * Creates a new instance with the current default {@link Charset} and the specified <tt>delimiter</tt>.
+     * Creates a new instance with the current default {@link Charset} and the
+     * specified <tt>delimiter</tt>.
      */
     public TextLineDecoder(LineDelimiter delimiter) {
         this(Charset.defaultCharset(), delimiter);
     }
 
     /**
-     * Creates a new instance with the spcified <tt>charset</tt> and {@link LineDelimiter#AUTO} delimiter.
+     * Creates a new instance with the spcified <tt>charset</tt> and
+     * {@link LineDelimiter#AUTO} delimiter.
      */
     public TextLineDecoder(Charset charset) {
         this(charset, LineDelimiter.AUTO);
     }
 
     /**
-     * Creates a new instance with the spcified <tt>charset</tt> and the specified <tt>delimiter</tt>.
+     * Creates a new instance with the spcified <tt>charset</tt> and the
+     * specified <tt>delimiter</tt>.
      */
     public TextLineDecoder(Charset charset, String delimiter) {
         this(charset, new LineDelimiter(delimiter));
     }
 
     /**
-     * Creates a new instance with the specified <tt>charset</tt> and the specified <tt>delimiter</tt>.
+     * Creates a new instance with the specified <tt>charset</tt> and the
+     * specified <tt>delimiter</tt>.
      */
     public TextLineDecoder(Charset charset, LineDelimiter delimiter) {
         if (charset == null) {
@@ -107,16 +113,18 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
     }
 
     /**
-     * Returns the allowed maximum size of the line to be decoded. If the size of the line to be decoded exceeds this
-     * value, the decoder will throw a {@link BufferDataException}. The default value is <tt>1024</tt> (1KB).
+     * Returns the allowed maximum size of the line to be decoded. If the size
+     * of the line to be decoded exceeds this value, the decoder will throw a
+     * {@link BufferDataException}. The default value is <tt>1024</tt> (1KB).
      */
     public int getMaxLineLength() {
         return maxLineLength;
     }
 
     /**
-     * Sets the allowed maximum size of the line to be decoded. If the size of the line to be decoded exceeds this
-     * value, the decoder will throw a {@link BufferDataException}. The default value is <tt>1024</tt> (1KB).
+     * Sets the allowed maximum size of the line to be decoded. If the size of
+     * the line to be decoded exceeds this value, the decoder will throw a
+     * {@link BufferDataException}. The default value is <tt>1024</tt> (1KB).
      */
     public void setMaxLineLength(int maxLineLength) {
         if (maxLineLength <= 0) {
@@ -127,9 +135,11 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
     }
 
     /**
-     * Sets the default buffer size. This buffer is used in the Context to store the decoded line.
+     * Sets the default buffer size. This buffer is used in the Context to store
+     * the decoded line.
      * 
-     * @param bufferLength The default bufer size
+     * @param bufferLength
+     *            The default bufer size
      */
     public void setBufferLength(int bufferLength) {
         if (bufferLength <= 0) {
@@ -141,7 +151,8 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
     }
 
     /**
-     * Returns the allowed buffer size used to store the decoded line in the Context instance.
+     * Returns the allowed buffer size used to store the decoded line in the
+     * Context instance.
      */
     public int getBufferLength() {
         return bufferLength;
@@ -222,7 +233,7 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
 
                         CharsetDecoder decoder = ctx.getDecoder();
                         CharBuffer buffer = decoder.decode(buf);
-                        decoded = new String(buffer.array());
+                        decoded = buffer.toString();
                     } else {
                         int overflowPosition = ctx.getOverflowLength();
                         throw new IllegalStateException("Line is too long: " + overflowPosition);
@@ -313,10 +324,11 @@ public class TextLineDecoder implements ProtocolDecoder<ByteBuffer, String, Text
     }
 
     /**
-     * A Context used during the decoding of a lin. It stores the decoder, the temporary buffer containing the decoded
-     * line, and other status flags.
+     * A Context used during the decoding of a lin. It stores the decoder, the
+     * temporary buffer containing the decoded line, and other status flags.
      * 
-     * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+     * @author <a href="mailto:dev@directory.apache.org">Apache Directory
+     *         Project</a>
      * @version $Rev$, $Date$
      */
     public class Context {
