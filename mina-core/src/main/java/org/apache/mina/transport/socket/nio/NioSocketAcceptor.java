@@ -48,8 +48,8 @@ import org.apache.mina.transport.socket.SocketAcceptor;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel> 
-    implements SocketAcceptor {
+public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel>
+implements SocketAcceptor {
 
     private volatile Selector selector;
     private volatile SelectorProvider selectorProvider = null;
@@ -63,11 +63,11 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     }
 
     /**
-     * Constructor for {@link NioSocketAcceptor} using default parameters, and 
+     * Constructor for {@link NioSocketAcceptor} using default parameters, and
      * given number of {@link NioProcessor} for multithreading I/O operations.
      * 
      * @param processorCount the number of processor to create and place in a
-     * {@link SimpleIoProcessorPool} 
+     * {@link SimpleIoProcessorPool}
      */
     public NioSocketAcceptor(int processorCount) {
         super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
@@ -75,7 +75,7 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     }
 
     /**
-    *  Constructor for {@link NioSocketAcceptor} with default configuration but a
+     *  Constructor for {@link NioSocketAcceptor} with default configuration but a
      *  specific {@link IoProcessor}, useful for sharing the same processor over multiple
      *  {@link IoService} of the same type.
      * @param processor the processor to use for managing I/O events
@@ -86,8 +86,8 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     }
 
     /**
-     *  Constructor for {@link NioSocketAcceptor} with a given {@link Executor} for handling 
-     *  connection events and a given {@link IoProcessor} for handling I/O events, useful for 
+     *  Constructor for {@link NioSocketAcceptor} with a given {@link Executor} for handling
+     *  connection events and a given {@link IoProcessor} for handling I/O events, useful for
      *  sharing the same processor and executor over multiple {@link IoService} of the same type.
      * @param executor the executor for connection
      * @param processor the processor for I/O operations
@@ -228,7 +228,15 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
             socket.setReuseAddress(isReuseAddress());
 
             // and bind.
-            socket.bind(localAddress, getBacklog());
+            try {
+                socket.bind(localAddress, getBacklog());
+            } catch (IOException ioe) {
+                // Add some info regarding the address we try to bind to the
+                // message
+                String newMessage = "Error while binding on " + localAddress + "\n" + "original message : "
+                        + ioe.getMessage();
+                throw new IOException(newMessage, ioe.getCause());
+            }
 
             // Register the channel within the selector for ACCEPT event
             channel.register(selector, SelectionKey.OP_ACCEPT);
@@ -250,18 +258,18 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     }
 
     /**
-      * Check if we have at least one key whose corresponding channels is 
-      * ready for I/O operations.
-      *
-      * This method performs a blocking selection operation. 
-      * It returns only after at least one channel is selected, 
-      * this selector's wakeup method is invoked, or the current thread 
-      * is interrupted, whichever comes first.
-      * 
-      * @return The number of keys having their ready-operation set updated
-      * @throws IOException If an I/O error occurs
-      * @throws ClosedSelectorException If this selector is closed 
-      */
+     * Check if we have at least one key whose corresponding channels is
+     * ready for I/O operations.
+     *
+     * This method performs a blocking selection operation.
+     * It returns only after at least one channel is selected,
+     * this selector's wakeup method is invoked, or the current thread
+     * is interrupted, whichever comes first.
+     * 
+     * @return The number of keys having their ready-operation set updated
+     * @throws IOException If an I/O error occurs
+     * @throws ClosedSelectorException If this selector is closed
+     */
     @Override
     protected int select() throws Exception {
         return selector.select();
@@ -298,7 +306,7 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
     }
 
     /**
-     * Defines an iterator for the selected-key Set returned by the 
+     * Defines an iterator for the selected-key Set returned by the
      * selector.selectedKeys(). It replaces the SelectionKey operator.
      */
     private static class ServerSocketChannelIterator implements Iterator<ServerSocketChannel> {
@@ -309,7 +317,7 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
          * Build a SocketChannel iterator which will return a SocketChannel instead of
          * a SelectionKey.
          * 
-         * @param selectedKeys The selector selected-key set 
+         * @param selectedKeys The selector selected-key set
          */
         private ServerSocketChannelIterator(Collection<SelectionKey> selectedKeys) {
             iterator = selectedKeys.iterator();
@@ -317,7 +325,7 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
 
         /**
          * Tells if there are more SockectChannel left in the iterator
-         * @return <code>true</code> if there is at least one more 
+         * @return <code>true</code> if there is at least one more
          * SockectChannel object to read
          */
         public boolean hasNext() {
@@ -341,7 +349,7 @@ public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSessio
         }
 
         /**
-         * Remove the current SocketChannel from the iterator 
+         * Remove the current SocketChannel from the iterator
          */
         public void remove() {
             iterator.remove();
