@@ -25,6 +25,14 @@ package org.apache.mina.http.api;
 public enum HttpStatus {
 
     /**
+     * 100 - Continue
+     */
+    INFORMATIONAL_CONTINUE(100, "HTTP/1.1 100 Continue"),
+    /**
+     * 101 - Switching Protocols
+     */
+    INFORMATIONAL_SWITCHING_PROTOCOLS(101, "HTTP/1.1 101 Swtiching Protocols"),
+    /**
      * 200 - OK
      */
     SUCCESS_OK(200, "HTTP/1.1 200 OK"),
