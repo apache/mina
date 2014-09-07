@@ -235,7 +235,9 @@ implements SocketAcceptor {
                 // message
                 String newMessage = "Error while binding on " + localAddress + "\n" + "original message : "
                         + ioe.getMessage();
-                throw new IOException(newMessage, ioe.getCause());
+                Exception e = new IOException(newMessage);
+                e.initCause(ioe.getCause());
+                throw e;
             }
 
             // Register the channel within the selector for ACCEPT event
