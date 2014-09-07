@@ -45,7 +45,7 @@ public class Subnet {
 
     /**
      * Creates a subnet from CIDR notation. For example, the subnet
-     * 192.168.0.0/24 would be created using the {@link InetAddress}  
+     * 192.168.0.0/24 would be created using the {@link InetAddress}
      * 192.168.0.0 and the mask 24.
      * @param subnet The {@link InetAddress} of the subnet
      * @param mask The mask
@@ -70,7 +70,7 @@ public class Subnet {
         this.subnetMask = IP_MASK >> (mask - 1);
     }
 
-    /** 
+    /**
      * Converts an IP address into an integer
      */
     private int toInt(InetAddress inetAddress) {
@@ -84,7 +84,7 @@ public class Subnet {
     }
 
     /**
-     * Converts an IP address to a subnet using the provided 
+     * Converts an IP address to a subnet using the provided
      * mask
      * @param address The address to convert into a subnet
      * @return The subnet as an integer
@@ -99,6 +99,10 @@ public class Subnet {
      * @return True if the address is within this subnet, false otherwise
      */
     public boolean inSubnet(InetAddress address) {
+        if (address.isAnyLocalAddress()) {
+            return true;
+        }
+
         return toSubnet(address) == subnetInt;
     }
 
