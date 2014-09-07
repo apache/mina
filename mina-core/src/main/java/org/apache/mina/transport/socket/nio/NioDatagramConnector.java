@@ -19,11 +19,13 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.Executor;
 
 import org.apache.mina.core.polling.AbstractPollingIoConnector;
 import org.apache.mina.core.service.IoConnector;
@@ -39,7 +41,7 @@ import org.apache.mina.transport.socket.DefaultDatagramSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class NioDatagramConnector extends AbstractPollingIoConnector<NioSession, DatagramChannel> implements
-        DatagramConnector {
+DatagramConnector {
 
     /**
      * Creates a new instance.
@@ -63,9 +65,9 @@ public final class NioDatagramConnector extends AbstractPollingIoConnector<NioSe
     }
 
     /**
-     * Constructor for {@link NioDatagramConnector} with default configuration which will use a built-in 
-     * thread pool executor to manage the given number of processor instances. The processor class must have 
-     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a 
+     * Constructor for {@link NioDatagramConnector} with default configuration which will use a built-in
+     * thread pool executor to manage the given number of processor instances. The processor class must have
+     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a
      * no-arg constructor.
      * 
      * @param processorClass the processor class.
@@ -78,10 +80,10 @@ public final class NioDatagramConnector extends AbstractPollingIoConnector<NioSe
     }
 
     /**
-     * Constructor for {@link NioDatagramConnector} with default configuration with default configuration which will use a built-in 
-     * thread pool executor to manage the default number of processor instances. The processor class must have 
-     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a 
-     * no-arg constructor. The default number of instances is equal to the number of processor cores 
+     * Constructor for {@link NioDatagramConnector} with default configuration with default configuration which will use a built-in
+     * thread pool executor to manage the default number of processor instances. The processor class must have
+     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a
+     * no-arg constructor. The default number of instances is equal to the number of processor cores
      * in the system, plus one.
      * 
      * @param processorClass the processor class.
@@ -121,7 +123,21 @@ public final class NioDatagramConnector extends AbstractPollingIoConnector<NioSe
 
         try {
             if (localAddress != null) {
-                ch.socket().bind(localAddress);
+                try {
+                    ch.socket().bind(localAddress);
+                } catch (IOException ioe) {
+                    // Add some info regarding the address we try to bind to the
+                    // message
+                    String newMessage = "Error while binding on " + localAddress + "\n" + "original message : "
+                            + ioe.getMessage();
+                    Exception e = new IOException(newMessage);
+                    e.initCause(ioe.getCause());
+
+                    // and close the channel
+                    ch.close();
+
+                    throw e;
+                }
             }
 
             return ch;

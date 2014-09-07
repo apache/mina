@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -65,9 +66,9 @@ import org.apache.mina.util.ExceptionMonitor;
  * @org.apache.xbean.XBean
  */
 public final class NioDatagramAcceptor extends AbstractIoAcceptor implements DatagramAcceptor, IoProcessor<NioSession> {
-    /** 
+    /**
      * A session recycler that is used to retrieve an existing session, unless it's too old.
-     **/  
+     **/
     private static final IoSessionRecycler DEFAULT_RECYCLER = new ExpiringSessionRecycler();
 
     /**
@@ -690,21 +691,37 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     }
 
     protected DatagramChannel open(SocketAddress localAddress) throws Exception {
-        final DatagramChannel c = DatagramChannel.open();
+        final DatagramChannel ch = DatagramChannel.open();
         boolean success = false;
         try {
-            new NioDatagramSessionConfig(c).setAll(getSessionConfig());
-            c.configureBlocking(false);
-            c.socket().bind(localAddress);
-            c.register(selector, SelectionKey.OP_READ);
+            new NioDatagramSessionConfig(ch).setAll(getSessionConfig());
+            ch.configureBlocking(false);
+
+            try {
+                ch.socket().bind(localAddress);
+            } catch (IOException ioe) {
+                // Add some info regarding the address we try to bind to the
+                // message
+                String newMessage = "Error while binding on " + localAddress + "\n" + "original message : "
+                        + ioe.getMessage();
+                Exception e = new IOException(newMessage);
+                e.initCause(ioe.getCause());
+
+                // And close the channel
+                ch.close();
+
+                throw e;
+            }
+
+            ch.register(selector, SelectionKey.OP_READ);
             success = true;
         } finally {
             if (!success) {
-                close(c);
+                close(ch);
             }
         }
 
-        return c;
+        return ch;
     }
 
     protected SocketAddress receive(DatagramChannel handle, IoBuffer buffer) throws Exception {

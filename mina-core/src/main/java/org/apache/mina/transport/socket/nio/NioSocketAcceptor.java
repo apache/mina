@@ -237,6 +237,10 @@ implements SocketAcceptor {
                         + ioe.getMessage();
                 Exception e = new IOException(newMessage);
                 e.initCause(ioe.getCause());
+
+                // And close the channel
+                channel.close();
+
                 throw e;
             }
 

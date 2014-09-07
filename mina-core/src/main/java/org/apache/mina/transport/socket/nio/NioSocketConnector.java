@@ -19,6 +19,7 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
@@ -44,7 +45,7 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class NioSocketConnector extends AbstractPollingIoConnector<NioSession, SocketChannel> implements
-        SocketConnector {
+SocketConnector {
 
     private volatile Selector selector;
 
@@ -57,10 +58,10 @@ public final class NioSocketConnector extends AbstractPollingIoConnector<NioSess
     }
 
     /**
-     * Constructor for {@link NioSocketConnector} with default configuration, and 
+     * Constructor for {@link NioSocketConnector} with default configuration, and
      * given number of {@link NioProcessor} for multithreading I/O operations
      * @param processorCount the number of processor to create and place in a
-     * {@link SimpleIoProcessorPool} 
+     * {@link SimpleIoProcessorPool}
      */
     public NioSocketConnector(int processorCount) {
         super(new DefaultSocketSessionConfig(), NioProcessor.class, processorCount);
@@ -79,8 +80,8 @@ public final class NioSocketConnector extends AbstractPollingIoConnector<NioSess
     }
 
     /**
-     *  Constructor for {@link NioSocketConnector} with a given {@link Executor} for handling 
-     *  connection events and a given {@link IoProcessor} for handling I/O events, useful for sharing 
+     *  Constructor for {@link NioSocketConnector} with a given {@link Executor} for handling
+     *  connection events and a given {@link IoProcessor} for handling I/O events, useful for sharing
      *  the same processor and executor over multiple {@link IoService} of the same type.
      * @param executor the executor for connection
      * @param processor the processor for I/O operations
@@ -91,9 +92,9 @@ public final class NioSocketConnector extends AbstractPollingIoConnector<NioSess
     }
 
     /**
-     * Constructor for {@link NioSocketConnector} with default configuration which will use a built-in 
-     * thread pool executor to manage the given number of processor instances. The processor class must have 
-     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a 
+     * Constructor for {@link NioSocketConnector} with default configuration which will use a built-in
+     * thread pool executor to manage the given number of processor instances. The processor class must have
+     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a
      * no-arg constructor.
      * 
      * @param processorClass the processor class.
@@ -106,10 +107,10 @@ public final class NioSocketConnector extends AbstractPollingIoConnector<NioSess
     }
 
     /**
-     * Constructor for {@link NioSocketConnector} with default configuration with default configuration which will use a built-in 
-     * thread pool executor to manage the default number of processor instances. The processor class must have 
-     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a 
-     * no-arg constructor. The default number of instances is equal to the number of processor cores 
+     * Constructor for {@link NioSocketConnector} with default configuration with default configuration which will use a built-in
+     * thread pool executor to manage the default number of processor instances. The processor class must have
+     * a constructor that accepts ExecutorService or Executor as its single argument, or, failing that, a
+     * no-arg constructor. The default number of instances is equal to the number of processor cores
      * in the system, plus one.
      * 
      * @param processorClass the processor class.
@@ -238,14 +239,30 @@ public final class NioSocketConnector extends AbstractPollingIoConnector<NioSess
         SocketChannel ch = SocketChannel.open();
 
         int receiveBufferSize = (getSessionConfig()).getReceiveBufferSize();
+
         if (receiveBufferSize > 65535) {
             ch.socket().setReceiveBufferSize(receiveBufferSize);
         }
 
         if (localAddress != null) {
-            ch.socket().bind(localAddress);
+            try {
+                ch.socket().bind(localAddress);
+            } catch (IOException ioe) {
+                // Add some info regarding the address we try to bind to the
+                // message
+                String newMessage = "Error while binding on " + localAddress + "\n" + "original message : "
+                        + ioe.getMessage();
+                Exception e = new IOException(newMessage);
+                e.initCause(ioe.getCause());
+
+                // Preemptively close the channel
+                ch.close();
+                throw ioe;
+            }
         }
+
         ch.configureBlocking(false);
+
         return ch;
     }
 
