@@ -241,4 +241,58 @@ public class HttpServerDecoderTest {
         assertTrue(out.getMessageQueue().poll() instanceof IoBuffer);
         assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
     }
+    
+    @Test
+    public void verifyThatHeaderWithoutLeadingSpaceIsSupported() throws Exception {
+        AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
+            public void flush(NextFilter nextFilter, IoSession session) {
+            }
+        };
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost:localhost\r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getMessageQueue().size());
+        HttpRequest request = (HttpRequest) out.getMessageQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+    }
+
+    @Test
+    public void verifyThatLeadingSpacesAreRemovedFromHeader() throws Exception {
+        AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
+            public void flush(NextFilter nextFilter, IoSession session) {
+            }
+        };
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost:  localhost\r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getMessageQueue().size());
+        HttpRequest request = (HttpRequest) out.getMessageQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+    }
+
+    @Test
+    public void verifyThatTrailingSpacesAreRemovedFromHeader() throws Exception {
+        AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
+            public void flush(NextFilter nextFilter, IoSession session) {
+            }
+        };
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost:localhost  \r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getMessageQueue().size());
+        HttpRequest request = (HttpRequest) out.getMessageQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+    }
 }
