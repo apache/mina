@@ -211,6 +211,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         while (e != tail) {
             if (e.getFilter() == filter) {
                 deregister(e);
+
                 return;
             }
 
@@ -227,6 +228,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             if (filterType.isAssignableFrom(e.getFilter().getClass())) {
                 IoFilter oldFilter = e.getFilter();
                 deregister(e);
+
                 return oldFilter;
             }
 
@@ -445,8 +447,6 @@ public class DefaultIoFilterChain implements IoFilterChain {
     }
 
     public void fireMessageSent(WriteRequest request) {
-        session.increaseWrittenMessages(request, System.currentTimeMillis());
-
         try {
             request.getFuture().setWritten();
         } catch (Throwable t) {
@@ -689,6 +689,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         @Override
         public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
+
             try {
                 s.getHandler().exceptionCaught(s, cause);
             } finally {
@@ -701,6 +702,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         @Override
         public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
+
             if (!(message instanceof IoBuffer)) {
                 s.increaseReadMessages(System.currentTimeMillis());
             } else if (!((IoBuffer) message).hasRemaining()) {
@@ -718,6 +720,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
         @Override
         public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+            ((AbstractIoSession) session).increaseWrittenMessages(writeRequest, System.currentTimeMillis());
             session.getHandler().messageSent(session, writeRequest.getMessage());
         }
 

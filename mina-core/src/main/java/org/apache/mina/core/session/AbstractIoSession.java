@@ -236,7 +236,7 @@ public abstract class AbstractIoSession implements IoSession {
         // Always false...
         return false;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -865,8 +865,10 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public final void increaseWrittenMessages(WriteRequest request, long currentTime) {
         Object message = request.getMessage();
+
         if (message instanceof IoBuffer) {
             IoBuffer b = (IoBuffer) message;
+
             if (b.hasRemaining()) {
                 return;
             }
@@ -874,6 +876,7 @@ public abstract class AbstractIoSession implements IoSession {
 
         writtenMessages++;
         lastWriteTime = currentTime;
+
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).getStatistics().increaseWrittenMessages(currentTime);
         }
