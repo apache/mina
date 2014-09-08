@@ -424,6 +424,11 @@ public class SslFilter extends IoFilterAdapter {
         // Create a SSL handler and start handshake.
         SslHandler sslHandler = new SslHandler(this, session);
         sslHandler.init();
+
+        // Adding the supported ciphers in the SSLHandler
+        String[] ciphers = sslContext.getSupportedSSLParameters().getCipherSuites();
+
+        setEnabledCipherSuites(ciphers);
         session.setAttribute(SSL_HANDLER, sslHandler);
     }
 
