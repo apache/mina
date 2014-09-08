@@ -78,7 +78,7 @@ public abstract class AbstractBindTest {
         // Let's start from port #1 to detect possible resource leak
         // because test will fail in port 1-1023 if user run this test
         // as a normal user.
-        for (port = 1; port <= 65535; port++) {
+        for (port = 1024; port <= 65535; port++) {
             socketBound = false;
             try {
                 acceptor.setDefaultLocalAddress(createSocketAddress(port));
