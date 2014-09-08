@@ -761,10 +761,9 @@ public abstract class AbstractIoSession implements IoSession {
         int interval = (int) (currentTime - lastThroughputCalculationTime);
 
         long minInterval = getConfig().getThroughputCalculationIntervalInMillis();
-        if ((minInterval == 0) || (interval < minInterval)) {
-            if (!force) {
-                return;
-            }
+
+        if (((minInterval == 0) || (interval < minInterval)) && !force) {
+            return;
         }
 
         readBytesThroughput = (readBytes - lastReadBytes) * 1000.0 / interval;
