@@ -426,8 +426,9 @@ public class SslFilter extends IoFilterAdapter {
         sslHandler.init();
 
         // Adding the supported ciphers in the SSLHandler
-        String[] ciphers = sslContext.getSupportedSSLParameters().getCipherSuites();
-
+        // In Java 6, we should call sslContext.getSupportedSSLParameters()
+        // instead
+        String[] ciphers = sslContext.getServerSocketFactory().getSupportedCipherSuites();
         setEnabledCipherSuites(ciphers);
         session.setAttribute(SSL_HANDLER, sslHandler);
     }
