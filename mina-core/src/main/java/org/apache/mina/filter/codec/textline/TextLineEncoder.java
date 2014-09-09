@@ -36,7 +36,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class TextLineEncoder extends ProtocolEncoderAdapter {
-    private final AttributeKey ENCODER = new AttributeKey(getClass(), "encoder");
+    private static final AttributeKey ENCODER = new AttributeKey(TextLineEncoder.class, "encoder");
 
     private final Charset charset;
 

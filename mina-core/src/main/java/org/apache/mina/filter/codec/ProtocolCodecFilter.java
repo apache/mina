@@ -55,13 +55,13 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
     private static final IoBuffer EMPTY_BUFFER = IoBuffer.wrap(new byte[0]);
 
-    private final AttributeKey ENCODER = new AttributeKey(ProtocolCodecFilter.class, "encoder");
+    private static final AttributeKey ENCODER = new AttributeKey(ProtocolCodecFilter.class, "encoder");
 
-    private final AttributeKey DECODER = new AttributeKey(ProtocolCodecFilter.class, "decoder");
+    private static final AttributeKey DECODER = new AttributeKey(ProtocolCodecFilter.class, "decoder");
 
-    private final AttributeKey DECODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "decoderOut");
+    private static final AttributeKey DECODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "decoderOut");
 
-    private final AttributeKey ENCODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "encoderOut");
+    private static final AttributeKey ENCODER_OUT = new AttributeKey(ProtocolCodecFilter.class, "encoderOut");
 
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
