@@ -139,7 +139,7 @@ public class LoggingFilter extends IoFilterAdapter {
 
     /**
      * Log if the logger and the current event log level are compatible. We log
-     * a formated message and its parameters. 
+     * a formated message and its parameters.
      * 
      * @param eventLevel the event log level as requested by the user
      * @param message the formated message to log
@@ -169,7 +169,7 @@ public class LoggingFilter extends IoFilterAdapter {
 
     /**
      * Log if the logger and the current event log level are compatible. We log
-     * a simple message. 
+     * a simple message.
      * 
      * @param eventLevel the event log level as requested by the user
      * @param message the message to log
@@ -210,7 +210,7 @@ public class LoggingFilter extends IoFilterAdapter {
 
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-        log(messageSentLevel, "SENT: {}", writeRequest.getMessage());
+        log(messageSentLevel, "SENT: {}", writeRequest.getOriginalRequest().getMessage());
         nextFilter.messageSent(session, writeRequest);
     }
 
