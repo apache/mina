@@ -185,7 +185,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                     notifyIdleSessions(currentTime);
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
-                    cse.printStackTrace();
+                    ExceptionMonitor.getInstance().exceptionCaught(cse);
                     break;
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);

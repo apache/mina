@@ -478,7 +478,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                     nHandles -= unregisterHandles();
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
-                    cse.printStackTrace();
+                    ExceptionMonitor.getInstance().exceptionCaught(cse);
                     break;
                 } catch (Throwable e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);

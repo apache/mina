@@ -1159,7 +1159,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
                     // But first, dump a stack trace
-                    cse.printStackTrace();
+                    ExceptionMonitor.getInstance().exceptionCaught(cse);
                     break;
                 } catch (Throwable t) {
                     ExceptionMonitor.getInstance().exceptionCaught(t);
