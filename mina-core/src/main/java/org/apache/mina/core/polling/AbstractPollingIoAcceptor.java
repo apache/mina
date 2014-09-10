@@ -149,7 +149,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      * @param selectorProvider The SelectorProvider to use
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass,
-        int processorCount, SelectorProvider selectorProvider ) {
+            int processorCount, SelectorProvider selectorProvider ) {
         this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass, processorCount, selectorProvider), true, selectorProvider);
     }
 
@@ -478,6 +478,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                     nHandles -= unregisterHandles();
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
+                    cse.printStackTrace();
                     break;
                 } catch (Throwable e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
@@ -688,7 +689,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
             this.reuseAddress = reuseAddress;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
