@@ -31,15 +31,21 @@ import java.net.InetAddress;
  */
 public class Subnet {
 
-    private static final int IP_MASK = 0x80000000;
+    private static final int IP_MASK_V4 = 0x80000000;
+
+    private static final long IP_MASK_V6 = 0x8000000000000000L;
 
     private static final int BYTE_MASK = 0xFF;
 
     private InetAddress subnet;
 
+    /** An int representation of a subnet for IPV4 addresses */
     private int subnetInt;
 
-    private int subnetMask;
+    /** An long representation of a subnet for IPV6 addresses */
+    private long subnetLong;
+
+    private long subnetMask;
 
     private int suffix;
 
@@ -54,20 +60,36 @@ public class Subnet {
         if (subnet == null) {
             throw new IllegalArgumentException("Subnet address can not be null");
         }
+
         if (!(subnet instanceof Inet4Address)) {
             throw new IllegalArgumentException("Only IPv4 supported");
         }
 
-        if (mask < 0 || mask > 32) {
-            throw new IllegalArgumentException("Mask has to be an integer between 0 and 32");
+        if (subnet instanceof Inet4Address) {
+            // IPV4 address
+            if ((mask < 0) || (mask > 32)) {
+                throw new IllegalArgumentException("Mask has to be an integer between 0 and 32 for an IPV4 address");
+            } else {
+                this.subnet = subnet;
+                subnetInt = toInt(subnet);
+                this.suffix = mask;
+
+                // binary mask for this subnet
+                this.subnetMask = IP_MASK_V4 >> (mask - 1);
+            }
+        } else {
+            // IPV6 address
+            if ((mask < 0) || (mask > 128)) {
+                throw new IllegalArgumentException("Mask has to be an integer between 0 and 128 for an IPV6 address");
+            } else {
+                this.subnet = subnet;
+                subnetLong = toLong(subnet);
+                this.suffix = mask;
+
+                // binary mask for this subnet
+                this.subnetMask = IP_MASK_V6 >> (mask - 1);
+            }
         }
-
-        this.subnet = subnet;
-        this.subnetInt = toInt(subnet);
-        this.suffix = mask;
-
-        // binary mask for this subnet
-        this.subnetMask = IP_MASK >> (mask - 1);
     }
 
     /**
@@ -76,21 +98,43 @@ public class Subnet {
     private int toInt(InetAddress inetAddress) {
         byte[] address = inetAddress.getAddress();
         int result = 0;
+
         for (int i = 0; i < address.length; i++) {
             result <<= 8;
             result |= address[i] & BYTE_MASK;
         }
+
         return result;
     }
 
     /**
-     * Converts an IP address to a subnet using the provided
-     * mask
-     * @param address The address to convert into a subnet
+     * Converts an IP address into a long
+     */
+    private long toLong(InetAddress inetAddress) {
+        byte[] address = inetAddress.getAddress();
+        long result = 0;
+
+        for (int i = 0; i < address.length; i++) {
+            result <<= 8;
+            result |= address[i] & BYTE_MASK;
+        }
+
+        return result;
+    }
+
+    /**
+     * Converts an IP address to a subnet using the provided mask
+     * 
+     * @param address
+     *            The address to convert into a subnet
      * @return The subnet as an integer
      */
-    private int toSubnet(InetAddress address) {
-        return toInt(address) & subnetMask;
+    private long toSubnet(InetAddress address) {
+        if (address instanceof Inet4Address) {
+            return toInt(address) & (int) subnetMask;
+        } else {
+            return toLong(address) & subnetMask;
+        }
     }
 
     /**
@@ -103,7 +147,11 @@ public class Subnet {
             return true;
         }
 
-        return toSubnet(address) == subnetInt;
+        if (address instanceof Inet4Address) {
+            return (int) toSubnet(address) == subnetInt;
+        } else {
+            return toSubnet(address) == subnetLong;
+        }
     }
 
     /**
