@@ -58,6 +58,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
     /** The associated session */
     private final AbstractIoSession session;
 
+    /** The mapping between the filters and their associated name */
     private final Map<String, Entry> name2entry = new ConcurrentHashMap<String, Entry>();
 
     /** The chain head */
@@ -242,37 +243,115 @@ public class DefaultIoFilterChain implements IoFilterChain {
     public synchronized IoFilter replace(String name, IoFilter newFilter) {
         EntryImpl entry = checkOldName(name);
         IoFilter oldFilter = entry.getFilter();
+
+        // Call the preAdd method of the new filter
+        try {
+            newFilter.onPreAdd(this, name, entry.getNextFilter());
+        } catch (Exception e) {
+            throw new IoFilterLifeCycleException("onPreAdd(): " + name + ':' + newFilter + " in " + getSession(), e);
+        }
+
+        // Now, register the new Filter replacing the old one.
         entry.setFilter(newFilter);
+
+        // Call the postAdd method of the new filter
+        try {
+            newFilter.onPostAdd(this, name, entry.getNextFilter());
+        } catch (Exception e) {
+            entry.setFilter(oldFilter);
+            throw new IoFilterLifeCycleException("onPostAdd(): " + name + ':' + newFilter + " in " + getSession(), e);
+        }
 
         return oldFilter;
     }
 
     public synchronized void replace(IoFilter oldFilter, IoFilter newFilter) {
-        EntryImpl e = head.nextEntry;
+        EntryImpl entry = head.nextEntry;
 
-        while (e != tail) {
-            if (e.getFilter() == oldFilter) {
-                e.setFilter(newFilter);
+        // Search for the filter to replace
+        while (entry != tail) {
+            if (entry.getFilter() == oldFilter) {
+                String oldFilterName = null;
+
+                // Get the old filter name. It's not really efficient...
+                for (String name : name2entry.keySet()) {
+                    if (entry == name2entry.get(name)) {
+                        oldFilterName = name;
+
+                        break;
+                    }
+                }
+
+                // Call the preAdd method of the new filter
+                try {
+                    newFilter.onPreAdd(this, oldFilterName, entry.getNextFilter());
+                } catch (Exception e) {
+                    throw new IoFilterLifeCycleException("onPreAdd(): " + oldFilterName + ':' + newFilter + " in "
+                            + getSession(), e);
+                }
+
+                // Now, register the new Filter replacing the old one.
+                entry.setFilter(newFilter);
+
+                // Call the postAdd method of the new filter
+                try {
+                    newFilter.onPostAdd(this, oldFilterName, entry.getNextFilter());
+                } catch (Exception e) {
+                    entry.setFilter(oldFilter);
+                    throw new IoFilterLifeCycleException("onPostAdd(): " + oldFilterName + ':' + newFilter + " in "
+                            + getSession(), e);
+                }
+
                 return;
             }
 
-            e = e.nextEntry;
+            entry = entry.nextEntry;
         }
 
         throw new IllegalArgumentException("Filter not found: " + oldFilter.getClass().getName());
     }
 
     public synchronized IoFilter replace(Class<? extends IoFilter> oldFilterType, IoFilter newFilter) {
-        EntryImpl e = head.nextEntry;
+        EntryImpl entry = head.nextEntry;
 
-        while (e != tail) {
-            if (oldFilterType.isAssignableFrom(e.getFilter().getClass())) {
-                IoFilter oldFilter = e.getFilter();
-                e.setFilter(newFilter);
+        while (entry != tail) {
+            if (oldFilterType.isAssignableFrom(entry.getFilter().getClass())) {
+                IoFilter oldFilter = entry.getFilter();
+
+                String oldFilterName = null;
+
+                // Get the old filter name. It's not really efficient...
+                for (String name : name2entry.keySet()) {
+                    if (entry == name2entry.get(name)) {
+                        oldFilterName = name;
+
+                        break;
+                    }
+                }
+
+                // Call the preAdd method of the new filter
+                try {
+                    newFilter.onPreAdd(this, oldFilterName, entry.getNextFilter());
+                } catch (Exception e) {
+                    throw new IoFilterLifeCycleException("onPreAdd(): " + oldFilterName + ':' + newFilter + " in "
+                            + getSession(), e);
+                }
+
+                entry.setFilter(newFilter);
+
+                // Call the postAdd method of the new filter
+                try {
+                    newFilter.onPostAdd(this, oldFilterName, entry.getNextFilter());
+                } catch (Exception e) {
+                    entry.setFilter(oldFilter);
+                    throw new IoFilterLifeCycleException("onPostAdd(): " + oldFilterName + ':' + newFilter + " in "
+                            + getSession(), e);
+                }
+
                 return oldFilter;
             }
 
-            e = e.nextEntry;
+            entry = entry.nextEntry;
         }
 
         throw new IllegalArgumentException("Filter not found: " + oldFilterType.getName());
@@ -290,6 +369,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
     }
 
+    /**
+     * Register the newly added filter, inserting it between the previous and
+     * the next filter in the filter's chain. We also call the preAdd and
+     * postAdd methods.
+     */
     private void register(EntryImpl prevEntry, String name, IoFilter filter) {
         EntryImpl newEntry = new EntryImpl(prevEntry, prevEntry.nextEntry, name, filter);
 

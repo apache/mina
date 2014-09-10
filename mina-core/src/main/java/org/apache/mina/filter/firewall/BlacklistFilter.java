@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * @org.apache.xbean.XBean
  */
 public class BlacklistFilter extends IoFilterAdapter {
+    /** The list of blocked addresses */
     private final List<Subnet> blacklist = new CopyOnWriteArrayList<Subnet>();
 
     private final static Logger LOGGER = LoggerFactory.getLogger(BlacklistFilter.class);
@@ -56,7 +57,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         if (addresses == null) {
             throw new IllegalArgumentException("addresses");
         }
+
         blacklist.clear();
+
         for (int i = 0; i < addresses.length; i++) {
             InetAddress addr = addresses[i];
             block(addr);
@@ -74,7 +77,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         if (subnets == null) {
             throw new IllegalArgumentException("Subnets must not be null");
         }
+
         blacklist.clear();
+
         for (Subnet subnet : subnets) {
             block(subnet);
         }
@@ -113,7 +118,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         if (subnets == null) {
             throw new IllegalArgumentException("Subnets must not be null");
         }
+
         blacklist.clear();
+
         for (Subnet subnet : subnets) {
             block(subnet);
         }
@@ -159,6 +166,7 @@ public class BlacklistFilter extends IoFilterAdapter {
         if (subnet == null) {
             throw new IllegalArgumentException("Subnet can not be null");
         }
+
         blacklist.remove(subnet);
     }
 
@@ -229,6 +237,7 @@ public class BlacklistFilter extends IoFilterAdapter {
 
     private boolean isBlocked(IoSession session) {
         SocketAddress remoteAddress = session.getRemoteAddress();
+
         if (remoteAddress instanceof InetSocketAddress) {
             InetAddress address = ((InetSocketAddress) remoteAddress).getAddress();
 
