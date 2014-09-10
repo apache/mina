@@ -83,9 +83,21 @@ public interface IoConnector extends IoService {
     void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress);
 
     /**
-     * Connects to the {@link #setDefaultRemoteAddress(SocketAddress) default remote address}.
+     * Returns the default local address
+     */
+    SocketAddress getDefaultLocalAddress();
+
+    /**
+     * Sets the default local address
+     */
+    void setDefaultLocalAddress(SocketAddress defaultLocalAddress);
+
+    /**
+     * Connects to the {@link #setDefaultRemoteAddress(SocketAddress) default
+     * remote address}.
      * 
-     * @throws IllegalStateException if no default remoted address is set.
+     * @throws IllegalStateException
+     *             if no default remoted address is set.
      */
     ConnectFuture connect();
 

@@ -125,6 +125,7 @@ DatagramConnector {
             if (localAddress != null) {
                 try {
                     ch.socket().bind(localAddress);
+                    setDefaultLocalAddress(localAddress);
                 } catch (IOException ioe) {
                     // Add some info regarding the address we try to bind to the
                     // message

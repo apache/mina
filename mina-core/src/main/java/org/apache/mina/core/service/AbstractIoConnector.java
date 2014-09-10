@@ -44,7 +44,11 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
 
     private long connectTimeoutInMillis = 60 * 1000L; // 1 minute by default
 
+    /** The remote address we are connected to */
     private SocketAddress defaultRemoteAddress;
+
+    /** The local address */
+    private SocketAddress defaultLocalAddress;
 
     /**
      * Constructor for {@link AbstractIoConnector}. You need to provide a default
@@ -123,6 +127,20 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
      */
     public SocketAddress getDefaultRemoteAddress() {
         return defaultRemoteAddress;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final void setDefaultLocalAddress(SocketAddress localAddress) {
+        defaultLocalAddress = localAddress;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final SocketAddress getDefaultLocalAddress() {
+        return defaultLocalAddress;
     }
 
     /**
@@ -284,6 +302,6 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     public String toString() {
         TransportMetadata m = getTransportMetadata();
         return '(' + m.getProviderName() + ' ' + m.getName() + " connector: " + "managedSessionCount: "
-                + getManagedSessionCount() + ')';
+        + getManagedSessionCount() + ')';
     }
 }
