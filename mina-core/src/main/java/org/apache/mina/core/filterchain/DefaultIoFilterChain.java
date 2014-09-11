@@ -600,7 +600,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.filterClose(nextFilter, session);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             fireExceptionCaught(e);
         }
     }
