@@ -23,6 +23,8 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -113,6 +115,8 @@ class SslHandler {
      * it will write is already encrypted (this will be the case
      * for data being produced during the handshake). */
     private boolean writingEncryptedData;
+
+    private Lock sslLock = new ReentrantLock();
 
     /**
      * Create a new SSL Handler, and initialize it.
@@ -306,16 +310,20 @@ class SslHandler {
 
         // We need synchronization here inevitably because filterWrite can be
         // called simultaneously and cause 'bad record MAC' integrity error.
-        synchronized (this) {
+        sslLock.lock();
+
+        try {
             while ((event = filterWriteEventQueue.poll()) != null) {
                 NextFilter nextFilter = event.getNextFilter();
                 nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
             }
-        }
 
-        while ((event = messageReceivedEventQueue.poll()) != null) {
-            NextFilter nextFilter = event.getNextFilter();
-            nextFilter.messageReceived(session, event.getParameter());
+            while ((event = messageReceivedEventQueue.poll()) != null) {
+                NextFilter nextFilter = event.getNextFilter();
+                nextFilter.messageReceived(session, event.getParameter());
+            }
+        } finally {
+            sslLock.unlock();
         }
     }
 
