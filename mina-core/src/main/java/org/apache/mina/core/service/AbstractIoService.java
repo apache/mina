@@ -63,15 +63,15 @@ public abstract class AbstractIoService implements IoService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIoService.class);
 
-    /** 
+    /**
      * The unique number identifying the Service. It's incremented
      * for each new IoService created.
      */
     private static final AtomicInteger id = new AtomicInteger();
 
-    /** 
-     * The thread name built from the IoService inherited 
-     * instance class name and the IoService Id 
+    /**
+     * The thread name built from the IoService inherited
+     * instance class name and the IoService Id
      **/
     private final String threadName;
 
@@ -90,7 +90,7 @@ public abstract class AbstractIoService implements IoService {
     private final boolean createdExecutor;
 
     /**
-     * The IoHandler in charge of managing all the I/O Events. It is 
+     * The IoHandler in charge of managing all the I/O Events. It is
      */
     private IoHandler handler;
 
@@ -110,19 +110,23 @@ public abstract class AbstractIoService implements IoService {
 
         }
 
-        public void serviceDeactivated(IoService service) {
+        public void serviceDeactivated(IoService service) throws Exception {
             // Empty handler
         }
 
-        public void serviceIdle(IoService service, IdleStatus idleStatus) {
+        public void serviceIdle(IoService service, IdleStatus idleStatus) throws Exception {
             // Empty handler
         }
 
-        public void sessionCreated(IoSession session) {
+        public void sessionCreated(IoSession session) throws Exception {
             // Empty handler
         }
 
-        public void sessionDestroyed(IoSession session) {
+        public void sessionClosed(IoSession session) throws Exception {
+            // Empty handler
+        }
+
+        public void sessionDestroyed(IoSession session) throws Exception {
             // Empty handler
         }
     };
@@ -480,7 +484,7 @@ public abstract class AbstractIoService implements IoService {
      * this method instead.
      */
     protected void finishSessionInitialization0(IoSession session, IoFuture future) {
-        // Do nothing. Extended class might add some specific code 
+        // Do nothing. Extended class might add some specific code
     }
 
     protected static class ServiceOperationFuture extends DefaultIoFuture {

@@ -502,7 +502,9 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.sessionClosed(nextFilter, session);
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            fireExceptionCaught(e);
+        } catch (Error e) {
             fireExceptionCaught(e);
         }
     }

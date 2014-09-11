@@ -57,9 +57,18 @@ public interface IoServiceListener extends EventListener {
     void sessionCreated(IoSession session) throws Exception;
 
     /**
+     * Invoked when a new session is closed by an {@link IoService}.
+     * 
+     * @param session
+     *            the new session
+     */
+    void sessionClosed(IoSession session) throws Exception;
+
+    /**
      * Invoked when a session is being destroyed by an {@link IoService}.
-     *
-     * @param session the session to be destroyed
+     * 
+     * @param session
+     *            the session to be destroyed
      */
     void sessionDestroyed(IoSession session) throws Exception;
 }
