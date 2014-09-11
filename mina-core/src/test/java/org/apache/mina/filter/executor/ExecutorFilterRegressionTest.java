@@ -137,9 +137,9 @@ public class ExecutorFilterRegressionTest {
         public void messageReceived(IoSession session, Object message) {
             try {
                 ((EventOrderCounter) session).setLastCount((Integer) message);
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 if (this.throwable == null) {
-                    this.throwable = t;
+                    this.throwable = e;
                 }
             }
         }

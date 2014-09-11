@@ -371,7 +371,7 @@ public class StateMachineFactory {
                     throw new NoSuchMethodException();
                 }
                 return (T) m.invoke(annotation);
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 throw new StateMachineCreationException("Could not get parameter '" + name
                         + "' from Transition annotation " + transitionClazz);
             }
@@ -409,7 +409,7 @@ public class StateMachineFactory {
                     throw new NoSuchMethodException();
                 }
                 return (T) m.invoke(annotation);
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 throw new StateMachineCreationException("Could not get parameter '" + name
                         + "' from Transitions annotation " + transitionsclazz);
             }

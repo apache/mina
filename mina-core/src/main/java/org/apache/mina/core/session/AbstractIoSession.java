@@ -884,7 +884,10 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Increase the number of scheduled write bytes for the session
+     * 
+     * @param increment
+     *            The number of newly added bytes to write
      */
     public final void increaseScheduledWriteBytes(int increment) {
         scheduledWriteBytes.addAndGet(increment);
@@ -1215,14 +1218,13 @@ public abstract class AbstractIoSession implements IoSession {
 
             try {
                 remote = String.valueOf(getRemoteAddress());
-            } catch (Throwable t) {
-                remote = "Cannot get the remote address informations: " + t.getMessage();
+            } catch (Exception e) {
+                remote = "Cannot get the remote address informations: " + e.getMessage();
             }
 
             try {
                 local = String.valueOf(getLocalAddress());
-            } catch (Throwable t) {
-                local = "Cannot get the local address informations: " + t.getMessage();
+            } catch (Exception e) {
             }
 
             if (getService() instanceof IoAcceptor) {

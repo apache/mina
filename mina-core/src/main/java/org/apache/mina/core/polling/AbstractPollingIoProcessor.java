@@ -532,7 +532,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             // Propagate the SESSION_CREATED event up to the chain
             IoServiceListenerSupport listeners = ((AbstractIoService) session.getService()).getListeners();
             listeners.fireSessionCreated(session);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             ExceptionMonitor.getInstance().exceptionCaught(e);
 
             try {
@@ -722,7 +722,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             if (ret < 0) {
                 scheduleRemove(session);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             if (e instanceof IOException) {
                 if (!(e instanceof PortUnreachableException)
                         || !AbstractDatagramSessionConfig.class.isAssignableFrom(config.getClass())
@@ -1161,8 +1161,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // But first, dump a stack trace
                     ExceptionMonitor.getInstance().exceptionCaught(cse);
                     break;
-                } catch (Throwable t) {
-                    ExceptionMonitor.getInstance().exceptionCaught(t);
+                } catch (Exception e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
 
                     try {
                         Thread.sleep(1000);
@@ -1178,8 +1178,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                         doDispose();
                     }
                 }
-            } catch (Throwable t) {
-                ExceptionMonitor.getInstance().exceptionCaught(t);
+            } catch (Exception e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
             } finally {
                 disposalFuture.setValue(true);
             }

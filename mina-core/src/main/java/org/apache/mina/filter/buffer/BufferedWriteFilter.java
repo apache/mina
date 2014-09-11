@@ -34,12 +34,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An {@link IoFilter} implementation used to buffer outgoing {@link WriteRequest} almost 
- * like what {@link BufferedOutputStream} does. Using this filter allows to be less dependent 
- * from network latency. It is also useful when a session is generating very small messages 
+ * An {@link IoFilter} implementation used to buffer outgoing {@link WriteRequest} almost
+ * like what {@link BufferedOutputStream} does. Using this filter allows to be less dependent
+ * from network latency. It is also useful when a session is generating very small messages
  * too frequently and consequently generating unnecessary traffic overhead.
  * 
- * Please note that it should always be placed before the {@link ProtocolCodecFilter} 
+ * Please note that it should always be placed before the {@link ProtocolCodecFilter}
  * as it only handles {@link WriteRequest}'s carrying {@link IoBuffer} objects.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -74,7 +74,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     }
 
     /**
-     * Constructor which sets buffer size to <code>bufferSize</code>.Uses a default 
+     * Constructor which sets buffer size to <code>bufferSize</code>.Uses a default
      * instance of {@link ConcurrentHashMap}.
      * 
      * @param bufferSize the new buffer size
@@ -84,12 +84,12 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     }
 
     /**
-     * Constructor which sets buffer size to <code>bufferSize</code>. If 
-     * <code>buffersMap</code> is null then a default instance of {@link ConcurrentHashMap} 
+     * Constructor which sets buffer size to <code>bufferSize</code>. If
+     * <code>buffersMap</code> is null then a default instance of {@link ConcurrentHashMap}
      * is created else the provided instance is used.
      * 
      * @param bufferSize the new buffer size
-     * @param buffersMap the map to use for storing each session buffer 
+     * @param buffersMap the map to use for storing each session buffer
      */
     public BufferedWriteFilter(int bufferSize, LazyInitializedCacheMap<IoSession, IoBuffer> buffersMap) {
         super();
@@ -150,12 +150,12 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     /**
      * Writes <code>data</code> {@link IoBuffer} to the <code>buf</code>
      * {@link IoBuffer} which buffers write requests for the
-     * <code>session</code> {@ link IoSession} until buffer is full 
+     * <code>session</code> {@ link IoSession} until buffer is full
      * or manually flushed.
      * 
      * @param session the session where buffer will be written
      * @param data the data to buffer
-     * @param buf the buffer where data will be temporarily written 
+     * @param buf the buffer where data will be temporarily written
      */
     private void write(IoSession session, IoBuffer data, IoBuffer buf) {
         try {
@@ -176,7 +176,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
             synchronized (buf) {
                 buf.put(data);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             session.getFilterChain().fireExceptionCaught(e);
         }
     }
@@ -208,7 +208,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     public void flush(IoSession session) {
         try {
             internalFlush(session.getFilterChain().getNextFilter(this), session, buffersMap.get(session));
-        } catch (Throwable e) {
+        } catch (Exception e) {
             session.getFilterChain().fireExceptionCaught(e);
         }
     }

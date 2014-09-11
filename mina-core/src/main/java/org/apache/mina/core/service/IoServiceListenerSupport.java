@@ -114,7 +114,7 @@ public class IoServiceListenerSupport {
     }
 
     /**
-     * @return The largest number of managed session since the creation of this 
+     * @return The largest number of managed session since the creation of this
      * listenerSupport
      */
     public int getLargestManagedSessionCount() {
@@ -122,7 +122,7 @@ public class IoServiceListenerSupport {
     }
 
     /**
-     * @return The total number of sessions managed since the initilization of this 
+     * @return The total number of sessions managed since the initilization of this
      * ListenerSupport
      */
     public long getCumulativeManagedSessionCount() {
@@ -152,7 +152,7 @@ public class IoServiceListenerSupport {
         for (IoServiceListener listener : listeners) {
             try {
                 listener.serviceActivated(service);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
             }
         }
@@ -164,7 +164,7 @@ public class IoServiceListenerSupport {
      */
     public void fireServiceDeactivated() {
         if (!activated.compareAndSet(true, false)) {
-            // The instance is already desactivated 
+            // The instance is already desactivated
             return;
         }
 
@@ -173,7 +173,7 @@ public class IoServiceListenerSupport {
             for (IoServiceListener listener : listeners) {
                 try {
                     listener.serviceDeactivated(service);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }
@@ -223,7 +223,7 @@ public class IoServiceListenerSupport {
         for (IoServiceListener l : listeners) {
             try {
                 l.sessionCreated(session);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
             }
         }
@@ -248,7 +248,7 @@ public class IoServiceListenerSupport {
             for (IoServiceListener l : listeners) {
                 try {
                     l.sessionDestroyed(session);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
             }

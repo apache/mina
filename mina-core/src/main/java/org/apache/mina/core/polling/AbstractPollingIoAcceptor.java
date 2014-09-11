@@ -480,7 +480,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                     // If the selector has been closed, we can exit the loop
                     ExceptionMonitor.getInstance().exceptionCaught(cse);
                     break;
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
 
                     try {
@@ -630,7 +630,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                 try {
                     close(handle);
                     wakeup(); // wake up again to trigger thread death
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 } finally {
                     cancelledHandles++;

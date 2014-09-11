@@ -138,7 +138,7 @@ class SerialSessionImpl extends AbstractIoSession implements SerialSession, Seri
         try {
             getService().getFilterChainBuilder().buildFilterChain(getFilterChain());
             serviceListeners.fireSessionCreated(this);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             getFilterChain().fireExceptionCaught(e);
             processor.remove(this);
         }

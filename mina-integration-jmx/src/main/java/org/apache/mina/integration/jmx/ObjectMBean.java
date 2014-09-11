@@ -154,12 +154,12 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     }
 
     public final Object getAttribute(String fqan) throws AttributeNotFoundException, MBeanException,
-            ReflectionException {
+    ReflectionException {
         try {
             return convertValue(source.getClass(), fqan, getAttribute0(fqan), false);
         } catch (AttributeNotFoundException e) {
             // Do nothing
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throwMBeanException(e);
         }
 
@@ -176,7 +176,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
             return convertValue(parent.getClass(), getLeafAttributeName(fqan),
                     getAttribute(source, fqan, pdesc.getPropertyType()), writable);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throwMBeanException(e);
         }
 
@@ -184,7 +184,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     }
 
     public final void setAttribute(Attribute attribute) throws AttributeNotFoundException, MBeanException,
-            ReflectionException {
+    ReflectionException {
         String aname = attribute.getName();
         Object avalue = attribute.getValue();
 
@@ -192,7 +192,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             setAttribute0(aname, avalue);
         } catch (AttributeNotFoundException e) {
             // Do nothing
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throwMBeanException(e);
         }
 
@@ -207,13 +207,13 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             OgnlContext ctx = (OgnlContext) Ognl.createDefaultContext(source);
             ctx.setTypeConverter(typeConverter);
             Ognl.setValue(aname, ctx, source, e.getValue());
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throwMBeanException(e);
         }
     }
 
     public final Object invoke(String name, Object params[], String signature[]) throws MBeanException,
-            ReflectionException {
+    ReflectionException {
 
         // Handle synthetic operations first.
         if (name.equals("unregisterMBean")) {
@@ -229,7 +229,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
             return convertValue(null, null, invoke0(name, params, signature), false);
         } catch (NoSuchMethodException e) {
             // Do nothing
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throwMBeanException(e);
         }
 
@@ -287,7 +287,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
             // No methods matched.
             throw new IllegalArgumentException("Failed to find a matching operation: " + name);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throwMBeanException(e);
         }
 
@@ -341,7 +341,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     }
 
     public final void setManagedResource(Object resource, String type) throws InstanceNotFoundException,
-            InvalidTargetObjectTypeException, MBeanException {
+    InvalidTargetObjectTypeException, MBeanException {
         throw new RuntimeOperationsException(new UnsupportedOperationException());
 
     }
@@ -781,12 +781,12 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
     private void throwMBeanException(Throwable e) throws MBeanException {
         if (e instanceof OgnlException) {
             OgnlException ognle = (OgnlException) e;
-            
+
             if (ognle.getReason() != null) {
                 throwMBeanException(ognle.getReason());
             } else {
                 String message = ognle.getMessage();
-                
+
                 if (e instanceof NoSuchPropertyException) {
                     message = "No such property: " + message;
                 } else if (e instanceof ExpressionSyntaxException) {
@@ -794,7 +794,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 } else if (e instanceof InappropriateExpressionException) {
                     message = "Inappropriate expression: " + message;
                 }
-                
+
                 e = new IllegalArgumentException(message);
                 e.setStackTrace(ognle.getStackTrace());
             }

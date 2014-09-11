@@ -110,8 +110,8 @@ public final class VmPipeConnector extends AbstractIoConnector {
             // The following sentences don't throw any exceptions.
             getListeners().fireSessionCreated(localSession);
             idleChecker.addSession(localSession);
-        } catch (Throwable t) {
-            future.setException(t);
+        } catch (Exception e) {
+            future.setException(e);
             return future;
         }
 
@@ -125,8 +125,8 @@ public final class VmPipeConnector extends AbstractIoConnector {
             // The following sentences don't throw any exceptions.
             entry.getListeners().fireSessionCreated(remoteSession);
             idleChecker.addSession(remoteSession);
-        } catch (Throwable t) {
-            ExceptionMonitor.getInstance().exceptionCaught(t);
+        } catch (Exception e) {
+            ExceptionMonitor.getInstance().exceptionCaught(e);
             remoteSession.close(true);
         }
 

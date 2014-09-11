@@ -272,8 +272,8 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                         scheduleFlush((NioSession) session);
                     }
                 }
-            } catch (Throwable t) {
-                ExceptionMonitor.getInstance().exceptionCaught(t);
+            } catch (Exception e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
             }
         }
     }
@@ -331,8 +331,8 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
         try {
             this.getFilterChainBuilder().buildFilterChain(session.getFilterChain());
             getListeners().fireSessionCreated(session);
-        } catch (Throwable t) {
-            ExceptionMonitor.getInstance().exceptionCaught(t);
+        } catch (Exception e) {
+            ExceptionMonitor.getInstance().exceptionCaught(e);
         }
 
         return session;
@@ -444,7 +444,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                 try {
                     close(handle);
                     wakeup(); // wake up again to trigger thread death
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 } finally {
                     nHandles++;

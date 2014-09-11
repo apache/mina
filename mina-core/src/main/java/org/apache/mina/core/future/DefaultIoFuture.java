@@ -97,7 +97,7 @@ public class DefaultIoFuture implements IoFuture {
                 waiters++;
                 try {
                     // Wait for a notify, or if no notify is called,
-                    // assume that we have a deadlock and exit the 
+                    // assume that we have a deadlock and exit the
                     // loop to check for a potential deadlock.
                     lock.wait(DEAD_LOCK_CHECK_INTERVAL);
                 } finally {
@@ -157,10 +157,10 @@ public class DefaultIoFuture implements IoFuture {
     }
 
     /**
-     * Wait for the Future to be ready. If the requested delay is 0 or 
-     * negative, this method immediately returns the value of the 
-     * 'ready' flag. 
-     * Every 5 second, the wait will be suspended to be able to check if 
+     * Wait for the Future to be ready. If the requested delay is 0 or
+     * negative, this method immediately returns the value of the
+     * 'ready' flag.
+     * Every 5 second, the wait will be suspended to be able to check if
      * there is a deadlock or not.
      * 
      * @param timeoutMillis The delay we will wait for the Future to be ready
@@ -219,12 +219,12 @@ public class DefaultIoFuture implements IoFuture {
      *
      */
     private void checkDeadLock() {
-        // Only read / write / connect / write future can cause dead lock. 
+        // Only read / write / connect / write future can cause dead lock.
         if (!(this instanceof CloseFuture || this instanceof WriteFuture || this instanceof ReadFuture || this instanceof ConnectFuture)) {
             return;
         }
 
-        // Get the current thread stackTrace. 
+        // Get the current thread stackTrace.
         // Using Thread.currentThread().getStackTrace() is the best solution,
         // even if slightly less efficient than doing a new Exception().getStackTrace(),
         // as internally, it does exactly the same thing. The advantage of using
@@ -373,8 +373,8 @@ public class DefaultIoFuture implements IoFuture {
     private void notifyListener(IoFutureListener l) {
         try {
             l.operationComplete(this);
-        } catch (Throwable t) {
-            ExceptionMonitor.getInstance().exceptionCaught(t);
+        } catch (Exception e) {
+            ExceptionMonitor.getInstance().exceptionCaught(e);
         }
     }
 }

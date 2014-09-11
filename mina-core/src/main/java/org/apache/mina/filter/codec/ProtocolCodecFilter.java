@@ -233,12 +233,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 decoder.decode(session, in, decoderOut);
                 // Finish decoding if no exception was thrown.
                 decoderOut.flush(nextFilter, session);
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 ProtocolDecoderException pde;
-                if (t instanceof ProtocolDecoderException) {
-                    pde = (ProtocolDecoderException) t;
+                if (e instanceof ProtocolDecoderException) {
+                    pde = (ProtocolDecoderException) e;
                 } else {
-                    pde = new ProtocolDecoderException(t);
+                    pde = new ProtocolDecoderException(e);
                 }
                 if (pde.getHexdump() == null) {
                     // Generate a message hex dump
@@ -254,7 +254,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 // recoverable and the buffer position has changed.
                 // We check buffer position additionally to prevent an
                 // infinite loop.
-                if (!(t instanceof RecoverableProtocolDecoderException) || (in.position() == oldPos)) {
+                if (!(e instanceof RecoverableProtocolDecoderException) || (in.position() == oldPos)) {
                     break;
                 }
             } finally {
@@ -327,14 +327,14 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
             // Call the next filter
             nextFilter.filterWrite(session, new MessageWriteRequest(writeRequest));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             ProtocolEncoderException pee;
 
             // Generate the correct exception
-            if (t instanceof ProtocolEncoderException) {
-                pee = (ProtocolEncoderException) t;
+            if (e instanceof ProtocolEncoderException) {
+                pee = (ProtocolEncoderException) e;
             } else {
-                pee = new ProtocolEncoderException(t);
+                pee = new ProtocolEncoderException(e);
             }
 
             throw pee;
@@ -349,12 +349,12 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         try {
             decoder.finishDecode(session, decoderOut);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             ProtocolDecoderException pde;
-            if (t instanceof ProtocolDecoderException) {
-                pde = (ProtocolDecoderException) t;
+            if (e instanceof ProtocolDecoderException) {
+                pde = (ProtocolDecoderException) e;
             } else {
-                pde = new ProtocolDecoderException(t);
+                pde = new ProtocolDecoderException(e);
             }
             throw pde;
         } finally {
@@ -480,7 +480,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         try {
             encoder.dispose(session);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             LOGGER.warn("Failed to dispose: " + encoder.getClass().getName() + " (" + encoder + ')');
         }
     }
@@ -498,7 +498,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         try {
             decoder.dispose(session);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             LOGGER.warn("Failed to dispose: " + decoder.getClass().getName() + " (" + decoder + ')');
         }
     }

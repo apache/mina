@@ -19,6 +19,11 @@
  */
 package org.apache.mina.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -31,11 +36,6 @@ import org.apache.mina.core.service.IoServiceListenerSupport;
 import org.apache.mina.core.session.DummySession;
 import org.easymock.EasyMock;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 /**
  * Tests {@link IoServiceListenerSupport}.
@@ -180,7 +180,7 @@ public class IoServiceListenerSupportTest {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    //e.printStackTrace();
+                    // e.printStackTrace();
                 }
                 // This synchronization block is a workaround for
                 // the visibility problem of simultaneous EasyMock

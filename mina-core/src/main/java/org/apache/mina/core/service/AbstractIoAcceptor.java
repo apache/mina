@@ -307,7 +307,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
                 throw e;
             } catch (RuntimeException e) {
                 throw e;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 throw new RuntimeIoException("Failed to bind to: " + getLocalAddresses(), e);
             }
         }
@@ -389,7 +389,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
                         unbind0(localAddressesCopy);
                     } catch (RuntimeException e) {
                         throw e;
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         throw new RuntimeIoException("Failed to unbind from: " + getLocalAddresses(), e);
                     }
 

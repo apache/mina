@@ -447,7 +447,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     nHandles++;
                 }
                 success = true;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 connectionRequest.setException(e);
             } finally {
                 if (!success) {
@@ -517,7 +517,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                     // If the selector has been closed, we can exit the loop
                     ExceptionMonitor.getInstance().exceptionCaught(cse);
                     break;
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
 
                     try {
