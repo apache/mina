@@ -395,9 +395,14 @@ class SslHandler {
      * @return buffer with data
      */
     /* no qualifier */IoBuffer fetchAppBuffer() {
-        IoBuffer appBuffer = this.appBuffer.flip();
-        this.appBuffer = null;
-        return appBuffer;
+        if (this.appBuffer == null) {
+            return IoBuffer.allocate(0);
+        } else {
+            IoBuffer appBuffer = this.appBuffer.flip();
+            this.appBuffer = null;
+
+            return appBuffer;
+        }
     }
 
     /**
