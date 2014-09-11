@@ -62,6 +62,10 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler {
         // Do nothing
     }
 
+    public void inputClosed(IoSession session) {
+        // Do nothing
+    }
+
     public void messageReceived(Object message) throws Exception {
         // Do nothing
     }

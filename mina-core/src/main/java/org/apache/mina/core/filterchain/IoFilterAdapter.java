@@ -130,6 +130,10 @@ public class IoFilterAdapter implements IoFilter {
         nextFilter.filterClose(session);
     }
 
+    public void inputClosed(NextFilter nextFilter, IoSession session) throws Exception {
+        nextFilter.inputClosed(session);
+    }
+
     public String toString() {
         return this.getClass().getSimpleName();
     }

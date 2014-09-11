@@ -720,7 +720,9 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             }
 
             if (ret < 0) {
-                scheduleRemove(session);
+                // scheduleRemove(session);
+                IoFilterChain filterChain = session.getFilterChain();
+                filterChain.fireInputClosed();
             }
         } catch (Exception e) {
             if (e instanceof IOException) {

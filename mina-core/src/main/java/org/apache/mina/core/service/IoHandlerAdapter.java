@@ -64,4 +64,8 @@ public class IoHandlerAdapter implements IoHandler {
     public void messageSent(IoSession session, Object message) throws Exception {
         // Empty handler
     }
+
+    public void inputClosed(IoSession session) throws Exception {
+        session.close(true);
+    }
 }

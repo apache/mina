@@ -38,7 +38,7 @@ import org.apache.mina.core.session.IoSession;
  * conversational state as instance variables in this object.
  * </p>
  *
- * WARNING: This class is badly named as the actual {@link IoHandler} implementor 
+ * WARNING: This class is badly named as the actual {@link IoHandler} implementor
  * is in fact the {@link SingleSessionIoHandlerDelegate}.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -89,6 +89,8 @@ public interface SingleSessionIoHandler {
      * @see IoHandler#exceptionCaught(IoSession, Throwable)
      */
     void exceptionCaught(Throwable cause) throws Exception;
+
+    void inputClosed(IoSession session);
 
     /**
      * Invoked when protocol message is received. Implement your protocol flow

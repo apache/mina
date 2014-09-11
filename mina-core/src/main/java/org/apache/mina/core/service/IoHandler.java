@@ -78,4 +78,9 @@ public interface IoHandler {
      * sent out.
      */
     void messageSent(IoSession session, Object message) throws Exception;
+
+    /**
+     * Handle the closure of an half-duplex TCP channel
+     */
+    void inputClosed(IoSession session) throws Exception;
 }

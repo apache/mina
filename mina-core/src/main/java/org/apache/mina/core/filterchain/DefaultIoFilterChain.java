@@ -599,6 +599,21 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
     }
 
+    public void fireInputClosed() {
+        Entry head = this.head;
+        callNextInputClosed(head, session);
+    }
+
+    private void callNextInputClosed(Entry entry, IoSession session) {
+        try {
+            IoFilter filter = entry.getFilter();
+            NextFilter nextFilter = entry.getNextFilter();
+            filter.inputClosed(nextFilter, session);
+        } catch (Throwable e) {
+            fireExceptionCaught(e);
+        }
+    }
+
     public void fireFilterWrite(WriteRequest writeRequest) {
         callPreviousFilterWrite(tail, session, writeRequest);
     }
@@ -815,6 +830,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
 
         @Override
+        public void inputClosed(NextFilter nextFilter, IoSession session) throws Exception {
+            session.getHandler().inputClosed(session);
+        }
+
+        @Override
         public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
 
@@ -911,6 +931,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 public void exceptionCaught(IoSession session, Throwable cause) {
                     Entry nextEntry = EntryImpl.this.nextEntry;
                     callNextExceptionCaught(nextEntry, session, cause);
+                }
+
+                public void inputClosed(IoSession session) {
+                    Entry nextEntry = EntryImpl.this.nextEntry;
+                    callNextInputClosed(nextEntry, session);
                 }
 
                 public void messageReceived(IoSession session, Object message) {

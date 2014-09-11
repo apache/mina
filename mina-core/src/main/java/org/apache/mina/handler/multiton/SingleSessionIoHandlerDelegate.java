@@ -30,8 +30,8 @@ import org.apache.mina.core.session.IoSession;
  * is used to create a new {@link SingleSessionIoHandler} for each newly
  * created session.
  *
- * WARNING : This {@link IoHandler} implementation may be easier to understand and 
- * thus to use but the user should be aware that creating one handler by session 
+ * WARNING : This {@link IoHandler} implementation may be easier to understand and
+ * thus to use but the user should be aware that creating one handler by session
  * will lower scalability if building an high performance server. This should only
  * be used with very specific needs in mind.
  * 
@@ -144,5 +144,10 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
     public void messageSent(IoSession session, Object message) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.messageSent(message);
+    }
+
+    public void inputClosed(IoSession session) throws Exception {
+        SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
+        handler.inputClosed(session);
     }
 }

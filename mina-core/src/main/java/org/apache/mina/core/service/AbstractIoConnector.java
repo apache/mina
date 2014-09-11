@@ -257,6 +257,10 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
                     public void sessionOpened(IoSession session) throws Exception {
                         // Empty handler
                     }
+
+                    public void inputClosed(IoSession session) throws Exception {
+                        // Empty handler
+                    }
                 });
             } else {
                 throw new IllegalStateException("handler is not set.");

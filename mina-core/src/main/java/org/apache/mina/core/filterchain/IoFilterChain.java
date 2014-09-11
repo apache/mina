@@ -301,11 +301,19 @@ public interface IoFilterChain {
     public void fireExceptionCaught(Throwable cause);
 
     /**
-     * Fires a {@link IoSession#write(Object)} event. Most users don't need to call this
-     * method at all. Please use this method only when you implement a new transport or fire a
-     * virtual event.
+     * Fires a {@link IoHandler#inputClosed(IoSession, Throwable)} event. Most
+     * users don't need to call this method at all. Please use this method only
+     * when you implement a new transport or fire a virtual event.
+     */
+    public void fireInputClosed();
+
+    /**
+     * Fires a {@link IoSession#write(Object)} event. Most users don't need to
+     * call this method at all. Please use this method only when you implement a
+     * new transport or fire a virtual event.
      * 
-     * @param writeRequest The message to write
+     * @param writeRequest
+     *            The message to write
      */
     public void fireFilterWrite(WriteRequest writeRequest);
 

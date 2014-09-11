@@ -134,6 +134,10 @@ public class ExecutorFilterRegressionTest {
             // Do nothing
         }
 
+        public void inputClosed(IoSession session) {
+            // Do nothing
+        }
+
         public void messageReceived(IoSession session, Object message) {
             try {
                 ((EventOrderCounter) session).setLastCount((Integer) message);

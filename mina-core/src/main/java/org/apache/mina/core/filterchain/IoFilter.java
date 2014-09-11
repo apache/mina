@@ -172,6 +172,8 @@ public interface IoFilter {
      */
     void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception;
 
+    void inputClosed(NextFilter nextFilter, IoSession session) throws Exception;
+
     /**
      * Filters {@link IoHandler#messageReceived(IoSession,Object)}
      * event.
@@ -222,6 +224,8 @@ public interface IoFilter {
          * Forwards <tt>exceptionCaught</tt> event to next filter.
          */
         void exceptionCaught(IoSession session, Throwable cause);
+
+        void inputClosed(IoSession session);
 
         /**
          * Forwards <tt>messageReceived</tt> event to next filter.
