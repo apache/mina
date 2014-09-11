@@ -457,8 +457,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.sessionCreated(nextFilter, session);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
         }
     }
 
@@ -471,8 +474,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.sessionOpened(nextFilter, session);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
         }
     }
 
@@ -480,8 +486,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         // Update future.
         try {
             session.getCloseFuture().setClosed();
-        } catch (Throwable t) {
-            fireExceptionCaught(t);
+        } catch (Exception e) {
+            fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
         }
 
         // And start the chain.
@@ -508,8 +517,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.sessionIdle(nextFilter, session, status);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
         }
     }
 
@@ -526,16 +538,22 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.messageReceived(nextFilter, session, message);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
         }
     }
 
     public void fireMessageSent(WriteRequest request) {
         try {
             request.getFuture().setWritten();
-        } catch (Throwable t) {
-            fireExceptionCaught(t);
+        } catch (Exception e) {
+            fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
         }
 
         if (!request.isEncoded()) {
@@ -548,8 +566,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.messageSent(nextFilter, session, writeRequest);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
         }
     }
 
@@ -585,9 +606,13 @@ public class DefaultIoFilterChain implements IoFilterChain {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.filterWrite(nextFilter, session, writeRequest);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             writeRequest.getFuture().setException(e);
             fireExceptionCaught(e);
+        } catch (Error e) {
+            writeRequest.getFuture().setException(e);
+            fireExceptionCaught(e);
+            throw e;
         }
     }
 
@@ -602,6 +627,9 @@ public class DefaultIoFilterChain implements IoFilterChain {
             filter.filterClose(nextFilter, session);
         } catch (Exception e) {
             fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
         }
     }
 
