@@ -125,7 +125,6 @@ public class SslDIRMINA937Test {
 
             @Override
             public void messageReceived(IoSession session, Object message) throws Exception {
-                System.out.println("Message received");
                 if (message == SslFilter.SESSION_SECURED) {
                     counter.countDown();
                 }
