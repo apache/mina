@@ -125,6 +125,7 @@ public class SslDIRMINA937Test {
 
             @Override
             public void messageReceived(IoSession session, Object message) throws Exception {
+                System.out.println("Message received");
                 if (message == SslFilter.SESSION_SECURED) {
                     counter.countDown();
                 }
@@ -159,7 +160,7 @@ public class SslDIRMINA937Test {
      * Test is ignore as it will cause the build to fail
      */
     @Test
-    @Ignore
+    @Ignore("This test is not yet fully functionnal, it servers as the basis for validating DIRMINA-937")
     public void testDIRMINA937() throws Exception {
         startServer();
 
