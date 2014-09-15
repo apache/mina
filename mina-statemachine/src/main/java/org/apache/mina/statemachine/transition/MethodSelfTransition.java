@@ -23,21 +23,23 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import org.apache.mina.statemachine.State;
+import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.context.StateContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.mina.statemachine.State;
 
 /**
  * {@link SelfTransition} which invokes a {@link Method}. The {@link Method} can
  * have zero or any number of StateContext and State regarding order
  * <p>
- * Normally you wouldn't create instances of this class directly but rather use the
- * {@link SelfTransition} annotation to define the methods which should be used as
- * transitions in your state machine and then let {@link StateMachineFactory} create a
+ * Normally you wouldn't create instances of this class directly but rather use
+ * the {@link SelfTransition} annotation to define the methods which should be
+ * used as transitions in your state machine and then let
+ * {@link org.apache.mina.statemachine#StateMachineFactory} create a
  * {@link StateMachine} for you.
  * </p>
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MethodSelfTransition extends AbstractSelfTransition {
@@ -58,8 +60,10 @@ public class MethodSelfTransition extends AbstractSelfTransition {
     /**
      * Creates a new instance
      * 
-     * @param method the target method.
-     * @param target the target object.
+     * @param methodName
+     *            the target method.
+     * @param target
+     *            the target object.
      */
     public MethodSelfTransition(String methodName, Object target) {
 
@@ -67,7 +71,7 @@ public class MethodSelfTransition extends AbstractSelfTransition {
 
         Method[] candidates = target.getClass().getMethods();
         Method result = null;
-        
+
         for (int i = 0; i < candidates.length; i++) {
             if (candidates[i].getName().equals(methodName)) {
                 if (result != null) {
@@ -109,7 +113,7 @@ public class MethodSelfTransition extends AbstractSelfTransition {
         Object[] args = new Object[types.length];
 
         int i = 0;
-        
+
         if (types[i].isAssignableFrom(StateContext.class)) {
             args[i++] = stateContext;
         }

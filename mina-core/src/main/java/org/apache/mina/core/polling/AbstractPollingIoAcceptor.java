@@ -170,43 +170,49 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     }
 
     /**
-     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
-     * session configuration and an {@link Executor} for handling I/O events. If a
-     * null {@link Executor} is provided, a default one will be created using
-     * {@link Executors#newCachedThreadPool()}.
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a
+     * default session configuration and an {@link Executor} for handling I/O
+     * events. If a null {@link Executor} is provided, a default one will be
+     * created using {@link Executors#newCachedThreadPool()}.
      * 
-     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * @see AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
      * @param executor
-     *            the {@link Executor} used for handling asynchronous execution of I/O
-     *            events. Can be <code>null</code>.
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering
-     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
+     *            the {@link Executor} used for handling asynchronous execution
+     *            of I/O events. Can be <code>null</code>.
+     * @param processor
+     *            the {@link IoProcessor} for processing the {@link IoSession}
+     *            of this transport, triggering events to the bound
+     *            {@link IoHandler} and processing the chains of
+     *            {@link IoFilter}
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Executor executor, IoProcessor<S> processor) {
         this(sessionConfig, executor, processor, false, null);
     }
 
     /**
-     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
-     * session configuration and an {@link Executor} for handling I/O events. If a
-     * null {@link Executor} is provided, a default one will be created using
-     * {@link Executors#newCachedThreadPool()}.
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a
+     * default session configuration and an {@link Executor} for handling I/O
+     * events. If a null {@link Executor} is provided, a default one will be
+     * created using {@link Executors#newCachedThreadPool()}.
      * 
-     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * @see AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
      * @param executor
-     *            the {@link Executor} used for handling asynchronous execution of I/O
-     *            events. Can be <code>null</code>.
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of
-     * this transport, triggering events to the bound {@link IoHandler} and processing
-     * the chains of {@link IoFilter}
-     * @param createdProcessor tagging the processor as automatically created, so it
-     * will be automatically disposed
+     *            the {@link Executor} used for handling asynchronous execution
+     *            of I/O events. Can be <code>null</code>.
+     * @param processor
+     *            the {@link IoProcessor} for processing the {@link IoSession}
+     *            of this transport, triggering events to the bound
+     *            {@link IoHandler} and processing the chains of
+     *            {@link IoFilter}
+     * @param createdProcessor
+     *            tagging the processor as automatically created, so it will be
+     *            automatically disposed
      */
     private AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Executor executor, IoProcessor<S> processor,
             boolean createdProcessor, SelectorProvider selectorProvider) {
@@ -651,14 +657,17 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     }
 
     /**
-     * {@inheritDoc}
+     * @return the backLog
      */
     public int getBacklog() {
         return backlog;
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the Backlog parameter
+     * 
+     * @param backlog
+     *            the backlog variable
      */
     public void setBacklog(int backlog) {
         synchronized (bindLock) {
@@ -671,14 +680,17 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     }
 
     /**
-     * {@inheritDoc}
+     * @return the flag that sets the reuseAddress information
      */
     public boolean isReuseAddress() {
         return reuseAddress;
     }
 
     /**
-     * {@inheritDoc}
+     * Set the Reuse Address flag
+     * 
+     * @param reuseAddress
+     *            The flag to set
      */
     public void setReuseAddress(boolean reuseAddress) {
         synchronized (bindLock) {

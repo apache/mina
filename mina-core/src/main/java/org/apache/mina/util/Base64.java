@@ -24,14 +24,18 @@ import java.security.InvalidParameterException;
 /**
  * Provides Base64 encoding and decoding as defined by RFC 2045.
  * 
- * <p>This class implements section <cite>6.8. Base64 Content-Transfer-Encoding</cite> 
- * from RFC 2045 <cite>Multipurpose Internet Mail Extensions (MIME) Part One: 
- * Format of Internet Message Bodies</cite> by Freed and Borenstein.</p> 
- *
+ * <p>
+ * This class implements section <cite>6.8. Base64
+ * Content-Transfer-Encoding</cite> from RFC 2045 <cite>Multipurpose Internet
+ * Mail Extensions (MIME) Part One: Format of Internet Message Bodies</cite> by
+ * Freed and Borenstein.
+ * </p>
+ * 
  * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>
  * 
- *  This class was 
- * @author Apache Software Foundation commons codec (http://commons.apache.org/codec/)
+ * 
+ * @author Apache Software Foundation commons codec
+ *         (http://commons.apache.org/codec/)
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Base64 {
@@ -39,7 +43,7 @@ public class Base64 {
     /**
      * Chunk size per RFC 2045 section 6.8.
      * 
-     * <p>The {@value} character limit does not count the trailing CRLF, but counts 
+     * <p>The {@value} character limit does not count the trailing CRLF, but counts
      * all other characters, including any equal signs.</p>
      * 
      * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 section 6.8</a>
@@ -93,7 +97,7 @@ public class Base64 {
      */
     static final byte PAD = (byte) '=';
 
-    // Create arrays to hold the base64 characters and a 
+    // Create arrays to hold the base64 characters and a
     // lookup for base64 chars
     private static byte[] base64Alphabet = new byte[BASELENGTH];
 
@@ -197,7 +201,7 @@ public class Base64 {
      * supplied object is not of type byte[].
      *
      * @param pObject Object to decode
-     * @return An object (of type byte[]) containing the 
+     * @return An object (of type byte[]) containing the
      *         binary data which corresponds to the byte[] supplied.
      * @throws InvalidParameterException if the parameter supplied is not
      *                          of type byte[]
@@ -245,8 +249,8 @@ public class Base64 {
             encodedDataLength = numberTriplets * 4;
         }
 
-        // If the output is to be "chunked" into 76 character sections, 
-        // for compliance with RFC 2045 MIME, then it is important to 
+        // If the output is to be "chunked" into 76 character sections,
+        // for compliance with RFC 2045 MIME, then it is important to
         // allow for extra length to account for the separator(s)
         if (isChunked) {
 
@@ -274,26 +278,26 @@ public class Base64 {
             k = (byte) (b1 & 0x03);
 
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
-            byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
-            byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6) : (byte) ((b3) >> 6 ^ 0xfc);
+        byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
+        byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6) : (byte) ((b3) >> 6 ^ 0xfc);
 
-            encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
-            encodedData[encodedIndex + 1] = lookUpBase64Alphabet[val2 | (k << 4)];
-            encodedData[encodedIndex + 2] = lookUpBase64Alphabet[(l << 2) | val3];
-            encodedData[encodedIndex + 3] = lookUpBase64Alphabet[b3 & 0x3f];
+        encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
+        encodedData[encodedIndex + 1] = lookUpBase64Alphabet[val2 | (k << 4)];
+        encodedData[encodedIndex + 2] = lookUpBase64Alphabet[(l << 2) | val3];
+        encodedData[encodedIndex + 3] = lookUpBase64Alphabet[b3 & 0x3f];
 
-            encodedIndex += 4;
+        encodedIndex += 4;
 
-            // If we are chunking, let's put a chunk separator down.
-            if (isChunked) {
-                // this assumes that CHUNK_SIZE % 4 == 0
-                if (encodedIndex == nextSeparatorIndex) {
-                    System.arraycopy(CHUNK_SEPARATOR, 0, encodedData, encodedIndex, CHUNK_SEPARATOR.length);
-                    chunksSoFar++;
-                    nextSeparatorIndex = (CHUNK_SIZE * (chunksSoFar + 1)) + (chunksSoFar * CHUNK_SEPARATOR.length);
-                    encodedIndex += CHUNK_SEPARATOR.length;
-                }
+        // If we are chunking, let's put a chunk separator down.
+        if (isChunked) {
+            // this assumes that CHUNK_SIZE % 4 == 0
+            if (encodedIndex == nextSeparatorIndex) {
+                System.arraycopy(CHUNK_SEPARATOR, 0, encodedData, encodedIndex, CHUNK_SEPARATOR.length);
+                chunksSoFar++;
+                nextSeparatorIndex = (CHUNK_SIZE * (chunksSoFar + 1)) + (chunksSoFar * CHUNK_SEPARATOR.length);
+                encodedIndex += CHUNK_SEPARATOR.length;
             }
+        }
         }
 
         // form integral number of 6-bit groups
@@ -303,10 +307,10 @@ public class Base64 {
             b1 = binaryData[dataIndex];
             k = (byte) (b1 & 0x03);
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
-            encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
-            encodedData[encodedIndex + 1] = lookUpBase64Alphabet[k << 4];
-            encodedData[encodedIndex + 2] = PAD;
-            encodedData[encodedIndex + 3] = PAD;
+        encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
+        encodedData[encodedIndex + 1] = lookUpBase64Alphabet[k << 4];
+        encodedData[encodedIndex + 2] = PAD;
+        encodedData[encodedIndex + 3] = PAD;
         } else if (fewerThan24bits == SIXTEENBIT) {
 
             b1 = binaryData[dataIndex];
@@ -315,12 +319,12 @@ public class Base64 {
             k = (byte) (b1 & 0x03);
 
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
-            byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
+        byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
 
-            encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
-            encodedData[encodedIndex + 1] = lookUpBase64Alphabet[val2 | (k << 4)];
-            encodedData[encodedIndex + 2] = lookUpBase64Alphabet[l << 2];
-            encodedData[encodedIndex + 3] = PAD;
+        encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
+        encodedData[encodedIndex + 1] = lookUpBase64Alphabet[val2 | (k << 4)];
+        encodedData[encodedIndex + 2] = lookUpBase64Alphabet[l << 2];
+        encodedData[encodedIndex + 3] = PAD;
         }
 
         if (isChunked) {
@@ -465,7 +469,7 @@ public class Base64 {
      * supplied object is not of type byte[].
      *
      * @param pObject Object to encode
-     * @return An object (of type byte[]) containing the 
+     * @return An object (of type byte[]) containing the
      *         base64 encoded data which corresponds to the byte[] supplied.
      * @throws InvalidParameterException if the parameter supplied is not
      *                          of type byte[]

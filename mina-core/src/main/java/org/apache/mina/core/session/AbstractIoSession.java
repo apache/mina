@@ -246,8 +246,8 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * Tells if the session is scheduled for flushed
-     *
-     * @param true if the session is scheduled for flush
+     * 
+     * @return true if the session is scheduled for flush
      */
     public final boolean isScheduledForFlush() {
         return scheduledForFlush.get();

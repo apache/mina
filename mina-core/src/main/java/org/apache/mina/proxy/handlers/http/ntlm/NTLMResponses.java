@@ -19,23 +19,23 @@
  */
 package org.apache.mina.proxy.handlers.http.ntlm;
 
-import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.MessageDigest;
 
 import javax.crypto.Cipher;
-
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * NTLMResponses.java - Calculates the various Type 3 responses. Needs an MD4, MD5 and DES
- * crypto provider (Please note that default provider doesn't provide MD4).
+ * NTLMResponses.java - Calculates the various Type 3 responses. Needs an MD4,
+ * MD5 and DES crypto provider (Please note that default provider doesn't
+ * provide MD4).
  * 
- * Copyright (c) 2003 Eric Glass 
- * Permission to use, copy, modify, and distribute this document for any purpose and without 
- * any fee is hereby granted, provided that the above copyright notice and this list of 
- * conditions appear in all copies. 
- * @see http://curl.haxx.se/rfc/ntlm.html
+ * Copyright (c) 2003 Eric Glass Permission to use, copy, modify, and distribute
+ * this document for any purpose and without any fee is hereby granted, provided
+ * that the above copyright notice and this list of conditions appear in all
+ * copies.
+ * 
+ * @see <a href="http://curl.haxx.se/rfc/ntlm.html">NTLM RFC</a>
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
@@ -43,7 +43,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class NTLMResponses {
 
     // LAN Manager magic constant used in LM Response calculation
-    public static final byte[] LM_HASH_MAGIC_CONSTANT = 
+    public static final byte[] LM_HASH_MAGIC_CONSTANT =
             new byte[]{ 'K', 'G', 'S', '!', '@', '#', '$', '%' };
 
     /**
@@ -80,7 +80,7 @@ public class NTLMResponses {
      * block, and client nonce.
      *
      * @param target The authentication target (i.e., domain).
-     * @param user The username. 
+     * @param user The username.
      * @param password The user's password.
      * @param targetInformation The target information block from the Type 2
      * message.
@@ -102,13 +102,13 @@ public class NTLMResponses {
      * block, and client nonce.
      *
      * @param target The authentication target (i.e., domain).
-     * @param user The username. 
+     * @param user The username.
      * @param password The user's password.
      * @param targetInformation The target information block from the Type 2
      * message.
      * @param challenge The Type 2 challenge from the server.
      * @param clientNonce The random 8-byte client nonce.
-     * @param time The time stamp. 
+     * @param time The time stamp.
      *
      * @return The NTLMv2 Response.
      */
@@ -130,7 +130,7 @@ public class NTLMResponses {
      * @param challenge The Type 2 challenge from the server.
      * @param clientNonce The random 8-byte client nonce.
      *
-     * @return The LMv2 Response. 
+     * @return The LMv2 Response.
      */
     public static byte[] getLMv2Response(String target, String user, String password, byte[] challenge,
             byte[] clientNonce) throws Exception {
@@ -209,7 +209,7 @@ public class NTLMResponses {
      * @param password The password.
      *
      * @return The NTLMv2 Hash, used in the calculation of the NTLMv2
-     * and LMv2 Responses. 
+     * and LMv2 Responses.
      */
     private static byte[] ntlmv2Hash(String target, String user, String password) throws Exception {
         byte[] ntlmHash = ntlmHash(password);
@@ -293,7 +293,7 @@ public class NTLMResponses {
             time >>>= 8;
         }
         byte[] blob = new byte[blobSignature.length + reserved.length + timestamp.length + clientNonce.length
-                + unknown1.length + targetInformation.length + unknown2.length];
+                               + unknown1.length + targetInformation.length + unknown2.length];
         int offset = 0;
         System.arraycopy(blobSignature, 0, blob, offset, blobSignature.length);
         offset += blobSignature.length;
@@ -315,7 +315,7 @@ public class NTLMResponses {
      * Calculates the HMAC-MD5 hash of the given data using the specified
      * hashing key.
      *
-     * @param data The data for which the hash will be calculated. 
+     * @param data The data for which the hash will be calculated.
      * @param key The hashing key.
      *
      * @return The HMAC-MD5 hash of the given data.

@@ -63,8 +63,8 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
      * session configuration and an {@link Executor} for handling I/O events. If
      * null {@link Executor} is provided, a default one will be created using
      * {@link Executors#newCachedThreadPool()}.
-     *
-     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * 
+     * @see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}

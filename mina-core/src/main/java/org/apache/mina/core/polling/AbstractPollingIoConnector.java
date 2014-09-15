@@ -34,6 +34,7 @@ import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultConnectFuture;
 import org.apache.mina.core.service.AbstractIoConnector;
+import org.apache.mina.core.service.AbstractIoService;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
@@ -115,57 +116,68 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     }
 
     /**
-     * Constructor for {@link AbstractPollingIoConnector}. You need to provide a default
-     * session configuration, a default {@link Executor} will be created using
-     * {@link Executors#newCachedThreadPool()}.
+     * Constructor for {@link AbstractPollingIoConnector}. You need to provide a
+     * default session configuration, a default {@link Executor} will be created
+     * using {@link Executors#newCachedThreadPool()}.
      * 
-     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * @see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering
-     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
+     * @param processor
+     *            the {@link IoProcessor} for processing the {@link IoSession}
+     *            of this transport, triggering events to the bound
+     *            {@link IoHandler} and processing the chains of
+     *            {@link IoFilter}
      */
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, IoProcessor<T> processor) {
         this(sessionConfig, null, processor, false);
     }
 
     /**
-     * Constructor for {@link AbstractPollingIoConnector}. You need to provide a default
-     * session configuration and an {@link Executor} for handling I/O events. If
-     * null {@link Executor} is provided, a default one will be created using
-     * {@link Executors#newCachedThreadPool()}.
+     * Constructor for {@link AbstractPollingIoConnector}. You need to provide a
+     * default session configuration and an {@link Executor} for handling I/O
+     * events. If null {@link Executor} is provided, a default one will be
+     * created using {@link Executors#newCachedThreadPool()}.
      * 
-     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * @see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
      * @param executor
-     *            the {@link Executor} used for handling asynchronous execution of I/O
-     *            events. Can be <code>null</code>.
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering
-     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
+     *            the {@link Executor} used for handling asynchronous execution
+     *            of I/O events. Can be <code>null</code>.
+     * @param processor
+     *            the {@link IoProcessor} for processing the {@link IoSession}
+     *            of this transport, triggering events to the bound
+     *            {@link IoHandler} and processing the chains of
+     *            {@link IoFilter}
      */
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor) {
         this(sessionConfig, executor, processor, false);
     }
 
     /**
-     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a default
-     * session configuration and an {@link Executor} for handling I/O events. If
-     * null {@link Executor} is provided, a default one will be created using
-     * {@link Executors#newCachedThreadPool()}.
+     * Constructor for {@link AbstractPollingIoAcceptor}. You need to provide a
+     * default session configuration and an {@link Executor} for handling I/O
+     * events. If null {@link Executor} is provided, a default one will be
+     * created using {@link Executors#newCachedThreadPool()}.
      * 
-     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * @see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
      * @param executor
-     *            the {@link Executor} used for handling asynchronous execution of I/O
-     *            events. Can be <code>null</code>.
-     * @param processor the {@link IoProcessor} for processing the {@link IoSession} of this transport, triggering
-     *            events to the bound {@link IoHandler} and processing the chains of {@link IoFilter}
-     * @param createdProcessor tagging the processor as automatically created, so it will be automatically disposed
+     *            the {@link Executor} used for handling asynchronous execution
+     *            of I/O events. Can be <code>null</code>.
+     * @param processor
+     *            the {@link IoProcessor} for processing the {@link IoSession}
+     *            of this transport, triggering events to the bound
+     *            {@link IoHandler} and processing the chains of
+     *            {@link IoFilter}
+     * @param createdProcessor
+     *            tagging the processor as automatically created, so it will be
+     *            automatically disposed
      */
     private AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor,
             boolean createdProcessor) {
@@ -230,12 +242,15 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected abstract boolean connect(H handle, SocketAddress remoteAddress) throws Exception;
 
     /**
-     * Finish the connection process of a client socket after it was marked as ready to process
-     * by the {@link #select(int)} call. The socket will be connected or reported as connection
-     * failed.
-     * @param handle the client socket handle to finsh to connect
+     * Finish the connection process of a client socket after it was marked as
+     * ready to process by the {@link select(int)} call. The socket will be
+     * connected or reported as connection failed.
+     * 
+     * @param handle
+     *            the client socket handle to finish to connect
      * @return true if the socket is connected
-     * @throws Exception any exception thrown by the underlying systems calls
+     * @throws Exception
+     *             any exception thrown by the underlying systems calls
      */
     protected abstract boolean finishConnect(H handle) throws Exception;
 
@@ -258,7 +273,8 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected abstract void close(H handle) throws Exception;
 
     /**
-     * Interrupt the {@link #select()} method. Used when the poll set need to be modified.
+     * Interrupt the {@link #select(int)} method. Used when the poll set need to
+     * be modified.
      */
     protected abstract void wakeup();
 
@@ -272,8 +288,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     protected abstract int select(int timeout) throws Exception;
 
     /**
-     * {@link Iterator} for the set of client sockets found connected or
-     * failed to connect during the last {@link #select()} call.
+     * {@link Iterator} for the set of client sockets found connected or failed
+     * to connect during the last {@link #select(int)} call.
+     * 
      * @return the list of client socket handles to process
      */
     protected abstract Iterator<H> selectedHandles();

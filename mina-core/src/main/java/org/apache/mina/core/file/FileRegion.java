@@ -44,12 +44,13 @@ public interface FileRegion {
     long getPosition();
 
     /**
-     * Updates the current file position based on the specified amount.  This
+     * Updates the current file position based on the specified amount. This
      * increases the value returned by {@link #getPosition()} and
      * {@link getWrittenBytes} by the given amount and decreases the value
-     * returned by {@link #getCount()} by the given {@code amount}.
-     *
-     * @param amount  The new value for the file position.
+     * returned by {@link #getRemainingBytes()} by the given {@code amount}.
+     * 
+     * @param amount
+     *            The new value for the file position.
      */
     void update(long amount);
 

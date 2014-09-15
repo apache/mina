@@ -230,7 +230,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     protected abstract boolean isSelectorEmpty();
 
     /**
-     * Interrupt the {@link AbstractPollingIoProcessor#select(int) call.
+     * Interrupt the {@link AbstractPollingIoProcessor#select(int)} call.
      */
     protected abstract void wakeup();
 
@@ -244,7 +244,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
 
     /**
      * Get an {@link Iterator} for the list of {@link IoSession} found selected
-     * by the last call of {@link AbstractPollingIoProcessor#select(int)
+     * by the last call of {@link AbstractPollingIoProcessor#select(int)}
+     * 
      * @return {@link Iterator} of {@link IoSession} read for I/Os operation
      */
     protected abstract Iterator<S> selectedSessions();
@@ -440,7 +441,10 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     }
 
     /**
-     * {@inheritDoc}
+     * Updates the traffic mask for a given session
+     * 
+     * @param session
+     *            the session to update
      */
     public final void updateTrafficMask(S session) {
         trafficControllingSessions.add(session);

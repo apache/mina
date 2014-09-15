@@ -48,7 +48,6 @@ public interface IoConnector extends IoService {
      * Returns the connect timeout in seconds.  The default value is 1 minute.
      * 
      * @deprecated
-     * @see getConnectTimeoutMillis()
      */
     int getConnectTimeout();
 
@@ -61,7 +60,6 @@ public interface IoConnector extends IoService {
      * Sets the connect timeout in seconds.  The default value is 1 minute.
      * 
      * @deprecated
-     * @see setConnectTimeoutMillis()
      */
     void setConnectTimeout(int connectTimeout);
 

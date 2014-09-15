@@ -366,7 +366,7 @@ public class IoServiceStatistics {
     /**
      * Sets last time at which a write occurred on the service.
      * 
-     * @param lastReadTime
+     * @param lastWriteTime
      *            The last time a write has occurred
      */
     protected final void setLastWriteTime(long lastWriteTime) {

@@ -42,15 +42,15 @@ public class NTLMUtilities implements NTLMConstants {
     public final static byte[] writeSecurityBuffer(short length, int bufferOffset) {
         byte[] b = new byte[8];
         writeSecurityBuffer(length, length, bufferOffset, b, 0);
-        
+
         return b;
     }
 
     /**
-     * Writes a security buffer to the given array <code>b</code> at offset 
-     * <code>offset</code>. A security buffer defines a pointer to an area 
+     * Writes a security buffer to the given array <code>b</code> at offset
+     * <code>offset</code>. A security buffer defines a pointer to an area
      * in the data that defines some data with a variable length. This allows
-     * to have a semi-fixed length header thus making a little bit easier 
+     * to have a semi-fixed length header thus making a little bit easier
      * the decoding process in the NTLM protocol.
      * 
      * @param length the length of the security buffer
@@ -75,7 +75,7 @@ public class NTLMUtilities implements NTLMConstants {
      * @param majorVersion the major version number
      * @param minorVersion the minor version number
      * @param buildNumber the build number
-     * @param b the target byte array 
+     * @param b the target byte array
      * @param offset the offset at which to write in the array
      */
     public final static void writeOSVersion(byte majorVersion, byte minorVersion, short buildNumber, byte[] b,
@@ -91,8 +91,8 @@ public class NTLMUtilities implements NTLMConstants {
     }
 
     /**
-     * Tries to return a valid OS version on Windows systems. If it fails to 
-     * do so or if we're running on another OS then a fake Windows XP OS 
+     * Tries to return a valid OS version on Windows systems. If it fails to
+     * do so or if we're running on another OS then a fake Windows XP OS
      * version is returned because the protocol uses it.
      * 
      * @return a NTLM OS version byte buffer
@@ -107,7 +107,7 @@ public class NTLMUtilities implements NTLMConstants {
         byte[] osVer = new byte[8];
 
         // Let's enclose the code by a try...catch in order to
-        // manage incorrect strings. In this case, we will generate 
+        // manage incorrect strings. In this case, we will generate
         // an exception and deal with the special cases.
         try {
             Process pr = Runtime.getRuntime().exec("cmd /C ver");
@@ -167,9 +167,9 @@ public class NTLMUtilities implements NTLMConstants {
      * 
      * @param workStation the workstation name
      * @param domain the domain name
-     * @param customFlags custom flags, if null then 
+     * @param customFlags custom flags, if null then
      * <code>NTLMConstants.DEFAULT_CONSTANTS</code> is used
-     * @param osVersion the os version of the client, if null then 
+     * @param osVersion the os version of the client, if null then
      * <code>NTLMConstants.DEFAULT_OS_VERSION</code> is used
      * @return the type 1 message
      */
@@ -220,11 +220,11 @@ public class NTLMUtilities implements NTLMConstants {
     }
 
     /**
-     * Writes a security buffer and returns the pointer of the position 
+     * Writes a security buffer and returns the pointer of the position
      * where to write the next security buffer.
      * 
      * @param baos the stream where the security buffer is written
-     * @param len the length of the security buffer 
+     * @param len the length of the security buffer
      * @param pointer the position where the security buffer can be written
      * @return the position where the next security buffer will be written
      * @throws IOException if writing to the ByteArrayOutputStream fails
@@ -232,7 +232,7 @@ public class NTLMUtilities implements NTLMConstants {
     public final static int writeSecurityBufferAndUpdatePointer(ByteArrayOutputStream baos, short len, int pointer)
             throws IOException {
         baos.write(writeSecurityBuffer(len, pointer));
-        
+
         return pointer + len;
     }
 
@@ -245,7 +245,7 @@ public class NTLMUtilities implements NTLMConstants {
     public final static byte[] extractChallengeFromType2Message(byte[] msg) {
         byte[] challenge = new byte[8];
         System.arraycopy(msg, 24, challenge, 0, 8);
-        
+
         return challenge;
     }
 
@@ -270,7 +270,7 @@ public class NTLMUtilities implements NTLMConstants {
      * 
      * @param msg the message where to read the security buffer and it's value
      * @param securityBufferOffset the offset at which to read the security buffer
-     * @return a new byte array holding the data pointed by the security buffer 
+     * @return a new byte array holding the data pointed by the security buffer
      */
     public final static byte[] readSecurityBufferTarget(byte[] msg, int securityBufferOffset) {
         byte[] securityBuffer = new byte[8];
@@ -290,11 +290,11 @@ public class NTLMUtilities implements NTLMConstants {
      * Extracts the target name from the type 2 message.
      * 
      * @param msg the type 2 message byte array
-     * @param msgFlags the flags if null then flags are extracted from the 
+     * @param msgFlags the flags if null then flags are extracted from the
      * type 2 message
      * @return the target name
-     * @throws UnsupportedEncodingException if unable to use the 
-     * needed UTF-16LE or ASCII charsets 
+     * @throws UnsupportedEncodingException if unable to use the
+     * needed UTF-16LE or ASCII charsets
      */
     public final static String extractTargetNameFromType2Message(byte[] msg, Integer msgFlags)
             throws UnsupportedEncodingException {
@@ -304,7 +304,7 @@ public class NTLMUtilities implements NTLMConstants {
 
         // now we convert it to a string
         int flags = msgFlags == null ? extractFlagsFromType2Message(msg) : msgFlags;
-        
+
         if (ByteUtilities.isFlagSet(flags, FLAG_NEGOTIATE_UNICODE)) {
             return new String(targetName, "UTF-16LE");
         }
@@ -316,7 +316,7 @@ public class NTLMUtilities implements NTLMConstants {
      * Extracts the target information block from the type 2 message.
      * 
      * @param msg the type 2 message byte array
-     * @param msgFlags the flags if null then flags are extracted from the 
+     * @param msgFlags the flags if null then flags are extracted from the
      * type 2 message
      * @return the target info
      */
@@ -337,44 +337,44 @@ public class NTLMUtilities implements NTLMConstants {
      * from the type 2 message.
      * 
      * @param msg the type 2 message
-     * @param msgFlags the flags if null then flags are extracted from the 
+     * @param msgFlags the flags if null then flags are extracted from the
      * type 2 message
      * @param out the output target for the information
-     * @throws UnsupportedEncodingException if unable to use the 
-     * needed UTF-16LE or ASCII charsets 
+     * @throws UnsupportedEncodingException if unable to use the
+     * needed UTF-16LE or ASCII charsets
      */
     public final static void printTargetInformationBlockFromType2Message(byte[] msg, Integer msgFlags, PrintWriter out)
             throws UnsupportedEncodingException {
         int flags = msgFlags == null ? extractFlagsFromType2Message(msg) : msgFlags;
 
         byte[] infoBlock = extractTargetInfoFromType2Message(msg, flags);
-        
+
         if (infoBlock == null) {
             out.println("No target information block found !");
         } else {
             int pos = 0;
-            
+
             while (infoBlock[pos] != 0) {
                 out.print("---\nType " + infoBlock[pos] + ": ");
-                
+
                 switch (infoBlock[pos]) {
-                    case 1:
-                        out.println("Server name");
-                        break;
-                    case 2:
-                        out.println("Domain name");
-                        break;
-                    case 3:
-                        out.println("Fully qualified DNS hostname");
-                        break;
-                    case 4:
-                        out.println("DNS domain name");
-                        break;
-                    case 5:
-                        out.println("Parent DNS domain name");
-                        break;
+                case 1:
+                    out.println("Server name");
+                    break;
+                case 2:
+                    out.println("Domain name");
+                    break;
+                case 3:
+                    out.println("Fully qualified DNS hostname");
+                    break;
+                case 4:
+                    out.println("DNS domain name");
+                    break;
+                case 5:
+                    out.println("Parent DNS domain name");
+                    break;
                 }
-                
+
                 byte[] len = new byte[2];
                 System.arraycopy(infoBlock, pos + 2, len, 0, 2);
                 ByteUtilities.changeByteEndianess(len, 0, 2);
@@ -382,13 +382,13 @@ public class NTLMUtilities implements NTLMConstants {
                 int length = ByteUtilities.makeIntFromByte2(len, 0);
                 out.println("Length: " + length + " bytes");
                 out.print("Data: ");
-                
+
                 if (ByteUtilities.isFlagSet(flags, FLAG_NEGOTIATE_UNICODE)) {
                     out.println(new String(infoBlock, pos + 4, length, "UTF-16LE"));
                 } else {
                     out.println(new String(infoBlock, pos + 4, length, "ASCII"));
                 }
-                
+
                 pos += 4 + length;
                 out.flush();
             }
@@ -396,15 +396,24 @@ public class NTLMUtilities implements NTLMConstants {
     }
 
     /**
-     * @see http://davenport.sourceforge.net/ntlm.html#theType3Message
+     * @see <a
+     *      href="http://davenport.sourceforge.net/ntlm.html#theType3Message">NTLM
+     *      message type</a>
      * 
-     * @param user the user name
-     * @param password the user password
-     * @param challenge the challenge response
-     * @param target the target name
-     * @param workstation the client workstation's name
-     * @param serverFlags the flags set by the client
-     * @param osVersion the os version of the client
+     * @param user
+     *            the user name
+     * @param password
+     *            the user password
+     * @param challenge
+     *            the challenge response
+     * @param target
+     *            the target name
+     * @param workstation
+     *            the client workstation's name
+     * @param serverFlags
+     *            the flags set by the client
+     * @param osVersion
+     *            the os version of the client
      * @return the type 3 message
      */
     public final static byte[] createType3Message(String user, String password, byte[] challenge, String target,
@@ -444,15 +453,15 @@ public class NTLMUtilities implements NTLMConstants {
             writeSecurityBufferAndUpdatePointer(baos, (short) workstationName.length, pos);
 
             /**
-            LM/LMv2 Response security buffer 
-            20 NTLM/NTLMv2 Response security buffer 
-            28 Target Name security buffer 
-            36 User Name security buffer 
-            44 Workstation Name security buffer 
-            (52) Session Key (optional) security buffer 
-            (60) Flags (optional) long 
+            LM/LMv2 Response security buffer
+            20 NTLM/NTLMv2 Response security buffer
+            28 Target Name security buffer
+            36 User Name security buffer
+            44 Workstation Name security buffer
+            (52) Session Key (optional) security buffer
+            (60) Flags (optional) long
             (64) OS Version Structure (Optional) 8 bytes
-            **/
+             **/
 
             // Session Key Security Buffer ??!
             baos.write(new byte[] { 0, 0, 0, 0, (byte) 0x9a, 0, 0, 0 });

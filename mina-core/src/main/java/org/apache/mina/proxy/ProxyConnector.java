@@ -44,16 +44,20 @@ import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 
 /**
- * ProxyConnector.java - Decorator for {@link SocketConnector} to provide proxy support, 
- * as suggested by MINA list discussions.
+ * ProxyConnector.java - Decorator for {@link SocketConnector} to provide proxy
+ * support, as suggested by MINA list discussions.
  * <p>
- * Operates by intercepting connect requests and replacing the endpoint address with the 
- * proxy address, then adding a {@link ProxyFilter} as the first {@link IoFilter} which 
- * performs any necessary handshaking with the proxy before allowing data to flow 
- * normally. During the handshake, any outgoing write requests are buffered.
+ * Operates by intercepting connect requests and replacing the endpoint address
+ * with the proxy address, then adding a {@link ProxyFilter} as the first
+ * {@link IoFilter} which performs any necessary handshaking with the proxy
+ * before allowing data to flow normally. During the handshake, any outgoing
+ * write requests are buffered.
  * 
- * @see        http://www.nabble.com/Meta-Transport%3A-an-idea-on-implementing-reconnection-and-proxy-td12969001.html
- * @see        http://issues.apache.org/jira/browse/DIRMINA-415
+ * @see <a
+ *      href="http://www.nabble.com/Meta-Transport%3A-an-idea-on-implementing-reconnection-and-proxy-td12969001.html">Proxy
+ *      reconnection</a>
+ * @see <a href="http://issues.apache.org/jira/browse/DIRMINA-415">Proxy
+ *      support</a>
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
@@ -99,7 +103,7 @@ public class ProxyConnector extends AbstractIoConnector {
     }
 
     /**
-     * Creates a new proxy connector. 
+     * Creates a new proxy connector.
      * @see AbstractIoConnector(IoSessionConfig, Executor).
      */
     public ProxyConnector(final SocketConnector connector, IoSessionConfig config, Executor executor) {
@@ -166,7 +170,7 @@ public class ProxyConnector extends AbstractIoConnector {
         ConnectFuture conFuture = connector.connect(proxyIoSession.getProxyAddress(), new ProxyIoSessionInitializer(
                 sessionInitializer, proxyIoSession));
 
-        // If proxy does not use reconnection like socks the connector's 
+        // If proxy does not use reconnection like socks the connector's
         // future is returned. If we're in the middle of a reconnection
         // then we send back the connector's future which is only used
         // internally while <code>future</code> will be used to notify
@@ -223,7 +227,7 @@ public class ProxyConnector extends AbstractIoConnector {
             connector.getFilterChain().remove(className);
         }
 
-        // Insert the ProxyFilter as the first filter in the filter chain builder        
+        // Insert the ProxyFilter as the first filter in the filter chain builder
         connector.getFilterChain().addFirst(className, proxyFilter);
     }
 

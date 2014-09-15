@@ -51,12 +51,12 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     private SocketAddress defaultLocalAddress;
 
     /**
-     * Constructor for {@link AbstractIoConnector}. You need to provide a default
-     * session configuration and an {@link Executor} for handling I/O events. If
-     * null {@link Executor} is provided, a default one will be created using
-     * {@link Executors#newCachedThreadPool()}.
-     *
-     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * Constructor for {@link AbstractIoConnector}. You need to provide a
+     * default session configuration and an {@link Executor} for handling I/O
+     * events. If null {@link Executor} is provided, a default one will be
+     * created using {@link Executors#newCachedThreadPool()}.
+     * 
+     * @see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
@@ -282,8 +282,6 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
      * Adds required internal attributes and {@link IoFutureListener}s
      * related with event notifications to the specified {@code session}
      * and {@code future}.  Do not call this method directly;
-     * {@link #finishSessionInitialization(IoSession, IoFuture, IoSessionInitializer)}
-     * will call this method instead.
      */
     @Override
     protected final void finishSessionInitialization0(final IoSession session, IoFuture future) {

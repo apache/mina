@@ -25,19 +25,22 @@ import org.apache.mina.statemachine.StateMachineProxyBuilder;
 import org.apache.mina.statemachine.context.StateContext;
 
 /**
- * Used by {@link StateMachineProxyBuilder} to create {@link Event} objects when 
+ * Used by {@link StateMachineProxyBuilder} to create {@link Event} objects when
  * methods are invoked on the proxy.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface EventFactory {
     /**
-     * Creates a new {@link Event} from the specified method and method 
+     * Creates a new {@link Event} from the specified method and method
      * arguments.
      * 
-     * @param context the current {@link StateContext}.
-     * @param method the method being invoked.
-     * @param args the method arguments.
+     * @param context
+     *            the current {@link StateContext}.
+     * @param method
+     *            the method being invoked.
+     * @param arguments
+     *            the method arguments.
      * @return the {@link Event} object.
      */
     Event create(StateContext context, Method method, Object[] arguments);

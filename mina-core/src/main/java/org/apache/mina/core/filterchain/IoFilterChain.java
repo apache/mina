@@ -221,19 +221,20 @@ public interface IoFilterChain {
     IoFilter remove(String name);
 
     /**
-     * Replace the filter with the specified name with the specified new
-     * filter.
-     *
-     * @param name The filter to remove
+     * Replace the filter with the specified name with the specified new filter.
+     * 
+     * @param filter
+     *            The filter to remove
      */
     void remove(IoFilter filter);
 
     /**
-     * Replace the filter of the specified type with the specified new
-     * filter.  If there's more than one filter with the specified type,
-     * the first match will be replaced.
-     *
-     * @param name The filter class to remove
+     * Replace the filter of the specified type with the specified new filter.
+     * If there's more than one filter with the specified type, the first match
+     * will be replaced.
+     * 
+     * @param filterType
+     *            The filter class to remove
      * @return The removed filter
      */
     IoFilter remove(Class<? extends IoFilter> filterType);
@@ -274,20 +275,22 @@ public interface IoFilterChain {
     public void fireSessionIdle(IdleStatus status);
 
     /**
-     * Fires a {@link IoHandler#messageReceived(Object)} event. Most users don't need to
-     * call this method at all. Please use this method only when you implement a new transport
-     * or fire a virtual event.
+     * Fires a {@link IoHandler#messageReceived(IoSession, Object)} event. Most
+     * users don't need to call this method at all. Please use this method only
+     * when you implement a new transport or fire a virtual event.
      * 
-     * @param message The received message
+     * @param message
+     *            The received message
      */
     public void fireMessageReceived(Object message);
 
     /**
-     * Fires a {@link IoHandler#messageSent(IoSession)} event. Most users don't need to call
-     * this method at all. Please use this method only when you implement a new transport or
-     * fire a virtual event.
+     * Fires a {@link IoHandler#messageSent(IoSession, Object)} event. Most
+     * users don't need to call this method at all. Please use this method only
+     * when you implement a new transport or fire a virtual event.
      * 
-     * @param request The sent request
+     * @param request
+     *            The sent request
      */
     public void fireMessageSent(WriteRequest request);
 
@@ -301,9 +304,9 @@ public interface IoFilterChain {
     public void fireExceptionCaught(Throwable cause);
 
     /**
-     * Fires a {@link IoHandler#inputClosed(IoSession, Throwable)} event. Most
-     * users don't need to call this method at all. Please use this method only
-     * when you implement a new transport or fire a virtual event.
+     * Fires a {@link IoHandler#inputClosed(IoSession)} event. Most users don't
+     * need to call this method at all. Please use this method only when you
+     * implement a new transport or fire a virtual event.
      */
     public void fireInputClosed();
 

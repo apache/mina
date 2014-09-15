@@ -102,10 +102,10 @@ public interface IoAcceptor extends IoService {
     void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses);
 
     /**
-    * Returns <tt>true</tt> if and only if all clients are closed when this
-    * acceptor unbinds from all the related local address (i.e. when the
-    * service is deactivated).
-    */
+     * Returns <tt>true</tt> if and only if all clients are closed when this
+     * acceptor unbinds from all the related local address (i.e. when the
+     * service is deactivated).
+     */
     boolean isCloseOnDeactivation();
 
     /**
@@ -128,7 +128,7 @@ public interface IoAcceptor extends IoService {
      * connections.
      *
      * @param localAddress The SocketAddress to bind to
-     *  
+     * 
      * @throws IOException if failed to bind
      */
     void bind(SocketAddress localAddress) throws IOException;
@@ -137,10 +137,13 @@ public interface IoAcceptor extends IoService {
      * Binds to the specified local addresses and start to accept incoming
      * connections. If no address is given, bind on the default local address.
      * 
-     * @param firstLocalAddresses The first address to bind to 
-     * @param addresses The SocketAddresses to bind to 
-     *
-     * @throws IOException if failed to bind
+     * @param firstLocalAddress
+     *            The first address to bind to
+     * @param addresses
+     *            The SocketAddresses to bind to
+     * 
+     * @throws IOException
+     *             if failed to bind
      */
     void bind(SocketAddress firstLocalAddress, SocketAddress... addresses) throws IOException;
 
@@ -148,7 +151,7 @@ public interface IoAcceptor extends IoService {
      * Binds to the specified local addresses and start to accept incoming
      * connections. If no address is given, bind on the default local address.
      * 
-     * @param addresses The SocketAddresses to bind to 
+     * @param addresses The SocketAddresses to bind to
      *
      * @throws IOException if failed to bind
      */
