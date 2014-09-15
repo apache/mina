@@ -243,7 +243,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
 
     /**
      * Finish the connection process of a client socket after it was marked as
-     * ready to process by the {@link select(int)} call. The socket will be
+     * ready to process by the {@link #select(int)} call. The socket will be
      * connected or reported as connection failed.
      * 
      * @param handle

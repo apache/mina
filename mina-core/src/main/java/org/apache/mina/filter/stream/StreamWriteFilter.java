@@ -24,6 +24,7 @@ import java.io.InputStream;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * Filter implementation which makes it possible to write {@link InputStream}
@@ -31,7 +32,7 @@ import org.apache.mina.core.filterchain.IoFilter;
  * {@link InputStream} is written to a session this filter will read the bytes
  * from the stream into {@link IoBuffer} objects and write those buffers
  * to the next filter. When end of stream has been reached this filter will
- * call {@link IoFilter.NextFilter#messageSent(IoSession,WriteRequest)} using the original
+ * call {@link org.apache.mina.core.filterchain.IoFilter.NextFilter#messageSent(org.apache.mina.core.session.IoSession, org.apache.mina.core.write.WriteRequest)} using the original
  * {@link InputStream} written to the session and notifies
  * {@link org.apache.mina.core.future.WriteFuture} on the
  * original {@link org.apache.mina.core.write.WriteRequest}.

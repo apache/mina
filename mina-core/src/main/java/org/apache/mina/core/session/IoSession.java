@@ -61,7 +61,7 @@ import org.apache.mina.core.write.WriteRequestQueue;
  * <h3>Equality of Sessions</h3>
  * TODO : The getId() method is totally wrong. We can't base
  * a method which is designed to create a unique ID on the hashCode method.
- * {@link #equals(Object)} and {@link #hashCode()} shall not be overriden
+ * {@link Object#equals(Object)} and {@link Object#hashCode()} shall not be overriden
  * to the default behavior that is defined in {@link Object}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -164,10 +164,10 @@ public interface IoSession {
      * {@link CloseFuture} if you want to wait for the session actually closed.
      *
      * @param immediately {@code true} to close this session immediately
-     *                    (i.e. {@link #close()}). The pending write requests
+     *                    . The pending write requests
      *                    will simply be discarded.
      *                    {@code false} to close this session after all queued
-     *                    write requests are flushed (i.e. {@link #closeOnFlush()}).
+     *                    write requests are flushed (i.e. {@link #close()}).
      */
     CloseFuture close(boolean immediately);
 
@@ -175,7 +175,7 @@ public interface IoSession {
      * Closes this session after all queued write requests
      * are flushed. This operation is asynchronous.  Wait for the returned
      * {@link CloseFuture} if you want to wait for the session actually closed.
-     * @deprecated use {@link IoSession#close(boolean)}
+     * @deprecated use {@link #close(boolean)}
      */
     @Deprecated
     CloseFuture close();
@@ -370,9 +370,9 @@ public interface IoSession {
 
     /**
      * 
-     * TODO setWriteRequestQueue.
+     * Associate the current write request with the session
      *
-     * @param writeRequestQueue
+     * @param currentWriteRequest the current write request to associate
      */
     void setCurrentWriteRequest(WriteRequest currentWriteRequest);
 

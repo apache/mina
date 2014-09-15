@@ -99,7 +99,7 @@ SocketConnector {
      * 
      * @param processorClass the processor class.
      * @param processorCount the number of processors to instantiate.
-     * @see org.apache.mina.core.service.SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int)
+     * @see SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int, java.nio.channels.spi.SelectorProvider)
      * @since 2.0.0-M4
      */
     public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass, int processorCount) {
@@ -114,7 +114,7 @@ SocketConnector {
      * in the system, plus one.
      * 
      * @param processorClass the processor class.
-     * @see org.apache.mina.core.service.SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int)
+     * @see SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int, java.nio.channels.spi.SelectorProvider)
      * @see org.apache.mina.core.service.SimpleIoProcessorPool#DEFAULT_SIZE
      * @since 2.0.0-M4
      */

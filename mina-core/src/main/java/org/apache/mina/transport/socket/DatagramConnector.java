@@ -45,7 +45,7 @@ public interface DatagramConnector extends IoConnector {
     /**
      * Sets the default remote InetSocketAddress to connect to when no argument is
      * specified in {@link #connect()} method.
-     * This method overrides the {@link IoConnector#setDefaultRemoteAddress()} method.
+     * This method overrides the {@link IoConnector#setDefaultRemoteAddress(java.net.SocketAddress)} method.
      */
     void setDefaultRemoteAddress(InetSocketAddress remoteAddress);
 }

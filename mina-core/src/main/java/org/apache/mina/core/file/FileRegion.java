@@ -46,7 +46,7 @@ public interface FileRegion {
     /**
      * Updates the current file position based on the specified amount. This
      * increases the value returned by {@link #getPosition()} and
-     * {@link getWrittenBytes} by the given amount and decreases the value
+     * {@link #getWrittenBytes()} by the given amount and decreases the value
      * returned by {@link #getRemainingBytes()} by the given {@code amount}.
      * 
      * @param amount

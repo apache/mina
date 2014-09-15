@@ -38,7 +38,7 @@ public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
     private final static Logger logger = LoggerFactory.getLogger(HttpNoAuthLogicHandler.class);
 
     /**
-     * {@inheritDoc}
+     * Build an HttpNoAuthLogicHandler
      */
     public HttpNoAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);

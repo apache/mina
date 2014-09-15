@@ -45,7 +45,7 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
     private final static Logger logger = LoggerFactory.getLogger(HttpBasicAuthLogicHandler.class);
 
     /**
-     * {@inheritDoc}
+     * Build an HttpBasicAuthLogicHandler
      */
     public HttpBasicAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);

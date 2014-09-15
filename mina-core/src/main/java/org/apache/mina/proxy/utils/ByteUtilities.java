@@ -35,7 +35,7 @@ public class ByteUtilities {
      * @param buf the buffer to read the bytes from
      * @param start
      * @param count
-     * @return
+     * @return the integer value        
      */
     public static int networkByteOrderToInt(byte[] buf, int start, int count) {
         if (count > 4) {
@@ -276,8 +276,7 @@ public class ByteUtilities {
      * Reads an int from 4 bytes of the given array at offset 0.
      * 
      * @param b the byte array to read
-     * @param offset the offset at which to start
-     * @return the int value
+     * @return the integer value
      */
     public static final int makeIntFromByte4(byte[] b) {
         return makeIntFromByte4(b, 0);
@@ -319,7 +318,7 @@ public class ByteUtilities {
      * Returns true if the flag <code>testFlag</code> is set in the
      * <code>flags</code> flagset.
      * 
-     * @param flagset the flagset to test
+     * @param flagSet the flagset to test
      * @param testFlag the flag we search the presence of
      * @return true if testFlag is present in the flagset, false otherwise.
      */

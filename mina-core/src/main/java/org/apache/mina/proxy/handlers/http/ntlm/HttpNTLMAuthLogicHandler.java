@@ -52,7 +52,7 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
     private byte[] challengePacket = null;
 
     /**
-     * {@inheritDoc}
+     * Build an HttpNTLMAuthLogicHandler
      */
     public HttpNTLMAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);

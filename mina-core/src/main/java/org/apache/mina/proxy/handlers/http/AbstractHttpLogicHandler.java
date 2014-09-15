@@ -102,7 +102,6 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
      * Creates a new {@link AbstractHttpLogicHandler}.
      * 
      * @param proxyIoSession the {@link ProxyIoSession} in use.
-     * @param request the requested url to negotiate with the proxy.
      */
     public AbstractHttpLogicHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);
@@ -284,7 +283,7 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
     public abstract void handleResponse(final HttpProxyResponse response) throws ProxyAuthException;
 
     /**
-     * Calls{@link #writeRequest0(NextFilter, HttpProxyRequest)} to write the request. 
+     * Calls writeRequest0(NextFilter, HttpProxyRequest) to write the request. 
      * If needed a reconnection to the proxy is done previously.
      * 
      * @param nextFilter the next filter

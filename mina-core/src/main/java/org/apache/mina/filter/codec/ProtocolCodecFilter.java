@@ -116,8 +116,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      * the two parameters (encoder and decoder), which are class names. Instances
      * for those classes will be created in this constructor.
      * 
-     * @param encoder The class responsible for encoding the message
-     * @param decoder The class responsible for decoding the message
+     * @param encoderClass The class responsible for encoding the message
+     * @param decoderClass The class responsible for decoding the message
      */
     public ProtocolCodecFilter(final Class<? extends ProtocolEncoder> encoderClass,
             final Class<? extends ProtocolDecoder> decoderClass) {

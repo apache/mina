@@ -341,7 +341,7 @@ public final class CompositeByteArray extends AbstractByteArray {
      * array) and with the given listener.
      * 
      * @param listener
-     *  Returns a new {@link Cursor} instance
+     *  Returns a new {@link ByteArray.Cursor} instance
      */
     public Cursor cursor(CursorListener listener) {
         return new CursorImpl(listener);

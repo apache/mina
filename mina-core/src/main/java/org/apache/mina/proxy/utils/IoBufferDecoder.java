@@ -148,7 +148,7 @@ public class IoBufferDecoder {
 
     /**
      * Dynamically sets a new delimiter. Next time 
-     * {@link IoBufferDecoder#decodeOnce(IoSession, int) } will be called it will use the new 
+     * {@link #decodeFully(IoBuffer)} will be called it will use the new 
      * delimiter. Delimiter matching is reset only if <tt>resetMatchCount</tt> is true but 
      * decoding will continue from current position.
      * 

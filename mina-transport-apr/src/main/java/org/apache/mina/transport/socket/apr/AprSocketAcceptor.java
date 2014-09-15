@@ -344,7 +344,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
     }
 
     /**
-     * {@inheritDoc}
+     * @see #setDefaultLocalAddress(SocketAddress)
      */
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         super.setDefaultLocalAddress(localAddress);

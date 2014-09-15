@@ -76,7 +76,7 @@ public class IdleStatusChecker {
 
     /**
      * get a runnable task able to be scheduled in the {@link IoService} executor.
-     * @return
+     * @return the associated runnable task
      */
     public NotifyingTask getNotifyingTask() {
         return notifyingTask;

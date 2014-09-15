@@ -67,7 +67,7 @@ public interface HttpRequest extends HttpMessage {
     
     /**
      * Retrurn the HTTP request path
-     * @retrun the request path
+     * @return the request path
      */
     String getRequestPath();
 }

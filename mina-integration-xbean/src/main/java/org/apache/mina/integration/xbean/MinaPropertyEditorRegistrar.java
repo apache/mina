@@ -56,8 +56,7 @@ public class MinaPropertyEditorRegistrar implements PropertyEditorRegistrar {
      *   <li>org.apache.mina.integration.beans.VmPipeAddressEditor</li>
      * </ul>
      * 
-     * @see org.springframework.beans.PropertyEditorRegistrar#
-     * registerCustomEditors(org.springframework.beans.PropertyEditorRegistry)
+     * @see PropertyEditorRegistrar#registerCustomEditors(PropertyEditorRegistry)
      */
     public void registerCustomEditors(PropertyEditorRegistry registry) {
         // it is expected that new PropertyEditor instances are created

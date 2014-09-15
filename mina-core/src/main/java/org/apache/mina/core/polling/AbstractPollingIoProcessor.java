@@ -230,7 +230,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     protected abstract boolean isSelectorEmpty();
 
     /**
-     * Interrupt the {@link AbstractPollingIoProcessor#select(int)} call.
+     * Interrupt the {@link #select(long)} call.
      */
     protected abstract void wakeup();
 
@@ -244,7 +244,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
 
     /**
      * Get an {@link Iterator} for the list of {@link IoSession} found selected
-     * by the last call of {@link AbstractPollingIoProcessor#select(int)}
+     * by the last call of {@link #select(long)}
      * 
      * @return {@link Iterator} of {@link IoSession} read for I/Os operation
      */

@@ -64,7 +64,7 @@ public interface WriteRequestQueue {
 
     /**
      * Returns the number of objects currently stored in the queue.
-     * @return
+     * @return the size of the queue
      */
     int size();
 }

@@ -472,7 +472,6 @@ public class ExecutorFilter extends IoFilterAdapter {
      * @param executor The underlying {@link Executor} in charge of managing the Thread pool.
      * @param manageableExecutor Tells if the Executor's Life Cycle can be managed or not
      * @param eventTypes The lit of event which are handled by the executor
-     * @param
      */
     private void init(Executor executor, boolean manageableExecutor, IoEventType... eventTypes) {
         if (executor == null) {

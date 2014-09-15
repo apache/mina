@@ -174,7 +174,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     }
 
     /**
-     * {@inheritDoc}
+     * @return return the values from the cache
      */
     public Collection<LazyInitializer<V>> getValues() {
         return cache.values();

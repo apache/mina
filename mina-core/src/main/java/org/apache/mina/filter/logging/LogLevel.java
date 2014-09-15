@@ -24,7 +24,7 @@ package org.apache.mina.filter.logging;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
- * @see NoopFilter
+ * @see LoggingFilter
  */
 public enum LogLevel {
 

@@ -67,7 +67,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
     private final static String GSS_TOKEN = Socks5LogicHandler.class.getName() + ".GSSToken";
 
     /**
-     * {@inheritDoc}
+     * @see AbstractSocksLogicHandler#AbstractSocksLogicHandler(ProxyIoSession)
      */
     public Socks5LogicHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);

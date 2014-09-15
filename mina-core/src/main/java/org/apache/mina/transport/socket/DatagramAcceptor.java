@@ -50,7 +50,7 @@ public interface DatagramAcceptor extends IoAcceptor {
      * Sets the default local InetSocketAddress to bind when no argument is specified in
      * {@link #bind()} method. Please note that the default will not be used
      * if any local InetSocketAddress is specified.
-     * This method overrides the {@link IoAcceptor#setDefaultLocalAddress()} method.
+     * This method overrides the {@link IoAcceptor#setDefaultLocalAddress(java.net.SocketAddress)} method.
      */
     void setDefaultLocalAddress(InetSocketAddress localAddress);
 

@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.service.AbstractIoAcceptor;
+import org.apache.mina.core.service.AbstractIoService;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
@@ -158,7 +159,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      * session configuration, a default {@link Executor} will be created using
      * {@link Executors#newCachedThreadPool()}.
      * 
-     * {@see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)}
+     * @see AbstractIoService
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
@@ -175,7 +176,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      * events. If a null {@link Executor} is provided, a default one will be
      * created using {@link Executors#newCachedThreadPool()}.
      * 
-     * @see AbstractIoService(IoSessionConfig, Executor)
+     * @see AbstractIoService#AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}

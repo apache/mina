@@ -39,7 +39,7 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
     private final static Logger logger = LoggerFactory.getLogger(Socks4LogicHandler.class);
 
     /**
-     * {@inheritDoc}
+     * @see AbstractSocksLogicHandler#AbstractSocksLogicHandler(ProxyIoSession)
      */
     public Socks4LogicHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);

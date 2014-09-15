@@ -28,7 +28,7 @@ import org.apache.mina.core.file.FileRegion;
  * Filter implementation that converts a {@link FileRegion} to {@link IoBuffer}
  * objects and writes those buffers to the next filter. When end of the
  * {@code FileRegion} has been reached this filter will call
- * {@link IoFilter.NextFilter#messageSent(IoSession,WriteRequest)} using the
+ * {@link org.apache.mina.core.filterchain.IoFilter.NextFilter#messageSent(org.apache.mina.core.session.IoSession, org.apache.mina.core.write.WriteRequest)} using the
  * original {@link FileRegion} written to the session and notifies
  * {@link org.apache.mina.core.future.WriteFuture} on the original
  * {@link org.apache.mina.core.write.WriteRequest}.

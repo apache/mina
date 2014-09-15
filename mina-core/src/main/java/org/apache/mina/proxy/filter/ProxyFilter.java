@@ -100,9 +100,9 @@ public class ProxyFilter extends IoFilterAdapter {
      * {@link ProxyIoSession} session's instance to signal that handshake
      * failed.  
      * 
-     * @param chain the filter chain
-     * @param name the name assigned to this filter
-     * @param nextFilter the next filter
+     * @param nextFilter next filter in the filter chain
+     * @param session the MINA session
+     * @param cause the original exception
      */
     @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {

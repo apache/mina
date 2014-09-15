@@ -45,8 +45,8 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  * the classes that depends on {@link IoSession}.
  *
  * <h2>Overriding I/O request methods</h2>
- * All I/O request methods (i.e. {@link #close()}, {@link #write(Object)} and
- * {@link #setTrafficMask(TrafficMask)}) are final and therefore cannot be
+ * All I/O request methods (i.e. {@link #close()}, {@link #write(Object)}
+ * are final and therefore cannot be
  * overridden, but you can always add your custom {@link IoFilter} to the
  * {@link IoFilterChain} to intercept any I/O events and requests.
  *
