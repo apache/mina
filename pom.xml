@@ -552,6 +552,30 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${version.javadoc.plugin}</version>
+          <configuration>
+            <tags>
+              <tag>
+                <name>org.apache.xbean.XBean</name>
+                <placement>t</placement>
+                <head/>
+              </tag>
+              <tag>
+                <name>org.apache.xbean.Property</name>
+                <placement>m</placement>
+                <head/>
+              </tag>
+              <tag>
+              <tag>
+                <name>org.apache.xbean.FactoryMethod</name>
+                <placement>m</placement>
+                <head/>
+              </tag>
+                <name>org.apache.xbean.DestroyMethod</name>
+                <placement>m</placement>
+                <head/>
+              </tag>
+            </tags>
+         </configuration>
         </plugin>
 
         <plugin>
