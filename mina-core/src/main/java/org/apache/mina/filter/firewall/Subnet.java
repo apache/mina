@@ -21,6 +21,7 @@
 package org.apache.mina.filter.firewall;
 
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 
 /**
@@ -61,8 +62,8 @@ public class Subnet {
             throw new IllegalArgumentException("Subnet address can not be null");
         }
 
-        if (!(subnet instanceof Inet4Address)) {
-            throw new IllegalArgumentException("Only IPv4 supported");
+        if (!(subnet instanceof Inet4Address) && !(subnet instanceof Inet6Address)) {
+            throw new IllegalArgumentException("Only IPv4 and IPV6 supported");
         }
 
         if (subnet instanceof Inet4Address) {

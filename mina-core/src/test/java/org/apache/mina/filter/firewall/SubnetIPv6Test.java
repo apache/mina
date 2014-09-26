@@ -21,7 +21,6 @@
 package org.apache.mina.filter.firewall;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -45,12 +44,6 @@ public class SubnetIPv6Test {
 
         assertTrue(a instanceof Inet6Address);
 
-        try {
-            new Subnet(a, 24);
-            fail("IPv6 not supported");
-        } catch (IllegalArgumentException e) {
-            // signifies a successful test execution
-            assertTrue(true);
-        }
+        new Subnet(a, 24);
     }
 }
