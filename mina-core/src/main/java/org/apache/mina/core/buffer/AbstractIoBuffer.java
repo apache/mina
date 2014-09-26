@@ -304,17 +304,24 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         int position = position();
         int capacity = capacity();
         int limit = limit();
+
         if (capacity == limit) {
             return this;
         }
 
         int newCapacity = capacity;
         int minCapacity = Math.max(minimumCapacity, limit);
+
         for (;;) {
             if (newCapacity >>> 1 < minCapacity) {
                 break;
             }
+
             newCapacity >>>= 1;
+
+            if (minCapacity == 0) {
+                break;
+            }
         }
 
         newCapacity = Math.max(minCapacity, newCapacity);

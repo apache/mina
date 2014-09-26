@@ -1449,4 +1449,23 @@ public class IoBufferTest {
         assertEquals(0x02, res.get());
         assertEquals(0x03, res.get());
     }
+
+    @Test
+    public void testShrink() {
+        IoBuffer buf = IoBuffer.allocate(36);
+        buf.minimumCapacity(0);
+
+        buf.limit(18);
+        buf.shrink();
+        buf.limit(9);
+        buf.shrink();
+        buf.limit(4);
+        buf.shrink();
+        buf.limit(2);
+        buf.shrink();
+        buf.limit(1);
+        buf.shrink();
+        buf.limit(0);
+        buf.shrink();
+    }
 }
