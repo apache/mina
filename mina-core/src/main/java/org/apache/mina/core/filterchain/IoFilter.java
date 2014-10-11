@@ -147,52 +147,122 @@ public interface IoFilter {
 
     /**
      * Filters {@link IoHandler#sessionCreated(IoSession)} event.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has received this event
      */
     void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionOpened(IoSession)} event.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has received this event
      */
     void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception;
 
     /**
      * Filters {@link IoHandler#sessionClosed(IoSession)} event.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has received this event
      */
     void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception;
 
     /**
-     * Filters {@link IoHandler#sessionIdle(IoSession,IdleStatus)}
-     * event.
+     * Filters {@link IoHandler#sessionIdle(IoSession,IdleStatus)} event.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has received this event
+     * @param status
+     *            The {@link IdleStatus} type
      */
     void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception;
 
     /**
-     * Filters {@link IoHandler#exceptionCaught(IoSession,Throwable)}
-     * event.
+     * Filters {@link IoHandler#exceptionCaught(IoSession,Throwable)} event.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has received this event
+     * @param cause
+     *            The exception that cause this event to be received
      */
     void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception;
 
+    /**
+     * Filters {@link IoHandler#inputClosed(IoSession)} event.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has received this event
+     */
     void inputClosed(NextFilter nextFilter, IoSession session) throws Exception;
 
     /**
-     * Filters {@link IoHandler#messageReceived(IoSession,Object)}
-     * event.
+     * Filters {@link IoHandler#messageReceived(IoSession,Object)} event.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has received this event
+     * @param message
+     *            The received message
      */
     void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception;
 
     /**
-     * Filters {@link IoHandler#messageSent(IoSession,Object)}
-     * event.
+     * Filters {@link IoHandler#messageSent(IoSession,Object)} event.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has received this event
+     * @param writeRequest
+     *            The {@link WriteRequest} that contains the sent message
      */
     void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception;
 
     /**
      * Filters {@link IoSession#close()} method invocation.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has to process this method
+     *            invocation
      */
     void filterClose(NextFilter nextFilter, IoSession session) throws Exception;
 
     /**
      * Filters {@link IoSession#write(Object)} method invocation.
+     * 
+     * @param nextFilter
+     *            the {@link NextFilter} for this filter. You can reuse this
+     *            object until this filter is removed from the chain.
+     * @param session
+     *            The {@link IoSession} which has to process this invocation
+     * @param writeRequest
+     *            The {@link WriteRequest} to process
      */
     void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception;
 

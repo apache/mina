@@ -130,6 +130,9 @@ public class IoFilterAdapter implements IoFilter {
         nextFilter.filterClose(session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void inputClosed(NextFilter nextFilter, IoSession session) throws Exception {
         nextFilter.inputClosed(session);
     }
