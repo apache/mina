@@ -155,7 +155,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             Selector newSelector = null;
 
             if (selectorProvider == null) {
-               newSelector = Selector.open();
+                newSelector = Selector.open();
             } else {
                 newSelector = selectorProvider.openSelector();
             }
@@ -232,25 +232,29 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     @Override
     protected boolean isReadable(NioSession session) {
         SelectionKey key = session.getSelectionKey();
-        return key.isValid() && key.isReadable();
+
+        return (key != null) && key.isValid() && key.isReadable();
     }
 
     @Override
     protected boolean isWritable(NioSession session) {
         SelectionKey key = session.getSelectionKey();
-        return key.isValid() && key.isWritable();
+
+        return (key != null) && key.isValid() && key.isWritable();
     }
 
     @Override
     protected boolean isInterestedInRead(NioSession session) {
         SelectionKey key = session.getSelectionKey();
-        return key.isValid() && ((key.interestOps() & SelectionKey.OP_READ) != 0);
+
+        return (key != null) && key.isValid() && ((key.interestOps() & SelectionKey.OP_READ) != 0);
     }
 
     @Override
     protected boolean isInterestedInWrite(NioSession session) {
         SelectionKey key = session.getSelectionKey();
-        return key.isValid() && ((key.interestOps() & SelectionKey.OP_WRITE) != 0);
+
+        return (key != null) && key.isValid() && ((key.interestOps() & SelectionKey.OP_WRITE) != 0);
     }
 
     /**
@@ -259,6 +263,11 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     @Override
     protected void setInterestedInRead(NioSession session, boolean isInterested) throws Exception {
         SelectionKey key = session.getSelectionKey();
+
+        if ((key == null) || !key.isValid()) {
+            return;
+        }
+
         int oldInterestOps = key.interestOps();
         int newInterestOps = oldInterestOps;
 
@@ -280,7 +289,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     protected void setInterestedInWrite(NioSession session, boolean isInterested) throws Exception {
         SelectionKey key = session.getSelectionKey();
 
-        if (key == null) {
+        if ((key == null) || !key.isValid()) {
             return;
         }
 
