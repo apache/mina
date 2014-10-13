@@ -20,11 +20,13 @@
 
 package org.apache.mina.monitoring;
 
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+
+import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
@@ -34,67 +36,72 @@ import org.apache.mina.transport.nio.NioTcpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
 
 /**
  *
  */
-public class NioTcpEchoServerWithMonitoring {
-
+public class NioTcpEchoServerWithMonitoring extends NioTcpServer {
     static final Logger LOG = LoggerFactory.getLogger(NioTcpEchoServerWithMonitoring.class);
 
-    public static void main(final String[] args) {
+    /** The server logger filter */
+    public final class TcpEchoFilter extends AbstractIoFilter {
+        @Override
+        public void sessionOpened(final IoSession session) {
+            LOG.info("session {} opened", session);
+            super.sessionOpened(session);
+        }
+
+        @Override
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            LOG.info("session {} idle", session);
+            super.sessionIdle(session, status);
+        }
+
+        @Override
+        public void sessionClosed(IoSession session) {
+            LOG.info("session {} closed", session);
+            super.sessionClosed(session);
+        }
+
+        @Override
+        public void messageWriting(IoSession session, WriteRequest message, WriteFilterChainController controller) {
+            // we just push the message in the chain
+            super.messageWriting(session, message, controller);
+        }
+
+        @Override
+        public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
+
+            if (message instanceof ByteBuffer) {
+                LOG.info("echoing");
+                session.write(message);
+            }
+
+            super.messageReceived(session, message, controller);
+        }
+
+        @Override
+        public void messageSent(IoSession session, Object message) {
+            LOG.info("message {} sent", message);
+            super.messageSent(session, message);
+        }
+    }
+
+    public static void main(String[] args) {
         LOG.info("starting echo server");
 
-        final NioTcpServer server = new NioTcpServer();
-        final MetricRegistry metrics = new MetricRegistry();
-        final JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
+        NioTcpServer server = new NioTcpServer();
+        MetricRegistry metrics = new MetricRegistry();
+        JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
         reporter.start();
-        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 60*600*1000);
-        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE, 60*600*1000);
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.READ_IDLE, 60 * 600 * 1000);
+        server.getSessionConfig().setIdleTimeInMillis(IdleStatus.WRITE_IDLE, 60 * 600 * 1000);
 
         // create the filter chain for this service
-        server.setFilters(new MonitoringFilter(metrics), new LoggingFilter("LoggingFilter1"), new IoFilter() {
-
-            @Override
-            public void sessionOpened(final IoSession session) {
-                LOG.info("session {} open", session);
-            }
-
-            @Override
-            public void sessionIdle(final IoSession session, final IdleStatus status) {
-                LOG.info("session {} idle", session);
-            }
-
-            @Override
-            public void sessionClosed(final IoSession session) {
-                LOG.info("session {} open", session);
-            }
-
-            @Override
-            public void messageWriting(final IoSession session, WriteRequest message,
-                                       final WriteFilterChainController controller) {
-                // we just push the message in the chain
-                controller.callWriteNextFilter(message);
-            }
-
-            @Override
-            public void messageReceived(final IoSession session, final Object message,
-                                        final ReadFilterChainController controller) {
-
-                if (message instanceof ByteBuffer) {
-                    LOG.info("echoing");
-                    session.write(message);
-                }
-            }
-
-            @Override
-            public void messageSent(final IoSession session, final Object message) {
-                LOG.info("message {} sent", message);
-            }
-        });
+        server.setFilters(new MonitoringFilter(metrics), new LoggingFilter("LoggingFilter1"),
+                ((NioTcpEchoServerWithMonitoring) server).new TcpEchoFilter());
         server.setIoHandler(new AbstractIoHandler() {
             @Override
             public void sessionOpened(final IoSession session) {

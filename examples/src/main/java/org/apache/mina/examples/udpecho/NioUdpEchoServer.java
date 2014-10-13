@@ -23,9 +23,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
+import org.apache.mina.api.AbstractIoFilter;
 import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoFilter;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filterchain.ReadFilterChainController;
@@ -40,54 +40,59 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class NioUdpEchoServer {
+public class NioUdpEchoServer extends NioUdpServer {
     static final Logger LOG = LoggerFactory.getLogger(NioUdpEchoServer.class);
+
+    /** The server logger filter */
+    public final class UdpEchoFilter extends AbstractIoFilter {
+        @Override
+        public void sessionOpened(final IoSession session) {
+            LOG.info("session {} opened", session);
+            super.sessionOpened(session);
+        }
+
+        @Override
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            LOG.info("session {} idle", session);
+            super.sessionIdle(session, status);
+        }
+
+        @Override
+        public void sessionClosed(IoSession session) {
+            LOG.info("session {} closed", session);
+            super.sessionClosed(session);
+        }
+
+        @Override
+        public void messageWriting(IoSession session, WriteRequest message, WriteFilterChainController controller) {
+            // we just push the message in the chain
+            super.messageWriting(session, message, controller);
+        }
+
+        @Override
+        public void messageReceived(IoSession session, Object message, ReadFilterChainController controller) {
+            if (message instanceof ByteBuffer) {
+                LOG.info("echoing");
+                session.write(message);
+            }
+
+            super.messageReceived(session, message, controller);
+        }
+
+        @Override
+        public void messageSent(IoSession session, Object message) {
+            LOG.info("message {} sent", message);
+            super.messageSent(session, message);
+        }
+    }
 
     public static void main(final String[] args) {
         LOG.info("starting echo server");
 
-        final NioUdpServer server = new NioUdpServer();
+        final NioUdpServer server = new NioUdpEchoServer();
 
         // create the filter chain for this service
-        server.setFilters(new LoggingFilter("LoggingFilter1"), new IoFilter() {
-
-            @Override
-            public void sessionOpened(final IoSession session) {
-                LOG.info("session {} open", session);
-            }
-
-            @Override
-            public void sessionIdle(final IoSession session, final IdleStatus status) {
-                LOG.info("session {} idle", session);
-            }
-
-            @Override
-            public void sessionClosed(final IoSession session) {
-                LOG.info("session {} open", session);
-            }
-
-            @Override
-            public void messageWriting(final IoSession session, WriteRequest message,
-                    final WriteFilterChainController controller) {
-                // we just push the message in the chain
-                controller.callWriteNextFilter(message);
-            }
-
-            @Override
-            public void messageReceived(final IoSession session, final Object message,
-                    final ReadFilterChainController controller) {
-
-                if (message instanceof ByteBuffer) {
-                    LOG.info("echoing");
-                    session.write(message);
-                }
-            }
-
-            @Override
-            public void messageSent(final IoSession session, final Object message) {
-                LOG.info("message {} sent", message);
-            }
-        });
+        server.setFilters(new LoggingFilter("LoggingFilter1"), ((NioUdpEchoServer) server).new UdpEchoFilter());
 
         server.setIoHandler(new AbstractIoHandler() {
             @Override
