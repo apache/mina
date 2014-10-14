@@ -36,11 +36,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An {@link IoFilter} which translates binary or protocol specific data into message objects and vice versa using
- * {@link ProtocolCodecFactory}, {@link ProtocolEncoder}, or {@link ProtocolDecoder}.
+ * An {@link IoFilter} which translates binary or protocol specific data into
+ * message objects and vice versa using {@link ProtocolCodecFactory},
+ * {@link ProtocolEncoder}, or {@link ProtocolDecoder}.
  * 
- * @param MESSAGE the kind of high level business message this filter will encode and decode.
- * @param ENCODED the kind of low level message (most of time {@link ByteBuffer}) this filter will produce of consume.
+ * @param MESSAGE
+ *            the kind of high level business message this filter will encode
+ *            and decode.
+ * @param ENCODED
+ *            the kind of low level message (most of time {@link ByteBuffer})
+ *            this filter will produce of consume.
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STATE> extends AbstractIoFilter {
@@ -60,7 +65,8 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
     private static final AttributeKey<Object> DECODER = new AttributeKey<Object>(Object.class, "internal_decoder");
 
     /**
-     * Creates a new instance of ProtocolCodecFilter, with the specified encoder and decoder.
+     * Creates a new instance of ProtocolCodecFilter, with the specified encoder
+     * and decoder.
      * 
      */
     public ProtocolCodecFilter(ProtocolEncoder<MESSAGE, ENCODED, ENCODING_STATE> encoder,
@@ -72,8 +78,9 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
     }
 
     /**
-     * Process the incoming message, calling the session decoder. As the incoming buffer might contains more than one
-     * messages, we have to loop until the decoder throws an exception. <code>
+     * Process the incoming message, calling the session decoder. As the
+     * incoming buffer might contains more than one messages, we have to loop
+     * until the decoder throws an exception. <code>
      *  while ( buffer not empty )
      *    try
      *      decode ( buffer )
@@ -92,7 +99,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
         MESSAGE msg;
         try {
             while (((msg = decoder.decode((ENCODED) in, state)) != null)) {
-                controller.callReadNextFilter(msg);
+                super.messageReceived(session, msg, controller);
             }
         } catch (ProtocolDecoderException e) {
             LOGGER.debug("decoding exception : ", e);
@@ -111,7 +118,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
         ENCODED encoded = encoder.encode((MESSAGE) message.getMessage(), getEncodingState(session));
         message.setMessage(encoded);
 
-        controller.callWriteNextFilter(message);
+        super.messageWriting(session, message, controller);
     }
 
     /**
@@ -126,6 +133,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
 
         DECODING_STATE decodingState = decoder.createDecoderState();
         session.setAttribute(DECODER, decodingState);
+        super.sessionOpened(session);
     }
 
     /**
@@ -134,6 +142,7 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
     @Override
     public void sessionClosed(IoSession session) {
         decoder.finishDecode(getDecodingState(session));
+        super.sessionClosed(session);
 
     }
 

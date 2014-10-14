@@ -19,7 +19,10 @@
  */
 package org.apache.mina.transport.nio;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -40,7 +43,6 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.NioUdpClient;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,8 +71,8 @@ public class NioUdpClientFilterEventTest {
     private final CountDownLatch closedLatch = new CountDownLatch(CLIENT_COUNT);
 
     /**
-     * Create an old IO server and use a bunch of MINA client on it. Test if the events occurs correctly in the
-     * different IoFilters.
+     * Create an old IO server and use a bunch of MINA client on it. Test if the
+     * events occurs correctly in the different IoFilters.
      */
     @Test
     public void generate_all_kind_of_client_event() throws IOException, InterruptedException, ExecutionException {
@@ -114,8 +116,7 @@ public class NioUdpClientFilterEventTest {
 
             InetAddress IPAddress = receivePacket.getAddress();
             int clientPort = receivePacket.getPort();
-            DatagramPacket sendPacket = new DatagramPacket("tata".getBytes(), "tata".getBytes().length, IPAddress,
-                    clientPort);
+            DatagramPacket sendPacket = new DatagramPacket("tata".getBytes(), "tata".getBytes().length, IPAddress, clientPort);
             serverSocket.send(sendPacket);
         }
 
@@ -144,13 +145,12 @@ public class NioUdpClientFilterEventTest {
     private class MyCodec extends AbstractIoFilter {
 
         @Override
-        public void messageReceived(final IoSession session, final Object message,
-                final ReadFilterChainController controller) {
+        public void messageReceived(final IoSession session, final Object message, final ReadFilterChainController controller) {
             if (message instanceof ByteBuffer) {
                 final ByteBuffer in = (ByteBuffer) message;
                 final byte[] buffer = new byte[in.remaining()];
                 in.get(buffer);
-                controller.callReadNextFilter(new String(buffer));
+                super.messageReceived(session, new String(buffer), controller);
             } else {
                 fail();
             }
@@ -159,7 +159,7 @@ public class NioUdpClientFilterEventTest {
         @Override
         public void messageWriting(IoSession session, WriteRequest writeRequest, WriteFilterChainController controller) {
             writeRequest.setMessage(ByteBuffer.wrap(writeRequest.getMessage().toString().getBytes()));
-            controller.callWriteNextFilter(writeRequest);
+            super.messageWriting(session, writeRequest, controller);
         }
     }
 
@@ -179,8 +179,7 @@ public class NioUdpClientFilterEventTest {
         }
 
         @Override
-        public void messageReceived(final IoSession session, final Object message,
-                final ReadFilterChainController controller) {
+        public void messageReceived(final IoSession session, final Object message, final ReadFilterChainController controller) {
             LOG.info("** message received {}", message);
             msgReadLatch.countDown();
         }

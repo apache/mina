@@ -34,9 +34,6 @@ import org.apache.mina.api.IoSession;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.session.WriteRequest;
-import org.apache.mina.transport.nio.FixedSelectorLoopPool;
-import org.apache.mina.transport.nio.NioTcpServer;
-import org.apache.mina.transport.nio.SelectorLoopPool;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,8 +124,9 @@ public class NioTcpServerFilterEventTest {
     }
 
     /**
-     * A test that creates 50 clients, each one of them writing one message. We will check that for each client we
-     * correctly process the sessionOpened, messageReceived, messageSent and sessionClosed events. We use only one
+     * A test that creates 50 clients, each one of them writing one message. We
+     * will check that for each client we correctly process the sessionOpened,
+     * messageReceived, messageSent and sessionClosed events. We use only one
      * selector to process all the OP events.
      */
     @Test
@@ -194,13 +192,12 @@ public class NioTcpServerFilterEventTest {
     private class MyCodec extends AbstractIoFilter {
 
         @Override
-        public void messageReceived(final IoSession session, final Object message,
-                final ReadFilterChainController controller) {
+        public void messageReceived(final IoSession session, final Object message, final ReadFilterChainController controller) {
             if (message instanceof ByteBuffer) {
                 final ByteBuffer in = (ByteBuffer) message;
                 final byte[] buffer = new byte[in.remaining()];
                 in.get(buffer);
-                controller.callReadNextFilter(new String(buffer));
+                super.messageReceived(session, new String(buffer), controller);
             } else {
                 fail();
             }
@@ -209,7 +206,7 @@ public class NioTcpServerFilterEventTest {
         @Override
         public void messageWriting(IoSession session, WriteRequest writeRequest, WriteFilterChainController controller) {
             writeRequest.setMessage(ByteBuffer.wrap(writeRequest.getMessage().toString().getBytes()));
-            controller.callWriteNextFilter(writeRequest);
+            super.messageWriting(session, writeRequest, controller);
         }
     }
 
@@ -228,8 +225,7 @@ public class NioTcpServerFilterEventTest {
         }
 
         @Override
-        public void messageReceived(final IoSession session, final Object message,
-                final ReadFilterChainController controller) {
+        public void messageReceived(final IoSession session, final Object message, final ReadFilterChainController controller) {
             LOG.info("** message received {}", message);
             msgReadLatch.countDown();
             session.write(message.toString());
