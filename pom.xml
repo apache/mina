@@ -565,11 +565,11 @@
                 <head/>
               </tag>
               <tag>
-              <tag>
                 <name>org.apache.xbean.FactoryMethod</name>
                 <placement>m</placement>
                 <head/>
               </tag>
+              <tag>
                 <name>org.apache.xbean.DestroyMethod</name>
                 <placement>m</placement>
                 <head/>
