@@ -2180,11 +2180,17 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
                 @Override
                 protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-                    String name = desc.getName();
-                    try {
-                        return Class.forName(name, false, classLoader);
-                    } catch (ClassNotFoundException ex) {
-                        return super.resolveClass(desc);
+                    Class<?> clazz = desc.forClass();
+                    
+                    if (clazz == null) {
+                        String name = desc.getName();
+                        try {
+                            return Class.forName(name, false, classLoader);
+                        } catch (ClassNotFoundException ex) {
+                            return super.resolveClass(desc);
+                        }
+                    } else {
+                        return clazz;
                     }
                 }
             };
@@ -2207,23 +2213,15 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             ObjectOutputStream out = new ObjectOutputStream(asOutputStream()) {
                 @Override
                 protected void writeClassDescriptor(ObjectStreamClass desc) throws IOException {
-                    try {
-                        if (!desc.forClass().isArray()) {
-                            Class<?> clz = Thread.currentThread().getContextClassLoader().loadClass(desc.getName());
-                            if (!Serializable.class.isAssignableFrom(clz)) { // NON-Serializable class
-                                write(0);
-                                super.writeClassDescriptor(desc);
-                            } else { // Serializable class
-                                write(1);
-                                writeUTF(desc.getName());
-                            }
-                        } else {
-                            write(0);
-                            super.writeClassDescriptor(desc);
-                        }
-                    } catch (ClassNotFoundException ex) { // Primitive types
+                    Class<?> clazz = desc.forClass();
+                    
+                    if (clazz.isArray() || clazz.isPrimitive() || !Serializable.class.isAssignableFrom(clazz)) {
                         write(0);
-                        super.writeClassDescriptor(desc);
+                        super.writeClassDescriptor(desc); 
+                    } else {
+                        // Serializable class
+                        write(1);
+                        writeUTF(desc.getName());                            
                     }
                 }
             };
