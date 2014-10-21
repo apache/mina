@@ -10,4 +10,4 @@ bin/
 *.log
 .deployables
 .clover
-
+META-INF/
