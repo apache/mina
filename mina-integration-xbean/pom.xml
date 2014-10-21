@@ -76,6 +76,27 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <inherited>true</inherited>
+        <extensions>true</extensions>
+        <configuration>
+          <manifestLocation>META-INF</manifestLocation>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.integration.xbeans</Bundle-SymbolicName>
+            <Export-Package>
+              org.apache.mina.integration.xbean;version=${project.version};-noimport:=true
+            </Export-Package>
+            <Import-Package>
+              org.apache.mina.integration.beans;version=${project.version},
+              org.apache.mina.transport.vmpipe;version=${project.version},
+              org.springframework.beans;version=${version.springframework}
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.xbean</groupId>
         <artifactId>maven-xbean-plugin</artifactId>
         <executions>

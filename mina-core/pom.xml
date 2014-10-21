@@ -31,11 +31,6 @@
   <name>Apache MINA Core</name>
   <packaging>bundle</packaging>
 
-  <properties>
-    <symbolicName>${project.groupId}.core</symbolicName>
-    <exportedPackage>${project.groupId}</exportedPackage>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.easymock</groupId>
@@ -103,8 +98,8 @@
               org.apache.mina.transport.socket;version=${project.version};-noimport:=true,
               org.apache.mina.transport.socket.nio;version=${project.version};-noimport:=true,
               org.apache.mina.transport.vmpipe;version=${project.version};-noimport:=true,
-              org.apache.mina.util;version=${project.version};-noimport:=true,
-              org.apache.mina.util.byteaccess;version=${project.version};-noimport:=true,
+              org.apache.mina.util;version=${project.version};-noimport:=true
+              org.apache.mina.util.byteaccess;version=${project.version};-noimport:=true
             </Export-Package>
             <Import-Package>
               org.slf4j;version=${version.slf4j.api}

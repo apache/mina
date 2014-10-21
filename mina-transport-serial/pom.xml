@@ -32,8 +32,7 @@
   <packaging>bundle</packaging>  
 
   <properties>
-    <symbolicName>${project.groupId}.transport.serial</symbolicName>
-    <exportedPackage>${project.groupId}.transport.serial</exportedPackage>
+    <version.rxtx>2.1.7</version.rxtx>
   </properties>
 
   <dependencies>
@@ -54,9 +53,42 @@
     <dependency>
       <groupId>org.rxtx</groupId>
       <artifactId>rxtx</artifactId>
-      <version>2.1.7</version>
+      <version>${version.rxtx}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <inherited>true</inherited>
+        <extensions>true</extensions>
+        <configuration>
+          <manifestLocation>META-INF</manifestLocation>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.transport.serial</Bundle-SymbolicName>
+            <Export-Package>
+              org.apache.mina.transport.serial;version=${project.version};-noimport:=true
+            </Export-Package>
+            <Import-Package>
+              gnu.io;version=${version.rxtx},
+              org.apache.mina.core;version=${project.version},
+              org.apache.mina.core.buffer;version=${project.version},
+              org.apache.mina.core.filterchain;version=${project.version},
+              org.apache.mina.core.future;version=${project.version},
+              org.apache.mina.core.service;version=${project.version},
+              org.apache.mina.core.session;version=${project.version},
+              org.apache.mina.core.write;version=${project.version},
+              org.apache.mina.integration.beans;version=${project.version},
+              org.apache.mina.util;version=${project.version},
+              org.slf4j;version=${version.slf4j.api}
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
 

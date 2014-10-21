@@ -29,11 +29,6 @@
   <name>Apache MINA APR Transport</name>
   <packaging>bundle</packaging>  
 
-  <properties>
-    <symbolicName>${project.groupId}.transport.socket.apr</symbolicName>
-    <exportedPackage>${project.groupId}.transport.socket.apr</exportedPackage>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -47,5 +42,36 @@
       <artifactId>tomcat-apr</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <inherited>true</inherited>
+        <extensions>true</extensions>
+        <configuration>
+          <manifestLocation>META-INF</manifestLocation>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.transport.apr</Bundle-SymbolicName>
+            <Export-Package>
+              org.apache.mina.transport.socket.apr;version=${project.version};-noimport:=true
+            </Export-Package>
+            <Import-Package>
+              org.apache.mina.core;version=${project.version},
+              org.apache.mina.core.buffer;version=${project.version},
+              org.apache.mina.core.file;version=${project.version},
+              org.apache.mina.core.filterchain;version=${project.version},
+              org.apache.mina.core.polling;version=${project.version},
+              org.apache.mina.core.service;version=${project.version},
+              org.apache.mina.core.session;version=${project.version},
+              org.apache.mina.transport.socket;version=${project.version},
+              org.apache.tomcat.jni;version=${version.tomcat.apr}
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
 
