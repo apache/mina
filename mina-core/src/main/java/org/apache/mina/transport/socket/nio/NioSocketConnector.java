@@ -257,7 +257,7 @@ SocketConnector {
 
                 // Preemptively close the channel
                 ch.close();
-                throw ioe;
+                throw e;
             }
         }
 
