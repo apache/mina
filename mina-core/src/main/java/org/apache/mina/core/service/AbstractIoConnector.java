@@ -210,7 +210,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     public final ConnectFuture connect(SocketAddress remoteAddress, SocketAddress localAddress,
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         if (isDisposing()) {
-            throw new IllegalStateException("The connector has been disposed.");
+            throw new IllegalStateException("The connector is being disposed.");
         }
 
         if (remoteAddress == null) {

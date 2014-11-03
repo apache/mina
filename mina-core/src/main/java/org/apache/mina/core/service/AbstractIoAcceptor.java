@@ -267,7 +267,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
      */
     public final void bind(Iterable<? extends SocketAddress> localAddresses) throws IOException {
         if (isDisposing()) {
-            throw new IllegalStateException("Already disposed.");
+            throw new IllegalStateException("The Accpetor disposed is being disposed.");
         }
 
         if (localAddresses == null) {

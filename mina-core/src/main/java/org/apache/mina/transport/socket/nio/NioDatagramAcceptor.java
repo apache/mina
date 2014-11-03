@@ -667,7 +667,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
      */
     public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         if (isDisposing()) {
-            throw new IllegalStateException("Already disposed.");
+            throw new IllegalStateException("The Acceptor is being disposed.");
         }
 
         if (remoteAddress == null) {
