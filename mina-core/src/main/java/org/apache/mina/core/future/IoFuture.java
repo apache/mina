@@ -46,14 +46,19 @@ public interface IoFuture {
     /**
      * Wait for the asynchronous operation to complete with the specified timeout.
      *
-     * @return <tt>true</tt> if the operation is completed.
+     * @param timeout The maximum delay to wait before getting out
+     * @param unit the type of unit for the delay (seconds, minutes...)
+     * @return <tt>true</tt> if the operation is completed. 
+     * @exception InterruptedException If the thread is interruped while waiting
      */
     boolean await(long timeout, TimeUnit unit) throws InterruptedException;
 
     /**
      * Wait for the asynchronous operation to complete with the specified timeout.
      *
+     * @param timeout The maximum milliseconds to wait before getting out
      * @return <tt>true</tt> if the operation is completed.
+     * @exception InterruptedException If the thread is interruped while waiting
      */
     boolean await(long timeoutMillis) throws InterruptedException;
 
@@ -70,6 +75,8 @@ public interface IoFuture {
      * Wait for the asynchronous operation to complete with the specified timeout
      * uninterruptibly.
      *
+     * @param timeout The maximum delay to wait before getting out
+     * @param unit the type of unit for the delay (seconds, minutes...)
      * @return <tt>true</tt> if the operation is completed.
      */
     boolean awaitUninterruptibly(long timeout, TimeUnit unit);
@@ -78,6 +85,7 @@ public interface IoFuture {
      * Wait for the asynchronous operation to complete with the specified timeout
      * uninterruptibly.
      *
+     * @param timeout The maximum milliseconds to wait before getting out
      * @return <tt>true</tt> if the operation is finished.
      */
     boolean awaitUninterruptibly(long timeoutMillis);
@@ -96,6 +104,8 @@ public interface IoFuture {
 
     /**
      * Returns if the asynchronous operation is completed.
+     * 
+     * @return <tt>true</tt> if the operation is completed.
      */
     boolean isDone();
 
@@ -103,12 +113,18 @@ public interface IoFuture {
      * Adds an event <tt>listener</tt> which is notified when
      * this future is completed. If the listener is added
      * after the completion, the listener is directly notified.
+     * 
+     * @param listener The listener to add
+     * @return the current IoFuture
      */
     IoFuture addListener(IoFutureListener<?> listener);
 
     /**
      * Removes an existing event <tt>listener</tt> so it won't be notified when
      * the future is completed.
+     * 
+     * @param listener The listener to remove
+     * @return the current IoFuture
      */
     IoFuture removeListener(IoFutureListener<?> listener);
 }
