@@ -28,7 +28,7 @@ import org.apache.mina.core.session.IoSession;
  * <pre>
  * IoConnector connector = ...;
  * ConnectFuture future = connector.connect(...);
- * future.join(); // Wait until the connection attempt is finished.
+ * future.await(); // Wait until the connection attempt is finished.
  * IoSession session = future.getSession();
  * session.write(...);
  * </pre>
@@ -39,8 +39,7 @@ public interface ConnectFuture extends IoFuture {
     /**
      * Returns {@link IoSession} which is the result of connect operation.
      *
-     * @return <tt>null</tt> if the connect operation is not finished yet
-     * @throws RuntimeException if connection attempt failed by an exception
+     * @return {@code true} if the connect operation is not finished yet
      */
     IoSession getSession();
 
@@ -48,17 +47,18 @@ public interface ConnectFuture extends IoFuture {
      * Returns the cause of the connection failure.
      *
      * @return <tt>null</tt> if the connect operation is not finished yet,
-     *         or if the connection attempt is successful.
+     *         or if the connection attempt is successful, otherwise returns
+     *         teh cause of the exception
      */
     Throwable getException();
 
     /**
-     * Returns <tt>true</tt> if the connect operation is finished successfully.
+     * @return {@code true} if the connect operation is finished successfully.
      */
     boolean isConnected();
 
     /**
-     * Returns {@code true} if the connect operation has been canceled by
+     * @return {@code true} if the connect operation has been canceled by
      * {@link #cancel()} method.
      */
     boolean isCanceled();
@@ -67,6 +67,8 @@ public interface ConnectFuture extends IoFuture {
      * Sets the newly connected session and notifies all threads waiting for
      * this future.  This method is invoked by MINA internally.  Please do not
      * call this method directly.
+     * 
+     * @param session The created session to store in the ConnectFuture insteance
      */
     void setSession(IoSession session);
 
@@ -74,6 +76,8 @@ public interface ConnectFuture extends IoFuture {
      * Sets the exception caught due to connection failure and notifies all
      * threads waiting for this future.  This method is invoked by MINA
      * internally.  Please do not call this method directly.
+     * 
+     * @param exception The exception to store in the ConnectFuture instance
      */
     void setException(Throwable exception);
 
@@ -83,11 +87,23 @@ public interface ConnectFuture extends IoFuture {
      */
     void cancel();
 
+    /**
+     * {@inheritDoc}
+     */
     ConnectFuture await() throws InterruptedException;
 
+    /**
+     * {@inheritDoc}
+     */
     ConnectFuture awaitUninterruptibly();
 
+    /**
+     * {@inheritDoc}
+     */
     ConnectFuture addListener(IoFutureListener<?> listener);
 
+    /**
+     * {@inheritDoc}
+     */
     ConnectFuture removeListener(IoFutureListener<?> listener);
 }
