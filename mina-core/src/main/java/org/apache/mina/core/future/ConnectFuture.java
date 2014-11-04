@@ -28,7 +28,7 @@ import org.apache.mina.core.session.IoSession;
  * <pre>
  * IoConnector connector = ...;
  * ConnectFuture future = connector.connect(...);
- * future.await(); // Wait until the connection attempt is finished.
+ * future.awaitUninterruptibly(); // Wait until the connection attempt is finished.
  * IoSession session = future.getSession();
  * session.write(...);
  * </pre>

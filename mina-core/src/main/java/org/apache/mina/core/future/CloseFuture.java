@@ -26,8 +26,10 @@ package org.apache.mina.core.future;
  * <pre>
  * IoSession session = ...;
  * CloseFuture future = session.close(true);
+ * 
  * // Wait until the connection is closed
  * future.awaitUninterruptibly();
+ * 
  * // Now connection should be closed.
  * assert future.isClosed();
  * </pre>
@@ -36,22 +38,34 @@ package org.apache.mina.core.future;
  */
 public interface CloseFuture extends IoFuture {
     /**
-     * Returns <tt>true</tt> if the close request is finished and the session is closed.
+     * @return <tt>true</tt> if the close request is finished and the session is closed.
      */
     boolean isClosed();
 
     /**
      * Marks this future as closed and notifies all threads waiting for this
-     * future.  This method is invoked by MINA internally.  Please do not call
+     * future. This method is invoked by MINA internally.  Please do not call
      * this method directly.
      */
     void setClosed();
 
+    /**
+     * {@inheritDoc}
+     */
     CloseFuture await() throws InterruptedException;
 
+    /**
+     * {@inheritDoc}
+     */
     CloseFuture awaitUninterruptibly();
 
+    /**
+     * {@inheritDoc}
+     */
     CloseFuture addListener(IoFutureListener<?> listener);
 
+    /**
+     * {@inheritDoc}
+     */
     CloseFuture removeListener(IoFutureListener<?> listener);
 }

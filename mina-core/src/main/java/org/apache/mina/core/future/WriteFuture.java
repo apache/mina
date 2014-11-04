@@ -26,15 +26,17 @@ package org.apache.mina.core.future;
  * <pre>
  * IoSession session = ...;
  * WriteFuture future = session.write(...);
+ * 
  * // Wait until the message is completely written out to the O/S buffer.
- * future.join();
+ * future.awaitUninterruptibly();
+ * 
  * if( future.isWritten() )
  * {
  *     // The message has been written successfully.
  * }
  * else
  * {
- *     // The messsage couldn't be written out completely for some reason.
+ *     // The message couldn't be written out completely for some reason.
  *     // (e.g. Connection is closed)
  * }
  * </pre>
@@ -43,12 +45,12 @@ package org.apache.mina.core.future;
  */
 public interface WriteFuture extends IoFuture {
     /**
-     * Returns <tt>true</tt> if the write operation is finished successfully.
+     * @return <tt>true</tt> if the write operation is finished successfully.
      */
     boolean isWritten();
 
     /**
-     * Returns the cause of the write failure if and only if the write
+     * @return the cause of the write failure if and only if the write
      * operation has failed due to an {@link Exception}.  Otherwise,
      * <tt>null</tt> is returned.
      */
@@ -65,6 +67,8 @@ public interface WriteFuture extends IoFuture {
      * Sets the cause of the write failure, and notifies all threads waiting
      * for this future.  This method is invoked by MINA internally.  Please
      * do not call this method directly.
+     * 
+     * @param cause The exception to store in the Future instance
      */
     void setException(Throwable cause);
 

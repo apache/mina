@@ -27,12 +27,15 @@ import org.apache.mina.core.session.IoSession;
  * <h3>Example</h3>
  * <pre>
  * IoSession session = ...;
+ * 
  * // useReadOperation must be enabled to use read operation.
  * session.getConfig().setUseReadOperation(true);
  * 
  * ReadFuture future = session.read();
+ * 
  * // Wait until a message is received.
- * future.await();
+ * future.awaitUninterruptibly();
+ * 
  * try {
  *     Object message = future.getMessage();
  * } catch (Exception e) {
@@ -45,26 +48,26 @@ import org.apache.mina.core.session.IoSession;
 public interface ReadFuture extends IoFuture {
 
     /**
-     * Returns the received message.  It returns <tt>null</tt> if this
-     * future is not ready or the associated {@link IoSession} has been closed. 
+     * Get the read message.
      * 
-     * @throws RuntimeException if read or any relevant operation has failed.
+     * @return the received message.  It returns <tt>null</tt> if this
+     * future is not ready or the associated {@link IoSession} has been closed. 
      */
     Object getMessage();
 
     /**
-     * Returns <tt>true</tt> if a message was received successfully.
+     * @return <tt>true</tt> if a message was received successfully.
      */
     boolean isRead();
 
     /**
-     * Returns <tt>true</tt> if the {@link IoSession} associated with this
+     * @return <tt>true</tt> if the {@link IoSession} associated with this
      * future has been closed.
      */
     boolean isClosed();
 
     /**
-     * Returns the cause of the read failure if and only if the read
+     * @return the cause of the read failure if and only if the read
      * operation has failed due to an {@link Exception}.  Otherwise,
      * <tt>null</tt> is returned.
      */
@@ -74,6 +77,8 @@ public interface ReadFuture extends IoFuture {
      * Sets the message is written, and notifies all threads waiting for
      * this future.  This method is invoked by MINA internally.  Please do
      * not call this method directly.
+     * 
+     * @param message The received message to store in this future
      */
     void setRead(Object message);
 
@@ -87,14 +92,28 @@ public interface ReadFuture extends IoFuture {
      * Sets the cause of the read failure, and notifies all threads waiting
      * for this future.  This method is invoked by MINA internally.  Please
      * do not call this method directly.
+     * 
+     * @param cause The exception to store in the Future instance
      */
     void setException(Throwable cause);
 
+    /**
+     * {@inheritDoc}
+     */
     ReadFuture await() throws InterruptedException;
 
+    /**
+     * {@inheritDoc}
+     */
     ReadFuture awaitUninterruptibly();
 
+    /**
+     * {@inheritDoc}
+     */
     ReadFuture addListener(IoFutureListener<?> listener);
 
+    /**
+     * {@inheritDoc}
+     */
     ReadFuture removeListener(IoFutureListener<?> listener);
 }
