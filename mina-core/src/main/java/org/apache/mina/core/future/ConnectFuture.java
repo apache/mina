@@ -39,7 +39,8 @@ public interface ConnectFuture extends IoFuture {
     /**
      * Returns {@link IoSession} which is the result of connect operation.
      *
-     * @return {@code true} if the connect operation is not finished yet
+     * @return The {link IoSession} instance that has been associated with the connection,
+     * if the connection was successful, {@code null} otherwise
      */
     IoSession getSession();
 
