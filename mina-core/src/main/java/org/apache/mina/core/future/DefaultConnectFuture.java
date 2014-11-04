@@ -123,8 +123,8 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
     /**
      * {@inheritDoc}
      */
-    public void cancel() {
-        setValue(CANCELED);
+    public boolean cancel() {
+        return setValue(CANCELED);
     }
 
     /**

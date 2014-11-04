@@ -293,12 +293,14 @@ public class DefaultIoFuture implements IoFuture {
      * Sets the result of the asynchronous operation, and mark it as finished.
      * 
      * @param newValue The result to store into the Future
+     * @return {@code true} if the value has been set, {@code false} if
+     * the future already has a value (thus is in ready state)
      */
-    public void setValue(Object newValue) {
+    public boolean setValue(Object newValue) {
         synchronized (lock) {
             // Allowed only once.
             if (ready) {
-                return;
+                return false;
             }
 
             result = newValue;
@@ -312,6 +314,8 @@ public class DefaultIoFuture implements IoFuture {
 
         // Last, not least, inform the listeners
         notifyListeners();
+        
+        return true;
     }
 
     /**

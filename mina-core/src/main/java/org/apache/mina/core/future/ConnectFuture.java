@@ -85,8 +85,11 @@ public interface ConnectFuture extends IoFuture {
     /**
      * Cancels the connection attempt and notifies all threads waiting for
      * this future.
+     * 
+     * @return {@code true} if the future has been cancelled by this call, {@code false}
+     * if the future was already cancelled.
      */
-    void cancel();
+    boolean cancel();
 
     /**
      * {@inheritDoc}

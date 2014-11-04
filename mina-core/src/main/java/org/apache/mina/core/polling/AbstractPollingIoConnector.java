@@ -569,20 +569,25 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     }
 
     public final class ConnectionRequest extends DefaultConnectFuture {
+        /** The handle associated with this connection request */
         private final H handle;
 
+        /** The time up to this connection request will be valid */
         private final long deadline;
 
+        /** The callback to call when the session is initialized */
         private final IoSessionInitializer<? extends ConnectFuture> sessionInitializer;
 
         public ConnectionRequest(H handle, IoSessionInitializer<? extends ConnectFuture> callback) {
             this.handle = handle;
             long timeout = getConnectTimeoutMillis();
+            
             if (timeout <= 0L) {
                 this.deadline = Long.MAX_VALUE;
             } else {
                 this.deadline = System.currentTimeMillis() + timeout;
             }
+            
             this.sessionInitializer = callback;
         }
 
@@ -599,13 +604,20 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         }
 
         @Override
-        public void cancel() {
+        public boolean cancel() {
             if (!isDone()) {
-                super.cancel();
-                cancelQueue.add(this);
-                startupWorker();
-                wakeup();
+                boolean justCancelled = super.cancel();
+                
+                // We haven't cancelled the request before, so add the future
+                // in the cancel queue.
+                if (justCancelled) {
+                    cancelQueue.add(this);
+                    startupWorker();
+                    wakeup();
+                }
             }
+            
+            return true;
         }
     }
 }
