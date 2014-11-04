@@ -29,24 +29,35 @@ import org.apache.mina.core.session.IoSession;
 public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**
      * Returns a new {@link DefaultWriteFuture} which is already marked as 'written'.
+     * 
+     * @param session The associated session
+     * @return A new future for a written message
      */
     public static WriteFuture newWrittenFuture(IoSession session) {
-        DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture(session);
-        unwrittenFuture.setWritten();
-        return unwrittenFuture;
+        DefaultWriteFuture writtenFuture = new DefaultWriteFuture(session);
+        writtenFuture.setWritten();
+        
+        return writtenFuture;
     }
 
     /**
      * Returns a new {@link DefaultWriteFuture} which is already marked as 'not written'.
+     * 
+     * @param session The associated session
+     * @param cause The reason why the message has not be written
+     * @return A new future for not written message
      */
     public static WriteFuture newNotWrittenFuture(IoSession session, Throwable cause) {
         DefaultWriteFuture unwrittenFuture = new DefaultWriteFuture(session);
         unwrittenFuture.setException(cause);
+        
         return unwrittenFuture;
     }
 
     /**
      * Creates a new instance.
+     * 
+     * @param session The associated session
      */
     public DefaultWriteFuture(IoSession session) {
         super(session);
@@ -58,10 +69,12 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     public boolean isWritten() {
         if (isDone()) {
             Object v = getValue();
+            
             if (v instanceof Boolean) {
                 return ((Boolean) v).booleanValue();
             }
         }
+        
         return false;
     }
 
@@ -71,10 +84,12 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     public Throwable getException() {
         if (isDone()) {
             Object v = getValue();
+            
             if (v instanceof Throwable) {
                 return (Throwable) v;
             }
         }
+        
         return null;
     }
 

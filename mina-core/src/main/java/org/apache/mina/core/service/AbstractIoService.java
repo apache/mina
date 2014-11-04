@@ -487,6 +487,11 @@ public abstract class AbstractIoService implements IoService {
         // Do nothing. Extended class might add some specific code
     }
 
+    /**
+     * A specific class used to 
+     * @author elecharny
+     *
+     */
     protected static class ServiceOperationFuture extends DefaultIoFuture {
         public ServiceOperationFuture() {
             super(null);
@@ -512,6 +517,7 @@ public abstract class AbstractIoService implements IoService {
             if (exception == null) {
                 throw new IllegalArgumentException("exception");
             }
+            
             setValue(exception);
         }
     }
