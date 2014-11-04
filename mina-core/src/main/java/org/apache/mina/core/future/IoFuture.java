@@ -32,7 +32,7 @@ import org.apache.mina.core.session.IoSession;
  */
 public interface IoFuture {
     /**
-     * Returns the {@link IoSession} which is associated with this future.
+     * @return the {@link IoSession} which is associated with this future.
      */
     IoSession getSession();
 
@@ -40,6 +40,9 @@ public interface IoFuture {
      * Wait for the asynchronous operation to complete.
      * The attached listeners will be notified when the operation is 
      * completed.
+     * 
+     * @return The instance of IoFuture that we are waiting for
+     * @exception InterruptedException If the thread is interrupted while waiting
      */
     IoFuture await() throws InterruptedException;
 
@@ -49,7 +52,7 @@ public interface IoFuture {
      * @param timeout The maximum delay to wait before getting out
      * @param unit the type of unit for the delay (seconds, minutes...)
      * @return <tt>true</tt> if the operation is completed. 
-     * @exception InterruptedException If the thread is interruped while waiting
+     * @exception InterruptedException If the thread is interrupted while waiting
      */
     boolean await(long timeout, TimeUnit unit) throws InterruptedException;
 
@@ -58,7 +61,7 @@ public interface IoFuture {
      *
      * @param timeout The maximum milliseconds to wait before getting out
      * @return <tt>true</tt> if the operation is completed.
-     * @exception InterruptedException If the thread is interruped while waiting
+     * @exception InterruptedException If the thread is interrupted while waiting
      */
     boolean await(long timeoutMillis) throws InterruptedException;
 
