@@ -61,7 +61,7 @@ import org.apache.mina.core.session.IoSession;
  * IoBuffer buf = IoBuffer.allocate(1024, false);
  * </pre>
  * 
- * you can also allocate a new direct buffer:
+ * You can also allocate a new direct buffer:
  * 
  * <pre>
  * IoBuffer buf = IoBuffer.allocate(1024, true);
@@ -72,6 +72,7 @@ import org.apache.mina.core.session.IoSession;
  * <pre>
  * // Allocate heap buffer by default.
  * IoBuffer.setUseDirectBuffer(false);
+ * 
  * // A new heap buffer is returned.
  * IoBuffer buf = IoBuffer.allocate(1024);
  * </pre>
@@ -86,11 +87,11 @@ import org.apache.mina.core.session.IoSession;
  * <h2>AutoExpand</h2>
  * <p>
  * Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
- * easy, and it is because its size is fixed. {@link IoBuffer} introduces
- * <tt>autoExpand</tt> property. If <tt>autoExpand</tt> property is true, you
- * never get {@link BufferOverflowException} or
- * {@link IndexOutOfBoundsException} (except when index is negative). It
- * automatically expands its capacity and limit value. For example:
+ * easy, and it is because its size is fixed at allocation. {@link IoBuffer} introduces
+ * the <tt>autoExpand</tt> property. If <tt>autoExpand</tt> property is set to true, 
+ * you never get a {@link BufferOverflowException} or
+ * an {@link IndexOutOfBoundsException} (except when index is negative). It
+ * automatically expands its capacity. For instance:
  * 
  * <pre>
  * String greeting = messageBundle.getMessage(&quot;hello&quot;);
@@ -115,29 +116,30 @@ import org.apache.mina.core.session.IoSession;
  * buffer when {@link #compact()} is invoked and only 1/4 or less of the current
  * capacity is being used.
  * <p>
- * You can also {@link #shrink()} method manually to shrink the capacity of the
+ * You can also call the {@link #shrink()} method manually to shrink the capacity of the
  * buffer.
  * <p>
- * The underlying {@link ByteBuffer} is reallocated by {@link IoBuffer} behind
+ * The underlying {@link ByteBuffer} is reallocated by the {@link IoBuffer} behind
  * the scene, and therefore {@link #buf()} will return a different
  * {@link ByteBuffer} instance once capacity changes. Please also note
- * {@link #compact()} or {@link #shrink()} will not decrease the capacity if the
- * new capacity is less than the {@link #minimumCapacity()} of the buffer.
+ * that the {@link #compact()} method or the {@link #shrink()} method
+ * will not decrease the capacity if the new capacity is less than the 
+ * {@link #minimumCapacity()} of the buffer.
  * 
  * <h2>Derived Buffers</h2>
  * <p>
- * Derived buffers are the buffers which were created by {@link #duplicate()},
- * {@link #slice()}, or {@link #asReadOnlyBuffer()}. They are useful especially
+ * Derived buffers are the buffers which were created by the {@link #duplicate()},
+ * {@link #slice()}, or {@link #asReadOnlyBuffer()} methods. They are useful especially
  * when you broadcast the same messages to multiple {@link IoSession}s. Please
- * note that the buffer derived from and its derived buffers are not both
- * auto-expandable neither auto-shrinkable. Trying to call
+ * note that the buffer derived from and its derived buffers are not 
+ * auto-expandable nor auto-shrinkable. Trying to call
  * {@link #setAutoExpand(boolean)} or {@link #setAutoShrink(boolean)} with
  * <tt>true</tt> parameter will raise an {@link IllegalStateException}.
  * </p>
  * 
  * <h2>Changing Buffer Allocation Policy</h2>
  * <p>
- * {@link IoBufferAllocator} interface lets you override the default buffer
+ * The {@link IoBufferAllocator} interface lets you override the default buffer
  * management behavior. There are two allocators provided out-of-the-box:
  * <ul>
  * <li>{@link SimpleBufferAllocator} (default)</li>
@@ -157,7 +159,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     private static boolean useDirectBuffer = false;
 
     /**
-     * Returns the allocator used by existing and new buffers
+     * @return the allocator used by existing and new buffers
      */
     public static IoBufferAllocator getAllocator() {
         return allocator;
@@ -165,6 +167,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * Sets the allocator used by existing and new buffers
+     * 
+     * @paream newAllocator the new allocator to use
      */
     public static void setAllocator(IoBufferAllocator newAllocator) {
         if (newAllocator == null) {
@@ -181,7 +185,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * Returns <tt>true</tt> if and only if a direct buffer is allocated by
+     * @return <tt>true</tt> if and only if a direct buffer is allocated by
      * default when the type of the new buffer is not specified. The default
      * value is <tt>false</tt>.
      */
@@ -192,6 +196,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Sets if a direct buffer should be allocated by default when the type of
      * the new buffer is not specified. The default value is <tt>false</tt>.
+     * 
+     * @param useDirectBuffer Tells if direct buffers should be allocated
      */
     public static void setUseDirectBuffer(boolean useDirectBuffer) {
         IoBuffer.useDirectBuffer = useDirectBuffer;
@@ -201,8 +207,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Returns the direct or heap buffer which is capable to store the specified
      * amount of bytes.
      * 
-     * @param capacity
-     *            the capacity of the buffer
+     * @param capacity the capacity of the buffer
+     * @return a IoBuffer which can hold up to capacity bytes
      * 
      * @see #setUseDirectBuffer(boolean)
      */
@@ -211,38 +217,53 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * Returns the buffer which is capable of the specified size.
+     * Returns a direct or heap IoBuffer which can contain the specified number of bytes.
      * 
-     * @param capacity
-     *            the capacity of the buffer
-     * @param direct
-     *            <tt>true</tt> to get a direct buffer, <tt>false</tt> to get a
+     * @param capacity the capacity of the buffer
+     * @param useDirectBuffer <tt>true</tt> to get a direct buffer, <tt>false</tt> to get a
      *            heap buffer.
+     * @return a direct or heap  IoBuffer which can hold up to capacity bytes
      */
-    public static IoBuffer allocate(int capacity, boolean direct) {
+    public static IoBuffer allocate(int capacity, boolean useDirectBuffer) {
         if (capacity < 0) {
             throw new IllegalArgumentException("capacity: " + capacity);
         }
 
-        return allocator.allocate(capacity, direct);
+        return allocator.allocate(capacity, useDirectBuffer);
     }
 
     /**
-     * Wraps the specified NIO {@link ByteBuffer} into MINA buffer.
+     * Wraps the specified NIO {@link ByteBuffer} into a MINA buffer (either direct or heap).
+     * 
+     * @param nioBuffer The {@link ByteBuffer} to wrap
+     * @return a IoBuffer containing the bytes stored in the {@link ByteBuffer}
      */
     public static IoBuffer wrap(ByteBuffer nioBuffer) {
         return allocator.wrap(nioBuffer);
     }
 
     /**
-     * Wraps the specified byte array into MINA heap buffer.
+     * Wraps the specified byte array into a MINA heap buffer. Note that
+     * the byte array is not copied, so any modification done on it will
+     * be visible by both sides.
+     * 
+     * @param byteArray The byte array to wrap
+     * @return a heap IoBuffer containing the byte array
      */
     public static IoBuffer wrap(byte[] byteArray) {
         return wrap(ByteBuffer.wrap(byteArray));
     }
 
     /**
-     * Wraps the specified byte array into MINA heap buffer.
+     * Wraps the specified byte array into MINA heap buffer. We just wrap the 
+     * bytes starting from offset up to offset + length.  Note that
+     * the byte array is not copied, so any modification done on it will
+     * be visible by both sides.
+     * 
+     * @param byteArray The byte array to wrap
+     * @param offset The starting point in the byte array
+     * @param length The number of bytes to store
+     * @return a heap IoBuffer containing the selected part of the byte array
      */
     public static IoBuffer wrap(byte[] byteArray, int offset, int length) {
         return wrap(ByteBuffer.wrap(byteArray, offset, length));
@@ -253,6 +274,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * often helpful for optimal memory usage and performance. If it is greater
      * than or equal to {@link Integer#MAX_VALUE}, it returns
      * {@link Integer#MAX_VALUE}. If it is zero, it returns zero.
+     * 
+     * @param requestedCapacity The IoBuffer capacity we want to be able to store
+     * @return The  power of 2 strictly superior to the requested capacity
      */
     protected static int normalizeCapacity(int requestedCapacity) {
         if (requestedCapacity < 0) {
@@ -261,11 +285,13 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
         int newCapacity = Integer.highestOneBit(requestedCapacity);
         newCapacity <<= (newCapacity < requestedCapacity ? 1 : 0);
+        
         return newCapacity < 0 ? Integer.MAX_VALUE : newCapacity;
     }
 
     /**
-     * Creates a new instance. This is an empty constructor.
+     * Creates a new instance. This is an empty constructor. It's protected, 
+     * to forbid its usage by the users.
      */
     protected IoBuffer() {
         // Do nothing
@@ -280,7 +306,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract void free();
 
     /**
-     * Returns the underlying NIO buffer instance.
+     * @return the underlying NIO {@link ByteBuffer} instance.
      */
     public abstract ByteBuffer buf();
 
@@ -290,9 +316,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract boolean isDirect();
 
     /**
-     * returns <tt>true</tt> if and only if this buffer is derived from other
-     * buffer via {@link #duplicate()}, {@link #slice()} or
-     * {@link #asReadOnlyBuffer()}.
+     * @return <tt>true</tt> if and only if this buffer is derived from another
+     * buffer via one of the {@link #duplicate()}, {@link #slice()} or
+     * {@link #asReadOnlyBuffer()} methods.
      */
     public abstract boolean isDerived();
 
@@ -302,8 +328,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract boolean isReadOnly();
 
     /**
-     * Returns the minimum capacity of this buffer which is used to determine
-     * the new capacity of the buffer shrunk by {@link #compact()} and
+     * @return the minimum capacity of this buffer which is used to determine
+     * the new capacity of the buffer shrunk by the {@link #compact()} and
      * {@link #shrink()} operation. The default value is the initial capacity of
      * the buffer.
      */
@@ -314,6 +340,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * new capacity of the buffer shrunk by {@link #compact()} and
      * {@link #shrink()} operation. The default value is the initial capacity of
      * the buffer.
+     * 
+     * @param minimumCapacity the wanted minimum capacity
+     * @return the underlying NIO {@link ByteBuffer} instance.
      */
     public abstract IoBuffer minimumCapacity(int minimumCapacity);
 
@@ -324,30 +353,76 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * Increases the capacity of this buffer. If the new capacity is less than
-     * or equal to the current capacity, this method returns silently. If the
-     * new capacity is greater than the current capacity, the buffer is
+     * or equal to the current capacity, this method returns the original buffer. 
+     * If the new capacity is greater than the current capacity, the buffer is
      * reallocated while retaining the position, limit, mark and the content of
-     * the buffer.
+     * the buffer.<br/>
+     * Note that the IoBuffer is replaced, it's not copied.
+     * <br>
+     * Assuming a buffer contains N bytes, its position is 0 and its current capacity is C, 
+     * here are the resulting buffer if we set the new capacity to a value V < C and V > C :
+     * 
+     * <pre>
+     *  Initial buffer :
+     *   
+     *   0       L          C
+     *  +--------+----------+
+     *  |XXXXXXXX|          |
+     *  +--------+----------+
+     *   ^       ^          ^
+     *   |       |          |
+     *  pos    limit     capacity
+     *  
+     * V < C :
+     * 
+     *   0       L          V
+     *  +--------+----------+
+     *  |XXXXXXXX|          |
+     *  +--------+----------+
+     *   ^       ^          ^
+     *   |       |          |
+     *  pos    limit   newCapacity
+     *  
+     * V > C :
+     * 
+     *   0       L          C            V
+     *  +--------+-----------------------+
+     *  |XXXXXXXX|          :            |
+     *  +--------+-----------------------+
+     *   ^       ^          ^            ^
+     *   |       |          |            |
+     *  pos    limit   oldCapacity  newCapacity
+     *  
+     * </pre>
+     * 
+     * @param capacity the wanted capacity
+     * @return the underlying NIO {@link ByteBuffer} instance.
      */
     public abstract IoBuffer capacity(int newCapacity);
 
     /**
-     * Returns <tt>true</tt> if and only if <tt>autoExpand</tt> is turned on.
+     * @return <tt>true</tt> if and only if <tt>autoExpand</tt> is turned on.
      */
     public abstract boolean isAutoExpand();
 
     /**
      * Turns on or off <tt>autoExpand</tt>.
+     * 
+     * @param autoExpand The flag value to set
+     * @return The modified IoBuffer instance
      */
     public abstract IoBuffer setAutoExpand(boolean autoExpand);
 
     /**
-     * Returns <tt>true</tt> if and only if <tt>autoShrink</tt> is turned on.
+     * @return <tt>true</tt> if and only if <tt>autoShrink</tt> is turned on.
      */
     public abstract boolean isAutoShrink();
 
     /**
      * Turns on or off <tt>autoShrink</tt>.
+     * 
+     * @param autoShrink The flag value to set
+     * @return The modified IoBuffer instance
      */
     public abstract IoBuffer setAutoShrink(boolean autoShrink);
 
@@ -355,6 +430,68 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Changes the capacity and limit of this buffer so this buffer get the
      * specified <tt>expectedRemaining</tt> room from the current position. This
      * method works even if you didn't set <tt>autoExpand</tt> to <tt>true</tt>.
+     * <br>
+     * Assuming a buffer contains N bytes, its position is P and its current capacity is C, 
+     * here are the resulting buffer if we call the expand method with a expectedRemaining
+     * value V :
+     * 
+     * <pre>
+     *  Initial buffer :
+     *   
+     *   0       L          C
+     *  +--------+----------+
+     *  |XXXXXXXX|          |
+     *  +--------+----------+
+     *   ^       ^          ^
+     *   |       |          |
+     *  pos    limit     capacity
+     *  
+     * ( pos + V)  <= L, no change :
+     * 
+     *   0       L          C
+     *  +--------+----------+
+     *  |XXXXXXXX|          |
+     *  +--------+----------+
+     *   ^       ^          ^
+     *   |       |          |
+     *  pos    limit   newCapacity
+     *  
+     * You can still put ( L - pos ) bytes in the buffer
+     *  
+     * ( pos + V ) > L & ( pos + V ) <= C :
+     * 
+     *  0        L          C
+     *  +------------+------+
+     *  |XXXXXXXX:...|      |
+     *  +------------+------+
+     *   ^           ^      ^
+     *   |           |      |
+     *  pos       newlimit  newCapacity
+     *  
+     *  You can now put ( L - pos + V)  bytes in the buffer.
+     *  
+     *  
+     *  ( pos + V ) > C
+     * 
+     *   0       L          C
+     *  +-------------------+----+
+     *  |XXXXXXXX:..........:....|
+     *  +------------------------+
+     *   ^                       ^
+     *   |                       |
+     *  pos                      +-- newlimit
+     *                           |
+     *                           +-- newCapacity
+     *                           
+     * You can now put ( L - pos + V ) bytes in the buffer, which limit is now
+     * equals to the capacity.
+     * </pre>
+     *
+     * Note that the expecting remaining bytes starts at the current position. In all
+     * those examples, the position is 0.
+     *  
+     * @param expectedRemaining The expected remaining bytes in the buffer
+     * @return The modified IoBuffer instance
      */
     public abstract IoBuffer expand(int expectedRemaining);
 
@@ -363,6 +500,69 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * specified <tt>expectedRemaining</tt> room from the specified
      * <tt>position</tt>. This method works even if you didn't set
      * <tt>autoExpand</tt> to <tt>true</tt>.
+     * Assuming a buffer contains N bytes, its position is P and its current capacity is C, 
+     * here are the resulting buffer if we call the expand method with a expectedRemaining
+     * value V :
+     * 
+     * <pre>
+     *  Initial buffer :
+     *   
+     *      P    L          C
+     *  +--------+----------+
+     *  |XXXXXXXX|          |
+     *  +--------+----------+
+     *      ^    ^          ^
+     *      |    |          |
+     *     pos limit     capacity
+     *  
+     * ( pos + V)  <= L, no change :
+     * 
+     *      P    L          C
+     *  +--------+----------+
+     *  |XXXXXXXX|          |
+     *  +--------+----------+
+     *      ^    ^          ^
+     *      |    |          |
+     *     pos limit   newCapacity
+     *  
+     * You can still put ( L - pos ) bytes in the buffer
+     *  
+     * ( pos + V ) > L & ( pos + V ) <= C :
+     * 
+     *      P    L          C
+     *  +------------+------+
+     *  |XXXXXXXX:...|      |
+     *  +------------+------+
+     *      ^        ^      ^
+     *      |        |      |
+     *     pos    newlimit  newCapacity
+     *  
+     *  You can now put ( L - pos + V)  bytes in the buffer.
+     *  
+     *  
+     *  ( pos + V ) > C
+     * 
+     *      P       L          C
+     *  +-------------------+----+
+     *  |XXXXXXXX:..........:....|
+     *  +------------------------+
+     *      ^                    ^
+     *      |                    |
+     *     pos                   +-- newlimit
+     *                           |
+     *                           +-- newCapacity
+     *                           
+     * You can now put ( L - pos + V ) bytes in the buffer, which limit is now
+     * equals to the capacity.
+     * </pre>
+     *
+     * Note that the expecting remaining bytes starts at the current position. In all
+     * those examples, the position is P.
+     * 
+     * @param position The starting position from which we want to define a remaining 
+     * number of bytes
+     * @param expectedRemaining The expected remaining bytes in the buffer
+     * @return The modified IoBuffer instance
      */
     public abstract IoBuffer expand(int position, int expectedRemaining);
 
@@ -372,6 +572,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * content between the position and limit. The capacity of the buffer never
      * becomes less than {@link #minimumCapacity()}. The mark is discarded once
      * the capacity changes.
+     * 
+     * @return The modified IoBuffer instance
      */
     public abstract IoBuffer shrink();
 

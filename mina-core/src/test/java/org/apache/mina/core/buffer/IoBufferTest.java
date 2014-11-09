@@ -56,6 +56,173 @@ public class IoBufferTest {
     }
 
     @Test
+    public void testCapacity() {
+        IoBuffer buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        
+        // See if we can decrease the capacity (we shouldn't)
+        IoBuffer newBuffer = buffer.capacity(7);
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(buffer, newBuffer);
+        
+        // See if we can increase the capacity
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        newBuffer = buffer.capacity(14);
+        assertEquals(14, newBuffer.capacity());
+        assertEquals(buffer, newBuffer);
+        newBuffer.put(0, (byte)'9');
+        assertEquals((byte)'9', newBuffer.get(0));
+        assertEquals((byte)'9', buffer.get(0));
+    }
+
+    @Test
+    public void testExpand() {
+        IoBuffer buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        
+        assertEquals(6, buffer.remaining());
+        
+        // See if we can expand with a lower number of remaining bytes. We should not.
+        IoBuffer newBuffer = buffer.expand(2);
+        assertEquals(6, newBuffer.limit());
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(0, newBuffer.position());
+        
+        // Now, let's expand the buffer above the number of current bytes but below the limit
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        newBuffer = buffer.expand(8);
+        assertEquals(8, newBuffer.limit());
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(0, newBuffer.position());
+        
+        // Last, expand the buffer above the limit
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        newBuffer = buffer.expand(12);
+        assertEquals(12, newBuffer.limit());
+        assertEquals(12, newBuffer.capacity());
+        assertEquals(0, newBuffer.position());
+        
+        // Now, move forward in the buffer
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        buffer.position(4);
+
+        // See if we can expand with a lower number of remaining bytes. We should not.
+        newBuffer = buffer.expand(2);
+        assertEquals(6, newBuffer.limit());
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(4, newBuffer.position());
+
+        // Expand above the current limit
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        buffer.position(4);
+        newBuffer = buffer.expand(3);
+        assertEquals(7, newBuffer.limit());
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(4, newBuffer.position());
+
+        // Expand above the current capacity
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        buffer.position(4);
+        newBuffer = buffer.expand(7);
+        assertEquals(11, newBuffer.limit());
+        assertEquals(11, newBuffer.capacity());
+        assertEquals(4, newBuffer.position());
+    }
+
+    @Test
+    public void testExpandPos() {
+        IoBuffer buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        
+        assertEquals(6, buffer.remaining());
+        
+        // See if we can expand with a lower number of remaining bytes. We should not.
+        IoBuffer newBuffer = buffer.expand(3, 2);
+        assertEquals(6, newBuffer.limit());
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(0, newBuffer.position());
+        
+        // Now, let's expand the buffer above the number of current bytes but below the limit
+        buffer = IoBuffer.allocate(10);
+        buffer.put("012345".getBytes());
+        buffer.flip();
+
+        newBuffer = buffer.expand(3, 5);
+        assertEquals(8, newBuffer.limit());
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(0, newBuffer.position());
+        
+        // Last, expand the buffer above the limit
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        newBuffer = buffer.expand(3,9);
+        assertEquals(12, newBuffer.limit());
+        assertEquals(12, newBuffer.capacity());
+        assertEquals(0, newBuffer.position());
+        
+        // Now, move forward in the buffer
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        buffer.position(4);
+
+        // See if we can expand with a lower number of remaining bytes. We should not be.
+        newBuffer = buffer.expand(5, 1);
+        assertEquals(6, newBuffer.limit());
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(4, newBuffer.position());
+
+        // Expand above the current limit
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        buffer.position(4);
+        newBuffer = buffer.expand(5, 2);
+        assertEquals(7, newBuffer.limit());
+        assertEquals(10, newBuffer.capacity());
+        assertEquals(4, newBuffer.position());
+
+        // Expand above the current capacity
+        buffer = IoBuffer.allocate(10);
+        
+        buffer.put("012345".getBytes());
+        buffer.flip();
+        buffer.position(4);
+        newBuffer = buffer.expand(5, 6);
+        assertEquals(11, newBuffer.limit());
+        assertEquals(11, newBuffer.capacity());
+        assertEquals(4, newBuffer.position());
+    }
+    
+    @Test
     public void testNormalizeCapacity() {
         // A few sanity checks
         assertEquals(Integer.MAX_VALUE, IoBufferImpl.normalizeCapacity(-10));
