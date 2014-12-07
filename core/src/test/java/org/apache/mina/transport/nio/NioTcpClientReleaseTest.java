@@ -80,4 +80,34 @@ public class NioTcpClientReleaseTest {
             closedLatch.countDown();
         }
     }
+    
+    /**
+     * Test added for DIRMINA-999
+     */
+    @Test
+    public void checkSessionCloseEventIsSentClientSideWhenImmediateIsFalse() throws IOException, InterruptedException,
+            ExecutionException {
+
+        NioTcpServer server = new NioTcpServer();
+        server.bind(0);
+
+        NioTcpClient client = new NioTcpClient();
+        final CountDownLatch closeCounter = new CountDownLatch(1);
+        client.setIoHandler(new AbstractIoHandler() {
+
+            @Override
+            public void sessionOpened(IoSession session) {
+                session.close(false);
+            }
+
+            @Override
+            public void sessionClosed(IoSession session) {
+                closeCounter.countDown();
+            }
+            
+        });
+        client.connect(new InetSocketAddress(server.getServerSocketChannel().socket().getLocalPort()));
+        assertTrue(closeCounter.await(WAIT_TIME, TimeUnit.MILLISECONDS));
+    }
+    
 }

@@ -326,6 +326,7 @@ public abstract class AbstractNioSession extends AbstractIoSession {
 
                         // we was flushing writes, now we to the close
                         channelClose();
+                        processSessionClosed();
                     } else {
                         // no more write event needed
                         selectorLoop.modifyRegistration(false, !isReadSuspended(), false, (SelectorListener) this,
