@@ -112,7 +112,7 @@ public class DefaultWriteRequest implements WriteRequest {
             sb.append("Original message : '");
 
             if (originalMessage instanceof ByteBuffer) {
-                sb.append(ByteBufferDumper.dump((ByteBuffer) originalMessage));
+                sb.append(ByteBufferDumper.dump((ByteBuffer) originalMessage, 16, false));
             } else {
                 sb.append(originalMessage);
             }
