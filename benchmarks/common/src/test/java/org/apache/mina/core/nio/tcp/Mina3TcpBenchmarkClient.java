@@ -24,8 +24,8 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkClient;
@@ -46,7 +46,7 @@ public class Mina3TcpBenchmarkClient implements BenchmarkClient {
         client = new NioTcpClient();
         client.getSessionConfig().setSendBufferSize(64 * 1024);
         client.getSessionConfig().setTcpNoDelay(true);
-        client.setIoHandler(new IoHandler() {
+        client.setIoHandler(new AbstractIoHandler() {
             private void sendMessage(IoSession session, byte[] data) {
                 ByteBuffer iobuf = ByteBuffer.wrap(data);
                 session.write(iobuf);

@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
+import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
@@ -65,7 +65,7 @@ public class Mina3TcpBenchmarkServer implements BenchmarkServer {
         tcpServer = new NioTcpServer(new FixedSelectorLoopPool("Server", 1), null);
         tcpServer.getSessionConfig().setReadBufferSize(128 * 1024);
         tcpServer.getSessionConfig().setTcpNoDelay(true);
-        tcpServer.setIoHandler(new IoHandler() {
+        tcpServer.setIoHandler(new AbstractIoHandler() {
             public void sessionOpened(IoSession session) {
                 session.setAttribute(STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
             }

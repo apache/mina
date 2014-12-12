@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
+import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
-import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkServer;
@@ -68,7 +68,7 @@ public class BioUdpBenchmarkServer implements BenchmarkServer {
         UdpSessionConfig config = new DefaultUdpSessionConfig();
         config.setReadBufferSize(65536);
         udpServer = new BioUdpServer(config, null);
-        udpServer.setIoHandler(new IoHandler() {
+        udpServer.setIoHandler(new AbstractIoHandler() {
             @Override
             public void sessionOpened(IoSession session) {
                 session.setAttribute(STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);

@@ -25,9 +25,9 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.mina.api.AbstractIoHandler;
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoFuture;
-import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
 import org.apache.mina.core.BenchmarkClient;
@@ -47,7 +47,7 @@ public class Mina3UdpBenchmarkClient implements BenchmarkClient {
      */
     public void start(int port, final CountDownLatch counter, final byte[] data) throws IOException {
         udpClient = new NioUdpClient();
-        udpClient.setIoHandler(new IoHandler() {
+        udpClient.setIoHandler(new AbstractIoHandler() {
             private void sendMessage(IoSession session, byte[] data) {
                 ByteBuffer iobuf = ByteBuffer.wrap(data);
                 session.write(iobuf);
