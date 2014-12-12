@@ -75,4 +75,26 @@ public interface IoFilter {
      * @param message the incoming message to process
      */
     void messageSent(IoSession session, Object message);
+    
+    /**
+     * Invoked when a secure handshake has been started.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void handshakeStarted(IoSession session);
+    
+    /**
+     * Invoked when a secure handshake has been completed.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void handshakeCompleted(IoSession session);
+
+    /**
+     * Invoked when a secure context has been closed.
+     * 
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void secureClosed(IoSession session);
+
 }

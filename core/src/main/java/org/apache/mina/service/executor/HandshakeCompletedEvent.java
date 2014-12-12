@@ -1,6 +1,6 @@
 /*
- *  Licensed to the Apache Software Foundation (ASF) under one
- *  or more contributor license agreements.  See the NOTICE file
+ *  Licensed to the Apache Software Founimport org.apache.mina.api.IoSession;
+tributor license agreements.  See the NOTICE file
  *  distributed with this work for additional information
  *  regarding copyright ownership.  The ASF licenses this file
  *  to you under the Apache License, Version 2.0 (the
@@ -19,26 +19,30 @@
  */
 package org.apache.mina.service.executor;
 
+import org.apache.mina.api.IoSession;
+
 /**
- * Implement this interface for implementing different behavior on different {@link Event}.
+ * An {@link IoSession} handshake started {@link Event}
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface EventVisitor {
+public class HandshakeCompletedEvent implements Event {
+    private final IoSession session;
 
-    void visit(OpenEvent event);
+    public HandshakeCompletedEvent(final IoSession session) {
+        this.session = session;
+    }
 
-    void visit(CloseEvent event);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoSession getSession() {
+        return session;
+    }
 
-    void visit(ReceiveEvent event);
-
-    void visit(SentEvent event);
-
-    void visit(IdleEvent event);
-    
-    void visit(HandshakeStartedEvent event);
-
-    void visit(HandshakeCompletedEvent handshakeCompletedEvent);
-
-    void visit(SecureClosedEvent secureClosedEvent);
+    @Override
+    public void visit(EventVisitor visitor) {
+        visitor.visit(this);
+    }
 }

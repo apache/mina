@@ -92,4 +92,25 @@ public interface IoHandler {
      * @param cause the caught exception
      */
     void exceptionCaught(IoSession session, Exception cause);
+    
+    /**
+     * Invoked for secured session when the handshake has been started. May be called
+     * several times for a single session in case of rehandshake.
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void handshakeStarted(IoSession abstractIoSession);
+
+    /**
+     * Invoked for secured session when the handshake has been completed. May be called
+     * several times for a single session in case of rehandshake.
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void handshakeCompleted(IoSession session);
+    
+    /**
+     * Invoked for secured session when underlying SSL/TLS session has been closed.
+     * @param session {@link IoSession} associated with the invocation
+     */
+    void secureClosed(IoSession session);
+
 }

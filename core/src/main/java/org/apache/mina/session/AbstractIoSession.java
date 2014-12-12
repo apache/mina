@@ -40,10 +40,13 @@ import org.apache.mina.api.IoSessionConfig;
 import org.apache.mina.filterchain.ReadFilterChainController;
 import org.apache.mina.filterchain.WriteFilterChainController;
 import org.apache.mina.service.executor.CloseEvent;
+import org.apache.mina.service.executor.HandshakeCompletedEvent;
+import org.apache.mina.service.executor.HandshakeStartedEvent;
 import org.apache.mina.service.executor.IdleEvent;
 import org.apache.mina.service.executor.IoHandlerExecutor;
 import org.apache.mina.service.executor.OpenEvent;
 import org.apache.mina.service.executor.ReceiveEvent;
+import org.apache.mina.service.executor.SecureClosedEvent;
 import org.apache.mina.service.executor.SentEvent;
 import org.apache.mina.service.idlechecker.IdleChecker;
 import org.apache.mina.transport.nio.SelectorLoop;
@@ -330,14 +333,8 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
      */
     @Override
     public boolean isSecured() {
-        return secured;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setSecured(boolean secured) {
-        this.secured = secured;
+        SslHelper helper = attributes.getAttribute(SSL_HELPER);
+        return helper != null && helper.isActive();
     }
 
     /**
@@ -347,9 +344,7 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
     public void initSecure(SSLContext sslContext) {
         SslHelper sslHelper = new SslHelper(this, sslContext);
         sslHelper.init();
-
         attributes.setAttribute(SSL_HELPER, sslHelper);
-        setSecured(true);
     }
 
     /**
@@ -763,6 +758,98 @@ public abstract class AbstractIoSession implements IoSession, ReadFilterChainCon
             processException(e);
         }
 
+    }
+
+    public void processHandshakeStarted() {
+        if (IS_DEBUG) {
+            LOG.debug("processing handshake started event for session {}", this);
+        }
+
+        try {
+            int size = chain.length;
+
+            for (int i = size - 1; i >= 0; i--) {
+                chain[i].handshakeStarted(this);
+            }
+
+            IoHandler handler = getService().getIoHandler();
+
+            if (handler != null) {
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+
+                if (executor != null) {
+                    // asynchronous event
+                    executor.execute(new HandshakeStartedEvent(this));
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.handshakeStarted(this);
+                }
+            }
+        } catch (RuntimeException e) {
+            processException(e);
+        }
+
+    }
+
+    public void processHandshakeCompleted() {
+        if (IS_DEBUG) {
+            LOG.debug("processing handshake completed event for session {}", this);
+        }
+
+        try {
+            int size = chain.length;
+
+            for (int i = size - 1; i >= 0; i--) {
+                chain[i].handshakeCompleted(this);
+            }
+
+            IoHandler handler = getService().getIoHandler();
+
+            if (handler != null) {
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+
+                if (executor != null) {
+                    // asynchronous event
+                    executor.execute(new HandshakeCompletedEvent(this));
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.handshakeCompleted(this);
+                }
+            }
+        } catch (RuntimeException e) {
+            processException(e);
+        }
+
+    }
+
+    public void processSecureClosed() {
+        if (IS_DEBUG) {
+            LOG.debug("processing secure closed event for session {}", this);
+        }
+
+        try {
+            int size = chain.length;
+
+            for (int i = size - 1; i >= 0; i--) {
+                chain[i].secureClosed(this);
+            }
+
+            IoHandler handler = getService().getIoHandler();
+
+            if (handler != null) {
+                IoHandlerExecutor executor = getService().getIoHandlerExecutor();
+
+                if (executor != null) {
+                    // asynchronous event
+                    executor.execute(new SecureClosedEvent(this));
+                } else {
+                    // synchronous call (in the I/O loop)
+                    handler.secureClosed(this);
+                }
+            }
+        } catch (RuntimeException e) {
+            processException(e);
+        }
     }
 
     /**

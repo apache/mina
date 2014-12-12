@@ -81,4 +81,34 @@ class HandlerCaller implements EventVisitor {
             session.getService().getIoHandler().exceptionCaught(session, e);
         }
     }
+
+    @Override
+    public void visit(HandshakeStartedEvent event) {
+        IoSession session = event.getSession();
+        try {
+            session.getService().getIoHandler().handshakeStarted(session);
+        } catch (Exception e) {
+            session.getService().getIoHandler().exceptionCaught(session, e);
+        }
+    }
+
+    @Override
+    public void visit(HandshakeCompletedEvent event) {
+        IoSession session = event.getSession();
+        try {
+            session.getService().getIoHandler().handshakeCompleted(session);
+        } catch (Exception e) {
+            session.getService().getIoHandler().exceptionCaught(session, e);
+        }
+    }
+
+    @Override
+    public void visit(SecureClosedEvent event) {
+        IoSession session = event.getSession();
+        try {
+            session.getService().getIoHandler().secureClosed(session);
+        } catch (Exception e) {
+            session.getService().getIoHandler().exceptionCaught(session, e);
+        }
+    }
 }

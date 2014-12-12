@@ -87,4 +87,25 @@ public abstract class AbstractIoHandler implements IoHandler {
         LOG.error("Unexpected exception, we close the session : ", cause);
         session.close(true);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handshakeStarted(IoSession abstractIoSession) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handshakeCompleted(IoSession session) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void secureClosed(IoSession session) {
+    }
 }

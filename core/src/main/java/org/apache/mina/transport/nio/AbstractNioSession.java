@@ -26,6 +26,9 @@ import java.nio.channels.SocketChannel;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.net.ssl.SSLException;
+
+import org.apache.mina.api.IoClient;
 import org.apache.mina.api.IoFuture;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
@@ -40,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Common ancestor for NIO based {@link IoSession} implmentation.
+ * Common ancestor for NIO based {@link IoSession} implementation.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -99,6 +102,18 @@ public abstract class AbstractNioSession extends AbstractIoSession {
         }
     };
 
+    @Override
+    public void processSessionOpen() {
+        super.processSessionOpen();
+        try {
+            if (isSecured() && getService() instanceof IoClient) {
+                getAttribute(SSL_HELPER).beginHandshake();
+            }
+        } catch (IOException e) {
+            processException(e);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -114,6 +129,16 @@ public abstract class AbstractNioSession extends AbstractIoSession {
                 channelClose();
                 processSessionClosed();
             } else {
+                if (isSecured()) {
+                    SslHelper sslHelper = getAttribute(SSL_HELPER, null);
+                    if (sslHelper != null) {
+                        try {
+                            sslHelper.close();
+                        } catch (IOException e) {
+                            processException(e);
+                        }
+                    }
+                }
                 // flush this session the flushing code will close the session
                 flushWriteQueue();
             }
@@ -146,7 +171,7 @@ public abstract class AbstractNioSession extends AbstractIoSession {
             LOG.debug("enqueueWriteRequest {}", writeRequest);
         }
 
-        if (isConnectedSecured()) {
+        if (isSecured()) {
             // SSL/TLS : we have to encrypt the message
             SslHelper sslHelper = getAttribute(SSL_HELPER, null);
 
@@ -154,10 +179,12 @@ public abstract class AbstractNioSession extends AbstractIoSession {
                 throw new IllegalStateException();
             }
 
-            writeRequest = sslHelper.processWrite(this, writeRequest.getMessage(), writeQueue);
+            if (!writeRequest.isSecureInternal()) {
+                writeRequest = sslHelper.processWrite(this, writeRequest.getMessage(), writeQueue);
+            }
         }
 
-        /*synchronized (writeQueue)*/{
+        if (writeRequest != null) {
             ByteBuffer message = (ByteBuffer) writeRequest.getMessage();
 
             if (writeQueue.isEmpty()) {
@@ -214,6 +241,9 @@ public abstract class AbstractNioSession extends AbstractIoSession {
 
                 // We have to push the request on the writeQueue
                 writeQueue.add(writeRequest);
+                if (!registeredForWrite.getAndSet(true)) {
+                    flushWriteQueue();
+                }
             }
         }
 

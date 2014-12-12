@@ -38,6 +38,12 @@ public class DefaultWriteRequest implements WriteRequest {
 
     /** the future to complete when this message is written */
     private IoFuture<Void> future;
+    
+    /**
+     * The secure internal flag that tells if the message must be encrypted
+     * when sent (false) or not (true)
+     */
+    private boolean secureInternal = false;
 
     /**
      * Creates a new instance of a WriteRequest, storing the message as it was
@@ -141,5 +147,15 @@ public class DefaultWriteRequest implements WriteRequest {
         sb.append("]");
 
         return sb.toString();
+    }
+
+    @Override
+    public boolean isSecureInternal() {
+        return secureInternal;
+    }
+
+    @Override
+    public void setSecureInternal(boolean secureInternal) {
+        this.secureInternal = secureInternal;        
     }
 }

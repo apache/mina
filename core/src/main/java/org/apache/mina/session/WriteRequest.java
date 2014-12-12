@@ -69,4 +69,19 @@ public interface WriteRequest {
      * @param the future
      */
     void setFuture(IoFuture<Void> future);
+    
+    /**
+     * Get the flag that tells that the underlying message is an internal one,
+     * not needed to be encrypted
+     * @return the internal secure flag of the message
+     */
+    boolean isSecureInternal();
+    
+
+    /**
+     * Set the flag that tells that the underlying message is an internal one,
+     * not needed to be encrypted
+     * @param secureInternal the secure internal flag
+     */
+    void setSecureInternal(boolean secureInternal);
 }

@@ -73,4 +73,26 @@ public abstract class AbstractIoFilter implements IoFilter {
     @Override
     public void messageSent(final IoSession session, final Object message) {
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handshakeStarted(IoSession session) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handshakeCompleted(IoSession session) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void secureClosed(IoSession session) {
+    }
+    
 }
