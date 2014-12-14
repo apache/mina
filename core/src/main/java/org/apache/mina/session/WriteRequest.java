@@ -84,4 +84,11 @@ public interface WriteRequest {
      * @param secureInternal the secure internal flag
      */
     void setSecureInternal(boolean secureInternal);
+    
+    /**
+     * When this message has been set, should we send a corresponding send event
+     * or not.
+     * @return the send confirm flag
+     */
+    boolean isConfirmRequested();
 }

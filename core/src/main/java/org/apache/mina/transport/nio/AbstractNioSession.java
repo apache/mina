@@ -231,7 +231,7 @@ public abstract class AbstractNioSession extends AbstractIoSession {
 
                     final Object highLevel = ((DefaultWriteRequest) writeRequest).getOriginalMessage();
 
-                    if (highLevel != null) {
+                    if ((highLevel != null) && writeRequest.isConfirmRequested()) {
                         processMessageSent(highLevel);
                     }
                 }
@@ -329,7 +329,7 @@ public abstract class AbstractNioSession extends AbstractIoSession {
                     // generate the message sent event
                     final Object highLevel = ((DefaultWriteRequest) writeRequest).getOriginalMessage();
 
-                    if (highLevel != null) {
+                    if ((highLevel != null) && writeRequest.isConfirmRequested()) {
                         processMessageSent(highLevel);
                     }
                 } else {

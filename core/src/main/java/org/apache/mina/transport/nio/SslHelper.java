@@ -420,9 +420,9 @@ public class SslHelper {
                         appBuffer.flip();
                         done = buf.remaining() == 0;
                         if (done) {
-                            request = new DefaultWriteRequest(appBuffer);
+                            request = new DefaultWriteRequest(appBuffer, buf, done);
                         } else {
-                            writeQueue.offer(new DefaultWriteRequest(appBuffer));
+                            writeQueue.offer(new DefaultWriteRequest(appBuffer, buf, done));
                             appBuffer = ByteBuffer.allocateDirect(appBuffer.capacity());
                         }
                         break;

@@ -45,6 +45,8 @@ public class DefaultWriteRequest implements WriteRequest {
      */
     private boolean secureInternal = false;
 
+    private boolean confirmRequested = true;
+    
     /**
      * Creates a new instance of a WriteRequest, storing the message as it was
      * when the IoSession.write() has been called.
@@ -54,6 +56,20 @@ public class DefaultWriteRequest implements WriteRequest {
     public DefaultWriteRequest(Object originalMessage) {
         this.message = originalMessage;
         this.originalMessage = originalMessage;
+    }
+
+    /**
+     * Creates a new instance of a WriteRequest, storing the message as it was
+     * when the IoSession.write() has been called.
+     * 
+     * @param message The message to write
+     * @param originalMessage the original message
+     * @param confirmRequested whether to send an event or not
+     */
+    public DefaultWriteRequest(Object message, Object originalMessage, boolean confirmRequested) {
+        this.message = message;
+        this.originalMessage = originalMessage;
+        this.confirmRequested = confirmRequested;
     }
 
     /**
@@ -157,5 +173,10 @@ public class DefaultWriteRequest implements WriteRequest {
     @Override
     public void setSecureInternal(boolean secureInternal) {
         this.secureInternal = secureInternal;        
+    }
+
+    @Override
+    public boolean isConfirmRequested() {
+        return confirmRequested;
     }
 }

@@ -157,7 +157,7 @@ public class BioUdpSession extends AbstractIoSession {
 
                 final Object highLevel = ((DefaultWriteRequest) writeRequest).getOriginalMessage();
 
-                if (highLevel != null) {
+                if ((highLevel != null) && writeRequest.isConfirmRequested()) {
                     processMessageSent(highLevel);
                 }
 

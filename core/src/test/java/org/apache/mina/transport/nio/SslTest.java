@@ -473,4 +473,31 @@ public class SslTest {
     public void test1MMessageWithMINAClientBeforeHandshake() throws IOException, GeneralSecurityException, InterruptedException {
         testMessage(1024 * 1024, Client.MINA_BEFORE_HANDSHAKE);
     }
+    
+    @Test
+    public void checkThatASingleMessageSentEventIsSent() throws IOException, GeneralSecurityException, InterruptedException {
+        final CountDownLatch counter = new CountDownLatch(1);
+        final byte[] message = new byte[1024 * 1024];
+        new Random().nextBytes(message);
+        final AtomicInteger sentCounter = new AtomicInteger();
+
+        NioTcpServer server = createReceivingServer(1024 * 1024, counter, null);
+        NioTcpClient client = new NioTcpClient();
+        client.getSessionConfig().setSslContext(createSSLContext());
+        client.setIoHandler(new AbstractIoHandler() {
+
+            @Override
+            public void handshakeCompleted(IoSession session) {
+                session.write(ByteBuffer.wrap(message));
+            }
+
+            @Override
+            public void messageSent(IoSession session, Object message) {
+                sentCounter.incrementAndGet();
+            }
+        });
+        client.connect(new InetSocketAddress(server.getServerSocketChannel().socket().getLocalPort()));
+        assertTrue(counter.await(10, TimeUnit.SECONDS));
+        assertEquals(5, sentCounter.get());
+    }
 }
