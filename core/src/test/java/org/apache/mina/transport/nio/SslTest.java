@@ -401,8 +401,6 @@ public class SslTest {
                 } else {
                     NioTcpClient client = new NioTcpClient();
                     client.setIoHandler(new AbstractIoHandler() {
-                        int sendSize = 0;
-                        
                         @Override
                         public void sessionOpened(IoSession session) {
                             if (clientType == Client.MINA_BEFORE_HANDSHAKE) {
@@ -415,11 +413,6 @@ public class SslTest {
                             if (clientType == Client.MINA_AFTER_HANDSHAKE) {
                                 session.write(ByteBuffer.wrap(message));
                             }
-                        }
-
-                        @Override
-                        public void messageSent(IoSession session, Object message) {
-                            sendSize += ((ByteBuffer)message).capacity();
                         }
                     });
                     client.getSessionConfig().setSslContext(createSSLContext());
