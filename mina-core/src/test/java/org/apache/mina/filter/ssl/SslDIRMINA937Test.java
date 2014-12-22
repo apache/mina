@@ -72,10 +72,10 @@ public class SslDIRMINA937Test {
             String line = (String) message;
 
             if (line.startsWith("hello")) {
-                System.out.println("Server got: 'hello', waiting for 'send'");
+                //System.out.println("Server got: 'hello', waiting for 'send'");
                 Thread.sleep(1500);
             } else if (line.startsWith("send")) {
-                System.out.println("Server got: 'send', sending 'data'");
+                //System.out.println("Server got: 'send', sending 'data'");
                 session.write("data");
             }
         }
