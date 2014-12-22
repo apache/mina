@@ -274,6 +274,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
         int end = pos + expectedRemaining;
         int newCapacity;
+        
         if (autoExpand) {
             newCapacity = IoBuffer.normalizeCapacity(end);
         } else {
@@ -366,9 +367,11 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public final IoBuffer position(int newPosition) {
         autoExpand(newPosition, 0);
         buf().position(newPosition);
+        
         if (mark > newPosition) {
             mark = -1;
         }
+        
         return this;
     }
 

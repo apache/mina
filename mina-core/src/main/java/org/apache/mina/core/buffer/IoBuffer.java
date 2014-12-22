@@ -373,9 +373,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *   |       |          |
      *  pos    limit     capacity
      *  
-     * V < C :
+     * V <= C :
      * 
-     *   0       L          V
+     *   0       L          C
      *  +--------+----------+
      *  |XXXXXXXX|          |
      *  +--------+----------+
@@ -392,6 +392,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *   ^       ^          ^            ^
      *   |       |          |            |
      *  pos    limit   oldCapacity  newCapacity
+     *  
+     *  The buffer has been increased.
      *  
      * </pre>
      * 
@@ -446,7 +448,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *   |       |          |
      *  pos    limit     capacity
      *  
-     * ( pos + V)  <= L, no change :
+     * ( pos + V )  <= L, no change :
      * 
      *   0       L          C
      *  +--------+----------+
@@ -468,7 +470,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *   |           |      |
      *  pos       newlimit  newCapacity
      *  
-     *  You can now put ( L - pos + V)  bytes in the buffer.
+     *  You can now put ( L - pos + V )  bytes in the buffer.
      *  
      *  
      *  ( pos + V ) > C
@@ -515,7 +517,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *      |    |          |
      *     pos limit     capacity
      *  
-     * ( pos + V)  <= L, no change :
+     * ( pos + V )  <= L, no change :
      * 
      *      P    L          C
      *  +--------+----------+
@@ -569,10 +571,43 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Changes the capacity of this buffer so this buffer occupies as less
      * memory as possible while retaining the position, limit and the buffer
-     * content between the position and limit. The capacity of the buffer never
-     * becomes less than {@link #minimumCapacity()}. The mark is discarded once
-     * the capacity changes.
+     * content between the position and limit. <br/>
+     * <b>The capacity of the buffer never becomes less than {@link #minimumCapacity()}</b></br>. 
+     * The mark is discarded once the capacity changes.<br/>
+     * Typically, a call to this method tries to remove as much unused bytes
+     * as possible, dividing by two the initial capacity until it can't without
+     * obtaining a new capacity lower than the {@link #minimumCapacity()}. For instance, if 
+     * the limit is 7 and the capacity is 36, with a minimum capacity of 8, 
+     * shrinking the buffer will left a capacity of 9 (we go down from 36 to 18, then from 18 to 9).  
      * 
+     * <pre>
+     *  Initial buffer :
+     *   
+     *  +--------+----------+
+     *  |XXXXXXXX|          |
+     *  +--------+----------+
+     *      ^    ^  ^       ^
+     *      |    |  |       |
+     *     pos   |  |    capacity
+     *           |  |
+     *           |  +-- minimumCapacity
+     *           |
+     *           +-- limit
+     * 
+     * Resulting buffer :
+     * 
+     *  +--------+--+-+
+     *  |XXXXXXXX|  | |
+     *  +--------+--+-+
+     *      ^    ^  ^ ^
+     *      |    |  | |
+     *      |    |  | +-- new capacity
+     *      |    |  |
+     *     pos   |  +-- minimum capacity
+     *           |
+     *           +-- limit
+     * </pre>
+     *           
      * @return The modified IoBuffer instance
      */
     public abstract IoBuffer shrink();
