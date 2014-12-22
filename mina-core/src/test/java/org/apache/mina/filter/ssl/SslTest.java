@@ -79,7 +79,14 @@ public class SslTest {
                 Thread.sleep(1500);
             } else if (line.startsWith("send")) {
                 System.out.println("Server got: 'send', sending 'data'");
-                session.write("data");
+                StringBuilder sb = new StringBuilder();
+                
+                for ( int i = 0; i < 10000; i++) {
+                    sb.append('A');
+                }
+                    
+                session.write(sb.toString());
+                session.close(true);
             }
         }
     }
@@ -127,7 +134,7 @@ public class SslTest {
         System.out.println("Client sending: hello");
         socket.getOutputStream().write("hello                      \n".getBytes());
         socket.getOutputStream().flush();
-        socket.setSoTimeout(10000);
+        socket.setSoTimeout(1000000);
 
         System.out.println("Client sending: send");
         socket.getOutputStream().write("send\n".getBytes());

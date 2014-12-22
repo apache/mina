@@ -43,7 +43,7 @@ import org.apache.mina.util.Bar;
 import org.junit.Test;
 
 /**
- * Tests {@link IoBuffer}.
+ * Tests the {@link IoBuffer} class.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -55,6 +55,9 @@ public class IoBufferTest {
     public static class NonserializableClass {
     }
 
+    /**
+     * Test the capacity(newCapacity) method.
+     */
     @Test
     public void testCapacity() {
         IoBuffer buffer = IoBuffer.allocate(10);
@@ -62,7 +65,7 @@ public class IoBufferTest {
         buffer.put("012345".getBytes());
         buffer.flip();
         
-        // See if we can decrease the capacity (we shouldn't)
+        // See if we can decrease the capacity (we shouldn't be able to go under the minimul capacity)
         IoBuffer newBuffer = buffer.capacity(7);
         assertEquals(10, newBuffer.capacity());
         assertEquals(buffer, newBuffer);
@@ -78,8 +81,18 @@ public class IoBufferTest {
         newBuffer.put(0, (byte)'9');
         assertEquals((byte)'9', newBuffer.get(0));
         assertEquals((byte)'9', buffer.get(0));
+        
+        // See if we can go down when the minimum capacity is below the current capacity
+        // We should not.
+        buffer = IoBuffer.allocate(10);
+        buffer.capacity(5);
+        assertEquals(10, buffer.minimumCapacity());
+        assertEquals(10, buffer.capacity());
     }
 
+    /**
+     * Test the expand(expectedRemaining) method.
+     */
     @Test
     public void testExpand() {
         IoBuffer buffer = IoBuffer.allocate(10);
@@ -151,6 +164,9 @@ public class IoBufferTest {
         assertEquals(4, newBuffer.position());
     }
 
+    /**
+     * Test the expand(position, expectedRemaining) method.
+     */
     @Test
     public void testExpandPos() {
         IoBuffer buffer = IoBuffer.allocate(10);
@@ -221,7 +237,10 @@ public class IoBufferTest {
         assertEquals(11, newBuffer.capacity());
         assertEquals(4, newBuffer.position());
     }
-    
+
+    /**
+     * Test the normalizeCapacity(requestedCapacity) method.
+     */
     @Test
     public void testNormalizeCapacity() {
         // A few sanity checks
@@ -404,6 +423,15 @@ public class IoBufferTest {
             assertTrue(buf.capacity() >= i);
             assertTrue(buf.capacity() < i * 2);
         }
+    }
+
+    /**
+     * Test that we can't allocate a buffser with a negative value
+     * @throws Exception
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void testAllocateNegative() throws Exception {
+        IoBuffer.allocate(-1);
     }
 
     @Test
@@ -1558,6 +1586,9 @@ public class IoBufferTest {
         assertEquals(0x0000000083838383L, buf.getUnsignedInt());
     }
 
+    /**
+     * Test the IoBuffer.putUnsignedInIndex() method.
+     */
     @Test
     public void testPutUnsignedIntIndex() {
         IoBuffer buf = IoBuffer.allocate(16);
@@ -1584,7 +1615,7 @@ public class IoBufferTest {
     }
 
     /**
-     * Test the getSlice method (even if we haven't flipped the buffer
+     * Test the getSlice method (even if we haven't flipped the buffer)
      */
     @Test
     public void testGetSlice() {
@@ -1617,22 +1648,42 @@ public class IoBufferTest {
         assertEquals(0x03, res.get());
     }
 
+    /**
+     * Test the IoBuffer.shrink() method.
+     */
     @Test
     public void testShrink() {
         IoBuffer buf = IoBuffer.allocate(36);
-        buf.minimumCapacity(0);
+        buf.put( "012345".getBytes());
+        buf.flip();
+        buf.position(4);
+        buf.minimumCapacity(8);
 
-        buf.limit(18);
-        buf.shrink();
-        buf.limit(9);
-        buf.shrink();
-        buf.limit(4);
-        buf.shrink();
-        buf.limit(2);
-        buf.shrink();
-        buf.limit(1);
-        buf.shrink();
-        buf.limit(0);
-        buf.shrink();
+        IoBuffer newBuf = buf.shrink();
+        assertEquals(4, newBuf.position());
+        assertEquals(6, newBuf.limit());
+        assertEquals(9, newBuf.capacity());
+        assertEquals(8, newBuf.minimumCapacity());
+
+        buf = IoBuffer.allocate(6);
+        buf.put( "012345".getBytes());
+        buf.flip();
+        buf.position(4);
+
+        newBuf = buf.shrink();
+        assertEquals(4, newBuf.position());
+        assertEquals(6, newBuf.limit());
+        assertEquals(6, newBuf.capacity());
+        assertEquals(6, newBuf.minimumCapacity());
+    }
+    
+    
+    /**
+     * Test the IoBuffer.position(newPosition) method.
+     */
+    @Test
+    public void testSetPosition()
+    {
+        
     }
 }
