@@ -35,15 +35,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class ExpiringMap<K, V> implements Map<K, V> {
-
-    /**
-     * The default value, 60
-     */
+    /** The default value, 60 seconds */
     public static final int DEFAULT_TIME_TO_LIVE = 60;
 
-    /**
-     * The default value, 1
-     */
+    /** The default value, 1 second */
     public static final int DEFAULT_EXPIRATION_INTERVAL = 1;
 
     private static volatile int expirerCount = 1;
@@ -67,8 +62,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
      * Creates a new instance of ExpiringMap using the supplied 
      * time-to-live value and the default value for DEFAULT_EXPIRATION_INTERVAL
      *
-     * @param timeToLive
-     *  The time-to-live value (seconds)
+     * @param timeToLive The time-to-live value (seconds)
      */
     public ExpiringMap(int timeToLive) {
         this(timeToLive, DEFAULT_EXPIRATION_INTERVAL);
@@ -78,10 +72,8 @@ public class ExpiringMap<K, V> implements Map<K, V> {
      * Creates a new instance of ExpiringMap using the supplied values and 
      * a {@link ConcurrentHashMap} for the internal data structure.
      *
-     * @param timeToLive
-     *  The time-to-live value (seconds)
-     * @param expirationInterval
-     *  The time between checks to see if a value should be removed (seconds)
+     * @param timeToLive The time-to-live value (seconds)
+     * @param expirationInterval The time between checks to see if a value should be removed (seconds)
      */
     public ExpiringMap(int timeToLive, int expirationInterval) {
         this(new ConcurrentHashMap<K, ExpiringObject>(), new CopyOnWriteArrayList<ExpirationListener<V>>(), timeToLive,
@@ -100,6 +92,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
 
     public V put(K key, V value) {
         ExpiringObject answer = delegate.put(key, new ExpiringObject(key, value, System.currentTimeMillis()));
+        
         if (answer == null) {
             return null;
         }

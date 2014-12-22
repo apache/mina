@@ -27,12 +27,11 @@ import org.apache.mina.util.ExpiringMap;
 /**
  * An {@link IoSessionRecycler} with sessions that time out on inactivity.
  *
- * TODO Document me.
- *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
  */
 public class ExpiringSessionRecycler implements IoSessionRecycler {
+    /** A map used to store the session */
     private ExpiringMap<SocketAddress, IoSession> sessionMap;
 
     private ExpiringMap<SocketAddress, IoSession>.Expirer mapExpirer;
@@ -51,6 +50,9 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
         sessionMap.addExpirationListener(new DefaultExpirationListener());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void put(IoSession session) {
         mapExpirer.startExpiringIfNotStarted();
 
@@ -61,10 +63,16 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoSession recycle(SocketAddress remoteAddress) {
         return sessionMap.get(remoteAddress);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void remove(IoSession session) {
         sessionMap.remove(session.getRemoteAddress());
     }

@@ -37,14 +37,23 @@ public interface IoSessionRecycler {
      * sessions.
      */
     static IoSessionRecycler NOOP = new IoSessionRecycler() {
+        /**
+         * {@inheritDoc}
+         */
         public void put(IoSession session) {
             // Do nothing
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public IoSession recycle(SocketAddress remoteAddress) {
             return null;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void remove(IoSession session) {
             // Do nothing
         }
@@ -53,17 +62,14 @@ public interface IoSessionRecycler {
     /**
      * Called when the underlying transport creates or writes a new {@link IoSession}.
      *
-     * @param session
-     *            the new {@link IoSession}.
+     * @param session the new {@link IoSession}.
      */
     void put(IoSession session);
 
     /**
      * Attempts to retrieve a recycled {@link IoSession}.
      *
-     * @param remoteAddress
-     *            the remote socket address of the {@link IoSession} the
-     *            transport wants to recycle.
+     * @param remoteAddress the remote socket address of the {@link IoSession} the transport wants to recycle.
      * @return a recycled {@link IoSession}, or null if one cannot be found.
      */
     IoSession recycle(SocketAddress remoteAddress);
@@ -71,8 +77,7 @@ public interface IoSessionRecycler {
     /**
      * Called when an {@link IoSession} is explicitly closed.
      *
-     * @param session
-     *            the new {@link IoSession}.
+     * @param session the new {@link IoSession}.
      */
     void remove(IoSession session);
 }
