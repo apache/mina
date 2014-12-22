@@ -75,10 +75,10 @@ public class SslTest {
             String line = (String) message;
 
             if (line.startsWith("hello")) {
-                System.out.println("Server got: 'hello', waiting for 'send'");
+                //System.out.println("Server got: 'hello', waiting for 'send'");
                 Thread.sleep(1500);
             } else if (line.startsWith("send")) {
-                System.out.println("Server got: 'send', sending 'data'");
+                //System.out.println("Server got: 'send', sending 'data'");
                 StringBuilder sb = new StringBuilder();
                 
                 for ( int i = 0; i < 10000; i++) {
@@ -131,18 +131,18 @@ public class SslTest {
         Socket parent = new Socket(address, port);
         Socket socket = factory.createSocket(parent, address.getCanonicalHostName(), port, false);
 
-        System.out.println("Client sending: hello");
+        //System.out.println("Client sending: hello");
         socket.getOutputStream().write("hello                      \n".getBytes());
         socket.getOutputStream().flush();
         socket.setSoTimeout(1000000);
 
-        System.out.println("Client sending: send");
+        //System.out.println("Client sending: send");
         socket.getOutputStream().write("send\n".getBytes());
         socket.getOutputStream().flush();
 
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String line = in.readLine();
-        System.out.println("Client got: " + line);
+        //System.out.println("Client got: " + line);
         socket.close();
 
     }
