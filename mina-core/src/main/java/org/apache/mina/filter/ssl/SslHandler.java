@@ -301,29 +301,26 @@ class SslHandler {
     }
 
     /* no qualifier */void flushScheduledEvents() {
-        // Fire events only when no lock is hold for this handler.
-        if (Thread.holdsLock(this)) {
-            return;
-        }
+        // Fire events only when the lock is available for this handler.
+        if (sslLock.tryLock()) {
 
-        IoFilterEvent event;
+            IoFilterEvent event;
 
-        // We need synchronization here inevitably because filterWrite can be
-        // called simultaneously and cause 'bad record MAC' integrity error.
-        sslLock.lock();
+            // We need synchronization here inevitably because filterWrite can be
+            // called simultaneously and cause 'bad record MAC' integrity error.
+            try {
+                while ((event = filterWriteEventQueue.poll()) != null) {
+                    NextFilter nextFilter = event.getNextFilter();
+                    nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
+                }
 
-        try {
-            while ((event = filterWriteEventQueue.poll()) != null) {
-                NextFilter nextFilter = event.getNextFilter();
-                nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
+                while ((event = messageReceivedEventQueue.poll()) != null) {
+                    NextFilter nextFilter = event.getNextFilter();
+                    nextFilter.messageReceived(session, event.getParameter());
+                }
+            } finally {
+                sslLock.unlock();
             }
-
-            while ((event = messageReceivedEventQueue.poll()) != null) {
-                NextFilter nextFilter = event.getNextFilter();
-                nextFilter.messageReceived(session, event.getParameter());
-            }
-        } finally {
-            sslLock.unlock();
         }
     }
 
