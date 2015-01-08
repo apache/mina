@@ -59,7 +59,7 @@ import org.apache.mina.util.ExceptionMonitor;
 
 /**
  * Base implementation of {@link IoSession}.
- *
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoSession implements IoSession {
@@ -92,7 +92,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * An internal write request object that triggers session close.
-     *
+     * 
      * @see #writeRequestQueue
      */
     private static final WriteRequest CLOSE_REQUEST = new DefaultWriteRequest(new Object());
@@ -203,7 +203,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * We use an AtomicLong to guarantee that the session ID are unique.
      */
     public final long getId() {
@@ -270,7 +270,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * Set the scheduledForFLush flag. As we may have concurrent access to this
      * flag, we compare and set it in one call.
-     *
+     * 
      * @param schedule
      *            the new value to set if not already set.
      * @return true if the session flag has been set, and if it wasn't set
@@ -294,7 +294,9 @@ public abstract class AbstractIoSession implements IoSession {
     public final CloseFuture close(boolean rightNow) {
         if (!isClosing()) {
             if (rightNow) {
-                return close();
+                CloseFuture closeFuture = close();
+
+                return closeFuture;
             }
 
             return closeOnFlush();
@@ -630,7 +632,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * Create a new close aware write queue, based on the given write queue.
-     *
+     * 
      * @param writeRequestQueue
      *            The write request queue
      */
@@ -1275,7 +1277,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable sessions
      * in the specified collection.
-     *
+     * 
      * @param currentTime
      *            the current time (i.e. {@link System#currentTimeMillis()})
      */
@@ -1290,7 +1292,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * Fires a {@link IoEventType#SESSION_IDLE} event if applicable for the
      * specified {@code session}.
-     *
+     * 
      * @param currentTime
      *            the current time (i.e. {@link System#currentTimeMillis()})
      */
@@ -1335,7 +1337,7 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * A queue which handles the CLOSE request.
-     *
+     * 
      * TODO : Check that when closing a session, all the pending requests are
      * correctly sent.
      */
