@@ -90,7 +90,7 @@
   <properties>
     <!-- Dependencies versions ========================================== -->
     <version.junit>4.11</version.junit>
-    <version.log4j>2.0-rc1</version.log4j>
+    <version.log4j>2.2</version.log4j>
     <version.mockito-core>1.9.5</version.mockito-core>
     <version.slf4j.api>1.7.5</version.slf4j.api>
 
