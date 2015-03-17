@@ -149,12 +149,12 @@ public class ProtocolCodecFilter<MESSAGE, ENCODED, ENCODING_STATE, DECODING_STAT
     // ----------- Helper methods ---------------------------------------------
 
     @SuppressWarnings("unchecked")
-    private DECODING_STATE getDecodingState(IoSession session) {
+    protected DECODING_STATE getDecodingState(IoSession session) {
         return (DECODING_STATE) session.getAttribute(DECODER);
     }
 
     @SuppressWarnings("unchecked")
-    private ENCODING_STATE getEncodingState(IoSession session) {
+    protected ENCODING_STATE getEncodingState(IoSession session) {
         return (ENCODING_STATE) session.getAttribute(ENCODER);
     }
 
