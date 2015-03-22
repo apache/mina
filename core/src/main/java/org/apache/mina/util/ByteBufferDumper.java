@@ -143,7 +143,7 @@ public class ByteBufferDumper {
         ByteBuffer res = ByteBuffer.allocate(size);
 
         for (int i = 0; i < size; i++) {
-            int b = Integer.parseInt(hex.substring(i, i + 2), 16);
+            int b = Integer.parseInt(hex.substring(i*2, i*2 + 2), 16);
             if (Integer.highestOneBit(b) == 128) {
               b = b - 256;
             }
