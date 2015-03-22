@@ -92,4 +92,31 @@ public class ByteBufferDumperTest {
         bb.flip();
         assertEquals("000102FE", ByteBufferDumper.toHex(bb));
     }
+    
+    @Test
+    public void checkFromHexStringEmptyStringReturnsEmptyByteArray() {
+        ByteBuffer buffer = ByteBufferDumper.fromHexString("");
+        assertEquals(0, buffer.remaining());
+    }
+    
+    @Test
+    public void checkFromHexStringNormalStringReturnsByteArray() {
+        ByteBuffer buffer = ByteBufferDumper.fromHexString("ff");
+        assertEquals(1, buffer.remaining());
+        assertEquals(-1, buffer.get());
+    }
+    
+    @Test
+    public void checkFromHexStringNormalStringUppercaseReturnsByteArray() {
+        ByteBuffer buffer = ByteBufferDumper.fromHexString("FF");
+        assertEquals(1, buffer.remaining());
+        assertEquals(-1, buffer.get());
+    }
+    
+    @Test(expected=NumberFormatException.class)
+    public void checkFromHexStringInvalidStringReturnsException() {
+        ByteBuffer buffer = ByteBufferDumper.fromHexString("non-hexastring");
+        assertEquals(1, buffer.remaining());
+        assertEquals(-1, buffer.get());
+    }
 }
