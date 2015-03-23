@@ -20,89 +20,93 @@
 package org.apache.mina.http2.api;
 
 /**
- * An SPY frame
+ * An SPY data frame
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
  */
-public class Http2Frame {
-    private int length;
-    
-    private short type;
-    
-    private short flags;
-    
-    private int streamID;
-    
-    public byte[] payload;
+public abstract class Http2Frame {
 
-    /**
-     * @return the length
-     */
+    private final int length;
+    
+    private final short type;
+    
+    private final short flags;
+    
+    private final int streamID;
+    
     public int getLength() {
         return length;
     }
 
-    /**
-     * @param length the length to set
-     */
-    public void setLength(int length) {
-        this.length = length;
-    }
-
-    /**
-     * @return the type
-     */
     public short getType() {
         return type;
     }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(short type) {
-        this.type = type;
-    }
-
-    /**
-     * @return the flags
-     */
+    
     public short getFlags() {
         return flags;
     }
 
-    /**
-     * @param flags the flags to set
-     */
-    public void setFlags(short flags) {
-        this.flags = flags;
-    }
-
-    /**
-     * @return the streamID
-     */
     public int getStreamID() {
         return streamID;
     }
 
-    /**
-     * @param streamID the streamID to set
-     */
-    public void setStreamID(int streamID) {
-        this.streamID = streamID;
+    protected <T extends AbstractHttp2FrameBuilder<T,V>, V extends Http2Frame> Http2Frame(AbstractHttp2FrameBuilder<T, V> builder) {
+        this.length = builder.getLength();
+        this.type = builder.getType();
+        this.flags = builder.getFlags();
+        this.streamID = builder.getStreamID();
     }
 
-    /**
-     * @return the payload
-     */
-    public byte[] getPayload() {
-        return payload;
-    }
+    public static abstract class AbstractHttp2FrameBuilder<T extends AbstractHttp2FrameBuilder<T,V>, V extends Http2Frame>  {
+        private int length;
+        
+        private short type;
+        
+        private short flags;
+        
+        private int streamID;
+        
+        @SuppressWarnings("unchecked")
+        public T length(int length) {
+            this.length = length;
+            return (T) this;
+        }
+        
+        public int getLength() {
+            return length;
+        }
 
-    /**
-     * @param payload the payload to set
-     */
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
+        @SuppressWarnings("unchecked")
+        public T type(short type) {
+            this.type = type;
+            return (T) this;
+        }
+        
+        public short getType() {
+            return type;
+        }
+
+        @SuppressWarnings("unchecked")
+        public T flags(short flags) {
+            this.flags = flags;
+            return (T) this;
+        }
+        
+        public short getFlags() {
+            return flags;
+        }
+
+        @SuppressWarnings("unchecked")
+        public T streamID(int streamID) {
+            this.streamID = streamID;
+            return (T) this;
+        }
+        
+        public int getStreamID() {
+            return streamID;
+        }
+        
+        public abstract V build();
     }
 }

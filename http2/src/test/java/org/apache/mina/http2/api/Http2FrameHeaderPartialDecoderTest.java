@@ -58,8 +58,6 @@ public class Http2FrameHeaderPartialDecoderTest {
         assertEquals(0, header.getType());
         assertEquals(0, header.getFlags());
         assertEquals(1, header.getStreamID());
-        assertEquals(1, header.getPayload().length);
-        assertEquals(0x40, header.getPayload()[0]       );
     }
 
 }

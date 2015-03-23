@@ -190,4 +190,6 @@ public final class Http2Constants {
     
     public static final Charset US_ASCII_CHARSET = Charset.forName("US-ASCII");
     
+    public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+    
 }
