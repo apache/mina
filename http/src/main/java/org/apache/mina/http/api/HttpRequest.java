@@ -62,4 +62,18 @@ public interface HttpRequest extends HttpMessage {
      * @return the method
      */
     HttpMethod getMethod();
+    
+    /**
+     * Return the HTTP protocol version of the request {@link HttpVersion}.
+     * 
+     * @return the HTTP version
+     */
+    HttpVersion getProtocolVersion();
+    
+    /**
+     * Return the target URI of the request.
+     * 
+     * @return the target URI
+     */
+    String getTargetURI();
 }

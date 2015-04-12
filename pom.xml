@@ -111,6 +111,7 @@
     <module>core</module>
     <module>codec</module>
     <module>http</module>
+    <module>http2</module>
     <module>examples</module>
     <module>coap</module>
     <module>thrift</module>

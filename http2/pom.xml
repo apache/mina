@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements.  See the NOTICE file
@@ -26,47 +27,29 @@
     <version>3.0.0-M3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>mina-core</artifactId>
-  <name>Apache MINA Core ${project.version}</name>
+  <artifactId>mina-http2</artifactId>
+  <name>Apache MINA HTTP2 ${project.version}</name>
   <packaging>jar</packaging>
+  <description>Low level HTTP2 codec for building simple &amp; fast HTTP2 server and clients</description>
 
   <properties>
-    <symbolicName>${project.groupId}.core</symbolicName>
-    <exportedPackage>${project.groupId}</exportedPackage>
+    <symbolicName>${project.groupId}.http2</symbolicName>
+    <exportedPackage>${project.groupId}.http2.api</exportedPackage>
   </properties>
 
   <dependencies>
-   <!-- put Junit in fromt because it seems Maven does not resolve correctly
-        hamcrest version which cause link errors since Junit 4.11
-    -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mina-codec</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-    	<groupId>org.apache.logging.log4j</groupId>
-    	<artifactId>log4j-slf4j-impl</artifactId>
-    	<version>2.1</version>
-    	<scope>test</scope>
+      <artifactId>mina-core</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.apache.logging.log4j</groupId>
-    	<artifactId>log4j-core</artifactId>
-    	<version>2.1</version>
-    	<scope>test</scope>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-http</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>com.twitter</groupId>
+    	<artifactId>hpack</artifactId>
+    	<version>0.10.0</version>
     </dependency>
   </dependencies>
 </project>

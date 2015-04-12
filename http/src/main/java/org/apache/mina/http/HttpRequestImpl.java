@@ -39,14 +39,14 @@ public class HttpRequestImpl implements HttpRequest {
 
     private final HttpMethod method;
 
-    private final String requestedPath;
+    private final String targetURI;
 
     private final Map<String, String> headers;
 
-    public HttpRequestImpl(HttpVersion version, HttpMethod method, String requestedPath, Map<String, String> headers) {
+    public HttpRequestImpl(HttpVersion version, HttpMethod method, String targetURI, Map<String, String> headers) {
         this.version = version;
         this.method = method;
-        this.requestedPath = requestedPath;
+        this.targetURI = targetURI;
         this.headers = Collections.unmodifiableMap(headers);
     }
 
@@ -56,6 +56,14 @@ public class HttpRequestImpl implements HttpRequest {
     @Override
     public HttpVersion getProtocolVersion() {
         return version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTargetURI() {
+        return targetURI;
     }
 
     /**
@@ -148,7 +156,7 @@ public class HttpRequestImpl implements HttpRequest {
 
         sb.append("HTTP REQUEST METHOD: ").append(method).append('\n');
         sb.append("VERSION: ").append(version).append('\n');
-        sb.append("PATH: ").append(requestedPath).append('\n');
+        sb.append("PATH: ").append(targetURI).append('\n');
 
         sb.append("--- HEADER --- \n");
 
