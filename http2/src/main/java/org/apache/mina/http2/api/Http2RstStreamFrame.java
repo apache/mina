@@ -19,8 +19,11 @@
  */
 package org.apache.mina.http2.api;
 
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_RST_STREAM;
+
+import java.nio.ByteBuffer;
 /**
- * An SPY data frame
+ * An HTTP2 RST_STREAM frame.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -32,35 +35,42 @@ public class Http2RstStreamFrame extends Http2Frame {
         return errorCode;
     }
 
-    protected <T extends AbstractHttp2RstStreamFrameBuilder<T,V>, V extends Http2RstStreamFrame> Http2RstStreamFrame(AbstractHttp2RstStreamFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        buffer.putInt((int) getErrorCode());
+    }
+
+    protected Http2RstStreamFrame(Http2RstStreamFrameBuilder builder) {
         super(builder);
         this.errorCode = builder.getErrorCode();
     }
 
     
-    public static abstract class AbstractHttp2RstStreamFrameBuilder<T extends AbstractHttp2RstStreamFrameBuilder<T,V>, V extends Http2RstStreamFrame> extends AbstractHttp2FrameBuilder<T,V> {
+    public static class Http2RstStreamFrameBuilder extends AbstractHttp2FrameBuilder<Http2RstStreamFrameBuilder,Http2RstStreamFrame> {
         private long errorCode;
         
-        @SuppressWarnings("unchecked")
-        public T errorCode(long errorCode) {
+        public Http2RstStreamFrameBuilder errorCode(long errorCode) {
             this.errorCode = errorCode;
-            return (T) this;
+            return this;
         }
         
         public long getErrorCode() {
             return errorCode;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2RstStreamFrameBuilder<Builder, Http2RstStreamFrame> {
 
         @Override
         public Http2RstStreamFrame build() {
-            return new Http2RstStreamFrame(this);
+            if (getLength() == (-1)) {
+                setLength(4);
+            }
+            return new Http2RstStreamFrame(type(FRAME_TYPE_RST_STREAM));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2RstStreamFrameBuilder builder() {
+            return new Http2RstStreamFrameBuilder();
         }
     }
 }

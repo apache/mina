@@ -19,6 +19,10 @@
  */
 package org.apache.mina.http2.api;
 
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_WINDOW_UPDATE;
+
+import java.nio.ByteBuffer;
+
 /**
  * An SPY data frame
  * 
@@ -32,35 +36,42 @@ public class Http2WindowUpdateFrame extends Http2Frame {
         return windowUpdateIncrement;
     }
 
-    protected <T extends AbstractHttp2WindowUpdateFrameBuilder<T,V>, V extends Http2WindowUpdateFrame> Http2WindowUpdateFrame(AbstractHttp2WindowUpdateFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        buffer.putInt(getWindowUpdateIncrement());
+    }
+
+    protected Http2WindowUpdateFrame(Http2WindowUpdateFrameBuilder builder) {
         super(builder);
         this.windowUpdateIncrement = builder.getWindowUpdateIncrement();
     }
 
     
-    public static abstract class AbstractHttp2WindowUpdateFrameBuilder<T extends AbstractHttp2WindowUpdateFrameBuilder<T,V>, V extends Http2WindowUpdateFrame> extends AbstractHttp2FrameBuilder<T,V> {
+    public static class Http2WindowUpdateFrameBuilder extends AbstractHttp2FrameBuilder<Http2WindowUpdateFrameBuilder,Http2WindowUpdateFrame> {
         private int windowUpdateIncrement;
         
-        @SuppressWarnings("unchecked")
-        public T windowUpdateIncrement(int windowUpdateIncrement) {
+        public Http2WindowUpdateFrameBuilder windowUpdateIncrement(int windowUpdateIncrement) {
             this.windowUpdateIncrement = windowUpdateIncrement;
-            return (T) this;
+            return this;
         }
         
         public int getWindowUpdateIncrement() {
             return windowUpdateIncrement;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2WindowUpdateFrameBuilder<Builder, Http2WindowUpdateFrame> {
 
         @Override
         public Http2WindowUpdateFrame build() {
-            return new Http2WindowUpdateFrame(this);
+            if (getLength() == (-1)) {
+                setLength(4);
+            }
+            return new Http2WindowUpdateFrame(type(FRAME_TYPE_WINDOW_UPDATE));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2WindowUpdateFrameBuilder builder() {
+            return new Http2WindowUpdateFrameBuilder();
         }
     }
 }

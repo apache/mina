@@ -20,6 +20,10 @@
 package org.apache.mina.http2.api;
 
 import static org.apache.mina.http2.api.Http2Constants.EMPTY_BYTE_ARRAY;
+import static org.apache.mina.http2.api.Http2Constants.FLAGS_PADDING;
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_PUSH_PROMISE;
+
+import java.nio.ByteBuffer;
 
 /**
  * An SPY data frame
@@ -48,60 +52,77 @@ public class Http2PushPromiseFrame extends Http2Frame {
         return headerBlockFragment;
     }
 
-    protected <T extends AbstractHttp2PushPromiseFrameBuilder<T,V>, V extends Http2PushPromiseFrame> Http2PushPromiseFrame(AbstractHttp2PushPromiseFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        if (isFlagSet(FLAGS_PADDING)) {
+            buffer.put((byte) getPadding().length);
+        }
+        buffer.putInt(getPromisedStreamID());
+        buffer.put(getHeaderBlockFragment());
+        if (isFlagSet(FLAGS_PADDING)) {
+            buffer.put(getPadding());
+        }
+    }
+
+    protected Http2PushPromiseFrame(Http2PushPromiseFrameBuilder builder) {
         super(builder);
         this.padding = builder.getPadding();
         this.promisedStreamID = builder.getPromisedStreamID();
         this.headerBlockFragment = builder.getHeaderBlockFragment();
     }
 
-    public static abstract class AbstractHttp2PushPromiseFrameBuilder<T extends AbstractHttp2PushPromiseFrameBuilder<T,V>, V extends Http2PushPromiseFrame> extends AbstractHttp2FrameBuilder<T,V> {
+    public static class Http2PushPromiseFrameBuilder extends AbstractHttp2FrameBuilder<Http2PushPromiseFrameBuilder,Http2PushPromiseFrame> {
         private byte[] padding = EMPTY_BYTE_ARRAY;
         
         private int promisedStreamID;
         
         private byte[] headerBlockFragment = EMPTY_BYTE_ARRAY;
         
-        @SuppressWarnings("unchecked")
-        public T padding(byte[] padding) {
+        public Http2PushPromiseFrameBuilder padding(byte[] padding) {
             this.padding = padding;
-            return (T) this;
+            addFlag(FLAGS_PADDING);
+            return this;
         }
         
         public byte[] getPadding() {
             return padding;
         }
 
-        @SuppressWarnings("unchecked")
-        public T promisedStreamID(int promisedStreamID) {
+        public Http2PushPromiseFrameBuilder promisedStreamID(int promisedStreamID) {
             this.promisedStreamID = promisedStreamID;
-            return (T) this;
+            return this;
         }
         
         public int getPromisedStreamID() {
             return promisedStreamID;
         }
 
-        @SuppressWarnings("unchecked")
-        public T headerBlockFragment(byte[] headerBlockFragment) {
+        public Http2PushPromiseFrameBuilder headerBlockFragment(byte[] headerBlockFragment) {
             this.headerBlockFragment = headerBlockFragment;
-            return (T) this;
+            return this;
         }
         
         public byte[] getHeaderBlockFragment() {
             return headerBlockFragment;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2PushPromiseFrameBuilder<Builder, Http2PushPromiseFrame> {
 
         @Override
         public Http2PushPromiseFrame build() {
-            return new Http2PushPromiseFrame(this);
+            if (getLength() == (-1)) {
+                int length = getHeaderBlockFragment().length + 4;
+                if (isFlagSet(FLAGS_PADDING)) {
+                    length += getPadding().length + 1;
+                }
+                setLength(length);
+            }
+            return new Http2PushPromiseFrame(type(FRAME_TYPE_PUSH_PROMISE));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2PushPromiseFrameBuilder builder() {
+            return new Http2PushPromiseFrameBuilder();
         }
     }
 }

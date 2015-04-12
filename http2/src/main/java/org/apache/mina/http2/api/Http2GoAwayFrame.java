@@ -19,6 +19,11 @@
  */
 package org.apache.mina.http2.api;
 
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_GOAWAY;
+import static org.apache.mina.http2.api.Http2Constants.EMPTY_BYTE_ARRAY;
+
+import java.nio.ByteBuffer;
+
 /**
  * An SPY data frame
  * 
@@ -28,7 +33,7 @@ package org.apache.mina.http2.api;
 public class Http2GoAwayFrame extends Http2Frame {
     private final int lastStreamID;
     
-    private final int errorCode;
+    private final long errorCode;
 
     private byte[] data;
     
@@ -36,7 +41,7 @@ public class Http2GoAwayFrame extends Http2Frame {
         return lastStreamID;
     }
     
-    public int getErrorCode() {
+    public long getErrorCode() {
         return errorCode;
     }
 
@@ -44,7 +49,17 @@ public class Http2GoAwayFrame extends Http2Frame {
         return data;
     }
     
-    protected <T extends AbstractHttp2GoAwayFrameBuilder<T,V>, V extends Http2GoAwayFrame> Http2GoAwayFrame(AbstractHttp2GoAwayFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        buffer.putInt(getLastStreamID());
+        buffer.putInt((int) getErrorCode());
+        buffer.put(getData());
+    }
+
+    protected Http2GoAwayFrame(Http2GoAwayFrameBuilder builder) {
         super(builder);
         this.lastStreamID = builder.getLastStreamID();
         this.errorCode = builder.getErrorCode();
@@ -52,53 +67,50 @@ public class Http2GoAwayFrame extends Http2Frame {
     }
 
     
-    public static abstract class AbstractHttp2GoAwayFrameBuilder<T extends AbstractHttp2GoAwayFrameBuilder<T,V>, V extends Http2GoAwayFrame> extends AbstractHttp2FrameBuilder<T,V> {
+    public static class Http2GoAwayFrameBuilder extends AbstractHttp2FrameBuilder<Http2GoAwayFrameBuilder,Http2GoAwayFrame> {
         private int lastStreamID;
         
-        private int errorCode;
+        private long errorCode;
         
-        private byte[] data;
+        private byte[] data = EMPTY_BYTE_ARRAY;
         
-        @SuppressWarnings("unchecked")
-        public T lastStreamID(int lastStreamID) {
+        public Http2GoAwayFrameBuilder lastStreamID(int lastStreamID) {
             this.lastStreamID = lastStreamID;
-            return (T) this;
+            return this;
         }
         
         public int getLastStreamID() {
             return lastStreamID;
         }
 
-        @SuppressWarnings("unchecked")
-        public T errorCode(int errorCode) {
+        public Http2GoAwayFrameBuilder errorCode(long errorCode) {
             this.errorCode = errorCode;
-            return (T) this;
+            return this;
         }
         
-        public int getErrorCode() {
+        public long getErrorCode() {
             return errorCode;
         }
         
-        @SuppressWarnings("unchecked")
-        public T data(byte[] data) {
+        public Http2GoAwayFrameBuilder data(byte[] data) {
             this.data = data;
-            return (T) this;
+            return this;
         }
         
         public byte[] getData() {
             return data;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2GoAwayFrameBuilder<Builder, Http2GoAwayFrame> {
 
         @Override
         public Http2GoAwayFrame build() {
-            return new Http2GoAwayFrame(this);
+            if (getLength() == (-1)) {
+                setLength(getData().length + 8);
+            }
+            return new Http2GoAwayFrame(type(FRAME_TYPE_GOAWAY));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2GoAwayFrameBuilder builder() {
+            return new Http2GoAwayFrameBuilder();
         }
     }
 }

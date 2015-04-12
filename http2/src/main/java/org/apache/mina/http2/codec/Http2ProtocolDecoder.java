@@ -17,46 +17,31 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.http2.api;
+package org.apache.mina.http2.codec;
+
+import java.nio.ByteBuffer;
+
+import org.apache.mina.codec.ProtocolDecoder;
+import org.apache.mina.http2.api.Http2Frame;
+import org.apache.mina.http2.impl.Http2Connection;
 
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public enum Http2Header {
+public class Http2ProtocolDecoder implements ProtocolDecoder<ByteBuffer, Http2Frame, Http2Connection> {
 
-    METHOD(":method"),
-    
-    PATH(":path"),
-    
-    STATUS(":status"),
-    
-    AUTHORITY(":authority"),
-    
-    SCHEME(":scheme");
-    
-    private final String name;
-    
-    private Http2Header(String name) {
-        this.name = name;
+    @Override
+    public Http2Connection createDecoderState() {
+        return new Http2Connection();
     }
-    
-    public String getName() {
-        return name;
+
+    @Override
+    public Http2Frame decode(ByteBuffer input, Http2Connection context) {
+        return context.decode(input);
     }
-    
-    /**
-     * Check whether a header is an HTTP2 reserved one.
-     * 
-     * @param name the name of the HTTP header
-     * @return true is this is a reserved HTTP2 header, false otherwise
-     */
-    public static boolean isHTTP2ReservedHeader(String name) {
-        for(Http2Header header : Http2Header.values()) {
-            if (header.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
+
+    @Override
+    public void finishDecode(Http2Connection context) {
     }
 }

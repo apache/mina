@@ -19,8 +19,10 @@
  */
 package org.apache.mina.http2.api;
 
+import java.nio.ByteBuffer;
+
 /**
- * An SPY data frame
+ * An HTTP2 unknown frame.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -32,35 +34,42 @@ public class Http2UnknownFrame extends Http2Frame {
         return payload;
     }
 
-    protected <T extends AbstractHttp2UnknownFrameBuilder<T,V>, V extends Http2UnknownFrame> Http2UnknownFrame(AbstractHttp2UnknownFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        buffer.put(getPayload());
+    }
+
+    protected Http2UnknownFrame(Http2UnknownFrameBuilder builder) {
         super(builder);
         this.payload = builder.getPayload();
     }
 
     
-    public static abstract class AbstractHttp2UnknownFrameBuilder<T extends AbstractHttp2UnknownFrameBuilder<T,V>, V extends Http2UnknownFrame> extends AbstractHttp2FrameBuilder<T,V> {
+    public static class Http2UnknownFrameBuilder extends AbstractHttp2FrameBuilder<Http2UnknownFrameBuilder,Http2UnknownFrame> {
         private byte[] payload = new byte[0];
         
-        @SuppressWarnings("unchecked")
-        public T payload(byte[] payload) {
+        public Http2UnknownFrameBuilder payload(byte[] payload) {
             this.payload = payload;
-            return (T) this;
+            return this;
         }
         
         public byte[] getPayload() {
             return payload;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2UnknownFrameBuilder<Builder, Http2UnknownFrame> {
 
         @Override
         public Http2UnknownFrame build() {
+            if (getLength() == (-1)) {
+                setLength(getPayload().length);
+            }
             return new Http2UnknownFrame(this);
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2UnknownFrameBuilder builder() {
+            return new Http2UnknownFrameBuilder();
         }
     }
 }

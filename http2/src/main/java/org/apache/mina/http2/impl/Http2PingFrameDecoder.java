@@ -1,34 +1,41 @@
-/**
- * 
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *  
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License. 
+ *  
  */
 package org.apache.mina.http2.impl;
 
 import java.nio.ByteBuffer;
-import org.apache.mina.http2.api.BytePartialDecoder;
-import org.apache.mina.http2.api.Http2FrameHeadePartialDecoder.Http2FrameHeader;
-import org.apache.mina.http2.api.Http2PingFrame.Builder;
+
+import org.apache.mina.http2.api.Http2PingFrame.Http2PingFrameBuilder;
+import org.apache.mina.http2.impl.Http2FrameHeadePartialDecoder.Http2FrameHeader;
 
 /**
- * @author jeffmaury
- *
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Http2PingFrameDecoder extends Http2FrameDecoder {
-
-    private static enum State {
-        DATA,
-        EXTRA
-    }
-    
-    private State state;
-    
     private BytePartialDecoder decoder;
     
-    private Builder builder = new Builder();
+    private Http2PingFrameBuilder builder = new Http2PingFrameBuilder();
     
     public Http2PingFrameDecoder(Http2FrameHeader header) {
         super(header);
-        decoder = new BytePartialDecoder(8);
-        state = State.DATA;
+        decoder = new BytePartialDecoder(header.getLength());
         initBuilder(builder);
     }
     
@@ -37,25 +44,9 @@ public class Http2PingFrameDecoder extends Http2FrameDecoder {
      */
     @Override
     public boolean consume(ByteBuffer buffer) {
-        while ((getValue() == null) && buffer.remaining() > 0) {
-            switch (state) {
-            case DATA:
-                if (decoder.consume(buffer)) {
-                    builder.data(decoder.getValue());
-                    if (getHeader().getLength() > 8) {
-                        state = State.EXTRA;
-                        decoder = new BytePartialDecoder(getHeader().getLength() - 8);
-                    } else {
-                        setValue(builder.build());
-                    }
-                }
-                break;
-            case EXTRA:
-                if (decoder.consume(buffer)) {
-                    setValue(builder.build());
-                }
-                break;
-            }
+        if (decoder.consume(buffer)) {
+            builder.data(decoder.getValue());
+            setValue(builder.build());
         }
         return getValue() != null;
     }

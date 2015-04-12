@@ -1,13 +1,29 @@
-/**
- * 
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *  
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License. 
+ *  
  */
 package org.apache.mina.http2.api;
 
 import java.nio.charset.Charset;
 
 /**
- * @author jeffmaury
- *
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class Http2Constants {
     /**
@@ -21,6 +37,11 @@ public final class Http2Constants {
      * the exclusive bit
      */
     public static final int HTTP2_EXCLUSIVE_MASK = 0x80000000;
+    
+    /**
+     * Length of the HTTP2 header (length, type, flags, streamID)
+     */
+    public static final int HTTP2_HEADER_LENGTH = 9;
 
     /*
      * Frame types
@@ -28,52 +49,52 @@ public final class Http2Constants {
     /**
      * DATA frame
      */
-    public static final int FRAME_TYPE_DATA = 0x00;
+    public static final short FRAME_TYPE_DATA = 0x00;
     
     /**
      * HEADERS frame
      */
-    public static final int FRAME_TYPE_HEADERS = 0x01;
+    public static final short FRAME_TYPE_HEADERS = 0x01;
     
     /**
      * PRIORITY frame
      */
-    public static final int FRAME_TYPE_PRIORITY = 0x02;
+    public static final short FRAME_TYPE_PRIORITY = 0x02;
     
     /**
      * RST_STREAM frame
      */
-    public static final int FRAME_TYPE_RST_STREAM = 0x03;
+    public static final short FRAME_TYPE_RST_STREAM = 0x03;
     
     /**
      * SETTINGS stream
      */
-    public static final int FRAME_TYPE_SETTINGS = 0x04;
+    public static final short FRAME_TYPE_SETTINGS = 0x04;
     
     /**
      * PUSH_PROMISE frame
      */
-    public static final int FRAME_TYPE_PUSH_PROMISE = 0x05;
+    public static final short FRAME_TYPE_PUSH_PROMISE = 0x05;
     
     /**
      * PING frame
      */
-    public static final int FRAME_TYPE_PING = 0x06;
+    public static final short FRAME_TYPE_PING = 0x06;
     
     /**
      * GOAWAY frame
      */
-    public static final int FRAME_TYPE_GOAWAY = 0x07;
+    public static final short FRAME_TYPE_GOAWAY = 0x07;
     
     /**
      * WINDOW_UPDATE frame
      */
-    public static final int FRAME_TYPE_WINDOW_UPDATE = 0x08;
+    public static final short FRAME_TYPE_WINDOW_UPDATE = 0x08;
     
     /**
      * CONTINUATION frame
      */
-    public static final int FRAME_TYPE_CONTINUATION = 0x09;
+    public static final short FRAME_TYPE_CONTINUATION = 0x09;
     
     /*
      * Flags

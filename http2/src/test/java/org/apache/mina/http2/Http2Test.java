@@ -17,46 +17,19 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.http2.api;
+package org.apache.mina.http2;
+
+import java.nio.ByteBuffer;
 
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public enum Http2Header {
 
-    METHOD(":method"),
-    
-    PATH(":path"),
-    
-    STATUS(":status"),
-    
-    AUTHORITY(":authority"),
-    
-    SCHEME(":scheme");
-    
-    private final String name;
-    
-    private Http2Header(String name) {
-        this.name = name;
-    }
-    
-    public String getName() {
-        return name;
-    }
-    
-    /**
-     * Check whether a header is an HTTP2 reserved one.
-     * 
-     * @param name the name of the HTTP header
-     * @return true is this is a reserved HTTP2 header, false otherwise
-     */
-    public static boolean isHTTP2ReservedHeader(String name) {
-        for(Http2Header header : Http2Header.values()) {
-            if (header.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
+public abstract class Http2Test {
+    protected byte[] toByteArray(ByteBuffer buffer) {
+        byte[] result = new byte[buffer.remaining()];
+        buffer.get(result);
+        return result;
     }
 }

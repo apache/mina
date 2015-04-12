@@ -17,46 +17,34 @@
  *  under the License. 
  *  
  */
-package org.apache.mina.http2.api;
+package org.apache.mina.http2.impl;
+
+import java.nio.ByteBuffer;
 
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public enum Http2Header {
-
-    METHOD(":method"),
-    
-    PATH(":path"),
-    
-    STATUS(":status"),
-    
-    AUTHORITY(":authority"),
-    
-    SCHEME(":scheme");
-    
-    private final String name;
-    
-    private Http2Header(String name) {
-        this.name = name;
-    }
-    
-    public String getName() {
-        return name;
-    }
+public interface PartialDecoder<T> {
+    /**
+     * Consume the buffer so as to decode a value. Not all the input buffer
+     * may be consumed.
+     * 
+     * @param buffer the input buffer to decode
+     * @return true if a value is available false if more data is requested
+     */
+    public boolean consume(ByteBuffer buffer);
     
     /**
-     * Check whether a header is an HTTP2 reserved one.
+     * Return the decoded value.
      * 
-     * @param name the name of the HTTP header
-     * @return true is this is a reserved HTTP2 header, false otherwise
+     * @return the decoded value
      */
-    public static boolean isHTTP2ReservedHeader(String name) {
-        for(Http2Header header : Http2Header.values()) {
-            if (header.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    public T getValue();
+    
+    /**
+     * Reset the internal state of the decoder to that new decoding can take place.
+     */
+    public void reset();
+
 }

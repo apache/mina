@@ -19,8 +19,16 @@
  */
 package org.apache.mina.http2.api;
 
+import static org.apache.mina.http2.api.Http2Constants.FLAGS_PADDING;
+import static org.apache.mina.http2.api.Http2Constants.FLAGS_PRIORITY;
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_HEADERS;
+import static org.apache.mina.http2.api.Http2Constants.HTTP2_HEADER_LENGTH;
+import static org.apache.mina.http2.api.Http2Constants.HTTP2_EXCLUSIVE_MASK;
+
+import java.nio.ByteBuffer;
+
 /**
- * An SPY data frame
+ * An HTTP2 HEADERS frame
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -33,7 +41,7 @@ public class Http2HeadersFrame extends Http2Frame {
     
     private final boolean exclusiveMode;
     
-    private final byte weight;
+    private final short weight;
     
     private final byte[] headerBlockFragment;
     
@@ -50,7 +58,7 @@ public class Http2HeadersFrame extends Http2Frame {
         return exclusiveMode;
     }
 
-    public byte getWeight() {
+    public short getWeight() {
         return weight;
     }
 
@@ -58,7 +66,25 @@ public class Http2HeadersFrame extends Http2Frame {
         return headerBlockFragment;
     }
 
-    protected <T extends AbstractHttp2HeadersFrameBuilder<T,V>, V extends Http2HeadersFrame> Http2HeadersFrame(AbstractHttp2HeadersFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        if (isFlagSet(FLAGS_PADDING)) {
+            buffer.put((byte) getPadding().length);
+        }
+        if (isFlagSet(FLAGS_PRIORITY)) {
+            buffer.putInt(getExclusiveMode()?HTTP2_EXCLUSIVE_MASK | getStreamDependencyID():getStreamDependencyID());
+            buffer.put((byte) (getWeight() - 1));
+        }
+        buffer.put(getHeaderBlockFragment());
+        if (isFlagSet(FLAGS_PADDING)) {
+            buffer.put(getPadding());
+        }
+    }
+
+    protected Http2HeadersFrame(Http2HeadersFrameBuilder builder) {
         super(builder);
         this.padding = builder.getPadding();
         this.streamDependencyID = builder.getStreamDependencyID();
@@ -68,78 +94,83 @@ public class Http2HeadersFrame extends Http2Frame {
     }
 
     
-    public static abstract class AbstractHttp2HeadersFrameBuilder<T extends AbstractHttp2HeadersFrameBuilder<T,V>, V extends Http2HeadersFrame> extends AbstractHttp2FrameBuilder<T,V> {
+    public static class Http2HeadersFrameBuilder extends AbstractHttp2FrameBuilder<Http2HeadersFrameBuilder,Http2HeadersFrame> {
         private byte[] padding;
         
         private int streamDependencyID;
         
-        private byte weight;
+        private short weight;
         
         private byte[] headerBlockFragment;
         
         private boolean exclusiveMode;
         
-        @SuppressWarnings("unchecked")
-        public T padding(byte[] padding) {
+        public Http2HeadersFrameBuilder padding(byte[] padding) {
             this.padding = padding;
-            return (T) this;
+            addFlag(FLAGS_PADDING);
+            return this;
         }
         
         public byte[] getPadding() {
             return padding;
         }
 
-        @SuppressWarnings("unchecked")
-        public T streamDependencyID(int streamDependencyID) {
+        public Http2HeadersFrameBuilder streamDependencyID(int streamDependencyID) {
             this.streamDependencyID = streamDependencyID;
-            return (T) this;
+            addFlag(FLAGS_PRIORITY);
+            return this;
         }
         
         public int getStreamDependencyID() {
             return streamDependencyID;
         }
 
-        @SuppressWarnings("unchecked")
-        public T exclusiveMode(boolean exclusiveMode) {
+        public Http2HeadersFrameBuilder exclusiveMode(boolean exclusiveMode) {
             this.exclusiveMode = exclusiveMode;
-            return (T) this;
+            addFlag(FLAGS_PRIORITY);
+            return this;
         }
         
         public boolean getExclusiveMode() {
             return exclusiveMode;
         }
 
-        @SuppressWarnings("unchecked")
-        public T weight(byte weight) {
+        public Http2HeadersFrameBuilder weight(short weight) {
             this.weight = weight;
-            return (T) this;
+            addFlag(FLAGS_PRIORITY);
+            return this;
         }
         
-        public byte getWeight() {
+        public short getWeight() {
             return weight;
         }
 
-        @SuppressWarnings("unchecked")
-        public T headerBlockFragment(byte[] headerBlockFragment) {
+        public Http2HeadersFrameBuilder headerBlockFragment(byte[] headerBlockFragment) {
             this.headerBlockFragment = headerBlockFragment;
-            return (T) this;
+            return this;
         }
         
         public byte[] getHeaderBlockFragment() {
             return headerBlockFragment;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2HeadersFrameBuilder<Builder, Http2HeadersFrame> {
 
         @Override
         public Http2HeadersFrame build() {
-            return new Http2HeadersFrame(this);
+            if (getLength() == (-1)) {
+                int length = getHeaderBlockFragment().length;
+                if (isFlagSet(FLAGS_PADDING)) {
+                    length += getPadding().length + 1;
+                }
+                if (isFlagSet(FLAGS_PRIORITY)) {
+                    length += 5;
+                }
+                length(length);
+            }
+            return new Http2HeadersFrame(type(FRAME_TYPE_HEADERS));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2HeadersFrameBuilder builder() {
+            return new Http2HeadersFrameBuilder();
         }
-
     }
 }

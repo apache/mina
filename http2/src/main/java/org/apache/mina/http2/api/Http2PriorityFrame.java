@@ -19,8 +19,13 @@
  */
 package org.apache.mina.http2.api;
 
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_PRIORITY;
+import static org.apache.mina.http2.api.Http2Constants.HTTP2_EXCLUSIVE_MASK;
+
+import java.nio.ByteBuffer;
+
 /**
- * An SPY data frame
+ * An HTTP2 PRIORITY frame.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -44,7 +49,16 @@ public class Http2PriorityFrame extends Http2Frame {
         return weight;
     }
 
-    protected <T extends AbstractHttp2PriorityFrameBuilder<T,V>, V extends Http2PriorityFrame> Http2PriorityFrame(AbstractHttp2PriorityFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        buffer.putInt(getExclusiveMode()?HTTP2_EXCLUSIVE_MASK | getStreamDependencyID():getStreamDependencyID());
+        buffer.put((byte) (getWeight() - 1));
+    }
+
+    protected Http2PriorityFrame(Http2PriorityFrameBuilder builder) {
         super(builder);
         this.streamDependencyID = builder.getStreamDependencyID();
         this.exclusiveMode = builder.exclusiveMode;
@@ -52,54 +66,50 @@ public class Http2PriorityFrame extends Http2Frame {
     }
 
     
-    public static abstract class AbstractHttp2PriorityFrameBuilder<T extends AbstractHttp2PriorityFrameBuilder<T,V>, V extends Http2PriorityFrame> extends AbstractHttp2FrameBuilder<T,V> {
+    public static class Http2PriorityFrameBuilder extends AbstractHttp2FrameBuilder<Http2PriorityFrameBuilder,Http2PriorityFrame> {
         private int streamDependencyID;
         
         private boolean exclusiveMode;
         
         private short weight;
         
-        @SuppressWarnings("unchecked")
-        public T streamDependencyID(int streamDependencyID) {
+        public Http2PriorityFrameBuilder streamDependencyID(int streamDependencyID) {
             this.streamDependencyID = streamDependencyID;
-            return (T) this;
+            return this;
         }
         
         public int getStreamDependencyID() {
             return streamDependencyID;
         }
         
-        @SuppressWarnings("unchecked")
-        public T exclusiveMode(boolean exclusiveMode) {
+        public Http2PriorityFrameBuilder exclusiveMode(boolean exclusiveMode) {
             this.exclusiveMode = exclusiveMode;
-            return (T) this;
+            return this;
         }
         
         public boolean getExclusiveMode() {
             return exclusiveMode;
         }
 
-
-        @SuppressWarnings("unchecked")
-        public T weight(short weight) {
+        public Http2PriorityFrameBuilder weight(short weight) {
             this.weight = weight;
-            return (T) this;
+            return this;
         }
         
         public short getWeight() {
             return weight;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2PriorityFrameBuilder<Builder, Http2PriorityFrame> {
 
         @Override
         public Http2PriorityFrame build() {
-            return new Http2PriorityFrame(this);
+            if (getLength() == (-1)) {
+                setLength(5);
+            }
+            return new Http2PriorityFrame(type(FRAME_TYPE_PRIORITY));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2PriorityFrameBuilder builder() {
+            return new Http2PriorityFrameBuilder();
         }
     }
-}
+ }

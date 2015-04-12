@@ -19,10 +19,13 @@
  */
 package org.apache.mina.http2.api;
 
+import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.Collections;
 
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_SETTINGS;
 /**
- * An SPY data frame
+ * An HTTP2 SETTINGS frame.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -34,35 +37,44 @@ public class Http2SettingsFrame extends Http2Frame {
         return settings;
     }
 
-    protected <T extends AbstractHttp2SettingsFrameBuilder<T,V>, V extends Http2SettingsFrame> Http2SettingsFrame(AbstractHttp2SettingsFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        for(Http2Setting setting : getSettings()) {
+            buffer.putShort((short) setting.getID());
+            buffer.putInt((int) setting.getValue());
+        }
+    }
+
+    protected Http2SettingsFrame(Http2SettingsFrameBuilder builder) {
         super(builder);
         this.settings = builder.getSettings();
     }
 
-    
-    public static abstract class AbstractHttp2SettingsFrameBuilder<T extends AbstractHttp2SettingsFrameBuilder<T,V>, V extends Http2SettingsFrame> extends AbstractHttp2FrameBuilder<T,V> {
-        private Collection<Http2Setting> settings;
+    public static class Http2SettingsFrameBuilder extends AbstractHttp2FrameBuilder<Http2SettingsFrameBuilder,Http2SettingsFrame> {
+        private Collection<Http2Setting> settings = Collections.emptyList();
         
-        @SuppressWarnings("unchecked")
-        public T settings(Collection<Http2Setting> settings) {
+        public Http2SettingsFrameBuilder settings(Collection<Http2Setting> settings) {
             this.settings = settings;
-            return (T) this;
+            return this;
         }
         
         public Collection<Http2Setting> getSettings() {
             return settings;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2SettingsFrameBuilder<Builder, Http2SettingsFrame> {
 
         @Override
         public Http2SettingsFrame build() {
-            return new Http2SettingsFrame(this);
+            if (getLength() == (-1)) {
+                setLength(getSettings().size() * 6);
+            }
+            return new Http2SettingsFrame(type(FRAME_TYPE_SETTINGS));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2SettingsFrameBuilder builder() {
+            return new Http2SettingsFrameBuilder();
         }
     }
 }

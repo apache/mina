@@ -19,6 +19,10 @@
  */
 package org.apache.mina.http2.api;
 
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_PING;
+
+import java.nio.ByteBuffer;
+
 /**
  * An SPY data frame
  * 
@@ -32,35 +36,42 @@ public class Http2PingFrame extends Http2Frame {
         return data;
     }
 
-    protected <T extends AbstractHttp2PingFrameBuilder<T,V>, V extends Http2PingFrame> Http2PingFrame(AbstractHttp2PingFrameBuilder<T, V> builder) {
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        buffer.put(getData());
+    }
+
+    protected Http2PingFrame(Http2PingFrameBuilder builder) {
         super(builder);
         this.data = builder.getData();
     }
 
     
-    public static abstract class AbstractHttp2PingFrameBuilder<T extends AbstractHttp2PingFrameBuilder<T,V>, V extends Http2PingFrame> extends AbstractHttp2FrameBuilder<T,V> {
+    public static class Http2PingFrameBuilder extends AbstractHttp2FrameBuilder<Http2PingFrameBuilder,Http2PingFrame> {
         private byte[] data;
         
-        @SuppressWarnings("unchecked")
-        public T data(byte[] data) {
+        public Http2PingFrameBuilder data(byte[] data) {
             this.data = data;
-            return (T) this;
+            return this;
         }
         
         public byte[] getData() {
             return data;
         }
-    }
-    
-    public static class Builder extends AbstractHttp2PingFrameBuilder<Builder, Http2PingFrame> {
 
         @Override
         public Http2PingFrame build() {
-            return new Http2PingFrame(this);
+            if (getLength() == (-1)) {
+                setLength(getData().length);
+            }
+            return new Http2PingFrame(type(FRAME_TYPE_PING));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2PingFrameBuilder builder() {
+            return new Http2PingFrameBuilder();
         }
     }
 }

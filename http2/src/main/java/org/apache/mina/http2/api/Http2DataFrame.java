@@ -20,9 +20,14 @@
 package org.apache.mina.http2.api;
 
 import static org.apache.mina.http2.api.Http2Constants.EMPTY_BYTE_ARRAY;
+import static org.apache.mina.http2.api.Http2Constants.FLAGS_PADDING;
+import static org.apache.mina.http2.api.Http2Constants.FRAME_TYPE_DATA;
+import static org.apache.mina.http2.api.Http2Constants.HTTP2_HEADER_LENGTH;
+
+import java.nio.ByteBuffer;
 
 /**
- * An SPY data frame
+ * An HTTP2 data frame
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * 
@@ -40,48 +45,64 @@ public class Http2DataFrame extends Http2Frame {
         return padding;
     }
     
-    protected <T extends AbstractHttp2DataFrameBuilder<T,V>, V extends Http2Frame> Http2DataFrame(AbstractHttp2DataFrameBuilder<T, V> builder) {
-        super(builder);
-        this.data = builder.getData();
-        this.padding = builder.getPadding();
+    /* (non-Javadoc)
+     * @see org.apache.mina.http2.api.Http2Frame#writePayload(java.nio.ByteBuffer)
+     */
+    @Override
+    public void writePayload(ByteBuffer buffer) {
+        if (isFlagSet(FLAGS_PADDING)) {
+            buffer.put((byte) getPadding().length);
+        }
+        buffer.put(getData());
+        if (isFlagSet(FLAGS_PADDING)) {
+            buffer.put(getPadding());
+        }
     }
 
-    
-    public static abstract class AbstractHttp2DataFrameBuilder<T extends AbstractHttp2DataFrameBuilder<T,V>, V extends Http2Frame> extends AbstractHttp2FrameBuilder<T,V> {
+    protected Http2DataFrame(Http2DataFrameBuilder builder) {
+        super(builder);
+        data = builder.getData();
+        padding = builder.getPadding();
+    }
+
+    public static class Http2DataFrameBuilder extends AbstractHttp2FrameBuilder<Http2DataFrameBuilder,Http2DataFrame> {
         private byte[] data = EMPTY_BYTE_ARRAY;
         
         private byte[] padding = EMPTY_BYTE_ARRAY;
 
-        @SuppressWarnings("unchecked")
-        public T data(byte[] data) {
+        public Http2DataFrameBuilder data(byte[] data) {
             this.data = data;
-            return (T) this;
+            return this;
         }
         
         public byte[] getData() {
             return data;
         }
 
-        @SuppressWarnings("unchecked")
-        public T padding(byte[] padding) {
+        public Http2DataFrameBuilder padding(byte[] padding) {
             this.padding = padding;
-            return (T) this;
+            addFlag(FLAGS_PADDING);
+            return this;
         }
         
         public byte[] getPadding() {
             return padding;
         }
-}
-    
-    public static class Builder extends AbstractHttp2DataFrameBuilder<Builder, Http2Frame> {
 
         @Override
-        public Http2Frame build() {
-            return new Http2DataFrame(this);
+        public Http2DataFrame build() {
+            if (getLength() == (-1)) {
+                int length = getData().length;
+                if (isFlagSet(FLAGS_PADDING)) {
+                    length += getPadding().length + 1;
+                }
+                length(length);
+            }
+            return new Http2DataFrame(type(FRAME_TYPE_DATA));
         }
         
-        public static Builder builder() {
-            return new Builder();
+        public static Http2DataFrameBuilder builder() {
+            return new Http2DataFrameBuilder();
         }
     }
 }
