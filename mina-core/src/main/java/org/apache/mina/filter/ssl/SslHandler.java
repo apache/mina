@@ -751,7 +751,7 @@ class SslHandler {
             if (status == SSLEngineResult.Status.BUFFER_OVERFLOW) {
                 // We have to grow the target buffer, it's too small.
                 // Then we can call the unwrap method again
-                appBuffer.capacity(appBuffer.capacity() << 1);
+                appBuffer.capacity(sslEngine.getSession().getApplicationBufferSize());
                 appBuffer.limit(appBuffer.capacity());
                 continue;
             }
