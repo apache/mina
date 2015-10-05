@@ -66,7 +66,7 @@
               org.apache.mina.core.service;version=${project.version},
               org.apache.mina.core.session;version=${project.version},
               org.apache.mina.transport.socket;version=${project.version},
-              org.apache.tomcat.jni;version=${version.tomcat.apr}
+              org.apache.tomcat.jni;version=${version.tomcat.jni}
             </Import-Package>
           </instructions>
         </configuration>
