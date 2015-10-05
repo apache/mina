@@ -398,7 +398,7 @@ class SslHandler {
             IoBuffer appBuffer = this.appBuffer.flip();
             this.appBuffer = null;
 
-            return appBuffer;
+            return appBuffer.shrink();
         }
     }
 
