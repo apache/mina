@@ -28,6 +28,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 /**
  * TODO Add documentation
@@ -90,7 +91,7 @@ public class SubnetIPv4Test {
 
     @Test
     public void testToStringLiteral() throws UnknownHostException {
-        InetAddress a = InetAddress.getByName("localhost");
+        InetAddress a = InetAddress.getLocalHost();
         Subnet mask = new Subnet(a, 32);
 
         assertEquals("127.0.0.1/32", mask.toString());
