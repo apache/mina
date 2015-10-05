@@ -60,7 +60,7 @@
               org.apache.mina.core.filterchain;version=${project.version},
               org.apache.mina.core.session;version=${project.version},
               org.apache.mina.filter.codec;version=${project.version},
-			  org.slf4j;version=${version.slf4j.api}
+              org.slf4j;version=${osgi-min-version.slf4j.api}
             </Import-Package>
           </instructions>
         </configuration>

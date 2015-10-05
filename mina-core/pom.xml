@@ -97,7 +97,7 @@
               org.apache.mina.util.byteaccess;version=${project.version};-noimport:=true
             </Export-Package>
             <Import-Package>
-              javax.crypto,javax.crypto.spec,javax.net.ssl,javax.security.sasl,org.slf4j;version=${version.slf4j.api}
+              javax.crypto,javax.crypto.spec,javax.net.ssl,javax.security.sasl,org.slf4j;version=${osgi-min-version.slf4j.api}
             </Import-Package>
           </instructions>
         </configuration>

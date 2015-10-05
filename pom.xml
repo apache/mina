@@ -153,6 +153,9 @@
     <version.springframework>2.5.6.SEC03</version.springframework>
     <version.tomcat.jni>8.0.27</version.tomcat.jni>
     <version.xbean.spring>4.4</version.xbean.spring>
+
+    <!-- OSGi minimum versions -->
+    <osgi-min-version.slf4j.api>1.7</osgi-min-version.slf4j.api>
   </properties>
 
   <modules>

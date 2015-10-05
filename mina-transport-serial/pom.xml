@@ -83,7 +83,7 @@
               org.apache.mina.core.write;version=${project.version},
               org.apache.mina.integration.beans;version=${project.version},
               org.apache.mina.util;version=${project.version},
-              org.slf4j;version=${version.slf4j.api}
+              org.slf4j;version=${osgi-min-version.slf4j.api}
             </Import-Package>
           </instructions>
         </configuration>
