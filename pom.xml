@@ -152,7 +152,7 @@
     <version.slf4j.log4j12>1.7.7</version.slf4j.log4j12>
     <version.slf4j.jcl.over.slf4j>1.7.7</version.slf4j.jcl.over.slf4j>
     <version.springframework>2.5.6.SEC03</version.springframework>
-    <version.tomcat.apr>5.5.23</version.tomcat.apr>
+    <version.tomcat.apr>8.0.22</version.tomcat.apr>
     <version.xbean.spring>4.0</version.xbean.spring>
   </properties>
 
@@ -228,8 +228,8 @@
 
       <!-- Transport -->
       <dependency>
-        <groupId>tomcat</groupId>
-        <artifactId>tomcat-apr</artifactId>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-jni</artifactId>
         <version>${version.tomcat.apr}</version>
       </dependency>
 

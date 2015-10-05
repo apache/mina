@@ -38,8 +38,8 @@
     </dependency>
 
     <dependency>
-      <groupId>tomcat</groupId>
-      <artifactId>tomcat-apr</artifactId>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jni</artifactId>
     </dependency>
   </dependencies>
 
