@@ -116,7 +116,7 @@ class SslHandler {
      * for data being produced during the handshake). */
     private boolean writingEncryptedData;
 
-    private Lock sslLock = new ReentrantLock();
+    private ReentrantLock sslLock = new ReentrantLock();
 
     /**
      * Create a new SSL Handler, and initialize it.
@@ -302,25 +302,23 @@ class SslHandler {
 
     /* no qualifier */void flushScheduledEvents() {
         // Fire events only when the lock is available for this handler.
-        if (sslLock.tryLock()) {
-
-            IoFilterEvent event;
+        IoFilterEvent event;
+        try {
+            sslLock.lock();
 
             // We need synchronization here inevitably because filterWrite can be
             // called simultaneously and cause 'bad record MAC' integrity error.
-            try {
-                while ((event = filterWriteEventQueue.poll()) != null) {
-                    NextFilter nextFilter = event.getNextFilter();
-                    nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
-                }
-
-                while ((event = messageReceivedEventQueue.poll()) != null) {
-                    NextFilter nextFilter = event.getNextFilter();
-                    nextFilter.messageReceived(session, event.getParameter());
-                }
-            } finally {
-                sslLock.unlock();
+            while ((event = filterWriteEventQueue.poll()) != null) {
+                NextFilter nextFilter = event.getNextFilter();
+                nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
             }
+        } finally {
+            sslLock.unlock();
+        }
+
+        while ((event = messageReceivedEventQueue.poll()) != null) {
+            NextFilter nextFilter = event.getNextFilter();
+            nextFilter.messageReceived(session, event.getParameter());
         }
     }
 
