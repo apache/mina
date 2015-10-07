@@ -21,7 +21,6 @@ package org.apache.mina.filter.codec;
 
 import java.net.SocketAddress;
 import java.util.Queue;
-import java.util.concurrent.Semaphore;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
@@ -65,8 +64,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
     /** The factory responsible for creating the encoder and decoder */
     private final ProtocolCodecFactory factory;
-
-    private final Semaphore lock = new Semaphore(1, true);
 
     /**
      * Creates a new instance of ProtocolCodecFilter, associating a factory
@@ -228,9 +225,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         while (in.hasRemaining()) {
             int oldPos = in.position();
             try {
-                lock.acquire();
-                // Call the decoder with the read bytes
-                decoder.decode(session, in, decoderOut);
+                synchronized (session) {
+                    // Call the decoder with the read bytes
+                    decoder.decode(session, in, decoderOut);
+                }
                 // Finish decoding if no exception was thrown.
                 decoderOut.flush(nextFilter, session);
             } catch (Exception e) {
@@ -257,8 +255,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 if (!(e instanceof RecoverableProtocolDecoderException) || (in.position() == oldPos)) {
                     break;
                 }
-            } finally {
-                lock.release();
             }
         }
     }
