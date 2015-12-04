@@ -167,7 +167,7 @@ public interface IoSession {
      *                    . The pending write requests
      *                    will simply be discarded.
      *                    {@code false} to close this session after all queued
-     *                    write requests are flushed (i.e. {@link #close()}).
+     *                    write requests are flushed.
      */
     CloseFuture close(boolean immediately);
 

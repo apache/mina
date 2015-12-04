@@ -321,7 +321,7 @@ public interface IoFilterChain {
     public void fireFilterWrite(WriteRequest writeRequest);
 
     /**
-     * Fires a {@link IoSession#close()} event. Most users don't need to call this method at
+     * Fires a {@link IoSession#close(boolean)} event. Most users don't need to call this method at
      * all. Please use this method only when you implement a new transport or fire a virtual
      * event.
      */
