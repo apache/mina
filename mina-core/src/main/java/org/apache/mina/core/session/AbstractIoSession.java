@@ -294,7 +294,15 @@ public abstract class AbstractIoSession implements IoSession {
     public final CloseFuture close(boolean rightNow) {
         if (!isClosing()) {
             if (rightNow) {
-                CloseFuture closeFuture = close();
+                synchronized (lock) {
+                    if (isClosing()) {
+                        return closeFuture;
+                    }
+
+                    closing = true;
+                }
+
+                getFilterChain().fireFilterClose();
 
                 return closeFuture;
             }
@@ -1359,7 +1367,7 @@ public abstract class AbstractIoSession implements IoSession {
             WriteRequest answer = queue.poll(session);
 
             if (answer == CLOSE_REQUEST) {
-                AbstractIoSession.this.close();
+                AbstractIoSession.this.close( true );
                 dispose(session);
                 answer = null;
             }
