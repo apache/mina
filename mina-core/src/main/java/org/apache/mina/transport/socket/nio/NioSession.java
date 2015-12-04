@@ -43,7 +43,7 @@ public abstract class NioSession extends AbstractIoSession {
     protected final Channel channel;
 
     /** The SelectionKey used for this session */
-    protected SelectionKey key;
+    private SelectionKey key;
 
     /** The FilterChain created for this session */
     private final IoFilterChain filterChain;
