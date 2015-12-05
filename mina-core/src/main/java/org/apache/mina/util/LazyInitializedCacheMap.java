@@ -141,7 +141,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     }
 
     /**
-     * @throws {@link UnsupportedOperationException} as this method would imply
+     * Throws {@link UnsupportedOperationException} as this method would imply
      *         performance drops.
      */
     public boolean containsValue(Object value) {
@@ -149,7 +149,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     }
 
     /**
-     * @throws {@link UnsupportedOperationException} as this method would imply
+     * Throws {@link UnsupportedOperationException} as this method would imply
      *         performance drops.
      */
     public Collection<V> values() {
@@ -157,7 +157,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     }
 
     /**
-     * @throws {@link UnsupportedOperationException} as this method would imply
+     * Throws {@link UnsupportedOperationException} as this method would imply
      *         performance drops.
      */
     public Set<java.util.Map.Entry<K, V>> entrySet() {

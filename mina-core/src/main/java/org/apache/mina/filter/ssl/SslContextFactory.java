@@ -195,7 +195,7 @@ public class SslContextFactory {
      * no algorithm has been set using
      * {@link #setKeyManagerFactoryAlgorithm(String)} the default algorithm
      * return by {@link KeyManagerFactory#getDefaultAlgorithm()} will be used.
-     * The default value of this property is <tt>true<tt/>.
+     * The default value of this property is <tt>true</tt>.
      *
      * @param useDefault
      *            <code>true</code> or <code>false</code>.
@@ -210,7 +210,7 @@ public class SslContextFactory {
      * no algorithm has been set using
      * {@link #setTrustManagerFactoryAlgorithm(String)} the default algorithm
      * return by {@link TrustManagerFactory#getDefaultAlgorithm()} will be used.
-     * The default value of this property is <tt>true<tt/>.
+     * The default value of this property is <tt>true</tt>.
      *
      * @param useDefault <code>true</code> or <code>false</code>.
      */

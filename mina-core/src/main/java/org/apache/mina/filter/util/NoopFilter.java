@@ -23,7 +23,8 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
 
 /**
  * A Noop filter. It does nothing, as all the method are already implemented
- * in the super class.<br/>
+ * in the super class.
+ * <br>
  * 
  * This class is used by tests, when some faked filter is needed to test that the 
  * chain is working properly when adding or removing a filter.

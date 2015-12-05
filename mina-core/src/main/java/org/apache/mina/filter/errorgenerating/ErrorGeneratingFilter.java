@@ -197,7 +197,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     /**
      * Set the probability for the change byte error.
-     * If this probability is > 0 the filter will modify a random number of byte
+     * If this probability is &gt; 0 the filter will modify a random number of byte
      * of the processed {@link IoBuffer}.
      * @param changeByteProbability probability of modifying an IoBuffer out of 1000 processed {@link IoBuffer} 
      */
@@ -223,7 +223,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     /**
      * Set the probability for the insert byte error.
-     * If this probability is > 0 the filter will insert a random number of byte
+     * If this probability is &gt; 0 the filter will insert a random number of byte
      * in the processed {@link IoBuffer}.
      * @param insertByteProbability probability of inserting in IoBuffer out of 1000 processed {@link IoBuffer} 
      */
@@ -261,7 +261,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     /**
      * Set the probability for the remove byte error.
-     * If this probability is > 0 the filter will remove a random number of byte
+     * If this probability is &gt; 0 the filter will remove a random number of byte
      * in the processed {@link IoBuffer}.
      * @param removeByteProbability probability of modifying an {@link IoBuffer} out of 1000 processed IoBuffer 
      */

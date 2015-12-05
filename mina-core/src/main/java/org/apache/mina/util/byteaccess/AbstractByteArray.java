@@ -29,14 +29,14 @@ package org.apache.mina.util.byteaccess;
 abstract class AbstractByteArray implements ByteArray {
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public final int length() {
         return last() - first();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public final boolean equals(Object other) {

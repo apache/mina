@@ -124,7 +124,8 @@ public class SslFilter extends IoFilterAdapter {
      * {@link SSLContext#createSSLEngine(String, int)} to be called passing the
      * hostname and port of the {@link InetSocketAddress} to get an
      * {@link SSLEngine} instance. If not set {@link SSLContext#createSSLEngine()}
-     * will be called.<br/>
+     * will be called.
+     * <br>
      * Using this feature {@link SSLSession} objects may be cached and reused
      * when in client mode.
      *

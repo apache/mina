@@ -36,28 +36,28 @@ import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 
 /**
- * A handle which represents connection between two end-points regardless of
- * transport types.
- * <p/>
- * {@link IoSession} provides user-defined attributes.  User-defined attributes
- * are application-specific data which are associated with a session.
- * It often contains objects that represents the state of a higher-level protocol
- * and becomes a way to exchange data between filters and handlers.
- * <p/>
+ * <p>
+ *   A handle which represents connection between two end-points regardless of
+ *   transport types.
+ * </p>
+ * <p>
+ *   {@link IoSession} provides user-defined attributes.  User-defined attributes
+ *   are application-specific data which are associated with a session.
+ *   It often contains objects that represents the state of a higher-level protocol
+ *   and becomes a way to exchange data between filters and handlers.
+ * </p>
  * <h3>Adjusting Transport Type Specific Properties</h3>
- * <p/>
- * You can simply downcast the session to an appropriate subclass.
+ * <p>
+ *   You can simply downcast the session to an appropriate subclass.
  * </p>
- * <p/>
  * <h3>Thread Safety</h3>
- * <p/>
- * {@link IoSession} is thread-safe.  But please note that performing
- * more than one {@link #write(Object)} calls at the same time will
- * cause the {@link IoFilter#filterWrite(IoFilter.NextFilter,IoSession,WriteRequest)}
- * to be executed simultaneously, and therefore you have to make sure the
- * {@link IoFilter} implementations you're using are thread-safe, too.
+ * <p>
+ *   {@link IoSession} is thread-safe.  But please note that performing
+ *   more than one {@link #write(Object)} calls at the same time will
+ *   cause the {@link IoFilter#filterWrite(IoFilter.NextFilter,IoSession,WriteRequest)}
+ *   to be executed simultaneously, and therefore you have to make sure the
+ *   {@link IoFilter} implementations you're using are thread-safe, too.
  * </p>
- * <p/>
  * <h3>Equality of Sessions</h3>
  * TODO : The getId() method is totally wrong. We can't base
  * a method which is designed to create a unique ID on the hashCode method.
@@ -286,7 +286,7 @@ public interface IoSession {
      * with the following code except that the operation is performed
      * atomically.
      * <pre>
-     * if (containsAttribute(key) && getAttribute(key).equals(value)) {
+     * if (containsAttribute(key) &amp;&amp; getAttribute(key).equals(value)) {
      *     removeAttribute(key);
      *     return true;
      * } else {
@@ -302,7 +302,7 @@ public interface IoSession {
      * This method is same with the following code except that the operation
      * is performed atomically.
      * <pre>
-     * if (containsAttribute(key) && getAttribute(key).equals(oldValue)) {
+     * if (containsAttribute(key) &amp;&amp; getAttribute(key).equals(oldValue)) {
      *     setAttribute(key, newValue);
      *     return true;
      * } else {
@@ -329,13 +329,13 @@ public interface IoSession {
     boolean isConnected();
 
     /**
-     * @return <code>true</tt> if and only if this session is being closed
+     * @return <code>true</code> if and only if this session is being closed
      * (but not disconnected yet) or is closed.
      */
     boolean isClosing();
     
     /**
-     * @return <code>true</tt> if the session has started and initialized a SslEngine,
+     * @return <code>true</code> if the session has started and initialized a SslEngine,
      * <code>false</code> if the session is not yet secured (the handshake is not completed)
      * or if SSL is not set for this session, or if SSL is not even an option.
      */
@@ -531,9 +531,10 @@ public interface IoSession {
     boolean isBothIdle();
 
     /**
+     * <p>
      * Returns the number of the fired continuous <tt>sessionIdle</tt> events
      * for the specified {@link IdleStatus}.
-     * <p/>
+     * </p>
      * If <tt>sessionIdle</tt> event is fired first after some time after I/O,
      * <tt>idleCount</tt> becomes <tt>1</tt>.  <tt>idleCount</tt> resets to
      * <tt>0</tt> if any I/O occurs again, otherwise it increases to

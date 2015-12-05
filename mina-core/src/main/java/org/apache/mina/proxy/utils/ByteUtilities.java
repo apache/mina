@@ -140,7 +140,7 @@ public class ByteUtilities {
     /**
      * Invert the endianness of words (4 bytes) in the given byte array 
      * starting at the given offset and repeating length/4 times.
-     * eg: b0b1b2b3 -> b3b2b1b0 
+     * eg: b0b1b2b3 -&gt; b3b2b1b0 
      * 
      * @param b the byte array 
      * @param offset the offset at which to change word start
@@ -163,7 +163,7 @@ public class ByteUtilities {
     /**
      * Invert two bytes in the given byte array starting at the given 
      * offset and repeating the inversion length/2 times.
-     * eg: b0b1 -> b1b0
+     * eg: b0b1 -@gt; b1b0
      * 
      * @param b the byte array 
      * @param offset the offset at which to change word start

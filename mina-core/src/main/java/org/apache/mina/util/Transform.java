@@ -48,7 +48,7 @@ public class Transform {
     /**
      * This method takes a string which may contain HTML tags (ie,
      * &lt;b&gt;, &lt;table&gt;, etc) and replaces any
-     * '<',  '>' , '&' or '"'
+     * '&lt;',  '&gt;' , '&amp;' or '"'
      * characters with respective predefined entity references.
      *
      * @param input The text to be converted.
@@ -89,11 +89,11 @@ public class Transform {
     }
 
     /**
-     * Ensures that embeded CDEnd strings (]]>) are handled properly
+     * Ensures that embeded CDEnd strings (]]&gt;) are handled properly
      * within message, NDC and throwable tag text.
      *
      * @param buf StringBuffer holding the XML data to this point.  The
-     * initial CDStart (<![CDATA[) and final CDEnd (]]>) of the CDATA
+     * initial CDStart (&lt;![CDATA[) and final CDEnd (]]&gt;) of the CDATA
      * section are the responsibility of the calling method.
      * @param str The String that is inserted into an existing CDATA Section within buf.
      * */

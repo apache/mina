@@ -52,21 +52,21 @@ public abstract class BufferByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Iterable<IoBuffer> getIoBuffers() {
         return Collections.singletonList(bb);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public IoBuffer getSingleIoBuffer() {
         return bb;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * 
      * Calling <code>free()</code> on the returned slice has no effect.
      */
@@ -86,68 +86,68 @@ public abstract class BufferByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public abstract void free();
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Cursor cursor() {
         return new CursorImpl();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Cursor cursor(int index) {
         return new CursorImpl(index);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public int first() {
         return 0;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public int last() {
         return bb.limit();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public ByteOrder order() {
         return bb.order();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void order(ByteOrder order) {
         bb.order(order);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public byte get(int index) {
         return bb.get(index);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void put(int index, byte b) {
         bb.put(index, b);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void get(int index, IoBuffer other) {
         bb.position(index);
@@ -155,7 +155,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void put(int index, IoBuffer other) {
         bb.position(index);
@@ -163,84 +163,84 @@ public abstract class BufferByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public short getShort(int index) {
         return bb.getShort(index);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putShort(int index, short s) {
         bb.putShort(index, s);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public int getInt(int index) {
         return bb.getInt(index);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putInt(int index, int i) {
         bb.putInt(index, i);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public long getLong(int index) {
         return bb.getLong(index);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putLong(int index, long l) {
         bb.putLong(index, l);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public float getFloat(int index) {
         return bb.getFloat(index);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putFloat(int index, float f) {
         bb.putFloat(index, f);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public double getDouble(int index) {
         return bb.getDouble(index);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putDouble(int index, double d) {
         bb.putDouble(index, d);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public char getChar(int index) {
         return bb.getChar(index);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putChar(int index, char c) {
         bb.putChar(index, c);
@@ -259,28 +259,28 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public int getRemaining() {
             return last() - index;
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public boolean hasRemaining() {
             return getRemaining() > 0;
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public int getIndex() {
             return index;
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void setIndex(int index) {
             if (index < 0 || index > last()) {
@@ -300,14 +300,14 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public ByteOrder order() {
             return BufferByteArray.this.order();
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public byte get() {
             byte b = BufferByteArray.this.get(index);
@@ -316,7 +316,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void put(byte b) {
             BufferByteArray.this.put(index, b);
@@ -324,7 +324,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void get(IoBuffer bb) {
             int size = Math.min(getRemaining(), bb.remaining());
@@ -333,7 +333,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void put(IoBuffer bb) {
             int size = bb.remaining();
@@ -342,7 +342,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public short getShort() {
             short s = BufferByteArray.this.getShort(index);
@@ -351,7 +351,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putShort(short s) {
             BufferByteArray.this.putShort(index, s);
@@ -359,7 +359,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public int getInt() {
             int i = BufferByteArray.this.getInt(index);
@@ -368,7 +368,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putInt(int i) {
             BufferByteArray.this.putInt(index, i);
@@ -376,7 +376,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public long getLong() {
             long l = BufferByteArray.this.getLong(index);
@@ -385,7 +385,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putLong(long l) {
             BufferByteArray.this.putLong(index, l);
@@ -393,7 +393,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public float getFloat() {
             float f = BufferByteArray.this.getFloat(index);
@@ -402,7 +402,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putFloat(float f) {
             BufferByteArray.this.putFloat(index, f);
@@ -410,7 +410,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public double getDouble() {
             double d = BufferByteArray.this.getDouble(index);
@@ -419,7 +419,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putDouble(double d) {
             BufferByteArray.this.putDouble(index, d);
@@ -427,7 +427,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public char getChar() {
             char c = BufferByteArray.this.getChar(index);
@@ -436,7 +436,7 @@ public abstract class BufferByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putChar(char c) {
             BufferByteArray.this.putChar(index, c);

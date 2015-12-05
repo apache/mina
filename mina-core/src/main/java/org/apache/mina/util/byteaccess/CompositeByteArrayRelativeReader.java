@@ -61,14 +61,14 @@ public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void skip(int length) {
         cursor.skip(length);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public ByteArray slice(int length) {
         return cursor.slice(length);
@@ -91,42 +91,42 @@ public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public short getShort() {
         return cursor.getShort();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public int getInt() {
         return cursor.getInt();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public long getLong() {
         return cursor.getLong();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public float getFloat() {
         return cursor.getFloat();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public double getDouble() {
         return cursor.getDouble();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public char getChar() {
         return cursor.getChar();

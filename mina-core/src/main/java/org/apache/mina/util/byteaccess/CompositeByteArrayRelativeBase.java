@@ -76,21 +76,21 @@ abstract class CompositeByteArrayRelativeBase {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public final int getRemaining() {
         return cursor.getRemaining();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public final boolean hasRemaining() {
         return cursor.hasRemaining();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public ByteOrder order() {
         return cba.order();

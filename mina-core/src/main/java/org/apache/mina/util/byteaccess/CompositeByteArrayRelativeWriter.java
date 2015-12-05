@@ -32,7 +32,8 @@ import org.apache.mina.core.buffer.IoBuffer;
  *
  * By providing an appropriate <code>Expander</code> it is also possible to
  * automatically add more backing storage as more data is written.
- *<br/><br/>
+ *<br>
+ *<br>
  * TODO: Get flushing working.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -151,7 +152,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void skip(int length) {
         cursor.skip(length);
@@ -165,7 +166,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void put(byte b) {
         prepareForAccess(1);
@@ -173,7 +174,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void put(IoBuffer bb) {
         prepareForAccess(bb.remaining());
@@ -181,7 +182,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putShort(short s) {
         prepareForAccess(2);
@@ -189,7 +190,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putInt(int i) {
         prepareForAccess(4);
@@ -197,7 +198,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putLong(long l) {
         prepareForAccess(8);
@@ -205,7 +206,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putFloat(float f) {
         prepareForAccess(4);
@@ -213,7 +214,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putDouble(double d) {
         prepareForAccess(8);
@@ -221,7 +222,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putChar(char c) {
         prepareForAccess(2);

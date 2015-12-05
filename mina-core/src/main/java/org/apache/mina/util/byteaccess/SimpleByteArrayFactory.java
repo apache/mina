@@ -39,7 +39,7 @@ public class SimpleByteArrayFactory implements ByteArrayFactory {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public ByteArray create(int size) {
         if (size < 0) {

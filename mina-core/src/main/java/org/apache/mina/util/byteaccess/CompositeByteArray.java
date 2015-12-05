@@ -231,7 +231,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void free() {
         while (!bas.isEmpty()) {
@@ -255,7 +255,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Iterable<IoBuffer> getIoBuffers() {
         if (bas.isEmpty()) {
@@ -281,7 +281,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public IoBuffer getSingleIoBuffer() {
         if (byteArrayFactory == null) {
@@ -323,14 +323,14 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Cursor cursor() {
         return new CursorImpl();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public Cursor cursor(int index) {
         return new CursorImpl(index);
@@ -360,49 +360,49 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public ByteArray slice(int index, int length) {
         return cursor(index).slice(length);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public byte get(int index) {
         return cursor(index).get();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void put(int index, byte b) {
         cursor(index).put(b);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void get(int index, IoBuffer bb) {
         cursor(index).get(bb);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void put(int index, IoBuffer bb) {
         cursor(index).put(bb);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public int first() {
         return bas.firstByte();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public int last() {
         return bas.lastByte();
@@ -430,7 +430,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public ByteOrder order() {
         if (order == null) {
@@ -440,7 +440,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void order(ByteOrder order) {
         if (order == null || !order.equals(this.order)) {
@@ -455,84 +455,84 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public short getShort(int index) {
         return cursor(index).getShort();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putShort(int index, short s) {
         cursor(index).putShort(s);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public int getInt(int index) {
         return cursor(index).getInt();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putInt(int index, int i) {
         cursor(index).putInt(i);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public long getLong(int index) {
         return cursor(index).getLong();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putLong(int index, long l) {
         cursor(index).putLong(l);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public float getFloat(int index) {
         return cursor(index).getFloat();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putFloat(int index, float f) {
         cursor(index).putFloat(f);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public double getDouble(int index) {
         return cursor(index).getDouble();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putDouble(int index, double d) {
         cursor(index).putDouble(d);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public char getChar(int index) {
         return cursor(index).getChar();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void putChar(int index, char c) {
         cursor(index).putChar(c);
@@ -570,14 +570,14 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public int getIndex() {
             return index;
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void setIndex(int index) {
             checkBounds(index, 0);
@@ -585,14 +585,14 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void skip(int length) {
             setIndex(index + length);
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public ByteArray slice(int length) {
             CompositeByteArray slice = new CompositeByteArray(byteArrayFactory);
@@ -609,7 +609,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public ByteOrder order() {
             return CompositeByteArray.this.order();
@@ -680,21 +680,21 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public int getRemaining() {
             return last() - index + 1;
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public boolean hasRemaining() {
             return getRemaining() > 0;
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public byte get() {
             prepareForAccess(1);
@@ -704,7 +704,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void put(byte b) {
             prepareForAccess(1);
@@ -713,7 +713,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void get(IoBuffer bb) {
             while (bb.hasRemaining()) {
@@ -728,7 +728,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void put(IoBuffer bb) {
             while (bb.hasRemaining()) {
@@ -743,7 +743,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public short getShort() {
             prepareForAccess(2);
@@ -763,7 +763,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putShort(short s) {
             prepareForAccess(2);
@@ -786,7 +786,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public int getInt() {
             prepareForAccess(4);
@@ -808,7 +808,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putInt(int i) {
             prepareForAccess(4);
@@ -839,7 +839,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public long getLong() {
             prepareForAccess(8);
@@ -867,7 +867,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putLong(long l) {
             //TODO: see if there is some optimizing that can be done here
@@ -915,7 +915,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public float getFloat() {
             prepareForAccess(4);
@@ -930,7 +930,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putFloat(float f) {
             prepareForAccess(4);
@@ -944,7 +944,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public double getDouble() {
             prepareForAccess(8);
@@ -959,7 +959,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putDouble(double d) {
             prepareForAccess(8);
@@ -973,7 +973,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public char getChar() {
             prepareForAccess(2);
@@ -993,7 +993,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         public void putChar(char c) {
             prepareForAccess(2);

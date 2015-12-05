@@ -29,10 +29,10 @@ import java.nio.channels.FileChannel;
 public interface FileRegion {
 
     /**
-     * The open <tt>FileChannel<tt> from which data will be read to send to
+     * The open <tt>FileChannel</tt> from which data will be read to send to
      * remote host.
      *
-     * @return  An open <tt>FileChannel<tt>.
+     * @return  An open <tt>FileChannel</tt>.
      */
     FileChannel getFileChannel();
 

@@ -1152,6 +1152,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * Implement this method to return the unexpandable read only version of
      * this buffer.
+     * 
+     * @return the IoBoffer instance
      */
     protected abstract IoBuffer asReadOnlyBuffer0();
 
@@ -1167,6 +1169,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * Implement this method to return the unexpandable duplicate of this
      * buffer.
+     * 
+     * @return the IoBoffer instance
      */
     protected abstract IoBuffer duplicate0();
 
@@ -1239,6 +1243,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * Implement this method to return the unexpandable slice of this
      * buffer.
+     * 
+     * @return the IoBoffer instance
      */
     protected abstract IoBuffer slice0();
 

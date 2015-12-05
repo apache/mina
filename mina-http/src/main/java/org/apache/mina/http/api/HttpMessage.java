@@ -23,7 +23,7 @@ package org.apache.mina.http.api;
 import java.util.Map;
 
 /**
- * An HTTP message, the ancestor of HTTP request & response.
+ * An HTTP message, the ancestor of HTTP request &amp; response.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  */

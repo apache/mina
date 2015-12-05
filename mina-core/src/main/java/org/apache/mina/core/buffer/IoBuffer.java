@@ -43,110 +43,114 @@ import org.apache.mina.core.session.IoSession;
 /**
  * A byte buffer used by MINA applications.
  * <p>
- * This is a replacement for {@link ByteBuffer}. Please refer to
- * {@link ByteBuffer} documentation for preliminary usage. MINA does not use NIO
- * {@link ByteBuffer} directly for two reasons:
- * <ul>
- * <li>It doesn't provide useful getters and putters such as <code>fill</code>,
- * <code>get/putString</code>, and <code>get/putAsciiInt()</code> enough.</li>
- * <li>It is difficult to write variable-length data due to its fixed capacity</li>
- * </ul>
+ *   This is a replacement for {@link ByteBuffer}. Please refer to
+ *   {@link ByteBuffer} documentation for preliminary usage. MINA does not use NIO
+ *   {@link ByteBuffer} directly for two reasons:
+ *   <ul>
+ *     <li>It doesn't provide useful getters and putters such as <code>fill</code>,
+ *         <code>get/putString</code>, and <code>get/putAsciiInt()</code> enough.</li>
+ *     <li>It is difficult to write variable-length data due to its fixed capacity</li>
+ *   </ul>
  * </p>
  * 
  * <h2>Allocation</h2>
  * <p>
- * You can allocate a new heap buffer.
+ *   You can allocate a new heap buffer.
  * 
- * <pre>
- * IoBuffer buf = IoBuffer.allocate(1024, false);
- * </pre>
+ *   <pre>
+ *     IoBuffer buf = IoBuffer.allocate(1024, false);
+ *   </pre>
  * 
- * You can also allocate a new direct buffer:
+ *   You can also allocate a new direct buffer:
  * 
- * <pre>
- * IoBuffer buf = IoBuffer.allocate(1024, true);
- * </pre>
+ *   <pre>
+ *     IoBuffer buf = IoBuffer.allocate(1024, true);
+ *   </pre>
  * 
- * or you can set the default buffer type.
+ *   or you can set the default buffer type.
  * 
- * <pre>
- * // Allocate heap buffer by default.
- * IoBuffer.setUseDirectBuffer(false);
+ *   <pre>
+ *     // Allocate heap buffer by default.
+ *     IoBuffer.setUseDirectBuffer(false);
  * 
- * // A new heap buffer is returned.
- * IoBuffer buf = IoBuffer.allocate(1024);
- * </pre>
+ *     // A new heap buffer is returned.
+ *     IoBuffer buf = IoBuffer.allocate(1024);
+ *   </pre>
  * 
  * </p>
  * 
  * <h2>Wrapping existing NIO buffers and arrays</h2>
  * <p>
- * This class provides a few <tt>wrap(...)</tt> methods that wraps any NIO
- * buffers and byte arrays.
+ *   This class provides a few <tt>wrap(...)</tt> methods that wraps any NIO
+ *   buffers and byte arrays.
+ * </p>
  * 
  * <h2>AutoExpand</h2>
  * <p>
- * Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
- * easy, and it is because its size is fixed at allocation. {@link IoBuffer} introduces
- * the <tt>autoExpand</tt> property. If <tt>autoExpand</tt> property is set to true, 
- * you never get a {@link BufferOverflowException} or
- * an {@link IndexOutOfBoundsException} (except when index is negative). It
- * automatically expands its capacity. For instance:
+ *   Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
+ *   easy, and it is because its size is fixed at allocation. {@link IoBuffer} introduces
+ *   the <tt>autoExpand</tt> property. If <tt>autoExpand</tt> property is set to true, 
+ *   you never get a {@link BufferOverflowException} or
+ *   an {@link IndexOutOfBoundsException} (except when index is negative). It
+ *   automatically expands its capacity. For instance:
  * 
- * <pre>
- * String greeting = messageBundle.getMessage(&quot;hello&quot;);
- * IoBuffer buf = IoBuffer.allocate(16);
- * // Turn on autoExpand (it is off by default)
- * buf.setAutoExpand(true);
- * buf.putString(greeting, utf8encoder);
- * </pre>
+ *   <pre>
+ *     String greeting = messageBundle.getMessage(&quot;hello&quot;);
+ *     IoBuffer buf = IoBuffer.allocate(16);
+ *     // Turn on autoExpand (it is off by default)
+ *     buf.setAutoExpand(true);
+ *     buf.putString(greeting, utf8encoder);
+ *   </pre>
  * 
- * The underlying {@link ByteBuffer} is reallocated by {@link IoBuffer} behind
- * the scene if the encoded data is larger than 16 bytes in the example above.
- * Its capacity will double, and its limit will increase to the last position
- * the string is written.
+ *   The underlying {@link ByteBuffer} is reallocated by {@link IoBuffer} behind
+ *   the scene if the encoded data is larger than 16 bytes in the example above.
+ *   Its capacity will double, and its limit will increase to the last position
+ *   the string is written.
  * </p>
  * 
  * <h2>AutoShrink</h2>
  * <p>
- * You might also want to decrease the capacity of the buffer when most of the
- * allocated memory area is not being used. {@link IoBuffer} provides
- * <tt>autoShrink</tt> property to take care of this issue. If
- * <tt>autoShrink</tt> is turned on, {@link IoBuffer} halves the capacity of the
- * buffer when {@link #compact()} is invoked and only 1/4 or less of the current
- * capacity is being used.
+ *   You might also want to decrease the capacity of the buffer when most of the
+ *   allocated memory area is not being used. {@link IoBuffer} provides
+ *   <tt>autoShrink</tt> property to take care of this issue. If
+ *   <tt>autoShrink</tt> is turned on, {@link IoBuffer} halves the capacity of the
+ *   buffer when {@link #compact()} is invoked and only 1/4 or less of the current
+ *   capacity is being used.
+ * </p>
  * <p>
- * You can also call the {@link #shrink()} method manually to shrink the capacity of the
- * buffer.
+ *   You can also call the {@link #shrink()} method manually to shrink the capacity of the
+ *   buffer.
+ * </p>
  * <p>
- * The underlying {@link ByteBuffer} is reallocated by the {@link IoBuffer} behind
- * the scene, and therefore {@link #buf()} will return a different
- * {@link ByteBuffer} instance once capacity changes. Please also note
- * that the {@link #compact()} method or the {@link #shrink()} method
- * will not decrease the capacity if the new capacity is less than the 
- * {@link #minimumCapacity()} of the buffer.
+ *   The underlying {@link ByteBuffer} is reallocated by the {@link IoBuffer} behind
+ *   the scene, and therefore {@link #buf()} will return a different
+ *   {@link ByteBuffer} instance once capacity changes. Please also note
+ *   that the {@link #compact()} method or the {@link #shrink()} method
+ *   will not decrease the capacity if the new capacity is less than the 
+ *   {@link #minimumCapacity()} of the buffer.
+ * </p>
  * 
  * <h2>Derived Buffers</h2>
  * <p>
- * Derived buffers are the buffers which were created by the {@link #duplicate()},
- * {@link #slice()}, or {@link #asReadOnlyBuffer()} methods. They are useful especially
- * when you broadcast the same messages to multiple {@link IoSession}s. Please
- * note that the buffer derived from and its derived buffers are not 
- * auto-expandable nor auto-shrinkable. Trying to call
- * {@link #setAutoExpand(boolean)} or {@link #setAutoShrink(boolean)} with
- * <tt>true</tt> parameter will raise an {@link IllegalStateException}.
+ *   Derived buffers are the buffers which were created by the {@link #duplicate()},
+ *   {@link #slice()}, or {@link #asReadOnlyBuffer()} methods. They are useful especially
+ *   when you broadcast the same messages to multiple {@link IoSession}s. Please
+ *   note that the buffer derived from and its derived buffers are not 
+ *   auto-expandable nor auto-shrinkable. Trying to call
+ *   {@link #setAutoExpand(boolean)} or {@link #setAutoShrink(boolean)} with
+ *   <tt>true</tt> parameter will raise an {@link IllegalStateException}.
  * </p>
  * 
  * <h2>Changing Buffer Allocation Policy</h2>
  * <p>
- * The {@link IoBufferAllocator} interface lets you override the default buffer
- * management behavior. There are two allocators provided out-of-the-box:
- * <ul>
- * <li>{@link SimpleBufferAllocator} (default)</li>
- * <li>{@link CachedBufferAllocator}</li>
- * </ul>
- * You can implement your own allocator and use it by calling
- * {@link #setAllocator(IoBufferAllocator)}.
+ *   The {@link IoBufferAllocator} interface lets you override the default buffer
+ *   management behavior. There are two allocators provided out-of-the-box:
+ *   <ul>
+ *     <li>{@link SimpleBufferAllocator} (default)</li>
+ *     <li>{@link CachedBufferAllocator}</li>
+ *   </ul>
+ *   You can implement your own allocator and use it by calling
+ *   {@link #setAllocator(IoBufferAllocator)}.
  * </p>
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -168,7 +172,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Sets the allocator used by existing and new buffers
      * 
-     * @paream newAllocator the new allocator to use
+     * @param newAllocator the new allocator to use
      */
     public static void setAllocator(IoBufferAllocator newAllocator) {
         if (newAllocator == null) {
@@ -356,11 +360,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * or equal to the current capacity, this method returns the original buffer. 
      * If the new capacity is greater than the current capacity, the buffer is
      * reallocated while retaining the position, limit, mark and the content of
-     * the buffer.<br/>
+     * the buffer.
+     * <br>
      * Note that the IoBuffer is replaced, it's not copied.
      * <br>
      * Assuming a buffer contains N bytes, its position is 0 and its current capacity is C, 
-     * here are the resulting buffer if we set the new capacity to a value V < C and V > C :
+     * here are the resulting buffer if we set the new capacity to a value V &lt; C and V &gt; C :
      * 
      * <pre>
      *  Initial buffer :
@@ -373,7 +378,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *   |       |          |
      *  pos    limit     capacity
      *  
-     * V <= C :
+     * V &lt;= C :
      * 
      *   0       L          C
      *  +--------+----------+
@@ -383,7 +388,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *   |       |          |
      *  pos    limit   newCapacity
      *  
-     * V > C :
+     * V &gt; C :
      * 
      *   0       L          C            V
      *  +--------+-----------------------+
@@ -448,7 +453,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *   |       |          |
      *  pos    limit     capacity
      *  
-     * ( pos + V )  <= L, no change :
+     * ( pos + V )  &lt;= L, no change :
      * 
      *   0       L          C
      *  +--------+----------+
@@ -460,7 +465,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *  
      * You can still put ( L - pos ) bytes in the buffer
      *  
-     * ( pos + V ) > L & ( pos + V ) <= C :
+     * ( pos + V ) &gt; L & ( pos + V ) &lt;= C :
      * 
      *  0        L          C
      *  +------------+------+
@@ -473,7 +478,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *  You can now put ( L - pos + V )  bytes in the buffer.
      *  
      *  
-     *  ( pos + V ) > C
+     *  ( pos + V ) &gt; C
      * 
      *   0       L          C
      *  +-------------------+----+
@@ -517,7 +522,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *      |    |          |
      *     pos limit     capacity
      *  
-     * ( pos + V )  <= L, no change :
+     * ( pos + V )  &lt;= L, no change :
      * 
      *      P    L          C
      *  +--------+----------+
@@ -529,7 +534,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *  
      * You can still put ( L - pos ) bytes in the buffer
      *  
-     * ( pos + V ) > L & ( pos + V ) <= C :
+     * ( pos + V ) &gt; L & ( pos + V ) &lt;= C :
      * 
      *      P    L          C
      *  +------------+------+
@@ -542,7 +547,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      *  You can now put ( L - pos + V)  bytes in the buffer.
      *  
      *  
-     *  ( pos + V ) > C
+     *  ( pos + V ) &gt; C
      * 
      *      P       L          C
      *  +-------------------+----+
@@ -571,9 +576,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Changes the capacity of this buffer so this buffer occupies as less
      * memory as possible while retaining the position, limit and the buffer
-     * content between the position and limit. <br/>
-     * <b>The capacity of the buffer never becomes less than {@link #minimumCapacity()}</b></br>. 
-     * The mark is discarded once the capacity changes.<br/>
+     * content between the position and limit. 
+     * <br>
+     * <b>The capacity of the buffer never becomes less than {@link #minimumCapacity()}</b>
+     * <br>. 
+     * The mark is discarded once the capacity changes.
+     * <br>
      * Typically, a call to this method tries to remove as much unused bytes
      * as possible, dividing by two the initial capacity until it can't without
      * obtaining a new capacity lower than the {@link #minimumCapacity()}. For instance, if 
@@ -814,16 +822,22 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * @see ByteBuffer#getChar(int)
+     * 
+     * @return the char at 'index' position
      */
     public abstract char getChar(int index);
 
     /**
      * @see ByteBuffer#putChar(int, char)
+     * 
+     * @return the modified IoBuffer
      */
     public abstract IoBuffer putChar(int index, char value);
 
     /**
      * @see ByteBuffer#asCharBuffer()
+     * 
+     * @return a new CharBuffer
      */
     public abstract CharBuffer asCharBuffer();
 

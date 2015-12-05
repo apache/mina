@@ -32,17 +32,17 @@ import org.apache.mina.core.buffer.IoBuffer;
 public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     int first();
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     int last();
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     ByteOrder order();
 
@@ -80,17 +80,17 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
     public boolean equals(Object other);
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     byte get(int index);
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void get(int index, IoBuffer bb);
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     int getInt(int index);
 
@@ -126,27 +126,27 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
         void setIndex(int index);
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         int getRemaining();
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         boolean hasRemaining();
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         byte get();
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         void get(IoBuffer bb);
 
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          */
         int getInt();
     }
