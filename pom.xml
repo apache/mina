@@ -411,6 +411,7 @@
                 </goals>
                 <configuration>
                   <aggregate>true</aggregate>
+                  <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
               </execution>
             </executions>
@@ -553,6 +554,7 @@
                 <head />
               </tag>
             </tags>
+            <additionalparam>-Xdoclint:none</additionalparam>
          </configuration>
         </plugin>
 
