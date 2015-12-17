@@ -66,6 +66,10 @@ public class IoUtil {
      * Writes the specified {@code message} to the specified {@code sessions}.
      * If the specified {@code message} is an {@link IoBuffer}, the buffer is
      * automatically duplicated using {@link IoBuffer#duplicate()}.
+     * 
+     * @param message The message to write
+     * @param sessions The sessions the message has to be written to
+     * @return The list of {@link WriteFuture} for the written messages
      */
     public static List<WriteFuture> broadcast(Object message, Iterator<IoSession> sessions) {
         List<WriteFuture> answer = new ArrayList<WriteFuture>();
@@ -77,6 +81,10 @@ public class IoUtil {
      * Writes the specified {@code message} to the specified {@code sessions}.
      * If the specified {@code message} is an {@link IoBuffer}, the buffer is
      * automatically duplicated using {@link IoBuffer#duplicate()}.
+     * 
+     * @param message The message to write
+     * @param sessions The sessions the message has to be written to
+     * @return The list of {@link WriteFuture} for the written messages
      */
     public static List<WriteFuture> broadcast(Object message, IoSession... sessions) {
         if (sessions == null) {

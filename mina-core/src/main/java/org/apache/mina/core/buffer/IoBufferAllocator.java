@@ -34,6 +34,7 @@ public interface IoBufferAllocator {
      * @param capacity the capacity of the buffer
      * @param direct <tt>true</tt> to get a direct buffer,
      *               <tt>false</tt> to get a heap buffer.
+     * @return The allocated {@link IoBuffer}
      */
     IoBuffer allocate(int capacity, boolean direct);
 
@@ -43,11 +44,15 @@ public interface IoBufferAllocator {
      * @param capacity the capacity of the buffer
      * @param direct <tt>true</tt> to get a direct buffer,
      *               <tt>false</tt> to get a heap buffer.
+     * @return The allocated {@link ByteBuffer}
      */
     ByteBuffer allocateNioBuffer(int capacity, boolean direct);
 
     /**
      * Wraps the specified NIO {@link ByteBuffer} into MINA buffer.
+     * 
+     * @param The {@link ByteBuffer} to wrap
+     * @return The {@link IoBuffer} wrapping the {@link ByteBuffer}
      */
     IoBuffer wrap(ByteBuffer nioBuffer);
 

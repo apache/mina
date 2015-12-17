@@ -116,7 +116,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
     }
 
     /**
-     * Returns the maximum number of buffers with the same capacity per thread.
+     * @return the maximum number of buffers with the same capacity per thread.
      * <tt>0</tt> means 'no limitation'.
      */
     public int getMaxPoolSize() {
@@ -124,7 +124,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
     }
 
     /**
-     * Returns the maximum capacity of a cached buffer.  A buffer whose
+     * @return the maximum capacity of a cached buffer.  A buffer whose
      * capacity is bigger than this value is not pooled.  <tt>0</tt> means
      * 'no limitation'.
      */

@@ -209,6 +209,7 @@ public interface IoFilterChain {
      *
      * @param oldFilterType The filter class we want to replace
      * @param newFilter The new filter
+     * @return The replaced IoFilter
      */
     IoFilter replace(Class<? extends IoFilter> oldFilterType, IoFilter newFilter);
 
@@ -241,6 +242,8 @@ public interface IoFilterChain {
 
     /**
      * Removes all filters added to this chain.
+     * 
+     * @throws Exception If we weren't able to clear the filters
      */
     void clear() throws Exception;
 
