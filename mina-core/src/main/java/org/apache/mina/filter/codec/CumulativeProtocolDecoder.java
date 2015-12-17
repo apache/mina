@@ -25,38 +25,36 @@ import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 
 /**
- * A {@link ProtocolDecoder} that cumulates the content of received
- * buffers to a <em>cumulative buffer</em> to help users implement decoders.
+ * A {@link ProtocolDecoder} that cumulates the content of received buffers to a
+ * <em>cumulative buffer</em> to help users implement decoders.
  * <p>
- * If the received {@link IoBuffer} is only a part of a message.
- * decoders should cumulate received buffers to make a message complete or
- * to postpone decoding until more buffers arrive.
+ * If the received {@link IoBuffer} is only a part of a message. decoders should
+ * cumulate received buffers to make a message complete or to postpone decoding
+ * until more buffers arrive.
  * <p>
  * Here is an example decoder that decodes CRLF terminated lines into
  * <code>Command</code> objects:
+ * 
  * <pre>
- * public class CrLfTerminatedCommandLineDecoder
- *         extends CumulativeProtocolDecoder {
- *
+ * public class CrLfTerminatedCommandLineDecoder extends CumulativeProtocolDecoder {
+ * 
  *     private Command parseCommand(IoBuffer in) {
  *         // Convert the bytes in the specified buffer to a
  *         // Command object.
  *         ...
  *     }
- *
- *     protected boolean doDecode(
- *             IoSession session, IoBuffer in, ProtocolDecoderOutput out)
- *             throws Exception {
- *
+ * 
+ *     protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+ * 
  *         // Remember the initial position.
  *         int start = in.position();
- *
+ * 
  *         // Now find the first CRLF in the buffer.
  *         byte previous = 0;
  *         while (in.hasRemaining()) {
  *             byte current = in.get();
- *
- *             if (previous == '\r' && current == '\n') {
+ * 
+ *             if (previous == '\r' &amp;&amp; current == '\n') {
  *                 // Remember the current position and limit.
  *                 int position = in.position();
  *                 int limit = in.limit();
@@ -79,14 +77,14 @@ import org.apache.mina.core.session.IoSession;
  *                 // buffer.
  *                 return true;
  *             }
- *
+ * 
  *             previous = current;
  *         }
- *
+ * 
  *         // Could not find CRLF in the buffer. Reset the initial
  *         // position to the one we recorded above.
  *         in.position(start);
- *
+ * 
  *         return false;
  *     }
  * }
@@ -94,7 +92,7 @@ import org.apache.mina.core.session.IoSession;
  * <p>
  * Please note that this decoder simply forward the call to
  * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)} if the
- * underlying transport doesn't have a packet fragmentation.  Whether the
+ * underlying transport doesn't have a packet fragmentation. Whether the
  * transport has fragmentation or not is determined by querying
  * {@link TransportMetadata}.
  *
@@ -113,12 +111,14 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
 
     /**
      * Cumulates content of <tt>in</tt> into internal buffer and forwards
-     * decoding request to {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
+     * decoding request to
+     * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
      * <tt>doDecode()</tt> is invoked repeatedly until it returns <tt>false</tt>
      * and the cumulative buffer is compacted after decoding ends.
      *
-     * @throws IllegalStateException if your <tt>doDecode()</tt> returned
-     *                               <tt>true</tt> not consuming the cumulative buffer.
+     * @throws IllegalStateException
+     *             if your <tt>doDecode()</tt> returned <tt>true</tt> not
+     *             consuming the cumulative buffer.
      */
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (!session.getTransportMetadata().hasFragmentation()) {
@@ -207,19 +207,22 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      * Implement this method to consume the specified cumulative buffer and
      * decode its content into message(s).
      *
-     * @param in the cumulative buffer
+     * @param in
+     *            the cumulative buffer
      * @return <tt>true</tt> if and only if there's more to decode in the buffer
      *         and you want to have <tt>doDecode</tt> method invoked again.
      *         Return <tt>false</tt> if remaining data is not enough to decode,
-     *         then this method will be invoked again when more data is cumulated.
-     * @throws Exception if cannot decode <tt>in</tt>.
+     *         then this method will be invoked again when more data is
+     *         cumulated.
+     * @throws Exception
+     *             if cannot decode <tt>in</tt>.
      */
     protected abstract boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception;
 
     /**
      * Releases the cumulative buffer used by the specified <tt>session</tt>.
-     * Please don't forget to call <tt>super.dispose( session )</tt> when
-     * you override this method.
+     * Please don't forget to call <tt>super.dispose( session )</tt> when you
+     * override this method.
      */
     @Override
     public void dispose(IoSession session) throws Exception {

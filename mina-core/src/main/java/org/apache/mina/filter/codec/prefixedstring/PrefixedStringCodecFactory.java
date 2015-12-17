@@ -53,7 +53,7 @@ public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
      * If the size of the encoded String exceeds this value, the encoder
      * will throw a {@link IllegalArgumentException}.
      * The default value is {@link PrefixedStringEncoder#DEFAULT_MAX_DATA_LENGTH}.
-     * <p/>
+     * <p>
      * This method does the same job as {@link PrefixedStringEncoder#setMaxDataLength(int)}.
      *
      * @return the allowed maximum size of an encoded string.
@@ -67,7 +67,7 @@ public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
      * If the size of the encoded String exceeds this value, the encoder
      * will throw a {@link IllegalArgumentException}.
      * The default value is {@link PrefixedStringEncoder#DEFAULT_MAX_DATA_LENGTH}.
-     * <p/>
+     * <p>
      * This method does the same job as {@link PrefixedStringEncoder#getMaxDataLength()}.
      *
      * @param maxDataLength allowed maximum size of an encoded String.
@@ -80,7 +80,6 @@ public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
      * Returns the allowed maximum size of a decoded string.
      * <p>
      * This method does the same job as {@link PrefixedStringEncoder#setMaxDataLength(int)}.
-     * </p>
      *
      * @return the allowed maximum size of an encoded string.
      * @see #setDecoderMaxDataLength(int)
@@ -96,9 +95,8 @@ public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
      * The decoder will throw a {@link BufferDataException} when data length
      * specified in the incoming data is greater than maxDataLength
      * The default value is {@link PrefixedStringDecoder#DEFAULT_MAX_DATA_LENGTH}.
-     *
+     * <p>
      * This method does the same job as {@link PrefixedStringDecoder#setMaxDataLength(int)}.
-     * </p>
      *
      * @param maxDataLength maximum allowed value specified as data length in the incoming data
      */

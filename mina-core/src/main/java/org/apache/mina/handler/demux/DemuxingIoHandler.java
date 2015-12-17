@@ -37,7 +37,6 @@ import org.apache.mina.util.IdentityHashSet;
  * You can freely register and deregister {@link MessageHandler}s using
  * {@link #addReceivedMessageHandler(Class, MessageHandler)} and
  * {@link #removeReceivedMessageHandler(Class)}.
- * </p>
  * <p>
  * When <code>message</code> is received through a call to
  * {@link #messageReceived(IoSession, Object)} the class of the
@@ -48,7 +47,6 @@ import org.apache.mina.util.IdentityHashSet;
  * order. If no match can be found for any of the interfaces the search will be
  * repeated recursively for the superclass of the immediate class
  * (i.e. <code>message.getClass().getSuperclass()</code>).
- * </p>
  * <p>
  * Consider the following type hierarchy (<code>Cx</code> are classes while
  * <code>Ix</code> are interfaces):
@@ -67,12 +65,10 @@ import org.apache.mina.util.IdentityHashSet;
  * When <code>message</code> is of type <code>C3</code> this hierarchy will be
  * searched in the following order:
  * <code>C3, I7, I8, I9, I3, I4, C2, I5, I6, C1, I1, I2, I3, I4, Object</code>.
- * </p>
  * <p>
  * For efficiency searches will be cached. Calls to
  * {@link #addReceivedMessageHandler(Class, MessageHandler)} and
  * {@link #removeReceivedMessageHandler(Class)} clear this cache.
- * </p>
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

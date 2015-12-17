@@ -54,64 +54,82 @@ import org.apache.mina.core.write.WriteRequest;
  * message is a keep-alive message or not and creates a new keep-alive
  * message:
  *
- * <table border="1">
- * <tr>
- * <th>Name</th><th>Description</th><th>Implementation</th>
- * </tr>
- * <tr valign="top">
- * <td>Active</td>
- * <td>You want a keep-alive request is sent when the reader is idle.
- * Once the request is sent, the response for the request should be
- * received within <tt>keepAliveRequestTimeout</tt> seconds.  Otherwise,
- * the specified {@link KeepAliveRequestTimeoutHandler} will be invoked.
- * If a keep-alive request is received, its response also should be sent back.
- * </td>
- * <td>Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
- * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- * return a non-<tt>null</tt>.</td>
- * </tr>
- * <tr valign="top">
- * <td>Semi-active</td>
- * <td>You want a keep-alive request to be sent when the reader is idle.
- * However, you don't really care if the response is received or not.
- * If a keep-alive request is received, its response should
- * also be sent back.
- * </td>
- * <td>Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
- * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- * return a non-<tt>null</tt>, and the <tt>timeoutHandler</tt> property
- * should be set to {@link KeepAliveRequestTimeoutHandler#NOOP},
- * {@link KeepAliveRequestTimeoutHandler#LOG} or the custom {@link KeepAliveRequestTimeoutHandler}
- * implementation that doesn't affect the session state nor throw an exception.
- * </td>
- * </tr>
- * <tr valign="top">
- * <td>Passive</td>
- * <td>You don't want to send a keep-alive request by yourself, but the
- * response should be sent back if a keep-alive request is received.</td>
- * <td>{@link KeepAliveMessageFactory#getRequest(IoSession)} must return
- * <tt>null</tt> and {@link KeepAliveMessageFactory#getResponse(IoSession, Object)}
- * must return a non-<tt>null</tt>.</td>
- * </tr>
- * <tr valign="top">
- * <td>Deaf Speaker</td>
- * <td>You want a keep-alive request to be sent when the reader is idle, but
- * you don't want to send any response back.</td>
- * <td>{@link KeepAliveMessageFactory#getRequest(IoSession)} must return
- * a non-<tt>null</tt>,
- * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- * return <tt>null</tt> and the <tt>timeoutHandler</tt> must be set to
- * {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}.</td>
- * </tr>
- * <tr valign="top">
- * <td>Silent Listener</td>
- * <td>You don't want to send a keep-alive request by yourself nor send any
- * response back.</td>
- * <td>Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
- * {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- * return <tt>null</tt>.</td>
- * </tr>
+ * <table border="1" summary="Message">
+ *   <tr>
+ *     <th>Name</th><th>Description</th><th>Implementation</th>
+ *   </tr>
+ *   <tr valign="top">
+ *     <td>Active</td>
+ *     <td>
+ *       You want a keep-alive request is sent when the reader is idle.
+ *       Once the request is sent, the response for the request should be
+ *       received within <tt>keepAliveRequestTimeout</tt> seconds.  Otherwise,
+ *       the specified {@link KeepAliveRequestTimeoutHandler} will be invoked.
+ *       If a keep-alive request is received, its response also should be sent back.
+ *     </td>
+ *     <td>
+ *       Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
+ *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
+ *       return a non-<tt>null</tt>.
+ *     </td>
+ *   </tr>
+ *   <tr valign="top">
+ *     <td>Semi-active</td>
+ *     <td>
+ *       You want a keep-alive request to be sent when the reader is idle.
+ *       However, you don't really care if the response is received or not.
+ *       If a keep-alive request is received, its response should
+ *       also be sent back.
+ *     </td>
+ *     <td>
+ *       Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
+ *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
+ *       return a non-<tt>null</tt>, and the <tt>timeoutHandler</tt> property
+ *       should be set to {@link KeepAliveRequestTimeoutHandler#NOOP},
+ *       {@link KeepAliveRequestTimeoutHandler#LOG} or the custom {@link KeepAliveRequestTimeoutHandler}
+ *       implementation that doesn't affect the session state nor throw an exception.
+ *     </td>
+ *   </tr>
+ *   <tr valign="top">
+ *     <td>Passive</td>
+ *     <td>
+ *       You don't want to send a keep-alive request by yourself, but the
+ *       response should be sent back if a keep-alive request is received.
+ *     </td>
+ *     <td>
+ *       {@link KeepAliveMessageFactory#getRequest(IoSession)} must return
+ *       <tt>null</tt> and {@link KeepAliveMessageFactory#getResponse(IoSession, Object)}
+ *       must return a non-<tt>null</tt>.
+ *     </td>
+ *   </tr>
+ *   <tr valign="top">
+ *     <td>Deaf Speaker</td>
+ *     <td>
+ *       You want a keep-alive request to be sent when the reader is idle, but
+ *       you don't want to send any response back.
+ *     </td>
+ *     <td>
+ *       {@link KeepAliveMessageFactory#getRequest(IoSession)} must return
+ *       a non-<tt>null</tt>,
+ *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
+ *       return <tt>null</tt> and the <tt>timeoutHandler</tt> must be set to
+ *       {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}.
+ *     </td>
+ *   </tr>
+ *   <tr valign="top">
+ *     <td>Silent Listener</td>
+ *     <td>
+ *       You don't want to send a keep-alive request by yourself nor send any
+ *       response back.
+ *     </td>
+ *     <td>
+ *       Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
+ *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
+ *       return <tt>null</tt>.
+ *     </td>
+ *   </tr>
  * </table>
+ * 
  * Please note that you must implement
  * {@link KeepAliveMessageFactory#isRequest(IoSession, Object)} and
  * {@link KeepAliveMessageFactory#isResponse(IoSession, Object)} properly

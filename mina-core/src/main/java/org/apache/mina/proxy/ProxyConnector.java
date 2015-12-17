@@ -104,7 +104,6 @@ public class ProxyConnector extends AbstractIoConnector {
 
     /**
      * Creates a new proxy connector.
-     * @see AbstractIoConnector#AbstractIoConnector(IoSessionConfig, Executor).
      */
     public ProxyConnector(final SocketConnector connector, IoSessionConfig config, Executor executor) {
         super(config, executor);

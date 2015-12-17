@@ -35,7 +35,7 @@ import org.slf4j.MDC;
 
 /**
  * This filter will inject some key IoSession properties into the Mapped Diagnostic Context (MDC)
- * <p/>
+ * <p>
  * These properties will be set in the MDC for all logging events that are generated
  * down the call stack, even in code that is not aware of MINA.
  *

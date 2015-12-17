@@ -39,15 +39,12 @@ import javax.net.ssl.TrustManagerFactory;
  *      SSLContext c = SSLContext.getInstance( "TLS" );
  *      c.init(null, null, null);
  * </pre>
- * </p>
  * <p>
  * Use the properties prefixed with <code>keyManagerFactory</code> to control
  * the creation of the {@link KeyManager} to be used.
- * </p>
  * <p>
  * Use the properties prefixed with <code>trustManagerFactory</code> to control
  * the creation of the {@link TrustManagerFactory} to be used.
- * </p>
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -236,14 +233,12 @@ public class SslContextFactory {
      * <p>
      * This property will be ignored if a {@link KeyManagerFactory} has been
      * set directly using {@link #setKeyManagerFactory(KeyManagerFactory)}.
-     * </p>
      * <p>
      * If this property isn't set while no {@link KeyManagerFactory} has been
      * set using {@link #setKeyManagerFactory(KeyManagerFactory)} and
      * {@link #setKeyManagerFactoryAlgorithmUseDefault(boolean)} has been set to
      * <code>true</code> the value returned
      * by {@link KeyManagerFactory#getDefaultAlgorithm()} will be used instead.
-     * </p>
      *
      * @param algorithm the algorithm to use.
      */
@@ -258,13 +253,11 @@ public class SslContextFactory {
      * <p>
      * This property will be ignored if a {@link KeyManagerFactory} has been
      * set directly using {@link #setKeyManagerFactory(KeyManagerFactory)}.
-     * </p>
      * <p>
      * If this property isn't set and no {@link KeyManagerFactory} has been set
      * using {@link #setKeyManagerFactory(KeyManagerFactory)}
      * {@link KeyManagerFactory#getInstance(java.lang.String)} will be used
      * to create the {@link KeyManagerFactory}.
-     * </p>
      *
      * @param provider the name of the provider.
      */
@@ -317,14 +310,12 @@ public class SslContextFactory {
      * <p>
      * This property will be ignored if a {@link TrustManagerFactory} has been
      * set directly using {@link #setTrustManagerFactory(TrustManagerFactory)}.
-     * </p>
      * <p>
      * If this property isn't set while no {@link TrustManagerFactory} has been
      * set using {@link #setTrustManagerFactory(TrustManagerFactory)} and
      * {@link #setTrustManagerFactoryAlgorithmUseDefault(boolean)} has been set to
      * <code>true</code> the value returned
      * by {@link TrustManagerFactory#getDefaultAlgorithm()} will be used instead.
-     * </p>
      *
      * @param algorithm the algorithm to use.
      */
@@ -339,7 +330,6 @@ public class SslContextFactory {
      * <p>
      * This property will be ignored if {@link ManagerFactoryParameters} has been
      * set directly using {@link #setTrustManagerFactoryParameters(ManagerFactoryParameters)}.
-     * </p>
      *
      * @param keyStore the key store.
      */
@@ -365,13 +355,11 @@ public class SslContextFactory {
      * <p>
      * This property will be ignored if a {@link TrustManagerFactory} has been
      * set directly using {@link #setTrustManagerFactory(TrustManagerFactory)}.
-     * </p>
      * <p>
      * If this property isn't set and no {@link TrustManagerFactory} has been set
      * using {@link #setTrustManagerFactory(TrustManagerFactory)}
      * {@link TrustManagerFactory#getInstance(java.lang.String)} will be used
      * to create the {@link TrustManagerFactory}.
-     * </p>
      *
      * @param provider the name of the provider.
      */

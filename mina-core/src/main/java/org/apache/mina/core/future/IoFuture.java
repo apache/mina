@@ -59,7 +59,7 @@ public interface IoFuture {
     /**
      * Wait for the asynchronous operation to complete with the specified timeout.
      *
-     * @param timeout The maximum milliseconds to wait before getting out
+     * @param timeoutMillis The maximum milliseconds to wait before getting out
      * @return <tt>true</tt> if the operation is completed.
      * @exception InterruptedException If the thread is interrupted while waiting
      */
@@ -88,7 +88,7 @@ public interface IoFuture {
      * Wait for the asynchronous operation to complete with the specified timeout
      * uninterruptibly.
      *
-     * @param timeout The maximum milliseconds to wait before getting out
+     * @param timeoutMillis The maximum milliseconds to wait before getting out
      * @return <tt>true</tt> if the operation is finished.
      */
     boolean awaitUninterruptibly(long timeoutMillis);

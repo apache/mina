@@ -36,17 +36,15 @@ import org.apache.mina.core.session.IoSession;
  * {@link InputStream} written to the session and notifies
  * {@link org.apache.mina.core.future.WriteFuture} on the
  * original {@link org.apache.mina.core.write.WriteRequest}.
- * <p/>
+ * <p>
  * This filter will ignore written messages which aren't {@link InputStream}
  * instances. Such messages will be passed to the next filter directly.
- * </p>
- * <p/>
+ * <p>
  * NOTE: this filter does not close the stream after all data from stream
  * has been written. The {@link org.apache.mina.core.service.IoHandler} should take
  * care of that in its
  * {@link org.apache.mina.core.service.IoHandler#messageSent(IoSession,Object)}
  * callback.
- * </p>
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean

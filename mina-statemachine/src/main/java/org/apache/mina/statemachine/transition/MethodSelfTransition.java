@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * Normally you wouldn't create instances of this class directly but rather use
  * the {@link SelfTransition} annotation to define the methods which should be
  * used as transitions in your state machine and then let
- * {@link org.apache.mina.statemachine#StateMachineFactory} create a
+ * {@link org.apache.mina.statemachine.StateMachineFactory} create a
  * {@link StateMachine} for you.
  * </p>
  * 

@@ -83,7 +83,7 @@ public interface IoSessionAttributeMap {
      * with the following code except that the operation is performed
      * atomically.
      * <pre>
-     * if (containsAttribute(key) && getAttribute(key).equals(value)) {
+     * if (containsAttribute(key) &amp;&amp; getAttribute(key).equals(value)) {
      *     removeAttribute(key);
      *     return true;
      * } else {
@@ -99,7 +99,7 @@ public interface IoSessionAttributeMap {
      * This method is same with the following code except that the operation
      * is performed atomically.
      * <pre>
-     * if (containsAttribute(key) && getAttribute(key).equals(oldValue)) {
+     * if (containsAttribute(key) &amp;&amp; getAttribute(key).equals(oldValue)) {
      *     setAttribute(key, newValue);
      *     return true;
      * } else {

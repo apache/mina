@@ -126,7 +126,7 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
      * if access is granted.
      * 
      * @param buf the buffer holding the server response data.
-     * @throws exception if server response is malformed or if request is rejected
+     * @throws Exception if server response is malformed or if request is rejected
      * by the proxy server.
      */
     protected void handleResponse(final IoBuffer buf) throws Exception {
