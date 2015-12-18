@@ -244,14 +244,12 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      * {@link SocketAddress}. This operation is non-blocking, so at end of the
      * call the socket can be still in connection process.
      * 
-     * @param handle
-     *            the client socket handle
-     * @param remoteAddress
-     *            the remote address where to connect
+     * @param handle the client socket handle
+     * @param remoteAddress the remote address where to connect
      * @return <tt>true</tt> if a connection was established, <tt>false</tt> if
      *         this client socket is in non-blocking mode and the connection
      *         operation is in progress
-     * @throws Exception
+     * @throws Exception If the connect failed
      */
     protected abstract boolean connect(H handle, SocketAddress remoteAddress) throws Exception;
 
@@ -304,9 +302,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      * processed (connected or failed to connect). All the client socket
      * descriptors processed need to be returned by {@link #selectedHandles()}
      * 
+     * @param timeout The timeout for the select() method
      * @return The number of socket having received some data
-     * @throws Exception
-     *             any exception thrown by the underlying systems calls
+     * @throws Exception any exception thrown by the underlying systems calls
      */
     protected abstract int select(int timeout) throws Exception;
 

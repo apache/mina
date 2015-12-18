@@ -39,31 +39,35 @@ import org.apache.mina.core.session.IoSessionDataStructureFactory;
  */
 public interface IoService {
     /**
-     * Returns the {@link TransportMetadata} that this service runs on.
+     * @return the {@link TransportMetadata} that this service runs on.
      */
     TransportMetadata getTransportMetadata();
 
     /**
      * Adds an {@link IoServiceListener} that listens any events related with
      * this service.
+     * 
+     * @param listener The listener to add
      */
     void addListener(IoServiceListener listener);
 
     /**
      * Removed an existing {@link IoServiceListener} that listens any events
      * related with this service.
+     * 
+     * @param listener The listener to use
      */
     void removeListener(IoServiceListener listener);
 
     /**
-     * Returns <tt>true</tt> if and if only {@link #dispose()} method has
+     * @return <tt>true</tt> if and if only {@link #dispose()} method has
      * been called.  Please note that this method will return <tt>true</tt>
      * even after all the related resources are released.
      */
     boolean isDisposing();
 
     /**
-     * Returns <tt>true</tt> if and if only all resources of this processor
+     * @return <tt>true</tt> if and if only all resources of this processor
      * have been disposed.
      */
     boolean isDisposed();
@@ -87,12 +91,14 @@ public interface IoService {
     void dispose(boolean awaitTermination);
 
     /**
-     * Returns the handler which will handle all connections managed by this service.
+     * @return the handler which will handle all connections managed by this service.
      */
     IoHandler getHandler();
 
     /**
      * Sets the handler which will handle all connections managed by this service.
+     * 
+     * @param handler The IoHandler to use
      */
     void setHandler(IoHandler handler);
 
@@ -108,12 +114,16 @@ public interface IoService {
     /**
      * Returns the number of all sessions which are currently managed by this
      * service.
+     * 
+     * @return The number of managed sessions
      */
     int getManagedSessionCount();
 
     /**
      * Returns the default configuration of the new {@link IoSession}s
      * created by this service.
+     * 
+     * @return The session config
      */
     IoSessionConfig getSessionConfig();
 
@@ -122,6 +132,8 @@ public interface IoService {
      * {@link IoFilterChain} of all {@link IoSession}s which is created
      * by this service.
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
+     * 
+     * @return The filter chain builder in use
      */
     IoFilterChainBuilder getFilterChainBuilder();
 
@@ -131,6 +143,8 @@ public interface IoService {
      * by this service.
      * If you specify <tt>null</tt> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
+     * 
+     * @param builder The filter chain builder to use
      */
     void setFilterChainBuilder(IoFilterChainBuilder builder);
 
@@ -141,6 +155,7 @@ public interface IoService {
      * won't affect the existing {@link IoSession}s at all, because
      * {@link IoFilterChainBuilder}s affect only newly created {@link IoSession}s.
      *
+     * @return The filter chain in use
      * @throws IllegalStateException if the current {@link IoFilterChainBuilder} is
      *                               not a {@link DefaultIoFilterChainBuilder}
      */
@@ -165,18 +180,25 @@ public interface IoService {
      * Writes the specified {@code message} to all the {@link IoSession}s
      * managed by this service.  This method is a convenience shortcut for
      * {@link IoUtil#broadcast(Object, Collection)}.
+     * 
+     * @param message the message to broadcast
+     * @return The set of WriteFuture associated to the message being broadcasted
      */
     Set<WriteFuture> broadcast(Object message);
 
     /**
      * Returns the {@link IoSessionDataStructureFactory} that provides
      * related data structures for a new session created by this service.
+     * 
+     * @return The used session factory
      */
     IoSessionDataStructureFactory getSessionDataStructureFactory();
 
     /**
      * Sets the {@link IoSessionDataStructureFactory} that provides
      * related data structures for a new session created by this service.
+     * 
+     * @param sessionDataStructureFactory The factory to use
      */
     void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory);
 

@@ -319,6 +319,8 @@ public abstract class AbstractIoService implements IoService {
     /**
      * Implement this method to release any acquired resources.  This method
      * is invoked only once by {@link #dispose()}.
+     * 
+     * @throws Exception If the dispose failed
      */
     protected abstract void dispose0() throws Exception;
 
@@ -482,6 +484,10 @@ public abstract class AbstractIoService implements IoService {
      * initialization. Do not call this method directly;
      * {@link #initSession(IoSession, IoFuture, IoSessionInitializer)} will call
      * this method instead.
+     * 
+     * @param session The session to initialize
+     * @param future The Future to use
+     * 
      */
     protected void finishSessionInitialization0(IoSession session, IoFuture future) {
         // Do nothing. Extended class might add some specific code

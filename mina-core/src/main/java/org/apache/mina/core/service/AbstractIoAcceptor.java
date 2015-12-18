@@ -409,12 +409,18 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
 
     /**
      * Starts the acceptor, and register the given addresses
+     * 
+     * @param localAddresses The address to bind to
      * @return the {@link Set} of the local addresses which is bound actually
+     * @throws Exception If the bind failed
      */
     protected abstract Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses) throws Exception;
 
     /**
      * Implement this method to perform the actual unbind operation.
+     * 
+     * @param localAddresses The address to unbind from
+     * @throws Exception If the unbind failed
      */
     protected abstract void unbind0(List<? extends SocketAddress> localAddresses) throws Exception;
 

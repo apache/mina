@@ -51,7 +51,7 @@ public interface IoBufferAllocator {
     /**
      * Wraps the specified NIO {@link ByteBuffer} into MINA buffer.
      * 
-     * @param The {@link ByteBuffer} to wrap
+     * @param nioBuffer The {@link ByteBuffer} to wrap
      * @return The {@link IoBuffer} wrapping the {@link ByteBuffer}
      */
     IoBuffer wrap(ByteBuffer nioBuffer);

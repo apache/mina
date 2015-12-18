@@ -835,7 +835,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * @see ByteBuffer#get(byte[])
-     * 
+     *
+     * @param dst The byte[] that will contain the read bytes
      * @return the IoBuffer
      */
     public abstract IoBuffer get(byte[] dst);

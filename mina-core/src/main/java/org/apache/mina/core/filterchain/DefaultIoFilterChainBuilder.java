@@ -74,6 +74,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * Creates a new copy of the specified {@link DefaultIoFilterChainBuilder}.
+     * 
+     * @param filterChain The FilterChain we will copy
      */
     public DefaultIoFilterChainBuilder(DefaultIoFilterChainBuilder filterChain) {
         if (filterChain == null) {
@@ -84,6 +86,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#getEntry(String)
+     * 
+     * @param name The Filter's name we are looking for
+     * @return The found Entry
      */
     public Entry getEntry(String name) {
         for (Entry e : entries) {
@@ -97,6 +102,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#getEntry(IoFilter)
+     * 
+     * @param filter The Filter we are looking for
+     * @return The found Entry
      */
     public Entry getEntry(IoFilter filter) {
         for (Entry e : entries) {
@@ -110,6 +118,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#getEntry(Class)
+     * 
+     * @param filterType The FilterType we are looking for
+     * @return The found Entry
      */
     public Entry getEntry(Class<? extends IoFilter> filterType) {
         for (Entry e : entries) {
@@ -123,6 +134,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#get(String)
+     * 
+     * @param name The Filter's name we are looking for
+     * @return The found Filter, or null
      */
     public IoFilter get(String name) {
         Entry e = getEntry(name);
@@ -135,6 +149,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#get(Class)
+     * 
+     * @param filterType The FilterType we are looking for
+     * @return The found Filter, or null
      */
     public IoFilter get(Class<? extends IoFilter> filterType) {
         Entry e = getEntry(filterType);
@@ -147,6 +164,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#getAll()
+     * 
+     * @return The list of Filters
      */
     public List<Entry> getAll() {
         return new ArrayList<Entry>(entries);
@@ -154,6 +173,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#getAllReversed()
+     * 
+     * @return The list of Filters, reversed
      */
     public List<Entry> getAllReversed() {
         List<Entry> result = getAll();
@@ -163,6 +184,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#contains(String)
+     * 
+     * @param name The Filter's name we want to check if it's in the chain
+     * @return <tt>true</tt> if the chain contains the given filter name
      */
     public boolean contains(String name) {
         return getEntry(name) != null;
@@ -170,6 +194,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#contains(IoFilter)
+     * 
+     * @param filter The Filter we want to check if it's in the chain
+     * @return <tt>true</tt> if the chain contains the given filter
      */
     public boolean contains(IoFilter filter) {
         return getEntry(filter) != null;
@@ -177,6 +204,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#contains(Class)
+     * 
+     * @param filterType The FilterType we want to check if it's in the chain
+     * @return <tt>true</tt> if the chain contains the given filterType
      */
     public boolean contains(Class<? extends IoFilter> filterType) {
         return getEntry(filterType) != null;
@@ -184,6 +214,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#addFirst(String, IoFilter)
+     * 
+     * @param name The filter's name
+     * @param filter The filter to add
      */
     public synchronized void addFirst(String name, IoFilter filter) {
         register(0, new EntryImpl(name, filter));
@@ -191,6 +224,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#addLast(String, IoFilter)
+     * 
+     * @param name The filter's name
+     * @param filter The filter to add
      */
     public synchronized void addLast(String name, IoFilter filter) {
         register(entries.size(), new EntryImpl(name, filter));
@@ -198,6 +234,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#addBefore(String, String, IoFilter)
+     * 
+     * @param baseName The filter baseName
+     * @param name The filter's name
+     * @param filter The filter to add
      */
     public synchronized void addBefore(String baseName, String name, IoFilter filter) {
         checkBaseName(baseName);
@@ -213,6 +253,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#addAfter(String, String, IoFilter)
+     * 
+     * @param baseName The filter baseName
+     * @param name The filter's name
+     * @param filter The filter to add
      */
     public synchronized void addAfter(String baseName, String name, IoFilter filter) {
         checkBaseName(baseName);
@@ -228,6 +272,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#remove(String)
+     * 
+     * @param name The Filter's name to remove from the list of Filters
+     * @return The removed IoFilter
      */
     public synchronized IoFilter remove(String name) {
         if (name == null) {
@@ -247,6 +294,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#remove(IoFilter)
+     * 
+     * @param filter The Filter we want to remove from the list of Filters
+     * @return The removed IoFilter
      */
     public synchronized IoFilter remove(IoFilter filter) {
         if (filter == null) {
@@ -266,6 +316,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     /**
      * @see IoFilterChain#remove(Class)
+     * 
+     * @param filterType The FilterType we want to remove from the list of Filters
+     * @return The removed IoFilter
      */
     public synchronized IoFilter remove(Class<? extends IoFilter> filterType) {
         if (filterType == null) {
@@ -324,6 +377,8 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * a {@link Map} implementation that iterates the filter mapping in the
      * order of insertion such as {@link LinkedHashMap}.  Otherwise, it will
      * throw an {@link IllegalArgumentException}.
+     * 
+     * @param filters The list of filters to set
      */
     public void setFilters(Map<String, ? extends IoFilter> filters) {
         if (filters == null) {

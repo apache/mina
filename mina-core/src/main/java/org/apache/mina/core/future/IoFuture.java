@@ -101,6 +101,9 @@ public interface IoFuture {
 
     /**
      * @deprecated Replaced with {@link #awaitUninterruptibly(long)}.
+     * 
+     * @param timeoutMillis The time to wait for the join before bailing out
+     * @return <tt>true</tt> if the join was successful
      */
     @Deprecated
     boolean join(long timeoutMillis);

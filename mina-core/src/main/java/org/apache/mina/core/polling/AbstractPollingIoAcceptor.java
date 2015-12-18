@@ -256,6 +256,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
 
     /**
      * Initialize the polling system, will be called at construction time.
+     * 
+     * @param selectorProvider The Selector Provider that will be used by this polling acceptor
      * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract void init(SelectorProvider selectorProvider) throws Exception;

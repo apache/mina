@@ -64,7 +64,7 @@ public class IoBufferWrapper extends IoBuffer {
     }
 
     /**
-     * Returns the parent buffer that this buffer wrapped.
+     * @return the parent buffer that this buffer wrapped.
      */
     public IoBuffer getParentBuffer() {
         return buf;

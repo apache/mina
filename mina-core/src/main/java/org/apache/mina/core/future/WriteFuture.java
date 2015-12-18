@@ -78,7 +78,7 @@ public interface WriteFuture extends IoFuture {
      * completed.
      * 
      * @return the created {@link WriteFuture}
-     * @throws InterruptedException
+     * @throws InterruptedException If the wait is interrupted
      */
     WriteFuture await() throws InterruptedException;
 

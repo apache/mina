@@ -337,12 +337,12 @@ public interface IoFilterChain {
      */
     public interface Entry {
         /**
-         * Returns the name of the filter.
+         * @return the name of the filter.
          */
         String getName();
 
         /**
-         * Returns the filter.
+         * @return the filter.
          */
         IoFilter getFilter();
 
@@ -353,16 +353,24 @@ public interface IoFilterChain {
 
         /**
          * Adds the specified filter with the specified name just before this entry.
+         * 
+         * @param name The Filter's name
+         * @param filter The added Filter 
          */
         void addBefore(String name, IoFilter filter);
 
         /**
          * Adds the specified filter with the specified name just after this entry.
+         * 
+         * @param name The Filter's name
+         * @param filter The added Filter 
          */
         void addAfter(String name, IoFilter filter);
 
         /**
          * Replace the filter of this entry with the specified new filter.
+         * 
+         * @param newFilter The new filter that will be put in the chain 
          */
         void replace(IoFilter newFilter);
 

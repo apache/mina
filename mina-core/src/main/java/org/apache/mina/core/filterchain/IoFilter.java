@@ -276,48 +276,75 @@ public interface IoFilter {
     public interface NextFilter {
         /**
          * Forwards <tt>sessionCreated</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
          */
         void sessionCreated(IoSession session);
 
         /**
          * Forwards <tt>sessionOpened</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
          */
         void sessionOpened(IoSession session);
 
         /**
          * Forwards <tt>sessionClosed</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
          */
         void sessionClosed(IoSession session);
 
         /**
          * Forwards <tt>sessionIdle</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
+         * @param status The {@link IdleStatus} type
          */
         void sessionIdle(IoSession session, IdleStatus status);
 
         /**
          * Forwards <tt>exceptionCaught</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
+         * @param cause The exception that cause this event to be received
          */
         void exceptionCaught(IoSession session, Throwable cause);
 
+        /**
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
+         */
         void inputClosed(IoSession session);
 
         /**
          * Forwards <tt>messageReceived</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
+         * @param message The received message
          */
         void messageReceived(IoSession session, Object message);
 
         /**
          * Forwards <tt>messageSent</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
+         * @param writeRequest The {@link WriteRequest} to process
          */
         void messageSent(IoSession session, WriteRequest writeRequest);
 
         /**
          * Forwards <tt>filterWrite</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
+         * @param writeRequest The {@link WriteRequest} to process
          */
         void filterWrite(IoSession session, WriteRequest writeRequest);
 
         /**
          * Forwards <tt>filterClose</tt> event to next filter.
+         * 
+         * @param session The {@link IoSession} which has to process this invocation
          */
         void filterClose(IoSession session);
 
