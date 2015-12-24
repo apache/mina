@@ -160,7 +160,8 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
             StringBuilder sb = new StringBuilder("Digest ");
             boolean addSeparator = false;
 
-            for (String key : map.keySet()) {
+            for ( Map.Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
 
                 if (addSeparator) {
                     sb.append(", ");
@@ -170,10 +171,11 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
 
                 boolean quotedValue = !"qop".equals(key) && !"nc".equals(key);
                 sb.append(key);
+                
                 if (quotedValue) {
-                    sb.append("=\"").append(map.get(key)).append('\"');
+                    sb.append("=\"").append(entry.getValue()).append('\"');
                 } else {
-                    sb.append('=').append(map.get(key));
+                    sb.append('=').append(entry.getValue());
                 }
             }
 
