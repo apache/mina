@@ -55,6 +55,7 @@ import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteTimeoutException;
 import org.apache.mina.core.write.WriteToClosedSessionException;
+import org.apache.mina.proxy.utils.StringUtilities;
 import org.apache.mina.util.ExceptionMonitor;
 
 /**
@@ -178,7 +179,9 @@ public abstract class AbstractIoSession implements IoSession {
     private boolean deferDecreaseReadBuffer = true;
 
     /**
-     * TODO Add method documentation
+     * Create a Session for a service
+     * 
+     * @param service the Service for this session
      */
     protected AbstractIoSession(IoService service) {
         this.service = service;
@@ -376,77 +379,92 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Associates a message to a ReadFuture
+     * 
+     * @param message the message to associate to the ReadFuture
+     * 
      */
     public final void offerReadFuture(Object message) {
         newReadFuture().setRead(message);
     }
 
     /**
-     * TODO Add method documentation
+     * Associates a failure to a ReadFuture
+     * 
+     * @param exception the exception to associate to the ReadFuture
      */
     public final void offerFailedReadFuture(Throwable exception) {
         newReadFuture().setException(exception);
     }
 
     /**
-     * TODO Add method documentation
+     * Inform the ReadFuture that the session has been closed
      */
     public final void offerClosedReadFuture() {
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
+        
         synchronized (readyReadFutures) {
             newReadFuture().setClosed();
         }
     }
 
     /**
-     * TODO Add method documentation
+     * @return a readFuture get from the waiting ReadFuture
      */
     private ReadFuture newReadFuture() {
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
         Queue<ReadFuture> waitingReadFutures = getWaitingReadFutures();
         ReadFuture future;
+        
         synchronized (readyReadFutures) {
             future = waitingReadFutures.poll();
+            
             if (future == null) {
                 future = new DefaultReadFuture(this);
                 readyReadFutures.offer(future);
             }
         }
+        
         return future;
     }
 
     /**
-     * TODO Add method documentation
+     * @return a queue of ReadFuture
      */
     private Queue<ReadFuture> getReadyReadFutures() {
         Queue<ReadFuture> readyReadFutures = (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES_KEY);
+        
         if (readyReadFutures == null) {
             readyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
 
             Queue<ReadFuture> oldReadyReadFutures = (Queue<ReadFuture>) setAttributeIfAbsent(READY_READ_FUTURES_KEY,
                     readyReadFutures);
+            
             if (oldReadyReadFutures != null) {
                 readyReadFutures = oldReadyReadFutures;
             }
         }
+        
         return readyReadFutures;
     }
 
     /**
-     * TODO Add method documentation
+     * @return the queue of waiting ReadFuture
      */
     private Queue<ReadFuture> getWaitingReadFutures() {
         Queue<ReadFuture> waitingReadyReadFutures = (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES_KEY);
+        
         if (waitingReadyReadFutures == null) {
             waitingReadyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
 
             Queue<ReadFuture> oldWaitingReadyReadFutures = (Queue<ReadFuture>) setAttributeIfAbsent(
                     WAITING_READ_FUTURES_KEY, waitingReadyReadFutures);
+            
             if (oldWaitingReadyReadFutures != null) {
                 waitingReadyReadFutures = oldWaitingReadyReadFutures;
             }
         }
+        
         return waitingReadyReadFutures;
     }
 
@@ -625,14 +643,16 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * @return The map of attributes associated with the session
      */
     public final IoSessionAttributeMap getAttributeMap() {
         return attributes;
     }
 
     /**
-     * TODO Add method documentation
+     * Set the map of attributes associated with the session
+     * 
+     * @param attributes The Map of attributes
      */
     public final void setAttributeMap(IoSessionAttributeMap attributes) {
         this.attributes = attributes;
@@ -641,8 +661,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * Create a new close aware write queue, based on the given write queue.
      * 
-     * @param writeRequestQueue
-     *            The write request queue
+     * @param writeRequestQueue The write request queue
      */
     public final void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
         this.writeRequestQueue = new CloseAwareWriteQueue(writeRequestQueue);
@@ -804,21 +823,28 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Set the number of scheduled write bytes
+     * 
+     * @param byteCount The number of scheduled bytes for write
      */
     protected void setScheduledWriteBytes(int byteCount) {
         scheduledWriteBytes.set(byteCount);
     }
 
     /**
-     * TODO Add method documentation
+     * Set the number of scheduled write messages
+     * 
+     * @param messages The number of scheduled messages for write
      */
     protected void setScheduledWriteMessages(int messages) {
         scheduledWriteMessages.set(messages);
     }
 
     /**
-     * TODO Add method documentation
+     * Increase the number of read bytes
+     * 
+     * @param increment The number of read bytes
+     * @param currentTime The current time
      */
     public final void increaseReadBytes(long increment, long currentTime) {
         if (increment <= 0) {
@@ -836,7 +862,9 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Increase the number of read messages
+     * 
+     * @param currentTime The current time
      */
     public final void increaseReadMessages(long currentTime) {
         readMessages++;
@@ -850,7 +878,10 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Increase the number of written bytes
+     * 
+     * @param increment The number of written bytes
+     * @param currentTime The current time
      */
     public final void increaseWrittenBytes(int increment, long currentTime) {
         if (increment <= 0) {
@@ -870,7 +901,10 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Increase the number of written messages
+     * 
+     * @param request The written message
+     * @param currentTime The current tile
      */
     public final void increaseWrittenMessages(WriteRequest request, long currentTime) {
         Object message = request.getMessage();
@@ -896,8 +930,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * Increase the number of scheduled write bytes for the session
      * 
-     * @param increment
-     *            The number of newly added bytes to write
+     * @param increment The number of newly added bytes to write
      */
     public final void increaseScheduledWriteBytes(int increment) {
         scheduledWriteBytes.addAndGet(increment);
@@ -907,17 +940,18 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Increase the number of scheduled message to write
      */
     public final void increaseScheduledWriteMessages() {
         scheduledWriteMessages.incrementAndGet();
+        
         if (getService() instanceof AbstractIoService) {
             ((AbstractIoService) getService()).getStatistics().increaseScheduledWriteMessages();
         }
     }
 
     /**
-     * TODO Add method documentation
+     * Decrease the number of scheduled message written
      */
     private void decreaseScheduledWriteMessages() {
         scheduledWriteMessages.decrementAndGet();
@@ -927,12 +961,16 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Decrease the counters of written messages and written bytes when a message has been written
+     * 
+     * @param request The written message
      */
     public final void decreaseScheduledBytesAndMessages(WriteRequest request) {
         Object message = request.getMessage();
+        
         if (message instanceof IoBuffer) {
             IoBuffer b = (IoBuffer) message;
+            
             if (b.hasRemaining()) {
                 increaseScheduledWriteBytes(-((IoBuffer) message).remaining());
             } else {
@@ -950,6 +988,7 @@ public abstract class AbstractIoSession implements IoSession {
         if (writeRequestQueue == null) {
             throw new IllegalStateException();
         }
+        
         return writeRequestQueue;
     }
 
@@ -965,6 +1004,7 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public final Object getCurrentWriteMessage() {
         WriteRequest req = getCurrentWriteRequest();
+        
         if (req == null) {
             return null;
         }
@@ -979,7 +1019,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Increase the ReadBuffer size (it will double)
      */
     public final void increaseReadBufferSize() {
         int newReadBufferSize = getConfig().getReadBufferSize() << 1;
@@ -993,7 +1033,7 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Decrease the ReadBuffer size (it will be divided by a factor 2)
      */
     public final void decreaseReadBufferSize() {
         if (deferDecreaseReadBuffer) {
@@ -1129,7 +1169,10 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Increase the count of the various Idle counter
+     * 
+     * @param status The current status
+     * @param currentTime The current time
      */
     public final void increaseIdleCount(IdleStatus status, long currentTime) {
         if (status == IdleStatus.BOTH_IDLE) {
@@ -1248,23 +1291,20 @@ public abstract class AbstractIoSession implements IoSession {
     }
 
     /**
-     * TODO Add method documentation
+     * Get the Id as a String
      */
     private String getIdAsString() {
         String id = Long.toHexString(getId()).toUpperCase();
-
-        // Somewhat inefficient, but it won't happen that often
-        // because an ID is often a big integer.
-        while (id.length() < 8) {
-            id = '0' + id; // padding
+        
+        if (id.length() <= 8) {
+            return "0x00000000".substring(0, 10 - id.length()) + id;
+        } else {
+            return "0x" + id;
         }
-        id = "0x" + id;
-
-        return id;
     }
 
     /**
-     * TODO Add method documentation
+     * TGet the Service name
      */
     private String getServiceName() {
         TransportMetadata tm = getTransportMetadata();
@@ -1286,8 +1326,8 @@ public abstract class AbstractIoSession implements IoSession {
      * Fires a {@link IoEventType#SESSION_IDLE} event to any applicable sessions
      * in the specified collection.
      * 
-     * @param currentTime
-     *            the current time (i.e. {@link System#currentTimeMillis()})
+     * @param sessions The sessions that are notified
+     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleness(Iterator<? extends IoSession> sessions, long currentTime) {
         IoSession s = null;
@@ -1301,8 +1341,8 @@ public abstract class AbstractIoSession implements IoSession {
      * Fires a {@link IoEventType#SESSION_IDLE} event if applicable for the
      * specified {@code session}.
      * 
-     * @param currentTime
-     *            the current time (i.e. {@link System#currentTimeMillis()})
+     * @param session The session that is notified
+     * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleSession(IoSession session, long currentTime) {
         notifyIdleSession0(session, currentTime, session.getConfig().getIdleTimeInMillis(IdleStatus.BOTH_IDLE),
