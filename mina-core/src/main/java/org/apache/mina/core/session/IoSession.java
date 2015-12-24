@@ -98,7 +98,13 @@ public interface IoSession {
     IoFilterChain getFilterChain();
 
     /**
-     * TODO Add method documentation
+     * Get the queue that contains the message waiting for being written.
+     * As the reader might not be ready, it's frequent that the messages
+     * aren't written completely, or that some older messages are waiting
+     * to be written when a new message arrives. This queue is used to manage
+     * the backlog of messages.
+     * 
+     * @return The queue containing the pending messages.
      */
     WriteRequestQueue getWriteRequestQueue();
 
@@ -133,6 +139,9 @@ public interface IoSession {
      * will be invoked when the message is actually sent to remote peer.
      * You can also wait for the returned {@link WriteFuture} if you want
      * to wait for the message actually written.
+     * 
+     * @param message The message to write
+     * @return The associated WriteFuture
      */
     WriteFuture write(Object message);
 
@@ -150,11 +159,11 @@ public interface IoSession {
      * way to specify the destination when you write the response message.
      * This interface provides {@link #write(Object, SocketAddress)} method so you
      * can specify the destination.
-     *
+     * 
+     * @param message The message to write
      * @param destination <tt>null</tt> if you want the message sent to the
      *                    default remote address
-     *
-     * @throws UnsupportedOperationException if this operation is not supported
+     * @return The associated WriteFuture
      */
     WriteFuture write(Object message, SocketAddress destination);
 
@@ -168,6 +177,7 @@ public interface IoSession {
      *                    will simply be discarded.
      *                    {@code false} to close this session after all queued
      *                    write requests are flushed.
+     * @return The associated CloseFuture
      */
     CloseFuture close(boolean immediately);
 
@@ -176,6 +186,8 @@ public interface IoSession {
      * are flushed. This operation is asynchronous.  Wait for the returned
      * {@link CloseFuture} if you want to wait for the session actually closed.
      * @deprecated use {@link #close(boolean)}
+     * 
+     * @return The associated CloseFuture
      */
     @Deprecated
     CloseFuture close();
@@ -184,6 +196,7 @@ public interface IoSession {
      * Returns an attachment of this session.
      * This method is identical with <tt>getAttribute( "" )</tt>.
      *
+     * @return The attachment
      * @deprecated Use {@link #getAttribute(Object)} instead.
      */
     @Deprecated
@@ -193,7 +206,8 @@ public interface IoSession {
      * Sets an attachment of this session.
      * This method is identical with <tt>setAttribute( "", attachment )</tt>.
      *
-     * @return Old attachment.  <tt>null</tt> if it is new.
+     * @param attachment The attachment
+     * @return Old attachment. <tt>null</tt> if it is new.
      * @deprecated Use {@link #setAttribute(Object, Object)} instead.
      */
     @Deprecated
@@ -221,13 +235,17 @@ public interface IoSession {
      *     return defaultValue;
      * }
      * </pre>
+     * 
+     * @param key the key of the attribute we want to retreive
+     * @param defaultValue the default value of the attribute
+     * @return The retrieved attribute or <tt>null</tt> if not found
      */
     Object getAttribute(Object key, Object defaultValue);
 
     /**
      * Sets a user-defined attribute.
      *
-     * @param key   the key of the attribute
+     * @param key the key of the attribute
      * @param value the value of the attribute
      * @return The old value of the attribute.  <tt>null</tt> if it is new.
      */
@@ -254,6 +272,10 @@ public interface IoSession {
      *     return setAttribute(key, value);
      * }
      * </pre>
+     * 
+     * @param key The key of the attribute we want to set
+     * @param value The value we want to set
+     * @return The old value of the attribute.  <tt>null</tt> if not found.
      */
     Object setAttributeIfAbsent(Object key, Object value);
 
@@ -270,12 +292,16 @@ public interface IoSession {
      *     return setAttribute(key);
      * }
      * </pre>
+     * 
+     * @param key The key of the attribute we want to set
+     * @return The old value of the attribute.  <tt>null</tt> if not found.
      */
     Object setAttributeIfAbsent(Object key);
 
     /**
      * Removes a user-defined attribute with the specified key.
      *
+     * @param key The key of the attribute we want to remove
      * @return The old value of the attribute.  <tt>null</tt> if not found.
      */
     Object removeAttribute(Object key);
@@ -293,6 +319,10 @@ public interface IoSession {
      *     return false;
      * }
      * </pre>
+     * 
+     * @param key The key we want to remove
+     * @param value The value we want to remove
+     * @return <tt>true</tt> if the removal was successful
      */
     boolean removeAttribute(Object key, Object value);
 
@@ -309,11 +339,17 @@ public interface IoSession {
      *     return false;
      * }
      * </pre>
+     * 
+     * @param key The key we want to replace
+     * @param oldValue The previous value
+     * @param newValue The new value
+     * @return <tt>true</tt> if the replacement was successful
      */
     boolean replaceAttribute(Object key, Object oldValue, Object newValue);
 
     /**
-     * Returns <tt>true</tt> if this session contains the attribute with
+     * @param key The key of the attribute we are looking for in the session 
+     * @return <tt>true</tt> if this session contains the attribute with
      * the specified <tt>key</tt>.
      */
     boolean containsAttribute(Object key);
@@ -342,24 +378,24 @@ public interface IoSession {
     boolean isSecured();
 
     /**
-     * Returns the {@link CloseFuture} of this session.  This method returns
+     * @return the {@link CloseFuture} of this session.  This method returns
      * the same instance whenever user calls it.
      */
     CloseFuture getCloseFuture();
 
     /**
-     * Returns the socket address of remote peer.
+     * @return the socket address of remote peer.
      */
     SocketAddress getRemoteAddress();
 
     /**
-     * Returns the socket address of local machine which is associated with this
+     * @return the socket address of local machine which is associated with this
      * session.
      */
     SocketAddress getLocalAddress();
 
     /**
-     * Returns the socket address of the {@link IoService} listens to to manage
+     * @return the socket address of the {@link IoService} listens to to manage
      * this session.  If this session is managed by {@link IoAcceptor}, it
      * returns the {@link SocketAddress} which is specified as a parameter of
      * {@link IoAcceptor#bind()}.  If this session is managed by
@@ -398,12 +434,14 @@ public interface IoSession {
 
     /**
      * Is read operation is suspended for this session. 
+     * 
      * @return <code>true</code> if suspended
      */
     boolean isReadSuspended();
 
     /**
      * Is write operation is suspended for this session.
+     * 
      * @return <code>true</code> if suspended
      */
     boolean isWriteSuspended();
@@ -418,56 +456,57 @@ public interface IoSession {
      * updates the throughput properties immediately.
 
      * @param currentTime the current time in milliseconds
+     * @param force Force the update if <tt>true</tt>
      */
     void updateThroughput(long currentTime, boolean force);
 
     /**
-     * Returns the total number of bytes which were read from this session.
+     * @return the total number of bytes which were read from this session.
      */
     long getReadBytes();
 
     /**
-     * Returns the total number of bytes which were written to this session.
+     * @return the total number of bytes which were written to this session.
      */
     long getWrittenBytes();
 
     /**
-     * Returns the total number of messages which were read and decoded from this session.
+     * @return the total number of messages which were read and decoded from this session.
      */
     long getReadMessages();
 
     /**
-     * Returns the total number of messages which were written and encoded by this session.
+     * @return the total number of messages which were written and encoded by this session.
      */
     long getWrittenMessages();
 
     /**
-     * Returns the number of read bytes per second.
+     * @return the number of read bytes per second.
      */
     double getReadBytesThroughput();
 
     /**
-     * Returns the number of written bytes per second.
+     * @return the number of written bytes per second.
      */
     double getWrittenBytesThroughput();
 
     /**
-     * Returns the number of read messages per second.
+     * @return the number of read messages per second.
      */
     double getReadMessagesThroughput();
 
     /**
-     * Returns the number of written messages per second.
+     * @return the number of written messages per second.
      */
     double getWrittenMessagesThroughput();
 
     /**
-     * Returns the number of messages which are scheduled to be written to this session.
+     * @return the number of messages which are scheduled to be written to this session.
      */
     int getScheduledWriteMessages();
 
     /**
-     * Returns the number of bytes which are scheduled to be written to this
+     * @return the number of bytes which are scheduled to be written to this
      * session.
      */
     long getScheduledWriteBytes();
@@ -492,49 +531,50 @@ public interface IoSession {
     long getCreationTime();
 
     /**
-     * Returns the time in millis when I/O occurred lastly.
+     * @return the time in millis when I/O occurred lastly.
      */
     long getLastIoTime();
 
     /**
-     * Returns the time in millis when read operation occurred lastly.
+     * @return the time in millis when read operation occurred lastly.
      */
     long getLastReadTime();
 
     /**
-     * Returns the time in millis when write operation occurred lastly.
+     * @return the time in millis when write operation occurred lastly.
      */
     long getLastWriteTime();
 
     /**
-     * Returns <code>true</code> if this session is idle for the specified
+     * @param status The researched idle status
+     * @return <code>true</code> if this session is idle for the specified
      * {@link IdleStatus}.
      */
     boolean isIdle(IdleStatus status);
 
     /**
-     * Returns <code>true</code> if this session is {@link IdleStatus#READER_IDLE}.
+     * @return <code>true</code> if this session is {@link IdleStatus#READER_IDLE}.
      * @see #isIdle(IdleStatus)
      */
     boolean isReaderIdle();
 
     /**
-     * Returns <code>true</code> if this session is {@link IdleStatus#WRITER_IDLE}.
+     * @return <code>true</code> if this session is {@link IdleStatus#WRITER_IDLE}.
      * @see #isIdle(IdleStatus)
      */
     boolean isWriterIdle();
 
     /**
-     * Returns <code>true</code> if this session is {@link IdleStatus#BOTH_IDLE}.
+     * @return <code>true</code> if this session is {@link IdleStatus#BOTH_IDLE}.
      * @see #isIdle(IdleStatus)
      */
     boolean isBothIdle();
 
     /**
-     * <p>
-     * Returns the number of the fired continuous <tt>sessionIdle</tt> events
+     * @param status The researched idle status
+     * @return the number of the fired continuous <tt>sessionIdle</tt> events
      * for the specified {@link IdleStatus}.
-     * </p>
+     * <p>
      * If <tt>sessionIdle</tt> event is fired first after some time after I/O,
      * <tt>idleCount</tt> becomes <tt>1</tt>.  <tt>idleCount</tt> resets to
      * <tt>0</tt> if any I/O occurs again, otherwise it increases to
@@ -544,48 +584,49 @@ public interface IoSession {
     int getIdleCount(IdleStatus status);
 
     /**
-     * Returns the number of the fired continuous <tt>sessionIdle</tt> events
+     * @return the number of the fired continuous <tt>sessionIdle</tt> events
      * for {@link IdleStatus#READER_IDLE}.
      * @see #getIdleCount(IdleStatus)
      */
     int getReaderIdleCount();
 
     /**
-     * Returns the number of the fired continuous <tt>sessionIdle</tt> events
+     * @return the number of the fired continuous <tt>sessionIdle</tt> events
      * for {@link IdleStatus#WRITER_IDLE}.
      * @see #getIdleCount(IdleStatus)
      */
     int getWriterIdleCount();
 
     /**
-     * Returns the number of the fired continuous <tt>sessionIdle</tt> events
+     * @return the number of the fired continuous <tt>sessionIdle</tt> events
      * for {@link IdleStatus#BOTH_IDLE}.
      * @see #getIdleCount(IdleStatus)
      */
     int getBothIdleCount();
 
     /**
-     * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
+     * @param status The researched idle status
+     * @return the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for the specified {@link IdleStatus}.
      */
     long getLastIdleTime(IdleStatus status);
 
     /**
-     * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
+     * @return the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for {@link IdleStatus#READER_IDLE}.
      * @see #getLastIdleTime(IdleStatus)
      */
     long getLastReaderIdleTime();
 
     /**
-     * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
+     * @return the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for {@link IdleStatus#WRITER_IDLE}.
      * @see #getLastIdleTime(IdleStatus)
      */
     long getLastWriterIdleTime();
 
     /**
-     * Returns the time in milliseconds when the last <tt>sessionIdle</tt> event
+     * @return the time in milliseconds when the last <tt>sessionIdle</tt> event
      * is fired for {@link IdleStatus#BOTH_IDLE}.
      * @see #getLastIdleTime(IdleStatus)
      */
