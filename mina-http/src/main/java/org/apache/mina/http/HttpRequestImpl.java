@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -124,24 +125,29 @@ public class HttpRequestImpl implements HttpRequest {
     }
 
     public String toString() {
-        String result = "HTTP REQUEST METHOD: " + method + "\n";
-        result += "VERSION: " + version + "\n";
-        result += "PATH: " + requestedPath + "\n";
-        result += "QUERY:" + queryString + "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("HTTP REQUEST METHOD: ").append(method).append('\n');
+        sb.append("VERSION: ").append(version).append('\n');
+        sb.append("PATH: ").append(requestedPath).append('\n');
+        sb.append("QUERY:").append(queryString).append('\n');
 
-        result += "--- HEADER --- \n";
-        for (String key : headers.keySet()) {
-            String value = headers.get(key);
-            result += key + ":" + value + "\n";
+        sb.append("--- HEADER --- \n");
+        
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            sb.append(entry.getKey()).append(':').append(entry.getValue()).append('\n');
         }
 
-        result += "--- PARAMETERS --- \n";
+        sb.append("--- PARAMETERS --- \n");
         Map<String, List<String>> parameters = getParameters();
-        for (String key : parameters.keySet()) {
-        	Collection<String> values = parameters.get(key);
-        	for (String value : values) { result += key + ":" + value + "\n"; }
+
+        for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
+            String key = entry.getKey();
+            
+            for (String value : entry.getValue()) { 
+                sb.append(key).append(':').append(value).append('\n'); 
+            }
         }
         
-        return result;
+        return sb.toString();
     }
 }

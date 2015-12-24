@@ -66,15 +66,16 @@ public class DefaultHttpResponse implements HttpResponse {
 
     @Override
     public String toString() {
-        String result = "HTTP RESPONSE STATUS: " + status + "\n";
-        result += "VERSION: " + version + "\n";
-
-        result += "--- HEADER --- \n";
-        for (String key : headers.keySet()) {
-            String value = headers.get(key);
-            result += key + ":" + value + "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("HTTP RESPONSE STATUS: " ).append(status).append('\n');
+        sb.append("VERSION: ").append(version).append('\n');
+        
+        sb.append("-- HEADER --- \n");
+        
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            sb.append(entry.getKey()).append(':').append(entry.getValue()).append('\n');
         }
 
-        return result;
+        return sb.toString();
     }
 }
