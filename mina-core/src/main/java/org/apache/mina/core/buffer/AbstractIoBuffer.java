@@ -2336,10 +2336,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             int r = size & 7;
 
             if (q > 0) {
-                int intValue = value | value << 8 | value << 16 | value << 24;
-                long longValue = intValue;
-                longValue <<= 32;
-                longValue |= intValue;
+                int intValue = value & 0x000000FF | ( value << 8 ) & 0x0000FF00 | ( value << 16 ) & 0x00FF0000 | value << 24;
+                long longValue = intValue & 0x00000000FFFFFFFFL | (long)intValue << 32;
 
                 for (int i = q; i > 0; i--) {
                     putLong(longValue);
@@ -2350,7 +2348,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 r = r & 3;
 
                 if (q > 0) {
-                    int intValue = value | value << 8 | value << 16 | value << 24;
+                    int intValue = value & 0x000000FF | ( value << 8 ) & 0x0000FF00 | ( value << 16 ) & 0x00FF0000 | value << 24;
                     putInt(intValue);
                 }
 
@@ -2358,7 +2356,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                     r = r & 1;
 
                     if (q > 0) {
-                        short shortValue = (short) (value | value << 8);
+                        short shortValue = (short) (value & 0x000FF | value << 8);
                         putShort(shortValue);
                     }
 

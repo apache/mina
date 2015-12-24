@@ -1686,4 +1686,18 @@ public class IoBufferTest {
     {
         
     }
+
+    
+    @Test
+    public void testFillByteSize()
+    {
+        int length = 1024*1020;
+        IoBuffer buffer = IoBuffer.allocate(length);
+        buffer.fill((byte)0x80, length);
+        
+        buffer.flip();
+        for (int i=0; i<length; i++) {
+            assertEquals((byte)0x80, buffer.get());
+        }
+    }
 }
