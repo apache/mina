@@ -34,6 +34,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.DummySession;
@@ -522,7 +523,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         synchronized (workers) {
             long answer = completedTaskCount;
             for (Worker w : workers) {
-                answer += w.completedTaskCount;
+                answer += w.completedTaskCount.get();
             }
 
             return answer;
@@ -620,13 +621,13 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         IoEvent event = (IoEvent) task;
         IoSession session = event.getSession();
         SessionTasksQueue sessionTasksQueue = (SessionTasksQueue) session.getAttribute(TASKS_QUEUE);
-        Queue<Runnable> tasksQueue = sessionTasksQueue.tasksQueue;
 
         if (sessionTasksQueue == null) {
             return false;
         }
 
         boolean removed;
+        Queue<Runnable> tasksQueue = sessionTasksQueue.tasksQueue;
 
         synchronized (tasksQueue) {
             removed = tasksQueue.remove(task);
@@ -671,7 +672,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private class Worker implements Runnable {
 
-        private volatile long completedTaskCount;
+        private AtomicLong completedTaskCount = new AtomicLong(0);
 
         private Thread thread;
 
@@ -709,7 +710,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             } finally {
                 synchronized (workers) {
                     workers.remove(this);
-                    OrderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount;
+                    OrderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount.get();
                     workers.notifyAll();
                 }
             }
@@ -769,7 +770,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                 task.run();
                 ran = true;
                 afterExecute(task, null);
-                completedTaskCount++;
+                completedTaskCount.incrementAndGet();
             } catch (RuntimeException e) {
                 if (!ran) {
                     afterExecute(task, e);
