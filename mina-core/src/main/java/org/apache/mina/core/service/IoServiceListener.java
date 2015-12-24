@@ -34,11 +34,13 @@ public interface IoServiceListener extends EventListener {
      * Invoked when a new service is activated by an {@link IoService}.
      *
      * @param service the {@link IoService}
+     * @throws Exception if an error occurred while the service is being activated
      */
     void serviceActivated(IoService service) throws Exception;
 
     /**
      * Invoked when a service is idle.
+     * @throws Exception if an error occurred while the service is being idled
      */
     void serviceIdle(IoService service, IdleStatus idleStatus) throws Exception;
 
@@ -46,6 +48,7 @@ public interface IoServiceListener extends EventListener {
      * Invoked when a service is deactivated by an {@link IoService}.
      *
      * @param service the {@link IoService}
+     * @throws Exception if an error occurred while the service is being deactivated
      */
     void serviceDeactivated(IoService service) throws Exception;
 
@@ -53,22 +56,23 @@ public interface IoServiceListener extends EventListener {
      * Invoked when a new session is created by an {@link IoService}.
      *
      * @param session the new session
+     * @throws Exception if an error occurred while the session is being created
      */
     void sessionCreated(IoSession session) throws Exception;
 
     /**
      * Invoked when a new session is closed by an {@link IoService}.
      * 
-     * @param session
-     *            the new session
+     * @param session the new session
+     * @throws Exception if an error occurred while the session is being closed
      */
     void sessionClosed(IoSession session) throws Exception;
 
     /**
      * Invoked when a session is being destroyed by an {@link IoService}.
      * 
-     * @param session
-     *            the session to be destroyed
+     * @param session the session to be destroyed
+     * @throws Exception if an error occurred while the session is being destroyed
      */
     void sessionDestroyed(IoSession session) throws Exception;
 }
