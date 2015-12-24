@@ -274,9 +274,9 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 String oldFilterName = null;
 
                 // Get the old filter name. It's not really efficient...
-                for (String name : name2entry.keySet()) {
-                    if (entry == name2entry.get(name)) {
-                        oldFilterName = name;
+                for (Map.Entry<String, Entry> mapping : name2entry.entrySet()) {
+                    if (entry == mapping.getValue() ) {
+                        oldFilterName = mapping.getKey();
 
                         break;
                     }
@@ -321,9 +321,9 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 String oldFilterName = null;
 
                 // Get the old filter name. It's not really efficient...
-                for (String name : name2entry.keySet()) {
-                    if (entry == name2entry.get(name)) {
-                        oldFilterName = name;
+                for (Map.Entry<String, Entry> mapping : name2entry.entrySet()) {
+                    if (entry == mapping.getValue() ) {
+                        oldFilterName = mapping.getKey();
 
                         break;
                     }
