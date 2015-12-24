@@ -755,7 +755,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         for (Object e : srcCol) {
             Object convertedValue = convertValue(dst.getClass(), "element", e, false);
             if ((e != null) && (convertedValue == null)) {
-                convertedValue = (e == null ? "" : e.toString());
+                convertedValue = e.toString();
             }
             dst.add(convertedValue);
         }
