@@ -328,7 +328,7 @@ public class IoServiceStatistics {
     }
 
     /**
-     * Returns the interval (milliseconds) between each throughput calculation.
+     * @return the interval (milliseconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */
     public final long getThroughputCalculationIntervalInMillis() {
@@ -338,6 +338,8 @@ public class IoServiceStatistics {
     /**
      * Sets the interval (seconds) between each throughput calculation.  The
      * default value is <tt>3</tt> seconds.
+     * 
+     * @param throughputCalculationInterval The interval between two calculation
      */
     public final void setThroughputCalculationInterval(int throughputCalculationInterval) {
         if (throughputCalculationInterval < 0) {
@@ -394,6 +396,8 @@ public class IoServiceStatistics {
 
     /**
      * Updates the throughput counters.
+     * 
+     * @param currentTime The current time
      */
     public void updateThroughput(long currentTime) {
         throughputCalculationLock.lock();
@@ -534,6 +538,8 @@ public class IoServiceStatistics {
 
     /**
      * Increments by <code>increment</code> the count of bytes scheduled for write.
+     * 
+     * @param increment The number of added bytes fro write
      */
     public final void increaseScheduledWriteBytes(int increment) {
         throughputCalculationLock.lock();
@@ -586,6 +592,8 @@ public class IoServiceStatistics {
 
     /**
      * Sets the time at which throughput counters where updated.
+     * 
+     * @param lastThroughputCalculationTime The time at which throughput counters where updated.
      */
     protected void setLastThroughputCalculationTime(long lastThroughputCalculationTime) {
         throughputCalculationLock.lock();
