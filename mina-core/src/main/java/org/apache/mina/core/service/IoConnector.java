@@ -45,14 +45,14 @@ import org.apache.mina.core.session.IoSessionInitializer;
  */
 public interface IoConnector extends IoService {
     /**
-     * Returns the connect timeout in seconds.  The default value is 1 minute.
+     * @return the connect timeout in seconds.  The default value is 1 minute.
      * 
      * @deprecated
      */
     int getConnectTimeout();
 
     /**
-     * Returns the connect timeout in milliseconds.  The default value is 1 minute.
+     * @return the connect timeout in milliseconds.  The default value is 1 minute.
      */
     long getConnectTimeoutMillis();
 
@@ -60,16 +60,19 @@ public interface IoConnector extends IoService {
      * Sets the connect timeout in seconds.  The default value is 1 minute.
      * 
      * @deprecated
+     * @param connectTimeout The time out for the connection
      */
     void setConnectTimeout(int connectTimeout);
 
     /**
      * Sets the connect timeout in milliseconds.  The default value is 1 minute.
+     * 
+     * @param connectTimeoutInMillis The time out for the connection
      */
     void setConnectTimeoutMillis(long connectTimeoutInMillis);
 
     /**
-     * Returns the default remote address to connect to when no argument
+     * @return the default remote address to connect to when no argument
      * is specified in {@link #connect()} method.
      */
     SocketAddress getDefaultRemoteAddress();
@@ -77,16 +80,20 @@ public interface IoConnector extends IoService {
     /**
      * Sets the default remote address to connect to when no argument is
      * specified in {@link #connect()} method.
+     * 
+     * @param defaultRemoteAddress The default remote address
      */
     void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress);
 
     /**
-     * Returns the default local address
+     * @return the default local address
      */
     SocketAddress getDefaultLocalAddress();
 
     /**
      * Sets the default local address
+     * 
+     * @param defaultLocalAddress The default local address
      */
     void setDefaultLocalAddress(SocketAddress defaultLocalAddress);
 
@@ -94,6 +101,8 @@ public interface IoConnector extends IoService {
      * Connects to the {@link #setDefaultRemoteAddress(SocketAddress) default
      * remote address}.
      * 
+     * @return the {@link ConnectFuture} instance which is completed when the
+     *         connection attempt initiated by this call succeeds or fails.
      * @throws IllegalStateException
      *             if no default remoted address is set.
      */
@@ -107,6 +116,8 @@ public interface IoConnector extends IoService {
      * will be invoked before this method returns.
      * 
      * @param sessionInitializer  the callback to invoke when the {@link IoSession} object is created
+     * @return the {@link ConnectFuture} instance which is completed when the
+     *         connection attempt initiated by this call succeeds or fails.
      * 
      * @throws IllegalStateException if no default remote address is set.
      */
@@ -114,7 +125,8 @@ public interface IoConnector extends IoService {
 
     /**
      * Connects to the specified remote address.
-     *
+     * 
+     * @param remoteAddress The remote address to connect to
      * @return the {@link ConnectFuture} instance which is completed when the
      *         connection attempt initiated by this call succeeds or fails.
      */
@@ -138,6 +150,9 @@ public interface IoConnector extends IoService {
     /**
      * Connects to the specified remote address binding to the specified local address.
      *
+     * @param remoteAddress The remote address to connect
+     * @param localAddress The local address to bind
+     * 
      * @return the {@link ConnectFuture} instance which is completed when the
      *         connection attempt initiated by this call succeeds or fails.
      */
