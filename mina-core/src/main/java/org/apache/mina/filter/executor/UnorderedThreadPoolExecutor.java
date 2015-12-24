@@ -30,6 +30,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.core.session.IoEvent;
 
@@ -301,7 +302,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         synchronized (workers) {
             long answer = completedTaskCount;
             for (Worker w : workers) {
-                answer += w.completedTaskCount;
+                answer += w.completedTaskCount.get();
             }
 
             return answer;
@@ -396,7 +397,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private class Worker implements Runnable {
 
-        private volatile long completedTaskCount;
+        private AtomicLong completedTaskCount = new AtomicLong(0);
 
         private Thread thread;
 
@@ -435,7 +436,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             } finally {
                 synchronized (workers) {
                     workers.remove(this);
-                    UnorderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount;
+                    UnorderedThreadPoolExecutor.this.completedTaskCount += completedTaskCount.get();
                     workers.notifyAll();
                 }
             }
@@ -475,7 +476,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                 task.run();
                 ran = true;
                 afterExecute(task, null);
-                completedTaskCount++;
+                completedTaskCount.incrementAndGet();
             } catch (RuntimeException e) {
                 if (!ran) {
                     afterExecute(task, e);
