@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.IoFuture;
@@ -61,7 +62,7 @@ public class IoServiceListenerSupport {
     private volatile int largestManagedSessionCount = 0;
 
     /** A global counter to count the number of sessions managed since the start */
-    private volatile long cumulativeManagedSessionCount = 0;
+    private AtomicLong cumulativeManagedSessionCount = new AtomicLong(0);
 
     /**
      * Creates a new instance of the listenerSupport.
@@ -126,7 +127,7 @@ public class IoServiceListenerSupport {
      * ListenerSupport
      */
     public long getCumulativeManagedSessionCount() {
-        return cumulativeManagedSessionCount;
+        return cumulativeManagedSessionCount.get();
     }
 
     /**
@@ -217,7 +218,7 @@ public class IoServiceListenerSupport {
             largestManagedSessionCount = managedSessionCount;
         }
 
-        cumulativeManagedSessionCount++;
+        cumulativeManagedSessionCount.incrementAndGet();
 
         // Fire listener events.
         for (IoServiceListener l : listeners) {
