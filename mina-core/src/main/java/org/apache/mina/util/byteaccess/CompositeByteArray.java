@@ -755,9 +755,9 @@ public final class CompositeByteArray extends AbstractByteArray {
                 byte b0 = get();
                 byte b1 = get();
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    return (short) ((b0 << 8) | (b1 << 0));
+                    return (short) ((b0 << 8) | (b1 & 0xFF));
                 } else {
-                    return (short) ((b1 << 8) | (b0 << 0));
+                    return (short) ((b1 << 8) | (b0 & 0xFF));
                 }
             }
         }
@@ -800,9 +800,9 @@ public final class CompositeByteArray extends AbstractByteArray {
                 byte b2 = get();
                 byte b3 = get();
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    return ((b0 << 24) | (b1 << 16) | (b2 << 8) | (b3 << 0));
+                    return (b0 << 24) | ((b1 & 0xFF) << 16) | ((b2 & 0xFF) << 8) | (b3 & 0xFF);
                 } else {
-                    return ((b3 << 24) | (b2 << 16) | (b1 << 8) | (b0 << 0));
+                    return (b3 << 24) | ((b2 & 0xFF) << 16) | ((b1 & 0xFF) << 8) | (b0 & 0xFF);
                 }
             }
         }
@@ -857,11 +857,11 @@ public final class CompositeByteArray extends AbstractByteArray {
                 byte b6 = get();
                 byte b7 = get();
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    return ((b0 & 0xffL) << 56) | ((b1 & 0xffL) << 48) | ((b2 & 0xffL) << 40) | ((b3 & 0xffL) << 32)
-                            | ((b4 & 0xffL) << 24) | ((b5 & 0xffL) << 16) | ((b6 & 0xffL) << 8) | ((b7 & 0xffL) << 0);
+                    return ((b0 & 0xFFL) << 56) | ((b1 & 0xFFL) << 48) | ((b2 & 0xFFL) << 40) | ((b3 & 0xFFL) << 32)
+                            | ((b4 & 0xFFL) << 24) | ((b5 & 0xFFL) << 16) | ((b6 & 0xFFL) << 8) | (b7 & 0xFFL);
                 } else {
-                    return ((b7 & 0xffL) << 56) | ((b6 & 0xffL) << 48) | ((b5 & 0xffL) << 40) | ((b4 & 0xffL) << 32)
-                            | ((b3 & 0xffL) << 24) | ((b2 & 0xffL) << 16) | ((b1 & 0xffL) << 8) | ((b0 & 0xffL) << 0);
+                    return ((b7 & 0xFFL) << 56) | ((b6 & 0xFFL) << 48) | ((b5 & 0xFFL) << 40) | ((b4 & 0xFFL) << 32)
+                            | ((b3 & 0xFFL) << 24) | ((b2 & 0xFFL) << 16) | ((b1 & 0xFFL) << 8) | (b0 & 0xFFL);
                 }
             }
         }
