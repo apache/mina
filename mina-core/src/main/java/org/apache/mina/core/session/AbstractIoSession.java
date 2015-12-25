@@ -332,7 +332,7 @@ public abstract class AbstractIoSession implements IoSession {
         return closeFuture;
     }
 
-    private final CloseFuture closeOnFlush() {
+    private CloseFuture closeOnFlush() {
         getWriteRequestQueue().offer(this, CLOSE_REQUEST);
         getProcessor().flush(this);
         return closeFuture;

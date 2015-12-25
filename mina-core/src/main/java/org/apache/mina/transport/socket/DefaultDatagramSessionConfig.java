@@ -27,17 +27,17 @@ import java.net.DatagramSocket;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig {
-    private static boolean DEFAULT_BROADCAST = false;
+    private static final boolean DEFAULT_BROADCAST = false;
 
-    private static boolean DEFAULT_REUSE_ADDRESS = false;
+    private static final boolean DEFAULT_REUSE_ADDRESS = false;
 
     /* The SO_RCVBUF parameter. Set to -1 (ie, will default to OS default) */
-    private static int DEFAULT_RECEIVE_BUFFER_SIZE = -1;
+    private static final int DEFAULT_RECEIVE_BUFFER_SIZE = -1;
 
     /* The SO_SNDBUF parameter. Set to -1 (ie, will default to OS default) */
-    private static int DEFAULT_SEND_BUFFER_SIZE = -1;
+    private static final int DEFAULT_SEND_BUFFER_SIZE = -1;
 
-    private static int DEFAULT_TRAFFIC_CLASS = 0;
+    private static final int DEFAULT_TRAFFIC_CLASS = 0;
 
     private boolean broadcast = DEFAULT_BROADCAST;
 

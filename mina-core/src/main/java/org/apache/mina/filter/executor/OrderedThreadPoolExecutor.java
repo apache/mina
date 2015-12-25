@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     /** A logger for this class (commented as it breaks MDCFlter tests) */
-    private static Logger LOGGER = LoggerFactory.getLogger(OrderedThreadPoolExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderedThreadPoolExecutor.class);
 
     /** A default value for the initial pool size */
     private static final int DEFAULT_INITIAL_THREAD_POOL_SIZE = 0;

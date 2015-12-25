@@ -138,7 +138,7 @@ public class ExecutorFilter extends IoFilterAdapter {
     private static final boolean NOT_MANAGEABLE_EXECUTOR = false;
 
     /** A list of default EventTypes to be handled by the executor */
-    private static IoEventType[] DEFAULT_EVENT_SET = new IoEventType[] { IoEventType.EXCEPTION_CAUGHT,
+    private static final IoEventType[] DEFAULT_EVENT_SET = new IoEventType[] { IoEventType.EXCEPTION_CAUGHT,
             IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT, IoEventType.SESSION_CLOSED,
             IoEventType.SESSION_IDLE, IoEventType.SESSION_OPENED };
 

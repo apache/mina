@@ -59,7 +59,7 @@ public class InetSocketAddressEditor extends AbstractPropertyEditor {
             return defaultValue();
         }
 
-        int colonIndex = text.lastIndexOf(":");
+        int colonIndex = text.lastIndexOf(':');
         if (colonIndex > 0) {
             String host = text.substring(0, colonIndex);
             if (!"*".equals(host)) {

@@ -117,7 +117,7 @@ public class HttpClientDecoder implements ProtocolDecoder {
                     session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(contentLen));
                 } else if ("chunked".equalsIgnoreCase(rp.getHeader("transfer-encoding"))) {
                     LOG.debug("no content len but chunked");
-                    session.setAttribute(BODY_CHUNKED, Boolean.valueOf("true"));
+                    session.setAttribute(BODY_CHUNKED, Boolean.TRUE);
                 } else if ("close".equalsIgnoreCase(rp.getHeader("connection"))) {
                     session.close(true);
                 } else {

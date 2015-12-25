@@ -27,17 +27,17 @@ import org.apache.mina.core.service.IoService;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
-    private static boolean DEFAULT_REUSE_ADDRESS = false;
+    private static final boolean DEFAULT_REUSE_ADDRESS = false;
 
-    private static int DEFAULT_TRAFFIC_CLASS = 0;
+    private static final int DEFAULT_TRAFFIC_CLASS = 0;
 
-    private static boolean DEFAULT_KEEP_ALIVE = false;
+    private static final boolean DEFAULT_KEEP_ALIVE = false;
 
-    private static boolean DEFAULT_OOB_INLINE = false;
+    private static final boolean DEFAULT_OOB_INLINE = false;
 
-    private static int DEFAULT_SO_LINGER = -1;
+    private static final int DEFAULT_SO_LINGER = -1;
 
-    private static boolean DEFAULT_TCP_NO_DELAY = false;
+    private static final boolean DEFAULT_TCP_NO_DELAY = false;
 
     protected IoService parent;
 

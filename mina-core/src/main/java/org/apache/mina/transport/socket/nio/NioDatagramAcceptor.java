@@ -637,9 +637,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
             byte[] ipV6Address = ((Inet6Address) inetAddress).getAddress();
             byte[] ipV4Address = new byte[4];
 
-            for (int i = 0; i < 4; i++) {
-                ipV4Address[i] = ipV6Address[12 + i];
-            }
+            System.arraycopy(ipV6Address, 12, ipV4Address, 0, 4);
 
             InetAddress inet4Adress = Inet4Address.getByAddress(ipV4Address);
             return new InetSocketAddress(inet4Adress, inetSocketAddress.getPort());
