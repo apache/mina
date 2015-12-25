@@ -31,6 +31,5 @@ public interface HttpResponse extends HttpMessage {
      * 
      * @return the status of the HTTP response
      */
-    public HttpStatus getStatus();
-
+    HttpStatus getStatus();
 }

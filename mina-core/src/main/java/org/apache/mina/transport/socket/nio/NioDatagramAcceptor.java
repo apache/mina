@@ -263,11 +263,11 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
             iterator.remove();
 
             try {
-                if ((key != null) && key.isValid() && key.isReadable()) {
+                if (key.isValid() && key.isReadable()) {
                     readHandle(handle);
                 }
 
-                if ((key != null) && key.isValid() && key.isWritable()) {
+                if (key.isValid() && key.isWritable()) {
                     for (IoSession session : getManagedSessions().values()) {
                         scheduleFlush((NioSession) session);
                     }

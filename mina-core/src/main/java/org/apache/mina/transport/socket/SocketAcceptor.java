@@ -57,23 +57,23 @@ public interface SocketAcceptor extends IoAcceptor {
     /**
      * @see ServerSocket#getReuseAddress()
      */
-    public boolean isReuseAddress();
+    boolean isReuseAddress();
 
     /**
      * @see ServerSocket#setReuseAddress(boolean)
      */
-    public void setReuseAddress(boolean reuseAddress);
+    void setReuseAddress(boolean reuseAddress);
 
     /**
      * Returns the size of the backlog.
      */
-    public int getBacklog();
+    int getBacklog();
 
     /**
      * Sets the size of the backlog.  This can only be done when this
      * class is not bound
      */
-    public void setBacklog(int backlog);
+    void setBacklog(int backlog);
 
     /**
      * Returns the default configuration of the new SocketSessions created by 

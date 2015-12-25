@@ -35,7 +35,7 @@ public interface MessageHandler<E> {
      * A {@link MessageHandler} that does nothing.  This is useful when
      * you want to ignore a message of a specific type silently.
      */
-    static MessageHandler<Object> NOOP = new MessageHandler<Object>() {
+    MessageHandler<Object> NOOP = new MessageHandler<Object>() {
         public void handleMessage(IoSession session, Object message) {
             // Do nothing
         }

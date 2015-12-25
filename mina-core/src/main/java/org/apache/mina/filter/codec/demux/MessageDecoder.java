@@ -41,21 +41,21 @@ public interface MessageDecoder {
      * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
-    static MessageDecoderResult OK = MessageDecoderResult.OK;
+    MessageDecoderResult OK = MessageDecoderResult.OK;
 
     /**
      * Represents a result from {@link #decodable(IoSession, IoBuffer)} and
      * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
-    static MessageDecoderResult NEED_DATA = MessageDecoderResult.NEED_DATA;
+    MessageDecoderResult NEED_DATA = MessageDecoderResult.NEED_DATA;
 
     /**
      * Represents a result from {@link #decodable(IoSession, IoBuffer)} and
      * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}.  Please
      * refer to each method's documentation for detailed explanation.
      */
-    static MessageDecoderResult NOT_OK = MessageDecoderResult.NOT_OK;
+    MessageDecoderResult NOT_OK = MessageDecoderResult.NOT_OK;
 
     /**
      * Checks the specified buffer is decodable by this decoder.

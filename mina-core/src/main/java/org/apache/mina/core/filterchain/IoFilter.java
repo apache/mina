@@ -273,7 +273,7 @@ public interface IoFilter {
     /**
      * Represents the next {@link IoFilter} in {@link IoFilterChain}.
      */
-    public interface NextFilter {
+    interface NextFilter {
         /**
          * Forwards <tt>sessionCreated</tt> event to next filter.
          * 

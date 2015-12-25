@@ -34,7 +34,7 @@ public interface IoFutureListener<F extends IoFuture> extends EventListener {
      * An {@link IoFutureListener} that closes the {@link IoSession} which is
      * associated with the specified {@link IoFuture}.
      */
-    static IoFutureListener<IoFuture> CLOSE = new IoFutureListener<IoFuture>() {
+    IoFutureListener<IoFuture> CLOSE = new IoFutureListener<IoFuture>() {
         public void operationComplete(IoFuture future) {
             future.getSession().close(true);
         }

@@ -34,19 +34,19 @@ public interface HttpMessage {
      * 
      * @return HTTP/1.0 or HTTP/1.1
      */
-    public HttpVersion getProtocolVersion();
+    HttpVersion getProtocolVersion();
 
     /**
      * Gets the <tt>Content-Type</tt> header of the message.
      * 
      * @return The content type.
      */
-    public String getContentType();
+    String getContentType();
 
     /**
      * Returns <tt>true</tt> if this message enables keep-alive connection.
      */
-    public boolean isKeepAlive();
+    boolean isKeepAlive();
 
     /**
      * Returns the value of the HTTP header with the specified name. If more than one header with the given name is
@@ -55,16 +55,16 @@ public interface HttpMessage {
      * @param name The name of the desired header
      * @return The header value - or null if no header is found with the specified name
      */
-    public String getHeader(String name);
+    String getHeader(String name);
 
     /**
      * Returns <tt>true</tt> if the HTTP header with the specified name exists in this request.
      */
-    public boolean containsHeader(String name);
+    boolean containsHeader(String name);
 
     /**
      * Returns a read-only {@link Map} of HTTP headers whose key is a {@link String} and whose value is a {@link String}
      * s.
      */
-    public Map<String, String> getHeaders();
+    Map<String, String> getHeaders();
 }

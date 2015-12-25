@@ -53,7 +53,7 @@ public interface IoAbsoluteWriter {
     /**
      * Puts bytes from the <code>IoBuffer</code> at the given index.
      */
-    public void put(int index, IoBuffer bb);
+    void put(int index, IoBuffer bb);
 
     /**
      * Puts a <code>short</code> at the given index.

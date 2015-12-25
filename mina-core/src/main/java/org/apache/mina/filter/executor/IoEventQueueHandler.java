@@ -34,7 +34,7 @@ public interface IoEventQueueHandler extends EventListener {
     /**
      * A dummy handler which always accepts event doing nothing particular.
      */
-    static IoEventQueueHandler NOOP = new IoEventQueueHandler() {
+    IoEventQueueHandler NOOP = new IoEventQueueHandler() {
         public boolean accept(Object source, IoEvent event) {
             return true;
         }

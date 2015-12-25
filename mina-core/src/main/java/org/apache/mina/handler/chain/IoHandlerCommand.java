@@ -82,7 +82,7 @@ public interface IoHandlerCommand {
      *
      * @author <a href="http://mina.apache.org">Apache MINA Project</a>
      */
-    public interface NextCommand {
+    interface NextCommand {
         /**
          * Forwards the request to the next {@link IoHandlerCommand} in the
          * {@link IoHandlerChain}.

@@ -37,7 +37,7 @@ public interface ProxyLogicHandler {
      * @return <code>true</code> if handshaking is complete and
      * data can be sent through the proxy, false otherwise.
      */
-    public abstract boolean isHandshakeComplete();
+    boolean isHandshakeComplete();
 
     /**
      * Handle incoming data during the handshake process. Should consume only the
@@ -47,7 +47,7 @@ public interface ProxyLogicHandler {
      * @param buf the buffer holding the received data
      * @throws ProxyAuthException if authentication fails
      */
-    public abstract void messageReceived(NextFilter nextFilter, IoBuffer buf) throws ProxyAuthException;
+    void messageReceived(NextFilter nextFilter, IoBuffer buf) throws ProxyAuthException;
 
     /**
      * Called at each step of the handshake procedure.
@@ -55,14 +55,14 @@ public interface ProxyLogicHandler {
      * @param nextFilter the next filter in filter chain
      * @throws ProxyAuthException if authentication fails
      */
-    public abstract void doHandshake(NextFilter nextFilter) throws ProxyAuthException;
+    void doHandshake(NextFilter nextFilter) throws ProxyAuthException;
 
     /**
      * Returns the {@link ProxyIoSession}.
      * 
      * @return the proxy session object
      */
-    public abstract ProxyIoSession getProxyIoSession();
+    ProxyIoSession getProxyIoSession();
 
     /**
      * Enqueue a message to be written once handshaking is complete.
@@ -70,5 +70,5 @@ public interface ProxyLogicHandler {
      * @param nextFilter the next filter in filter chain
      * @param writeRequest the data to be written
      */
-    public abstract void enqueueWriteRequest(final NextFilter nextFilter, final WriteRequest writeRequest);
+    void enqueueWriteRequest(final NextFilter nextFilter, final WriteRequest writeRequest);
 }
