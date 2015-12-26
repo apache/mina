@@ -354,7 +354,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
                 if (buf.get(0) != 0x01) {
                     throw new IllegalStateException("Authentication failed");
                 }
-                if (buf.get(1) == 0x00FF) {
+                if ((buf.get(1) & 0x00FF) == 0x00FF) {
                     throw new IllegalStateException("Authentication failed: GSS API Security Context Failure");
                 }
 

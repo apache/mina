@@ -48,22 +48,22 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * Called when the first component in the composite is entered by the cursor.
          */
-        public void enteredFirstComponent(int componentIndex, ByteArray component);
+        void enteredFirstComponent(int componentIndex, ByteArray component);
 
         /**
          * Called when the next component in the composite is entered by the cursor.
          */
-        public void enteredNextComponent(int componentIndex, ByteArray component);
+        void enteredNextComponent(int componentIndex, ByteArray component);
 
         /**
          * Called when the previous component in the composite is entered by the cursor.
          */
-        public void enteredPreviousComponent(int componentIndex, ByteArray component);
+        void enteredPreviousComponent(int componentIndex, ByteArray component);
 
         /**
          * Called when the last component in the composite is entered by the cursor.
          */
-        public void enteredLastComponent(int componentIndex, ByteArray component);
+        void enteredLastComponent(int componentIndex, ByteArray component);
     }
 
     /**
@@ -985,9 +985,9 @@ public final class CompositeByteArray extends AbstractByteArray {
                 byte b0 = get();
                 byte b1 = get();
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    return (char) ((b0 << 8) | (b1 << 0));
+                    return (char)((b0 << 8) | (b1 & 0xFF));
                 } else {
-                    return (char) ((b1 << 8) | (b0 << 0));
+                    return (char)((b1 << 8) | (b0 & 0xFF));
                 }
             }
         }

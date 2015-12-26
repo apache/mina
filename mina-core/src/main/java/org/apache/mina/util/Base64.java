@@ -278,26 +278,26 @@ public class Base64 {
             k = (byte) (b1 & 0x03);
 
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
-        byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
-        byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6) : (byte) ((b3) >> 6 ^ 0xfc);
-
-        encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
-        encodedData[encodedIndex + 1] = lookUpBase64Alphabet[val2 | (k << 4)];
-        encodedData[encodedIndex + 2] = lookUpBase64Alphabet[(l << 2) | val3];
-        encodedData[encodedIndex + 3] = lookUpBase64Alphabet[b3 & 0x3f];
-
-        encodedIndex += 4;
-
-        // If we are chunking, let's put a chunk separator down.
-        if (isChunked) {
-            // this assumes that CHUNK_SIZE % 4 == 0
-            if (encodedIndex == nextSeparatorIndex) {
-                System.arraycopy(CHUNK_SEPARATOR, 0, encodedData, encodedIndex, CHUNK_SEPARATOR.length);
-                chunksSoFar++;
-                nextSeparatorIndex = (CHUNK_SIZE * (chunksSoFar + 1)) + (chunksSoFar * CHUNK_SEPARATOR.length);
-                encodedIndex += CHUNK_SEPARATOR.length;
+            byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
+            byte val3 = ((b3 & SIGN) == 0) ? (byte) (b3 >> 6) : (byte) ((b3) >> 6 ^ 0xfc);
+    
+            encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
+            encodedData[encodedIndex + 1] = lookUpBase64Alphabet[val2 | (k << 4)];
+            encodedData[encodedIndex + 2] = lookUpBase64Alphabet[(l << 2) | val3];
+            encodedData[encodedIndex + 3] = lookUpBase64Alphabet[b3 & 0x3f];
+    
+            encodedIndex += 4;
+    
+            // If we are chunking, let's put a chunk separator down.
+            if (isChunked) {
+                // this assumes that CHUNK_SIZE % 4 == 0
+                if (encodedIndex == nextSeparatorIndex) {
+                    System.arraycopy(CHUNK_SEPARATOR, 0, encodedData, encodedIndex, CHUNK_SEPARATOR.length);
+                    chunksSoFar++;
+                    nextSeparatorIndex = (CHUNK_SIZE * (chunksSoFar + 1)) + (chunksSoFar * CHUNK_SEPARATOR.length);
+                    encodedIndex += CHUNK_SEPARATOR.length;
+                }
             }
-        }
         }
 
         // form integral number of 6-bit groups
@@ -307,10 +307,10 @@ public class Base64 {
             b1 = binaryData[dataIndex];
             k = (byte) (b1 & 0x03);
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
-        encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
-        encodedData[encodedIndex + 1] = lookUpBase64Alphabet[k << 4];
-        encodedData[encodedIndex + 2] = PAD;
-        encodedData[encodedIndex + 3] = PAD;
+            encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
+            encodedData[encodedIndex + 1] = lookUpBase64Alphabet[k << 4];
+            encodedData[encodedIndex + 2] = PAD;
+            encodedData[encodedIndex + 3] = PAD;
         } else if (fewerThan24bits == SIXTEENBIT) {
 
             b1 = binaryData[dataIndex];
@@ -319,12 +319,12 @@ public class Base64 {
             k = (byte) (b1 & 0x03);
 
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
-        byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
-
-        encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
-        encodedData[encodedIndex + 1] = lookUpBase64Alphabet[val2 | (k << 4)];
-        encodedData[encodedIndex + 2] = lookUpBase64Alphabet[l << 2];
-        encodedData[encodedIndex + 3] = PAD;
+            byte val2 = ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
+    
+            encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
+            encodedData[encodedIndex + 1] = lookUpBase64Alphabet[val2 | (k << 4)];
+            encodedData[encodedIndex + 2] = lookUpBase64Alphabet[l << 2];
+            encodedData[encodedIndex + 3] = PAD;
         }
 
         if (isChunked) {

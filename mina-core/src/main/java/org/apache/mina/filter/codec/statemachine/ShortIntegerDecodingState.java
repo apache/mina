@@ -30,24 +30,25 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class ShortIntegerDecodingState implements DecodingState {
-
-    private int highByte;
-
     private int counter;
 
     /**
      * {@inheritDoc}
      */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+        int highByte = 0;
+
 
         while (in.hasRemaining()) {
             switch (counter) {
             case 0:
                 highByte = in.getUnsigned();
                 break;
+                
             case 1:
                 counter = 0;
                 return finishDecode((short) ((highByte << 8) | in.getUnsigned()), out);
+                
             default:
                 throw new InternalError();
             }

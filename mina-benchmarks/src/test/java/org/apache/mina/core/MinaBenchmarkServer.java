@@ -74,19 +74,19 @@ public class MinaBenchmarkServer implements BenchmarkServer {
                     while (buffer.remaining() > 0) {
                         switch (state) {
                         case WAIT_FOR_FIRST_BYTE_LENGTH:
-                            length = (buffer.get() & 255) << 24;
+                            length = (buffer.get() & 0xFF) << 24;
                             state = State.WAIT_FOR_SECOND_BYTE_LENGTH;
                             break;
                         case WAIT_FOR_SECOND_BYTE_LENGTH:
-                            length += (buffer.get() & 255) << 16;
+                            length += (buffer.get() & 0xFF) << 16;
                             state = State.WAIT_FOR_THIRD_BYTE_LENGTH;
                             break;
                         case WAIT_FOR_THIRD_BYTE_LENGTH:
-                            length += (buffer.get() & 255) << 8;
+                            length += (buffer.get() & 0xFF) << 8;
                             state = State.WAIT_FOR_FOURTH_BYTE_LENGTH;
                             break;
                         case WAIT_FOR_FOURTH_BYTE_LENGTH:
-                            length += (buffer.get() & 255);
+                            length += (buffer.get() & 0xFF);
                             state = State.READING;
                             if ((length == 0) && (buffer.remaining() == 0)) {
                                 session.write(ACK.slice());

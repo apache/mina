@@ -30,36 +30,38 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class IntegerDecodingState implements DecodingState {
-
-    private int firstByte;
-
-    private int secondByte;
-
-    private int thirdByte;
-
     private int counter;
 
     /**
      * {@inheritDoc}
      */
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+        int firstByte = 0;
+        int secondByte = 0;
+        int thirdByte = 0;
+        
         while (in.hasRemaining()) {
             switch (counter) {
-            case 0:
-                firstByte = in.getUnsigned();
-                break;
-            case 1:
-                secondByte = in.getUnsigned();
-                break;
-            case 2:
-                thirdByte = in.getUnsigned();
-                break;
-            case 3:
-                counter = 0;
-                return finishDecode((firstByte << 24) | (secondByte << 16) | (thirdByte << 8) | in.getUnsigned(), out);
-            default:
-                throw new InternalError();
+                case 0:
+                    firstByte = in.getUnsigned();
+                    break;
+                    
+                case 1:
+                    secondByte = in.getUnsigned();
+                    break;
+                    
+                case 2:
+                    thirdByte = in.getUnsigned();
+                    break;
+                    
+                case 3:
+                    counter = 0;
+                    return finishDecode((firstByte << 24) | (secondByte << 16) | (thirdByte << 8) | in.getUnsigned(), out);
+                    
+                default:
+                    throw new InternalError();
             }
+            
             counter++;
         }
 

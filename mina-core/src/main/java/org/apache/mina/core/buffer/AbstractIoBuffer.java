@@ -1430,6 +1430,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         int b1 = getUnsigned(index);
         int b2 = getUnsigned(index + 1);
         int b3 = getUnsigned(index + 2);
+        
         if (ByteOrder.BIG_ENDIAN.equals(order())) {
             return b1 << 16 | b2 << 8 | b3;
         }
@@ -2167,8 +2168,10 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
         int oldLimit = limit();
         limit(position() + length);
+        ObjectInputStream in = null;
+        
         try {
-            ObjectInputStream in = new ObjectInputStream(asInputStream()) {
+            in = new ObjectInputStream(asInputStream()) {
                 @Override
                 protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
                     int type = read();
@@ -2207,6 +2210,14 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         } catch (IOException e) {
             throw new BufferDataException(e);
         } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ioe) {
+                // Nothing to do
+            }
+            
             limit(oldLimit);
         }
     }
@@ -2218,8 +2229,10 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public IoBuffer putObject(Object o) {
         int oldPos = position();
         skip(4); // Make a room for the length field.
+        ObjectOutputStream out = null;
+        
         try {
-            ObjectOutputStream out = new ObjectOutputStream(asOutputStream()) {
+            out = new ObjectOutputStream(asOutputStream()) {
                 @Override
                 protected void writeClassDescriptor(ObjectStreamClass desc) throws IOException {
                     Class<?> clazz = desc.forClass();
@@ -2238,6 +2251,14 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             out.flush();
         } catch (IOException e) {
             throw new BufferDataException(e);
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException ioe) {
+                // Nothing to do
+            }
         }
 
         // Fill the length field
