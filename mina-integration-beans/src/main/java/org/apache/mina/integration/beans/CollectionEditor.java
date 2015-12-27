@@ -59,10 +59,9 @@ public class CollectionEditor extends AbstractPropertyEditor {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected final String toText(Object value) {
         StringBuilder buf = new StringBuilder();
-        for (Object v : (Collection) value) {
+        for (Object v : (Collection<?>) value) {
             if (v == null) {
                 v = defaultElement();
             }

@@ -46,12 +46,15 @@ public class DefaultFileRegion implements FileRegion {
         if (channel == null) {
             throw new IllegalArgumentException("channel can not be null");
         }
+        
         if (position < 0) {
             throw new IllegalArgumentException("position may not be less than 0");
         }
+        
         if (remainingBytes < 0) {
             throw new IllegalArgumentException("remainingBytes may not be less than 0");
         }
+        
         this.channel = channel;
         this.originalPosition = position;
         this.position = position;

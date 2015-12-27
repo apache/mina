@@ -20,7 +20,6 @@
 package org.apache.mina.proxy.utils;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.textline.LineDelimiter;
 
 /**

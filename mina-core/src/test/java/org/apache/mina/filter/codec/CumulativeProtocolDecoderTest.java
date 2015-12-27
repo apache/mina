@@ -25,8 +25,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.DefaultTransportMetadata;
@@ -92,8 +90,6 @@ public class CumulativeProtocolDecoderTest {
         decoder.decode(session, buf, session.getDecoderOutput());
         assertEquals(4, session.getDecoderOutputQueue().size());
         assertEquals(buf.limit(), buf.position());
-
-        List<Object> expected = new ArrayList<Object>();
 
         for (int i = 0; i < 4; i++) {
             assertTrue(session.getDecoderOutputQueue().contains(i));
@@ -166,10 +162,6 @@ public class CumulativeProtocolDecoderTest {
             out.write(new Integer(in.getInt()));
             return true;
         }
-
-        public void dispose() throws Exception {
-            // Do nothing
-        }
     }
 
     private static class WrongDecoder extends CumulativeProtocolDecoder {
@@ -183,10 +175,6 @@ public class CumulativeProtocolDecoderTest {
         @Override
         protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
             return true;
-        }
-
-        public void dispose() throws Exception {
-            // Do nothing
         }
     }
 
@@ -203,10 +191,6 @@ public class CumulativeProtocolDecoderTest {
             in.duplicate(); // Will disable auto-expansion.
             assertFalse(in.isAutoExpand());
             return super.doDecode(session, in, out);
-        }
-
-        public void dispose() throws Exception {
-            // Do nothing
         }
     }
 }

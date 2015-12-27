@@ -77,7 +77,6 @@ public class MapEditor extends AbstractPropertyEditor {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected final String toText(Object value) {
         StringBuilder buf = new StringBuilder();
         for (Object o : ((Map) value).entrySet()) {

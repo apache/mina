@@ -105,7 +105,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * @param parent The buffer we get the properties from
      */
     protected AbstractIoBuffer(AbstractIoBuffer parent) {
-        setAllocator(parent.getAllocator());
+        setAllocator(IoBuffer.getAllocator());
         this.recapacityAllowed = false;
         this.derived = true;
         this.minimumCapacity = parent.minimumCapacity;

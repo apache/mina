@@ -55,7 +55,6 @@ import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteTimeoutException;
 import org.apache.mina.core.write.WriteToClosedSessionException;
-import org.apache.mina.proxy.utils.StringUtilities;
 import org.apache.mina.util.ExceptionMonitor;
 
 /**

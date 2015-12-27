@@ -141,10 +141,26 @@ public abstract class AbstractFileRegionTest {
     private File createLargeFile() throws IOException {
         File largeFile = File.createTempFile("mina-test", "largefile");
         largeFile.deleteOnExit();
-        FileChannel channel = new FileOutputStream(largeFile).getChannel();
-        ByteBuffer buffer = createBuffer();
-        channel.write(buffer);
-        channel.close();
+        FileChannel channel = null;
+        FileOutputStream out = null;
+        
+        try {
+            out =  new FileOutputStream(largeFile);
+            channel = out.getChannel();
+            ByteBuffer buffer = createBuffer();
+            channel.write(buffer);
+            channel.close();
+            out.close();
+        } finally {
+            if (channel != null) {
+                channel.close();
+            }
+            
+            if (out != null) {
+                out.close();
+            }
+        }
+        
         return largeFile;
     }
 

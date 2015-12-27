@@ -409,27 +409,30 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean isOrderedMap(Map map) {
+    private boolean isOrderedMap(Map<String,? extends IoFilter> map) {
         Class<?> mapType = map.getClass();
+        
         if (LinkedHashMap.class.isAssignableFrom(mapType)) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(mapType.getSimpleName() + " is an ordered map.");
+                LOGGER.debug("{} is an ordered map.", mapType.getSimpleName() );
             }
+            
             return true;
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(mapType.getName() + " is not a " + LinkedHashMap.class.getSimpleName());
+            LOGGER.debug("{} is not a {}", mapType.getName(), LinkedHashMap.class.getSimpleName());
         }
 
         // Detect Jakarta Commons Collections OrderedMap implementations.
         Class<?> type = mapType;
+        
         while (type != null) {
             for (Class<?> i : type.getInterfaces()) {
                 if (i.getName().endsWith("OrderedMap")) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(mapType.getSimpleName() + " is an ordered map (guessed from that it "
-                                + " implements OrderedMap interface.)");
+                        LOGGER.debug("{} is an ordered map (guessed from that it implements OrderedMap interface.)",
+                                mapType.getSimpleName());
                     }
                     return true;
                 }
@@ -438,20 +441,21 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(mapType.getName() + " doesn't implement OrderedMap interface.");
+            LOGGER.debug("{} doesn't implement OrderedMap interface.", mapType.getName() );
         }
 
         // Last resort: try to create a new instance and test if it maintains
         // the insertion order.
         LOGGER.debug("Last resort; trying to create a new map instance with a "
-                + "default constructor and test if insertion order is " + "maintained.");
+                + "default constructor and test if insertion order is maintained.");
 
-        Map newMap;
+        Map<String,IoFilter> newMap;
+        
         try {
-            newMap = (Map) mapType.newInstance();
+            newMap = (Map<String,IoFilter>) mapType.newInstance();
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Failed to create a new map instance of '" + mapType.getName() + "'.", e);
+                LOGGER.debug("Failed to create a new map instance of '{}'.", mapType.getName(), e);
             }
             return false;
         }
@@ -459,8 +463,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         Random rand = new Random();
         List<String> expectedNames = new ArrayList<String>();
         IoFilter dummyFilter = new IoFilterAdapter();
+        
         for (int i = 0; i < 65536; i++) {
             String filterName;
+            
             do {
                 filterName = String.valueOf(rand.nextInt());
             } while (newMap.containsKey(filterName));
@@ -469,20 +475,19 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             expectedNames.add(filterName);
 
             Iterator<String> it = expectedNames.iterator();
+            
             for (Object key : newMap.keySet()) {
                 if (!it.next().equals(key)) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("The specified map didn't pass the insertion " + "order test after " + (i + 1)
-                                + " tries.");
+                        LOGGER.debug("The specified map didn't pass the insertion order test after {} tries.", (i + 1));
                     }
                     return false;
                 }
             }
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("The specified map passed the insertion order test.");
-        }
+        LOGGER.debug("The specified map passed the insertion order test.");
+        
         return true;
     }
 

@@ -70,14 +70,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     private final static Logger LOG = LoggerFactory.getLogger(IoProcessor.class);
 
     /**
-     * The maximum loop count for a write operation until
-     * {@link #write(AbstractIoSession, IoBuffer, int)} returns non-zero value.
-     * It is similar to what a spin lock is for in concurrency programming. It
-     * improves memory utilization and write throughput significantly.
-     */
-    private static final int WRITE_SPIN_COUNT = 256;
-
-    /**
      * A timeout used for the select, as we need to get out to deal with idle
      * sessions
      */

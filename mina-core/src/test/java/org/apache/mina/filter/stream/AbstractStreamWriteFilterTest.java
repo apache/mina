@@ -513,10 +513,6 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
             return null;
         }
 
-        public Object getLock() {
-            return this;
-        }
-
         public void join() {
             // Do nothing
         }

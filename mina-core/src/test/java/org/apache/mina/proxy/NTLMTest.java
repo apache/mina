@@ -26,7 +26,6 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.Security;
 
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMResponses;
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMUtilities;

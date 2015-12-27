@@ -29,9 +29,8 @@ import java.beans.PropertyEditor;
  */
 public class ClassEditor extends AbstractPropertyEditor {
     @Override
-    @SuppressWarnings("unchecked")
     protected String toText(Object value) {
-        return ((Class) value).getName();
+        return ((Class<?>) value).getName();
     }
 
     @Override

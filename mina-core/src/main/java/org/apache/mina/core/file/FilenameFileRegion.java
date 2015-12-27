@@ -44,6 +44,7 @@ public class FilenameFileRegion extends DefaultFileRegion {
         if (file == null) {
             throw new IllegalArgumentException("file can not be null");
         }
+        
         this.file = file;
     }
 

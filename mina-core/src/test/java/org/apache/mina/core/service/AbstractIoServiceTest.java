@@ -19,7 +19,6 @@
  */
 package org.apache.mina.core.service;
 
-import junit.framework.Assert;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFuture;
@@ -54,7 +53,7 @@ public class AbstractIoServiceTest {
     @Test
     public void testDispose() throws IOException, InterruptedException {
 
-        List threadsBefore = getThreadNames();
+        List<String> threadsBefore = getThreadNames();
 
         final IoAcceptor acceptor = new NioSocketAcceptor();
 
@@ -113,7 +112,7 @@ public class AbstractIoServiceTest {
         closeFuture.awaitUninterruptibly();
         acceptor.dispose(true);
 
-        List threadsAfter = getThreadNames();
+        List<String> threadsAfter = getThreadNames();
 
         System.out.println("threadsBefore = " + threadsBefore);
         System.out.println("threadsAfter  = " + threadsAfter);

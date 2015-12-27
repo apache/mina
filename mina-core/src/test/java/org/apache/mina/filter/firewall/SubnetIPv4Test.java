@@ -28,7 +28,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.junit.Test;
-import org.junit.Ignore;
 
 /**
  * TODO Add documentation

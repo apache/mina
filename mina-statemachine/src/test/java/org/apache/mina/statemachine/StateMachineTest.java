@@ -149,7 +149,6 @@ public class StateMachineTest {
     }
 
     private static class SampleSelfTransition extends AbstractSelfTransition {
-        @SuppressWarnings("unused")
         public SampleSelfTransition() {
             super();
         }

@@ -64,6 +64,7 @@ public class ObjectSerializationTest {
         osos.flush();
 
         testDecoderAndInputStream(expected, IoBuffer.wrap(baos.toByteArray()));
+        osos.close();
     }
 
     private void testDecoderAndInputStream(String expected, IoBuffer in) throws Exception {
@@ -81,5 +82,6 @@ public class ObjectSerializationTest {
 
         assertEquals(1, session.getDecoderOutputQueue().size());
         assertEquals(expected, session.getDecoderOutputQueue().poll());
+        osis.close();
     }
 }

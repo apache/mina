@@ -213,13 +213,5 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
             this.nextFilter = nextFilter;
             this.data = data;
         }
-
-        public Object getData() {
-            return data;
-        }
-
-        public NextFilter getNextFilter() {
-            return nextFilter;
-        }
     }
 }

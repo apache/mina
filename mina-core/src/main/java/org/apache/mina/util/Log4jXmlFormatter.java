@@ -97,7 +97,6 @@ public class Log4jXmlFormatter extends Formatter {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public String format(final LogRecord record) {
         // Reset working buffer. If the buffer is too large, then we need a new
         // one in order to avoid the penalty of creating a large array.
@@ -144,16 +143,20 @@ public class Log4jXmlFormatter extends Formatter {
         }
 
         if (properties) {
-            Map contextMap = MDC.getCopyOfContextMap();
+            Map<String,String> contextMap = MDC.getCopyOfContextMap();
+            
             if (contextMap != null) {
-                Set keySet = contextMap.keySet();
+                Set<String> keySet = contextMap.keySet();
+                
                 if ((keySet != null) && (keySet.size() > 0)) {
                     buf.append("<log4j:properties>\r\n");
                     Object[] keys = keySet.toArray();
                     Arrays.sort(keys);
+                    
                     for (Object key1 : keys) {
                         String key = (key1 == null ? "" : key1.toString());
                         Object val = contextMap.get(key);
+                        
                         if (val != null) {
                             buf.append("<log4j:data name=\"");
                             buf.append(Transform.escapeTags(key));
@@ -162,6 +165,7 @@ public class Log4jXmlFormatter extends Formatter {
                             buf.append("\"/>\r\n");
                         }
                     }
+                    
                     buf.append("</log4j:properties>\r\n");
                 }
             }

@@ -233,8 +233,7 @@ public class MethodTransition extends AbstractTransition {
         return true;
     }
 
-    @SuppressWarnings("unchecked")
-    private boolean match(Class<?> paramType, Object arg, Class argType) {
+    private boolean match(Class<?> paramType, Object arg, Class<?> argType) {
         if (paramType.isPrimitive()) {
             if (paramType.equals(Boolean.TYPE)) {
                 return arg instanceof Boolean;

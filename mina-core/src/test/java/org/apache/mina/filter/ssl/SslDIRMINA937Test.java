@@ -53,8 +53,6 @@ public class SslDIRMINA937Test {
     /** A static port used for his test, chosen to avoid collisions */
     private static final int port = AvailablePortFinder.getNextAvailable(5555);
 
-    private static Exception clientError = null;
-
     /** A JVM independant KEY_MANAGER_FACTORY algorithm */
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
 
