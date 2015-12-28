@@ -268,13 +268,14 @@ public class DefaultIoFuture implements IoFuture {
         for (StackTraceElement s : stackTrace) {
             try {
                 Class<?> cls = DefaultIoFuture.class.getClassLoader().loadClass(s.getClassName());
+                
                 if (IoProcessor.class.isAssignableFrom(cls)) {
                     throw new IllegalStateException("DEAD LOCK: " + IoFuture.class.getSimpleName()
                             + ".await() was invoked from an I/O processor thread.  " + "Please use "
                             + IoFutureListener.class.getSimpleName()
                             + " or configure a proper thread model alternatively.");
                 }
-            } catch (Exception cnfe) {
+            } catch (ClassNotFoundException cnfe) {
                 // Ignore
             }
         }

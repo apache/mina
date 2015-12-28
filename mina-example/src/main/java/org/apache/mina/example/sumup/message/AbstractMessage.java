@@ -27,6 +27,8 @@ import java.io.Serializable;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractMessage implements Serializable {
+    static final long serialVersionUID = 1L;
+    
     private int sequence;
 
     public int getSequence() {

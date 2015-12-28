@@ -43,9 +43,6 @@ import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class MemoryMonitor {
-
-    private static final long serialVersionUID = 1L;
-
     public static final int PORT = 18567;
 
     protected static final Dimension PANEL_SIZE = new Dimension(300, 200);

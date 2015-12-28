@@ -36,8 +36,7 @@ import org.apache.mina.core.session.IoSession;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class IoUtil {
-
+public final class IoUtil {
     private static final IoSession[] EMPTY_SESSIONS = new IoSession[0];
 
     /**

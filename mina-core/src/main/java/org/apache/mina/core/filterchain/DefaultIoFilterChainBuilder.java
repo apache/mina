@@ -545,7 +545,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         entries.add(index, e);
     }
 
-    private class EntryImpl implements Entry {
+    private final class EntryImpl implements Entry {
         private final String name;
 
         private volatile IoFilter filter;

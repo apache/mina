@@ -39,9 +39,10 @@ public final class PropertyEditorFactory {
             return new NullEditor();
         }
 
-        if (object instanceof Collection) {
+        if (object instanceof Collection<?>) {
             Class<?> elementType = null;
-            for (Object e : (Collection) object) {
+            
+            for (Object e : (Collection<Object>) object) {
                 if (e != null) {
                     elementType = e.getClass();
                     break;
@@ -64,16 +65,18 @@ public final class PropertyEditorFactory {
         if (object instanceof Map) {
             Class<?> keyType = null;
             Class<?> valueType = null;
-            for (Object entry : ((Map) object).entrySet()) {
-                Map.Entry e = (Map.Entry) entry;
-                if (e.getKey() != null && e.getValue() != null) {
+            
+            for (Object entry : ((Map<?,?>) object).entrySet()) {
+                Map.Entry<?,?> e = (Map.Entry<?,?>) entry;
+                
+                if ((e.getKey() != null) && (e.getValue() != null)) {
                     keyType = e.getKey().getClass();
                     valueType = e.getValue().getClass();
                     break;
                 }
             }
 
-            if (keyType != null && valueType != null) {
+            if ((keyType != null) && (valueType != null)) {
                 return new MapEditor(keyType, valueType);
             }
         }

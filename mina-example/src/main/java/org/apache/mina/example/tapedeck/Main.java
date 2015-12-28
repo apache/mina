@@ -21,7 +21,6 @@ package org.apache.mina.example.tapedeck;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineEncoder;
@@ -29,7 +28,6 @@ import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.StateMachineFactory;
 import org.apache.mina.statemachine.StateMachineProxyBuilder;
-import org.apache.mina.statemachine.annotation.IoFilterTransition;
 import org.apache.mina.statemachine.annotation.IoHandlerTransition;
 import org.apache.mina.statemachine.context.IoSessionStateContextLookup;
 import org.apache.mina.statemachine.context.StateContext;

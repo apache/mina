@@ -227,6 +227,7 @@ public final class CompositeByteArray extends AbstractByteArray {
      */
     public ByteArray removeLast() {
         Node node = bas.removeLast();
+        
         return node == null ? null : node.getByteArray();
     }
 

@@ -79,8 +79,9 @@ public class MapEditor extends AbstractPropertyEditor {
     @Override
     protected final String toText(Object value) {
         StringBuilder buf = new StringBuilder();
-        for (Object o : ((Map) value).entrySet()) {
-            Map.Entry entry = (Map.Entry) o;
+        
+        for (Object o : ((Map<?,?>) value).entrySet()) {
+            Map.Entry<?,?> entry = (Map.Entry<?,?>) o;
             Object ekey = entry.getKey();
             Object evalue = entry.getValue();
 

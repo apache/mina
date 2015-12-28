@@ -883,7 +883,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
         }
     }
 
-    private class EntryImpl implements Entry {
+    private final class EntryImpl implements Entry {
         private EntryImpl prevEntry;
 
         private EntryImpl nextEntry;

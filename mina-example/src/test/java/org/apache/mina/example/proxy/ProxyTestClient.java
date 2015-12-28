@@ -21,7 +21,6 @@ package org.apache.mina.example.proxy;
 
 import java.net.InetSocketAddress;
 import java.net.URL;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
