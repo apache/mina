@@ -360,19 +360,19 @@ public interface IoSession {
     Set<Object> getAttributeKeys();
 
     /**
-     * @return <code>true</code> if this session is connected with remote peer.
+     * @return <tt>true</tt> if this session is connected with remote peer.
      */
     boolean isConnected();
 
     /**
-     * @return <code>true</code> if and only if this session is being closed
+     * @return <tt>true</tt> if and only if this session is being closed
      * (but not disconnected yet) or is closed.
      */
     boolean isClosing();
     
     /**
-     * @return <code>true</code> if the session has started and initialized a SslEngine,
-     * <code>false</code> if the session is not yet secured (the handshake is not completed)
+     * @return <tt>true</tt> if the session has started and initialized a SslEngine,
+     * <tt>false</tt> if the session is not yet secured (the handshake is not completed)
      * or if SSL is not set for this session, or if SSL is not even an option.
      */
     boolean isSecured();
@@ -435,14 +435,14 @@ public interface IoSession {
     /**
      * Is read operation is suspended for this session. 
      * 
-     * @return <code>true</code> if suspended
+     * @return <tt>true</tt> if suspended
      */
     boolean isReadSuspended();
 
     /**
      * Is write operation is suspended for this session.
      * 
-     * @return <code>true</code> if suspended
+     * @return <tt>true</tt> if suspended
      */
     boolean isWriteSuspended();
 
@@ -547,25 +547,25 @@ public interface IoSession {
 
     /**
      * @param status The researched idle status
-     * @return <code>true</code> if this session is idle for the specified
+     * @return <tt>true</tt> if this session is idle for the specified
      * {@link IdleStatus}.
      */
     boolean isIdle(IdleStatus status);
 
     /**
-     * @return <code>true</code> if this session is {@link IdleStatus#READER_IDLE}.
+     * @return <tt>true</tt> if this session is {@link IdleStatus#READER_IDLE}.
      * @see #isIdle(IdleStatus)
      */
     boolean isReaderIdle();
 
     /**
-     * @return <code>true</code> if this session is {@link IdleStatus#WRITER_IDLE}.
+     * @return <tt>true</tt> if this session is {@link IdleStatus#WRITER_IDLE}.
      * @see #isIdle(IdleStatus)
      */
     boolean isWriterIdle();
 
     /**
-     * @return <code>true</code> if this session is {@link IdleStatus#BOTH_IDLE}.
+     * @return <tt>true</tt> if this session is {@link IdleStatus#BOTH_IDLE}.
      * @see #isIdle(IdleStatus)
      */
     boolean isBothIdle();

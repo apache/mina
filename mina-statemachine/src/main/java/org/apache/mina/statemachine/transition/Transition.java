@@ -34,18 +34,18 @@ public interface Transition {
      * Executes this {@link Transition}. It is the responsibility of this
      * {@link Transition} to determine whether it actually applies for the
      * specified {@link Event}. If this {@link Transition} doesn't apply
-     * nothing should be executed and <code>false</code> must be returned.
+     * nothing should be executed and <tt>false</tt> must be returned.
      * 
      * @param event the current {@link Event}.
-     * @return <code>true</code> if the {@link Transition} was executed, 
-     *         <code>false</code> otherwise.
+     * @return <tt>true</tt> if the {@link Transition} was executed, 
+     *         <tt>false</tt> otherwise.
      */
     boolean execute(Event event);
 
     /**
      * Returns the {@link State} which the {@link StateMachine} should move to 
      * if this {@link Transition} is taken and {@link #execute(Event)} returns
-     * <code>true</code>.
+     * <tt>true</tt>.
      * 
      * @return the next {@link State} or <code>null</code> if this 
      *         {@link Transition} is a loopback {@link Transition}.

@@ -65,7 +65,7 @@ public abstract class SkippingState implements DecodingState {
      * Called to determine whether the specified byte can be skipped.
      * 
      * @param b the byte to check.
-     * @return <code>true</code> if the byte can be skipped.
+     * @return <tt>true</tt> if the byte can be skipped.
      */
     protected abstract boolean canSkip(byte b);
 

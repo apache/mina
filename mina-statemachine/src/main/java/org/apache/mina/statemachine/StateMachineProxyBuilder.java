@@ -120,7 +120,7 @@ public class StateMachineProxyBuilder {
      * an exception or be silently ignored. The default is to raise an 
      * exception. 
      * 
-     * @param b <code>true</code> to ignore context lookup failures.
+     * @param b <tt>true</tt> to ignore context lookup failures.
      * @return this {@link StateMachineProxyBuilder} for method chaining. 
      */
     public StateMachineProxyBuilder setIgnoreUnhandledEvents(boolean b) {
@@ -133,7 +133,7 @@ public class StateMachineProxyBuilder {
      * to a method call on the proxy produced by this builder will raise an
      * exception or be silently ignored. The default is to raise an exception.
      * 
-     * @param b <code>true</code> to ignore context lookup failures.
+     * @param b <tt>true</tt> to ignore context lookup failures.
      * @return this {@link StateMachineProxyBuilder} for method chaining. 
      */
     public StateMachineProxyBuilder setIgnoreStateContextLookupFailure(boolean b) {

@@ -41,7 +41,7 @@ public abstract class AbstractSelfTransition implements SelfTransition {
     /**
      * Executes this {@link SelfTransition}.
      * 
-     * @return <code>true</code> if the {@link SelfTransition} has been executed
+     * @return <tt>true</tt> if the {@link SelfTransition} has been executed
      *         successfully
      */
     protected abstract boolean doExecute(StateContext stateContext, State state);

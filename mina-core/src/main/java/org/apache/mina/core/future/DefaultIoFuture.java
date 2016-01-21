@@ -177,7 +177,7 @@ public class DefaultIoFuture implements IoFuture {
      * 
      * @param timeoutMillis The delay we will wait for the Future to be ready
      * @param interruptable Tells if the wait can be interrupted or not
-     * @return <code>true</code> if the Future is ready
+     * @return <tt>true</tt> if the Future is ready
      * @throws InterruptedException If the thread has been interrupted
      * when it's not allowed.
      */

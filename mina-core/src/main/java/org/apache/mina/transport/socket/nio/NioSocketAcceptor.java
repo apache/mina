@@ -331,7 +331,7 @@ implements SocketAcceptor {
 
         /**
          * Tells if there are more SockectChannel left in the iterator
-         * @return <code>true</code> if there is at least one more
+         * @return <tt>true</tt> if there is at least one more
          * SockectChannel object to read
          */
         public boolean hasNext() {

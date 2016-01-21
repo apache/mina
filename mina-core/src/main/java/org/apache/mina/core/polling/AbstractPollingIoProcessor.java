@@ -220,7 +220,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * Say if the list of {@link IoSession} polled by this {@link IoProcessor}
      * is empty
      * 
-     * @return true if at least a session is managed by this {@link IoProcessor}
+     * @return <tt>true</tt> if at least a session is managed by this {@link IoProcessor}
      */
     protected abstract boolean isSelectorEmpty();
 
@@ -246,87 +246,76 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     protected abstract Iterator<S> selectedSessions();
 
     /**
-     * Get the state of a session (preparing, open, closed)
+     * Get the state of a session (One of OPENING, OPEN, CLOSING)
      * 
-     * @param session
-     *            the {@link IoSession} to inspect
+     * @param session the {@link IoSession} to inspect
      * @return the state of the session
      */
     protected abstract SessionState getState(S session);
 
     /**
-     * Is the session ready for writing
+     * Tells if the session ready for writing
      * 
-     * @param session
-     *            the session queried
-     * @return true is ready, false if not ready
+     * @param session the queried session
+     * @return <tt>true</tt> is ready, <tt>false</tt> if not ready
      */
     protected abstract boolean isWritable(S session);
 
     /**
-     * Is the session ready for reading
+     * Tells if the session ready for reading
      * 
-     * @param session
-     *            the session queried
-     * @return true is ready, false if not ready
+     * @param session the queried session
+     * @return <tt>true</tt> is ready, <tt>false</tt> if not ready
      */
     protected abstract boolean isReadable(S session);
 
     /**
-     * register a session for writing
+     * Set the session to be informed when a write event should be processed
      * 
-     * @param session
-     *            the session registered
-     * @param isInterested
-     *            true for registering, false for removing
+     * @param session the session for which we want to be interested in write events
+     * @param isInterested <tt>true</tt> for registering, <tt>false</tt> for removing
+     * @throws Exception If there was a problem while registering the session 
      */
     protected abstract void setInterestedInWrite(S session, boolean isInterested) throws Exception;
 
     /**
-     * register a session for reading
+     * Set the session to be informed when a read event should be processed
      * 
-     * @param session
-     *            the session registered
-     * @param isInterested
-     *            true for registering, false for removing
+     * @param session the session for which we want to be interested in read events
+     * @param isInterested <tt>true</tt> for registering, <tt>false</tt> for removing
+     * @throws Exception If there was a problem while registering the session 
      */
     protected abstract void setInterestedInRead(S session, boolean isInterested) throws Exception;
 
     /**
-     * is this session registered for reading
+     * Tells if this session is registered for reading
      * 
-     * @param session
-     *            the session queried
-     * @return true is registered for reading
+     * @param session the queried session
+     * @return <tt>true</tt> is registered for reading
      */
     protected abstract boolean isInterestedInRead(S session);
 
     /**
-     * is this session registered for writing
+     * Tells if this session is registered for writing
      * 
-     * @param session
-     *            the session queried
-     * @return true is registered for writing
+     * @param session the queried session
+     * @return <tt>true</tt> is registered for writing
      */
     protected abstract boolean isInterestedInWrite(S session);
 
     /**
      * Initialize the polling of a session. Add it to the polling process.
      * 
-     * @param session
-     *            the {@link IoSession} to add to the polling
-     * @throws Exception
-     *             any exception thrown by the underlying system calls
+     * @param session the {@link IoSession} to add to the polling
+     * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract void init(S session) throws Exception;
 
     /**
      * Destroy the underlying client socket handle
      * 
-     * @param session
-     *            the {@link IoSession}
-     * @throws Exception
-     *             any exception thrown by the underlying system calls
+     * @param session the {@link IoSession}
+     * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract void destroy(S session) throws Exception;
 
@@ -334,13 +323,10 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * Reads a sequence of bytes from a {@link IoSession} into the given
      * {@link IoBuffer}. Is called when the session was found ready for reading.
      * 
-     * @param session
-     *            the session to read
-     * @param buf
-     *            the buffer to fill
+     * @param session the session to read
+     * @param buf the buffer to fill
      * @return the number of bytes read
-     * @throws Exception
-     *             any exception thrown by the underlying system calls
+     * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract int read(S session, IoBuffer buf) throws Exception;
 
@@ -348,16 +334,12 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * Write a sequence of bytes to a {@link IoSession}, means to be called when
      * a session was found ready for writing.
      * 
-     * @param session
-     *            the session to write
-     * @param buf
-     *            the buffer to write
-     * @param length
-     *            the number of bytes to write can be superior to the number of
+     * @param session the session to write
+     * @param buf the buffer to write
+     * @param length the number of bytes to write can be superior to the number of
      *            bytes remaining in the buffer
      * @return the number of byte written
-     * @throws Exception
-     *             any exception thrown by the underlying system calls
+     * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract int write(S session, IoBuffer buf, int length) throws Exception;
 
@@ -367,15 +349,11 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * {@link UnsupportedOperationException} so the file will be send using
      * usual {@link #write(AbstractIoSession, IoBuffer, int)} call.
      * 
-     * @param session
-     *            the session to write
-     * @param region
-     *            the file region to write
-     * @param length
-     *            the length of the portion to send
+     * @param session the session to write
+     * @param region the file region to write
+     * @param length the length of the portion to send
      * @return the number of written bytes
-     * @throws Exception
-     *             any exception thrown by the underlying system calls
+     * @throws Exception any exception thrown by the underlying system calls
      */
     protected abstract int transferFile(S session, FileRegion region, int length) throws Exception;
 
@@ -440,8 +418,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     /**
      * Updates the traffic mask for a given session
      * 
-     * @param session
-     *            the session to update
+     * @param session the session to update
      */
     public final void updateTrafficMask(S session) {
         trafficControllingSessions.add(session);
@@ -473,8 +450,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * trash the buggy selector and create a new one, registring all the sockets
      * on it.
      * 
-     * @throws IOException
-     *             If we got an exception
+     * @throws IOException If we got an exception
      */
     abstract protected void registerNewSelector() throws IOException;
 
@@ -483,9 +459,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * broken connection. In this case, this is a standard case, and we just
      * have to loop.
      * 
-     * @return true if a connection has been brutally closed.
-     * @throws IOException
-     *             If we got an exception
+     * @return <tt>true</tt> if a connection has been brutally closed.
+     * @throws IOException If we got an exception
      */
     abstract protected boolean isBrokenConnection() throws IOException;
 
@@ -512,9 +487,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * Process a new session : - initialize it - create its chain - fire the
      * CREATED listeners if any
      * 
-     * @param session
-     *            The session to create
-     * @return true if the session has been registered
+     * @param session The session to create
+     * @return <tt>true</tt> if the session has been registered
      */
     private boolean addNow(S session) {
         boolean registered = false;

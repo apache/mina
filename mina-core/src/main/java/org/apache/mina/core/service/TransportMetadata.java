@@ -33,7 +33,7 @@ import org.apache.mina.core.session.IoSessionConfig;
 public interface TransportMetadata {
 
     /**
-     * Returns the name of the service provider (e.g. "nio", "apr" and "rxtx").
+     * @return the name of the service provider (e.g. "nio", "apr" and "rxtx").
      */
     String getProviderName();
 
@@ -43,31 +43,31 @@ public interface TransportMetadata {
     String getName();
 
     /**
-     * Returns <code>true</code> if the session of this transport type is
+     * @return <tt>true</tt> if the session of this transport type is
      * <a href="http://en.wikipedia.org/wiki/Connectionless">connectionless</a>.
      */
     boolean isConnectionless();
 
     /**
-     * Returns {@code true} if the messages exchanged by the service can be
+     * @return {@code true} if the messages exchanged by the service can be
      * <a href="http://en.wikipedia.org/wiki/IPv4#Fragmentation_and_reassembly">fragmented
      * or reassembled</a> by its underlying transport.
      */
     boolean hasFragmentation();
 
     /**
-     * Returns the address type of the service.
+     * @return the address type of the service.
      */
     Class<? extends SocketAddress> getAddressType();
 
     /**
-     * Returns the set of the allowed message type when you write to an
+     * @return the set of the allowed message type when you write to an
      * {@link IoSession} that is managed by the service.
      */
     Set<Class<? extends Object>> getEnvelopeTypes();
 
     /**
-     * Returns the type of the {@link IoSessionConfig} of the service
+     * @return the type of the {@link IoSessionConfig} of the service
      */
     Class<? extends IoSessionConfig> getSessionConfigType();
 }

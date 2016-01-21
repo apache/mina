@@ -180,7 +180,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
-     * If the <code>autostart</code> flag is set to <code>true</code>, the
+     * If the <code>autostart</code> flag is set to <tt>true</tt>, the
      * handshake will start immediately.
      */
     public SslFilter(SSLContext sslContext, boolean autoStart) {

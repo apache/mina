@@ -28,7 +28,7 @@ package org.apache.mina.filter.codec.statemachine;
 public abstract class ConsumeToLinearWhitespaceDecodingState extends ConsumeToDynamicTerminatorDecodingState {
 
     /**
-     * @return <code>true</code> if the given byte is a space or a tab
+     * @return <tt>true</tt> if the given byte is a space or a tab
      */
     @Override
     protected boolean isTerminator(byte b) {

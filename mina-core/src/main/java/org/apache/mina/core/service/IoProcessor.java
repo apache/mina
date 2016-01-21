@@ -35,14 +35,14 @@ import org.apache.mina.core.write.WriteRequest;
 public interface IoProcessor<S extends IoSession> {
 
     /**
-     * Returns <tt>true</tt> if and if only {@link #dispose()} method has
+     * @return <tt>true</tt> if and if only {@link #dispose()} method has
      * been called.  Please note that this method will return <tt>true</tt>
      * even after all the related resources are released.
      */
     boolean isDisposing();
 
     /**
-     * Returns <tt>true</tt> if and if only all resources of this processor
+     * @return <tt>true</tt> if and if only all resources of this processor
      * have been disposed.
      */
     boolean isDisposed();
@@ -84,6 +84,8 @@ public interface IoProcessor<S extends IoSession> {
      * Controls the traffic of the specified {@code session} depending of the
      * {@link IoSession#isReadSuspended()} and {@link IoSession#isWriteSuspended()}
      * flags
+     * 
+     * @param session The session to be updated
      */
     void updateTrafficControl(S session);
 
@@ -92,6 +94,8 @@ public interface IoProcessor<S extends IoSession> {
      * processor so that the I/O processor closes the connection
      * associated with the {@code session} and releases any other related
      * resources.
+     * 
+     * @param session The session to be removed
      */
     void remove(S session);
 }

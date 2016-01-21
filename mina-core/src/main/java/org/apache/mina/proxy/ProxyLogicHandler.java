@@ -34,7 +34,7 @@ public interface ProxyLogicHandler {
     /**
      * Tests if handshake process is complete.
      * 
-     * @return <code>true</code> if handshaking is complete and
+     * @return <tt>true</tt> if handshaking is complete and
      * data can be sent through the proxy, false otherwise.
      */
     boolean isHandshakeComplete();

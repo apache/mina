@@ -45,7 +45,7 @@ public interface WriteRequestQueue {
     /**
      * Tells if the WriteRequest queue is empty or not for a session
      * @param session The session to check
-     * @return <code>true</code> if the writeRequest is empty
+     * @return <tt>true</tt> if the writeRequest is empty
      */
     boolean isEmpty(IoSession session);
 

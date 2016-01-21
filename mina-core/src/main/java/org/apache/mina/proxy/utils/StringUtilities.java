@@ -234,7 +234,7 @@ public class StringUtilities {
      * Note that we're checking individual bytes instead of CRLF
      * 
      * @param b the byte to check
-     * @return <code>true</code> if it's a linear white space
+     * @return <tt>true</tt> if it's a linear white space
      */
     public static boolean isLws(byte b) {
         switch (b) {
