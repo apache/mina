@@ -725,7 +725,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * @see java.nio.Buffer#hasRemaining()
      * 
-     * @return <tt>true</tt> if there are some reamining bytes in the buffer
+     * @return <tt>true</tt> if there are some remaining bytes in the buffer
      */
     public abstract boolean hasRemaining();
 
