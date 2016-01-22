@@ -90,9 +90,7 @@ public class MethodSelfTransition extends AbstractSelfTransition {
     }
 
     /**
-     * Returns the target {@link Method}.
-     * 
-     * @return the method.
+     * @return the target {@link Method}.
      */
     public Method getMethod() {
         return method;

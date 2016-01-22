@@ -114,8 +114,8 @@ public class TcpClient extends IoHandlerAdapter {
     /**
      * The main method : instanciates a client, and send N messages. We sleep 
      * between each K messages sent, to avoid the server saturation.
-     * @param args
-     * @throws Exception
+     * @param args The arguments
+     * @throws Exception If something went wrong
      */
     public static void main(String[] args) throws Exception {
         TcpClient client = new TcpClient();

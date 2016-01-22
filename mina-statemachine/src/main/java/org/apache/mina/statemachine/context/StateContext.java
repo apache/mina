@@ -33,9 +33,7 @@ import org.apache.mina.statemachine.StateMachine;
  */
 public interface StateContext {
     /**
-     * Returns the current {@link State}. This is only meant for internal use.
-     * 
-     * @return the current {@link State}.
+     * @return the current {@link State}. This is only meant for internal use.
      */
     State getCurrentState();
 

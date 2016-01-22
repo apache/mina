@@ -75,9 +75,9 @@ public class BogusSslContextFactory {
     /**
      * Get SSLContext singleton.
      *
-     * @return SSLContext
-     * @throws java.security.GeneralSecurityException
-     *
+     * @param server A flag to tell if this is a Client or Server instance we want to create
+     * @return SSLContext The created SSLContext 
+     * @throws GeneralSecurityException If we had an issue creating the SSLContext
      */
     public static SSLContext getInstance(boolean server)
             throws GeneralSecurityException {

@@ -32,6 +32,8 @@ public class TennisBall {
 
     /**
      * Creates a new ball with the specified TTL (Time To Live) value.
+     * 
+     * @param ttl The time to live
      */
     public TennisBall(int ttl) {
         this(ttl, true);
@@ -46,14 +48,14 @@ public class TennisBall {
     }
 
     /**
-     * Returns the TTL value of this ball.
+     * @return the TTL value of this ball.
      */
     public int getTTL() {
         return ttl;
     }
 
     /**
-     * Returns the ball after {@link TennisPlayer}'s stroke.
+     * @return the ball after {@link TennisPlayer}'s stroke.
      * The returned ball has decreased TTL value and switched PING/PONG state.
      */
     public TennisBall stroke() {
@@ -61,7 +63,7 @@ public class TennisBall {
     }
 
     /**
-     * Returns string representation of this message (<code>[PING|PONG]
+     * @return string representation of this message (<code>[PING|PONG]
      * (TTL)</code>).
      */
     @Override

@@ -42,6 +42,8 @@ public class IoSessionFinder {
     /**
      * Creates a new instance with the specified OGNL expression that returns
      * a boolean value (e.g. <tt>"id == 0x12345678"</tt>).
+     * 
+     * @param query The OGNL expression 
      */
     public IoSessionFinder(String query) {
         if (query == null) {
@@ -49,11 +51,13 @@ public class IoSessionFinder {
         }
 
         query = query.trim();
+        
         if (query.length() == 0) {
             throw new IllegalArgumentException("query is empty.");
         }
 
         this.query = query;
+        
         try {
             expression = Ognl.parseExpression(query);
         } catch (OgnlException e) {
@@ -65,6 +69,10 @@ public class IoSessionFinder {
      * Finds a {@link Set} of {@link IoSession}s that matches the query
      * from the specified sessions and returns the matches.
      * @throws OgnlException if failed to evaluate the OGNL expression
+     * 
+     * @param sessions The list of sessions to check
+     * @return A set of the session that matches the query
+     * @throws OgnlException If we can't find a boolean value in a session's context
      */
     public Set<IoSession> find(Iterable<IoSession> sessions) throws OgnlException {
         if (sessions == null) {
@@ -72,12 +80,14 @@ public class IoSessionFinder {
         }
 
         Set<IoSession> answer = new LinkedHashSet<IoSession>();
+        
         for (IoSession s : sessions) {
             OgnlContext context = (OgnlContext) Ognl.createDefaultContext(s);
             context.setTypeConverter(typeConverter);
             context.put(AbstractPropertyAccessor.READ_ONLY_MODE, true);
             context.put(AbstractPropertyAccessor.QUERY, query);
             Object result = Ognl.getValue(expression, context, s);
+            
             if (result instanceof Boolean) {
                 if (((Boolean) result).booleanValue()) {
                     answer.add(s);

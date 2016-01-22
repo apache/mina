@@ -179,17 +179,13 @@ public class MethodTransition extends AbstractTransition {
     }
 
     /**
-     * Returns the target {@link Method}.
-     * 
-     * @return the method.
+     * @return the target {@link Method}.
      */
     public Method getMethod() {
         return method;
     }
 
     /**
-     * Returns the target object.
-     * 
      * @return the target object.
      */
     public Object getTarget() {

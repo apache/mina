@@ -35,9 +35,7 @@ public class UnhandledEventException extends RuntimeException {
     }
 
     /**
-     * Returns the {@link Event} which couldn't be handled.
-     * 
-     * @return the {@link Event}.
+     * @return the {@link Event} which couldn't be handled.
      */
     public Event getEvent() {
         return event;

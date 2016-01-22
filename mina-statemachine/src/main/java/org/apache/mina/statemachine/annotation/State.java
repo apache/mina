@@ -38,6 +38,8 @@ public @interface State {
 
     /**
      * Sets the id of the parent state. The default is no parent.
+     * 
+     * @return the id of the parent state
      */
     String value() default ROOT;
 }

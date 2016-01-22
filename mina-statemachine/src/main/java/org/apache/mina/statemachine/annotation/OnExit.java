@@ -35,6 +35,8 @@ import java.lang.annotation.Target;
 public @interface OnExit {
     /**
      * Sets the id of related state.
+     * 
+     * @return the id of the related state
      */
     String value();
 }

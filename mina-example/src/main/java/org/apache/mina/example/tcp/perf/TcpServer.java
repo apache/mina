@@ -113,6 +113,8 @@ public class TcpServer extends IoHandlerAdapter {
 
     /**
      * {@inheritDoc}
+     * @param session the current seession
+     * @throws Exception If something went wrong
      */
     @Override
     public void sessionOpened(IoSession session) throws Exception {
@@ -121,6 +123,8 @@ public class TcpServer extends IoHandlerAdapter {
 
     /**
      * Create the TCP server
+     * 
+     * @throws IOException If something went wrong
      */
     public TcpServer() throws IOException {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
@@ -137,6 +141,9 @@ public class TcpServer extends IoHandlerAdapter {
 
     /**
      * The entry point.
+     * 
+     * @param args The arguments
+     * @throws IOException If something went wrong
      */
     public static void main(String[] args) throws IOException {
         new TcpServer();

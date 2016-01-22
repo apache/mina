@@ -33,10 +33,15 @@ import org.apache.mina.integration.beans.InetSocketAddressEditor;
 public class SocketAddressFactory {
     /**
      * @org.apache.xbean.FactoryMethod
+     * Creates a SocketAddress from its String description
+     * 
+     * @param value The socket address as a String
+     * @return A SocketAddress
      */
     public static SocketAddress create(String value) {
         InetSocketAddressEditor editor = new InetSocketAddressEditor();
         editor.setAsText(value);
+        
         return (SocketAddress) editor.getValue();
     }
 }

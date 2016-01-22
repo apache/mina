@@ -42,12 +42,16 @@ public @interface Transition {
     /**
      * Specifies the ids of one or more events handled by the annotated method. If
      * not specified the handler method will be executed for any event.
+     * 
+     * @return the ids of the handled events
      */
     String[] on() default Event.WILDCARD_EVENT_ID;
 
     /**
      * The id of the state or states that this handler applies to. Must be
      * specified.
+     * 
+     * @return the ids of the handled states
      */
     String[] in();
 
@@ -55,6 +59,8 @@ public @interface Transition {
      * The id of the state the {@link StateMachine} should move to next after
      * executing the annotated method. If not specified the {@link StateMachine}
      * will remain in the same state.
+     * 
+     * @return the id of the next state
      */
     String next() default SELF;
 
@@ -62,6 +68,8 @@ public @interface Transition {
      * The weight used to order handler annotations which match the same event 
      * in the same state. Transitions with lower weight will be matched first. The
      * default weight is 0.
+     * 
+     * @return the weight used to order the handler
      */
     int weight() default 0;
 }

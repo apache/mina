@@ -19,6 +19,7 @@
  */
 package org.apache.mina.example.udp.perf;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -112,8 +113,8 @@ public class UdpClient extends IoHandlerAdapter {
     /**
      * The main method : instanciates a client, and send N messages. We sleep 
      * between each K messages sent, to avoid the server saturation.
-     * @param args
-     * @throws Exception
+     * @param args The arguments
+     * @throws Exception If something went wrong
      */
     public static void main(String[] args) throws Exception {
         UdpClient client = new UdpClient();

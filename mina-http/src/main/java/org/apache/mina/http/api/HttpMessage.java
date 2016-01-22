@@ -44,7 +44,7 @@ public interface HttpMessage {
     String getContentType();
 
     /**
-     * Returns <tt>true</tt> if this message enables keep-alive connection.
+     * @return <tt>true</tt> if this message enables keep-alive connection.
      */
     boolean isKeepAlive();
 
@@ -58,12 +58,13 @@ public interface HttpMessage {
     String getHeader(String name);
 
     /**
-     * Returns <tt>true</tt> if the HTTP header with the specified name exists in this request.
+     * @param name the Header's name we are looking for
+     * @return <tt>true</tt> if the HTTP header with the specified name exists in this request.
      */
     boolean containsHeader(String name);
 
     /**
-     * Returns a read-only {@link Map} of HTTP headers whose key is a {@link String} and whose value is a {@link String}
+     * @return a read-only {@link Map} of HTTP headers whose key is a {@link String} and whose value is a {@link String}
      * s.
      */
     Map<String, String> getHeaders();

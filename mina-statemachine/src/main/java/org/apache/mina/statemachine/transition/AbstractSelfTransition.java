@@ -29,10 +29,8 @@ import org.apache.mina.statemachine.State;
  */
 
 public abstract class AbstractSelfTransition implements SelfTransition {
-
     /**
      * Creates a new instance
-     * 
      */
     public AbstractSelfTransition() {
 
@@ -41,14 +39,18 @@ public abstract class AbstractSelfTransition implements SelfTransition {
     /**
      * Executes this {@link SelfTransition}.
      * 
+     * @param stateContext the context in which the execution should occur
+     * @param state the current state
      * @return <tt>true</tt> if the {@link SelfTransition} has been executed
      *         successfully
      */
     protected abstract boolean doExecute(StateContext stateContext, State state);
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean execute(StateContext stateContext, State state) {
 
         return doExecute(stateContext, state);
     }
-
 }

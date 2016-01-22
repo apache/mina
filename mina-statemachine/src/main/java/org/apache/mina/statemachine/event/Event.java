@@ -71,27 +71,21 @@ public class Event {
     }
 
     /**
-     * Returns the {@link StateContext} this {@link Event} was triggered for.
-     * 
-     * @return the {@link StateContext}.
+     * @return the {@link StateContext} this {@link Event} was triggered for.
      */
     public StateContext getContext() {
         return context;
     }
 
     /**
-     * Returns the id of this {@link Event}.
-     * 
-     * @return the id.
+     * @return the id of this {@link Event}.
      */
     public Object getId() {
         return id;
     }
 
     /**
-     * Returns the arguments of this {@link Event}.
-     * 
-     * @return the arguments. Returns an empty array if this {@link Event} has 
+     * @return the arguments of this {@link Event}. @return an empty array if this {@link Event} has 
      *         no arguments.
      */
     public Object[] getArguments() {

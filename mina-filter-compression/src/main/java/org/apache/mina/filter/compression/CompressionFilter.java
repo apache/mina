@@ -201,7 +201,7 @@ public class CompressionFilter extends WriteRequestFilter {
     }
 
     /**
-     * Returns <tt>true</tt> if incoming data is being compressed.
+     * @return <tt>true</tt> if incoming data is being compressed.
      */
     public boolean isCompressInbound() {
         return compressInbound;
@@ -209,13 +209,15 @@ public class CompressionFilter extends WriteRequestFilter {
 
     /**
      * Sets if incoming data has to be compressed.
+     * 
+     * @param compressInbound <tt>true</tt> if the incoming data has to be compressed
      */
     public void setCompressInbound(boolean compressInbound) {
         this.compressInbound = compressInbound;
     }
 
     /**
-     * Returns <tt>true</tt> if the filter is compressing data being written.
+     * @return <tt>true</tt> if the filter is compressing data being written.
      */
     public boolean isCompressOutbound() {
         return compressOutbound;
@@ -223,6 +225,8 @@ public class CompressionFilter extends WriteRequestFilter {
 
     /**
      * Set if outgoing data has to be compressed.
+     * 
+     * @param compressOutbound <tt>true</tt> if the outgoing data has to be compressed
      */
     public void setCompressOutbound(boolean compressOutbound) {
         this.compressOutbound = compressOutbound;

@@ -108,10 +108,8 @@ public class StateMachine {
     }
 
     /**
-     * Returns an unmodifiable {@link Collection} of all {@link State}s used by
+     * @return an unmodifiable {@link Collection} of all {@link State}s used by
      * this {@link StateMachine}.
-     * 
-     * @return the {@link State}s.
      */
     public Collection<State> getStates() {
         return Collections.unmodifiableCollection(states.values());

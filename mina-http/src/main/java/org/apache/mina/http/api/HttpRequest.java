@@ -53,7 +53,7 @@ public interface HttpRequest extends HttpMessage {
     String getQueryString();
 
     /**
-     * Returns a read only {@link Map} of query parameters whose key is a {@link String} and whose value is a
+     * @return a read only {@link Map} of query parameters whose key is a {@link String} and whose value is a
      * {@link List} of {@link String}s.
      */
     Map<String, List<String>> getParameters();

@@ -81,17 +81,13 @@ public class State {
     }
 
     /**
-     * Returns the id of this {@link State}.
-     * 
-     * @return the id.
+     * @return the id of this {@link State}.
      */
     public String getId() {
         return id;
     }
 
     /**
-     * Returns the parent {@link State}.
-     * 
      * @return the parent or <code>null</code> if this {@link State} has no 
      *         parent.
      */
@@ -100,28 +96,22 @@ public class State {
     }
 
     /**
-     * Returns an unmodifiable {@link List} of {@link Transition}s going out
+     * @return an unmodifiable {@link List} of {@link Transition}s going out
      * from this {@link State}.
-     * 
-     * @return the {@link Transition}s.
      */
     public List<Transition> getTransitions() {
         return Collections.unmodifiableList(transitions);
     }
 
     /**
-     * Returns an unmodifiable {@link List} of entry {@link SelfTransition}s  
-     * 
-     * @return the {@link SelfTransition}s.
+     * @return an unmodifiable {@link List} of entry {@link SelfTransition}s  
      */
     public List<SelfTransition> getOnEntrySelfTransitions() {
         return Collections.unmodifiableList(onEntries);
     }
 
     /**
-     * Returns an unmodifiable {@link List} of exit {@link SelfTransition}s  
-     * 
-     * @return the {@link SelfTransition}s.
+     * @return an unmodifiable {@link List} of exit {@link SelfTransition}s  
      */
     public List<SelfTransition> getOnExitSelfTransitions() {
         return Collections.unmodifiableList(onExits);
@@ -181,6 +171,7 @@ public class State {
      * be executed.
      * 
      * @param transition the {@link Transition} to add.
+     * @param weight The weight of this transition
      * @return this {@link State}.
      */
     public State addTransition(Transition transition, int weight) {
@@ -194,23 +185,35 @@ public class State {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof State)) {
-            return false;
-        }
         if (o == this) {
             return true;
         }
+        
+        if (!(o instanceof State)) {
+            return false;
+        }
+        
         State that = (State) o;
+        
         return new EqualsBuilder().append(this.id, that.id).isEquals();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(13, 33).append(this.id).toHashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("id", this.id).toString();

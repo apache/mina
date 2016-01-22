@@ -44,6 +44,7 @@ public enum HttpVersion {
     /**
      * Returns the {@link HttpVersion} instance from the specified string.
      * 
+     * @param string The String contaoning the HTTP version
      * @return The version, or <code>null</code> if no version is found
      */
     public static HttpVersion fromString(String string) {

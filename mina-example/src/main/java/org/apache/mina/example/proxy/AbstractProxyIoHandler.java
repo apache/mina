@@ -39,12 +39,18 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractProxyIoHandler.class);
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionCreated(IoSession session) throws Exception {
         session.suspendRead();
         session.suspendWrite();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionClosed(IoSession session) throws Exception {
         if (session.getAttribute( OTHER_IO_SESSION ) != null) {
@@ -55,6 +61,9 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageReceived(IoSession session, Object message)
             throws Exception {

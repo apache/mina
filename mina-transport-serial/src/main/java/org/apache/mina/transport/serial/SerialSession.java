@@ -42,18 +42,19 @@ public interface SerialSession extends IoSession {
     void setRTS(boolean rts);
 
     /**
-     * Gets the state of the RTS (Request To Send) bit in the UART, if supported by the underlying implementation. 
+     * @return the state of the RTS (Request To Send) bit in the UART, if supported by the underlying implementation. 
      */
     boolean isRTS();
 
     /**
      * Sets or clears the DTR (Data Terminal Ready) bit in the UART, if supported by the underlying implementation.
+     * 
      * @param dtr true for set DTR, false for clearing
      */
     void setDTR(boolean dtr);
 
     /**
-     * Gets the state of the DTR (Data Terminal Ready) bit in the UART, if supported by the underlying implementation. 
+     * @return the state of the DTR (Data Terminal Ready) bit in the UART, if supported by the underlying implementation. 
      */
     boolean isDTR();
 }

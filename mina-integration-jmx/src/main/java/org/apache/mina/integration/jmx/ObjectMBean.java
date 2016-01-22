@@ -134,6 +134,8 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     /**
      * Creates a new instance with the specified POJO.
+     * 
+     * @param source The original POJO
      */
     public ObjectMBean(T source) {
         if (source == null) {

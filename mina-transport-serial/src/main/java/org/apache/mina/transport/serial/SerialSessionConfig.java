@@ -64,21 +64,21 @@ public interface SerialSessionConfig extends IoSessionConfig {
     boolean isLowLatency();
 
     /**
-     * Set the low latency mode, be carefull it's not supported by all the OS/hardware.
-     * @param lowLatency
+     * Set the low latency mode, be careful it's not supported by all the OS/hardware.
+     * @param lowLatency The low latency mode
      */
     void setLowLatency(boolean lowLatency);
 
     /**
      * The current receive threshold (-1 if not enabled). Give the value of the current buffer
      * needed for generate a new frame.
-     * @return the receive thresold in bytes or -1 if disabled
+     * @return the receive threshold in bytes or -1 if disabled
      */
     int getReceiveThreshold();
 
     /**
      * Set the receive threshold in byte (set it to -1 for disable). The serial port will try to
-     * provide frame of the given minimal byte count. Be carefull some devices doesn't support it.
+     * provide frame of the given minimal byte count. Be careful some devices doesn't support it.
      * @param bytes minimal amount of byte before producing a new frame, or -1 if disabled
      */
     void setReceiveThreshold(int bytes);

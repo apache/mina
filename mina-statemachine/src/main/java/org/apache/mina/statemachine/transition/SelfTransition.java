@@ -32,10 +32,9 @@ public interface SelfTransition {
     /**
      * Executes this {@link SelfTransition}.
      * 
-     * @return <tt>true</tt> if the {@link SelfTransition} was executed,
-     *         <tt>false</tt> otherwise.
+     * @param stateContext The context in which we are executing the transition
+     * @param state The current state
+     * @return <tt>true</tt> if the execution succeeded, <tt>false</tt> otherwise.
      */
-
     boolean execute(StateContext stateContext, State state);
-
 }

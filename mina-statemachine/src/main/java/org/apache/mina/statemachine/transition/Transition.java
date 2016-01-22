@@ -43,12 +43,10 @@ public interface Transition {
     boolean execute(Event event);
 
     /**
-     * Returns the {@link State} which the {@link StateMachine} should move to 
+     * @return the {@link State} which the {@link StateMachine} should move to 
      * if this {@link Transition} is taken and {@link #execute(Event)} returns
-     * <tt>true</tt>.
-     * 
-     * @return the next {@link State} or <code>null</code> if this 
-     *         {@link Transition} is a loopback {@link Transition}.
+     * <tt>true</tt>. <code>null</code> if this {@link Transition} is a loopback 
+     * {@link Transition}.
      */
     State getNextState();
 }

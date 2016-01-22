@@ -41,26 +41,26 @@ import org.apache.mina.statemachine.event.IoHandlerEvents;
 @TransitionAnnotation(IoHandlerTransitions.class)
 public @interface IoHandlerTransition {
     /**
-     * Specifies the ids of one or more events handled by the annotated method. If
+     * @return Specifies the ids of one or more events handled by the annotated method. If
      * not specified the handler method will be executed for any event.
      */
     IoHandlerEvents[] on() default IoHandlerEvents.ANY;
 
     /**
-     * The id of the state or states that this handler applies to. Must be
+     * @return The id of the state or states that this handler applies to. Must be
      * specified.
      */
     String[] in();
 
     /**
-     * The id of the state the {@link StateMachine} should move to next after
+     * @return The id of the state the {@link StateMachine} should move to next after
      * executing the annotated method. If not specified the {@link StateMachine}
      * will remain in the same state.
      */
     String next() default Transition.SELF;
 
     /**
-     * The weight used to order handler annotations which match the same event 
+     * @return The weight used to order handler annotations which match the same event 
      * in the same state. Transitions with lower weight will be matched first. The
      * default weight is 0.
      */

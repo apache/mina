@@ -46,6 +46,9 @@ public class MinaTimeServer {
     /**
      * The server implementation. It's based on TCP, and uses a logging filter 
      * plus a text line decoder.
+     * 
+     * @param args The arguments
+     * @throws IOException If something went wrong
      */
     public static void main(String[] args) throws IOException {
         // Create the acceptor

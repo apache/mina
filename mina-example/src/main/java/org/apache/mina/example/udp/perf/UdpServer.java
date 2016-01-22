@@ -121,6 +121,8 @@ public class UdpServer extends IoHandlerAdapter {
 
     /**
      * Create the UDP server
+     * 
+     * @throws IOException If something went wrong
      */
     public UdpServer() throws IOException {
         NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
@@ -137,6 +139,9 @@ public class UdpServer extends IoHandlerAdapter {
 
     /**
      * The entry point.
+     * 
+     * @param args The arguments
+     * @throws IOException If something went wrong
      */
     public static void main(String[] args) throws IOException {
         new UdpServer();
