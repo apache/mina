@@ -102,6 +102,7 @@ public class StringUtilities {
      * is a directive.
      *
      * @param buf A non-null digest-challenge string.
+     * @return A Map containing the aprsed directives
      * @throws SaslException if the String cannot be parsed according to RFC 2831
      */
     public static HashMap<String, String> parseDirectives(byte[] buf) throws SaslException {
@@ -273,7 +274,7 @@ public class StringUtilities {
      * 
      * @param str a non-null String
      * @return a non-null String containing the 8859_1 encoded string
-     * @throws UnsupportedEncodingException 
+     * @throws UnsupportedEncodingException if we weren't able to decode using the ISO 8859_1 encoding
      */
     public static String stringTo8859_1(String str) throws UnsupportedEncodingException {
         if (str == null) {

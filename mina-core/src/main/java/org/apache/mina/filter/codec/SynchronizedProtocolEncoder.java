@@ -36,6 +36,7 @@ public class SynchronizedProtocolEncoder implements ProtocolEncoder {
 
     /**
      * Creates a new instance which decorates the specified <tt>encoder</tt>.
+     * @param encoder The decorated encoder
      */
     public SynchronizedProtocolEncoder(ProtocolEncoder encoder) {
         if (encoder == null) {
@@ -45,18 +46,24 @@ public class SynchronizedProtocolEncoder implements ProtocolEncoder {
     }
 
     /**
-     * Returns the encoder this encoder is decorating.
+     * @return the encoder this encoder is decorating.
      */
     public ProtocolEncoder getEncoder() {
         return encoder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         synchronized (encoder) {
             encoder.encode(session, message, out);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void dispose(IoSession session) throws Exception {
         synchronized (encoder) {
             encoder.dispose(session);

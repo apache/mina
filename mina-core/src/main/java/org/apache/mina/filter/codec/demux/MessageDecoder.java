@@ -60,6 +60,8 @@ public interface MessageDecoder {
     /**
      * Checks the specified buffer is decodable by this decoder.
      *
+     * @param session The current session
+     * @param in The buffer containing the data to decode
      * @return {@link #OK} if this decoder can decode the specified buffer.
      *         {@link #NOT_OK} if this decoder cannot decode the specified buffer.
      *         {@link #NEED_DATA} if more data is required to determine if the
@@ -74,10 +76,12 @@ public interface MessageDecoder {
      * method with read data, and then the decoder implementation puts decoded
      * messages into {@link ProtocolDecoderOutput}.
      *
+     * @param session The current session
+     * @param in The buffer containing the data to decode
+     * @param out The instance of {@link ProtocolDecoderOutput} that will receive the decoded messages
      * @return {@link #OK} if you finished decoding messages successfully.
      *         {@link #NEED_DATA} if you need more data to finish decoding current message.
      *         {@link #NOT_OK} if you cannot decode current message due to protocol specification violation.
-     *
      * @throws Exception if the read data violated protocol specification
      */
     MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception;
@@ -90,6 +94,8 @@ public interface MessageDecoder {
      * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)} method didn't process
      * completely.
      *
+     * @param session The current session
+     * @param out The instance of {@link ProtocolDecoderOutput} that contains the decoded messages
      * @throws Exception if the read data violated protocol specification
      */
     void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception;

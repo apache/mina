@@ -42,6 +42,8 @@ public class ProtocolDecoderException extends ProtocolCodecException {
 
     /**
      * Constructs a new instance with the specified message.
+     * 
+     * @param message The detail message
      */
     public ProtocolDecoderException(String message) {
         super(message);
@@ -49,6 +51,8 @@ public class ProtocolDecoderException extends ProtocolCodecException {
 
     /**
      * Constructs a new instance with the specified cause.
+     * 
+     * @param cause The Exception's cause
      */
     public ProtocolDecoderException(Throwable cause) {
         super(cause);
@@ -57,13 +61,16 @@ public class ProtocolDecoderException extends ProtocolCodecException {
     /**
      * Constructs a new instance with the specified message and the specified
      * cause.
+     * 
+     * @param message The detail message
+     * @param cause The Exception's cause
      */
     public ProtocolDecoderException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Returns the message and the hexdump of the unknown part.
+     * @return the message and the hexdump of the unknown part.
      */
     @Override
     public String getMessage() {
@@ -81,7 +88,7 @@ public class ProtocolDecoderException extends ProtocolCodecException {
     }
 
     /**
-     * Returns the hexdump of the unknown message part.
+     * @return the hexdump of the unknown message part.
      */
     public String getHexdump() {
         return hexdump;
@@ -89,11 +96,14 @@ public class ProtocolDecoderException extends ProtocolCodecException {
 
     /**
      * Sets the hexdump of the unknown message part.
+     * 
+     * @param hexdump The hexadecimal String representation of the message 
      */
     public void setHexdump(String hexdump) {
         if (this.hexdump != null) {
             throw new IllegalStateException("Hexdump cannot be set more than once.");
         }
+        
         this.hexdump = hexdump;
     }
 }

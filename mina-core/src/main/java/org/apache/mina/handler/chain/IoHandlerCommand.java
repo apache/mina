@@ -86,6 +86,10 @@ public interface IoHandlerCommand {
         /**
          * Forwards the request to the next {@link IoHandlerCommand} in the
          * {@link IoHandlerChain}.
+         * 
+         * @param session The current session
+         * @param message The message to pass on
+         * @throws Exception If anything went wrong
          */
         void execute(IoSession session, Object message) throws Exception;
     }

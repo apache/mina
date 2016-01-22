@@ -38,16 +38,19 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
 
     /**
      * Creates a new instance which decorates the specified <tt>decoder</tt>.
+     * 
+     * @param decoder The decorated decoder
      */
     public SynchronizedProtocolDecoder(ProtocolDecoder decoder) {
         if (decoder == null) {
             throw new IllegalArgumentException("decoder");
         }
+        
         this.decoder = decoder;
     }
 
     /**
-     * Returns the decoder this decoder is decorating.
+     * @return the decoder this decoder is decorating.
      */
     public ProtocolDecoder getDecoder() {
         return decoder;
@@ -59,12 +62,18 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         synchronized (decoder) {
             decoder.finishDecode(session, out);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void dispose(IoSession session) throws Exception {
         synchronized (decoder) {
             decoder.dispose(session);

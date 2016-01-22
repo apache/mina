@@ -98,6 +98,8 @@ abstract class CompositeByteArrayRelativeBase {
 
     /**
      * Make a <code>ByteArray</code> available for access at the end of this object.
+     * 
+     * @param ba The ByteArray to append
      */
     public final void append(ByteArray ba) {
         cba.addLast(ba);
@@ -111,14 +113,14 @@ abstract class CompositeByteArrayRelativeBase {
     }
 
     /**
-     * Get the index that will be used for the next access.
+     * @return the index that will be used for the next access.
      */
     public final int getIndex() {
         return cursor.getIndex();
     }
 
     /**
-     * Get the index after the last byte that can be accessed.
+     * @return the index after the last byte that can be accessed.
      */
     public final int last() {
         return cba.last();

@@ -30,14 +30,14 @@ import org.apache.mina.core.service.IoConnector;
  */
 public interface DatagramConnector extends IoConnector {
     /**
-     * Returns the default remote InetSocketAddress to connect to when no argument
+     * @return the default remote InetSocketAddress to connect to when no argument
      * is specified in {@link #connect()} method.
      * This method overrides the {@link IoConnector#getDefaultRemoteAddress()} method.
      */
     InetSocketAddress getDefaultRemoteAddress();
 
     /**
-     * Returns the default configuration of the new FatagramSessions created by 
+     * @return the default configuration of the new FatagramSessions created by 
      * this connect service.
      */
     DatagramSessionConfig getSessionConfig();
@@ -46,6 +46,8 @@ public interface DatagramConnector extends IoConnector {
      * Sets the default remote InetSocketAddress to connect to when no argument is
      * specified in {@link #connect()} method.
      * This method overrides the {@link IoConnector#setDefaultRemoteAddress(java.net.SocketAddress)} method.
+     * 
+     * @param remoteAddress The remote address to set
      */
     void setDefaultRemoteAddress(InetSocketAddress remoteAddress);
 }

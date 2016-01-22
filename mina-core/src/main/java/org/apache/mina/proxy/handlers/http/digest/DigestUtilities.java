@@ -66,9 +66,13 @@ public class DigestUtilities {
      * @param pwd the password
      * @param charsetName the name of the charset used for the challenge
      * @param body the html body to be hashed for integrity calculations
+     * @return The response
+     * @throws AuthenticationException if we weren't able to find a directive value in the map
+     * @throws UnsupportedEncodingException If we weren't able to encode to ISO 8859_1 the username or realm,
+     * or if we weren't able to encode the charsetName
      */
     public static String computeResponseValue(IoSession session, HashMap<String, String> map, String method,
-            String pwd, String charsetName, String body) throws AuthenticationException, UnsupportedEncodingException {
+            String pwd, String charsetName, String body) throws AuthenticationException, UnsupportedEncodingException{
 
         byte[] hA1;
         StringBuilder sb;
@@ -81,6 +85,7 @@ public class DigestUtilities {
                     ':');
 
             String realm = StringUtilities.stringTo8859_1(StringUtilities.getDirectiveValue(map, "realm", false));
+            
             if (realm != null) {
                 sb.append(realm);
             }
@@ -89,6 +94,7 @@ public class DigestUtilities {
 
             if (isMD5Sess) {
                 byte[] prehA1;
+                
                 synchronized (md5) {
                     md5.reset();
                     prehA1 = md5.digest(sb.toString().getBytes(charsetName));
@@ -122,6 +128,7 @@ public class DigestUtilities {
         sb.append(StringUtilities.getDirectiveValue(map, "uri", false));
 
         String qop = StringUtilities.getDirectiveValue(map, "qop", false);
+        
         if ("auth-int".equalsIgnoreCase(qop)) {
             ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
             byte[] hEntity;
@@ -130,6 +137,7 @@ public class DigestUtilities {
                 md5.reset();
                 hEntity = md5.digest(body.getBytes(proxyIoSession.getCharsetName()));
             }
+            
             sb.append(':').append(hEntity);
         }
 
@@ -149,6 +157,7 @@ public class DigestUtilities {
         sb.append(ByteUtilities.asHex(hA2));
 
         byte[] hFinal;
+        
         synchronized (md5) {
             md5.reset();
             hFinal = md5.digest(sb.toString().getBytes(charsetName));

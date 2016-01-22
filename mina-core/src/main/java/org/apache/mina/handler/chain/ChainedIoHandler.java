@@ -53,7 +53,7 @@ public class ChainedIoHandler extends IoHandlerAdapter {
     }
 
     /**
-     * Returns the {@link IoHandlerCommand} this handler will use to
+     * @return the {@link IoHandlerCommand} this handler will use to
      * handle <tt>messageReceived</tt> events.
      */
     public IoHandlerChain getChain() {

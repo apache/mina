@@ -58,9 +58,7 @@ public interface ProxyLogicHandler {
     void doHandshake(NextFilter nextFilter) throws ProxyAuthException;
 
     /**
-     * Returns the {@link ProxyIoSession}.
-     * 
-     * @return the proxy session object
+     * @return the {@link ProxyIoSession}.
      */
     ProxyIoSession getProxyIoSession();
 

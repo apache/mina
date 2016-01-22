@@ -46,6 +46,9 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
 
     /**
      * Build an HttpBasicAuthLogicHandler
+     * 
+     * @param proxyIoSession The proxy session
+     * @throws ProxyAuthException If we had a probelm during the proxy authentication
      */
     public HttpBasicAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);

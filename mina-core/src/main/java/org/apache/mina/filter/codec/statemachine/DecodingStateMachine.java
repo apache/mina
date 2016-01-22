@@ -70,6 +70,7 @@ public abstract class DecodingStateMachine implements DecodingState {
      * Invoked to initialize this state machine.
      * 
      * @return the start {@link DecodingState}.
+     * @throws Exception if the initialization failed
      */
     protected abstract DecodingState init() throws Exception;
 
@@ -82,6 +83,7 @@ public abstract class DecodingStateMachine implements DecodingState {
      * @param out the real {@link ProtocolDecoderOutput} used by the 
      *        {@link ProtocolCodecFilter}.
      * @return the next state if the state machine should resume.
+     * @throws Exception if the decoding end failed
      */
     protected abstract DecodingState finishDecode(List<Object> childProducts, ProtocolDecoderOutput out)
             throws Exception;
@@ -89,6 +91,8 @@ public abstract class DecodingStateMachine implements DecodingState {
     /**
      * Invoked to destroy this state machine once the end state has been reached
      * or the session has been closed.
+     * 
+     * @throws Exception if the destruction failed
      */
     protected abstract void destroy() throws Exception;
 

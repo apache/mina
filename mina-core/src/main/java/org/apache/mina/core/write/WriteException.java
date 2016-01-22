@@ -30,18 +30,21 @@ import java.util.Set;
 import org.apache.mina.util.MapBackedSet;
 
 /**
- * An exception which is thrown when one or more write operations were failed.
+ * An exception which is thrown when one or more write operations failed.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class WriteException extends IOException {
-
+    /** The mandatory serialVersionUUID */
     private static final long serialVersionUID = -4174407422754524197L;
 
+    /** The list of WriteRequest stored in this exception */
     private final List<WriteRequest> requests;
 
     /**
      * Creates a new exception.
+     * 
+     * @param request The associated {@link WriteRequest}
      */
     public WriteException(WriteRequest request) {
         super();
@@ -50,14 +53,21 @@ public class WriteException extends IOException {
 
     /**
      * Creates a new exception.
+     * 
+     * @param request The associated {@link WriteRequest}
+     * @param message The detail message
      */
-    public WriteException(WriteRequest request, String s) {
-        super(s);
+    public WriteException(WriteRequest request, String message) {
+        super(message);
         this.requests = asRequestList(request);
     }
 
     /**
      * Creates a new exception.
+     * 
+     * @param request The associated {@link WriteRequest}
+     * @param message The detail message
+     * @param cause The Exception's cause
      */
     public WriteException(WriteRequest request, String message, Throwable cause) {
         super(message);
@@ -67,6 +77,9 @@ public class WriteException extends IOException {
 
     /**
      * Creates a new exception.
+     * 
+     * @param request The associated {@link WriteRequest}
+     * @param cause The Exception's cause
      */
     public WriteException(WriteRequest request, Throwable cause) {
         initCause(cause);
@@ -75,6 +88,8 @@ public class WriteException extends IOException {
 
     /**
      * Creates a new exception.
+     * 
+     * @param requests The collection of {@link WriteRequest}s
      */
     public WriteException(Collection<WriteRequest> requests) {
         super();
@@ -83,14 +98,21 @@ public class WriteException extends IOException {
 
     /**
      * Creates a new exception.
+     * 
+     * @param requests The collection of {@link WriteRequest}s
+     * @param message The detail message
      */
-    public WriteException(Collection<WriteRequest> requests, String s) {
-        super(s);
+    public WriteException(Collection<WriteRequest> requests, String message) {
+        super(message);
         this.requests = asRequestList(requests);
     }
 
     /**
      * Creates a new exception.
+     * 
+     * @param requests The collection of {@link WriteRequest}s
+     * @param message The detail message
+     * @param cause The Exception's cause
      */
     public WriteException(Collection<WriteRequest> requests, String message, Throwable cause) {
         super(message);
@@ -100,6 +122,9 @@ public class WriteException extends IOException {
 
     /**
      * Creates a new exception.
+     * 
+     * @param requests The collection of {@link WriteRequest}s
+     * @param cause The Exception's cause
      */
     public WriteException(Collection<WriteRequest> requests, Throwable cause) {
         initCause(cause);
@@ -107,14 +132,14 @@ public class WriteException extends IOException {
     }
 
     /**
-     * Returns the list of the failed {@link WriteRequest}, in the order of occurrance.
+     * @return the list of the failed {@link WriteRequest}, in the order of occurrence.
      */
     public List<WriteRequest> getRequests() {
         return requests;
     }
 
     /**
-     * Returns the firstly failed {@link WriteRequest}. 
+     * @return the firstly failed {@link WriteRequest}. 
      */
     public WriteRequest getRequest() {
         return requests.get(0);
@@ -124,12 +149,14 @@ public class WriteException extends IOException {
         if (requests == null) {
             throw new IllegalArgumentException("requests");
         }
+        
         if (requests.isEmpty()) {
             throw new IllegalArgumentException("requests is empty.");
         }
 
         // Create a list of requests removing duplicates.
         Set<WriteRequest> newRequests = new MapBackedSet<WriteRequest>(new LinkedHashMap<WriteRequest, Boolean>());
+        
         for (WriteRequest r : requests) {
             newRequests.add(r.getOriginalRequest());
         }
@@ -144,6 +171,7 @@ public class WriteException extends IOException {
 
         List<WriteRequest> requests = new ArrayList<WriteRequest>(1);
         requests.add(request.getOriginalRequest());
+        
         return Collections.unmodifiableList(requests);
     }
 }

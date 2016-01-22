@@ -102,7 +102,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     }
 
     /**
-     * Returns buffer size.
+     * @return The buffer size.
      */
     public int getBufferSize() {
         return bufferSize;

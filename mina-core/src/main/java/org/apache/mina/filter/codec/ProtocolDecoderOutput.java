@@ -42,6 +42,9 @@ public interface ProtocolDecoderOutput {
     /**
      * Flushes all messages you wrote via {@link #write(Object)} to
      * the next filter.
+     * 
+     * @param nextFilter the next Filter
+     * @param session The current Session
      */
     void flush(NextFilter nextFilter, IoSession session);
 }

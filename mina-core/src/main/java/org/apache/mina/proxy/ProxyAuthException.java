@@ -33,6 +33,8 @@ public class ProxyAuthException extends SaslException {
 
     /**
      * @see SaslException#SaslException(String)
+     * 
+     * @param message The detail message
      */
     public ProxyAuthException(String message) {
         super(message);
@@ -40,6 +42,9 @@ public class ProxyAuthException extends SaslException {
 
     /**
      * @see SaslException#SaslException(String, Throwable)
+     * 
+     * @param message The detail message
+     * @param ex The exception's cause
      */
     public ProxyAuthException(String message, Throwable ex) {
         super(message, ex);

@@ -34,6 +34,8 @@ public class WriteRequestWrapper implements WriteRequest {
 
     /**
      * Creates a new instance that wraps the specified request.
+     * 
+     * @param parentRequest The parent's request
      */
     public WriteRequestWrapper(WriteRequest parentRequest) {
         if (parentRequest == null) {
@@ -42,34 +44,52 @@ public class WriteRequestWrapper implements WriteRequest {
         this.parentRequest = parentRequest;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SocketAddress getDestination() {
         return parentRequest.getDestination();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public WriteFuture getFuture() {
         return parentRequest.getFuture();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Object getMessage() {
         return parentRequest.getMessage();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public WriteRequest getOriginalRequest() {
         return parentRequest.getOriginalRequest();
     }
 
     /**
-     * Returns the wrapped request object.
+     * @return the wrapped request object.
      */
     public WriteRequest getParentRequest() {
         return parentRequest;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "WR Wrapper" + parentRequest.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isEncoded() {
         return false;
     }

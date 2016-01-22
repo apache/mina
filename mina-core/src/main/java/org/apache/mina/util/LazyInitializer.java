@@ -43,8 +43,7 @@ public abstract class LazyInitializer<V> {
     public abstract V init();
 
     /**
-     * Returns the value resulting from the initialization.
-     * @return the initialized value
+     * @return the value resulting from the initialization.
      */
     public V get() {
         if (value == null) {

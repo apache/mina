@@ -209,12 +209,17 @@ public class DummySession extends AbstractIoSession {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoSessionConfig getConfig() {
         return config;
     }
 
     /**
      * Sets the configuration of this session.
+     * 
+     * @param config the {@link IoSessionConfig} to set
      */
     public void setConfig(IoSessionConfig config) {
         if (config == null) {
@@ -224,16 +229,24 @@ public class DummySession extends AbstractIoSession {
         this.config = config;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoFilterChain getFilterChain() {
         return filterChain;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoHandler getHandler() {
         return handler;
     }
 
     /**
      * Sets the {@link IoHandler} which handles this session.
+     * 
+     * @param handler the {@link IoHandler} to set
      */
     public void setHandler(IoHandler handler) {
         if (handler == null) {
@@ -243,10 +256,16 @@ public class DummySession extends AbstractIoSession {
         this.handler = handler;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SocketAddress getLocalAddress() {
         return localAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SocketAddress getRemoteAddress() {
         return remoteAddress;
     }
@@ -254,6 +273,8 @@ public class DummySession extends AbstractIoSession {
     /**
      * Sets the socket address of local machine which is associated with
      * this session.
+     * 
+     * @param localAddress The socket address to set
      */
     public void setLocalAddress(SocketAddress localAddress) {
         if (localAddress == null) {
@@ -265,6 +286,8 @@ public class DummySession extends AbstractIoSession {
 
     /**
      * Sets the socket address of remote peer.
+     * 
+     * @param remoteAddress The socket address to set
      */
     public void setRemoteAddress(SocketAddress remoteAddress) {
         if (remoteAddress == null) {
@@ -274,12 +297,17 @@ public class DummySession extends AbstractIoSession {
         this.remoteAddress = remoteAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoService getService() {
         return service;
     }
 
     /**
      * Sets the {@link IoService} which provides I/O service to this session.
+     * 
+     * @param service The {@link IoService} to set
      */
     public void setService(IoService service) {
         if (service == null) {
@@ -289,17 +317,25 @@ public class DummySession extends AbstractIoSession {
         this.service = service;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final IoProcessor<IoSession> getProcessor() {
         return processor;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return transportMetadata;
     }
 
     /**
      * Sets the {@link TransportMetadata} that this session runs on.
+     * 
+     * @param transportMetadata The {@link TransportMetadata} to set
      */
     public void setTransportMetadata(TransportMetadata transportMetadata) {
         if (transportMetadata == null) {
@@ -309,11 +345,17 @@ public class DummySession extends AbstractIoSession {
         this.transportMetadata = transportMetadata;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setScheduledWriteBytes(int byteCount) {
         super.setScheduledWriteBytes(byteCount);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setScheduledWriteMessages(int messages) {
         super.setScheduledWriteMessages(messages);
@@ -326,6 +368,8 @@ public class DummySession extends AbstractIoSession {
      * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
      * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method
      * updates the throughput properties immediately.
+     * 
+     * @param force the flag that forces the update of properties immediately if <tt>true</tt>
      */
     public void updateThroughput(boolean force) {
         super.updateThroughput(System.currentTimeMillis(), force);

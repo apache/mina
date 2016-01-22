@@ -59,7 +59,7 @@ public abstract class AbstractAuthLogicHandler {
      * Instantiates a handler for the given proxy session.
      * 
      * @param proxyIoSession the proxy session object
-     * @throws ProxyAuthException
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     protected AbstractAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         this.proxyIoSession = proxyIoSession;
@@ -74,7 +74,7 @@ public abstract class AbstractAuthLogicHandler {
      * Method called at each step of the handshaking process.
      * 
      * @param nextFilter the next filter
-     * @throws ProxyAuthException
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     public abstract void doHandshake(final NextFilter nextFilter) throws ProxyAuthException;
 
@@ -82,7 +82,7 @@ public abstract class AbstractAuthLogicHandler {
      * Handles a HTTP response from the proxy server.
      * 
      * @param response The HTTP response.
-     * @throws ProxyAuthException
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     public abstract void handleResponse(final HttpProxyResponse response) throws ProxyAuthException;
 
@@ -91,7 +91,7 @@ public abstract class AbstractAuthLogicHandler {
      * 
      * @param nextFilter the next filter
      * @param request the request to write
-     * @throws ProxyAuthException
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     protected void writeRequest(final NextFilter nextFilter, final HttpProxyRequest request) throws ProxyAuthException {
         logger.debug("  sending HTTP request");

@@ -70,9 +70,7 @@ public class Log4jXmlFormatter extends Formatter {
     }
 
     /**
-     * Returns the current value of the <b>LocationInfo</b> option.
-     *
-     * @return whether locationInfo will be output by this layout
+     * @return the current value of the <b>LocationInfo</b> option.
      */
     public boolean getLocationInfo() {
         return locationInfo;

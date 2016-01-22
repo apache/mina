@@ -44,6 +44,9 @@ public interface ProtocolDecoder {
      * method with read data, and then the decoder implementation puts decoded
      * messages into {@link ProtocolDecoderOutput}.
      *
+     * @param session The current Session
+     * @param in the buffer to decode
+     * @param out The {@link ProtocolDecoderOutput} that will receive the decoded message
      * @throws Exception if the read data violated protocol specification
      */
     void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception;
@@ -55,6 +58,8 @@ public interface ProtocolDecoder {
      * method to process the remaining data that {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
      * method didn't process completely.
      *
+     * @param session The current Session
+     * @param out The {@link ProtocolDecoderOutput} that contains the decoded message
      * @throws Exception if the read data violated protocol specification
      */
     void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception;
@@ -62,6 +67,7 @@ public interface ProtocolDecoder {
     /**
      * Releases all resources related with this decoder.
      *
+     * @param session The current Session
      * @throws Exception if failed to dispose all resources
      */
     void dispose(IoSession session) throws Exception;

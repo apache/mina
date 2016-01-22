@@ -63,8 +63,7 @@ public interface WriteRequestQueue {
     void dispose(IoSession session);
 
     /**
-     * Returns the number of objects currently stored in the queue.
-     * @return the size of the queue
+     * @return the number of objects currently stored in the queue.
      */
     int size();
 }

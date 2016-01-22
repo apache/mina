@@ -279,6 +279,7 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
      * Handles a HTTP response from the proxy server.
      * 
      * @param response The response.
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     public abstract void handleResponse(final HttpProxyResponse response) throws ProxyAuthException;
 
@@ -354,6 +355,8 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
      * Parse a HTTP response from the proxy server.
      * 
      * @param response The response string.
+     * @return The decoded HttpResponse
+     * @throws Exception If we get an error while decoding the response
      */
     protected HttpProxyResponse decodeResponse(final String response) throws Exception {
         LOGGER.debug("  parseResponse()");

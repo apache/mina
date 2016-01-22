@@ -68,6 +68,8 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
 
     /**
      * @see AbstractSocksLogicHandler#AbstractSocksLogicHandler(ProxyIoSession)
+     * 
+     * @param proxyIoSession The original session
      */
     public Socks5LogicHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);
@@ -329,7 +331,8 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
      * 
      * @param nextFilter the next filter
      * @param buf the buffered data received 
-     * @param step the current step in the authentication process     
+     * @param step the current step in the authentication process
+     * @throws Exception If something went wrong
      */
     protected void handleResponse(final NextFilter nextFilter, final IoBuffer buf, int step) throws Exception {
         int len = 2;

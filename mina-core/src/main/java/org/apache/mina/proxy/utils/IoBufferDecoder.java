@@ -180,6 +180,7 @@ public class IoBufferDecoder {
      * all the data and the trailing delimiter.
      * 
      * @param in the data to decode
+     * @return The decoded buffer
      */
     public IoBuffer decodeFully(IoBuffer in) {
         int contentLength = ctx.getContentLength();

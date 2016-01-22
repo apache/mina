@@ -73,21 +73,21 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
     }
 
     /**
-     * Returns the proxy filter {@link ProxyFilter}.
+     * @return the proxy filter {@link ProxyFilter}.
      */
     protected ProxyFilter getProxyFilter() {
         return proxyIoSession.getProxyFilter();
     }
 
     /**
-     * Returns the session.
+     * @return the session.
      */
     protected IoSession getSession() {
         return proxyIoSession.getSession();
     }
 
     /**
-     * Returns the {@link ProxyIoSession} object.
+     * @return the {@link ProxyIoSession} object.
      */
     public ProxyIoSession getProxyIoSession() {
         return proxyIoSession;
@@ -98,6 +98,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
      * 
      * @param nextFilter the next filter
      * @param data Data buffer to be written.
+     * @return A Future for the write operation
      */
     protected WriteFuture writeData(final NextFilter nextFilter, final IoBuffer data) {
         // write net data
@@ -112,7 +113,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
     }
 
     /**
-     * Returns <tt>true</tt> if handshaking is complete and
+     * @return <tt>true</tt> if handshaking is complete and
      * data can be sent through the proxy.
      */
     public boolean isHandshakeComplete() {
@@ -145,6 +146,8 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
 
     /**
      * Send any write requests which were queued whilst waiting for handshaking to complete.
+     * 
+     * @throws Exception If we can't flush the pending write requests
      */
     protected synchronized void flushPendingWriteRequests() throws Exception {
         LOGGER.debug(" flushPendingWriteRequests()");

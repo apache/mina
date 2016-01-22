@@ -55,6 +55,8 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     /**
      * Creates a new instance with the current default {@link Charset}
      * and the specified <tt>delimiter</tt>.
+     * 
+     * @param delimiter The line delimiter to use
      */
     public TextLineEncoder(String delimiter) {
         this(new LineDelimiter(delimiter));
@@ -63,30 +65,40 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     /**
      * Creates a new instance with the current default {@link Charset}
      * and the specified <tt>delimiter</tt>.
+     * 
+     * @param delimiter The line delimiter to use
      */
     public TextLineEncoder(LineDelimiter delimiter) {
         this(Charset.defaultCharset(), delimiter);
     }
 
     /**
-     * Creates a new instance with the spcified <tt>charset</tt>
+     * Creates a new instance with the specified <tt>charset</tt>
      * and {@link LineDelimiter#UNIX} delimiter.
+     * 
+     * @param charset The {@link Charset} to use
      */
     public TextLineEncoder(Charset charset) {
         this(charset, LineDelimiter.UNIX);
     }
 
     /**
-     * Creates a new instance with the spcified <tt>charset</tt>
+     * Creates a new instance with the specified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.
+     * 
+     * @param charset The {@link Charset} to use
+     * @param delimiter The line delimiter to use
      */
     public TextLineEncoder(Charset charset, String delimiter) {
         this(charset, new LineDelimiter(delimiter));
     }
 
     /**
-     * Creates a new instance with the spcified <tt>charset</tt>
+     * Creates a new instance with the specified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.
+     * 
+     * @param charset The {@link Charset} to use
+     * @param delimiter The line delimiter to use
      */
     public TextLineEncoder(Charset charset, LineDelimiter delimiter) {
         if (charset == null) {
@@ -104,7 +116,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     }
 
     /**
-     * Returns the allowed maximum size of the encoded line.
+     * @return the allowed maximum size of the encoded line.
      * If the size of the encoded line exceeds this value, the encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
@@ -118,6 +130,8 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
      * If the size of the encoded line exceeds this value, the encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
+     * 
+     * @param maxLineLength The maximum line length
      */
     public void setMaxLineLength(int maxLineLength) {
         if (maxLineLength <= 0) {
@@ -127,6 +141,9 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
         this.maxLineLength = maxLineLength;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         CharsetEncoder encoder = (CharsetEncoder) session.getAttribute(ENCODER);
 
@@ -148,6 +165,9 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
         out.write(buf);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void dispose() throws Exception {
         // Do nothing
     }

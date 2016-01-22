@@ -52,8 +52,6 @@ public abstract class ProxyRequest {
     }
 
     /**
-     * Returns the address of the request endpoint.
-     * 
      * @return the address of the request endpoint
      */
     public InetSocketAddress getEndpointAddress() {

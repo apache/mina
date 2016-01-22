@@ -57,6 +57,8 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
 
     /**
      * Creates a new instance.
+     * 
+     * @param executor The executor to use
      */
     public VmPipeAcceptor(Executor executor) {
         super(new DefaultVmPipeSessionConfig(), executor);
@@ -66,6 +68,9 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
         executeWorker(idleChecker.getNotifyingTask(), "idleStatusChecker");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return VmPipeSession.METADATA;
     }
@@ -77,11 +82,17 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
         return (VmPipeSessionConfig) sessionConfig;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public VmPipeAddress getLocalAddress() {
         return (VmPipeAddress) super.getLocalAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public VmPipeAddress getDefaultLocalAddress() {
         return (VmPipeAddress) super.getDefaultLocalAddress();
@@ -89,11 +100,18 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
 
     // This method is overriden to work around a problem with
     // bean property access mechanism.
-
+    /**
+     * Sets the local Address for this acceptor
+     * 
+     * @param localAddress The local address to use
+     */
     public void setDefaultLocalAddress(VmPipeAddress localAddress) {
         super.setDefaultLocalAddress(localAddress);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void dispose0() throws Exception {
         // stop the idle checking task
@@ -101,6 +119,9 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
         unbind();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses) throws IOException {
         Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
@@ -155,6 +176,9 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         throw new UnsupportedOperationException();
     }

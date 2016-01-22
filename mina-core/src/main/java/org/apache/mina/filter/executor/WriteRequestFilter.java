@@ -73,6 +73,8 @@ public class WriteRequestFilter extends IoFilterAdapter {
 
     /**
      * Creates a new instance with the specified {@link IoEventQueueHandler}.
+     * 
+     * @param queueHandler The {@link IoEventQueueHandler} instance to use
      */
     public WriteRequestFilter(IoEventQueueHandler queueHandler) {
         if (queueHandler == null) {
@@ -82,7 +84,7 @@ public class WriteRequestFilter extends IoFilterAdapter {
     }
 
     /**
-     * Returns the {@link IoEventQueueHandler} which is attached to this
+     * @return the {@link IoEventQueueHandler} which is attached to this
      * filter.
      */
     public IoEventQueueHandler getQueueHandler() {

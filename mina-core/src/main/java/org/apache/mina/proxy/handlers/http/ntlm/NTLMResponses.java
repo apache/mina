@@ -54,6 +54,7 @@ public class NTLMResponses {
      * @param challenge The Type 2 challenge from the server.
      *
      * @return The LM Response.
+     * @throws Exception If something went wrong
      */
     public static byte[] getLMResponse(String password, byte[] challenge) throws Exception {
         byte[] lmHash = lmHash(password);
@@ -68,6 +69,7 @@ public class NTLMResponses {
      * @param challenge The Type 2 challenge from the server.
      *
      * @return The NTLM Response.
+     * @throws Exception If something went wrong
      */
     public static byte[] getNTLMResponse(String password, byte[] challenge) throws Exception {
         byte[] ntlmHash = ntlmHash(password);
@@ -88,6 +90,7 @@ public class NTLMResponses {
      * @param clientNonce The random 8-byte client nonce.
      *
      * @return The NTLMv2 Response.
+     * @throws Exception If something went wrong
      */
     public static byte[] getNTLMv2Response(String target, String user, String password, byte[] targetInformation,
             byte[] challenge, byte[] clientNonce) throws Exception {
@@ -111,6 +114,7 @@ public class NTLMResponses {
      * @param time The time stamp.
      *
      * @return The NTLMv2 Response.
+     * @throws Exception If something went wrong
      */
     public static byte[] getNTLMv2Response(String target, String user, String password, byte[] targetInformation,
             byte[] challenge, byte[] clientNonce, long time) throws Exception {
@@ -131,6 +135,7 @@ public class NTLMResponses {
      * @param clientNonce The random 8-byte client nonce.
      *
      * @return The LMv2 Response.
+     * @throws Exception If something went wrong
      */
     public static byte[] getLMv2Response(String target, String user, String password, byte[] challenge,
             byte[] clientNonce) throws Exception {
@@ -149,6 +154,7 @@ public class NTLMResponses {
      * @return The NTLM2 Session Response.  This is placed in the NTLM
      * response field of the Type 3 message; the LM response field contains
      * the client nonce, null-padded to 24 bytes.
+     * @throws Exception If something went wrong
      */
     public static byte[] getNTLM2SessionResponse(String password, byte[] challenge, byte[] clientNonce)
             throws Exception {
@@ -319,6 +325,7 @@ public class NTLMResponses {
      * @param key The hashing key.
      *
      * @return The HMAC-MD5 hash of the given data.
+     * @throws Exception If something went wrong
      */
     public static byte[] hmacMD5(byte[] data, byte[] key) throws Exception {
         byte[] ipad = new byte[64];

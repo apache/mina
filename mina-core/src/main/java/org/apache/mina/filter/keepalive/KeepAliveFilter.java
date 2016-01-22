@@ -182,6 +182,8 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
+     * 
+     * @param messageFactory The message factory to use 
      */
     public KeepAliveFilter(KeepAliveMessageFactory messageFactory) {
         this(messageFactory, IdleStatus.READER_IDLE, KeepAliveRequestTimeoutHandler.CLOSE);
@@ -195,6 +197,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
+     * 
+     * @param messageFactory The message factory to use 
+     * @param interestedIdleStatus The IdleStatus the filter is interested in
      */
     public KeepAliveFilter(KeepAliveMessageFactory messageFactory, IdleStatus interestedIdleStatus) {
         this(messageFactory, interestedIdleStatus, KeepAliveRequestTimeoutHandler.CLOSE, 60, 30);
@@ -208,6 +213,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
+     * 
+     * @param messageFactory The message factory to use 
+     * @param policy The TimeOut handler policy
      */
     public KeepAliveFilter(KeepAliveMessageFactory messageFactory, KeepAliveRequestTimeoutHandler policy) {
         this(messageFactory, IdleStatus.READER_IDLE, policy, 60, 30);
@@ -220,6 +228,10 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
      * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
      * </ul>
+     * 
+     * @param messageFactory The message factory to use 
+     * @param interestedIdleStatus The IdleStatus the filter is interested in
+     * @param policy The TimeOut handler policy
      */
     public KeepAliveFilter(KeepAliveMessageFactory messageFactory, IdleStatus interestedIdleStatus,
             KeepAliveRequestTimeoutHandler policy) {
@@ -228,15 +240,23 @@ public class KeepAliveFilter extends IoFilterAdapter {
 
     /**
      * Creates a new instance.
+     * 
+     * @param messageFactory The message factory to use 
+     * @param interestedIdleStatus The IdleStatus the filter is interested in
+     * @param policy The TimeOut handler policy
+     * @param keepAliveRequestInterval the interval to use
+     * @param keepAliveRequestTimeout The timeout to use
      */
     public KeepAliveFilter(KeepAliveMessageFactory messageFactory, IdleStatus interestedIdleStatus,
             KeepAliveRequestTimeoutHandler policy, int keepAliveRequestInterval, int keepAliveRequestTimeout) {
         if (messageFactory == null) {
             throw new IllegalArgumentException("messageFactory");
         }
+        
         if (interestedIdleStatus == null) {
             throw new IllegalArgumentException("interestedIdleStatus");
         }
+        
         if (policy == null) {
             throw new IllegalArgumentException("policy");
         }
@@ -249,14 +269,25 @@ public class KeepAliveFilter extends IoFilterAdapter {
         setRequestTimeout(keepAliveRequestTimeout);
     }
 
+    /**
+     * @return The {@link IdleStatus} 
+     */
     public IdleStatus getInterestedIdleStatus() {
         return interestedIdleStatus;
     }
 
+    /**
+     * @return The timeout request handler
+     */
     public KeepAliveRequestTimeoutHandler getRequestTimeoutHandler() {
         return requestTimeoutHandler;
     }
 
+    /**
+     * Set the timeout handler
+     * 
+     * @param timeoutHandler The instance of {@link KeepAliveRequestTimeoutHandler} to use
+     */
     public void setRequestTimeoutHandler(KeepAliveRequestTimeoutHandler timeoutHandler) {
         if (timeoutHandler == null) {
             throw new IllegalArgumentException("timeoutHandler");
@@ -264,36 +295,57 @@ public class KeepAliveFilter extends IoFilterAdapter {
         requestTimeoutHandler = timeoutHandler;
     }
 
+    /**
+     * @return the interval for keep alive messages
+     */
     public int getRequestInterval() {
         return requestInterval;
     }
 
+    /**
+     * Sets the interval for keepAlive messages
+     * 
+     * @param keepAliveRequestInterval the interval to set
+     */
     public void setRequestInterval(int keepAliveRequestInterval) {
         if (keepAliveRequestInterval <= 0) {
             throw new IllegalArgumentException("keepAliveRequestInterval must be a positive integer: "
                     + keepAliveRequestInterval);
         }
+        
         requestInterval = keepAliveRequestInterval;
     }
 
+    /**
+     * @return The timeout
+     */
     public int getRequestTimeout() {
         return requestTimeout;
     }
 
+    /**
+     * Sets the timeout
+     * 
+     * @param keepAliveRequestTimeout The timeout to set
+     */
     public void setRequestTimeout(int keepAliveRequestTimeout) {
         if (keepAliveRequestTimeout <= 0) {
             throw new IllegalArgumentException("keepAliveRequestTimeout must be a positive integer: "
                     + keepAliveRequestTimeout);
         }
+        
         requestTimeout = keepAliveRequestTimeout;
     }
 
+    /**
+     * @return The message factory
+     */
     public KeepAliveMessageFactory getMessageFactory() {
         return messageFactory;
     }
 
     /**
-     * Returns <tt>true</tt> if and only if this filter forwards
+     * @return <tt>true</tt> if and only if this filter forwards
      * a {@link IoEventType#SESSION_IDLE} event to the next filter.
      * By default, the value of this property is <tt>false</tt>.
      */
@@ -305,11 +357,16 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * Sets if this filter needs to forward a
      * {@link IoEventType#SESSION_IDLE} event to the next filter.
      * By default, the value of this property is <tt>false</tt>.
+     * 
+     * @param forwardEvent a flag set to tell if the filter has to forward a {@link IoEventType#SESSION_IDLE} event
      */
     public void setForwardEvent(boolean forwardEvent) {
         this.forwardEvent = forwardEvent;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         if (parent.contains(this)) {
@@ -318,16 +375,25 @@ public class KeepAliveFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         resetStatus(parent.getSession());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         resetStatus(parent.getSession());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         try {
@@ -349,19 +415,27 @@ public class KeepAliveFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
+        
         if (!isKeepAliveMessage(session, message)) {
             nextFilter.messageSent(session, writeRequest);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         if (status == interestedIdleStatus) {
             if (!session.containsAttribute(WAITING_FOR_RESPONSE)) {
                 Object pingMessage = messageFactory.getRequest(session);
+                
                 if (pingMessage != null) {
                     nextFilter.filterWrite(session, new DefaultWriteRequest(pingMessage));
 

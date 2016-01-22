@@ -85,6 +85,8 @@ public class LineDelimiter {
 
     /**
      * Creates a new line delimiter with the specified <tt>value</tt>.
+     * 
+     * @param value The new Line Delimiter
      */
     public LineDelimiter(String value) {
         if (value == null) {
@@ -95,7 +97,7 @@ public class LineDelimiter {
     }
 
     /**
-     * Return the delimiter string.
+     * @return the delimiter string.
      */
     public String getValue() {
         return value;

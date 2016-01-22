@@ -154,7 +154,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
      * @param processorType The type of IoProcessor to use
      * @param executor The {@link Executor}
      * @param size The number of IoProcessor in the pool
-     * @param The SelectorProvider to used
+     * @param selectorProvider The SelectorProvider to used
      */
     @SuppressWarnings("unchecked")
     public SimpleIoProcessorPool(Class<? extends IoProcessor<S>> processorType, Executor executor, int size, 

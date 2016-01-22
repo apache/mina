@@ -38,7 +38,7 @@ public interface TransportMetadata {
     String getProviderName();
 
     /**
-     * Returns the name of the service.
+     * @return the name of the service.
      */
     String getName();
 

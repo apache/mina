@@ -52,7 +52,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
      *
      * Creates a new instance of NioProcessor.
      *
-     * @param executor
+     * @param executor The executor to use
      */
     public NioProcessor(Executor executor) {
         super(executor);
@@ -69,7 +69,8 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
      *
      * Creates a new instance of NioProcessor.
      *
-     * @param executor
+     * @param executor The executor to use
+     * @param selectorProvider The Selector provider to use
      */
     public NioProcessor(Executor executor, SelectorProvider selectorProvider) {
         super(executor);

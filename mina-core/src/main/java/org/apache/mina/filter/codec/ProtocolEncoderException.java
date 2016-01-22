@@ -37,6 +37,8 @@ public class ProtocolEncoderException extends ProtocolCodecException {
 
     /**
      * Constructs a new instance with the specified message.
+     * 
+     * @param message The detail message
      */
     public ProtocolEncoderException(String message) {
         super(message);
@@ -44,6 +46,8 @@ public class ProtocolEncoderException extends ProtocolCodecException {
 
     /**
      * Constructs a new instance with the specified cause.
+     * 
+     * @param cause The Exception's cause
      */
     public ProtocolEncoderException(Throwable cause) {
         super(cause);
@@ -52,6 +56,9 @@ public class ProtocolEncoderException extends ProtocolCodecException {
     /**
      * Constructs a new instance with the specified message and the specified
      * cause.
+     * 
+     * @param message The detail message
+     * @param cause The Exception's cause
      */
     public ProtocolEncoderException(String message, Throwable cause) {
         super(message, cause);

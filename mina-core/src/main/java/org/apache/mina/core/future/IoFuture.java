@@ -109,8 +109,6 @@ public interface IoFuture {
     boolean join(long timeoutMillis);
 
     /**
-     * Returns if the asynchronous operation is completed.
-     * 
      * @return <tt>true</tt> if the operation is completed.
      */
     boolean isDone();

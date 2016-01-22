@@ -60,7 +60,7 @@ public class IdleStatus {
     }
 
     /**
-     * Returns the string representation of this status.
+     * @return the string representation of this status.
      * <ul>
      *   <li>{@link #READER_IDLE} - <tt>"reader idle"</tt></li>
      *   <li>{@link #WRITER_IDLE} - <tt>"writer idle"</tt></li>

@@ -25,10 +25,15 @@ package org.apache.mina.filter.codec.demux;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *
  * @see DemuxingProtocolEncoder
+ * 
+ * @param T the message type
  */
 public interface MessageEncoderFactory<T> {
     /**
      * Creates a new message encoder.
+     * 
+     * @return The created encoder
+     * @throws Exception If we weren't able to create an encoder
      */
     MessageEncoder<T> getEncoder() throws Exception;
 }

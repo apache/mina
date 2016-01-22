@@ -48,6 +48,8 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
 
     /**
      * Set the byte order of the array.
+     * 
+     * @param order The ByteOrder to use
      */
     void order(ByteOrder order);
 
@@ -58,14 +60,14 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
     void free();
 
     /**
-     * Get the sequence of <code>IoBuffer</code>s that back this array.
+     * @return the sequence of <code>IoBuffer</code>s that back this array.
      * Compared to <code>getSingleIoBuffer()</code>, this method should be
      * relatively efficient for all implementations.
      */
     Iterable<IoBuffer> getIoBuffers();
 
     /**
-     * Gets a single <code>IoBuffer</code> that backs this array. Some
+     * @return a single <code>IoBuffer</code> that backs this array. Some
      * implementations may initially have data split across multiple buffers, so
      * calling this method may require a new buffer to be allocated and
      * populated.
@@ -76,6 +78,9 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
      * A ByteArray is equal to another ByteArray if they start and end at the
      * same index, have the same byte order, and contain the same bytes at each
      * index.
+     * 
+     * @param other The ByteArray we want to compare with
+     * @return <tt>true</tt> if both ByteArray are equals
      */
     boolean equals(Object other);
 
@@ -95,12 +100,13 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
     int getInt(int index);
 
     /**
-     * Get a cursor starting at index 0 (which may not be the start of the array).
+     * @return a cursor starting at index 0 (which may not be the start of the array).
      */
     Cursor cursor();
 
     /**
-     * Get a cursor starting at the given index.
+     * @param index The starting point
+     * @return a cursor starting at the given index.
      */
     Cursor cursor(int index);
 
@@ -115,13 +121,15 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
     interface Cursor extends IoRelativeReader, IoRelativeWriter {
 
         /**
-         * Gets the current index of the cursor.
+         * @return the current index of the cursor.
          */
         int getIndex();
 
         /**
          * Sets the current index of the cursor. No bounds checking will occur
          * until an access occurs.
+         * 
+         * @param index The current index to set
          */
         void setIndex(int index);
 

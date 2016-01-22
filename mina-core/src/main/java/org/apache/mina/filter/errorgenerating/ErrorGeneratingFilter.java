@@ -211,7 +211,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     /**
      * not functional ATM
-     * @param duplicatePduProbability
+     * @param duplicatePduProbability The probability for generating duplicated PDU
      */
     public void setDuplicatePduProbability(int duplicatePduProbability) {
         this.duplicatePduProbability = duplicatePduProbability;
@@ -237,7 +237,8 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     /**
      * Set to true if you want to apply error to the read {@link IoBuffer}
-     * @param manipulateReads
+     * 
+     * @param manipulateReads The number of manipulated reads
      */
     public void setManipulateReads(boolean manipulateReads) {
         this.manipulateReads = manipulateReads;
@@ -249,7 +250,8 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     /**
      * Set to true if you want to apply error to the written {@link IoBuffer}
-     * @param manipulateWrites
+     * 
+     * @param manipulateWrites The umber of manipulated writes
      */
     public void setManipulateWrites(boolean manipulateWrites) {
         this.manipulateWrites = manipulateWrites;
@@ -263,6 +265,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
      * Set the probability for the remove byte error.
      * If this probability is &gt; 0 the filter will remove a random number of byte
      * in the processed {@link IoBuffer}.
+     * 
      * @param removeByteProbability probability of modifying an {@link IoBuffer} out of 1000 processed IoBuffer 
      */
     public void setRemoveByteProbability(int removeByteProbability) {
@@ -275,7 +278,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     /**
      * not functional ATM
-     * @param removePduProbability
+     * @param removePduProbability The PDU removal probability
      */
     public void setRemovePduProbability(int removePduProbability) {
         this.removePduProbability = removePduProbability;
@@ -287,7 +290,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     /**
      * not functional ATM
-     * @param resendPduLasterProbability
+     * @param resendPduLasterProbability The delay before a resend
      */
     public void setResendPduLasterProbability(int resendPduLasterProbability) {
         this.resendPduLasterProbability = resendPduLasterProbability;

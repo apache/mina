@@ -854,8 +854,6 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         }
 
         /**
-         * Returns the total number of profiled operations
-         *
          * @return The total number of profiled operation 
          */
         public long getCallsNumber() {
@@ -863,8 +861,6 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         }
 
         /**
-         * Returns the total time
-         *
          * @return the total time
          */
         public long getTotal() {
@@ -872,8 +868,6 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         }
 
         /**
-         * Returns the lowest execution time 
-         *
          * @return the lowest execution time
          */
         public long getMinimum() {
@@ -881,8 +875,6 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
         }
 
         /**
-         * Returns the longest execution time
-         *
          * @return the longest execution time
          */
         public long getMaximum() {

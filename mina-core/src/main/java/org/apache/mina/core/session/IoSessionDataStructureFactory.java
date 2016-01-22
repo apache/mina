@@ -31,19 +31,25 @@ import org.apache.mina.core.write.WriteRequestQueue;
  */
 public interface IoSessionDataStructureFactory {
     /**
-     * Returns an {@link IoSessionAttributeMap} which is going to be associated
+     * @return an {@link IoSessionAttributeMap} which is going to be associated
      * with the specified <tt>session</tt>.  Please note that the returned
      * implementation must be thread-safe.
+     * 
+     * @param session The session for which we want the Attribute Map
+     * @throws Exception If an error occured while retrieving the map
      */
     IoSessionAttributeMap getAttributeMap(IoSession session) throws Exception;
 
     /**
-     * Returns an {@link WriteRequest} which is going to be associated with
+     * @return an {@link WriteRequest} which is going to be associated with
      * the specified <tt>session</tt>.  Please note that the returned
      * implementation must be thread-safe and robust enough to deal
      * with various messages types (even what you didn't expect at all),
      * especially when you are going to implement a priority queue which
      * involves {@link Comparator}.
+     * 
+     * @param session The session for which we want the WriteRequest queue
+     * @throws Exception If an error occured while retrieving the queue
      */
     WriteRequestQueue getWriteRequestQueue(IoSession session) throws Exception;
 }

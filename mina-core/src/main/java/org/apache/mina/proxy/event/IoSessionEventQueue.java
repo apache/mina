@@ -108,6 +108,8 @@ public class IoSessionEventQueue {
      * Send any session event which were queued while waiting for handshaking to complete.
      * 
      * Please note this is an internal method. DO NOT USE it in your code.
+     * 
+     * @throws Exception If something went wrong while flushing the pending events
      */
     public void flushPendingSessionEvents() throws Exception {
         synchronized (sessionEventsQueue) {

@@ -39,6 +39,9 @@ public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
 
     /**
      * Build an HttpNoAuthLogicHandler
+     * 
+     * @param proxyIoSession The original session
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     public HttpNoAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);

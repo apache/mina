@@ -49,6 +49,8 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
 
     /**
      * Creates a new instance with the specified {@link ClassLoader}.
+     * 
+     * @param classLoader The class loader to use
      */
     public ObjectSerializationDecoder(ClassLoader classLoader) {
         if (classLoader == null) {
@@ -58,7 +60,7 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
     }
 
     /**
-     * Returns the allowed maximum size of the object to be decoded.
+     * @return the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, this
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1048576</tt> (1MB).
@@ -72,6 +74,8 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
      * If the size of the object to be decoded exceeds this value, this
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1048576</tt> (1MB).
+     * 
+     * @param maxObjectSize The maximum size for an object to be decoded
      */
     public void setMaxObjectSize(int maxObjectSize) {
         if (maxObjectSize <= 0) {
@@ -81,6 +85,9 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
         this.maxObjectSize = maxObjectSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (!in.prefixedDataAvailable(4, maxObjectSize)) {

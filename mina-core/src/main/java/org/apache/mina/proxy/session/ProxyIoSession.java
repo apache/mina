@@ -116,14 +116,14 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns the pending event queue.
+     * @return the pending event queue.
      */
     public IoSessionEventQueue getEventQueue() {
         return eventQueue;
     }
 
     /**
-     * Returns the list of the prefered order for the authentication methods.
+     * @return the list of the prefered order for the authentication methods.
      * This list is used by the {@link HttpSmartProxyHandler} to determine
      * which authentication mechanism to use first between those accepted by the
      * proxy server. This list is only used when connecting to an http proxy.
@@ -142,7 +142,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns the {@link ProxyLogicHandler} currently in use.
+     * @return the {@link ProxyLogicHandler} currently in use.
      */
     public ProxyLogicHandler getHandler() {
         return handler;
@@ -158,7 +158,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns the {@link ProxyFilter}.
+     * @return the {@link ProxyFilter}.
      */
     public ProxyFilter getProxyFilter() {
         return proxyFilter;
@@ -176,7 +176,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns the proxy request.
+     * @return the proxy request.
      */
     public ProxyRequest getRequest() {
         return request;
@@ -196,7 +196,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns the current {@link IoSession}.
+     * @return the current {@link IoSession}.
      */
     public IoSession getSession() {
         return session;
@@ -214,7 +214,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns the proxy connector.
+     * @return the proxy connector.
      */
     public ProxyConnector getConnector() {
         return connector;
@@ -232,7 +232,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns the IP address of the proxy server.
+     * @return the IP address of the proxy server.
      */
     public InetSocketAddress getProxyAddress() {
         return proxyAddress;
@@ -252,7 +252,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns true if the current authentication process is not finished
+     * @return true if the current authentication process is not finished
      * but the server has closed the connection.
      */
     public boolean isReconnectionNeeded() {
@@ -274,14 +274,14 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns a charset instance of the in use charset name.
+     * @return a charset instance of the in use charset name.
      */
     public Charset getCharset() {
         return Charset.forName(getCharsetName());
     }
 
     /**
-     * Returns the used charset name or {@link #DEFAULT_ENCODING} if null.
+     * @return the used charset name or {@link #DEFAULT_ENCODING} if null.
      */
     public String getCharsetName() {
         if (charsetName == null) {
@@ -301,7 +301,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * Returns true if authentication failed.
+     * @return true if authentication failed.
      */
     public boolean isAuthenticationFailed() {
         return authenticationFailed;

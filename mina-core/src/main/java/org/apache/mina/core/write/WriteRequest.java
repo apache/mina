@@ -32,18 +32,18 @@ import org.apache.mina.core.session.IoSession;
  */
 public interface WriteRequest {
     /**
-     * Returns the {@link WriteRequest} which was requested originally,
+     * @return the {@link WriteRequest} which was requested originally,
      * which is not transformed by any {@link IoFilter}.
      */
     WriteRequest getOriginalRequest();
 
     /**
-     * Returns {@link WriteFuture} that is associated with this write request.
+     * @return {@link WriteFuture} that is associated with this write request.
      */
     WriteFuture getFuture();
 
     /**
-     * Returns a message object to be written.
+     * @return a message object to be written.
      */
     Object getMessage();
 

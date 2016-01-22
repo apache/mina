@@ -53,6 +53,11 @@ public class KeyStoreFactory {
      * by the base class when Spring creates a bean using this FactoryBean.
      *
      * @return a new {@link KeyStore} instance.
+     * @throws KeyStoreException If we can't create an instance of the KeyStore for the given type
+     * @throws NoSuchProviderException If we don't have the provider registered to create the KeyStore
+     * @throws NoSuchAlgorithmException If the KeyStore algorithm cannot be used
+     * @throws CertificateException If the KeyStore certificate cannot be loaded 
+     * @throws IOException If the KeyStore cannot be loaded
      */
     public KeyStore newInstance() throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException,
             CertificateException, IOException {
@@ -68,6 +73,7 @@ public class KeyStoreFactory {
         }
 
         InputStream is = new ByteArrayInputStream(data);
+        
         try {
             ks.load(is, password);
         } finally {
@@ -136,6 +142,7 @@ public class KeyStoreFactory {
      * Sets the data which contains the key store.
      *
      * @param dataStream the {@link InputStream} that contains the key store
+     * @throws IOException If we can't process the stream
      */
     private void setData(InputStream dataStream) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -161,6 +168,7 @@ public class KeyStoreFactory {
      * Sets the data which contains the key store.
      *
      * @param dataFile the {@link File} that contains the key store
+     * @throws IOException If we can't process the file
      */
     public void setDataFile(File dataFile) throws IOException {
         setData(new BufferedInputStream(new FileInputStream(dataFile)));
@@ -170,6 +178,7 @@ public class KeyStoreFactory {
      * Sets the data which contains the key store.
      *
      * @param dataUrl the {@link URL} that contains the key store.
+     * @throws IOException If we can't process the URL
      */
     public void setDataUrl(URL dataUrl) throws IOException {
         setData(dataUrl.openStream());

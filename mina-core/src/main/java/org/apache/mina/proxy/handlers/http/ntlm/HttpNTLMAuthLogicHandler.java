@@ -53,6 +53,9 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
 
     /**
      * Build an HttpNTLMAuthLogicHandler
+     * 
+     * @param proxyIoSession The original session
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     public HttpNTLMAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);
@@ -111,7 +114,7 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
     }
 
     /**
-     * Returns the value of the NTLM Proxy-Authenticate header.
+     * @return the value of the NTLM Proxy-Authenticate header.
      * 
      * @param response the proxy response
      */

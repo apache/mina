@@ -133,8 +133,6 @@ public class IoSessionEvent {
     }
 
     /**
-     * Returns the idle status of the event.
-     * 
      * @return the idle status of the event
      */
     public IdleStatus getStatus() {
@@ -142,27 +140,21 @@ public class IoSessionEvent {
     }
 
     /**
-     * Returns the next filter to which the event should be sent.
-     * 
-     * @return the next filter
+     * @return the next filter to which the event should be sent.
      */
     public NextFilter getNextFilter() {
         return nextFilter;
     }
 
     /**
-     * Returns the session on which the event occured.
-     * 
-     * @return the session
+     * @return the session on which the event occured.
      */
     public IoSession getSession() {
         return session;
     }
 
     /**
-     * Returns the event type that occured.
-     * 
-     * @return the event type
+     * @return the event type that occured.
      */
     public IoSessionEventType getType() {
         return type;

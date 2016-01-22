@@ -45,7 +45,7 @@ public class ObjectSerializationEncoder extends ProtocolEncoderAdapter {
     }
 
     /**
-     * Returns the allowed maximum size of the encoded object.
+     * @return the allowed maximum size of the encoded object.
      * If the size of the encoded object exceeds this value, this encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
@@ -59,6 +59,8 @@ public class ObjectSerializationEncoder extends ProtocolEncoderAdapter {
      * If the size of the encoded object exceeds this value, this encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
+     * 
+     * @param maxObjectSize the maximum size for an encoded object
      */
     public void setMaxObjectSize(int maxObjectSize) {
         if (maxObjectSize <= 0) {
@@ -68,6 +70,9 @@ public class ObjectSerializationEncoder extends ProtocolEncoderAdapter {
         this.maxObjectSize = maxObjectSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         if (!(message instanceof Serializable)) {
             throw new NotSerializableException();

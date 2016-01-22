@@ -55,22 +55,14 @@ class ByteArrayList {
     }
 
     /**
-     * 
-     * Returns the last byte in the array list
-     *
-     * @return
-     *  The last byte in the array list
+     * @return The last byte in the array list
      */
     public int lastByte() {
         return lastByte;
     }
 
     /**
-     * 
-     * Returns the first byte in the array list
-     *
-     * @return
-     *  The first byte in the array list
+     * @return The first byte in the array list
      */
     public int firstByte() {
         return firstByte;
@@ -88,20 +80,14 @@ class ByteArrayList {
     }
 
     /**
-     * Returns the first node in the byte array
-     *
-     * @return
-     *  
+     * @return the first node in the byte array
      */
     public Node getFirst() {
         return header.getNextNode();
     }
 
     /**
-     * Returns the last {@link Node} in the list
-     *
-     * @return
-     *  The last node in the list
+     * @return the last {@link Node} in the list
      */
     public Node getLast() {
         return header.getPreviousNode();

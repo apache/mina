@@ -70,6 +70,8 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * This constructor allows to provide a fine tuned {@link ConcurrentHashMap}
      * to stick with each special case the user needs.
+     * 
+     * @param map The map to use as a cache
      */
     public LazyInitializedCacheMap(final ConcurrentHashMap<K, LazyInitializer<V>> map) {
         this.cache = map;

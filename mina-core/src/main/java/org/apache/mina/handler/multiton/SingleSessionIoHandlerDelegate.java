@@ -66,7 +66,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
     }
 
     /**
-     * Returns the {@link SingleSessionIoHandlerFactory} that is used to create a new
+     * @return the {@link SingleSessionIoHandlerFactory} that is used to create a new
      * {@link SingleSessionIoHandler} instance.
      */
     public SingleSessionIoHandlerFactory getFactory() {
@@ -77,8 +77,10 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * Creates a new instance with the factory passed to the constructor of
      * this class.  The created handler is stored as a session
      * attribute named {@link #HANDLER}.
-     *
+     * 
      * @see org.apache.mina.core.service.IoHandler#sessionCreated(org.apache.mina.core.session.IoSession)
+     * 
+     * {@inheritDoc}
      */
     public void sessionCreated(IoSession session) throws Exception {
         SingleSessionIoHandler handler = factory.getHandler(session);
@@ -90,6 +92,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * Delegates the method call to the
      * {@link SingleSessionIoHandler#sessionOpened()} method of the handler
      * assigned to this session.
+     * 
+     * {@inheritDoc}
      */
     public void sessionOpened(IoSession session) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
@@ -100,6 +104,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * Delegates the method call to the
      * {@link SingleSessionIoHandler#sessionClosed()} method of the handler
      * assigned to this session.
+     * 
+     * {@inheritDoc}
      */
     public void sessionClosed(IoSession session) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
@@ -110,6 +116,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * Delegates the method call to the
      * {@link SingleSessionIoHandler#sessionIdle(IdleStatus)} method of the
      * handler assigned to this session.
+     * 
+     * {@inheritDoc}
      */
     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
@@ -120,6 +128,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * Delegates the method call to the
      * {@link SingleSessionIoHandler#exceptionCaught(Throwable)} method of the
      * handler assigned to this session.
+     * 
+     * {@inheritDoc}
      */
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
@@ -130,6 +140,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * Delegates the method call to the
      * {@link SingleSessionIoHandler#messageReceived(Object)} method of the
      * handler assigned to this session.
+     * 
+     * {@inheritDoc}
      */
     public void messageReceived(IoSession session, Object message) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
@@ -140,12 +152,17 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * Delegates the method call to the
      * {@link SingleSessionIoHandler#messageSent(Object)} method of the handler
      * assigned to this session.
+     * 
+     * {@inheritDoc}
      */
     public void messageSent(IoSession session, Object message) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.messageSent(message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void inputClosed(IoSession session) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.inputClosed(session);

@@ -43,14 +43,24 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
 
     private int maxObjectSize = 1048576;
 
+    /**
+     * Create a new instance of an ObjectSerializationInputStream
+     * @param in The {@link InputStream} to use
+     */
     public ObjectSerializationInputStream(InputStream in) {
         this(in, null);
     }
 
+    /**
+     * Create a new instance of an ObjectSerializationInputStream
+     * @param in The {@link InputStream} to use
+     * @param classLoader The class loader to use
+     */
     public ObjectSerializationInputStream(InputStream in, ClassLoader classLoader) {
         if (in == null) {
             throw new IllegalArgumentException("in");
         }
+        
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
         }
@@ -65,7 +75,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     }
 
     /**
-     * Returns the allowed maximum size of the object to be decoded.
+     * @return the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, this
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1048576</tt> (1MB).
@@ -79,6 +89,8 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
      * If the size of the object to be decoded exceeds this value, this
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1048576</tt> (1MB).
+     * 
+     * @param maxObjectSize The maximum decoded object size
      */
     public void setMaxObjectSize(int maxObjectSize) {
         if (maxObjectSize <= 0) {
@@ -88,11 +100,17 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
         this.maxObjectSize = maxObjectSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read() throws IOException {
         return in.read();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Object readObject() throws ClassNotFoundException, IOException {
         int objectSize = in.readInt();
         if (objectSize <= 0) {
@@ -112,34 +130,58 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
         return buf.getObject(classLoader);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean readBoolean() throws IOException {
         return in.readBoolean();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public byte readByte() throws IOException {
         return in.readByte();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public char readChar() throws IOException {
         return in.readChar();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public double readDouble() throws IOException {
         return in.readDouble();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public float readFloat() throws IOException {
         return in.readFloat();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void readFully(byte[] b) throws IOException {
         in.readFully(b);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void readFully(byte[] b, int off, int len) throws IOException {
         in.readFully(b, off, len);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int readInt() throws IOException {
         return in.readInt();
     }
@@ -153,26 +195,44 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
         return in.readLine();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public long readLong() throws IOException {
         return in.readLong();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public short readShort() throws IOException {
         return in.readShort();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String readUTF() throws IOException {
         return in.readUTF();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int readUnsignedByte() throws IOException {
         return in.readUnsignedByte();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int readUnsignedShort() throws IOException {
         return in.readUnsignedShort();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int skipBytes(int n) throws IOException {
         return in.skipBytes(n);
     }

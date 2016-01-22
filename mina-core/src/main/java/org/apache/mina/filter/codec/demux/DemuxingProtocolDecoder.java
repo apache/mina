@@ -32,20 +32,29 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * decoding requests into an appropriate {@link MessageDecoder}.
  * 
  * <h2>Internal mechanism of {@link MessageDecoder} selection</h2>
- * <p>
  * <ol>
- * <li>{@link DemuxingProtocolDecoder} iterates the list of candidate
- * {@link MessageDecoder}s and calls {@link MessageDecoder#decodable(IoSession, IoBuffer)}.
- * Initially, all registered {@link MessageDecoder}s are candidates.</li>
- * <li>If {@link MessageDecoderResult#NOT_OK} is returned, it is removed from the candidate
- *     list.</li>
- * <li>If {@link MessageDecoderResult#NEED_DATA} is returned, it is retained in the candidate
+ *   <li>
+ *     {@link DemuxingProtocolDecoder} iterates the list of candidate
+ *     {@link MessageDecoder}s and calls {@link MessageDecoder#decodable(IoSession, IoBuffer)}.
+ *     Initially, all registered {@link MessageDecoder}s are candidates.
+ *   </li>
+ *   <li>
+ *     If {@link MessageDecoderResult#NOT_OK} is returned, it is removed from the candidate
+ *     list.
+ *   </li>
+ *   <li>
+ *     If {@link MessageDecoderResult#NEED_DATA} is returned, it is retained in the candidate
  *     list, and its {@link MessageDecoder#decodable(IoSession, IoBuffer)} will be invoked
- *     again when more data is received.</li>
- * <li>If {@link MessageDecoderResult#OK} is returned, {@link DemuxingProtocolDecoder}
- *     found the right {@link MessageDecoder}.</li>
- * <li>If there's no candidate left, an exception is raised.  Otherwise, 
+ *     again when more data is received.
+ *   </li>
+ *   <li>
+ *     If {@link MessageDecoderResult#OK} is returned, {@link DemuxingProtocolDecoder}
+ *     found the right {@link MessageDecoder}.
+ *   </li>
+ *   <li>
+ *     If there's no candidate left, an exception is raised.  Otherwise, 
  *     {@link DemuxingProtocolDecoder} will keep iterating the candidate list.
+ *   </li>
  * </ol>
  * 
  * Please note that any change of position and limit of the specified {@link IoBuffer}
@@ -56,13 +65,19 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)} continuously
  * reading its return value:
  * <ul>
- * <li>{@link MessageDecoderResult#NOT_OK} - protocol violation; {@link ProtocolDecoderException}
- *                                           is raised automatically.</li>
- * <li>{@link MessageDecoderResult#NEED_DATA} - needs more data to read the whole message;
- *                                              {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
- *                                              will be invoked again when more data is received.</li>
- * <li>{@link MessageDecoderResult#OK} - successfully decoded a message; the candidate list will
- *                                       be reset and the selection process will start over.</li>
+ *   <li>
+ *     {@link MessageDecoderResult#NOT_OK} - protocol violation; {@link ProtocolDecoderException}
+ *     is raised automatically.
+ *   </li>
+ *   <li>
+ *     {@link MessageDecoderResult#NEED_DATA} - needs more data to read the whole message;
+ *     {@link MessageDecoder#decode(IoSession, IoBuffer, ProtocolDecoderOutput)}
+ *     will be invoked again when more data is received.
+ *   </li>
+ *   <li>
+ *     {@link MessageDecoderResult#OK} - successfully decoded a message; the candidate list will
+ *     be reset and the selection process will start over.
+ *   </li>
  * </ul>
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>

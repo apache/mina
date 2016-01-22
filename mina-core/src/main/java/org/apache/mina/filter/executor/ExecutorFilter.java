@@ -495,9 +495,7 @@ public class ExecutorFilter extends IoFilterAdapter {
     }
 
     /**
-     * Returns the underlying {@link Executor} instance this filter uses.
-     * 
-     * @return The underlying {@link Executor}
+     * @return the underlying {@link Executor} instance this filter uses.
      */
     public final Executor getExecutor() {
         return executor;

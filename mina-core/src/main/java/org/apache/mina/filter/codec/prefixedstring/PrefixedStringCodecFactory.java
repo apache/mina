@@ -77,11 +77,9 @@ public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
     }
 
     /**
-     * Returns the allowed maximum size of a decoded string.
+     * @return the allowed maximum size of a decoded string.
      * <p>
      * This method does the same job as {@link PrefixedStringEncoder#setMaxDataLength(int)}.
-     *
-     * @return the allowed maximum size of an encoded string.
      * @see #setDecoderMaxDataLength(int)
      */
     public int getDecoderMaxDataLength() {

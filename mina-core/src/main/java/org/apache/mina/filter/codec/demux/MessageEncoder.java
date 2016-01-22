@@ -34,6 +34,8 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  *
  * @see DemuxingProtocolEncoder
  * @see MessageEncoderFactory
+ * 
+ * @param T The message type
  */
 public interface MessageEncoder<T> {
     /**
@@ -43,6 +45,9 @@ public interface MessageEncoder<T> {
      * the encoder implementation puts encoded {@link IoBuffer}s into
      * {@link ProtocolEncoderOutput}.
      *
+     * @param session The current session 
+     * @param message The message to encode
+     * @param out The instance of {@link ProtocolEncoderOutput} that will receive the encoded message
      * @throws Exception if the message violated protocol specification
      */
     void encode(IoSession session, T message, ProtocolEncoderOutput out) throws Exception;

@@ -164,14 +164,14 @@ public class HttpProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Returns the HTTP request verb.
+     * @return the HTTP request verb.
      */
     public final String getHttpVerb() {
         return httpVerb;
     }
 
     /**
-     * Returns the HTTP version.
+     * @return the HTTP version.
      */
     public String getHttpVersion() {
         return httpVersion;
@@ -187,7 +187,7 @@ public class HttpProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Returns the host to which we are connecting.
+     * @return the host to which we are connecting.
      */
     public synchronized final String getHost() {
         if (host == null) {
@@ -208,14 +208,14 @@ public class HttpProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Returns the request HTTP URI.
+     * @return the request HTTP URI.
      */
     public final String getHttpURI() {
         return httpURI;
     }
 
     /**
-     * Returns the HTTP headers.
+     * @return the HTTP headers.
      */
     public final Map<String, List<String>> getHeaders() {
         return headers;
@@ -223,13 +223,15 @@ public class HttpProxyRequest extends ProxyRequest {
 
     /**
      * Set the HTTP headers.
+     * 
+     * @param headers The HTTP headers to set
      */
     public final void setHeaders(Map<String, List<String>> headers) {
         this.headers = headers;
     }
 
     /**
-     * Returns additional properties for the request.
+     * @return additional properties for the request.
      */
     public Map<String, String> getProperties() {
         return properties;
@@ -237,6 +239,8 @@ public class HttpProxyRequest extends ProxyRequest {
 
     /**
      * Set additional properties for the request.
+     * 
+     * @param properties The properties to add to the reqyest
      */
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
@@ -245,6 +249,9 @@ public class HttpProxyRequest extends ProxyRequest {
     /**
      * Check if the given property(ies) is(are) set. Otherwise throws a 
      * {@link ProxyAuthException}.
+     * 
+     * @param propNames The list of property name to check
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     public void checkRequiredProperties(String... propNames) throws ProxyAuthException {
         StringBuilder sb = new StringBuilder();
@@ -260,7 +267,7 @@ public class HttpProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Returns the string representation of the HTTP request .
+     * @return the string representation of the HTTP request .
      */
     public String toHttpString() {
         StringBuilder sb = new StringBuilder();

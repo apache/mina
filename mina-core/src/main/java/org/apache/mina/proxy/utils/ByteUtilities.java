@@ -33,9 +33,9 @@ public class ByteUtilities {
      * Returns the integer represented by up to 4 bytes in network byte order.
      * 
      * @param buf the buffer to read the bytes from
-     * @param start
-     * @param count
-     * @return the integer value        
+     * @param start The starting position
+     * @param count The number of bytes to in the buffer
+     * @return the integer value
      */
     public static int networkByteOrderToInt(byte[] buf, int start, int count) {
         if (count > 4) {
@@ -91,6 +91,7 @@ public class ByteUtilities {
      * Write a 16 bit short as LITTLE_ENDIAN.
      * 
      * @param v the short to write
+     * @return the Short in a byte[]
      */
     public final static byte[] writeShort(short v) {
         return writeShort(v, new byte[2], 0);
@@ -103,6 +104,7 @@ public class ByteUtilities {
      * @param v the short to write
      * @param b the byte array to write to
      * @param offset the offset at which to start writing in the array
+     * @return the Short in a byte[]
      */
     public final static byte[] writeShort(short v, byte[] b, int offset) {
         b[offset] = (byte) v;
@@ -115,6 +117,7 @@ public class ByteUtilities {
      * Write a 32 bit int as LITTLE_ENDIAN.
      * 
      * @param v the int to write
+     * @return the Int in a byte[]
      */
     public final static byte[] writeInt(int v) {
         return writeInt(v, new byte[4], 0);
@@ -127,6 +130,7 @@ public class ByteUtilities {
      * @param v the int to write
      * @param b the byte array to write to
      * @param offset the offset at which to start writing in the array
+     * @return the Int in a byte[]
      */
     public final static byte[] writeInt(int v, byte[] b, int offset) {
         b[offset] = (byte) v;

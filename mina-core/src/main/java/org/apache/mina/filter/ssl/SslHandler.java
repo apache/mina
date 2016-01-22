@@ -756,8 +756,7 @@ class SslHandler {
                     throw new SSLException("SSL buffer overflow");
                 }
 
-                appBuffer.capacity(newCapacity);
-                appBuffer.limit(appBuffer.capacity());
+                appBuffer.expand(newCapacity);
                 continue;
             }
         } while (((status == SSLEngineResult.Status.OK) || (status == SSLEngineResult.Status.BUFFER_OVERFLOW))

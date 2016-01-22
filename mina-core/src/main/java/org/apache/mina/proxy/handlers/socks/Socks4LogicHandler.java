@@ -40,6 +40,8 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
 
     /**
      * @see AbstractSocksLogicHandler#AbstractSocksLogicHandler(ProxyIoSession)
+     * 
+     * @param proxyIoSession The original session
      */
     public Socks4LogicHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);

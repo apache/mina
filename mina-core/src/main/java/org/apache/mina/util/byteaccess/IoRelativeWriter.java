@@ -31,62 +31,80 @@ import org.apache.mina.core.buffer.IoBuffer;
 public interface IoRelativeWriter {
 
     /**
-     * Gets the number of remaining bytes that can be read.
+     * @return the number of remaining bytes that can be read.
      */
     int getRemaining();
 
     /**
-     * Checks if there are any remaining bytes that can be read.
+     * @return if there are any remaining bytes that can be read.
      */
     boolean hasRemaining();
 
     /**
      * Advances the writer by the given number of bytes.
+     * 
+     * @param length The number of bytes to skip
      */
     void skip(int length);
 
     /**
-     * Gets the order of the bytes.
+     * @return the bytes' order
      */
     ByteOrder order();
 
     /**
      * Puts a <code>byte</code> and advances the reader.
+     * 
+     * @param b The byte to put
      */
     void put(byte b);
 
     /**
      * Puts enough bytes to fill the <code>IoBuffer</code> and advances the reader.
+     * 
+     * @param bb The bytes to put
      */
     void put(IoBuffer bb);
 
     /**
      * Puts a <code>short</code> and advances the reader.
+     * 
+     * @param s The short to put
      */
     void putShort(short s);
 
     /**
      * Puts an <code>int</code> and advances the reader.
+     * 
+     * @param i The int to put
      */
     void putInt(int i);
 
     /**
      * Puts a <code>long</code> and advances the reader.
+     * 
+     * @param l The long to put
      */
     void putLong(long l);
 
     /**
      * Puts a <code>float</code> and advances the reader.
+     * 
+     * @param f The float to put
      */
     void putFloat(float f);
 
     /**
      * Puts a <code>double</code> and advances the reader.
+     * 
+     * @param d The double to put
      */
     void putDouble(double d);
 
     /**
      * Puts a <code>char</code> and advances the reader.
+     * 
+     * @param c The char to put
      */
     void putChar(char c);
 }

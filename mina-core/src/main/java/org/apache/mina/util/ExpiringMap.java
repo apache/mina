@@ -388,10 +388,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         }
 
         /**
-         * Returns the Time-to-live value.
-         *
-         * @return
-         *  The time-to-live (seconds)
+         * @return the Time-to-live value in seconds.
          */
         public int getTimeToLive() {
             stateLock.readLock().lock();

@@ -103,37 +103,29 @@ public interface IoService {
     void setHandler(IoHandler handler);
 
     /**
-     * Returns the map of all sessions which are currently managed by this
+     * @return the map of all sessions which are currently managed by this
      * service.  The key of map is the {@link IoSession#getId() ID} of the
-     * session.
-     *
-     * @return the sessions. An empty collection if there's no session.
+     * session. An empty collection if there's no session.
      */
     Map<Long, IoSession> getManagedSessions();
 
     /**
-     * Returns the number of all sessions which are currently managed by this
+     * @return the number of all sessions which are currently managed by this
      * service.
-     * 
-     * @return The number of managed sessions
      */
     int getManagedSessionCount();
 
     /**
-     * Returns the default configuration of the new {@link IoSession}s
+     * @return the default configuration of the new {@link IoSession}s
      * created by this service.
-     * 
-     * @return The session config
      */
     IoSessionConfig getSessionConfig();
 
     /**
-     * Returns the {@link IoFilterChainBuilder} which will build the
+     * @return the {@link IoFilterChainBuilder} which will build the
      * {@link IoFilterChain} of all {@link IoSession}s which is created
      * by this service.
      * The default value is an empty {@link DefaultIoFilterChainBuilder}.
-     * 
-     * @return The filter chain builder in use
      */
     IoFilterChainBuilder getFilterChainBuilder();
 
@@ -162,17 +154,13 @@ public interface IoService {
     DefaultIoFilterChainBuilder getFilterChain();
 
     /**
-     * Returns a value of whether or not this service is active
-     *
-     * @return whether of not the service is active.
+     * @return a value of whether or not this service is active
      */
     boolean isActive();
 
     /**
-     * Returns the time when this service was activated.  It returns the last
+     * @return the time when this service was activated.  It returns the last
      * time when this service was activated if the service is not active now.
-     *
-     * @return The time by using {@link System#currentTimeMillis()}
      */
     long getActivationTime();
 
@@ -187,10 +175,8 @@ public interface IoService {
     Set<WriteFuture> broadcast(Object message);
 
     /**
-     * Returns the {@link IoSessionDataStructureFactory} that provides
+     * @return the {@link IoSessionDataStructureFactory} that provides
      * related data structures for a new session created by this service.
-     * 
-     * @return The used session factory
      */
     IoSessionDataStructureFactory getSessionDataStructureFactory();
 
@@ -203,22 +189,16 @@ public interface IoService {
     void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory);
 
     /**
-     * Returns the number of bytes scheduled to be written
-     *
      * @return The number of bytes scheduled to be written
      */
     int getScheduledWriteBytes();
 
     /**
-     * Returns the number of messages scheduled to be written
-     *
      * @return The number of messages scheduled to be written
      */
     int getScheduledWriteMessages();
 
     /**
-     * Returns the IoServiceStatistics object for this service.
-     * 
      * @return The statistics object for this service.
      */
     IoServiceStatistics getStatistics();

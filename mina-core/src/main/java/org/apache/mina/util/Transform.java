@@ -120,8 +120,8 @@ public class Transform {
     }
 
     /**
-     * convert a Throwable into an array of Strings
-     * @param throwable
+     * Converts a Throwable into an array of Strings
+     * @param throwable The Throwable to convert 
      * @return string representation of the throwable
      */
     public static String[] getThrowableStrRep(Throwable throwable) {

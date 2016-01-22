@@ -33,9 +33,10 @@ import org.apache.mina.core.session.IoSession;
 public interface SingleSessionIoHandlerFactory {
 
     /**
-     * Returns a {@link SingleSessionIoHandler} for the given session.
+     * @return a {@link SingleSessionIoHandler} for the given session.
      *
      * @param session the session for which a handler is requested
+     * @throws Exception If we can't get the handler
      */
     SingleSessionIoHandler getHandler(IoSession session) throws Exception;
 }

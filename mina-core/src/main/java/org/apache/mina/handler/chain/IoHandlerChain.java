@@ -306,21 +306,21 @@ public class IoHandlerChain implements IoHandlerCommand {
         }
 
         /**
-         * Returns the name of the command.
+         * @return the name of the command.
          */
         public String getName() {
             return name;
         }
 
         /**
-         * Returns the command.
+         * @return the command.
          */
         public IoHandlerCommand getCommand() {
             return command;
         }
 
         /**
-         * Returns the {@link IoHandlerCommand.NextCommand} of the command.
+         * @return the {@link IoHandlerCommand.NextCommand} of the command.
          */
         public NextCommand getNextCommand() {
             return nextCommand;

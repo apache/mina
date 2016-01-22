@@ -104,6 +104,10 @@ public class ProxyConnector extends AbstractIoConnector {
 
     /**
      * Creates a new proxy connector.
+     * 
+     * @param connector The Connector used to establish proxy connections.
+     * @param config The session confiugarion to use
+     * @param executor The associated executor
      */
     public ProxyConnector(final SocketConnector connector, IoSessionConfig config, Executor executor) {
         super(config, executor);
@@ -118,7 +122,7 @@ public class ProxyConnector extends AbstractIoConnector {
     }
 
     /**
-     * Returns the {@link ProxyIoSession} linked with this connector.
+     * @return the {@link ProxyIoSession} linked with this connector.
      */
     public ProxyIoSession getProxyIoSession() {
         return proxyIoSession;
@@ -200,7 +204,7 @@ public class ProxyConnector extends AbstractIoConnector {
     }
 
     /**
-     * Get the {@link SocketConnector} to be used for connections
+     * @return the {@link SocketConnector} to be used for connections
      * to the proxy server.
      */
     public final SocketConnector getConnector() {

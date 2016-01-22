@@ -33,31 +33,37 @@ public class VmPipeAddress extends SocketAddress implements Comparable<VmPipeAdd
 
     /**
      * Creates a new instance with the specifid port number.
+     * 
+     * @param port the port to use
      */
     public VmPipeAddress(int port) {
         this.port = port;
     }
 
     /**
-     * Returns the port number.
+     * @return the port number.
      */
     public int getPort() {
         return port;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return port;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
         if (this == o) {
             return true;
         }
+
         if (o instanceof VmPipeAddress) {
             VmPipeAddress that = (VmPipeAddress) o;
             return this.port == that.port;
@@ -66,10 +72,16 @@ public class VmPipeAddress extends SocketAddress implements Comparable<VmPipeAdd
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int compareTo(VmPipeAddress o) {
         return this.port - o.port;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         if (port >= 0) {

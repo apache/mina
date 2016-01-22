@@ -38,8 +38,6 @@ public enum IoSessionEventType {
     }
 
     /**
-     * Returns the event id.
-     * 
      * @return the event id
      */
     public int getId() {

@@ -207,15 +207,15 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      * Implement this method to consume the specified cumulative buffer and
      * decode its content into message(s).
      *
-     * @param in
-     *            the cumulative buffer
+     * @param session The current Session
+     * @param in the cumulative buffer
+     * @param out The {@link ProtocolDecoderOutput} that will receive the decoded message
      * @return <tt>true</tt> if and only if there's more to decode in the buffer
      *         and you want to have <tt>doDecode</tt> method invoked again.
      *         Return <tt>false</tt> if remaining data is not enough to decode,
      *         then this method will be invoked again when more data is
      *         cumulated.
-     * @throws Exception
-     *             if cannot decode <tt>in</tt>.
+     * @throws Exception if cannot decode <tt>in</tt>.
      */
     protected abstract boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception;
 

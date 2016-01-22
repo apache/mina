@@ -320,9 +320,7 @@ public class DefaultIoFuture implements IoFuture {
     }
 
     /**
-     * Returns the result of the asynchronous operation.
-     * 
-     * @return The stored value
+     * @return the result of the asynchronous operation.
      */
     protected Object getValue() {
         synchronized (lock) {

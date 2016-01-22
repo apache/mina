@@ -53,6 +53,8 @@ DatagramConnector {
 
     /**
      * Creates a new instance.
+     * 
+     * @param processorCount The number of IoProcessor instance to create
      */
     public NioDatagramConnector(int processorCount) {
         super(new DefaultDatagramSessionConfig(), NioProcessor.class, processorCount);
@@ -60,6 +62,8 @@ DatagramConnector {
 
     /**
      * Creates a new instance.
+     * 
+     * @param processor The IoProcessor instance to use
      */
     public NioDatagramConnector(IoProcessor<NioSession> processor) {
         super(new DefaultDatagramSessionConfig(), processor);

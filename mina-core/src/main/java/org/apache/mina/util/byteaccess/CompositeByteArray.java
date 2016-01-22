@@ -44,24 +44,35 @@ public final class CompositeByteArray extends AbstractByteArray {
      * TODO: Is this interface right?
      */
     public interface CursorListener {
-
         /**
          * Called when the first component in the composite is entered by the cursor.
+         * 
+         * @param componentIndex The component position
+         * @param component The component to use
          */
         void enteredFirstComponent(int componentIndex, ByteArray component);
 
         /**
          * Called when the next component in the composite is entered by the cursor.
+         * 
+         * @param componentIndex The component position
+         * @param component The component to use
          */
         void enteredNextComponent(int componentIndex, ByteArray component);
 
         /**
          * Called when the previous component in the composite is entered by the cursor.
+         * 
+         * @param componentIndex The component position
+         * @param component The component to use
          */
         void enteredPreviousComponent(int componentIndex, ByteArray component);
 
         /**
          * Called when the last component in the composite is entered by the cursor.
+         * 
+         * @param componentIndex The component position
+         * @param component The component to use
          */
         void enteredLastComponent(int componentIndex, ByteArray component);
     }
@@ -100,10 +111,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     }
 
     /**
-     * Returns the first {@link ByteArray} in the list
-     *
-     * @return
-     *  The first ByteArray in the list
+     * @return the first {@link ByteArray} in the list
      */
     public ByteArray getFirst() {
         if (bas.isEmpty()) {
@@ -142,6 +150,9 @@ public final class CompositeByteArray extends AbstractByteArray {
      * The caller is responsible for freeing the returned object.
      *
      * TODO: Document free behaviour more thoroughly.
+     * 
+     * @param index The index from where we will remove bytes
+     * @return$ The resulting byte aaay
      */
     public ByteArray removeTo(int index) {
         if (index < first() || index > last()) {
@@ -341,8 +352,8 @@ public final class CompositeByteArray extends AbstractByteArray {
      * Get a cursor starting at index 0 (which may not be the start of the
      * array) and with the given listener.
      * 
-     * @param listener
-     *  Returns a new {@link ByteArray.Cursor} instance
+     * @param listener The listener to use
+     * @return a new {@link ByteArray.Cursor} instance
      */
     public Cursor cursor(CursorListener listener) {
         return new CursorImpl(listener);
@@ -351,10 +362,9 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * Get a cursor starting at the given index and with the given listener.
      * 
-     * @param index
-     *  The position of the array to start the Cursor at
-     * @param listener
-     *  The listener for the Cursor that is returned
+     * @param index The position of the array to start the Cursor at
+     * @param listener The listener for the Cursor that is returned
+     * @return The created Cursor
      */
     public Cursor cursor(int index, CursorListener listener) {
         return new CursorImpl(index, listener);

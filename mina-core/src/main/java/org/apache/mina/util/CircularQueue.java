@@ -87,7 +87,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
     }
 
     /**
-     * Returns the capacity of this queue.
+     * @return the capacity of this queue.
      */
     public int capacity() {
         return items.length;

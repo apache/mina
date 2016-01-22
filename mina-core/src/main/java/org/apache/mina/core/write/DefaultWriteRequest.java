@@ -112,6 +112,8 @@ public class DefaultWriteRequest implements WriteRequest {
      * Creates a new instance without {@link WriteFuture}.  You'll get
      * an instance of {@link WriteFuture} even if you called this constructor
      * because {@link #getFuture()} will return a bogus future.
+     * 
+     * @param message The message that will be written
      */
     public DefaultWriteRequest(Object message) {
         this(message, null, null);
@@ -119,6 +121,9 @@ public class DefaultWriteRequest implements WriteRequest {
 
     /**
      * Creates a new instance with {@link WriteFuture}.
+     * 
+     * @param message The message that will be written
+     * @param future The associated {@link WriteFuture}
      */
     public DefaultWriteRequest(Object message, WriteFuture future) {
         this(message, future, null);

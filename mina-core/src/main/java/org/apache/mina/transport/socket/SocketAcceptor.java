@@ -33,7 +33,7 @@ import org.apache.mina.core.service.IoAcceptor;
  */
 public interface SocketAcceptor extends IoAcceptor {
     /**
-     * Returns the local InetSocketAddress which is bound currently.  If more than one
+     * @return the local InetSocketAddress which is bound currently.  If more than one
      * address are bound, only one of them will be returned, but it's not
      * necessarily the firstly bound address.
      * This method overrides the {@link IoAcceptor#getLocalAddress()} method.
@@ -41,7 +41,7 @@ public interface SocketAcceptor extends IoAcceptor {
     InetSocketAddress getLocalAddress();
 
     /**
-     * Returns a {@link Set} of the local InetSocketAddress which are bound currently.
+     * @return a {@link Set} of the local InetSocketAddress which are bound currently.
      * This method overrides the {@link IoAcceptor#getDefaultLocalAddress()} method.
      */
     InetSocketAddress getDefaultLocalAddress();
@@ -51,32 +51,40 @@ public interface SocketAcceptor extends IoAcceptor {
      * {@link #bind()} method. Please note that the default will not be used
      * if any local InetSocketAddress is specified.
      * This method overrides the {@link IoAcceptor#setDefaultLocalAddress(java.net.SocketAddress)} method.
+     * 
+     * @param localAddress The local address
      */
     void setDefaultLocalAddress(InetSocketAddress localAddress);
 
     /**
      * @see ServerSocket#getReuseAddress()
+     * 
+     * @return <tt>true</tt> if the <tt>SO_REUSEADDR</tt> is enabled
      */
     boolean isReuseAddress();
 
     /**
      * @see ServerSocket#setReuseAddress(boolean)
+     * 
+     * @param reuseAddress tells if the <tt>SO_REUSEADDR</tt> is to be enabled
      */
     void setReuseAddress(boolean reuseAddress);
 
     /**
-     * Returns the size of the backlog.
+     * @return the size of the backlog.
      */
     int getBacklog();
 
     /**
      * Sets the size of the backlog.  This can only be done when this
      * class is not bound
+     * 
+     * @param backlog The backlog's size
      */
     void setBacklog(int backlog);
 
     /**
-     * Returns the default configuration of the new SocketSessions created by 
+     * @return the default configuration of the new SocketSessions created by 
      * this acceptor service.
      */
     SocketSessionConfig getSessionConfig();

@@ -36,7 +36,7 @@ public abstract class ExceptionMonitor {
     private static ExceptionMonitor instance = new DefaultExceptionMonitor();
 
     /**
-     * Returns the current exception monitor.
+     * @return the current exception monitor.
      */
     public static ExceptionMonitor getInstance() {
         return instance;

@@ -52,8 +52,7 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * encoder uses a UNIX {@link LineDelimiter} and the decoder uses
      * the AUTO {@link LineDelimiter}.
      *
-     * @param charset
-     *  The charset to use in the encoding and decoding
+     * @param charset The charset to use in the encoding and decoding
      */
     public TextLineCodecFactory(Charset charset) {
         encoder = new TextLineEncoder(charset, LineDelimiter.UNIX);
@@ -92,16 +91,22 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
         decoder = new TextLineDecoder(charset, decodingDelimiter);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ProtocolEncoder getEncoder(IoSession session) {
         return encoder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ProtocolDecoder getDecoder(IoSession session) {
         return decoder;
     }
 
     /**
-     * Returns the allowed maximum size of the encoded line.
+     * @return the allowed maximum size of the encoded line.
      * If the size of the encoded line exceeds this value, the encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
@@ -119,13 +124,15 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * is {@link Integer#MAX_VALUE}.
      * <p>
      * This method does the same job with {@link TextLineEncoder#setMaxLineLength(int)}.
+     * 
+     * @param maxLineLength The maximum encoded line length
      */
     public void setEncoderMaxLineLength(int maxLineLength) {
         encoder.setMaxLineLength(maxLineLength);
     }
 
     /**
-     * Returns the allowed maximum size of the line to be decoded.
+     * @return the allowed maximum size of the line to be decoded.
      * If the size of the line to be decoded exceeds this value, the
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1024</tt> (1KB).
@@ -143,6 +150,8 @@ public class TextLineCodecFactory implements ProtocolCodecFactory {
      * value is <tt>1024</tt> (1KB).
      * <p>
      * This method does the same job with {@link TextLineDecoder#setMaxLineLength(int)}.
+     * 
+     * @param maxLineLength the maximum decoded line length
      */
     public void setDecoderMaxLineLength(int maxLineLength) {
         decoder.setMaxLineLength(maxLineLength);

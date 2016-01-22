@@ -75,7 +75,7 @@ public class CompositeByteArrayRelativeReader extends CompositeByteArrayRelative
     }
 
     /**
-     * Returns the byte at the current position in the buffer
+     * @return the byte at the current position in the buffer
      * 
      */
     public byte get() {

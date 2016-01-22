@@ -72,6 +72,8 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * Implement this method to set all transport-specific configuration
      * properties retrieved from the specified <tt>config</tt>.
+     * 
+     * @param config the {@link IoSessionConfig} to set
      */
     protected abstract void doSetAll(IoSessionConfig config);
 

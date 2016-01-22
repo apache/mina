@@ -21,6 +21,7 @@ package org.apache.mina.filter.codec.serialization;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutput;
 import java.io.OutputStream;
 
@@ -38,6 +39,10 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
 
     private int maxObjectSize = Integer.MAX_VALUE;
 
+    /**
+     * Create a new instance of an ObjectSerializationOutputStream
+     * @param out The {@link OutputStream} to use
+     */
     public ObjectSerializationOutputStream(OutputStream out) {
         if (out == null) {
             throw new IllegalArgumentException("out");
@@ -51,7 +56,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     }
 
     /**
-     * Returns the allowed maximum size of the encoded object.
+     * @return the allowed maximum size of the encoded object.
      * If the size of the encoded object exceeds this value, this encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
@@ -65,6 +70,8 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
      * If the size of the encoded object exceeds this value, this encoder
      * will throw a {@link IllegalArgumentException}.  The default value
      * is {@link Integer#MAX_VALUE}.
+     * 
+     * @param maxObjectSize The maximum object size
      */
     public void setMaxObjectSize(int maxObjectSize) {
         if (maxObjectSize <= 0) {
@@ -74,31 +81,49 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
         this.maxObjectSize = maxObjectSize;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws IOException {
         out.close();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void flush() throws IOException {
         out.flush();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(int b) throws IOException {
         out.write(b);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(byte[] b) throws IOException {
         out.write(b);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeObject(Object obj) throws IOException {
         IoBuffer buf = IoBuffer.allocate(64, false);
         buf.setAutoExpand(true);
@@ -113,46 +138,79 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
         out.write(buf.array(), 0, buf.position());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeBoolean(boolean v) throws IOException {
         out.writeBoolean(v);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeByte(int v) throws IOException {
         out.writeByte(v);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeBytes(String s) throws IOException {
         out.writeBytes(s);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeChar(int v) throws IOException {
         out.writeChar(v);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeChars(String s) throws IOException {
         out.writeChars(s);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeDouble(double v) throws IOException {
         out.writeDouble(v);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeFloat(float v) throws IOException {
         out.writeFloat(v);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeInt(int v) throws IOException {
         out.writeInt(v);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeLong(long v) throws IOException {
         out.writeLong(v);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeShort(int v) throws IOException {
         out.writeShort(v);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void writeUTF(String str) throws IOException {
         out.writeUTF(str);
     }

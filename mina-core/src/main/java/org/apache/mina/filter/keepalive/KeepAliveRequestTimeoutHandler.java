@@ -86,6 +86,10 @@ public interface KeepAliveRequestTimeoutHandler {
     /**
      * Invoked when {@link KeepAliveFilter} couldn't receive the response for
      * the sent keep alive message.
+     * 
+     * @param filter The filter to use
+     * @param session The current session
+     * @throws Exception If anything went wrong
      */
     void keepAliveRequestTimedOut(KeepAliveFilter filter, IoSession session) throws Exception;
 }

@@ -62,11 +62,15 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
      * Implement this method to execute your stream I/O logic;
      * <b>please note that you must forward the process request to other
      * thread or thread pool.</b>
+     * 
+     * @param session The current session
+     * @param in The input stream
+     * @param out The output stream
      */
     protected abstract void processStreamIo(IoSession session, InputStream in, OutputStream out);
 
     /**
-     * Returns read timeout in seconds.
+     * @return read timeout in seconds.
      * The default value is <tt>0</tt> (disabled).
      */
     public int getReadTimeout() {
@@ -76,13 +80,14 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
     /**
      * Sets read timeout in seconds.
      * The default value is <tt>0</tt> (disabled).
+     * @param readTimeout The Read timeout
      */
     public void setReadTimeout(int readTimeout) {
         this.readTimeout = readTimeout;
     }
 
     /**
-     * Returns write timeout in seconds.
+     * @return write timeout in seconds.
      * The default value is <tt>0</tt> (disabled).
      */
     public int getWriteTimeout() {
@@ -92,6 +97,8 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
     /**
      * Sets write timeout in seconds.
      * The default value is <tt>0</tt> (disabled).
+     * 
+     * @param writeTimeout The Write timeout
      */
     public void setWriteTimeout(int writeTimeout) {
         this.writeTimeout = writeTimeout;

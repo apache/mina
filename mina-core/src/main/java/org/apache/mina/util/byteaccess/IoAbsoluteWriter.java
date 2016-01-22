@@ -31,57 +31,81 @@ import org.apache.mina.core.buffer.IoBuffer;
 public interface IoAbsoluteWriter {
 
     /**
-     * Get the index of the first byte that can be accessed.
+     * @return the index of the first byte that can be accessed.
      */
     int first();
 
     /**
-     * Gets the index after the last byte that can be accessed.
+     * @return the index after the last byte that can be accessed.
      */
     int last();
 
     /**
-     * Gets the order of the bytes.
+     * @return the order of the bytes.
      */
     ByteOrder order();
 
     /**
      * Puts a <code>byte</code> at the given index.
+     * 
+     * @param index The position
+     * @param b The byte to put
      */
     void put(int index, byte b);
 
     /**
      * Puts bytes from the <code>IoBuffer</code> at the given index.
+     * 
+     * @param index The position
+     * @param bb The bytes to put
      */
     void put(int index, IoBuffer bb);
 
     /**
      * Puts a <code>short</code> at the given index.
+     * 
+     * @param index The position
+     * @param s The short to put
      */
     void putShort(int index, short s);
 
     /**
      * Puts an <code>int</code> at the given index.
+     * 
+     * @param index The position
+     * @param i The int to put
      */
     void putInt(int index, int i);
 
     /**
      * Puts a <code>long</code> at the given index.
+     * 
+     * @param index The position
+     * @param l The long to put
      */
     void putLong(int index, long l);
 
     /**
      * Puts a <code>float</code> at the given index.
+     * 
+     * @param index The position
+     * @param f The float to put
      */
     void putFloat(int index, float f);
 
     /**
      * Puts a <code>double</code> at the given index.
+     * 
+     * @param index The position
+     * @param d The doubvle to put
      */
     void putDouble(int index, double d);
 
     /**
      * Puts a <code>char</code> at the given index.
+     * 
+     * @param index The position
+     * @param c The char to put
      */
     void putChar(int index, char c);
 }

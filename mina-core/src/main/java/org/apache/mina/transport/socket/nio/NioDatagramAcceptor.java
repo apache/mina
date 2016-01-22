@@ -113,6 +113,8 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
 
     /**
      * Creates a new instance.
+     * 
+     * @param executor The executor to use
      */
     public NioDatagramAcceptor(Executor executor) {
         this(new DefaultDatagramSessionConfig(), executor);

@@ -50,7 +50,7 @@ public interface SingleSessionIoHandler {
      * Invoked when the session is created. Initialize default socket parameters
      * and user-defined attributes here.
      *
-     * @throws Exception
+     * @throws Exception If the session can't be created
      * @see IoHandler#sessionCreated(IoSession)
      */
     void sessionCreated() throws Exception;
@@ -59,6 +59,7 @@ public interface SingleSessionIoHandler {
      * Invoked when the connection is opened. This method is not invoked if the
      * transport type is UDP.
      *
+     * @throws Exception If the session can't be opened
      * @see IoHandler#sessionOpened(IoSession)
      */
     void sessionOpened() throws Exception;
@@ -67,6 +68,7 @@ public interface SingleSessionIoHandler {
      * Invoked when the connection is closed. This method is not invoked if the
      * transport type is UDP.
      *
+     * @throws Exception If the session can't be closed
      * @see IoHandler#sessionClosed(IoSession)
      */
     void sessionClosed() throws Exception;
@@ -76,6 +78,7 @@ public interface SingleSessionIoHandler {
      * method is not invoked if the transport type is UDP.
      *
      * @param status the type of idleness
+     * @throws Exception If the idle event can't be handled
      * @see IoHandler#sessionIdle(IoSession, IdleStatus)
      */
     void sessionIdle(IdleStatus status) throws Exception;
@@ -86,10 +89,16 @@ public interface SingleSessionIoHandler {
      * {@link IOException}, MINA will close the connection automatically.
      *
      * @param cause the caught exception
+     * @throws Exception If the exception can't be handled
      * @see IoHandler#exceptionCaught(IoSession, Throwable)
      */
     void exceptionCaught(Throwable cause) throws Exception;
 
+    /**
+     * Invoked when a half-duplex connection is closed
+     * 
+     * @param session The current session
+     */
     void inputClosed(IoSession session);
 
     /**
@@ -97,6 +106,7 @@ public interface SingleSessionIoHandler {
      * here.
      *
      * @param message the received message
+     * @throws Exception If the received message can't be processed
      * @see IoHandler#messageReceived(IoSession, Object)
      */
     void messageReceived(Object message) throws Exception;
@@ -106,6 +116,7 @@ public interface SingleSessionIoHandler {
      * {@link IoSession#write(Object)} is sent out actually.
      *
      * @param message the sent message
+     * @throws Exception If the sent message can't be processed
      * @see IoHandler#messageSent(IoSession, Object)
      */
     void messageSent(Object message) throws Exception;

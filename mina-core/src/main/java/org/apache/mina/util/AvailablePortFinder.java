@@ -51,7 +51,7 @@ public class AvailablePortFinder {
     }
 
     /**
-     * Returns the {@link Set} of currently available port numbers
+     * @return the {@link Set} of currently available port numbers
      * ({@link Integer}).  This method is identical to
      * <code>getAvailablePorts(MIN_PORT_NUMBER, MAX_PORT_NUMBER)</code>.
      *
@@ -62,7 +62,7 @@ public class AvailablePortFinder {
     }
 
     /**
-     * Gets an available port, selected by the system.
+     * @return an available port, selected by the system.
      *
      * @throws NoSuchElementException if there are no ports available
      */
@@ -84,7 +84,7 @@ public class AvailablePortFinder {
     }
 
     /**
-     * Gets the next available port starting at a port.
+     * @return the next available port starting at a port.
      *
      * @param fromPort the port to scan for availability
      * @throws NoSuchElementException if there are no ports available
@@ -107,6 +107,7 @@ public class AvailablePortFinder {
      * Checks to see if a specific port is available.
      *
      * @param port the port to check for availability
+     * @return <tt>true</tt> if the port is available
      */
     public static boolean available(int port) {
         if (port < MIN_PORT_NUMBER || port > MAX_PORT_NUMBER) {
@@ -142,7 +143,9 @@ public class AvailablePortFinder {
     }
 
     /**
-     * Returns the {@link Set} of currently avaliable port numbers ({@link Integer})
+     * @param fromPort The port we start from
+     * @param toPort The posrt we stop at
+     * @return the {@link Set} of currently avalaible port numbers ({@link Integer})
      * between the specified port range.
      *
      * @throws IllegalArgumentException if port range is not between

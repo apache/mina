@@ -36,9 +36,7 @@ import org.apache.mina.core.write.WriteRequest;
  */
 public interface IoFilterChain {
     /**
-     * Returns the parent {@link IoSession} of this chain.
-     * 
-     * @return {@link IoSession}
+     * @return the parent {@link IoSession} of this chain.
      */
     IoSession getSession();
 

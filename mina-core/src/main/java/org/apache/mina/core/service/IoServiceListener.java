@@ -40,6 +40,9 @@ public interface IoServiceListener extends EventListener {
 
     /**
      * Invoked when a service is idle.
+     * 
+     * @param service the {@link IoService}
+     * @param idleStatus The idle status
      * @throws Exception if an error occurred while the service is being idled
      */
     void serviceIdle(IoService service, IdleStatus idleStatus) throws Exception;

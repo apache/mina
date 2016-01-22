@@ -38,6 +38,8 @@ public class ProtocolCodecException extends Exception {
 
     /**
      * Constructs a new instance with the specified message.
+     * 
+     * @param message The detail message
      */
     public ProtocolCodecException(String message) {
         super(message);
@@ -45,6 +47,8 @@ public class ProtocolCodecException extends Exception {
 
     /**
      * Constructs a new instance with the specified cause.
+     * 
+     * @param cause The Exception's cause
      */
     public ProtocolCodecException(Throwable cause) {
         super(cause);
@@ -53,6 +57,9 @@ public class ProtocolCodecException extends Exception {
     /**
      * Constructs a new instance with the specified message and the specified
      * cause.
+     * 
+     * @param message The detail message
+     * @param cause The Exception's cause
      */
     public ProtocolCodecException(String message, Throwable cause) {
         super(message, cause);

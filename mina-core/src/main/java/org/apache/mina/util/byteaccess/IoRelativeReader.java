@@ -31,67 +31,74 @@ import org.apache.mina.core.buffer.IoBuffer;
 public interface IoRelativeReader {
 
     /**
-     * Gets the number of remaining bytes that can be read.
+     * @return the number of remaining bytes that can be read.
      */
     int getRemaining();
 
     /**
      * Checks if there are any remaining bytes that can be read.
+     * 
+     * @return <tt>true</tt> if there are some remaining bytes in the buffer
      */
     boolean hasRemaining();
 
     /**
      * Advances the reader by the given number of bytes.
+     * 
+     * @param length the number of bytes to skip
      */
     void skip(int length);
 
     /**
-     * Creates an array with a view of part of this array.
+     * @param length The number of bytes to get
+     * @return an array with a view of part of this array.
      */
     ByteArray slice(int length);
 
     /**
-     * Gets the order of the bytes.
+     * @return the bytes' order
      */
     ByteOrder order();
 
     /**
-     * Gets a <code>byte</code> and advances the reader.
+     * @return the <code>byte</code> at the current position and advances the reader.
      */
     byte get();
 
     /**
      * Gets enough bytes to fill the <code>IoBuffer</code> and advances the reader.
+     * 
+     * @param bb The IoBuffer that will contain the read bytes
      */
     void get(IoBuffer bb);
 
     /**
-     * Gets a <code>short</code> and advances the reader.
+     * @return a <code>short</code> and advances the reader.
      */
     short getShort();
 
     /**
-     * Gets an <code>int</code> and advances the reader.
+     * @return an <code>int</code> and advances the reader.
      */
     int getInt();
 
     /**
-     * Gets a <code>long</code> and advances the reader.
+     * @return a <code>long</code> and advances the reader.
      */
     long getLong();
 
     /**
-     * Gets a <code>float</code> and advances the reader.
+     * @return a <code>float</code> and advances the reader.
      */
     float getFloat();
 
     /**
-     * Gets a <code>double</code> and advances the reader.
+     * @return a <code>double</code> and advances the reader.
      */
     double getDouble();
 
     /**
-     * Gets a <code>char</code> and advances the reader.
+     * @return a <code>char</code> and advances the reader.
      */
     char getChar();
 }

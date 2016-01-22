@@ -38,6 +38,10 @@ import org.apache.mina.proxy.utils.ByteUtilities;
 public class NTLMUtilities implements NTLMConstants {
     /**
      * @see #writeSecurityBuffer(short, short, int, byte[], int)
+     * 
+     * @param length The length of the security buffer
+     * @param bufferOffset The offset in the security buffer
+     * @return Th created buffer
      */
     public final static byte[] writeSecurityBuffer(short length, int bufferOffset) {
         byte[] b = new byte[8];

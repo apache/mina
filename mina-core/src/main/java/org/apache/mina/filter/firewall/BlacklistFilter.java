@@ -128,6 +128,8 @@ public class BlacklistFilter extends IoFilterAdapter {
 
     /**
      * Blocks the specified endpoint.
+     * 
+     * @param address The address to block
      */
     public void block(InetAddress address) {
         if (address == null) {
@@ -139,6 +141,8 @@ public class BlacklistFilter extends IoFilterAdapter {
 
     /**
      * Blocks the specified subnet.
+     * 
+     * @param subnet The subnet to block
      */
     public void block(Subnet subnet) {
         if (subnet == null) {
@@ -150,6 +154,8 @@ public class BlacklistFilter extends IoFilterAdapter {
 
     /**
      * Unblocks the specified endpoint.
+     * 
+     * @param address The address to unblock
      */
     public void unblock(InetAddress address) {
         if (address == null) {
@@ -161,6 +167,8 @@ public class BlacklistFilter extends IoFilterAdapter {
 
     /**
      * Unblocks the specified subnet.
+     * 
+     * @param subnet The subnet to unblock
      */
     public void unblock(Subnet subnet) {
         if (subnet == null) {

@@ -43,8 +43,7 @@ public enum HttpAuthenticationMethods {
     }
 
     /**
-     * Returns the authentication mechanism id.
-     * @return the id
+     * @return the authentication mechanism id.
      */
     public int getId() {
         return id;
@@ -55,6 +54,7 @@ public enum HttpAuthenticationMethods {
      * 
      * @param proxyIoSession the proxy session object
      * @return a new logic handler 
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     public AbstractAuthLogicHandler getNewHandler(ProxyIoSession proxyIoSession) throws ProxyAuthException {
         return getNewHandler(this.id, proxyIoSession);
@@ -66,6 +66,7 @@ public enum HttpAuthenticationMethods {
      * @param method the authentication mechanism to use
      * @param proxyIoSession the proxy session object
      * @return a new logic handler 
+     * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     public static AbstractAuthLogicHandler getNewHandler(int method, ProxyIoSession proxyIoSession)
             throws ProxyAuthException {

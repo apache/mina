@@ -46,6 +46,9 @@ public interface ProtocolEncoder {
      * the encoder implementation puts encoded messages (typically {@link IoBuffer}s)
      * into {@link ProtocolEncoderOutput}.
      *
+     * @param session The current Session
+     * @param message the message to encode
+     * @param out The {@link ProtocolEncoderOutput} that will receive the encoded message
      * @throws Exception if the message violated protocol specification
      */
     void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception;
@@ -53,6 +56,7 @@ public interface ProtocolEncoder {
     /**
      * Releases all resources related with this encoder.
      *
+     * @param session The current Session
      * @throws Exception if failed to dispose all resources
      */
     void dispose(IoSession session) throws Exception;

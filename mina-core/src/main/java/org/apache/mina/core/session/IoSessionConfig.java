@@ -29,7 +29,7 @@ import java.util.concurrent.BlockingQueue;
 public interface IoSessionConfig {
 
     /**
-     * Returns the size of the read buffer that I/O processor allocates
+     * @return the size of the read buffer that I/O processor allocates
      * per each read.  It's unusual to adjust this property because
      * it's often adjusted automatically by the I/O processor.
      */
@@ -39,11 +39,13 @@ public interface IoSessionConfig {
      * Sets the size of the read buffer that I/O processor allocates
      * per each read.  It's unusual to adjust this property because
      * it's often adjusted automatically by the I/O processor.
+     * 
+     * @param readBufferSize The size of the read buffer
      */
     void setReadBufferSize(int readBufferSize);
 
     /**
-     * Returns the minimum size of the read buffer that I/O processor
+     * @return the minimum size of the read buffer that I/O processor
      * allocates per each read.  I/O processor will not decrease the
      * read buffer size to the smaller value than this property value.
      */
@@ -53,11 +55,13 @@ public interface IoSessionConfig {
      * Sets the minimum size of the read buffer that I/O processor
      * allocates per each read.  I/O processor will not decrease the
      * read buffer size to the smaller value than this property value.
+     * 
+     * @param minReadBufferSize The minimum size of the read buffer
      */
     void setMinReadBufferSize(int minReadBufferSize);
 
     /**
-     * Returns the maximum size of the read buffer that I/O processor
+     * @return the maximum size of the read buffer that I/O processor
      * allocates per each read.  I/O processor will not increase the
      * read buffer size to the greater value than this property value.
      */
@@ -67,17 +71,19 @@ public interface IoSessionConfig {
      * Sets the maximum size of the read buffer that I/O processor
      * allocates per each read.  I/O processor will not increase the
      * read buffer size to the greater value than this property value.
+     * 
+     * @param maxReadBufferSize The maximum size of the read buffer
      */
     void setMaxReadBufferSize(int maxReadBufferSize);
 
     /**
-     * Returns the interval (seconds) between each throughput calculation.
+     * @return the interval (seconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */
     int getThroughputCalculationInterval();
 
     /**
-     * Returns the interval (milliseconds) between each throughput calculation.
+     * @return the interval (milliseconds) between each throughput calculation.
      * The default value is <tt>3</tt> seconds.
      */
     long getThroughputCalculationIntervalInMillis();
@@ -85,86 +91,105 @@ public interface IoSessionConfig {
     /**
      * Sets the interval (seconds) between each throughput calculation.  The
      * default value is <tt>3</tt> seconds.
+     * 
+     * @param throughputCalculationInterval The interval
      */
     void setThroughputCalculationInterval(int throughputCalculationInterval);
 
     /**
-     * Returns idle time for the specified type of idleness in seconds.
+     * @return idle time for the specified type of idleness in seconds.
+     * 
+     * @param status The status for which we want the idle time (One of READER_IDLE,
+     * WRITER_IDLE or BOTH_IDLE)
      */
     int getIdleTime(IdleStatus status);
 
     /**
-     * Returns idle time for the specified type of idleness in milliseconds.
+     * @return idle time for the specified type of idleness in milliseconds.
+     * 
+     * @param status The status for which we want the idle time (One of READER_IDLE,
+     * WRITER_IDLE or BOTH_IDLE)
      */
     long getIdleTimeInMillis(IdleStatus status);
 
     /**
      * Sets idle time for the specified type of idleness in seconds.
+     * @param status The status for which we want to set the idle time (One of READER_IDLE,
+     * WRITER_IDLE or BOTH_IDLE)
+     * @param idleTime The time in second to set
      */
     void setIdleTime(IdleStatus status, int idleTime);
 
     /**
-     * Returns idle time for {@link IdleStatus#READER_IDLE} in seconds.
+     * @return idle time for {@link IdleStatus#READER_IDLE} in seconds.
      */
     int getReaderIdleTime();
 
     /**
-     * Returns idle time for {@link IdleStatus#READER_IDLE} in milliseconds.
+     * @return idle time for {@link IdleStatus#READER_IDLE} in milliseconds.
      */
     long getReaderIdleTimeInMillis();
 
     /**
      * Sets idle time for {@link IdleStatus#READER_IDLE} in seconds.
+     * 
+     * @param idleTime The time to set
      */
     void setReaderIdleTime(int idleTime);
 
     /**
-     * Returns idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
+     * @return idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
      */
     int getWriterIdleTime();
 
     /**
-     * Returns idle time for {@link IdleStatus#WRITER_IDLE} in milliseconds.
+     * @return idle time for {@link IdleStatus#WRITER_IDLE} in milliseconds.
      */
     long getWriterIdleTimeInMillis();
 
     /**
      * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
+     * 
+     * @param idleTime The time to set
      */
     void setWriterIdleTime(int idleTime);
 
     /**
-     * Returns idle time for {@link IdleStatus#BOTH_IDLE} in seconds.
+     * @return idle time for {@link IdleStatus#BOTH_IDLE} in seconds.
      */
     int getBothIdleTime();
 
     /**
-     * Returns idle time for {@link IdleStatus#BOTH_IDLE} in milliseconds.
+     * @return idle time for {@link IdleStatus#BOTH_IDLE} in milliseconds.
      */
     long getBothIdleTimeInMillis();
 
     /**
      * Sets idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
+     * 
+     * @param idleTime The time to set
      */
     void setBothIdleTime(int idleTime);
 
     /**
-     * Returns write timeout in seconds.
+     * @return write timeout in seconds.
      */
     int getWriteTimeout();
 
     /**
-     * Returns write timeout in milliseconds.
+     * @return write timeout in milliseconds.
      */
     long getWriteTimeoutInMillis();
 
     /**
      * Sets write timeout in seconds.
+     * 
+     * @param writeTimeout The timeout to set
      */
     void setWriteTimeout(int writeTimeout);
 
     /**
-     * Returns <tt>true</tt> if and only if {@link IoSession#read()} operation
+     * @return <tt>true</tt> if and only if {@link IoSession#read()} operation
      * is enabled.  If enabled, all received messages are stored in an internal
      * {@link BlockingQueue} so you can read received messages in more
      * convenient way for client applications.  Enabling this option is not
@@ -180,12 +205,16 @@ public interface IoSessionConfig {
      * applications.  Enabling this option is not useful to server applications
      * and can cause unintended memory leak, and therefore it's disabled by
      * default.
+     * 
+     * @param useReadOperation <tt>true</tt> if the read operation is enabled, <tt>false</tt> otherwise
      */
     void setUseReadOperation(boolean useReadOperation);
 
     /**
      * Sets all configuration properties retrieved from the specified
      * <tt>config</tt>.
+     * 
+     * @param config The configuration to use
      */
     void setAll(IoSessionConfig config);
 }

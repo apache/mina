@@ -54,6 +54,10 @@ public interface ExceptionHandler<E extends Throwable> {
     /**
      * Invoked when the specific type of exception is caught from the
      * specified <code>session</code>.
+     * 
+     * @param session The current session
+     * @param cause the exception's cause
+     * @throws Exception If we can't process the event 
      */
     void exceptionCaught(IoSession session, E cause) throws Exception;
 }

@@ -96,7 +96,10 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     /**
      * Registers a {@link MessageHandler} that handles the received messages of
      * the specified <code>type</code>.
-     *
+     * 
+     * @param <E> The message handler's type
+     * @param type The message's type
+     * @param handler The message handler
      * @return the old handler if there is already a registered handler for
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
@@ -111,6 +114,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * Deregisters a {@link MessageHandler} that handles the received messages
      * of the specified <code>type</code>.
      *
+     * @param <E> The message handler's type
+     * @param type The message's type
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
@@ -124,6 +129,9 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * Registers a {@link MessageHandler} that handles the sent messages of the
      * specified <code>type</code>.
      *
+     * @param <E> The message handler's type
+     * @param type The message's type
+     * @param handler The message handler
      * @return the old handler if there is already a registered handler for
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
@@ -138,6 +146,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * Deregisters a {@link MessageHandler} that handles the sent messages of
      * the specified <code>type</code>.
      *
+     * @param <E> The message handler's type
+     * @param type The message's type
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
@@ -151,6 +161,9 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * Registers a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
      *
+     * @param <E> The message handler's type
+     * @param type The message's type
+     * @param handler The Exception handler
      * @return the old handler if there is already a registered handler for
      *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
      */
@@ -166,6 +179,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * Deregisters a {@link MessageHandler} that receives the messages of
      * the specified <code>type</code>.
      *
+     * @param <E> The Exception Handler's type
+     * @param type The message's type
      * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
      */
     @SuppressWarnings("unchecked")
@@ -176,8 +191,10 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     /**
-     * Returns the {@link MessageHandler} which is registered to process
+     * @return the {@link MessageHandler} which is registered to process
      * the specified <code>type</code>.
+     * @param <E> The message handler's type
+     * @param type The message's type
      */
     @SuppressWarnings("unchecked")
     public <E> MessageHandler<? super E> getMessageHandler(Class<E> type) {
@@ -185,7 +202,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     /**
-     * Returns the {@link Map} which contains all messageType-{@link MessageHandler}
+     * @return the {@link Map} which contains all messageType-{@link MessageHandler}
      * pairs registered to this handler for received messages.
      */
     public Map<Class<?>, MessageHandler<?>> getReceivedMessageHandlerMap() {
@@ -193,7 +210,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     /**
-     * Returns the {@link Map} which contains all messageType-{@link MessageHandler}
+     * @return the {@link Map} which contains all messageType-{@link MessageHandler}
      * pairs registered to this handler for sent messages.
      */
     public Map<Class<?>, MessageHandler<?>> getSentMessageHandlerMap() {
@@ -201,7 +218,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
     }
 
     /**
-     * Returns the {@link Map} which contains all messageType-{@link MessageHandler}
+     * @return the {@link Map} which contains all messageType-{@link MessageHandler}
      * pairs registered to this handler.
      */
     public Map<Class<?>, ExceptionHandler<?>> getExceptionHandlerMap() {
@@ -215,6 +232,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * <b>Warning !</b> If you are to overload this method, be aware that you 
      * _must_ call the messageHandler in your own method, otherwise it won't 
      * be called.
+     * 
+     * {@inheritDoc}
      */
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
@@ -234,6 +253,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * <b>Warning !</b> If you are to overload this method, be aware that you 
      * _must_ call the messageHandler in your own method, otherwise it won't 
      * be called.
+     * 
+     * {@inheritDoc}
      */
     @Override
     public void messageSent(IoSession session, Object message) throws Exception {
@@ -255,6 +276,8 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * <b>Warning !</b> If you are to overload this method, be aware that you 
      * _must_ call the messageHandler in your own method, otherwise it won't 
      * be called.
+     * 
+     * {@inheritDoc}
      */
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {

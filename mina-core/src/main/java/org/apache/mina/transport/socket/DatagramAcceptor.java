@@ -33,7 +33,7 @@ import org.apache.mina.core.session.IoSessionRecycler;
  */
 public interface DatagramAcceptor extends IoAcceptor {
     /**
-     * Returns the local InetSocketAddress which is bound currently.  If more than one
+     * @return the local InetSocketAddress which is bound currently.  If more than one
      * address are bound, only one of them will be returned, but it's not
      * necessarily the firstly bound address.
      * This method overrides the {@link IoAcceptor#getLocalAddress()} method.
@@ -41,7 +41,7 @@ public interface DatagramAcceptor extends IoAcceptor {
     InetSocketAddress getLocalAddress();
 
     /**
-     * Returns a {@link Set} of the local InetSocketAddress which are bound currently.
+     * @return a {@link Set} of the local InetSocketAddress which are bound currently.
      * This method overrides the {@link IoAcceptor#getDefaultLocalAddress()} method.
      */
     InetSocketAddress getDefaultLocalAddress();
@@ -51,11 +51,13 @@ public interface DatagramAcceptor extends IoAcceptor {
      * {@link #bind()} method. Please note that the default will not be used
      * if any local InetSocketAddress is specified.
      * This method overrides the {@link IoAcceptor#setDefaultLocalAddress(java.net.SocketAddress)} method.
+     * 
+     * @param localAddress The local address
      */
     void setDefaultLocalAddress(InetSocketAddress localAddress);
 
     /**
-     * Returns the {@link IoSessionRecycler} for this service.
+     * @return the {@link IoSessionRecycler} for this service.
      */
     IoSessionRecycler getSessionRecycler();
 
@@ -67,7 +69,7 @@ public interface DatagramAcceptor extends IoAcceptor {
     void setSessionRecycler(IoSessionRecycler sessionRecycler);
 
     /**
-     * Returns the default Datagram configuration of the new {@link IoSession}s
+     * @return the default Datagram configuration of the new {@link IoSession}s
      * created by this service.
      */
     DatagramSessionConfig getSessionConfig();

@@ -31,67 +31,81 @@ import org.apache.mina.core.buffer.IoBuffer;
 public interface IoAbsoluteReader {
 
     /**
-     * Get the index of the first byte that can be accessed.
+     * @return the index of the first byte that can be accessed.
      */
     int first();
 
     /**
-     * Gets the index after the last byte that can be accessed.
+     * @return the index after the last byte that can be accessed.
      */
     int last();
 
     /**
-     * Gets the total number of bytes that can be accessed.
+     * @return the total number of bytes that can be accessed.
      */
     int length();
 
     /**
      * Creates an array with a view of part of this array.
+     * 
+     * @param index The starting position
+     * @param length The number of bytes to copy
+     * @return The ByteArray that is a view on the original array 
      */
     ByteArray slice(int index, int length);
 
     /**
-     * Gets the order of the bytes.
+     * @return the order of the bytes.
      */
     ByteOrder order();
 
     /**
-     * Gets a <code>byte</code> from the given index.
+     * @param index The starting position
+     * @return a <tt>byte</tt> from the given index.
      */
     byte get(int index);
 
     /**
-     * Gets enough bytes to fill the <code>IoBuffer</code> from the given index.
+     * Gets enough bytes to fill the <tt>IoBuffer</tt> from the given index.
+     * 
+     * @param index The starting position
+     * @param bb The IoBuffer that will be filled with the bytes
      */
     void get(int index, IoBuffer bb);
 
     /**
-     * Gets a <code>short</code> from the given index.
+     * @param index The starting position
+     * @return a <tt>short</tt> from the given index.
      */
     short getShort(int index);
 
     /**
-     * Gets an <code>int</code> from the given index.
+     * @param index The starting position
+     * @return an <tt>int</tt> from the given index.
      */
     int getInt(int index);
 
     /**
-     * Gets a <code>long</code> from the given index.
+     * @param index The starting position
+     * @return a <tt>long</tt> from the given index.
      */
     long getLong(int index);
 
     /**
-     * Gets a <code>float</code> from the given index.
+     * @param index The starting position
+     * @return a <tt>float</tt> from the given index.
      */
     float getFloat(int index);
 
     /**
-     * Gets a <code>double</code> from the given index.
+     * @param index The starting position
+     * @return a <tt>double</tt> from the given index.
      */
     double getDouble(int index);
 
     /**
-     * Gets a <code>char</code> from the given index.
+     * @param index The starting position
+     * @return a <tt>char</tt> from the given index.
      */
     char getChar(int index);
 }

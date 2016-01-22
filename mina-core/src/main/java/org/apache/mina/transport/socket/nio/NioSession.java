@@ -54,7 +54,9 @@ public abstract class NioSession extends AbstractIoSession {
      * <br>
      * This method is only called by the inherited class.
      *
-     * @param processor The associated IoProcessor
+     * @param processor The associated {@link IoProcessor}
+     * @param service The associated {@link IoService}
+     * @param channel The associated {@link Channel}
      */
     protected NioSession(IoProcessor<NioSession> processor, IoService service, Channel channel) {
         super(service);

@@ -128,7 +128,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     // ====         the internal Maps            ====
     // ==============================================
     /**
-     * Returns the number of key/value pairs in this map.
+     * @return the number of key/value pairs in this map.
      *
      * @see java.util.Map#size()
      */
@@ -137,7 +137,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     }
 
     /**
-     * Returns true if this map is empty, otherwise false.
+     * @return true if this map is empty, otherwise false.
      *
      * @see java.util.Map#isEmpty()
      */
@@ -146,7 +146,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     }
 
     /**
-     * Returns true if this map contains the provided key, otherwise
+     * @return true if this map contains the provided key, otherwise
      * this method return false.
      *
      * @see java.util.Map#containsKey(java.lang.Object)
@@ -156,7 +156,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     }
 
     /**
-     * Returns true if this map contains the provided value, otherwise
+     * @return true if this map contains the provided value, otherwise
      * this method returns false.
      *
      * @see java.util.Map#containsValue(java.lang.Object)
@@ -166,7 +166,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     }
 
     /**
-     * Returns the value associated with the provided key from this
+     * @return the value associated with the provided key from this
      * map.
      *
      * @see java.util.Map#get(java.lang.Object)

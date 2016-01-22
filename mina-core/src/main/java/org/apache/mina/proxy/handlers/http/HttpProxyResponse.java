@@ -74,28 +74,28 @@ public class HttpProxyResponse {
     }
 
     /**
-     * Returns the HTTP response protocol version.
+     * @return the HTTP response protocol version.
      */
     public final String getHttpVersion() {
         return httpVersion;
     }
 
     /**
-     * Returns the HTTP response status code.
+     * @return the HTTP response status code.
      */
     public final int getStatusCode() {
         return statusCode;
     }
 
     /**
-     * Returns the HTTP response status line.
+     * @return the HTTP response status line.
      */
     public final String getStatusLine() {
         return statusLine;
     }
 
     /**
-     * Returns the HTTP response body.
+     * @return the HTTP response body.
      */
     public String getBody() {
         return body;
@@ -103,13 +103,15 @@ public class HttpProxyResponse {
 
     /**
      * Sets the HTTP response body.
+     * 
+     * @param body The HTTP Body
      */
     public void setBody(String body) {
         this.body = body;
     }
 
     /**
-     * Returns the HTTP response headers.
+     * @return the HTTP response headers.
      */
     public final Map<String, List<String>> getHeaders() {
         return headers;

@@ -67,6 +67,8 @@ public class TextLineDecoder implements ProtocolDecoder {
     /**
      * Creates a new instance with the current default {@link Charset}
      * and the specified <tt>delimiter</tt>.
+     * 
+     * @param delimiter The line delimiter to use
      */
     public TextLineDecoder(String delimiter) {
         this(new LineDelimiter(delimiter));
@@ -75,6 +77,8 @@ public class TextLineDecoder implements ProtocolDecoder {
     /**
      * Creates a new instance with the current default {@link Charset}
      * and the specified <tt>delimiter</tt>.
+     * 
+     * @param delimiter The line delimiter to use
      */
     public TextLineDecoder(LineDelimiter delimiter) {
         this(Charset.defaultCharset(), delimiter);
@@ -83,6 +87,8 @@ public class TextLineDecoder implements ProtocolDecoder {
     /**
      * Creates a new instance with the spcified <tt>charset</tt>
      * and {@link LineDelimiter#AUTO} delimiter.
+     * 
+     * @param charset The {@link Charset} to use
      */
     public TextLineDecoder(Charset charset) {
         this(charset, LineDelimiter.AUTO);
@@ -91,6 +97,9 @@ public class TextLineDecoder implements ProtocolDecoder {
     /**
      * Creates a new instance with the spcified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.
+     * 
+     * @param charset The {@link Charset} to use
+     * @param delimiter The line delimiter to use
      */
     public TextLineDecoder(Charset charset, String delimiter) {
         this(charset, new LineDelimiter(delimiter));
@@ -99,6 +108,9 @@ public class TextLineDecoder implements ProtocolDecoder {
     /**
      * Creates a new instance with the specified <tt>charset</tt>
      * and the specified <tt>delimiter</tt>.
+     * 
+     * @param charset The {@link Charset} to use
+     * @param delimiter The line delimiter to use
      */
     public TextLineDecoder(Charset charset, LineDelimiter delimiter) {
         if (charset == null) {
@@ -128,7 +140,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     /**
-     * Returns the allowed maximum size of the line to be decoded.
+     * @return the allowed maximum size of the line to be decoded.
      * If the size of the line to be decoded exceeds this value, the
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1024</tt> (1KB).
@@ -142,6 +154,8 @@ public class TextLineDecoder implements ProtocolDecoder {
      * If the size of the line to be decoded exceeds this value, the
      * decoder will throw a {@link BufferDataException}.  The default
      * value is <tt>1024</tt> (1KB).
+     * 
+     * @param maxLineLength The maximum line length
      */
     public void setMaxLineLength(int maxLineLength) {
         if (maxLineLength <= 0) {
@@ -167,7 +181,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     /**
-     * Returns the allowed buffer size used to store the decoded line
+     * @return the allowed buffer size used to store the decoded line
      * in the Context instance.
      */
     public int getBufferLength() {
@@ -188,7 +202,9 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     /**
-     * Return the context for this session
+     * @return the context for this session
+     * 
+     * @param session The session for which we want the context
      */
     private Context getContext(IoSession session) {
         Context ctx;

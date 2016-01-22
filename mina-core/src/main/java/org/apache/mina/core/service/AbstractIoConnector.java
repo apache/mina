@@ -69,9 +69,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     }
 
     /**
-     * Returns the minimum connection timeout value for this connector
-     * 
-     * @return
+    * @return
      *  The minimum time that this connector can have for a connection
      *  timeout in milliseconds.
      */

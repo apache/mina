@@ -145,6 +145,8 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
 
     /**
      * Flush to the given index.
+     * 
+     * @param index The end position
      */
     public void flushTo(int index) {
         ByteArray removed = cba.removeTo(index);

@@ -57,6 +57,8 @@ public final class VmPipeConnector extends AbstractIoConnector {
 
     /**
      * Creates a new instance.
+     * 
+     * @param executor The executor to use
      */
     public VmPipeConnector(Executor executor) {
         super(new DefaultVmPipeSessionConfig(), executor);
@@ -66,6 +68,9 @@ public final class VmPipeConnector extends AbstractIoConnector {
         executeWorker(idleChecker.getNotifyingTask(), "idleStatusChecker");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public TransportMetadata getTransportMetadata() {
         return VmPipeSession.METADATA;
     }
@@ -77,6 +82,9 @@ public final class VmPipeConnector extends AbstractIoConnector {
         return (VmPipeSessionConfig) sessionConfig;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected ConnectFuture connect0(SocketAddress remoteAddress, SocketAddress localAddress,
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
@@ -138,6 +146,9 @@ public final class VmPipeConnector extends AbstractIoConnector {
         return future;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void dispose0() throws Exception {
         // stop the idle checking task

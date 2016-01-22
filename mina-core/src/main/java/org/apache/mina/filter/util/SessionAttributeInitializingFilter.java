@@ -53,6 +53,8 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * Creates a new instance with the specified default attributes.  You can
      * set the additional attributes by calling methods such as
      * {@link #setAttribute(String, Object)} and {@link #setAttributes(Map)}.
+     * 
+     * @param attributes The Attribute's Map to set 
      */
     public SessionAttributeInitializingFilter(Map<String, ? extends Object> attributes) {
         setAttributes(attributes);
@@ -98,6 +100,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     /**
      * Removes a user-defined attribute with the specified key.
      *
+     * @param key The attribut's key we want to removee
      * @return The old value of the attribute.  <tt>null</tt> if not found.
      */
     public Object removeAttribute(String key) {
@@ -105,7 +108,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     }
 
     /**
-     * Returns <tt>true</tt> if this session contains the attribute with
+     * @return <tt>true</tt> if this session contains the attribute with
      * the specified <tt>key</tt>.
      */
     boolean containsAttribute(String key) {
@@ -113,7 +116,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
     }
 
     /**
-     * Returns the set of keys of all user-defined attributes.
+     * @return the set of keys of all user-defined attributes.
      */
     public Set<String> getAttributeKeys() {
         return attributes.keySet();
@@ -123,6 +126,8 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * Sets the attribute map.  The specified attributes are copied into the
      * underlying map, so modifying the specified attributes parameter after
      * the call won't change the internal state.
+     * 
+     * @param attributes The attributes Map to set
      */
     public void setAttributes(Map<String, ? extends Object> attributes) {
         if (attributes == null) {

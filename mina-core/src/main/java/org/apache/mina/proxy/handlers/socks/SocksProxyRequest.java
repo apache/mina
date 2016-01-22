@@ -98,11 +98,9 @@ public class SocksProxyRequest extends ProxyRequest {
     }
 
     /**
-     * Returns the endpoint address resulting from the {@link #getEndpointAddress()}. 
+     * @return the endpoint address resulting from the {@link #getEndpointAddress()}. 
      * If not set, it will return the {@link SocksProxyConstants#FAKE_IP} constant 
      * value which will be ignored in a SOCKS v4 request.
-     *   
-     * @return the endpoint address
      */
     public byte[] getIpAddress() {
         if (getEndpointAddress() == null) {
