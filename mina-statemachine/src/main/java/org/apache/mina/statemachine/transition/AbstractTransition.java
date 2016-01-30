@@ -19,9 +19,6 @@
  */
 package org.apache.mina.statemachine.transition;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.event.Event;
@@ -86,21 +83,53 @@ public abstract class AbstractTransition implements Transition {
     protected abstract boolean doExecute(Event event);
 
     public boolean equals(Object o) {
-        if (!(o instanceof AbstractTransition)) {
-            return false;
-        }
         if (o == this) {
             return true;
         }
+
+        if (!(o instanceof AbstractTransition)) {
+            return false;
+        }
+        
         AbstractTransition that = (AbstractTransition) o;
-        return new EqualsBuilder().append(eventId, that.eventId).append(nextState, that.nextState).isEquals();
+        
+        if (eventId != null) {
+            if (!eventId.equals( that.eventId )) {
+                return false;
+            }
+        } else {
+            if (that.eventId != null) {
+                return false;
+            }
+        }
+        
+        
+        if (nextState != null) {
+            return nextState.equals( that.nextState );
+        } else {
+            return that.nextState == null;
+        }
     }
 
     public int hashCode() {
-        return new HashCodeBuilder(11, 31).append(eventId).append(nextState).toHashCode();
+        int h = 17;
+        
+        if ( eventId != null) {
+            h = h*37 + eventId.hashCode();
+        }
+        
+        if (nextState != null) {
+            h = h*17 + nextState.hashCode();
+        }
+        
+        return h;
     }
 
     public String toString() {
-        return new ToStringBuilder(this).append("eventId", eventId).append("nextState", nextState).toString();
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("eventId=").append(eventId);
+        sb.append(",nextState=").append(nextState);
+        return sb.toString();
     }
 }

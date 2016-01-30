@@ -19,7 +19,6 @@
  */
 package org.apache.mina.statemachine.event;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.statemachine.context.StateContext;
 
 /**
@@ -93,7 +92,34 @@ public class Event {
     }
 
     public String toString() {
-        return new ToStringBuilder(this).append("id", id).append("context", context).append("arguments", arguments)
-                .toString();
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("Event[");
+        sb.append("id=").append(id);
+        sb.append(",context=").append(context);
+        sb.append(",arguments=");
+        
+        if (arguments != null) {
+            sb.append('{');
+            boolean isFirst = true;
+            
+            for (Object argument:arguments) {
+                if (isFirst) {
+                    isFirst = false;
+                } else {
+                    sb.append(',');
+                }
+                
+                sb.append(argument);
+            }
+            
+            sb.append('}');
+        } else {
+            sb.append("null");
+        }
+
+        sb.append("]");
+        
+        return sb.toString();
     }
 }

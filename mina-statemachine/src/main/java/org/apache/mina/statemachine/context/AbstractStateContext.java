@@ -22,7 +22,6 @@ package org.apache.mina.statemachine.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.statemachine.State;
 
 /**
@@ -60,7 +59,13 @@ public abstract class AbstractStateContext implements StateContext {
     }
 
     public String toString() {
-        return new ToStringBuilder(this).append("currentState", currentState).append("attributes", attributes)
-                .toString();
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("StateContext[");
+        sb.append("currentState=").append(currentState);
+        sb.append(",attributes=").append(attributes);
+        sb.append("]");
+        
+        return sb.toString();
     }
 }

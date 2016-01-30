@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.SelfTransition;
 import org.apache.mina.statemachine.transition.Transition;
@@ -198,9 +195,7 @@ public class State {
             return false;
         }
         
-        State that = (State) o;
-        
-        return new EqualsBuilder().append(this.id, that.id).isEquals();
+        return id.equals(((State) o).id);
     }
 
     /**
@@ -208,7 +203,9 @@ public class State {
      */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(13, 33).append(this.id).toHashCode();
+        int h = 37;
+        
+        return h * 17 + id.hashCode();
     }
 
     /**
@@ -216,7 +213,13 @@ public class State {
      */
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("id", this.id).toString();
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("State[");
+        sb.append("id=").append(id);
+        sb.append("]");
+        
+        return sb.toString();
     }
 
     private static class TransitionHolder implements Comparable<TransitionHolder> {

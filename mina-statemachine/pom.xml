@@ -41,11 +41,6 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    
-    <dependency>
       <groupId>com.agical.rmock</groupId>
       <artifactId>rmock</artifactId>
       <version>${version.rmock}</version>

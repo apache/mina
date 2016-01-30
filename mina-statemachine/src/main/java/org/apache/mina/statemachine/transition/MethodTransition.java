@@ -23,9 +23,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.StateMachineFactory;
@@ -276,23 +273,36 @@ public class MethodTransition extends AbstractTransition {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof MethodTransition)) {
-            return false;
-        }
         if (o == this) {
             return true;
         }
+
+        if (!(o instanceof MethodTransition)) {
+            return false;
+        }
+        
         MethodTransition that = (MethodTransition) o;
-        return new EqualsBuilder().appendSuper(super.equals(that)).append(method, that.method)
-                .append(target, that.target).isEquals();
+        
+        return method.equals(that.method) && target.equals(that.target);
     }
 
     public int hashCode() {
-        return new HashCodeBuilder(13, 33).appendSuper(super.hashCode()).append(method).append(target).toHashCode();
+        int h = 17;
+        h = h*37 + super.hashCode();
+        h = h*37 + method.hashCode();
+        h = h*37 + target.hashCode();
+        
+        return h;
     }
 
     public String toString() {
-        return new ToStringBuilder(this).appendSuper(super.toString()).append("method", method)
-                .append("target", target).toString();
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("MethodTransition[");
+        sb.append(super.toString());
+        sb.append(",method=").append(method);
+        sb.append(']');
+        
+        return sb.toString();
     }
 }

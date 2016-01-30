@@ -136,7 +136,6 @@
     <version.xbean.plugin>4.1</version.xbean.plugin>
 
     <!-- Jars -->
-    <version.commons.lang>2.6</version.commons.lang>
     <version.easymock>2.5.2</version.easymock>
     <version.jboss.javassist>3.7.ga</version.jboss.javassist>
     <version.jdom>1.0</version.jdom>
@@ -300,13 +299,6 @@
         <groupId>pmd</groupId>
         <artifactId>pmd</artifactId>
         <version>${version.pmd}</version>
-      </dependency>
-
-      <!-- State Machine -->
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>${version.commons.lang}</version>
       </dependency>
 
       <!-- Logging -->
