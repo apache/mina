@@ -1138,7 +1138,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                             IoSession session = i.next();
                             
                             if (session.isActive()) {
-                                scheduleRemove(i.next());
+                                scheduleRemove((S)session);
                                 hasKeys = true;
                             }
                         }
