@@ -96,4 +96,11 @@ public abstract class NioSession extends AbstractIoSession {
     public IoProcessor<NioSession> getProcessor() {
         return processor;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean isActive() {
+        return key.isValid();
+    }
 }

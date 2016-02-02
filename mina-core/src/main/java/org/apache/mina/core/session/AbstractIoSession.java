@@ -227,6 +227,14 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    public boolean isActive() {
+        // Return true by default
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public final boolean isClosing() {
         return closing || closeFuture.isClosed();
     }
@@ -294,22 +302,32 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     public final CloseFuture close(boolean rightNow) {
-        if (!isClosing()) {
-            if (rightNow) {
-                synchronized (lock) {
-                    if (isClosing()) {
-                        return closeFuture;
-                    }
-
-                    closing = true;
-                }
-
-                getFilterChain().fireFilterClose();
-
-                return closeFuture;
-            }
-
+        if (rightNow) {
+            return closeNow();
+        } else {
             return closeOnFlush();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final CloseFuture close() {
+        try {
+            closeNow();
+        } finally {
+            return closeFuture;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final CloseFuture closeOnFlush() {
+        if (!isClosing()) {
+            getWriteRequestQueue().offer(this, CLOSE_REQUEST);
+            getProcessor().flush(this);
+            return closeFuture;
         } else {
             return closeFuture;
         }
@@ -318,7 +336,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
-    public final CloseFuture close() {
+    public final CloseFuture closeNow() {
         synchronized (lock) {
             if (isClosing()) {
                 return closeFuture;
@@ -328,12 +346,7 @@ public abstract class AbstractIoSession implements IoSession {
         }
 
         getFilterChain().fireFilterClose();
-        return closeFuture;
-    }
 
-    private CloseFuture closeOnFlush() {
-        getWriteRequestQueue().offer(this, CLOSE_REQUEST);
-        getProcessor().flush(this);
         return closeFuture;
     }
 
@@ -1329,10 +1342,12 @@ public abstract class AbstractIoSession implements IoSession {
      * @param currentTime the current time (i.e. {@link System#currentTimeMillis()})
      */
     public static void notifyIdleness(Iterator<? extends IoSession> sessions, long currentTime) {
-        IoSession s = null;
         while (sessions.hasNext()) {
-            s = sessions.next();
-            notifyIdleSession(s, currentTime);
+            IoSession session = sessions.next();
+            
+            if (!session.getCloseFuture().isClosed()) {
+                notifyIdleSession(session, currentTime);
+            }
         }
     }
 

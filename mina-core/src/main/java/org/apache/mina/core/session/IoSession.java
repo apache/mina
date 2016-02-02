@@ -178,8 +178,24 @@ public interface IoSession {
      *                    {@code false} to close this session after all queued
      *                    write requests are flushed.
      * @return The associated CloseFuture
+     * @deprecated Use either the closeNow() or the flushAndClose() methods
      */
     CloseFuture close(boolean immediately);
+
+    /**
+     * Closes this session immediately.  This operation is asynchronous, it 
+     * returns a {@link CloseFuture}.
+     */
+    CloseFuture closeNow();
+
+    /**
+     * Closes this session after all queued write requests are flushed.  This operation 
+     * is asynchronous.  Wait for the returned {@link CloseFuture} if you want to wait 
+     * for the session actually closed.
+     *
+     * @return The associated CloseFuture
+     */
+    CloseFuture closeOnFlush();
 
     /**
      * Closes this session after all queued write requests
@@ -363,6 +379,11 @@ public interface IoSession {
      * @return <tt>true</tt> if this session is connected with remote peer.
      */
     boolean isConnected();
+    
+    /**
+     * @return <tt>true</tt> if this session is active.
+     */
+    boolean isActive();
 
     /**
      * @return <tt>true</tt> if and only if this session is being closed
