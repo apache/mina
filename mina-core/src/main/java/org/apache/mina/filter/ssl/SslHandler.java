@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLEngine;
@@ -115,7 +116,11 @@ class SslHandler {
      * for data being produced during the handshake). */
     private boolean writingEncryptedData;
 
+    /** A lock to protect the SSL flush of events */
     private ReentrantLock sslLock = new ReentrantLock();
+    
+    /** A counter of schedules events */
+    private final AtomicInteger scheduled_events = new AtomicInteger(0);
 
     /**
      * Create a new SSL Handler, and initialize it.
@@ -300,24 +305,29 @@ class SslHandler {
     }
 
     /* no qualifier */void flushScheduledEvents() {
+        scheduled_events.incrementAndGet();
+
         // Fire events only when the lock is available for this handler.
-        IoFilterEvent event;
-        try {
-            sslLock.lock();
-
-            // We need synchronization here inevitably because filterWrite can be
-            // called simultaneously and cause 'bad record MAC' integrity error.
-            while ((event = filterWriteEventQueue.poll()) != null) {
-                NextFilter nextFilter = event.getNextFilter();
-                nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
+        if (sslLock.tryLock()) {
+            IoFilterEvent event;
+            
+            try {
+                do {
+                    // We need synchronization here inevitably because filterWrite can be
+                    // called simultaneously and cause 'bad record MAC' integrity error.
+                    while ((event = filterWriteEventQueue.poll()) != null) {
+                        NextFilter nextFilter = event.getNextFilter();
+                        nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
+                    }
+            
+                    while ((event = messageReceivedEventQueue.poll()) != null) {
+                        NextFilter nextFilter = event.getNextFilter();
+                        nextFilter.messageReceived(session, event.getParameter());
+                    }
+                } while (scheduled_events.decrementAndGet() > 0);
+            } finally {
+                sslLock.unlock();
             }
-        } finally {
-            sslLock.unlock();
-        }
-
-        while ((event = messageReceivedEventQueue.poll()) != null) {
-            NextFilter nextFilter = event.getNextFilter();
-            nextFilter.messageReceived(session, event.getParameter());
         }
     }
 
@@ -440,6 +450,7 @@ class SslHandler {
         while (src.hasRemaining()) {
 
             SSLEngineResult result = sslEngine.wrap(src, outNetBuffer.buf());
+            
             if (result.getStatus() == SSLEngineResult.Status.OK) {
                 if (result.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK) {
                     doTasks();
