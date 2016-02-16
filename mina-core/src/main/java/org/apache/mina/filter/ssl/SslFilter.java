@@ -630,9 +630,7 @@ public class SslFilter extends IoFilterAdapter {
                         sslHandler.scheduleFilterWrite(nextFilter, writeRequest);
                     } else if (sslHandler.isHandshakeComplete()) {
                         // SSL encrypt
-                        int pos = buf.position();
                         sslHandler.encrypt(buf.buf());
-                        buf.position(pos);
                         IoBuffer encryptedBuffer = sslHandler.fetchOutNetBuffer();
                         sslHandler.scheduleFilterWrite(nextFilter, new EncryptedWriteRequest(writeRequest,
                                 encryptedBuffer));
