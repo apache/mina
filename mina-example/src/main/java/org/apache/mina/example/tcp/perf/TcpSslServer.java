@@ -21,22 +21,26 @@ package org.apache.mina.example.tcp.perf;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
- * An TCP server used for performance tests.
+ * An TCP SSL server used for performance tests.
  * 
  * It does nothing fancy, except receiving the messages, and counting the number of
  * received messages.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class TcpServer extends IoHandlerAdapter {
+public class TcpSslServer extends IoHandlerAdapter {
     /** The listening port (check that it's not already in use) */
     public static final int PORT = 18567;
 
@@ -125,9 +129,17 @@ public class TcpServer extends IoHandlerAdapter {
      * Create the TCP server
      * 
      * @throws IOException If something went wrong
+     * @throws GeneralSecurityException 
      */
-    public TcpServer() throws IOException {
+    public TcpSslServer() throws IOException, GeneralSecurityException {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
+        
+        // Inject the SSL filter
+        DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+        SslFilter sslFilter = new SslFilter(BogusSslContextFactory
+            .getInstance(true));
+        chain.addLast("sslFilter", sslFilter);
+
         acceptor.setHandler(this);
 
         // The logger, if needed. Commented atm
@@ -145,7 +157,7 @@ public class TcpServer extends IoHandlerAdapter {
      * @param args The arguments
      * @throws IOException If something went wrong
      */
-    public static void main(String[] args) throws IOException {
-        new TcpServer();
+    public static void main(String[] args) throws Exception {
+        new TcpSslServer();
     }
 }
