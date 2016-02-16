@@ -122,6 +122,9 @@ public class TcpSslClient extends IoHandlerAdapter {
      */
     @Override
     public void messageSent(IoSession session, Object message) throws Exception {
+        if (counter.getCount() % 10000 == 0) {
+            System.out.println("Sent " + counter + " messages");
+        }
     }
 
     /**
