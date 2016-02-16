@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  *        // Insert SSLFilter to get ready for handshaking
  *        session.getFilterChain().addFirst(sslFilter);
  *
- *        // Disable encryption temporarilly.
+ *        // Disable encryption temporarily.
  *        // This attribute will be removed by SSLFilter
  *        // inside the Session.write() call below.
  *        session.setAttribute(SSLFilter.DISABLE_ENCRYPTION_ONCE, Boolean.TRUE);
@@ -147,6 +147,7 @@ public class SslFilter extends IoFilterAdapter {
      */
     public static final SslFilterMessage SESSION_UNSECURED = new SslFilterMessage("SESSION_UNSECURED");
 
+    /** An attribute containing the next filter */
     private static final AttributeKey NEXT_FILTER = new AttributeKey(SslFilter.class, "nextFilter");
 
     private static final AttributeKey SSL_HANDLER = new AttributeKey(SslFilter.class, "handler");
@@ -435,13 +436,14 @@ public class SslFilter extends IoFilterAdapter {
 
         // Create a SSL handler and start handshake.
         SslHandler sslHandler = new SslHandler(this, session);
+        
+        // Adding the supported ciphers in the SSLHandler
+        if ((enabledCipherSuites == null) || (enabledCipherSuites.length == 0)) {
+            enabledCipherSuites = sslContext.getServerSocketFactory().getSupportedCipherSuites();
+        }
+
         sslHandler.init();
 
-        // Adding the supported ciphers in the SSLHandler
-        // In Java 6, we should call sslContext.getSupportedSSLParameters()
-        // instead
-        String[] ciphers = sslContext.getServerSocketFactory().getSupportedCipherSuites();
-        setEnabledCipherSuites(ciphers);
         session.setAttribute(SSL_HANDLER, sslHandler);
     }
 
@@ -470,8 +472,6 @@ public class SslFilter extends IoFilterAdapter {
                 // release resources
                 sslHandler.destroy();
             }
-
-            sslHandler.flushScheduledEvents();
         } finally {
             // notify closed session
             nextFilter.sessionClosed(session);
