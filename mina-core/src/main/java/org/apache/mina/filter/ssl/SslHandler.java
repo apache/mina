@@ -198,6 +198,7 @@ class SslHandler {
             LOGGER.debug("{} SSL Handler Initialization done.", sslFilter.getSessionInfo(session));
         }
     }
+    
 
     /**
      * Release allocated buffers.
@@ -771,7 +772,8 @@ class SslHandler {
                 continue;
             }
         } while (((status == SSLEngineResult.Status.OK) || (status == SSLEngineResult.Status.BUFFER_OVERFLOW))
-                && ((handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) || (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
+                && ((handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) || 
+                        (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
 
         return res;
     }
