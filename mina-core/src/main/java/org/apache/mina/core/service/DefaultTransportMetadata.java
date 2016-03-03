@@ -39,6 +39,7 @@ public class DefaultTransportMetadata implements TransportMetadata {
 
     private final boolean connectionless;
 
+    /** The flag indicating that the transport support fragmentation or not */
     private final boolean fragmentation;
 
     private final Class<? extends SocketAddress> addressType;
@@ -97,30 +98,51 @@ public class DefaultTransportMetadata implements TransportMetadata {
         this.envelopeTypes = Collections.unmodifiableSet(newEnvelopeTypes);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Class<? extends SocketAddress> getAddressType() {
         return addressType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Set<Class<? extends Object>> getEnvelopeTypes() {
         return envelopeTypes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Class<? extends IoSessionConfig> getSessionConfigType() {
         return sessionConfigType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getProviderName() {
         return providerName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isConnectionless() {
         return connectionless;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean hasFragmentation() {
         return fragmentation;
     }
