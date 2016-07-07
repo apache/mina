@@ -831,7 +831,11 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 int localWrittenBytes = 0;
                 Object message = req.getMessage();
 
+                // boolean to indicate if the current message is an empty buffer, representing a message marker
+                boolean isEmptyMessage = false;
+
                 if (message instanceof IoBuffer) {
+                    isEmptyMessage = !((IoBuffer) message).hasRemaining();
                     localWrittenBytes = writeBuffer(session, req, hasFragmentation, maxWrittenBytes - writtenBytes,
                             currentTime);
 
@@ -860,10 +864,16 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                             + message.getClass().getName() + "'.  Are you missing a protocol encoder?");
                 }
 
-                if (localWrittenBytes == 0) {
+                if (localWrittenBytes == 0 && !isEmptyMessage) {
                     // Kernel buffer is full.
                     setInterestedInWrite(session, true);
                     return false;
+                }
+
+                if (localWrittenBytes == 0 && isEmptyMessage) {
+                    // Just processed a message marker - empty buffer;
+                    // set the session write flag and continue
+                    setInterestedInWrite(session, true);
                 }
 
                 writtenBytes += localWrittenBytes;
