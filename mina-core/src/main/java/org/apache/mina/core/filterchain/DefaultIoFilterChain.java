@@ -594,7 +594,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
         } else {
             // Please note that this place is not the only place that
             // calls ConnectFuture.setException().
-            session.close(true);
+            if (!session.isClosing()) {
+                // Call the closeNow method only if needed
+                session.closeNow();
+            }
+            
             future.setException(cause);
         }
     }
