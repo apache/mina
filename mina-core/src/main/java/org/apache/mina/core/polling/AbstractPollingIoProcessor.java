@@ -767,7 +767,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                         }
                     } catch (Exception e) {
                         scheduleRemove(session);
-                        session.close(true);
+                        session.closeNow();
                         IoFilterChain filterChain = session.getFilterChain();
                         filterChain.fireExceptionCaught(e);
                     }
