@@ -135,11 +135,16 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     @Override
     protected void destroy(NioSession session) throws Exception {
         ByteChannel ch = session.getChannel();
+        
         SelectionKey key = session.getSelectionKey();
+        
         if (key != null) {
             key.cancel();
         }
-        ch.close();
+        
+        if ( ch.isOpen() ) {
+            ch.close();
+        }
     }
 
     /**
@@ -313,7 +318,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     }
 
     @Override
-    protected int write(NioSession session, IoBuffer buf, int length) throws Exception {
+    protected int write(NioSession session, IoBuffer buf, int length) throws IOException {
         if (buf.remaining() <= length) {
             return session.getChannel().write(buf.buf());
         }
