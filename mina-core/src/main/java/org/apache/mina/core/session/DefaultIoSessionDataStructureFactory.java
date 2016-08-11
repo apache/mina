@@ -182,7 +182,6 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
          * Default constructor
          */
         public DefaultWriteRequestQueue() {
-            super();
         }
 
         /**
@@ -217,7 +216,15 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
          * {@inheritDoc}
          */
         public synchronized WriteRequest poll(IoSession session) {
-            return q.poll();
+            WriteRequest answer = q.poll();
+
+            if (answer == AbstractIoSession.CLOSE_REQUEST) {
+                session.closeNow();
+                dispose(session);
+                answer = null;
+            }
+
+            return answer;
         }
 
         @Override
