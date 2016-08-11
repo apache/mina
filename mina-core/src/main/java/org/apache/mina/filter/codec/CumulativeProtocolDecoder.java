@@ -99,8 +99,13 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
-
+    /** The buffer used to store the data in the session */
     private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
+    
+    /** A flag set to true if we handle fragmentation accordingly to the TransportMetadata setting. 
+     * It can be set to false if needed (UDP with fragments, for instance). the default value is 'true'
+     */
+    private boolean transportMetadataFragmentation = true;
 
     /**
      * Creates a new instance.
@@ -121,7 +126,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      *             consuming the cumulative buffer.
      */
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-        if (!session.getTransportMetadata().hasFragmentation()) {
+        if (transportMetadataFragmentation && !session.getTransportMetadata().hasFragmentation()) {
             while (in.hasRemaining()) {
                 if (!doDecode(session, in, out)) {
                     break;
@@ -240,5 +245,15 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         remainingBuf.put(buf);
 
         session.setAttribute(BUFFER, remainingBuf);
+    }
+    
+    /**
+     * Let the user change the way we handle fragmentation. If set to <tt>false</tt>, the 
+     * decode() method will not check the TransportMetadata fragmentation capability
+     *  
+     * @param handleFragment The flag to set.
+     */
+    public void setTransportMetadataFragmentation(boolean transportMetadataFragmentation) {
+        this.transportMetadataFragmentation = transportMetadataFragmentation;
     }
 }
