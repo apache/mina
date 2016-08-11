@@ -341,7 +341,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * @return the number of byte written
      * @throws Exception any exception thrown by the underlying system calls
      */
-    protected abstract int write(S session, IoBuffer buf, int length) throws Exception;
+    protected abstract int write(S session, IoBuffer buf, int length) throws IOException;
 
     /**
      * Write a part of a file to a {@link IoSession}, if the underlying API
@@ -757,36 +757,36 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             SessionState state = getState(session);
 
             switch (state) {
-            case OPENED:
-                try {
-                    boolean flushedAll = flushNow(session, currentTime);
-
-                    if (flushedAll && !session.getWriteRequestQueue().isEmpty(session)
-                            && !session.isScheduledForFlush()) {
-                        scheduleFlush(session);
+                case OPENED:
+                    try {
+                        boolean flushedAll = flushNow(session, currentTime);
+    
+                        if (flushedAll && !session.getWriteRequestQueue().isEmpty(session)
+                                && !session.isScheduledForFlush()) {
+                            scheduleFlush(session);
+                        }
+                    } catch (Exception e) {
+                        scheduleRemove(session);
+                        session.close(true);
+                        IoFilterChain filterChain = session.getFilterChain();
+                        filterChain.fireExceptionCaught(e);
                     }
-                } catch (Exception e) {
-                    scheduleRemove(session);
-                    session.close(true);
-                    IoFilterChain filterChain = session.getFilterChain();
-                    filterChain.fireExceptionCaught(e);
-                }
-
-                break;
-
-            case CLOSING:
-                // Skip if the channel is already closed.
-                break;
-
-            case OPENING:
-                // Retry later if session is not yet fully initialized.
-                // (In case that Session.write() is called before addSession()
-                // is processed)
-                scheduleFlush(session);
-                return;
-
-            default:
-                throw new IllegalStateException(String.valueOf(state));
+    
+                    break;
+    
+                case CLOSING:
+                    // Skip if the channel is already closed.
+                    break;
+    
+                case OPENING:
+                    // Retry later if session is not yet fully initialized.
+                    // (In case that Session.write() is called before addSession()
+                    // is processed)
+                    scheduleFlush(session);
+                    return;
+    
+                default:
+                    throw new IllegalStateException(String.valueOf(state));
             }
 
         } while (!flushingSessions.isEmpty());
@@ -911,12 +911,11 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 // We have had an issue while trying to send data to the
                 // peer : let's close the session.
                 buf.free();
-                session.close(true);
-                destroy(session);
+                session.closeNow();
+                removeNow(session);
 
                 return 0;
             }
-
         }
 
         session.increaseWrittenBytes(localWrittenBytes, currentTime);
