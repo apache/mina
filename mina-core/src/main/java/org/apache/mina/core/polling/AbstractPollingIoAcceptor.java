@@ -356,8 +356,6 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
         try {
             lock.acquire();
 
-            // Wait a bit to give a chance to the Acceptor thread to do the select()
-            Thread.sleep(10);
             wakeup();
         } finally {
             lock.release();
@@ -447,16 +445,19 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
 
             while (selectable) {
                 try {
+                    // Process the bound sockets to this acceptor.
+                    // this actually sets the selector to OP_ACCEPT,
+                    // and binds to the port on which this class will
+                    // listen on. We do that before the select because 
+                    // the registerQueue containing the new handler is
+                    // already updated at this point.
+                    nHandles += registerHandles();
+
                     // Detect if we have some keys ready to be processed
                     // The select() will be woke up if some new connection
                     // have occurred, or if the selector has been explicitly
                     // woke up
                     int selected = select();
-
-                    // this actually sets the selector to OP_ACCEPT,
-                    // and binds to the port on which this class will
-                    // listen on
-                    nHandles += registerHandles();
 
                     // Now, if the number of registred handles is 0, we can
                     // quit the loop: we don't have any socket listening
@@ -592,6 +593,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
 
                 // and notify.
                 future.setDone();
+                
                 return newHandles.size();
             } catch (Exception e) {
                 // We store the exception in the future
