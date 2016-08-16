@@ -457,8 +457,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.compiler.plugin}</version>
           <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
+            <source>1.7</source>
+            <target>1.7</target>
             <optimize>true</optimize>
             <showDeprecations>true</showDeprecations>
             <encoding>ISO-8859-1</encoding>
@@ -760,8 +760,8 @@
         <version>${version.compiler.plugin}</version>
         <configuration>
           <encoding>UTF-8</encoding>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.7</source>
+          <target>1.7</target>
           <debug>true</debug>
           <optimize>true</optimize>
           <showDeprecations>true</showDeprecations>
