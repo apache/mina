@@ -56,6 +56,35 @@ public class IoSessionFinder {
             throw new IllegalArgumentException("query is empty.");
         }
 
+        // Only accept queries like [a-zA-Z_$ ]+ (== | < | > | <= | >=) [a-zA-Z\-$\.0-9 ]+
+        int comp = -1;
+        
+        for (int i=0; i<query.length();i++) {
+        	char c = query.charAt(i);
+        	
+        	if ((c == '=') || (c == '<') || (c == '>') || (c == '!')) {
+        		comp = i;
+        	} else if ( !Character.isJavaIdentifierPart(c) && (c != ' ')) {
+                throw new IllegalArgumentException("Invalid query.");
+        	} else {
+        		if ( comp > 0) {
+        			break;
+        		}
+        	}
+        }
+        
+        if (comp<=0) {
+            throw new IllegalArgumentException("Invalid query.");
+        }
+        
+        for (int i=comp+1; i<query.length();i++) {
+        	char c = query.charAt(i);
+
+        	if (!Character.isJavaIdentifierPart(c) && (c != ' ') && (c != '"') && (c != '\'')) {
+                throw new IllegalArgumentException("Invalid query.");
+        	}
+        }
+        
         this.query = query;
         
         try {
