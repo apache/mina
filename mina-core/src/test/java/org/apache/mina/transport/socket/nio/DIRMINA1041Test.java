@@ -1,6 +1,5 @@
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.log4j.net.SocketServer;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.WriteFuture;
@@ -10,6 +9,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketConnector;
+import org.apache.mina.util.AvailablePortFinder;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,30 +17,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 
 public class DIRMINA1041Test {
 
     private static final Logger LOG = LoggerFactory.getLogger(DIRMINA1041Test.class);
     private static final String HOST = "localhost";
-    private static int PORT; 
+    private static final int PORT = AvailablePortFinder.getNextAvailable(); 
     private static final long TIMEOUT = 3000L;
     private SocketAcceptor acceptor;
     private SocketConnector connector;
     
-    static {
-        try {
-            ServerSocket serverSocket = new ServerSocket(0);
-            PORT = serverSocket.getLocalPort();
-            serverSocket.close();
-            
-        } catch (IOException ioe) {
-            
-        }
-    }
-
     @Before
     public void setUp() throws Exception {
         acceptor = new NioSocketAcceptor();

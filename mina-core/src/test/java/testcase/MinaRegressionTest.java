@@ -142,7 +142,7 @@ public class MinaRegressionTest extends IoHandlerAdapter {
         } else {
             logger.info("I/O error: " + cause.getMessage());
         }
-        session.close(true);
+        session.closeNow();
     }
 
     @Override

@@ -80,7 +80,7 @@ public abstract class AbstractConnectorTest {
             ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
             future.awaitUninterruptibly();
             buf.append("3");
-            future.getSession().close(true);
+            future.getSession().closeNow();
             // sessionCreated() will fire before the connect future completes
             // but sessionOpened() may not
             assertTrue(Pattern.matches("12?32?", buf.toString()));
@@ -117,7 +117,7 @@ public abstract class AbstractConnectorTest {
             future.awaitUninterruptibly();
             buf.append("1");
             try {
-                future.getSession().close(true);
+                future.getSession().closeNow();
                 fail();
             } catch (RuntimeIoException e) {
                 // Signifies a successful test execution

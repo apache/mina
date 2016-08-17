@@ -53,7 +53,7 @@ public class TimeServerHandler extends IoHandlerAdapter
         
         if( str.trim().equalsIgnoreCase("quit") ) {
             // "Quit" ? let's get out ...
-            session.close(true);
+            session.closeNow();
             return;
         }
 

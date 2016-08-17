@@ -21,9 +21,7 @@ package org.apache.mina.transport.socket.nio;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
@@ -31,6 +29,7 @@ import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.util.AvailablePortFinder;
 import org.junit.Test;
 
 /**
@@ -42,17 +41,7 @@ public class DIRMINA777Test {
 
     @Test
     public void checkReadFuture() throws Throwable {
-        int port = 0;
-        
-        try {
-            ServerSocket serverSocket = new ServerSocket(0);
-            port = serverSocket.getLocalPort();
-            serverSocket.close();
-            
-        } catch (IOException ioe) {
-            
-        }
-
+        int port = AvailablePortFinder.getNextAvailable();
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
         acceptor.setHandler(new IoHandlerAdapter() {

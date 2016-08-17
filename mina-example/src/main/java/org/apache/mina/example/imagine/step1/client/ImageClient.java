@@ -73,7 +73,7 @@ public class ImageClient extends IoHandlerAdapter {
 
     public void disconnect() {
         if (session != null) {
-            session.close(true).awaitUninterruptibly(CONNECT_TIMEOUT);
+            session.closeNow().awaitUninterruptibly(CONNECT_TIMEOUT);
             session = null;
         }
     }

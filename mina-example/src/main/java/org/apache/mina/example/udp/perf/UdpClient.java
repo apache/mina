@@ -19,7 +19,6 @@
  */
 package org.apache.mina.example.udp.perf;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;

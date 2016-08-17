@@ -240,7 +240,7 @@ public class BlacklistFilter extends IoFilterAdapter {
 
     private void blockSession(IoSession session) {
         LOGGER.warn("Remote address in the blacklist; closing.");
-        session.close(true);
+        session.closeNow();
     }
 
     private boolean isBlocked(IoSession session) {

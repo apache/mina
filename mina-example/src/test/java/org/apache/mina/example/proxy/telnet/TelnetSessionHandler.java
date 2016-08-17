@@ -75,7 +75,7 @@ public class TelnetSessionHandler extends AbstractProxyIoHandler {
                     }
                 }
 
-                _session.close(true);
+                _session.closeNow();
             }
 
         }).start();
@@ -104,6 +104,6 @@ public class TelnetSessionHandler extends AbstractProxyIoHandler {
     public void exceptionCaught(IoSession session, Throwable cause) {
         logger.debug("CLIENT - Exception caught");
         //cause.printStackTrace();
-        session.close(true);
+        session.closeNow();
     }
 }

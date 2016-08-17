@@ -288,7 +288,7 @@ public class IoServiceListenerSupport {
         IoFutureListener<IoFuture> listener = new LockNotifyingListener(lock);
 
         for (IoSession s : managedSessions.values()) {
-            s.close(true).addListener(listener);
+            s.closeNow().addListener(listener);
         }
 
         try {

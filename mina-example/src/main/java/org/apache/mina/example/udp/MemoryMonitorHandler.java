@@ -44,7 +44,7 @@ public class MemoryMonitorHandler extends IoHandlerAdapter {
     public void exceptionCaught(IoSession session, Throwable cause)
             throws Exception {
         cause.printStackTrace();
-        session.close(true);
+        session.closeNow();
     }
 
     @Override

@@ -293,7 +293,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
         future.addListener(new IoFutureListener<ConnectFuture>() {
             public void operationComplete(ConnectFuture future) {
                 if (future.isCanceled()) {
-                    session.close(true);
+                    session.closeNow();
                 }
             }
         });

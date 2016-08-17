@@ -36,7 +36,7 @@ public interface IoFutureListener<F extends IoFuture> extends EventListener {
      */
     IoFutureListener<IoFuture> CLOSE = new IoFutureListener<IoFuture>() {
         public void operationComplete(IoFuture future) {
-            future.getSession().close(true);
+            future.getSession().closeNow();
         }
     };
 

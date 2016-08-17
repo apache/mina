@@ -286,7 +286,7 @@ public abstract class AbstractBindTest {
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
             //cause.printStackTrace();
-            session.close(true);
+            session.closeNow();
         }
 
         @Override

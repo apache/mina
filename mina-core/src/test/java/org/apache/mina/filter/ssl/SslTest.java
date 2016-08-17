@@ -86,7 +86,7 @@ public class SslTest {
                 }
                     
                 session.write(sb.toString());
-                session.close(true);
+                session.closeOnFlush();
             }
         }
     }

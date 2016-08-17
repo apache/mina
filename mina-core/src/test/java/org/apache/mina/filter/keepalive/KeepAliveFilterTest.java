@@ -124,7 +124,7 @@ public class KeepAliveFilterTest {
 
         assertFalse("got an exception on the client", gotException.get());
 
-        session.close(true);
+        session.closeNow();
         connector.dispose();
     }
 

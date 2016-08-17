@@ -90,6 +90,6 @@ public class IoHandlerAdapter implements IoHandler {
      * {@inheritDoc}
      */
     public void inputClosed(IoSession session) throws Exception {
-        session.close(true);
+        session.closeNow();
     }
 }

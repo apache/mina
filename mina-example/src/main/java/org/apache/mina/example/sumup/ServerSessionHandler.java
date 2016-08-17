@@ -82,12 +82,12 @@ public class ServerSessionHandler extends IoHandlerAdapter {
     public void sessionIdle(IoSession session, IdleStatus status) {
         LOGGER.info("Disconnecting the idle.");
         // disconnect an idle client
-        session.close(true);
+        session.closeNow();
     }
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
         // close the connection on exceptional situation
-        session.close(true);
+        session.closeNow();
     }
 }

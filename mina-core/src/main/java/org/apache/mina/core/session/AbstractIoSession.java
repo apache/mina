@@ -357,6 +357,12 @@ public abstract class AbstractIoSession implements IoSession {
      *
      */
     protected void destroy() throws Exception {
+        if (writeRequestQueue != null) {
+            while (!writeRequestQueue.isEmpty(this)) {
+                WriteRequest writeRequest = writeRequestQueue.poll(this);
+                writeRequest.getFuture().setWritten();
+            }
+        }
     }
 
     /**
@@ -1401,7 +1407,7 @@ public abstract class AbstractIoSession implements IoSession {
                 request.getFuture().setException(cause);
                 session.getFilterChain().fireExceptionCaught(cause);
                 // WriteException is an IOException, so we close the session.
-                session.close(true);
+                session.closeNow();
             }
         }
     }

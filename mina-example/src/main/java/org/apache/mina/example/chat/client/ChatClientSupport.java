@@ -100,7 +100,13 @@ public class ChatClientSupport {
     }
 
     public void broadcast(String message) {
-        session.write("BROADCAST " + message);
+        try {
+            for ( int i = 0; i < 1000000; i++) {
+                session.write("BROADCAST " + message + i);
+            }
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
     }
 
     public void quit() {
@@ -110,7 +116,7 @@ public class ChatClientSupport {
                 // Wait until the chat ends.
                 session.getCloseFuture().awaitUninterruptibly();
             }
-            session.close(true);
+            session.closeNow();
         }
     }
 

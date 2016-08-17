@@ -59,7 +59,7 @@ public class TennisPlayer extends IoHandlerAdapter {
         } else {
             // If the ball is dead, this player loses.
             System.out.println("Player-" + id + ": LOSE");
-            session.close(true);
+            session.closeNow();
         }
     }
 
@@ -71,6 +71,6 @@ public class TennisPlayer extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
         cause.printStackTrace();
-        session.close(true);
+        session.closeNow();
     }
 }

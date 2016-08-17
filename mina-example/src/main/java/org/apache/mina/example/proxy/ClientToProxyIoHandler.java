@@ -59,7 +59,7 @@ public class ClientToProxyIoHandler extends AbstractProxyIoHandler {
                     session2.resumeWrite();
                 } catch (RuntimeIoException e) {
                     // Connect failed
-                    session.close(true);
+                    session.closeNow();
                 } finally {
                     session.resumeRead();
                     session.resumeWrite();

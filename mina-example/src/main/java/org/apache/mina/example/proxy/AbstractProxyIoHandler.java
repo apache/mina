@@ -56,7 +56,7 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
         if (session.getAttribute( OTHER_IO_SESSION ) != null) {
             IoSession sess = (IoSession) session.getAttribute(OTHER_IO_SESSION);
             sess.setAttribute(OTHER_IO_SESSION, null);
-            sess.close(false);
+            sess.closeOnFlush();
             session.setAttribute(OTHER_IO_SESSION, null);
         }
     }

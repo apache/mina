@@ -21,7 +21,6 @@ package org.apache.mina.filter.codec.serialization;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectOutput;
 import java.io.OutputStream;
 

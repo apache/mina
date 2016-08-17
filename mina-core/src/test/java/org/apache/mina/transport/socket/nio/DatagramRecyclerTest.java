@@ -86,7 +86,7 @@ public class DatagramRecyclerTest {
             // Close the client-side connection.
             // This doesn't mean that the acceptor-side connection is also closed.
             // The life cycle of the acceptor-side connection is managed by the recycler.
-            future.getSession().close(true);
+            future.getSession().closeNow();
             future.getSession().getCloseFuture().awaitUninterruptibly();
             assertTrue(future.getSession().getCloseFuture().isClosed());
 
@@ -133,7 +133,7 @@ public class DatagramRecyclerTest {
             while (acceptorHandler.session == null) {
                 Thread.yield();
             }
-            acceptorHandler.session.close(true);
+            acceptorHandler.session.closeNow();
             assertTrue(acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
 
             IoSession oldSession = acceptorHandler.session;
@@ -157,10 +157,10 @@ public class DatagramRecyclerTest {
             while (acceptorHandler.session == null) {
                 Thread.yield();
             }
-            acceptorHandler.session.close(true);
+            acceptorHandler.session.closeNow();
             assertTrue(acceptorHandler.session.getCloseFuture().awaitUninterruptibly(3000));
 
-            future.getSession().close(true).awaitUninterruptibly();
+            future.getSession().closeNow().awaitUninterruptibly();
 
             assertNotSame(oldSession, acceptorHandler.session);
         } finally {

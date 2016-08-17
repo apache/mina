@@ -25,7 +25,6 @@ import static org.junit.Assert.fail;
 
 import java.net.InetSocketAddress;
 
-import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.WriteFuture;
@@ -115,21 +114,12 @@ public class ConnectorTest extends AbstractTest {
             future.awaitUninterruptibly();
             session = future.getSession();
         } else {
-            int clientPort = port;
-            for (int i = 0; i < 65536; i++) {
-                clientPort = AvailablePortFinder
-                        .getNextAvailable(clientPort + 1);
-                try {
-                    ConnectFuture future = connector.connect(
-                            new InetSocketAddress("127.0.0.1", port),
-                            new InetSocketAddress(clientPort));
-                    future.awaitUninterruptibly();
-                    session = future.getSession();
-                    break;
-                } catch (RuntimeIoException e) {
-                    // Try again until we succeed to bind.
-                }
-            }
+            int clientPort = AvailablePortFinder.getNextAvailable();
+            ConnectFuture future = connector.connect(
+                    new InetSocketAddress("127.0.0.1", port),
+                    new InetSocketAddress(clientPort));
+            future.awaitUninterruptibly();
+            session = future.getSession();
 
             if (session == null) {
                 fail("Failed to find out an appropriate local address.");
@@ -171,7 +161,7 @@ public class ConnectorTest extends AbstractTest {
             testConnector0(session);
         }
 
-        session.close(true).awaitUninterruptibly();
+        session.closeNow().awaitUninterruptibly();
     }
 
     private void testConnector0(IoSession session) throws InterruptedException {
@@ -180,6 +170,7 @@ public class ConnectorTest extends AbstractTest {
         IoBuffer readBuf = handler.readBuf;
         readBuf.clear();
         WriteFuture writeFuture = null;
+        
         for (int i = 0; i < COUNT; i++) {
             IoBuffer buf = IoBuffer.allocate(DATA_SIZE);
             buf.limit(DATA_SIZE);

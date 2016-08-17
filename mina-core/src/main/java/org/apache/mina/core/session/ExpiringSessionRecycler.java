@@ -99,7 +99,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
 
     private class DefaultExpirationListener implements ExpirationListener<IoSession> {
         public void expired(IoSession expiredSession) {
-            expiredSession.close(true);
+            expiredSession.closeNow();
         }
     }
 }

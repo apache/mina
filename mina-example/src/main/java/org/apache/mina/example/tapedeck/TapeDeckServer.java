@@ -136,7 +136,7 @@ public class TapeDeckServer {
     @IoHandlerTransition(on = EXCEPTION_CAUGHT, in = ROOT, weight = 10)
     public void exceptionCaught(IoSession session, Exception e) {
         e.printStackTrace();
-        session.close(true);
+        session.closeNow();
     }
     
     @IoHandlerTransition(in = ROOT, weight = 100)

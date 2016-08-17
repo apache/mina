@@ -92,7 +92,7 @@ public class AbstractIoServiceTest {
         latch.await();
 
         // close the session
-        CloseFuture closeFuture = session.close(false);
+        CloseFuture closeFuture = session.closeOnFlush();
 
         System.out.println("session.close called");
         //Thread.sleep(5);

@@ -32,7 +32,7 @@ public class ReverseProtocolHandler extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
         // Close connection when unexpected exception is caught.
-        session.close(true);
+        session.closeNow();
     }
 
     @Override

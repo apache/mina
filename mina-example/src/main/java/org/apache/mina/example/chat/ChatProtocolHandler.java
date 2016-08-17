@@ -48,7 +48,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
     public void exceptionCaught(IoSession session, Throwable cause) {
         LOGGER.warn("Unexpected exception.", cause);
         // Close connection when unexpected exception is caught.
-        session.close(true);
+        session.closeNow();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
 
             case ChatCommand.QUIT:
                 session.write("QUIT OK");
-                session.close(true);
+                session.closeNow();
                 break;
             case ChatCommand.LOGIN:
 
@@ -148,7 +148,7 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
         synchronized (sessions) {
             for (IoSession session : sessions) {
                 if (name.equals(session.getAttribute("user"))) {
-                    session.close(true);
+                    session.closeNow();
                     break;
                 }
             }
