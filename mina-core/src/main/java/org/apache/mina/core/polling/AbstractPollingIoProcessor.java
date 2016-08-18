@@ -1100,6 +1100,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                                 nbTries--;
                             }
                         }
+                    } else {
+                        nbTries = 10;
                     }
 
                     // Manage newly created session first
