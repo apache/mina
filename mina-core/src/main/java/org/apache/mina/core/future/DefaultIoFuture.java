@@ -307,7 +307,7 @@ public class DefaultIoFuture implements IoFuture {
             result = newValue;
             ready = true;
             
-            // Now, if we have waiters, notofy them that the operation has completed
+            // Now, if we have waiters, notify them that the operation has completed
             if (waiters > 0) {
                 lock.notifyAll();
             }

@@ -41,6 +41,7 @@ import org.apache.mina.transport.socket.DatagramAcceptor;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;
+import org.apache.mina.util.AvailablePortFinder;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -78,16 +79,14 @@ public abstract class AbstractBindTest {
         // Let's start from port #1 to detect possible resource leak
         // because test will fail in port 1-1023 if user run this test
         // as a normal user.
-        for (port = 1024; port <= 65535; port++) {
-            socketBound = false;
-            try {
-                acceptor.setDefaultLocalAddress(createSocketAddress(port));
-                acceptor.bind();
-                socketBound = true;
-                break;
-            } catch (IOException e) {
-                //System.out.println(e.getMessage());
-            }
+        port = AvailablePortFinder.getNextAvailable();
+        socketBound = false;
+        try {
+            acceptor.setDefaultLocalAddress(createSocketAddress(port));
+            acceptor.bind();
+            socketBound = true;
+        } catch (IOException e) {
+            //System.out.println(e.getMessage());
         }
 
         // If there is no port available, test fails.
