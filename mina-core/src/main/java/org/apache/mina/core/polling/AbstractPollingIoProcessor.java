@@ -814,9 +814,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 + (session.getConfig().getMaxReadBufferSize() >>> 1);
         int writtenBytes = 0;
         WriteRequest req = null;
-        
-        // boolean to indicate if the current message is an empty buffer, representing a message marker
-        boolean isEmptyMessage = false;
 
         try {
             // Clear OP_WRITE
@@ -840,7 +837,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 Object message = req.getMessage();
 
                 if (message instanceof IoBuffer) {
-                    isEmptyMessage = !((IoBuffer) message).hasRemaining();
                     localWrittenBytes = writeBuffer(session, req, hasFragmentation, maxWrittenBytes - writtenBytes,
                             currentTime);
 
@@ -870,14 +866,11 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 }
 
                 if (localWrittenBytes == 0) {
-                    if (isEmptyMessage) {
-                        // Kernel buffer is full.
+
+                    // Kernel buffer is full.
+                    if (!req.equals(AbstractIoSession.MESSAGE_SENT_REQUEST)) {
                         setInterestedInWrite(session, true);
                         return false;
-                    } else {
-                        // Just processed a message marker - empty buffer;
-                        // set the session write flag and continue
-                        setInterestedInWrite(session, true);
                     }
                 } else {
                     writtenBytes += localWrittenBytes;

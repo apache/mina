@@ -29,6 +29,7 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
@@ -435,9 +436,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
             if (future == null) {
                 // Creates an empty writeRequest containing the destination
-                WriteRequest writeRequest = new DefaultWriteRequest(
-                        DefaultWriteRequest.EMPTY_MESSAGE, null, destination);
-                future = DefaultWriteFuture.newNotWrittenFuture(session, new NothingWrittenException(writeRequest));
+                future = DefaultWriteFuture.newNotWrittenFuture(session, new NothingWrittenException(AbstractIoSession.MESSAGE_SENT_REQUEST));
             }
 
             return future;

@@ -97,6 +97,13 @@ public abstract class AbstractIoSession implements IoSession {
      */
     public static final WriteRequest CLOSE_REQUEST = new DefaultWriteRequest(new Object());
 
+    /**
+     * An internal write request object that triggers message sent events.
+     * 
+     * @see #writeRequestQueue
+     */
+    public static final WriteRequest MESSAGE_SENT_REQUEST = new DefaultWriteRequest(DefaultWriteRequest.EMPTY_MESSAGE);
+
     private final Object lock = new Object();
 
     private IoSessionAttributeMap attributes;
