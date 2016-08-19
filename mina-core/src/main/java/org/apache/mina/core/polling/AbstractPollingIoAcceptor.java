@@ -76,9 +76,9 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
 
     private final boolean createdProcessor;
 
-    private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<>();
 
     private final Map<SocketAddress, H> boundHandles = Collections.synchronizedMap(new HashMap<SocketAddress, H>());
 
@@ -88,7 +88,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     private volatile boolean selectable;
 
     /** The thread responsible of accepting incoming requests */
-    private AtomicReference<Acceptor> acceptorRef = new AtomicReference<Acceptor>();
+    private AtomicReference<Acceptor> acceptorRef = new AtomicReference<>();
 
     protected boolean reuseAddress = false;
 
@@ -371,7 +371,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
         // Update the local addresses.
         // setLocalAddresses() shouldn't be called from the worker thread
         // because of deadlock.
-        Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
+        Set<SocketAddress> newLocalAddresses = new HashSet<>();
 
         for (H handle : boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
@@ -577,7 +577,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
             // We create a temporary map to store the bound handles,
             // as we may have to remove them all if there is an exception
             // during the sockets opening.
-            Map<SocketAddress, H> newHandles = new ConcurrentHashMap<SocketAddress, H>();
+            Map<SocketAddress, H> newHandles = new ConcurrentHashMap<>();
             List<SocketAddress> localAddresses = future.getLocalAddresses();
 
             try {
@@ -609,7 +609,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                         }
                     }
 
-                    // TODO : add some comment : what is the wakeup() waking up ?
+                    // Wake up the selector to be sure we will process the newly bound handle
+                    // and not block forever in the select()
                     wakeup();
                 }
             }
@@ -657,6 +658,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     /**
      * {@inheritDoc}
      */
+    @Override
     public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         throw new UnsupportedOperationException();
     }
@@ -710,6 +712,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig)sessionConfig;
     }
