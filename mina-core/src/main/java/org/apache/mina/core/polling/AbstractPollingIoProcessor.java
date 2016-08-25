@@ -343,7 +343,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * @param length the number of bytes to write can be superior to the number of
      *            bytes remaining in the buffer
      * @return the number of byte written
-     * @throws Exception any exception thrown by the underlying system calls
+     * @throws IOException any exception thrown by the underlying system calls
      */
     protected abstract int write(S session, IoBuffer buf, int length) throws IOException;
 

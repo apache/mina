@@ -361,9 +361,8 @@ public abstract class AbstractIoSession implements IoSession {
     
     /**
      * Destroy the session
-     *
      */
-    protected void destroy() throws Exception {
+    protected void destroy() {
         if (writeRequestQueue != null) {
             while (!writeRequestQueue.isEmpty(this)) {
                 WriteRequest writeRequest = writeRequestQueue.poll(this);

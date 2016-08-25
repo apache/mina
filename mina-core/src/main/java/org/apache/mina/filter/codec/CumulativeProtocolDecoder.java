@@ -251,7 +251,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      * Let the user change the way we handle fragmentation. If set to <tt>false</tt>, the 
      * decode() method will not check the TransportMetadata fragmentation capability
      *  
-     * @param handleFragment The flag to set.
+     * @param transportMetadataFragmentation The flag to set.
      */
     public void setTransportMetadataFragmentation(boolean transportMetadataFragmentation) {
         this.transportMetadataFragmentation = transportMetadataFragmentation;

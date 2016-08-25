@@ -129,7 +129,7 @@ public class TcpSslServer extends IoHandlerAdapter {
      * Create the TCP server
      * 
      * @throws IOException If something went wrong
-     * @throws GeneralSecurityException 
+     * @throws GeneralSecurityException  If something went wrong 
      */
     public TcpSslServer() throws IOException, GeneralSecurityException {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();

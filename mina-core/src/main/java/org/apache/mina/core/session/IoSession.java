@@ -185,6 +185,8 @@ public interface IoSession {
     /**
      * Closes this session immediately.  This operation is asynchronous, it 
      * returns a {@link CloseFuture}.
+     * 
+     * @return The {@link CloseFuture} that can be use to wait for the completion of this operation
      */
     CloseFuture closeNow();
 
