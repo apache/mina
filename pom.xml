@@ -115,7 +115,7 @@
     <version.jdepend.plugin>2.0</version.jdepend.plugin>
     <version.jxr.plugin>2.5</version.jxr.plugin>
     <version.model.plugin>3.3.9</version.model.plugin>
-    <version.plexus.utils>3.0.22</version.plexus.utils>
+    <version.plexus.utils>3.0.24</version.plexus.utils>
     <version.plugin.plugin>3.4</version.plugin.plugin>
     <version.pmd.plugin>3.3</version.pmd.plugin>
     <version.project.plugin>3.0-alpha-2</version.project.plugin>
@@ -127,7 +127,7 @@
     <version.scm.plugin>1.9.2</version.scm.plugin>
     <version.site.plugin>3.4</version.site.plugin>
     <version.source.plugin>2.4</version.source.plugin>
-    <version.shade.plugin>2.4.2</version.shade.plugin>
+    <version.shade.plugin>2.4.3</version.shade.plugin>
     <version.surefire.plugin>2.18.1</version.surefire.plugin>
     <version.surfire.report.plugin>2.18.1</version.surfire.report.plugin>
     <version.taglist.plugin>2.4</version.taglist.plugin>
@@ -143,14 +143,14 @@
     <version.junit>4.12</version.junit>
     <version.jzlib>1.1.3</version.jzlib>
     <version.log4j>1.2.17</version.log4j>
-    <version.ognl>3.1.2</version.ognl>
+    <version.ognl>3.1.10</version.ognl>
     <version.pmd>4.3</version.pmd>
     <version.rmock>2.0.2</version.rmock>
-    <version.slf4j.api>1.7.14</version.slf4j.api>
-    <version.slf4j.log4j12>1.7.14</version.slf4j.log4j12>
-    <version.slf4j.jcl.over.slf4j>1.7.14</version.slf4j.jcl.over.slf4j>
+    <version.slf4j.api>1.7.21</version.slf4j.api>
+    <version.slf4j.log4j12>1.7.21</version.slf4j.log4j12>
+    <version.slf4j.jcl.over.slf4j>1.7.21</version.slf4j.jcl.over.slf4j>
     <version.springframework>2.5.6.SEC03</version.springframework>
-    <version.tomcat.jni>8.0.27</version.tomcat.jni>
+    <version.tomcat.jni>9.0.0.M9</version.tomcat.jni>
     <version.xbean.spring>4.5</version.xbean.spring>
 
     <!-- OSGi minimum versions -->
