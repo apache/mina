@@ -119,7 +119,7 @@ public class HttpClientDecoder implements ProtocolDecoder {
                     LOG.debug("no content len but chunked");
                     session.setAttribute(BODY_CHUNKED, Boolean.TRUE);
                 } else if ("close".equalsIgnoreCase(rp.getHeader("connection"))) {
-                    session.close(true);
+                    session.closeNow();
                 } else {
                     throw new HttpException(HttpStatus.CLIENT_ERROR_LENGTH_REQUIRED, "no content length !");
                 }

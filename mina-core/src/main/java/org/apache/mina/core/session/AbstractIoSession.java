@@ -401,8 +401,10 @@ public abstract class AbstractIoSession implements IoSession {
 
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
         ReadFuture future;
+        
         synchronized (readyReadFutures) {
             future = readyReadFutures.poll();
+            
             if (future != null) {
                 if (future.isClosed()) {
                     // Let other readers get notified.

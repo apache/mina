@@ -135,7 +135,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
             idleChecker.addSession(remoteSession);
         } catch (Exception e) {
             ExceptionMonitor.getInstance().exceptionCaught(e);
-            remoteSession.close(true);
+            remoteSession.closeNow();
         }
 
         // Start chains, and then allow and messages read/written to be processed. This is to ensure that
