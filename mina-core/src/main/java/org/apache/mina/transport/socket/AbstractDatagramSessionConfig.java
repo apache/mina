@@ -23,19 +23,13 @@ import org.apache.mina.core.session.AbstractIoSessionConfig;
 import org.apache.mina.core.session.IoSessionConfig;
 
 /**
- * TODO Add documentation
+ * The Datagram transport session configuration.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionConfig implements DatagramSessionConfig {
-
-    private static final boolean DEFAULT_CLOSE_ON_PORT_UNREACHABLE = true;
-
-    private boolean closeOnPortUnreachable = DEFAULT_CLOSE_ON_PORT_UNREACHABLE;
-
-    protected AbstractDatagramSessionConfig() {
-        // Do nothing
-    }
+    /** Tells if we should close the session if the port is unreachable. Default to true */
+    private boolean closeOnPortUnreachable = true;
 
     @Override
     protected void doSetAll(IoSessionConfig config) {
@@ -46,18 +40,23 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
         if (config instanceof AbstractDatagramSessionConfig) {
             // Minimize unnecessary system calls by checking all 'propertyChanged' properties.
             AbstractDatagramSessionConfig cfg = (AbstractDatagramSessionConfig) config;
+            
             if (cfg.isBroadcastChanged()) {
                 setBroadcast(cfg.isBroadcast());
             }
+            
             if (cfg.isReceiveBufferSizeChanged()) {
                 setReceiveBufferSize(cfg.getReceiveBufferSize());
             }
+            
             if (cfg.isReuseAddressChanged()) {
                 setReuseAddress(cfg.isReuseAddress());
             }
+            
             if (cfg.isSendBufferSizeChanged()) {
                 setSendBufferSize(cfg.getSendBufferSize());
             }
+            
             if (cfg.isTrafficClassChanged() && getTrafficClass() != cfg.getTrafficClass()) {
                 setTrafficClass(cfg.getTrafficClass());
             }
@@ -67,6 +66,7 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
             setReceiveBufferSize(cfg.getReceiveBufferSize());
             setReuseAddress(cfg.isReuseAddress());
             setSendBufferSize(cfg.getSendBufferSize());
+            
             if (getTrafficClass() != cfg.getTrafficClass()) {
                 setTrafficClass(cfg.getTrafficClass());
             }

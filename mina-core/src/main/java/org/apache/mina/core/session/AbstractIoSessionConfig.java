@@ -25,21 +25,31 @@ package org.apache.mina.core.session;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractIoSessionConfig implements IoSessionConfig {
-
+    /** The minimum size of the buffer used to read incoming data */
     private int minReadBufferSize = 64;
-
+    
+    /** The default size of the buffer used to read incoming data */
     private int readBufferSize = 2048;
 
+    /** The maximum size of the buffer used to read incoming data */
     private int maxReadBufferSize = 65536;
 
+    /** The delay before we notify a session that it has been idle on read. Default to infinite */
     private int idleTimeForRead;
 
+    /** The delay before we notify a session that it has been idle on write. Default to infinite */
     private int idleTimeForWrite;
 
+    /** 
+     * The delay before we notify a session that it has been idle on read and write. 
+     * Default to infinite 
+     **/
     private int idleTimeForBoth;
 
+    /** The delay to wait for a write operation to complete before bailing out */
     private int writeTimeout = 60;
 
+    /** A flag set to true when weallow the application to do a session.read(). Default to false */
     private boolean useReadOperation;
 
     private int throughputCalculationInterval = 3;
