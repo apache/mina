@@ -519,6 +519,9 @@ public class SslFilter extends IoFilterAdapter {
                         SSLException newSsle = new SSLHandshakeException("SSL handshake failed.");
                         newSsle.initCause(ssle);
                         ssle = newSsle;
+                        
+                        // Close the session immediately, the handshake has failed
+                        session.closeNow();
                     } else {
                         // Free the SSL Handler buffers
                         sslHandler.release();
