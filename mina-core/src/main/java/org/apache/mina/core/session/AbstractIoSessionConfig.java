@@ -61,6 +61,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setAll(IoSessionConfig config) {
         if (config == null) {
             throw new IllegalArgumentException("config");
@@ -90,6 +91,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getReadBufferSize() {
         return readBufferSize;
     }
@@ -97,6 +99,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setReadBufferSize(int readBufferSize) {
         if (readBufferSize <= 0) {
             throw new IllegalArgumentException("readBufferSize: " + readBufferSize + " (expected: 1+)");
@@ -107,6 +110,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getMinReadBufferSize() {
         return minReadBufferSize;
     }
@@ -114,6 +118,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setMinReadBufferSize(int minReadBufferSize) {
         if (minReadBufferSize <= 0) {
             throw new IllegalArgumentException("minReadBufferSize: " + minReadBufferSize + " (expected: 1+)");
@@ -129,6 +134,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getMaxReadBufferSize() {
         return maxReadBufferSize;
     }
@@ -136,6 +142,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setMaxReadBufferSize(int maxReadBufferSize) {
         if (maxReadBufferSize <= 0) {
             throw new IllegalArgumentException("maxReadBufferSize: " + maxReadBufferSize + " (expected: 1+)");
@@ -152,6 +159,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getIdleTime(IdleStatus status) {
         if (status == IdleStatus.BOTH_IDLE) {
             return idleTimeForBoth;
@@ -171,6 +179,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getIdleTimeInMillis(IdleStatus status) {
         return getIdleTime(status) * 1000L;
     }
@@ -178,6 +187,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setIdleTime(IdleStatus status, int idleTime) {
         if (idleTime < 0) {
             throw new IllegalArgumentException("Illegal idle time: " + idleTime);
@@ -197,6 +207,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final int getBothIdleTime() {
         return getIdleTime(IdleStatus.BOTH_IDLE);
     }
@@ -204,6 +215,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final long getBothIdleTimeInMillis() {
         return getIdleTimeInMillis(IdleStatus.BOTH_IDLE);
     }
@@ -211,6 +223,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final int getReaderIdleTime() {
         return getIdleTime(IdleStatus.READER_IDLE);
     }
@@ -218,6 +231,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final long getReaderIdleTimeInMillis() {
         return getIdleTimeInMillis(IdleStatus.READER_IDLE);
     }
@@ -225,6 +239,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final int getWriterIdleTime() {
         return getIdleTime(IdleStatus.WRITER_IDLE);
     }
@@ -232,6 +247,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final long getWriterIdleTimeInMillis() {
         return getIdleTimeInMillis(IdleStatus.WRITER_IDLE);
     }
@@ -239,6 +255,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setBothIdleTime(int idleTime) {
         setIdleTime(IdleStatus.BOTH_IDLE, idleTime);
     }
@@ -246,6 +263,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setReaderIdleTime(int idleTime) {
         setIdleTime(IdleStatus.READER_IDLE, idleTime);
     }
@@ -253,6 +271,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setWriterIdleTime(int idleTime) {
         setIdleTime(IdleStatus.WRITER_IDLE, idleTime);
     }
@@ -260,6 +279,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getWriteTimeout() {
         return writeTimeout;
     }
@@ -267,6 +287,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getWriteTimeoutInMillis() {
         return writeTimeout * 1000L;
     }
@@ -274,6 +295,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setWriteTimeout(int writeTimeout) {
         if (writeTimeout < 0) {
             throw new IllegalArgumentException("Illegal write timeout: " + writeTimeout);
@@ -284,6 +306,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isUseReadOperation() {
         return useReadOperation;
     }
@@ -291,6 +314,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setUseReadOperation(boolean useReadOperation) {
         this.useReadOperation = useReadOperation;
     }
@@ -298,6 +322,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getThroughputCalculationInterval() {
         return throughputCalculationInterval;
     }
@@ -305,6 +330,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setThroughputCalculationInterval(int throughputCalculationInterval) {
         if (throughputCalculationInterval < 0) {
             throw new IllegalArgumentException("throughputCalculationInterval: " + throughputCalculationInterval);
@@ -316,6 +342,7 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getThroughputCalculationIntervalInMillis() {
         return throughputCalculationInterval * 1000L;
     }
