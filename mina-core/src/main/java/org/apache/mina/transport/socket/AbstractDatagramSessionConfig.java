@@ -31,8 +31,13 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     /** Tells if we should close the session if the port is unreachable. Default to true */
     private boolean closeOnPortUnreachable = true;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void doSetAll(IoSessionConfig config) {
+    public void setAll(IoSessionConfig config) {
+        super.setAll(config);
+        
         if (!(config instanceof DatagramSessionConfig)) {
             return;
         }

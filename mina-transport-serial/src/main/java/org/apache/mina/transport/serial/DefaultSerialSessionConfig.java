@@ -45,7 +45,9 @@ class DefaultSerialSessionConfig extends AbstractIoSessionConfig implements Seri
      * {@inheritDoc}
      */
     @Override
-    protected void doSetAll(IoSessionConfig config) {
+    public void setAll(IoSessionConfig config) {
+        super.setAll(config);
+        
         if (config instanceof SerialSessionConfig) {
             SerialSessionConfig cfg = (SerialSessionConfig) config;
             setInputBufferSize(cfg.getInputBufferSize());

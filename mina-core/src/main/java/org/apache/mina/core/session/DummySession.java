@@ -68,10 +68,6 @@ public class DummySession extends AbstractIoSession {
     private volatile IoService service;
 
     private volatile IoSessionConfig config = new AbstractIoSessionConfig() {
-        @Override
-        protected void doSetAll(IoSessionConfig config) {
-            // Do nothing
-        }
     };
 
     private final IoFilterChain filterChain = new DefaultIoFilterChain(this);
@@ -94,10 +90,6 @@ public class DummySession extends AbstractIoSession {
 
         // Initialize dummy service.
                 new AbstractIoAcceptor(new AbstractIoSessionConfig() {
-                    @Override
-                    protected void doSetAll(IoSessionConfig config) {
-                        // Do nothing
-                    }
                 }, new Executor() {
                     public void execute(Runnable command) {
                         // Do nothing

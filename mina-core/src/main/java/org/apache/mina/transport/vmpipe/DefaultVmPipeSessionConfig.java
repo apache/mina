@@ -31,9 +31,4 @@ class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements VmPi
     DefaultVmPipeSessionConfig() {
         // Do nothing
     }
-
-    @Override
-    protected void doSetAll(IoSessionConfig config) {
-        // Do nothing
-    }
 }
