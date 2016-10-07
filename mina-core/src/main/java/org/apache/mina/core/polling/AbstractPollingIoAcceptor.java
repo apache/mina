@@ -144,7 +144,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      *
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
-     * @param processorClass a {@link Class}�of {@link IoProcessor} for the associated {@link IoSession}
+     * @param processorClass a {@link Class} of {@link IoProcessor} for the associated {@link IoSession}
      *            type.
      * @param processorCount the amount of processor to instantiate for the pool
      * @param selectorProvider The SelectorProvider to use
