@@ -366,12 +366,15 @@ public abstract class AbstractIoSession implements IoSession {
         if (writeRequestQueue != null) {
             while (!writeRequestQueue.isEmpty(this)) {
                 WriteRequest writeRequest = writeRequestQueue.poll(this);
-                WriteFuture writeFuture = writeRequest.getFuture();
                 
-                // The WriteRequest may not always have a future : The CLOSE_REQUEST
-                // and MESSAGE_SENT_REQUEST don't.
-                if (writeFuture != null) {
-                    writeFuture.setWritten();
+                if (writeRequest != null) {
+                    WriteFuture writeFuture = writeRequest.getFuture();
+                    
+                    // The WriteRequest may not always have a future : The CLOSE_REQUEST
+                    // and MESSAGE_SENT_REQUEST don't.
+                    if (writeFuture != null) {
+                        writeFuture.setWritten();
+                    }
                 }
             }
         }
