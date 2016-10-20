@@ -67,7 +67,6 @@
               org.apache.mina.statemachine.transition;version=${project.version};-noimport:=true
             </Export-Package>
             <Import-Package>
-              org.apache.commons.lang.builder;version=${version.commons.lang},
               org.apache.mina.core.filterchain;version=${project.version},
               org.apache.mina.core.service;version=${project.version},
               org.apache.mina.core.session;version=${project.version},
