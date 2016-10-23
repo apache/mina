@@ -201,21 +201,21 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
-        public synchronized boolean isEmpty(IoSession session) {
+        public boolean isEmpty(IoSession session) {
             return q.isEmpty();
         }
 
         /**
          * {@inheritDoc}
          */
-        public synchronized void offer(IoSession session, WriteRequest writeRequest) {
+        public void offer(IoSession session, WriteRequest writeRequest) {
             q.offer(writeRequest);
         }
 
         /**
          * {@inheritDoc}
          */
-        public synchronized WriteRequest poll(IoSession session) {
+        public WriteRequest poll(IoSession session) {
             WriteRequest answer = q.poll();
 
             if (answer == AbstractIoSession.CLOSE_REQUEST) {
