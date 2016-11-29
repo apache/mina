@@ -91,7 +91,7 @@ import org.apache.mina.core.session.IoSession;
  * </pre>
  * <p>
  * Please note that this decoder simply forward the call to
- * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)} if the
+ * doDecode(IoSession, IoBuffer, ProtocolDecoderOutput) if the
  * underlying transport doesn't have a packet fragmentation. Whether the
  * transport has fragmentation or not is determined by querying
  * {@link TransportMetadata}.
@@ -117,7 +117,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     /**
      * Cumulates content of <tt>in</tt> into internal buffer and forwards
      * decoding request to
-     * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
+     * doDecode(IoSession, IoBuffer, ProtocolDecoderOutput).
      * <tt>doDecode()</tt> is invoked repeatedly until it returns <tt>false</tt>
      * and the cumulative buffer is compacted after decoding ends.
      *

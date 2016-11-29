@@ -30,18 +30,29 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractProtocolEncoderOutput implements ProtocolEncoderOutput {
-    private final Queue<Object> messageQueue = new ConcurrentLinkedQueue<Object>();
+    /** The queue where the decoded messages are stored */
+    private final Queue<Object> messageQueue = new ConcurrentLinkedQueue<>();
 
     private boolean buffersOnly = true;
 
+    /**
+     * Creates an instance of AbstractProtocolEncoderOutput
+     */
     public AbstractProtocolEncoderOutput() {
         // Do nothing
     }
 
+    /**
+     * @return The message queue
+     */
     public Queue<Object> getMessageQueue() {
         return messageQueue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void write(Object encodedMessage) {
         if (encodedMessage instanceof IoBuffer) {
             IoBuffer buf = (IoBuffer) encodedMessage;
@@ -56,6 +67,10 @@ public abstract class AbstractProtocolEncoderOutput implements ProtocolEncoderOu
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void mergeAll() {
         if (!buffersOnly) {
             throw new IllegalStateException("the encoded message list contains a non-buffer.");

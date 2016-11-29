@@ -28,16 +28,27 @@ import java.util.Queue;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOutput {
-    private final Queue<Object> messageQueue = new LinkedList<Object>();
+    /** The queue where decoded messages are stored */
+    private final Queue<Object> messageQueue = new LinkedList<>();
 
+    /**
+     * Creates a new instance of a AbstractProtocolDecoderOutput
+     */
     public AbstractProtocolDecoderOutput() {
         // Do nothing
     }
 
+    /**
+     * @return The decoder's message queue
+     */
     public Queue<Object> getMessageQueue() {
         return messageQueue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void write(Object message) {
         if (message == null) {
             throw new IllegalArgumentException("message");

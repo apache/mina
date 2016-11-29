@@ -166,7 +166,9 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     }
 
     /**
-     * {@inheritDoc}
+     * Dispose the encoder
+     * 
+     * @throws Exception If the dispose failed
      */
     public void dispose() throws Exception {
         // Do nothing

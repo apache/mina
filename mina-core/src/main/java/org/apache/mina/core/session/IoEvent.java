@@ -29,80 +29,128 @@ import org.apache.mina.core.write.WriteRequest;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoEvent implements Runnable {
+    /** The IoEvent type */
     private final IoEventType type;
 
+    /** The associated IoSession */
     private final IoSession session;
 
+    /** The stored parameter */
     private final Object parameter;
 
+    /**
+     * Creates a new IoEvent
+     * 
+     * @param type The type of event to create
+     * @param session The associated IoSession
+     * @param parameter The parameter to add to the event
+     */
     public IoEvent(IoEventType type, IoSession session, Object parameter) {
         if (type == null) {
             throw new IllegalArgumentException("type");
         }
+        
         if (session == null) {
             throw new IllegalArgumentException("session");
         }
+        
         this.type = type;
         this.session = session;
         this.parameter = parameter;
     }
 
+    /**
+     * @return The IoEvent type
+     */
     public IoEventType getType() {
         return type;
     }
 
+    /**
+     * @return The associated IoSession
+     */
     public IoSession getSession() {
         return session;
     }
 
+    /**
+     * @return The stored parameter
+     */
     public Object getParameter() {
         return parameter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void run() {
         fire();
     }
 
+    /**
+     * Fire an event
+     */
     public void fire() {
-        switch (getType()) {
-        case MESSAGE_RECEIVED:
-            getSession().getFilterChain().fireMessageReceived(getParameter());
-            break;
-        case MESSAGE_SENT:
-            getSession().getFilterChain().fireMessageSent((WriteRequest) getParameter());
-            break;
-        case WRITE:
-            getSession().getFilterChain().fireFilterWrite((WriteRequest) getParameter());
-            break;
-        case CLOSE:
-            getSession().getFilterChain().fireFilterClose();
-            break;
-        case EXCEPTION_CAUGHT:
-            getSession().getFilterChain().fireExceptionCaught((Throwable) getParameter());
-            break;
-        case SESSION_IDLE:
-            getSession().getFilterChain().fireSessionIdle((IdleStatus) getParameter());
-            break;
-        case SESSION_OPENED:
-            getSession().getFilterChain().fireSessionOpened();
-            break;
-        case SESSION_CREATED:
-            getSession().getFilterChain().fireSessionCreated();
-            break;
-        case SESSION_CLOSED:
-            getSession().getFilterChain().fireSessionClosed();
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown event type: " + getType());
+        switch ( type ) {
+            case MESSAGE_RECEIVED:
+                session.getFilterChain().fireMessageReceived(getParameter());
+                break;
+                
+            case MESSAGE_SENT:
+                session.getFilterChain().fireMessageSent((WriteRequest) getParameter());
+                break;
+                
+            case WRITE:
+                session.getFilterChain().fireFilterWrite((WriteRequest) getParameter());
+                break;
+                
+            case CLOSE:
+                session.getFilterChain().fireFilterClose();
+                break;
+                
+            case EXCEPTION_CAUGHT:
+                session.getFilterChain().fireExceptionCaught((Throwable) getParameter());
+                break;
+                
+            case SESSION_IDLE:
+                session.getFilterChain().fireSessionIdle((IdleStatus) getParameter());
+                break;
+                
+            case SESSION_OPENED:
+                session.getFilterChain().fireSessionOpened();
+                break;
+                
+            case SESSION_CREATED:
+                session.getFilterChain().fireSessionCreated();
+                break;
+                
+            case SESSION_CLOSED:
+                session.getFilterChain().fireSessionClosed();
+                break;
+                
+            default:
+                throw new IllegalArgumentException("Unknown event type: " + getType());
         }
     }
 
+    /**
+     * @see Object#toString()
+     */
     @Override
     public String toString() {
-        if (getParameter() == null) {
-            return "[" + getSession() + "] " + getType().name();
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append('[');
+        sb.append(session);
+        sb.append(']');
+        sb.append(type.name());
+        
+        if (parameter != null) {
+            sb.append(':');
+            sb.append(parameter);
         }
 
-        return "[" + getSession() + "] " + getType().name() + ": " + getParameter();
+        return sb.toString();
     }
 }

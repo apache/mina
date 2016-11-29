@@ -39,7 +39,7 @@ import org.apache.mina.util.ConcurrentHashSet;
 public class IdleStatusChecker {
 
     // the list of session to check
-    private final Set<AbstractIoSession> sessions = new ConcurrentHashSet<AbstractIoSession>();
+    private final Set<AbstractIoSession> sessions = new ConcurrentHashSet<>();
 
     /* create a task you can execute in the transport code,
      * if the transport is like NIO or APR you don't need to call it,
@@ -50,6 +50,9 @@ public class IdleStatusChecker {
 
     private final IoFutureListener<IoFuture> sessionCloseListener = new SessionCloseListener();
 
+    /**
+     * Creates a new instance of IdleStatusChecker 
+     */
     public IdleStatusChecker() {
         // Do nothing
     }
@@ -64,14 +67,6 @@ public class IdleStatusChecker {
 
         // isn't service reponsability to remove the session nicely ?
         closeFuture.addListener(sessionCloseListener);
-    }
-
-    /**
-     * remove a session from the list of session being checked.
-     * @param session
-     */
-    private void removeSession(AbstractIoSession session) {
-        sessions.remove(session);
     }
 
     /**
@@ -96,6 +91,10 @@ public class IdleStatusChecker {
             // Do nothing
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void run() {
             thread = Thread.currentThread();
             try {
@@ -121,7 +120,7 @@ public class IdleStatusChecker {
          */
         public void cancel() {
             cancelled = true;
-            Thread thread = this.thread;
+            
             if (thread != null) {
                 thread.interrupt();
             }
@@ -146,8 +145,20 @@ public class IdleStatusChecker {
             super();
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void operationComplete(IoFuture future) {
             removeSession((AbstractIoSession) future.getSession());
+        }
+        
+        /**
+         * remove a session from the list of session being checked.
+         * @param session The session to remove
+         */
+        private void removeSession(AbstractIoSession session) {
+            sessions.remove(session);
         }
     }
 }

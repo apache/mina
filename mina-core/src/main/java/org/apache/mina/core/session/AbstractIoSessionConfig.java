@@ -68,8 +68,8 @@ public abstract class AbstractIoSessionConfig implements IoSessionConfig {
         }
 
         setReadBufferSize(config.getReadBufferSize());
-        setMinReadBufferSize(config.getMinReadBufferSize());
         setMaxReadBufferSize(config.getMaxReadBufferSize());
+        setMinReadBufferSize(config.getMinReadBufferSize());
         setIdleTime(IdleStatus.BOTH_IDLE, config.getIdleTime(IdleStatus.BOTH_IDLE));
         setIdleTime(IdleStatus.READER_IDLE, config.getIdleTime(IdleStatus.READER_IDLE));
         setIdleTime(IdleStatus.WRITER_IDLE, config.getIdleTime(IdleStatus.WRITER_IDLE));
