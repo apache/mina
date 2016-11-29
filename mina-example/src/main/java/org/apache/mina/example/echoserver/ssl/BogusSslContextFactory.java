@@ -53,7 +53,7 @@ public class BogusSslContextFactory {
     }
 
     /**
-     * Bougus Server certificate keystore file name.
+     * Bogus Server certificate keystore file name.
      */
     private static final String BOGUS_KEYSTORE = "bogus.cert";
 
