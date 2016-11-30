@@ -34,18 +34,33 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
     /** A map used to store the session */
     private ExpiringMap<SocketAddress, IoSession> sessionMap;
 
+    /** A map used to keep a track of the expiration */ 
     private ExpiringMap<SocketAddress, IoSession>.Expirer mapExpirer;
 
+    /**
+     * Create a new ExpiringSessionRecycler instance
+     */
     public ExpiringSessionRecycler() {
         this(ExpiringMap.DEFAULT_TIME_TO_LIVE);
     }
 
+    /**
+     * Create a new ExpiringSessionRecycler instance
+     * 
+     * @param timeToLive The delay after which the session is going to be recycled
+     */
     public ExpiringSessionRecycler(int timeToLive) {
         this(timeToLive, ExpiringMap.DEFAULT_EXPIRATION_INTERVAL);
     }
 
+    /**
+     * Create a new ExpiringSessionRecycler instance
+     * 
+     * @param timeToLive The delay after which the session is going to be recycled
+     * @param  expirationInterval
+     */
     public ExpiringSessionRecycler(int timeToLive, int expirationInterval) {
-        sessionMap = new ExpiringMap<SocketAddress, IoSession>(timeToLive, expirationInterval);
+        sessionMap = new ExpiringMap<>(timeToLive, expirationInterval);
         mapExpirer = sessionMap.getExpirer();
         sessionMap.addExpirationListener(new DefaultExpirationListener());
     }
@@ -53,6 +68,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void put(IoSession session) {
         mapExpirer.startExpiringIfNotStarted();
 
@@ -66,6 +82,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoSession recycle(SocketAddress remoteAddress) {
         return sessionMap.get(remoteAddress);
     }
@@ -73,6 +90,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void remove(IoSession session) {
         sessionMap.remove(session.getRemoteAddress());
     }
@@ -98,6 +116,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
     }
 
     private class DefaultExpirationListener implements ExpirationListener<IoSession> {
+        @Override
         public void expired(IoSession expiredSession) {
             expiredSession.closeNow();
         }

@@ -133,7 +133,7 @@ public class CachedBufferAllocator implements IoBufferAllocator {
     }
 
     Map<Integer, Queue<CachedBuffer>> newPoolMap() {
-        Map<Integer, Queue<CachedBuffer>> poolMap = new HashMap<Integer, Queue<CachedBuffer>>();
+        Map<Integer, Queue<CachedBuffer>> poolMap = new HashMap<>();
 
         for (int i = 0; i < 31; i++) {
             poolMap.put(1 << i, new ConcurrentLinkedQueue<CachedBuffer>());
@@ -145,6 +145,10 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         return poolMap;
     }
 
+    /**
+     * {@inheritDoc} 
+     */
+    @Override
     public IoBuffer allocate(int requestedCapacity, boolean direct) {
         int actualCapacity = IoBuffer.normalizeCapacity(requestedCapacity);
         IoBuffer buf;
@@ -184,14 +188,26 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         return buf;
     }
 
+    /**
+     * {@inheritDoc} 
+     */
+    @Override
     public ByteBuffer allocateNioBuffer(int capacity, boolean direct) {
         return allocate(capacity, direct).buf();
     }
 
+    /**
+     * {@inheritDoc} 
+     */
+    @Override
     public IoBuffer wrap(ByteBuffer nioBuffer) {
         return new CachedBuffer(nioBuffer);
     }
 
+    /**
+     * {@inheritDoc} 
+     */
+    @Override
     public void dispose() {
         // Do nothing
     }

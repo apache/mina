@@ -153,6 +153,14 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     private static boolean useDirectBuffer = false;
 
     /**
+     * Creates a new instance. This is an empty constructor. It's protected, 
+     * to forbid its usage by the users.
+     */
+    protected IoBuffer() {
+        // Do nothing
+    }
+
+    /**
      * @return the allocator used by existing and new buffers
      */
     public static IoBufferAllocator getAllocator() {
@@ -281,14 +289,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
         newCapacity <<= (newCapacity < requestedCapacity ? 1 : 0);
         
         return newCapacity < 0 ? Integer.MAX_VALUE : newCapacity;
-    }
-
-    /**
-     * Creates a new instance. This is an empty constructor. It's protected, 
-     * to forbid its usage by the users.
-     */
-    protected IoBuffer() {
-        // Do nothing
     }
 
     /**
@@ -1326,9 +1326,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * 
      * @param index the position in the buffer to write the value
      * @param value the int to write
-     * 
-     * @param index The position where to put the unsigned short
-     * @param value The unsigned short to put in the IoBuffer
      * @return the modified IoBuffer
      */
     public abstract IoBuffer putUnsignedShort(int index, int value);
@@ -1372,7 +1369,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param index The position where to put the int
      * @param value The int to put in the IoBuffer
      * @return the modified IoBuffer
-     * @return the modified IoBuffer
      */
     public abstract IoBuffer putInt(int index, int value);
 
@@ -1411,7 +1407,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * 
      * @param index The position where to put the long
      * @param value The long to put in the IoBuffer
-     * @return the modified IoBuffer
      * @return the modified IoBuffer
      */
     public abstract IoBuffer putLong(int index, long value);
