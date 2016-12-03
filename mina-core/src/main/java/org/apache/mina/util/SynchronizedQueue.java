@@ -28,102 +28,190 @@ import java.util.Queue;
  * A decorator that makes the specified {@link Queue} thread-safe.
  * Like any other synchronizing wrappers, iteration is not thread-safe.
  * 
+ * @param <E> The type of elements stored in the queue
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SynchronizedQueue<E> implements Queue<E>, Serializable {
 
     private static final long serialVersionUID = -1439242290701194806L;
 
-    private final Queue<E> q;
+    private final Queue<E> queue;
 
-    public SynchronizedQueue(Queue<E> q) {
-        this.q = q;
+    /**
+     * Create a new SynchronizedQueue instance
+     * 
+     * @param queue The queue
+     */
+    public SynchronizedQueue(Queue<E> queue) {
+        this.queue = queue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean add(E e) {
-        return q.add(e);
+        return queue.add(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized E element() {
-        return q.element();
+        return queue.element();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean offer(E e) {
-        return q.offer(e);
+        return queue.offer(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized E peek() {
-        return q.peek();
+        return queue.peek();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized E poll() {
-        return q.poll();
+        return queue.poll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized E remove() {
-        return q.remove();
+        return queue.remove();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean addAll(Collection<? extends E> c) {
-        return q.addAll(c);
+        return queue.addAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized void clear() {
-        q.clear();
+        queue.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean contains(Object o) {
-        return q.contains(o);
+        return queue.contains(o);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean containsAll(Collection<?> c) {
-        return q.containsAll(c);
+        return queue.containsAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean isEmpty() {
-        return q.isEmpty();
+        return queue.isEmpty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized Iterator<E> iterator() {
-        return q.iterator();
+        return queue.iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean remove(Object o) {
-        return q.remove(o);
+        return queue.remove(o);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean removeAll(Collection<?> c) {
-        return q.removeAll(c);
+        return queue.removeAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized boolean retainAll(Collection<?> c) {
-        return q.retainAll(c);
+        return queue.retainAll(c);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized int size() {
-        return q.size();
+        return queue.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized Object[] toArray() {
-        return q.toArray();
+        return queue.toArray();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized <T> T[] toArray(T[] a) {
-        return q.toArray(a);
+        return queue.toArray(a);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean equals(Object obj) {
-        return q.equals(obj);
+        return queue.equals(obj);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized int hashCode() {
-        return q.hashCode();
+        return queue.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized String toString() {
-        return q.toString();
+        return queue.toString();
     }
 }
