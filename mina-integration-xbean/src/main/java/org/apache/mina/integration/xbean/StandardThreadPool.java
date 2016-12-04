@@ -24,16 +24,27 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * A ThreadPool
+ * 
  * @org.apache.xbean.XBean
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StandardThreadPool implements Executor {
     private final ExecutorService delegate;
 
+    /**
+     * Creates a new StandardThreadPool instance
+     * 
+     * @param maxThreads The maximum number of threads to use in the associated pool
+     */
     public StandardThreadPool(int maxThreads) {
         delegate = Executors.newFixedThreadPool(maxThreads);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void execute(Runnable command) {
         delegate.execute(command);
     }
