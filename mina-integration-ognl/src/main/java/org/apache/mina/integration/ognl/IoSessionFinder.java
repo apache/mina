@@ -60,17 +60,17 @@ public class IoSessionFinder {
         int comp = -1;
         
         for (int i=0; i<query.length();i++) {
-        	char c = query.charAt(i);
-        	
-        	if ((c == '=') || (c == '<') || (c == '>') || (c == '!')) {
-        		comp = i;
-        	} else if ( !Character.isJavaIdentifierPart(c) && (c != ' ')) {
+            char c = query.charAt(i);
+            
+            if ((c == '=') || (c == '<') || (c == '>') || (c == '!')) {
+                comp = i;
+            } else if ( !Character.isJavaIdentifierPart(c) && (c != ' ')) {
                 throw new IllegalArgumentException("Invalid query.");
-        	} else {
-        		if ( comp > 0) {
-        			break;
-        		}
-        	}
+            } else {
+                if ( comp > 0) {
+                    break;
+                }
+            }
         }
         
         if (comp<=0) {
@@ -78,11 +78,11 @@ public class IoSessionFinder {
         }
         
         for (int i=comp+1; i<query.length();i++) {
-        	char c = query.charAt(i);
+            char c = query.charAt(i);
 
-        	if (!Character.isJavaIdentifierPart(c) && (c != ' ') && (c != '"') && (c != '\'')) {
+            if (!Character.isJavaIdentifierPart(c) && (c != ' ') && (c != '"') && (c != '\'')) {
                 throw new IllegalArgumentException("Invalid query.");
-        	}
+            }
         }
         
         this.query = query;
@@ -97,7 +97,6 @@ public class IoSessionFinder {
     /**
      * Finds a {@link Set} of {@link IoSession}s that matches the query
      * from the specified sessions and returns the matches.
-     * @throws OgnlException if failed to evaluate the OGNL expression
      * 
      * @param sessions The list of sessions to check
      * @return A set of the session that matches the query
@@ -108,7 +107,7 @@ public class IoSessionFinder {
             throw new IllegalArgumentException("sessions");
         }
 
-        Set<IoSession> answer = new LinkedHashSet<IoSession>();
+        Set<IoSession> answer = new LinkedHashSet<>();
         
         for (IoSession s : sessions) {
             OgnlContext context = (OgnlContext) Ognl.createDefaultContext(s);

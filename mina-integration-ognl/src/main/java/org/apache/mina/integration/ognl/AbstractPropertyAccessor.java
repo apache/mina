@@ -29,7 +29,6 @@ import ognl.PropertyAccessor;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-@SuppressWarnings("unchecked")
 public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
 
     static final Object READ_ONLY_MODE = new Object();
@@ -97,27 +96,4 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
 
     protected abstract Object setProperty0(OgnlContext context, Object target, String name, Object value)
             throws OgnlException;
-
-    // The following methods uses the four method above, so there's no need
-    // to override them.
-
-    @Override
-    public final Object getProperty(Map context, Object target, Object oname) throws OgnlException {
-        return super.getProperty(context, target, oname);
-    }
-
-    @Override
-    public final boolean hasGetProperty(Map context, Object target, Object oname) throws OgnlException {
-        return super.hasGetProperty(context, target, oname);
-    }
-
-    @Override
-    public final boolean hasSetProperty(Map context, Object target, Object oname) throws OgnlException {
-        return super.hasSetProperty(context, target, oname);
-    }
-
-    @Override
-    public final void setProperty(Map context, Object target, Object oname, Object value) throws OgnlException {
-        super.setProperty(context, target, oname, value);
-    }
 }
