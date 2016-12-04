@@ -34,16 +34,19 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
     /**
      * {@inheritDoc}
      */
+    @Override
     int first();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     int last();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     ByteOrder order();
 
     /**
@@ -82,21 +85,25 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
      * @param other The ByteArray we want to compare with
      * @return <tt>true</tt> if both ByteArray are equals
      */
+    @Override
     boolean equals(Object other);
 
     /**
      * {@inheritDoc}
      */
+    @Override
     byte get(int index);
 
     /**
      * {@inheritDoc}
      */
+    @Override
     void get(int index, IoBuffer bb);
 
     /**
      * {@inheritDoc}
      */
+    @Override
     int getInt(int index);
 
     /**
@@ -136,26 +143,31 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
         /**
          * {@inheritDoc}
          */
+        @Override
         int getRemaining();
 
         /**
          * {@inheritDoc}
          */
+        @Override
         boolean hasRemaining();
 
         /**
          * {@inheritDoc}
          */
+        @Override
         byte get();
 
         /**
          * {@inheritDoc}
          */
+        @Override
         void get(IoBuffer bb);
 
         /**
          * {@inheritDoc}
          */
+        @Override
         int getInt();
     }
 }

@@ -23,6 +23,8 @@ import java.util.NoSuchElementException;
 
 /**
  * A linked list that stores <code>ByteArray</code>s and maintains several useful invariants.
+ * 
+ * Note : this class is *not* thread safe.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -194,7 +196,6 @@ class ByteArrayList {
          * Constructs a new header node.
          */
         private Node() {
-            super();
             previous = this;
             next = this;
         }
@@ -203,8 +204,6 @@ class ByteArrayList {
          * Constructs a new node with a value.
          */
         private Node(ByteArray ba) {
-            super();
-
             if (ba == null) {
                 throw new IllegalArgumentException("ByteArray must not be null.");
             }
@@ -221,6 +220,7 @@ class ByteArrayList {
             if (!hasPreviousNode()) {
                 throw new NoSuchElementException();
             }
+            
             return previous;
         }
 
@@ -233,6 +233,7 @@ class ByteArrayList {
             if (!hasNextNode()) {
                 throw new NoSuchElementException();
             }
+            
             return next;
         }
 
@@ -252,5 +253,4 @@ class ByteArrayList {
             return removed;
         }
     }
-
 }

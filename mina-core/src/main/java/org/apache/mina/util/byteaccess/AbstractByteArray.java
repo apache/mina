@@ -27,13 +27,20 @@ package org.apache.mina.util.byteaccess;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 abstract class AbstractByteArray implements ByteArray {
-
     /**
      * {@inheritDoc}
      */
+    @Override
     public final int length() {
         return last() - first();
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract int hashCode();
 
     /**
      * {@inheritDoc}
@@ -44,36 +51,43 @@ abstract class AbstractByteArray implements ByteArray {
         if (other == this) {
             return true;
         }
+        
         // Compare types.
         if (!(other instanceof ByteArray)) {
             return false;
         }
+        
         ByteArray otherByteArray = (ByteArray) other;
+        
         // Compare properties.
         if (first() != otherByteArray.first() || last() != otherByteArray.last()
                 || !order().equals(otherByteArray.order())) {
             return false;
         }
+        
         // Compare bytes.
         Cursor cursor = cursor();
         Cursor otherCursor = otherByteArray.cursor();
+        
         for (int remaining = cursor.getRemaining(); remaining > 0;) {
             // Optimization: prefer int comparisons over byte comparisons
             if (remaining >= 4) {
                 int i = cursor.getInt();
                 int otherI = otherCursor.getInt();
+                
                 if (i != otherI) {
                     return false;
                 }
             } else {
                 byte b = cursor.get();
                 byte otherB = otherCursor.get();
+                
                 if (b != otherB) {
                     return false;
                 }
             }
         }
+        
         return true;
     }
-
 }

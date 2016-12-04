@@ -1498,10 +1498,10 @@ public class IoBufferWrapper extends IoBuffer {
         return this;
     }
 
-    @Override
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(short value) {
         buf.putUnsigned(value);
         return this;
