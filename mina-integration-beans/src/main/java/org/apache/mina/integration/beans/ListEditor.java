@@ -32,12 +32,20 @@ import java.util.List;
  */
 public class ListEditor extends CollectionEditor {
 
+    /**
+     * Creates a new DateEditor instance
+     * 
+     * @param elementType The type of element
+     */
     public ListEditor(Class<?> elementType) {
         super(elementType);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Collection<Object> newCollection() {
-        return new ArrayList<Object>();
+        return new ArrayList<>();
     }
 }

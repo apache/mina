@@ -33,6 +33,15 @@ import java.util.Set;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class PropertyEditorFactory {
+    private PropertyEditorFactory() {
+    }
+
+    /**
+     * Creates a new instance of editor, depending on the given object's type
+     * 
+     * @param object The object we need an editor to be created for
+     * @return The created editor
+     */
     @SuppressWarnings("unchecked")
     public static PropertyEditor getInstance(Object object) {
         if (object == null) {
@@ -45,6 +54,7 @@ public final class PropertyEditorFactory {
             for (Object e : (Collection<Object>) object) {
                 if (e != null) {
                     elementType = e.getClass();
+                    
                     break;
                 }
             }
@@ -72,6 +82,7 @@ public final class PropertyEditorFactory {
                 if ((e.getKey() != null) && (e.getValue() != null)) {
                     keyType = e.getKey().getClass();
                     valueType = e.getValue().getClass();
+                    
                     break;
                 }
             }
@@ -84,7 +95,12 @@ public final class PropertyEditorFactory {
         return getInstance(object.getClass());
     }
 
-    // parent type / property name / property type
+    /**
+     * Creates a new instance of editor, depending on the given type
+     * 
+     * @param type The type of editor to create
+     * @return The created editor
+     */
     public static PropertyEditor getInstance(Class<?> type) {
         if (type == null) {
             throw new IllegalArgumentException("type");
@@ -118,13 +134,12 @@ public final class PropertyEditorFactory {
             return new PropertiesEditor();
         }
 
-        type = filterPrimitiveType(type);
-
         try {
             return (PropertyEditor) PropertyEditorFactory.class
                     .getClassLoader()
                     .loadClass(
-                            PropertyEditorFactory.class.getPackage().getName() + '.' + type.getSimpleName() + "Editor")
+                            PropertyEditorFactory.class.getPackage().getName() + '.' + 
+                            filterPrimitiveType(type).getSimpleName() + "Editor")
                     .newInstance();
         } catch (Exception e) {
             return null;
@@ -134,33 +149,38 @@ public final class PropertyEditorFactory {
     private static Class<?> filterPrimitiveType(Class<?> type) {
         if (type.isPrimitive()) {
             if (type == boolean.class) {
-                type = Boolean.class;
+                return Boolean.class;
             }
+            
             if (type == byte.class) {
-                type = Byte.class;
+                return Byte.class;
             }
+            
             if (type == char.class) {
-                type = Character.class;
+                return Character.class;
             }
+            
             if (type == double.class) {
-                type = Double.class;
+                return Double.class;
             }
+            
             if (type == float.class) {
-                type = Float.class;
+                return Float.class;
             }
+            
             if (type == int.class) {
-                type = Integer.class;
+                return Integer.class;
             }
+            
             if (type == long.class) {
-                type = Long.class;
+                return Long.class;
             }
+            
             if (type == short.class) {
-                type = Short.class;
+                return Short.class;
             }
         }
+        
         return type;
-    }
-
-    private PropertyEditorFactory() {
     }
 }

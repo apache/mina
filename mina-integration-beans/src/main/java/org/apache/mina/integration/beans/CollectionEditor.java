@@ -39,6 +39,11 @@ public class CollectionEditor extends AbstractPropertyEditor {
 
     private final Class<?> elementType;
 
+    /**
+     * Creates a new CollectionEditor instance
+     * 
+     * @param elementType The Element type
+     */
     public CollectionEditor(Class<?> elementType) {
         if (elementType == null) {
             throw new IllegalArgumentException("elementType");
@@ -58,19 +63,25 @@ public class CollectionEditor extends AbstractPropertyEditor {
         return e;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final String toText(Object value) {
         StringBuilder buf = new StringBuilder();
+        
         for (Object v : (Collection<?>) value) {
             if (v == null) {
                 v = defaultElement();
             }
 
             PropertyEditor e = PropertyEditorFactory.getInstance(v);
+            
             if (e == null) {
                 throw new IllegalArgumentException("No " + PropertyEditor.class.getSimpleName() + " found for "
                         + v.getClass().getSimpleName() + '.');
             }
+            
             e.setValue(v);
             // TODO normalize.
             String s = e.getAsText();
@@ -82,9 +93,13 @@ public class CollectionEditor extends AbstractPropertyEditor {
         if (buf.length() >= 2) {
             buf.setLength(buf.length() - 2);
         }
+        
         return buf.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final Object toValue(String text) throws IllegalArgumentException {
         PropertyEditor e = getElementEditor();
@@ -107,6 +122,7 @@ public class CollectionEditor extends AbstractPropertyEditor {
             answer.add(e.getValue());
 
             matchedDelimiter = false;
+            
             if (m.group(2) != null || m.group(3) != null) {
                 // Skip the last '"'.
                 m.region(m.end() + 1, m.regionEnd());
@@ -117,11 +133,12 @@ public class CollectionEditor extends AbstractPropertyEditor {
     }
 
     protected Collection<Object> newCollection() {
-        return new ArrayList<Object>();
+        return new ArrayList<>();
     }
 
     protected Object defaultElement() {
         PropertyEditor e = PropertyEditorFactory.getInstance(elementType);
+        
         if (e == null) {
             return null;
         }

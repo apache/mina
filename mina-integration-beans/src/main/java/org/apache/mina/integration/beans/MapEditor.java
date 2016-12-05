@@ -20,6 +20,7 @@
 package org.apache.mina.integration.beans;
 
 import java.beans.PropertyEditor;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -43,14 +44,25 @@ public class MapEditor extends AbstractPropertyEditor {
     private final Class<?> keyType;
 
     private final Class<?> valueType;
+    
+    private static final String NO_VALUE = "No value {1} found for {2}.";
+    private static final String NO_KEY = "No key {1} found for {2}.";
 
+    /**
+     * Creates a new DateEditor instance
+     * 
+     * @param keyType The key type
+     * @param valueType The value type
+     */
     public MapEditor(Class<?> keyType, Class<?> valueType) {
         if (keyType == null) {
             throw new IllegalArgumentException("keyType");
         }
+        
         if (valueType == null) {
             throw new IllegalArgumentException("valueType");
         }
+        
         this.keyType = keyType;
         this.valueType = valueType;
         getKeyEditor();
@@ -60,19 +72,23 @@ public class MapEditor extends AbstractPropertyEditor {
 
     private PropertyEditor getKeyEditor() {
         PropertyEditor e = PropertyEditorFactory.getInstance(keyType);
+        
         if (e == null) {
-            throw new IllegalArgumentException("No key " + PropertyEditor.class.getSimpleName() + " found for "
-                    + keyType.getSimpleName() + '.');
+            throw new IllegalArgumentException(MessageFormat.format(NO_KEY, PropertyEditor.class.getSimpleName(),
+                    keyType.getSimpleName()));
         }
+        
         return e;
     }
 
     private PropertyEditor getValueEditor() {
         PropertyEditor e = PropertyEditorFactory.getInstance(valueType);
+        
         if (e == null) {
-            throw new IllegalArgumentException("No value " + PropertyEditor.class.getSimpleName() + " found for "
-                    + valueType.getSimpleName() + '.');
+            throw new IllegalArgumentException(MessageFormat.format(NO_VALUE, PropertyEditor.class.getSimpleName(),
+                    valueType.getSimpleName()));
         }
+        
         return e;
     }
 
@@ -80,23 +96,26 @@ public class MapEditor extends AbstractPropertyEditor {
     protected final String toText(Object value) {
         StringBuilder buf = new StringBuilder();
         
-        for (Object o : ((Map<?,?>) value).entrySet()) {
-            Map.Entry<?,?> entry = (Map.Entry<?,?>) o;
+        for (Map.Entry<?,?> entry : ((Map<?,?>) value).entrySet()) {
             Object ekey = entry.getKey();
             Object evalue = entry.getValue();
 
             PropertyEditor ekeyEditor = PropertyEditorFactory.getInstance(ekey);
+            
             if (ekeyEditor == null) {
-                throw new IllegalArgumentException("No key " + PropertyEditor.class.getSimpleName() + " found for "
-                        + ekey.getClass().getSimpleName() + '.');
+                throw new IllegalArgumentException(MessageFormat.format(NO_KEY, PropertyEditor.class.getSimpleName(),
+                        ekey.getClass().getSimpleName()));
             }
+            
             ekeyEditor.setValue(ekey);
 
             PropertyEditor evalueEditor = PropertyEditorFactory.getInstance(evalue);
+            
             if (evalueEditor == null) {
-                throw new IllegalArgumentException("No value " + PropertyEditor.class.getSimpleName() + " found for "
-                        + evalue.getClass().getSimpleName() + '.');
+                throw new IllegalArgumentException(MessageFormat.format(NO_VALUE, PropertyEditor.class.getSimpleName(),
+                        evalue.getClass().getSimpleName()));
             }
+            
             ekeyEditor.setValue(ekey);
             evalueEditor.setValue(evalue);
 
@@ -113,26 +132,23 @@ public class MapEditor extends AbstractPropertyEditor {
         if (buf.length() >= 2) {
             buf.setLength(buf.length() - 2);
         }
+        
         return buf.toString();
     }
 
     @Override
-    protected final Object toValue(String text) throws IllegalArgumentException {
+    protected final Object toValue(String text) {
         PropertyEditor keyEditor = getKeyEditor();
         PropertyEditor valueEditor = getValueEditor();
         Map<Object, Object> answer = newMap();
         Matcher m = ELEMENT.matcher(text);
         TokenType lastTokenType = TokenType.ENTRY_DELIM;
         Object key = null;
-        Object value = null;
+        Object value;
 
         while (m.find()) {
             if (m.group(1) != null) {
-                switch (lastTokenType) {
-                case VALUE:
-                case ENTRY_DELIM:
-                    break;
-                default:
+                if ((lastTokenType != TokenType.VALUE) && (lastTokenType != TokenType.ENTRY_DELIM)) {
                     throw new IllegalArgumentException("Unexpected entry delimiter: " + text);
                 }
 
@@ -158,20 +174,20 @@ public class MapEditor extends AbstractPropertyEditor {
             }
 
             switch (lastTokenType) {
-            case ENTRY_DELIM:
-                keyEditor.setAsText(region);
-                key = keyEditor.getValue();
-                lastTokenType = TokenType.KEY;
-                break;
-            case KEY_VALUE_DELIM:
-                valueEditor.setAsText(region);
-                value = valueEditor.getValue();
-                lastTokenType = TokenType.VALUE;
-                answer.put(key, value);
-                break;
-            case KEY:
-            case VALUE:
-                throw new IllegalArgumentException("Unexpected key or value: " + text);
+                case ENTRY_DELIM:
+                    keyEditor.setAsText(region);
+                    key = keyEditor.getValue();
+                    lastTokenType = TokenType.KEY;
+                    break;
+                case KEY_VALUE_DELIM:
+                    valueEditor.setAsText(region);
+                    value = valueEditor.getValue();
+                    lastTokenType = TokenType.VALUE;
+                    answer.put(key, value);
+                    break;
+                case KEY:
+                case VALUE:
+                    throw new IllegalArgumentException("Unexpected key or value: " + text);
             }
         }
 
@@ -179,10 +195,10 @@ public class MapEditor extends AbstractPropertyEditor {
     }
 
     protected Map<Object, Object> newMap() {
-        return new LinkedHashMap<Object, Object>();
+        return new LinkedHashMap<>();
     }
 
-    private static enum TokenType {
+    private enum TokenType {
         ENTRY_DELIM, KEY_VALUE_DELIM, KEY, VALUE,
     }
 }

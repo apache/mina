@@ -39,19 +39,29 @@ public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
         this.trimText = trimText;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getAsText() {
         return text;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getValue() {
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void setAsText(String text) throws IllegalArgumentException {
+    public void setAsText(String text) {
         this.text = text;
+        
         if (text == null) {
             value = defaultValue();
         } else {
@@ -59,9 +69,13 @@ public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setValue(Object value) {
         this.value = value;
+        
         if (value == null) {
             text = defaultText();
         } else {
@@ -69,16 +83,33 @@ public abstract class AbstractPropertyEditor extends PropertyEditorSupport {
         }
     }
 
+    /**
+     * @return The default text
+     */
     protected String defaultText() {
         return null;
     }
 
+    /**
+     * @return The default value
+     */
     protected Object defaultValue() {
         return null;
     }
 
+    /**
+     * Returns a String representation of the given value
+     * 
+     * @param value The value
+     * @return A String representation of the value
+     */
     protected abstract String toText(Object value);
 
-    protected abstract Object toValue(String text) throws IllegalArgumentException;
-
+    /**
+     * Returns an instance from a String representation of an object
+     * 
+     * @param text The String representation to convert
+     * @return A instance of an object
+     */
+    protected abstract Object toValue(String text);
 }

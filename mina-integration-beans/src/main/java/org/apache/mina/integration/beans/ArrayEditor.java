@@ -34,6 +34,11 @@ import java.util.regex.Matcher;
 public class ArrayEditor extends AbstractPropertyEditor {
     private final Class<?> componentType;
 
+    /**
+     * Creates a new ArrayEditor instance
+     * 
+     * @param componentType The component type
+     */
     public ArrayEditor(Class<?> componentType) {
         if (componentType == null) {
             throw new IllegalArgumentException("componentType");
@@ -46,27 +51,35 @@ public class ArrayEditor extends AbstractPropertyEditor {
 
     private PropertyEditor getComponentEditor() {
         PropertyEditor e = PropertyEditorFactory.getInstance(componentType);
+        
         if (e == null) {
             throw new IllegalArgumentException("No " + PropertyEditor.class.getSimpleName() + " found for "
                     + componentType.getSimpleName() + '.');
         }
+        
         return e;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String toText(Object value) {
         Class<?> componentType = value.getClass().getComponentType();
+        
         if (componentType == null) {
             throw new IllegalArgumentException("not an array: " + value);
         }
 
         PropertyEditor e = PropertyEditorFactory.getInstance(componentType);
+        
         if (e == null) {
             throw new IllegalArgumentException("No " + PropertyEditor.class.getSimpleName() + " found for "
                     + componentType.getSimpleName() + '.');
         }
 
         StringBuilder buf = new StringBuilder();
+        
         for (int i = 0; i < Array.getLength(value); i++) {
             e.setValue(Array.get(value, i));
             // TODO normalize.
@@ -79,9 +92,13 @@ public class ArrayEditor extends AbstractPropertyEditor {
         if (buf.length() >= 2) {
             buf.setLength(buf.length() - 2);
         }
+        
         return buf.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Object toValue(String text) throws IllegalArgumentException {
         PropertyEditor e = getComponentEditor();
@@ -106,14 +123,17 @@ public class ArrayEditor extends AbstractPropertyEditor {
             matchedDelimiter = false;
             if (m.group(2) != null || m.group(3) != null) {
                 // Skip the last '"'.
+                
                 m.region(m.end() + 1, m.regionEnd());
             }
         }
 
         Object answer = Array.newInstance(componentType, values.size());
+        
         for (int i = 0; i < Array.getLength(answer); i++) {
             Array.set(answer, i, values.get(i));
         }
+        
         return answer;
     }
 }

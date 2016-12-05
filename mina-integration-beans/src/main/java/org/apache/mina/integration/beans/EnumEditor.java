@@ -38,6 +38,11 @@ public class EnumEditor extends AbstractPropertyEditor {
 
     private final Set<Enum<?>> enums;
 
+    /**
+     * Creates a new EnumEditor instance
+     * 
+     * @param enumType The type of Enum
+     */
     public EnumEditor(Class enumType) {
         if (enumType == null) {
             throw new IllegalArgumentException("enumType");
@@ -47,15 +52,22 @@ public class EnumEditor extends AbstractPropertyEditor {
         this.enums = EnumSet.allOf(enumType);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String toText(Object value) {
-        return (value == null ? "" : value.toString());
+        return value == null ? "" : value.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected Object toValue(String text) throws IllegalArgumentException {
+    protected Object toValue(String text) {
         if (ORDINAL.matcher(text).matches()) {
             int ordinal = Integer.parseInt(text);
+            
             for (Enum<?> e : enums) {
                 if (e.ordinal() == ordinal) {
                     return e;
