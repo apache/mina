@@ -41,9 +41,16 @@ public interface IoFilterChainBuilder {
      * An implementation which does nothing.
      */
     IoFilterChainBuilder NOOP = new IoFilterChainBuilder() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void buildFilterChain(IoFilterChain chain) throws Exception {
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return "NOOP";

@@ -44,6 +44,14 @@ public class IoFilterEvent extends IoEvent {
 
     private final NextFilter nextFilter;
 
+    /**
+     * Creates a new IoFilterEvent instance
+     * 
+     * @param nextFilter The next Filter
+     * @param type The type of event
+     * @param session The current session
+     * @param parameter Any parameter
+     */
     public IoFilterEvent(NextFilter nextFilter, IoEventType type, IoSession session, Object parameter) {
         super(type, session, parameter);
 
@@ -54,14 +62,19 @@ public class IoFilterEvent extends IoEvent {
         this.nextFilter = nextFilter;
     }
 
+    /**
+     * @return The next filter
+     */
     public NextFilter getNextFilter() {
         return nextFilter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void fire() {
         IoSession session = getSession();
-        NextFilter nextFilter = getNextFilter();
         IoEventType type = getType();
 
         if (DEBUG) {
@@ -69,48 +82,48 @@ public class IoFilterEvent extends IoEvent {
         }
 
         switch (type) {
-        case MESSAGE_RECEIVED:
-            Object parameter = getParameter();
-            nextFilter.messageReceived(session, parameter);
-            break;
-
-        case MESSAGE_SENT:
-            WriteRequest writeRequest = (WriteRequest) getParameter();
-            nextFilter.messageSent(session, writeRequest);
-            break;
-
-        case WRITE:
-            writeRequest = (WriteRequest) getParameter();
-            nextFilter.filterWrite(session, writeRequest);
-            break;
-
-        case CLOSE:
-            nextFilter.filterClose(session);
-            break;
-
-        case EXCEPTION_CAUGHT:
-            Throwable throwable = (Throwable) getParameter();
-            nextFilter.exceptionCaught(session, throwable);
-            break;
-
-        case SESSION_IDLE:
-            nextFilter.sessionIdle(session, (IdleStatus) getParameter());
-            break;
-
-        case SESSION_OPENED:
-            nextFilter.sessionOpened(session);
-            break;
-
-        case SESSION_CREATED:
-            nextFilter.sessionCreated(session);
-            break;
-
-        case SESSION_CLOSED:
-            nextFilter.sessionClosed(session);
-            break;
-
-        default:
-            throw new IllegalArgumentException("Unknown event type: " + type);
+            case MESSAGE_RECEIVED:
+                Object parameter = getParameter();
+                nextFilter.messageReceived(session, parameter);
+                break;
+    
+            case MESSAGE_SENT:
+                WriteRequest writeRequest = (WriteRequest) getParameter();
+                nextFilter.messageSent(session, writeRequest);
+                break;
+    
+            case WRITE:
+                writeRequest = (WriteRequest) getParameter();
+                nextFilter.filterWrite(session, writeRequest);
+                break;
+    
+            case CLOSE:
+                nextFilter.filterClose(session);
+                break;
+    
+            case EXCEPTION_CAUGHT:
+                Throwable throwable = (Throwable) getParameter();
+                nextFilter.exceptionCaught(session, throwable);
+                break;
+    
+            case SESSION_IDLE:
+                nextFilter.sessionIdle(session, (IdleStatus) getParameter());
+                break;
+    
+            case SESSION_OPENED:
+                nextFilter.sessionOpened(session);
+                break;
+    
+            case SESSION_CREATED:
+                nextFilter.sessionCreated(session);
+                break;
+    
+            case SESSION_CLOSED:
+                nextFilter.sessionClosed(session);
+                break;
+    
+            default:
+                throw new IllegalArgumentException("Unknown event type: " + type);
         }
 
         if (DEBUG) {

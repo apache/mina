@@ -99,7 +99,7 @@ abstract class CompositeByteArrayRelativeBase {
     }
 
     /**
-     * @return <T>TRUE</T> if there are some more bytes
+     * @return <TT>TRUE</TT> if there are some more bytes
      */
     public final boolean hasRemaining() {
         return cursor.hasRemaining();
