@@ -199,7 +199,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      * events. If a null {@link Executor} is provided, a default one will be
      * created using {@link Executors#newCachedThreadPool()}.
      * 
-     * @see AbstractIoService(IoSessionConfig, Executor)
+     * @see #AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}

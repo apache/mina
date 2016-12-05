@@ -281,7 +281,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * @return the used charset name or {@link #DEFAULT_ENCODING} if null.
+     * @return the used charset name or DEFAULT_ENCODING if null.
      */
     public String getCharsetName() {
         if (charsetName == null) {

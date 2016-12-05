@@ -188,7 +188,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
 
     /**
      * @see DataInput#readLine()
-     * @deprecated
+     * @deprecated Bytes are not properly converted to chars
      */
     @Deprecated
     public String readLine() throws IOException {

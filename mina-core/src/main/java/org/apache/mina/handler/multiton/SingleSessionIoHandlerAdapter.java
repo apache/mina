@@ -25,7 +25,7 @@ import org.apache.mina.core.session.IoSession;
 /**
  * Adapter class for implementors of the {@link SingleSessionIoHandler}
  * interface. The session to which the handler is assigned is accessible
- * through the {@link #getSession()} method.
+ * through the getSession() method.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

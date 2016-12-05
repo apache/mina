@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core.service;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 

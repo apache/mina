@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * A {@link IoHandler} that adapts asynchronous MINA events to stream I/O.
  * <p>
  * Please extend this class and implement
- * {@link #processStreamIo(IoSession, InputStream, OutputStream)} to
+ * processStreamIo(IoSession, InputStream, OutputStream) to
  * execute your stream I/O logic; <b>please note that you must forward
  * the process request to other thread or thread pool.</b>
  *

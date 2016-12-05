@@ -115,7 +115,6 @@ SocketConnector {
      * 
      * @param processorClass the processor class.
      * @see SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int, java.nio.channels.spi.SelectorProvider)
-     * @see org.apache.mina.core.service.SimpleIoProcessorPool#DEFAULT_SIZE
      * @since 2.0.0-M4
      */
     public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass) {

@@ -57,7 +57,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
      * Create a new ExpiringSessionRecycler instance
      * 
      * @param timeToLive The delay after which the session is going to be recycled
-     * @param  expirationInterval
+     * @param expirationInterval The delay after which the expiration occurs
      */
     public ExpiringSessionRecycler(int timeToLive, int expirationInterval) {
         sessionMap = new ExpiringMap<>(timeToLive, expirationInterval);

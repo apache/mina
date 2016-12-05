@@ -56,7 +56,7 @@ class NioSocketSession extends NioSession {
      *
      * @param service the associated IoService 
      * @param processor the associated IoProcessor
-     * @param ch the used channel
+     * @param channel the used channel
      */
     public NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel channel) {
         super(processor, service, channel);

@@ -150,7 +150,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
     /**
      * Writes <code>data</code> {@link IoBuffer} to the <code>buf</code>
      * {@link IoBuffer} which buffers write requests for the
-     * <code>session</code> {@ link IoSession} until buffer is full
+     * <code>session</code> {@link IoSession} until buffer is full
      * or manually flushed.
      * 
      * @param session the session where buffer will be written
