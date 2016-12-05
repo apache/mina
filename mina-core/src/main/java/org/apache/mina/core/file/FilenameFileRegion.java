@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**
- * TODO Add documentation
- * 
+ * Manage a File to be sent to a remote host. We keep a track on the current
+ * position, and the number of already written bytes.
  * 
  * @author The Apache MINA Project (dev@mina.apache.org)
  * @version $Rev$, $Date$
@@ -34,10 +34,25 @@ public class FilenameFileRegion extends DefaultFileRegion {
 
     private final File file;
 
+    /**
+     * Create a new FilenameFileRegion instance
+     * 
+     * @param file The file to manage
+     * @param channel The channel over the file
+     * @throws IOException If we got an IO error
+     */
     public FilenameFileRegion(File file, FileChannel channel) throws IOException {
         this(file, channel, 0, file.length());
     }
 
+    /**
+     * Create a new FilenameFileRegion instance
+     * 
+     * @param file The file to manage
+     * @param channel The channel over the file
+     * @param position The position in teh file
+     * @param remainingBytes The remaining bytes
+     */
     public FilenameFileRegion(File file, FileChannel channel, long position, long remainingBytes) {
         super(channel, position, remainingBytes);
 
@@ -48,6 +63,10 @@ public class FilenameFileRegion extends DefaultFileRegion {
         this.file = file;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getFilename() {
         return file.getAbsolutePath();
     }

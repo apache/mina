@@ -23,25 +23,42 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**
- * TODO Add documentation
+ * Manage a File to be sent to a remote host. We keep a track on the current
+ * position, and the number of already written bytes.
  * 
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultFileRegion implements FileRegion {
-
+    /** The channel used to manage the file */
     private final FileChannel channel;
 
+    /** The original position in the file */
     private final long originalPosition;
 
+    /** The position in teh file */
     private long position;
 
+    /** The number of bytes remaining to write */
     private long remainingBytes;
 
+    /**
+     * Creates a new DefaultFileRegion instance
+     * 
+     * @param channel The channel mapped over the file
+     * @throws IOException If we had an IO error
+     */
     public DefaultFileRegion(FileChannel channel) throws IOException {
         this(channel, 0, channel.size());
     }
 
+    /**
+     * Creates a new DefaultFileRegion instance
+     * 
+     * @param channel The channel mapped over the file
+     * @param position The position in teh file
+     * @param remainingBytes The remaining bytes
+     */
     public DefaultFileRegion(FileChannel channel, long position, long remainingBytes) {
         if (channel == null) {
             throw new IllegalArgumentException("channel can not be null");
@@ -61,29 +78,52 @@ public class DefaultFileRegion implements FileRegion {
         this.remainingBytes = remainingBytes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public long getWrittenBytes() {
         return position - originalPosition;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public long getRemainingBytes() {
         return remainingBytes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public FileChannel getFileChannel() {
         return channel;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public long getPosition() {
         return position;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void update(long value) {
         position += value;
         remainingBytes -= value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getFilename() {
         return null;
     }
-
 }
