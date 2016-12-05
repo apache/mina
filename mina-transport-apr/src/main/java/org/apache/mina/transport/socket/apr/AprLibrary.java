@@ -29,7 +29,7 @@ import org.apache.tomcat.jni.Pool;
  * It'll finalize nicely the native resources (libraries and memory pools).
  * 
  * Each memory pool used in the APR transport module needs to be children of the
- * root pool {@link AprLibrary#getRootPool()}.
+ * root pool AprLibrary#getRootPool().
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

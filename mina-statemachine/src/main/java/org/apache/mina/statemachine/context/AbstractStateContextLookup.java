@@ -21,12 +21,12 @@ package org.apache.mina.statemachine.context;
 
 /**
  * Abstract {@link StateContextLookup} implementation. The {@link #lookup(Object[])}
- * method will loop through the event arguments and call the {@link #supports(Class)}
+ * method will loop through the event arguments and call the supports(Class)
  * method for each of them. The first argument that this method returns 
- * <tt>true</tt> for will be passed to the abstract {@link #lookup(Object)}
+ * <tt>true</tt> for will be passed to the abstract lookup(Object)
  * method which should try to extract a {@link StateContext} from the argument.
  * If none is found a new {@link StateContext} will be created and stored in the
- * event argument using the {@link #store(Object, StateContext)} method.
+ * event argument using the store(Object, StateContext) method.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

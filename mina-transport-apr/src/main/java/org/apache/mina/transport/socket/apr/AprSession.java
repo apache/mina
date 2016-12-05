@@ -65,7 +65,7 @@ public abstract class AprSession extends AbstractIoSession {
      * @param service the {@link IoService} creating this session. Can be {@link AprSocketAcceptor} or 
      *         {@link AprSocketConnector}
      * @param processor the {@link AprIoProcessor} managing this session.
-     * @param descriptor the low level APR socket descriptor for this socket. {@see Socket#create(int, int, int, long)}
+     * @param descriptor the low level APR socket descriptor for this socket. @see Socket#create(int, int, int, long)
      * @throws Exception exception produced during the setting of all the socket parameters. 
      */
     AprSession(IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
@@ -86,7 +86,7 @@ public abstract class AprSession extends AbstractIoSession {
      * @param service the {@link IoService} creating this session. Can be {@link AprSocketAcceptor} or 
      *         {@link AprSocketConnector}
      * @param processor the {@link AprIoProcessor} managing this session.
-     * @param descriptor the low level APR socket descriptor for this socket. {@see Socket#create(int, int, int, long)}
+     * @param descriptor the low level APR socket descriptor for this socket. @see Socket#create(int, int, int, long)
      * @param remoteAddress the remote end-point
      * @throws Exception exception produced during the setting of all the socket parameters. 
      */
@@ -103,7 +103,7 @@ public abstract class AprSession extends AbstractIoSession {
     }
 
     /**
-     * Get the socket descriptor {@see Socket#create(int, int, int, long)}.
+     * Get the socket descriptor @see Socket#create(int, int, int, long).
      * @return the low level APR socket descriptor
      */
     long getDescriptor() {
@@ -112,7 +112,7 @@ public abstract class AprSession extends AbstractIoSession {
 
     /**
      * Set the socket descriptor.
-     * @param desc the low level APR socket descriptor created by {@see Socket#create(int, int, int, long)}
+     * @param desc the low level APR socket descriptor created by @see Socket#create(int, int, int, long)
      */
     void setDescriptor(long desc) {
         this.descriptor = desc;
@@ -189,7 +189,7 @@ public abstract class AprSession extends AbstractIoSession {
 
     /**
      * Does this session needs to be registered for read events.
-     * Used for building poll set {@see Poll}. 
+     * Used for building poll set @see Poll. 
      * @return true if registered
      */
     boolean isInterestedInRead() {
@@ -198,7 +198,7 @@ public abstract class AprSession extends AbstractIoSession {
 
     /**
      * Set if this session needs to be registered for read events. 
-     * Used for building poll set {@see Poll}.
+     * Used for building poll set @see Poll.
      * @param isOpRead true if need to be registered
      */
     void setInterestedInRead(boolean isOpRead) {
@@ -207,7 +207,7 @@ public abstract class AprSession extends AbstractIoSession {
 
     /**
      * Does this session needs to be registered for write events.
-     * Used for building poll set {@see Poll}. 
+     * Used for building poll set @see Poll. 
      * @return true if registered
      */
     boolean isInterestedInWrite() {
@@ -216,7 +216,7 @@ public abstract class AprSession extends AbstractIoSession {
 
     /**
      * Set if this session needs to be registered for write events.
-     * Used for building poll set {@see Poll}.
+     * Used for building poll set @see Poll.
      * @param isOpWrite true if need to be registered
      */
     void setInterestedInWrite(boolean isOpWrite) {
