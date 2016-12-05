@@ -45,6 +45,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getMessage() {
         if (isDone()) {
             Object v = getValue();
@@ -74,11 +75,12 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isRead() {
         if (isDone()) {
             Object v = getValue();
             
-            return (v != CLOSED && !(v instanceof Throwable));
+            return v != CLOSED && !(v instanceof Throwable);
         }
         
         return false;
@@ -87,6 +89,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isClosed() {
         if (isDone()) {
             return getValue() == CLOSED;
@@ -98,6 +101,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Throwable getException() {
         if (isDone()) {
             Object v = getValue();
@@ -113,6 +117,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setClosed() {
         setValue(CLOSED);
     }
@@ -120,6 +125,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setRead(Object message) {
         if (message == null) {
             throw new IllegalArgumentException("message");
@@ -131,6 +137,7 @@ public class DefaultReadFuture extends DefaultIoFuture implements ReadFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setException(Throwable exception) {
         if (exception == null) {
             throw new IllegalArgumentException("exception");

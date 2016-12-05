@@ -73,6 +73,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoSession getSession() {
         return session;
     }
@@ -80,6 +81,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * @deprecated Replaced with {@link #awaitUninterruptibly()}.
      */
+    @Override
     @Deprecated
     public void join() {
         awaitUninterruptibly();
@@ -88,6 +90,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * @deprecated Replaced with {@link #awaitUninterruptibly(long)}.
      */
+    @Override
     @Deprecated
     public boolean join(long timeoutMillis) {
         return awaitUninterruptibly(timeoutMillis);
@@ -96,6 +99,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoFuture await() throws InterruptedException {
         synchronized (lock) {
             while (!ready) {
@@ -122,6 +126,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
         return await0(unit.toMillis(timeout), true);
     }
@@ -129,6 +134,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean await(long timeoutMillis) throws InterruptedException {
         return await0(timeoutMillis, true);
     }
@@ -136,6 +142,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoFuture awaitUninterruptibly() {
         try {
             await0(Long.MAX_VALUE, false);
@@ -149,6 +156,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean awaitUninterruptibly(long timeout, TimeUnit unit) {
         try {
             return await0(unit.toMillis(timeout), false);
@@ -160,6 +168,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean awaitUninterruptibly(long timeoutMillis) {
         try {
             return await0(timeoutMillis, false);
@@ -284,6 +293,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isDone() {
         synchronized (lock) {
             return ready;
@@ -331,6 +341,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoFuture addListener(IoFutureListener<?> listener) {
         if (listener == null) {
             throw new IllegalArgumentException("listener");
@@ -348,7 +359,7 @@ public class DefaultIoFuture implements IoFuture {
                     firstListener = listener;
                 } else {
                     if (otherListeners == null) {
-                        otherListeners = new ArrayList<IoFutureListener<?>>(1);
+                        otherListeners = new ArrayList<>(1);
                     }
                     
                     otherListeners.add(listener);
@@ -362,6 +373,7 @@ public class DefaultIoFuture implements IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoFuture removeListener(IoFutureListener<?> listener) {
         if (listener == null) {
             throw new IllegalArgumentException("listener");

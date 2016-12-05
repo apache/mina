@@ -42,6 +42,7 @@ public interface ConnectFuture extends IoFuture {
      * @return The {link IoSession} instance that has been associated with the connection,
      * if the connection was successful, {@code null} otherwise
      */
+    @Override
     IoSession getSession();
 
     /**
@@ -49,7 +50,7 @@ public interface ConnectFuture extends IoFuture {
      *
      * @return <tt>null</tt> if the connect operation is not finished yet,
      *         or if the connection attempt is successful, otherwise returns
-     *         teh cause of the exception
+     *         the cause of the exception
      */
     Throwable getException();
 
@@ -94,20 +95,24 @@ public interface ConnectFuture extends IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     ConnectFuture await() throws InterruptedException;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     ConnectFuture awaitUninterruptibly();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     ConnectFuture addListener(IoFutureListener<?> listener);
 
     /**
      * {@inheritDoc}
      */
+    @Override
     ConnectFuture removeListener(IoFutureListener<?> listener);
 }

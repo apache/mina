@@ -28,6 +28,15 @@ import org.apache.mina.core.session.IoSession;
  */
 public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**
+     * Creates a new instance.
+     * 
+     * @param session The associated session
+     */
+    public DefaultWriteFuture(IoSession session) {
+        super(session);
+    }
+
+    /**
      * Returns a new {@link DefaultWriteFuture} which is already marked as 'written'.
      * 
      * @param session The associated session
@@ -55,17 +64,9 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     }
 
     /**
-     * Creates a new instance.
-     * 
-     * @param session The associated session
-     */
-    public DefaultWriteFuture(IoSession session) {
-        super(session);
-    }
-
-    /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isWritten() {
         if (isDone()) {
             Object v = getValue();
@@ -81,6 +82,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Throwable getException() {
         if (isDone()) {
             Object v = getValue();
@@ -96,6 +98,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setWritten() {
         setValue(Boolean.TRUE);
     }
@@ -103,6 +106,7 @@ public class DefaultWriteFuture extends DefaultIoFuture implements WriteFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setException(Throwable exception) {
         if (exception == null) {
             throw new IllegalArgumentException("exception");

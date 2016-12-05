@@ -80,20 +80,24 @@ public interface WriteFuture extends IoFuture {
      * @return the created {@link WriteFuture}
      * @throws InterruptedException If the wait is interrupted
      */
+    @Override
     WriteFuture await() throws InterruptedException;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     WriteFuture awaitUninterruptibly();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     WriteFuture addListener(IoFutureListener<?> listener);
 
     /**
      * {@inheritDoc}
      */
+    @Override
     WriteFuture removeListener(IoFutureListener<?> listener);
 }

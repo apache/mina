@@ -100,20 +100,24 @@ public interface ReadFuture extends IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     ReadFuture await() throws InterruptedException;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     ReadFuture awaitUninterruptibly();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     ReadFuture addListener(IoFutureListener<?> listener);
 
     /**
      * {@inheritDoc}
      */
+    @Override
     ReadFuture removeListener(IoFutureListener<?> listener);
 }
