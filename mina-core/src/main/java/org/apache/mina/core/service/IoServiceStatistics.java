@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class IoServiceStatistics {
 
-    private AbstractIoService service;
+    private IoService service;
 
     /** The number of bytes read per second */
     private double readBytesThroughput;
@@ -94,7 +94,12 @@ public class IoServiceStatistics {
 
     private final Lock throughputCalculationLock = new ReentrantLock();
 
-    public IoServiceStatistics(AbstractIoService service) {
+    /**
+     * Creates a new IoServiceStatistics instance
+     * 
+     * @param service The {@link IoService} for which we want statistics
+     */
+    public IoServiceStatistics(IoService service) {
         this.service = service;
     }
 
@@ -103,7 +108,7 @@ public class IoServiceStatistics {
      *         same time.
      */
     public final int getLargestManagedSessionCount() {
-        return service.getListeners().getLargestManagedSessionCount();
+        return ((AbstractIoService)service).getListeners().getLargestManagedSessionCount();
     }
 
     /**
@@ -112,7 +117,7 @@ public class IoServiceStatistics {
      *         session count + closed session count'.
      */
     public final long getCumulativeManagedSessionCount() {
-        return service.getListeners().getCumulativeManagedSessionCount();
+        return ((AbstractIoService)service).getListeners().getCumulativeManagedSessionCount();
     }
 
     /**
@@ -409,11 +414,6 @@ public class IoServiceStatistics {
             if ((minInterval == 0) || (interval < minInterval)) {
                 return;
             }
-
-            long readBytes = this.readBytes;
-            long writtenBytes = this.writtenBytes;
-            long readMessages = this.readMessages;
-            long writtenMessages = this.writtenMessages;
 
             readBytesThroughput = (readBytes - lastReadBytes) * 1000.0 / interval;
             writtenBytesThroughput = (writtenBytes - lastWrittenBytes) * 1000.0 / interval;

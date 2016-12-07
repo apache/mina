@@ -49,6 +49,7 @@ public interface IoConnector extends IoService {
      * 
      * @deprecated
      */
+    @Deprecated
     int getConnectTimeout();
 
     /**
@@ -62,6 +63,7 @@ public interface IoConnector extends IoService {
      * @deprecated
      * @param connectTimeout The time out for the connection
      */
+    @Deprecated
     void setConnectTimeout(int connectTimeout);
 
     /**

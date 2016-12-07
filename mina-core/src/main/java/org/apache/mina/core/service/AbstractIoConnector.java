@@ -77,6 +77,11 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
         return connectTimeoutCheckInterval;
     }
 
+    /**
+     * Sets the timeout for the connection check
+     *  
+     * @param minimumConnectTimeout The delay we wait before checking the connection
+     */
     public void setConnectTimeoutCheckInterval(long minimumConnectTimeout) {
         if (getConnectTimeoutMillis() < minimumConnectTimeout) {
             this.connectTimeoutInMillis = minimumConnectTimeout;
@@ -86,9 +91,10 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     }
 
     /**
-     * @deprecated
-     *  Take a look at <tt>getConnectTimeoutMillis()</tt>
+     * @deprecated Take a look at <tt>getConnectTimeoutMillis()</tt>
      */
+    @Deprecated
+    @Override
     public final int getConnectTimeout() {
         return (int) connectTimeoutInMillis / 1000;
     }
@@ -96,6 +102,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public final long getConnectTimeoutMillis() {
         return connectTimeoutInMillis;
     }
@@ -104,6 +111,8 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
      * @deprecated
      *  Take a look at <tt>setConnectTimeoutMillis(long)</tt>
      */
+    @Deprecated
+    @Override
     public final void setConnectTimeout(int connectTimeout) {
 
         setConnectTimeoutMillis(connectTimeout * 1000L);
@@ -113,6 +122,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
      * Sets the connect timeout value in milliseconds.
      * 
      */
+    @Override
     public final void setConnectTimeoutMillis(long connectTimeoutInMillis) {
         if (connectTimeoutInMillis <= connectTimeoutCheckInterval) {
             this.connectTimeoutCheckInterval = connectTimeoutInMillis;
@@ -123,6 +133,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketAddress getDefaultRemoteAddress() {
         return defaultRemoteAddress;
     }
@@ -130,6 +141,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setDefaultLocalAddress(SocketAddress localAddress) {
         defaultLocalAddress = localAddress;
     }
@@ -137,6 +149,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public final SocketAddress getDefaultLocalAddress() {
         return defaultLocalAddress;
     }
@@ -144,6 +157,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setDefaultRemoteAddress(SocketAddress defaultRemoteAddress) {
         if (defaultRemoteAddress == null) {
             throw new IllegalArgumentException("defaultRemoteAddress");
@@ -159,30 +173,35 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public final ConnectFuture connect() {
-        SocketAddress defaultRemoteAddress = getDefaultRemoteAddress();
-        if (defaultRemoteAddress == null) {
+        SocketAddress remoteAddress = getDefaultRemoteAddress();
+        
+        if (remoteAddress == null) {
             throw new IllegalStateException("defaultRemoteAddress is not set.");
         }
 
-        return connect(defaultRemoteAddress, null, null);
+        return connect(remoteAddress, null, null);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public ConnectFuture connect(IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
-        SocketAddress defaultRemoteAddress = getDefaultRemoteAddress();
-        if (defaultRemoteAddress == null) {
+        SocketAddress remoteAddress = getDefaultRemoteAddress();
+        
+        if (remoteAddress == null) {
             throw new IllegalStateException("defaultRemoteAddress is not set.");
         }
 
-        return connect(defaultRemoteAddress, null, sessionInitializer);
+        return connect(remoteAddress, null, sessionInitializer);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public final ConnectFuture connect(SocketAddress remoteAddress) {
         return connect(remoteAddress, null, null);
     }
@@ -190,6 +209,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public ConnectFuture connect(SocketAddress remoteAddress,
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         return connect(remoteAddress, null, sessionInitializer);
@@ -198,6 +218,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public ConnectFuture connect(SocketAddress remoteAddress, SocketAddress localAddress) {
         return connect(remoteAddress, localAddress, null);
     }
@@ -205,6 +226,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     /**
      * {@inheritDoc}
      */
+    @Override
     public final ConnectFuture connect(SocketAddress remoteAddress, SocketAddress localAddress,
             IoSessionInitializer<? extends ConnectFuture> sessionInitializer) {
         if (isDisposing()) {
@@ -228,34 +250,66 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
         if (getHandler() == null) {
             if (getSessionConfig().isUseReadOperation()) {
                 setHandler(new IoHandler() {
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
                         // Empty handler
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public void messageReceived(IoSession session, Object message) throws Exception {
                         // Empty handler
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public void messageSent(IoSession session, Object message) throws Exception {
                         // Empty handler
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public void sessionClosed(IoSession session) throws Exception {
                         // Empty handler
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public void sessionCreated(IoSession session) throws Exception {
                         // Empty handler
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
                         // Empty handler
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public void sessionOpened(IoSession session) throws Exception {
                         // Empty handler
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public void inputClosed(IoSession session) throws Exception {
                         // Empty handler
                     }
@@ -291,6 +345,10 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
         // setSession() is invoked, add a listener that closes the
         // connection immediately on cancellation.
         future.addListener(new IoFutureListener<ConnectFuture>() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void operationComplete(ConnectFuture future) {
                 if (future.isCanceled()) {
                     session.closeNow();

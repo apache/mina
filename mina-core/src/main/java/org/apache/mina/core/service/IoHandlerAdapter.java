@@ -37,6 +37,7 @@ public class IoHandlerAdapter implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionCreated(IoSession session) throws Exception {
         // Empty handler
     }
@@ -44,6 +45,7 @@ public class IoHandlerAdapter implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionOpened(IoSession session) throws Exception {
         // Empty handler
     }
@@ -51,6 +53,7 @@ public class IoHandlerAdapter implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionClosed(IoSession session) throws Exception {
         // Empty handler
     }
@@ -58,6 +61,7 @@ public class IoHandlerAdapter implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
         // Empty handler
     }
@@ -65,6 +69,7 @@ public class IoHandlerAdapter implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         if (LOGGER.isWarnEnabled()) {
             LOGGER.warn("EXCEPTION, please implement " + getClass().getName()
@@ -75,6 +80,7 @@ public class IoHandlerAdapter implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         // Empty handler
     }
@@ -82,6 +88,7 @@ public class IoHandlerAdapter implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void messageSent(IoSession session, Object message) throws Exception {
         // Empty handler
     }
@@ -89,6 +96,7 @@ public class IoHandlerAdapter implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void inputClosed(IoSession session) throws Exception {
         session.closeNow();
     }

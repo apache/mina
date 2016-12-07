@@ -100,32 +100,56 @@ public abstract class AbstractIoService implements IoService {
     protected final IoSessionConfig sessionConfig;
 
     private final IoServiceListener serviceActivationListener = new IoServiceListener() {
+        IoServiceStatistics serviceStats;
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void serviceActivated(IoService service) {
             // Update lastIoTime.
-            AbstractIoService s = (AbstractIoService) service;
-            IoServiceStatistics _stats = s.getStatistics();
-            _stats.setLastReadTime(s.getActivationTime());
-            _stats.setLastWriteTime(s.getActivationTime());
-            _stats.setLastThroughputCalculationTime(s.getActivationTime());
-
+            serviceStats = service.getStatistics();
+            serviceStats.setLastReadTime(service.getActivationTime());
+            serviceStats.setLastWriteTime(service.getActivationTime());
+            serviceStats.setLastThroughputCalculationTime(service.getActivationTime());
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void serviceDeactivated(IoService service) throws Exception {
             // Empty handler
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void serviceIdle(IoService service, IdleStatus idleStatus) throws Exception {
             // Empty handler
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void sessionCreated(IoSession session) throws Exception {
             // Empty handler
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void sessionClosed(IoSession session) throws Exception {
             // Empty handler
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void sessionDestroyed(IoSession session) throws Exception {
             // Empty handler
         }
@@ -153,9 +177,6 @@ public abstract class AbstractIoService implements IoService {
 
     private volatile boolean disposed;
 
-    /**
-     * {@inheritDoc}
-     */
     private IoServiceStatistics stats = new IoServiceStatistics(this);
 
     /**
@@ -210,6 +231,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final IoFilterChainBuilder getFilterChainBuilder() {
         return filterChainBuilder;
     }
@@ -217,16 +239,19 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setFilterChainBuilder(IoFilterChainBuilder builder) {
         if (builder == null) {
-            builder = new DefaultIoFilterChainBuilder();
+            filterChainBuilder = new DefaultIoFilterChainBuilder();
+        } else {
+            filterChainBuilder = builder;
         }
-        filterChainBuilder = builder;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public final DefaultIoFilterChainBuilder getFilterChain() {
         if (filterChainBuilder instanceof DefaultIoFilterChainBuilder) {
             return (DefaultIoFilterChainBuilder) filterChainBuilder;
@@ -238,6 +263,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void addListener(IoServiceListener listener) {
         listeners.add(listener);
     }
@@ -245,6 +271,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void removeListener(IoServiceListener listener) {
         listeners.remove(listener);
     }
@@ -252,6 +279,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isActive() {
         return listeners.isActive();
     }
@@ -259,6 +287,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isDisposing() {
         return disposing;
     }
@@ -266,6 +295,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isDisposed() {
         return disposed;
     }
@@ -273,6 +303,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void dispose() {
         dispose(false);
     }
@@ -280,6 +311,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void dispose(boolean awaitTermination) {
         if (disposed) {
             return;
@@ -327,6 +359,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Map<Long, IoSession> getManagedSessions() {
         return listeners.getManagedSessions();
     }
@@ -334,6 +367,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final int getManagedSessionCount() {
         return listeners.getManagedSessionCount();
     }
@@ -341,6 +375,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final IoHandler getHandler() {
         return handler;
     }
@@ -348,6 +383,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setHandler(IoHandler handler) {
         if (handler == null) {
             throw new IllegalArgumentException("handler cannot be null");
@@ -363,6 +399,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final IoSessionDataStructureFactory getSessionDataStructureFactory() {
         return sessionDataStructureFactory;
     }
@@ -370,6 +407,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setSessionDataStructureFactory(IoSessionDataStructureFactory sessionDataStructureFactory) {
         if (sessionDataStructureFactory == null) {
             throw new IllegalArgumentException("sessionDataStructureFactory");
@@ -385,6 +423,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoServiceStatistics getStatistics() {
         return stats;
     }
@@ -392,6 +431,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final long getActivationTime() {
         return listeners.getActivationTime();
     }
@@ -399,6 +439,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Set<WriteFuture> broadcast(Object message) {
         // Convert to Set.  We do not return a List here because only the
         // direct caller of MessageBroadcaster knows the order of write
@@ -417,6 +458,9 @@ public abstract class AbstractIoService implements IoService {
         };
     }
 
+    /**
+     * @return The {@link IoServiceListenerSupport} attached to this service
+     */
     public final IoServiceListenerSupport getListeners() {
         return listeners;
     }
@@ -433,8 +477,6 @@ public abstract class AbstractIoService implements IoService {
         executor.execute(new NamePreservingRunnable(worker, actualThreadName));
     }
 
-    // TODO Figure out make it work without causing a compiler error / warning.
-    @SuppressWarnings("unchecked")
     protected final void initSession(IoSession session, IoFuture future, IoSessionInitializer sessionInitializer) {
         // Update lastIoTime if needed.
         if (stats.getLastReadTime() == 0) {
@@ -494,8 +536,7 @@ public abstract class AbstractIoService implements IoService {
     }
 
     /**
-     * A specific class used to 
-     * @author elecharny
+     * A  {@link IoFuture} dedicated class for 
      *
      */
     protected static class ServiceOperationFuture extends DefaultIoFuture {
@@ -503,6 +544,10 @@ public abstract class AbstractIoService implements IoService {
             super(null);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public final boolean isDone() {
             return getValue() == Boolean.TRUE;
         }
@@ -531,6 +576,7 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getScheduledWriteBytes() {
         return stats.getScheduledWriteBytes();
     }
@@ -538,8 +584,8 @@ public abstract class AbstractIoService implements IoService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getScheduledWriteMessages() {
         return stats.getScheduledWriteMessages();
     }
-
 }

@@ -45,10 +45,10 @@ public class IoServiceListenerSupport {
     private final IoService service;
 
     /** A list of {@link IoServiceListener}s. */
-    private final List<IoServiceListener> listeners = new CopyOnWriteArrayList<IoServiceListener>();
+    private final List<IoServiceListener> listeners = new CopyOnWriteArrayList<>();
 
     /** Tracks managed sessions. */
-    private final ConcurrentMap<Long, IoSession> managedSessions = new ConcurrentHashMap<Long, IoSession>();
+    private final ConcurrentMap<Long, IoSession> managedSessions = new ConcurrentHashMap<>();
 
     /**  Read only version of {@link #managedSessions}. */
     private final Map<Long, IoSession> readOnlyManagedSessions = Collections.unmodifiableMap(managedSessions);
@@ -106,10 +106,16 @@ public class IoServiceListenerSupport {
         return activationTime;
     }
 
+    /**
+     * @return A Map of the managed {@link IoSession}s
+     */
     public Map<Long, IoSession> getManagedSessions() {
         return readOnlyManagedSessions;
     }
 
+    /**
+     * @return The number of managed {@link IoSession}s
+     */
     public int getManagedSessionCount() {
         return managedSessions.size();
     }
@@ -271,7 +277,6 @@ public class IoServiceListenerSupport {
 
     /**
      * Close all the sessions
-     * TODO disconnectSessions.
      *
      */
     private void disconnectSessions() {
@@ -312,6 +317,7 @@ public class IoServiceListenerSupport {
             this.lock = lock;
         }
 
+        @Override
         public void operationComplete(IoFuture future) {
             synchronized (lock) {
                 lock.notifyAll();

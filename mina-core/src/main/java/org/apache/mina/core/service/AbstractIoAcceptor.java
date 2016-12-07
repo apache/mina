@@ -188,6 +188,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
         Collection<SocketAddress> newLocalAddresses = new ArrayList<>(otherLocalAddresses.length + 1);
 
         newLocalAddresses.add(firstLocalAddress);
+        
         for (SocketAddress a : otherLocalAddresses) {
             newLocalAddresses.add(a);
         }
@@ -318,9 +319,7 @@ public final void bind(Iterable<? extends SocketAddress> localAddresses) throws 
                 synchronized (boundAddresses) {
                     boundAddresses.addAll(addresses);
                 }
-            } catch (IOException e) {
-                throw e;
-            } catch (RuntimeException e) {
+            } catch (IOException | RuntimeException e) {
                 throw e;
             } catch (Exception e) {
                 throw new RuntimeIoException("Failed to bind to: " + getLocalAddresses(), e);
@@ -462,13 +461,24 @@ public final void bind(Iterable<? extends SocketAddress> localAddresses) throws 
         }
     }
 
+    /**
+     * A {@Link IoFuture} 
+     */
     public static class AcceptorOperationFuture extends ServiceOperationFuture {
         private final List<SocketAddress> localAddresses;
 
+        /**
+         * Creates a new AcceptorOperationFuture instance
+         * 
+         * @param localAddresses The list of local addresses to listen to
+         */
         public AcceptorOperationFuture(List<? extends SocketAddress> localAddresses) {
             this.localAddresses = new ArrayList<>(localAddresses);
         }
 
+        /**
+         * @return The list of local addresses we listen to
+         */
         public final List<SocketAddress> getLocalAddresses() {
             return Collections.unmodifiableList(localAddresses);
         }
@@ -476,6 +486,7 @@ public final void bind(Iterable<? extends SocketAddress> localAddresses) throws 
         /**
          * @see Object#toString()
          */
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
 
