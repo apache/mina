@@ -27,18 +27,37 @@ package org.apache.mina.core.session;
 public class UnknownMessageTypeException extends RuntimeException {
     private static final long serialVersionUID = 3257290227428047158L;
 
+    /**
+     * Creates a new UnknownMessageTypeException instance.
+     */
     public UnknownMessageTypeException() {
         // Do nothing
     }
 
+    /**
+     * Creates a new UnknownMessageTypeException instance.
+     * 
+     * @param message The detail message
+     * @param cause The Exception's cause
+     */
     public UnknownMessageTypeException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Creates a new UnknownMessageTypeException instance.
+     * 
+     * @param message The detail message
+     */
     public UnknownMessageTypeException(String message) {
         super(message);
     }
 
+    /**
+     * Creates a new UnknownMessageTypeException instance.
+     * 
+     * @param cause The Exception's cause
+     */
     public UnknownMessageTypeException(Throwable cause) {
         super(cause);
     }

@@ -475,7 +475,7 @@ public abstract class AbstractIoSession implements IoSession {
         Queue<ReadFuture> readyReadFutures = (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES_KEY);
         
         if (readyReadFutures == null) {
-            readyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
+            readyReadFutures = new ConcurrentLinkedQueue<>();
 
             Queue<ReadFuture> oldReadyReadFutures = (Queue<ReadFuture>) setAttributeIfAbsent(READY_READ_FUTURES_KEY,
                     readyReadFutures);
@@ -495,7 +495,7 @@ public abstract class AbstractIoSession implements IoSession {
         Queue<ReadFuture> waitingReadyReadFutures = (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES_KEY);
         
         if (waitingReadyReadFutures == null) {
-            waitingReadyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
+            waitingReadyReadFutures = new ConcurrentLinkedQueue<>();
 
             Queue<ReadFuture> oldWaitingReadyReadFutures = (Queue<ReadFuture>) setAttributeIfAbsent(
                     WAITING_READ_FUTURES_KEY, waitingReadyReadFutures);

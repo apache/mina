@@ -47,6 +47,7 @@ public class WriteRequestWrapper implements WriteRequest {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketAddress getDestination() {
         return parentRequest.getDestination();
     }
@@ -54,6 +55,7 @@ public class WriteRequestWrapper implements WriteRequest {
     /**
      * {@inheritDoc}
      */
+    @Override
     public WriteFuture getFuture() {
         return parentRequest.getFuture();
     }
@@ -61,6 +63,7 @@ public class WriteRequestWrapper implements WriteRequest {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getMessage() {
         return parentRequest.getMessage();
     }
@@ -68,6 +71,7 @@ public class WriteRequestWrapper implements WriteRequest {
     /**
      * {@inheritDoc}
      */
+    @Override
     public WriteRequest getOriginalRequest() {
         return parentRequest.getOriginalRequest();
     }
@@ -90,6 +94,7 @@ public class WriteRequestWrapper implements WriteRequest {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEncoded() {
         return false;
     }

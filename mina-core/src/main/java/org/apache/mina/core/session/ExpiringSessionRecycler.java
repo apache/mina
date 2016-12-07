@@ -95,22 +95,41 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
         sessionMap.remove(session.getRemoteAddress());
     }
 
+    /**
+     * Stop the thread from monitoring the map
+     */
     public void stopExpiring() {
         mapExpirer.stopExpiring();
     }
 
+    /**
+     * @return The session expiration time in second
+     */
     public int getExpirationInterval() {
         return sessionMap.getExpirationInterval();
     }
 
+    /**
+     * @return The session time-to-live in second
+     */
     public int getTimeToLive() {
         return sessionMap.getTimeToLive();
     }
 
+    /**
+     * Set the interval in which a session will live in the map before it is removed.
+     * 
+     * @param expirationInterval The session expiration time in seconds
+     */
     public void setExpirationInterval(int expirationInterval) {
         sessionMap.setExpirationInterval(expirationInterval);
     }
 
+    /**
+     * Update the value for the time-to-live
+     *
+     * @param timeToLive The time-to-live (seconds)
+     */
     public void setTimeToLive(int timeToLive) {
         sessionMap.setTimeToLive(timeToLive);
     }

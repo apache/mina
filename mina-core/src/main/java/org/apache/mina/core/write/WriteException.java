@@ -42,7 +42,7 @@ public class WriteException extends IOException {
     private final List<WriteRequest> requests;
 
     /**
-     * Creates a new exception.
+     * Creates a new WriteException instance.
      * 
      * @param request The associated {@link WriteRequest}
      */
@@ -52,7 +52,7 @@ public class WriteException extends IOException {
     }
 
     /**
-     * Creates a new exception.
+     * Creates a new WriteException instance.
      * 
      * @param request The associated {@link WriteRequest}
      * @param message The detail message
@@ -63,7 +63,7 @@ public class WriteException extends IOException {
     }
 
     /**
-     * Creates a new exception.
+     * Creates a new WriteException instance.
      * 
      * @param request The associated {@link WriteRequest}
      * @param message The detail message
@@ -76,7 +76,7 @@ public class WriteException extends IOException {
     }
 
     /**
-     * Creates a new exception.
+     * Creates a new WriteException instance.
      * 
      * @param request The associated {@link WriteRequest}
      * @param cause The Exception's cause
@@ -87,7 +87,7 @@ public class WriteException extends IOException {
     }
 
     /**
-     * Creates a new exception.
+     * Creates a new WriteException instance.
      * 
      * @param requests The collection of {@link WriteRequest}s
      */
@@ -97,7 +97,7 @@ public class WriteException extends IOException {
     }
 
     /**
-     * Creates a new exception.
+     * Creates a new WriteException instance.
      * 
      * @param requests The collection of {@link WriteRequest}s
      * @param message The detail message
@@ -108,7 +108,7 @@ public class WriteException extends IOException {
     }
 
     /**
-     * Creates a new exception.
+     * Creates a new WriteException instance.
      * 
      * @param requests The collection of {@link WriteRequest}s
      * @param message The detail message
@@ -121,7 +121,7 @@ public class WriteException extends IOException {
     }
 
     /**
-     * Creates a new exception.
+     * Creates a new WriteException instance.
      * 
      * @param requests The collection of {@link WriteRequest}s
      * @param cause The Exception's cause
@@ -155,7 +155,7 @@ public class WriteException extends IOException {
         }
 
         // Create a list of requests removing duplicates.
-        Set<WriteRequest> newRequests = new MapBackedSet<WriteRequest>(new LinkedHashMap<WriteRequest, Boolean>());
+        Set<WriteRequest> newRequests = new MapBackedSet<>(new LinkedHashMap<WriteRequest, Boolean>());
         
         for (WriteRequest r : requests) {
             newRequests.add(r.getOriginalRequest());
@@ -169,7 +169,7 @@ public class WriteException extends IOException {
             throw new IllegalArgumentException("request");
         }
 
-        List<WriteRequest> requests = new ArrayList<WriteRequest>(1);
+        List<WriteRequest> requests = new ArrayList<>(1);
         requests.add(request.getOriginalRequest());
         
         return Collections.unmodifiableList(requests);

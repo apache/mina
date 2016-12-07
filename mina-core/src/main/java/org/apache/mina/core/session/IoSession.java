@@ -180,6 +180,7 @@ public interface IoSession {
      * @return The associated CloseFuture
      * @deprecated Use either the closeNow() or the flushAndClose() methods
      */
+    @Deprecated
     CloseFuture close(boolean immediately);
 
     /**

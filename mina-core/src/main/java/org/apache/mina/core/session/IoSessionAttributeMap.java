@@ -29,7 +29,6 @@ import java.util.Set;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoSessionAttributeMap {
-
     /**
      * @return the value of user defined attribute associated with the
      * specified key.  If there's no such attribute, the specified default

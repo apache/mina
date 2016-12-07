@@ -91,30 +91,47 @@ public class DummySession extends AbstractIoSession {
         // Initialize dummy service.
                 new AbstractIoAcceptor(new AbstractIoSessionConfig() {
                 }, new Executor() {
+                    @Override
                     public void execute(Runnable command) {
                         // Do nothing
                     }
                 }) {
-
+                    /**
+                     * {@inheritDoc}
+                     */
                     @Override
                     protected Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses)
                             throws Exception {
                         throw new UnsupportedOperationException();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
                     @Override
                     protected void unbind0(List<? extends SocketAddress> localAddresses) throws Exception {
                         throw new UnsupportedOperationException();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
                         throw new UnsupportedOperationException();
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
                     public TransportMetadata getTransportMetadata() {
                         return TRANSPORT_METADATA;
                     }
 
+                    /**
+                     * {@inheritDoc}
+                     */
                     @Override
                     protected void dispose0() throws Exception {
                     }
@@ -122,16 +139,25 @@ public class DummySession extends AbstractIoSession {
                     /**
                      * {@inheritDoc}
                      */
+                    @Override
                     public IoSessionConfig getSessionConfig() {
                         return sessionConfig;
                     }
                 });
 
         processor = new IoProcessor<IoSession>() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void add(IoSession session) {
                 // Do nothing
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void flush(IoSession session) {
                 DummySession s = (DummySession) session;
                 WriteRequest req = s.getWriteRequestQueue().poll(session);
@@ -156,6 +182,7 @@ public class DummySession extends AbstractIoSession {
             /**
              * {@inheritDoc}
              */
+            @Override
             public void write(IoSession session, WriteRequest writeRequest) {
                 WriteRequestQueue writeRequestQueue = session.getWriteRequestQueue();
 
@@ -166,24 +193,44 @@ public class DummySession extends AbstractIoSession {
                 }
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void remove(IoSession session) {
                 if (!session.getCloseFuture().isClosed()) {
                     session.getFilterChain().fireSessionClosed();
                 }
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void updateTrafficControl(IoSession session) {
                 // Do nothing
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void dispose() {
                 // Do nothing
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public boolean isDisposed() {
                 return false;
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public boolean isDisposing() {
                 return false;
             }
@@ -204,6 +251,7 @@ public class DummySession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoSessionConfig getConfig() {
         return config;
     }
@@ -224,6 +272,7 @@ public class DummySession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoFilterChain getFilterChain() {
         return filterChain;
     }
@@ -231,6 +280,7 @@ public class DummySession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoHandler getHandler() {
         return handler;
     }
@@ -251,6 +301,7 @@ public class DummySession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketAddress getLocalAddress() {
         return localAddress;
     }
@@ -258,6 +309,7 @@ public class DummySession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketAddress getRemoteAddress() {
         return remoteAddress;
     }
@@ -292,6 +344,7 @@ public class DummySession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoService getService() {
         return service;
     }
@@ -320,6 +373,7 @@ public class DummySession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return transportMetadata;
     }

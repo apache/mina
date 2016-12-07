@@ -181,18 +181,36 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         return expirer;
     }
 
+    /**
+     * Get the interval in which an object will live in the map before it is removed.
+     * 
+     * @return The expiration time in second
+     */
     public int getExpirationInterval() {
         return expirer.getExpirationInterval();
     }
 
+    /**
+     * @return the Time-to-live value in seconds.
+     */
     public int getTimeToLive() {
         return expirer.getTimeToLive();
     }
 
+    /**
+     * Set the interval in which an object will live in the map before it is removed.
+     * 
+     * @param expirationInterval The expiration time in seconds
+     */
     public void setExpirationInterval(int expirationInterval) {
         expirer.setExpirationInterval(expirationInterval);
     }
 
+    /**
+     * Update the value for the time-to-live
+     *
+     * @param timeToLive The time-to-live (seconds)
+     */
     public void setTimeToLive(int timeToLive) {
         expirer.setTimeToLive(timeToLive);
     }

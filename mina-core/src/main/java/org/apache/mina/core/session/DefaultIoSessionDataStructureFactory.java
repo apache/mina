@@ -38,17 +38,24 @@ import org.apache.mina.core.write.WriteRequestQueue;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultIoSessionDataStructureFactory implements IoSessionDataStructureFactory {
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IoSessionAttributeMap getAttributeMap(IoSession session) throws Exception {
         return new DefaultIoSessionAttributeMap();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public WriteRequestQueue getWriteRequestQueue(IoSession session) throws Exception {
         return new DefaultWriteRequestQueue();
     }
 
     private static class DefaultIoSessionAttributeMap implements IoSessionAttributeMap {
-        private final ConcurrentHashMap<Object, Object> attributes = new ConcurrentHashMap<Object, Object>(4);
+        private final ConcurrentHashMap<Object, Object> attributes = new ConcurrentHashMap<>(4);
 
         /**
          * Default constructor
@@ -60,6 +67,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object getAttribute(IoSession session, Object key, Object defaultValue) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -81,6 +89,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object setAttribute(IoSession session, Object key, Object value) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -96,6 +105,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object setAttributeIfAbsent(IoSession session, Object key, Object value) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -111,6 +121,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object removeAttribute(IoSession session, Object key) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -122,6 +133,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean removeAttribute(IoSession session, Object key, Object value) {
             if (key == null) {
                 throw new IllegalArgumentException("key");
@@ -141,6 +153,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean replaceAttribute(IoSession session, Object key, Object oldValue, Object newValue) {
             try {
                 return attributes.replace(key, oldValue, newValue);
@@ -153,6 +166,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean containsAttribute(IoSession session, Object key) {
             return attributes.containsKey(key);
         }
@@ -160,15 +174,17 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public Set<Object> getAttributeKeys(IoSession session) {
             synchronized (attributes) {
-                return new HashSet<Object>(attributes.keySet());
+                return new HashSet<>(attributes.keySet());
             }
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dispose(IoSession session) throws Exception {
             // Do nothing
         }
@@ -176,17 +192,12 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
 
     private static class DefaultWriteRequestQueue implements WriteRequestQueue {
         /** A queue to store incoming write requests */
-        private final Queue<WriteRequest> q = new ConcurrentLinkedQueue<WriteRequest>();
-
-        /**
-         * Default constructor
-         */
-        public DefaultWriteRequestQueue() {
-        }
+        private final Queue<WriteRequest> q = new ConcurrentLinkedQueue<>();
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dispose(IoSession session) {
             // Do nothing
         }
@@ -194,6 +205,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public void clear(IoSession session) {
             q.clear();
         }
@@ -201,6 +213,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isEmpty(IoSession session) {
             return q.isEmpty();
         }
@@ -208,6 +221,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public void offer(IoSession session, WriteRequest writeRequest) {
             q.offer(writeRequest);
         }
@@ -215,6 +229,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public WriteRequest poll(IoSession session) {
             WriteRequest answer = q.poll();
 
@@ -227,6 +242,9 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
             return answer;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return q.toString();
@@ -235,6 +253,7 @@ public class DefaultIoSessionDataStructureFactory implements IoSessionDataStruct
         /**
          * {@inheritDoc}
          */
+        @Override
         public int size() {
             return q.size();
         }
