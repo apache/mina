@@ -31,34 +31,82 @@ public class NothingWrittenException extends WriteException {
 
     private static final long serialVersionUID = -6331979307737691005L;
 
+    /**
+     * Create a new NothingWrittenException instance
+     * 
+     * @param requests The {@link WriteRequest}s that haven't been written
+     * @param message The error message
+     * @param cause The original exception
+     */
     public NothingWrittenException(Collection<WriteRequest> requests, String message, Throwable cause) {
         super(requests, message, cause);
     }
 
-    public NothingWrittenException(Collection<WriteRequest> requests, String s) {
-        super(requests, s);
+    /**
+     * Create a new NothingWrittenException instance
+     * 
+     * @param requests The {@link WriteRequest}s that haven't been written
+     * @param message The error message
+     */
+    public NothingWrittenException(Collection<WriteRequest> requests, String message) {
+        super(requests, message);
     }
 
+    /**
+     * Create a new NothingWrittenException instance
+     * 
+     * @param requests The {@link WriteRequest} that haven't been written
+     * @param cause The original exception
+     */
     public NothingWrittenException(Collection<WriteRequest> requests, Throwable cause) {
         super(requests, cause);
     }
 
+    /**
+     * Create a new NothingWrittenException instance
+     * 
+     * @param requests The {@link WriteRequest} that haven't been written
+     */
     public NothingWrittenException(Collection<WriteRequest> requests) {
         super(requests);
     }
 
+    /**
+     * Create a new NothingWrittenException instance
+     * 
+     * @param request The {@link WriteRequest} that hasn't been written
+     * @param message The error message
+     * @param cause The original exception
+     */
     public NothingWrittenException(WriteRequest request, String message, Throwable cause) {
         super(request, message, cause);
     }
 
-    public NothingWrittenException(WriteRequest request, String s) {
-        super(request, s);
+    /**
+     * Create a new NothingWrittenException instance
+     * 
+     * @param request The {@link WriteRequest} that hasn't been written
+     * @param message The error message
+     */
+    public NothingWrittenException(WriteRequest request, String message) {
+        super(request, message);
     }
 
+    /**
+     * Create a new NothingWrittenException instance
+     * 
+     * @param request The {@link WriteRequest} that hasn't been written
+     * @param cause The original exception
+     */
     public NothingWrittenException(WriteRequest request, Throwable cause) {
         super(request, cause);
     }
 
+    /**
+     * Create a new NothingWrittenException instance
+     * 
+     * @param request The {@link WriteRequest} that hasn't been written
+     */
     public NothingWrittenException(WriteRequest request) {
         super(request);
     }
