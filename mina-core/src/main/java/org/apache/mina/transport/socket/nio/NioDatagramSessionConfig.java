@@ -54,6 +54,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * 
      * @see DatagramSocket#getReceiveBufferSize()
      */
+    @Override
     public int getReceiveBufferSize() {
         try {
             return channel.socket().getReceiveBufferSize();
@@ -72,8 +73,9 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * @throws RuntimeIoException if the socket is closed or if we 
      * had a SocketException
      * 
-     * @see DatagramSocket#setReceiveBufferSize()
+     * @see DatagramSocket#setReceiveBufferSize(int)
      */
+    @Override
     public void setReceiveBufferSize(int receiveBufferSize) {
         try {
             channel.socket().setReceiveBufferSize(receiveBufferSize);
@@ -89,6 +91,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */
+    @Override
     public boolean isBroadcast() {
         try {
             return channel.socket().getBroadcast();
@@ -97,6 +100,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
         }
     }
 
+    @Override
     public void setBroadcast(boolean broadcast) {
         try {
             channel.socket().setBroadcast(broadcast);
@@ -110,6 +114,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */
+    @Override
     public int getSendBufferSize() {
         try {
             return channel.socket().getSendBufferSize();
@@ -123,6 +128,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */
+    @Override
     public void setSendBufferSize(int sendBufferSize) {
         try {
             channel.socket().setSendBufferSize(sendBufferSize);
@@ -138,6 +144,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */
+    @Override
     public boolean isReuseAddress() {
         try {
             return channel.socket().getReuseAddress();
@@ -151,6 +158,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */
+    @Override
     public void setReuseAddress(boolean reuseAddress) {
         try {
             channel.socket().setReuseAddress(reuseAddress);
@@ -168,6 +176,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */
+    @Override
     public int getTrafficClass() {
         try {
             return channel.socket().getTrafficClass();
@@ -181,6 +190,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */
+    @Override
     public void setTrafficClass(int trafficClass) {
         try {
             channel.socket().setTrafficClass(trafficClass);

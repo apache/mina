@@ -66,27 +66,46 @@ class NioDatagramSession extends NioSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DatagramSessionConfig getConfig() {
         return (DatagramSessionConfig) config;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     DatagramChannel getChannel() {
         return (DatagramChannel) channel;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public InetSocketAddress getRemoteAddress() {
         return remoteAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public InetSocketAddress getLocalAddress() {
         return localAddress;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();

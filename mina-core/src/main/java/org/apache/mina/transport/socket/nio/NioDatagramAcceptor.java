@@ -81,11 +81,11 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     private final Semaphore lock = new Semaphore(1);
 
     /** A queue used to store the list of pending Binds */
-    private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<NioSession> flushingSessions = new ConcurrentLinkedQueue<NioSession>();
+    private final Queue<NioSession> flushingSessions = new ConcurrentLinkedQueue<>();
 
     private final Map<SocketAddress, DatagramChannel> boundHandles = Collections
             .synchronizedMap(new HashMap<SocketAddress, DatagramChannel>());
@@ -150,6 +150,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
      * the registered handles have been removed (unbound).
      */
     private class Acceptor implements Runnable {
+        @Override
         public void run() {
             int nHandles = 0;
             lastIdleCheckTime = System.currentTimeMillis();
@@ -220,7 +221,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                 break;
             }
 
-            Map<SocketAddress, DatagramChannel> newHandles = new HashMap<SocketAddress, DatagramChannel>();
+            Map<SocketAddress, DatagramChannel> newHandles = new HashMap<>();
             List<SocketAddress> localAddresses = req.getLocalAddresses();
 
             try {
@@ -494,6 +495,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     /**
      * {@inheritDoc}
      */
+    @Override
     public void add(NioSession session) {
         // Nothing to do for UDP
     }
@@ -538,7 +540,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
         // Update the local addresses.
         // setLocalAddresses() shouldn't be called from the worker thread
         // because of deadlock.
-        Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
+        Set<SocketAddress> newLocalAddresses = new HashSet<>();
 
         for (DatagramChannel handle : boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
@@ -577,6 +579,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     /**
      * {@inheritDoc}
      */
+    @Override
     public void flush(NioSession session) {
         if (scheduleFlush(session)) {
             wakeup();
@@ -596,14 +599,17 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     /**
      * {@inheritDoc}
      */
+    @Override
     public DatagramSessionConfig getSessionConfig() {
         return (DatagramSessionConfig) sessionConfig;
     }
 
+    @Override
     public final IoSessionRecycler getSessionRecycler() {
         return sessionRecycler;
     }
 
+    @Override
     public TransportMetadata getTransportMetadata() {
         return NioDatagramSession.METADATA;
     }
@@ -665,6 +671,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     /**
      * {@inheritDoc}
      */
+    @Override
     public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         if (isDisposing()) {
             throw new IllegalStateException("The Acceptor is being disposed.");
@@ -681,9 +688,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
 
             try {
                 return newSessionWithoutLock(remoteAddress, localAddress);
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Error e) {
+            } catch (RuntimeException | Error e) {
                 throw e;
             } catch (Exception e) {
                 throw new RuntimeIoException("Failed to create a session.", e);
@@ -732,6 +737,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     /**
      * {@inheritDoc}
      */
+    @Override
     public void remove(NioSession session) {
         getSessionRecycler().remove(session);
         getListeners().fireSessionDestroyed(session);
@@ -753,6 +759,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
         return ((DatagramChannel) session.getChannel()).send(buffer.buf(), remoteAddress);
     }
 
+    @Override
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         setDefaultLocalAddress((SocketAddress) localAddress);
     }
@@ -775,6 +782,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
         key.interestOps(newInterestOps);
     }
 
+    @Override
     public final void setSessionRecycler(IoSessionRecycler sessionRecycler) {
         synchronized (bindLock) {
             if (isActive()) {
@@ -810,6 +818,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     /**
      * {@inheritDoc}
      */
+    @Override
     public void updateTrafficControl(NioSession session) {
         throw new UnsupportedOperationException();
     }
@@ -821,6 +830,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     /**
      * {@inheritDoc}
      */
+    @Override
     public void write(NioSession session, WriteRequest writeRequest) {
         // We will try to write the message directly
         long currentTime = System.currentTimeMillis();
