@@ -65,6 +65,8 @@ import org.apache.mina.util.ExceptionMonitor;
  * by the subclassing implementation.
  * 
  * @see NioSocketAcceptor for a example of implementation
+ * @param <H> The type of IoHandler
+ * @param <S> The type of IoSession
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -435,8 +437,12 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      * The loop is stopped when all the bound handlers are unbound.
      */
     private class Acceptor implements Runnable {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void run() {
-            assert (acceptorRef.get() == this);
+            assert acceptorRef.get() == this;
 
             int nHandles = 0;
 
@@ -466,16 +472,16 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                         acceptorRef.set(null);
 
                         if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
-                            assert (acceptorRef.get() != this);
+                            assert acceptorRef.get() != this;
                             break;
                         }
 
                         if (!acceptorRef.compareAndSet(null, this)) {
-                            assert (acceptorRef.get() != this);
+                            assert acceptorRef.get() != this;
                             break;
                         }
 
-                        assert (acceptorRef.get() == this);
+                        assert acceptorRef.get() == this;
                     }
 
                     if (selected > 0) {
@@ -553,106 +559,106 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                 session.getProcessor().add(session);
             }
         }
-    }
 
-    /**
-     * Sets up the socket communications.  Sets items such as:
-     * <p/>
-     * Blocking
-     * Reuse address
-     * Receive buffer size
-     * Bind to listen port
-     * Registers OP_ACCEPT for selector
-     */
-    private int registerHandles() {
-        for (;;) {
-            // The register queue contains the list of services to manage
-            // in this acceptor.
-            AcceptorOperationFuture future = registerQueue.poll();
+        /**
+         * Sets up the socket communications.  Sets items such as:
+         * <p/>
+         * Blocking
+         * Reuse address
+         * Receive buffer size
+         * Bind to listen port
+         * Registers OP_ACCEPT for selector
+         */
+        private int registerHandles() {
+            for (;;) {
+                // The register queue contains the list of services to manage
+                // in this acceptor.
+                AcceptorOperationFuture future = registerQueue.poll();
 
-            if (future == null) {
-                return 0;
-            }
-
-            // We create a temporary map to store the bound handles,
-            // as we may have to remove them all if there is an exception
-            // during the sockets opening.
-            Map<SocketAddress, H> newHandles = new ConcurrentHashMap<>();
-            List<SocketAddress> localAddresses = future.getLocalAddresses();
-
-            try {
-                // Process all the addresses
-                for (SocketAddress a : localAddresses) {
-                    H handle = open(a);
-                    newHandles.put(localAddress(handle), handle);
+                if (future == null) {
+                    return 0;
                 }
 
-                // Everything went ok, we can now update the map storing
-                // all the bound sockets.
-                boundHandles.putAll(newHandles);
-
-                // and notify.
-                future.setDone();
-                
-                return newHandles.size();
-            } catch (Exception e) {
-                // We store the exception in the future
-                future.setException(e);
-            } finally {
-                // Roll back if failed to bind all addresses.
-                if (future.getException() != null) {
-                    for (H handle : newHandles.values()) {
-                        try {
-                            close(handle);
-                        } catch (Exception e) {
-                            ExceptionMonitor.getInstance().exceptionCaught(e);
-                        }
-                    }
-
-                    // Wake up the selector to be sure we will process the newly bound handle
-                    // and not block forever in the select()
-                    wakeup();
-                }
-            }
-        }
-    }
-
-    /**
-     * This method just checks to see if anything has been placed into the
-     * cancellation queue.  The only thing that should be in the cancelQueue
-     * is CancellationRequest objects and the only place this happens is in
-     * the doUnbind() method.
-     */
-    private int unregisterHandles() {
-        int cancelledHandles = 0;
-        for (;;) {
-            AcceptorOperationFuture future = cancelQueue.poll();
-            if (future == null) {
-                break;
-            }
-
-            // close the channels
-            for (SocketAddress a : future.getLocalAddresses()) {
-                H handle = boundHandles.remove(a);
-
-                if (handle == null) {
-                    continue;
-                }
+                // We create a temporary map to store the bound handles,
+                // as we may have to remove them all if there is an exception
+                // during the sockets opening.
+                Map<SocketAddress, H> newHandles = new ConcurrentHashMap<>();
+                List<SocketAddress> localAddresses = future.getLocalAddresses();
 
                 try {
-                    close(handle);
-                    wakeup(); // wake up again to trigger thread death
+                    // Process all the addresses
+                    for (SocketAddress a : localAddresses) {
+                        H handle = open(a);
+                        newHandles.put(localAddress(handle), handle);
+                    }
+
+                    // Everything went ok, we can now update the map storing
+                    // all the bound sockets.
+                    boundHandles.putAll(newHandles);
+
+                    // and notify.
+                    future.setDone();
+                    
+                    return newHandles.size();
                 } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                    // We store the exception in the future
+                    future.setException(e);
                 } finally {
-                    cancelledHandles++;
+                    // Roll back if failed to bind all addresses.
+                    if (future.getException() != null) {
+                        for (H handle : newHandles.values()) {
+                            try {
+                                close(handle);
+                            } catch (Exception e) {
+                                ExceptionMonitor.getInstance().exceptionCaught(e);
+                            }
+                        }
+
+                        // Wake up the selector to be sure we will process the newly bound handle
+                        // and not block forever in the select()
+                        wakeup();
+                    }
                 }
             }
-
-            future.setDone();
         }
 
-        return cancelledHandles;
+        /**
+         * This method just checks to see if anything has been placed into the
+         * cancellation queue.  The only thing that should be in the cancelQueue
+         * is CancellationRequest objects and the only place this happens is in
+         * the doUnbind() method.
+         */
+        private int unregisterHandles() {
+            int cancelledHandles = 0;
+            for (;;) {
+                AcceptorOperationFuture future = cancelQueue.poll();
+                if (future == null) {
+                    break;
+                }
+
+                // close the channels
+                for (SocketAddress a : future.getLocalAddresses()) {
+                    H handle = boundHandles.remove(a);
+
+                    if (handle == null) {
+                        continue;
+                    }
+
+                    try {
+                        close(handle);
+                        wakeup(); // wake up again to trigger thread death
+                    } catch (Exception e) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e);
+                    } finally {
+                        cancelledHandles++;
+                    }
+                }
+
+                future.setDone();
+            }
+
+            return cancelledHandles;
+        }
     }
 
     /**
