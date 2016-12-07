@@ -136,6 +136,7 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isCloseOnPortUnreachable() {
         return closeOnPortUnreachable;
     }
@@ -143,6 +144,7 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCloseOnPortUnreachable(boolean closeOnPortUnreachable) {
         this.closeOnPortUnreachable = closeOnPortUnreachable;
     }

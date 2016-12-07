@@ -142,6 +142,7 @@ SocketConnector {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return NioSocketSession.METADATA;
     }
@@ -149,6 +150,7 @@ SocketConnector {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) sessionConfig;
     }
@@ -164,6 +166,7 @@ SocketConnector {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
         super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
@@ -316,6 +319,7 @@ SocketConnector {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean hasNext() {
             return i.hasNext();
         }
@@ -323,6 +327,7 @@ SocketConnector {
         /**
          * {@inheritDoc}
          */
+        @Override
         public SocketChannel next() {
             SelectionKey key = i.next();
             return (SocketChannel) key.channel();
@@ -331,6 +336,7 @@ SocketConnector {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void remove() {
             i.remove();
         }

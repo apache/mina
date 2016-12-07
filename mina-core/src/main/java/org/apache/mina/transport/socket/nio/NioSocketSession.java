@@ -352,6 +352,7 @@ class NioSocketSession extends NioSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isSecured() {
         // If the session does not have a SslFilter, we can return false
         IoFilterChain chain = getFilterChain();

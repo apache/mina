@@ -70,6 +70,10 @@ public abstract class NioSession extends AbstractIoSession {
      */
     abstract ByteChannel getChannel();
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IoFilterChain getFilterChain() {
         return filterChain;
     }
@@ -93,6 +97,7 @@ public abstract class NioSession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoProcessor<NioSession> getProcessor() {
         return processor;
     }
@@ -100,6 +105,7 @@ public abstract class NioSession extends AbstractIoSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isActive() {
         return key.isValid();
     }
