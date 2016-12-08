@@ -39,10 +39,12 @@ public class IoHandlerChain implements IoHandlerCommand {
 
     private final String NEXT_COMMAND = IoHandlerChain.class.getName() + '.' + id + ".nextCommand";
 
-    private final Map<String, Entry> name2entry = new ConcurrentHashMap<String, Entry>();
+    private final Map<String, Entry> name2entry = new ConcurrentHashMap<>();
 
+    /** The head of the IoHandlerCommand chain */
     private final Entry head;
 
+    /** THe tail of the IoHandlerCommand chain */
     private final Entry tail;
 
     /**
@@ -56,6 +58,10 @@ public class IoHandlerChain implements IoHandlerCommand {
 
     private IoHandlerCommand createHeadCommand() {
         return new IoHandlerCommand() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void execute(NextCommand next, IoSession session, Object message) throws Exception {
                 next.execute(session, message);
             }
@@ -64,8 +70,13 @@ public class IoHandlerChain implements IoHandlerCommand {
 
     private IoHandlerCommand createTailCommand() {
         return new IoHandlerCommand() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void execute(NextCommand next, IoSession session, Object message) throws Exception {
                 next = (NextCommand) session.getAttribute(NEXT_COMMAND);
+                
                 if (next != null) {
                     next.execute(session, message);
                 }
@@ -73,16 +84,30 @@ public class IoHandlerChain implements IoHandlerCommand {
         };
     }
 
+    /**
+     * Retrieve a name-command pair by its name
+     * @param name The name of the {@link IoHandlerCommand} we are looking for
+     * @return The associated name-command pair, if any, null otherwise
+     */
     public Entry getEntry(String name) {
         Entry e = name2entry.get(name);
+        
         if (e == null) {
             return null;
         }
+        
         return e;
     }
 
+    /**
+     * Retrieve a {@link IoHandlerCommand} by its name
+     * 
+     * @param name The name of the {@link IoHandlerCommand} we are looking for
+     * @return The associated {@link IoHandlerCommand}, if any, null otherwise
+     */
     public IoHandlerCommand get(String name) {
         Entry e = getEntry(name);
+        
         if (e == null) {
             return null;
         }
@@ -90,8 +115,16 @@ public class IoHandlerChain implements IoHandlerCommand {
         return e.getCommand();
     }
 
+    /**
+     * Retrieve the {@link IoHandlerCommand} following the {@link IoHandlerCommand} we
+     * fetched by its name
+     * 
+     * @param name The name of the {@link IoHandlerCommand}
+     * @return The {@link IoHandlerCommand} which is next to teh ngiven name, if any, null otherwise
+     */
     public NextCommand getNextCommand(String name) {
         Entry e = getEntry(name);
+        
         if (e == null) {
             return null;
         }
@@ -99,38 +132,76 @@ public class IoHandlerChain implements IoHandlerCommand {
         return e.getNextCommand();
     }
 
+    /**
+     * Adds a name-command pair into the chain
+     * 
+     * @param name The name
+     * @param command The command
+     */
     public synchronized void addFirst(String name, IoHandlerCommand command) {
         checkAddable(name);
         register(head, name, command);
     }
 
+    /**
+     * Adds a name-command at the end of the chain
+     * 
+     * @param name The name
+     * @param command The command
+     */
     public synchronized void addLast(String name, IoHandlerCommand command) {
         checkAddable(name);
         register(tail.prevEntry, name, command);
     }
 
+    /**
+     * Adds a name-command before a given name-command in the chain
+     * 
+     * @param baseName The {@linkplain IoHandlerCommand} name before which we will inject a new name-command
+     * @param name The name The name
+     * @param command The command The command
+     */
     public synchronized void addBefore(String baseName, String name, IoHandlerCommand command) {
         Entry baseEntry = checkOldName(baseName);
         checkAddable(name);
         register(baseEntry.prevEntry, name, command);
     }
 
+    /**
+     * Adds a name-command after a given name-command in the chain
+     * 
+     * @param baseName The {@link IoHandlerCommand} name after which we will inject a new name-command
+     * @param name The name The name
+     * @param command The command The command
+     */
     public synchronized void addAfter(String baseName, String name, IoHandlerCommand command) {
         Entry baseEntry = checkOldName(baseName);
         checkAddable(name);
         register(baseEntry, name, command);
     }
 
+    /**
+     * Removes a {@link IoHandlerCommand} by its name
+     * 
+     * @param name The name
+     * @return The removed {@link IoHandlerCommand}
+     */
     public synchronized IoHandlerCommand remove(String name) {
         Entry entry = checkOldName(name);
         deregister(entry);
+        
         return entry.getCommand();
     }
 
+    /**
+     * Remove all the {@link IoHandlerCommand} from the chain
+     * @throws Exception If we faced some exception during the cleanup 
+     */
     public synchronized void clear() throws Exception {
         Iterator<String> it = new ArrayList<String>(name2entry.keySet()).iterator();
+       
         while (it.hasNext()) {
-            this.remove(it.next());
+            remove(it.next());
         }
     }
 
@@ -158,9 +229,11 @@ public class IoHandlerChain implements IoHandlerCommand {
      */
     private Entry checkOldName(String baseName) {
         Entry e = name2entry.get(baseName);
+        
         if (e == null) {
             throw new IllegalArgumentException("Unknown filter name:" + baseName);
         }
+        
         return e;
     }
 
@@ -173,6 +246,10 @@ public class IoHandlerChain implements IoHandlerCommand {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void execute(NextCommand next, IoSession session, Object message) throws Exception {
         if (next != null) {
             session.setAttribute(NEXT_COMMAND, next);
@@ -189,9 +266,13 @@ public class IoHandlerChain implements IoHandlerCommand {
         entry.getCommand().execute(entry.getNextCommand(), session, message);
     }
 
+    /**
+     * @return The list of name-commands registered into the chain
+     */
     public List<Entry> getAll() {
-        List<Entry> list = new ArrayList<Entry>();
+        List<Entry> list = new ArrayList<>();
         Entry e = head.nextEntry;
+        
         while (e != tail) {
             list.add(e);
             e = e.nextEntry;
@@ -200,20 +281,37 @@ public class IoHandlerChain implements IoHandlerCommand {
         return list;
     }
 
+    /**
+     * @return A reverted list of the registered name-commands
+     */
     public List<Entry> getAllReversed() {
-        List<Entry> list = new ArrayList<Entry>();
+        List<Entry> list = new ArrayList<>();
         Entry e = tail.prevEntry;
+        
         while (e != head) {
             list.add(e);
             e = e.prevEntry;
         }
+        
         return list;
     }
 
+    /**
+     * Checks if the chain of {@IoHandlerCommand} contains a {@IoHandlerCommand} by its name
+     * 
+     * @param name The {@IoHandlerCommand} name
+     * @return <tt>TRUE</tt> if the {@IoHandlerCommand} is found in the chain
+     */
     public boolean contains(String name) {
         return getEntry(name) != null;
     }
 
+    /**
+     * Checks if the chain of {@IoHandlerCommand} contains a specific {@IoHandlerCommand}
+     * 
+     * @param command The {@IoHandlerCommand} we are looking for
+     * @return <tt>TRUE</tt> if the {@IoHandlerCommand} is found in the chain
+     */
     public boolean contains(IoHandlerCommand command) {
         Entry e = head.nextEntry;
         while (e != tail) {
@@ -225,17 +323,29 @@ public class IoHandlerChain implements IoHandlerCommand {
         return false;
     }
 
+    /**
+     * Checks if the chain of {@IoHandlerCommand} contains a specific {@IoHandlerCommand}
+     * 
+     * @param commandType The type of {@IoHandlerCommand} we are looking for
+     * @return <tt>TRUE</tt> if the {@IoHandlerCommand} is found in the chain
+     */
     public boolean contains(Class<? extends IoHandlerCommand> commandType) {
         Entry e = head.nextEntry;
+        
         while (e != tail) {
             if (commandType.isAssignableFrom(e.getCommand().getClass())) {
                 return true;
             }
+            
             e = e.nextEntry;
         }
+        
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
@@ -244,6 +354,7 @@ public class IoHandlerChain implements IoHandlerCommand {
         boolean empty = true;
 
         Entry e = head.nextEntry;
+        
         while (e != tail) {
             if (!empty) {
                 buf.append(", ");
@@ -289,6 +400,7 @@ public class IoHandlerChain implements IoHandlerCommand {
             if (command == null) {
                 throw new IllegalArgumentException("command");
             }
+            
             if (name == null) {
                 throw new IllegalArgumentException("name");
             }
@@ -298,9 +410,12 @@ public class IoHandlerChain implements IoHandlerCommand {
             this.name = name;
             this.command = command;
             this.nextCommand = new NextCommand() {
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
                 public void execute(IoSession session, Object message) throws Exception {
-                    Entry nextEntry = Entry.this.nextEntry;
-                    callNextCommand(nextEntry, session, message);
+                    callNextCommand(Entry.this.nextEntry, session, message);
                 }
             };
         }

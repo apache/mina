@@ -41,6 +41,8 @@ import org.apache.mina.core.session.IoSession;
  * WARNING: This class is badly named as the actual {@link IoHandler} implementor
  * is in fact the {@link SingleSessionIoHandlerDelegate}.
  * 
+ * @deprecated This class is not to be used anymore
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @Deprecated

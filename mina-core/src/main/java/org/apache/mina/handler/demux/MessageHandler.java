@@ -28,14 +28,19 @@ import org.apache.mina.core.session.IoSession;
  * using {@link DemuxingIoHandler#addReceivedMessageHandler(Class, MessageHandler)}
  * or {@link DemuxingIoHandler#addSentMessageHandler(Class, MessageHandler)}.
  *
+ * @param <M> The message type
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public interface MessageHandler<E> {
+public interface MessageHandler<M> {
     /**
      * A {@link MessageHandler} that does nothing.  This is useful when
      * you want to ignore a message of a specific type silently.
      */
     MessageHandler<Object> NOOP = new MessageHandler<Object>() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void handleMessage(IoSession session, Object message) {
             // Do nothing
         }
@@ -49,5 +54,5 @@ public interface MessageHandler<E> {
      * @param message the message to decode. Its type is set by the implementation
      * @throws Exception if there is an error during the message processing
      */
-    void handleMessage(IoSession session, E message) throws Exception;
+    void handleMessage(IoSession session, M message) throws Exception;
 }

@@ -26,6 +26,8 @@ import org.apache.mina.core.session.IoSession;
  * <code>exceptionCaught</code> events to.  You have to register your
  * handler with the type of exception you want to get notified using
  * {@link DemuxingIoHandler#addExceptionHandler(Class, ExceptionHandler)}.
+ * 
+ * @param <E> The exception type
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -35,6 +37,10 @@ public interface ExceptionHandler<E extends Throwable> {
      * you want to ignore an exception of a specific type silently.
      */
     ExceptionHandler<Throwable> NOOP = new ExceptionHandler<Throwable>() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
             // Do nothing
         }
@@ -46,6 +52,10 @@ public interface ExceptionHandler<E extends Throwable> {
      * a specific type is raised.
      */
     ExceptionHandler<Throwable> CLOSE = new ExceptionHandler<Throwable>() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
             session.closeNow();
         }

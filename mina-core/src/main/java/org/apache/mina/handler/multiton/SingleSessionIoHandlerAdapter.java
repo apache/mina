@@ -26,6 +26,8 @@ import org.apache.mina.core.session.IoSession;
  * Adapter class for implementors of the {@link SingleSessionIoHandler}
  * interface. The session to which the handler is assigned is accessible
  * through the getSession() method.
+ * 
+ * @deprecated This class is deprecated
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -46,6 +48,7 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler {
         if (session == null) {
             throw new IllegalArgumentException("session");
         }
+        
         this.session = session;
     }
 
@@ -58,34 +61,66 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler {
         return session;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void exceptionCaught(Throwable th) throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void inputClosed(IoSession session) {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void messageReceived(Object message) throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void messageSent(Object message) throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sessionClosed() throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sessionCreated() throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sessionIdle(IdleStatus status) throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sessionOpened() throws Exception {
         // Do nothing
     }

@@ -26,6 +26,8 @@ import org.apache.mina.core.session.IoSession;
  * particular session.
  *
  * @see SingleSessionIoHandler
+ * 
+ * @deprecated this class is deprecated
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
