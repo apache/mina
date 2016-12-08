@@ -568,7 +568,7 @@ public class SslFilter extends IoFilterAdapter {
                     return;
                 }
 
-                List<WriteRequest> newFailedRequests = new ArrayList<WriteRequest>(failedRequests.size() - 1);
+                List<WriteRequest> newFailedRequests = new ArrayList<>(failedRequests.size() - 1);
 
                 for (WriteRequest r : failedRequests) {
                     if (!isCloseNotify(r.getMessage())) {
@@ -676,6 +676,7 @@ public class SslFilter extends IoFilterAdapter {
                 if (isSslStarted(session)) {
                     future = initiateClosure(nextFilter, session);
                     future.addListener(new IoFutureListener<IoFuture>() {
+                        @Override
                         public void operationComplete(IoFuture future) {
                             nextFilter.filterClose(session);
                         }
