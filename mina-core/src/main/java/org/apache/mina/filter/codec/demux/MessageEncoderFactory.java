@@ -26,7 +26,7 @@ package org.apache.mina.filter.codec.demux;
  *
  * @see DemuxingProtocolEncoder
  * 
- * @param T the message type
+ * @param <T> the message type
  */
 public interface MessageEncoderFactory<T> {
     /**

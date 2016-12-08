@@ -87,16 +87,17 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  */
 public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
 
-    private final AttributeKey STATE = new AttributeKey(getClass(), "state");
+    private static final AttributeKey STATE = new AttributeKey(DemuxingProtocolDecoder.class, "state");
 
     private MessageDecoderFactory[] decoderFactories = new MessageDecoderFactory[0];
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
-    public DemuxingProtocolDecoder() {
-        // Do nothing
-    }
-
+    /**
+     * Adds a new message decoder class
+     * 
+     * @param decoderClass The decoder class
+     */
     public void addMessageDecoder(Class<? extends MessageDecoder> decoderClass) {
         if (decoderClass == null) {
             throw new IllegalArgumentException("decoderClass");
@@ -119,15 +120,25 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         }
     }
 
+    /**
+     * Adds a new message decoder instance
+     * 
+     * @param decoder The decoder instance
+     */
     public void addMessageDecoder(MessageDecoder decoder) {
         addMessageDecoder(new SingletonMessageDecoderFactory(decoder));
     }
 
+    /**
+     * Adds a new message decoder factory
+     * 
+     * @param factory The decoder factory
+     */
     public void addMessageDecoder(MessageDecoderFactory factory) {
         if (factory == null) {
             throw new IllegalArgumentException("factory");
         }
-        MessageDecoderFactory[] decoderFactories = this.decoderFactories;
+
         MessageDecoderFactory[] newDecoderFactories = new MessageDecoderFactory[decoderFactories.length + 1];
         System.arraycopy(decoderFactories, 0, newDecoderFactories, 0, decoderFactories.length);
         newDecoderFactories[decoderFactories.length] = factory;
@@ -249,10 +260,11 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
         private MessageDecoder currentDecoder;
 
         private State() throws Exception {
-            MessageDecoderFactory[] decoderFactories = DemuxingProtocolDecoder.this.decoderFactories;
-            decoders = new MessageDecoder[decoderFactories.length];
-            for (int i = decoderFactories.length - 1; i >= 0; i--) {
-                decoders[i] = decoderFactories[i].getDecoder();
+            MessageDecoderFactory[] factories = DemuxingProtocolDecoder.this.decoderFactories;
+            decoders = new MessageDecoder[factories.length];
+            
+            for (int i = factories.length - 1; i >= 0; i--) {
+                decoders[i] = factories[i].getDecoder();
             }
         }
     }
@@ -267,6 +279,10 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
             this.decoder = decoder;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public MessageDecoder getDecoder() {
             return decoder;
         }
@@ -286,6 +302,10 @@ public class DemuxingProtocolDecoder extends CumulativeProtocolDecoder {
             this.decoderClass = decoderClass;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public MessageDecoder getDecoder() throws Exception {
             return (MessageDecoder) decoderClass.newInstance();
         }

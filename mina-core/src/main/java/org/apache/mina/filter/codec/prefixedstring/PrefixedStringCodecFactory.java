@@ -39,11 +39,19 @@ public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
 
     private final PrefixedStringDecoder decoder;
 
+    /**
+     * Creates a new PrefixedStringCodecFactory instance
+     * 
+     * @param charset The {@link Charset} to use for encoding or decoding
+     */
     public PrefixedStringCodecFactory(Charset charset) {
         encoder = new PrefixedStringEncoder(charset);
         decoder = new PrefixedStringDecoder(charset);
     }
 
+    /**
+     * Creates a new PrefixedStringCodecFactory instance
+     */
     public PrefixedStringCodecFactory() {
         this(Charset.defaultCharset());
     }
@@ -138,10 +146,18 @@ public class PrefixedStringCodecFactory implements ProtocolCodecFactory {
         return encoder.getPrefixLength();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ProtocolEncoder getEncoder(IoSession session) throws Exception {
         return encoder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ProtocolDecoder getDecoder(IoSession session) throws Exception {
         return decoder;
     }

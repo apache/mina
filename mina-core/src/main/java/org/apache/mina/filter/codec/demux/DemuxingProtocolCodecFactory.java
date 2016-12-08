@@ -40,13 +40,10 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
 
     private final DemuxingProtocolDecoder decoder = new DemuxingProtocolDecoder();
 
-    public DemuxingProtocolCodecFactory() {
-        // Do nothing
-    }
-
     /**
      * {@inheritDoc}
      */
+    @Override
     public ProtocolEncoder getEncoder(IoSession session) throws Exception {
         return encoder;
     }
@@ -54,34 +51,71 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ProtocolDecoder getDecoder(IoSession session) throws Exception {
         return decoder;
     }
 
+    /**
+     * Adds a new message encoder for a given message type
+     * 
+     * @param messageType The message type
+     * @param encoderClass The associated encoder class
+     */
     public void addMessageEncoder(Class<?> messageType, Class<? extends MessageEncoder> encoderClass) {
         this.encoder.addMessageEncoder(messageType, encoderClass);
     }
 
+    /**
+     * Adds a new message encoder for a given message type
+     * 
+     * @param messageType The message type
+     * @param encoder The associated encoder instance
+     */
     public <T> void addMessageEncoder(Class<T> messageType, MessageEncoder<? super T> encoder) {
         this.encoder.addMessageEncoder(messageType, encoder);
     }
 
+    /**
+     * Adds a new message encoder for a given message type
+     * 
+     * @param messageType The message type
+     * @param factory The associated encoder factory
+     */
     public <T> void addMessageEncoder(Class<T> messageType, MessageEncoderFactory<? super T> factory) {
         this.encoder.addMessageEncoder(messageType, factory);
     }
 
+    /**
+     * Adds a new message encoder for a list of message types
+     * 
+     * @param messageTypes The message types
+     * @param encoderClass The associated encoder class
+     */
     public void addMessageEncoder(Iterable<Class<?>> messageTypes, Class<? extends MessageEncoder> encoderClass) {
         for (Class<?> messageType : messageTypes) {
             addMessageEncoder(messageType, encoderClass);
         }
     }
 
+    /**
+     * Adds a new message encoder for a list of message types
+     * 
+     * @param messageTypes The messages types
+     * @param encoder The associated encoder instance
+     */
     public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoder<? super T> encoder) {
         for (Class<? extends T> messageType : messageTypes) {
             addMessageEncoder(messageType, encoder);
         }
     }
 
+    /**
+     * Adds a new message encoder for a list of message types
+     * 
+     * @param messageTypes The messages types
+     * @param factory The associated encoder factory
+     */
     public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes,
             MessageEncoderFactory<? super T> factory) {
         for (Class<? extends T> messageType : messageTypes) {
@@ -89,14 +123,29 @@ public class DemuxingProtocolCodecFactory implements ProtocolCodecFactory {
         }
     }
 
+    /**
+     * Adds a new message decoder
+     * 
+     * @param decoderClass The associated decoder class
+     */
     public void addMessageDecoder(Class<? extends MessageDecoder> decoderClass) {
         this.decoder.addMessageDecoder(decoderClass);
     }
 
+    /**
+     * Adds a new message decoder
+     * 
+     * @param decoder The associated decoder instance
+     */
     public void addMessageDecoder(MessageDecoder decoder) {
         this.decoder.addMessageDecoder(decoder);
     }
 
+    /**
+     * Adds a new message decoder
+     * 
+     * @param factory The associated decoder factory
+     */
     public void addMessageDecoder(MessageDecoderFactory factory) {
         this.decoder.addMessageDecoder(factory);
     }
