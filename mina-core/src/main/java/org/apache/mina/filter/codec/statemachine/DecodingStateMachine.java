@@ -50,13 +50,21 @@ import org.slf4j.LoggerFactory;
 public abstract class DecodingStateMachine implements DecodingState {
     private final Logger log = LoggerFactory.getLogger(DecodingStateMachine.class);
 
-    private final List<Object> childProducts = new ArrayList<Object>();
+    private final List<Object> childProducts = new ArrayList<>();
 
     private final ProtocolDecoderOutput childOutput = new ProtocolDecoderOutput() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void flush(NextFilter nextFilter, IoSession session) {
             // Do nothing
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void write(Object message) {
             childProducts.add(message);
         }
@@ -99,6 +107,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         DecodingState state = getCurrentState();
 
@@ -146,6 +155,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         DecodingState nextState;
         DecodingState state = getCurrentState();

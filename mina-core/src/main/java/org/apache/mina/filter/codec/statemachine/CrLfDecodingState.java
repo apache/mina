@@ -50,6 +50,7 @@ public abstract class CrLfDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         boolean found = false;
         boolean finished = false;
@@ -90,6 +91,7 @@ public abstract class CrLfDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         return finishDecode(false, out);
     }

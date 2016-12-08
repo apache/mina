@@ -40,7 +40,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     private final DecodingState state;
 
-    private final Queue<IoBuffer> undecodedBuffers = new ConcurrentLinkedQueue<IoBuffer>();
+    private final Queue<IoBuffer> undecodedBuffers = new ConcurrentLinkedQueue<>();
 
     private IoSession session;
 
@@ -61,6 +61,7 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (this.session == null) {
             this.session = session;
@@ -70,6 +71,7 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
         }
 
         undecodedBuffers.offer(in);
+        
         for (;;) {
             IoBuffer b = undecodedBuffers.peek();
             if (b == null) {
@@ -79,6 +81,7 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
             int oldRemaining = b.remaining();
             state.decode(b, out);
             int newRemaining = b.remaining();
+            
             if (newRemaining != 0) {
                 if (oldRemaining == newRemaining) {
                     throw new IllegalStateException(DecodingState.class.getSimpleName() + " must "
@@ -93,6 +96,7 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         state.finishDecode(out);
     }
@@ -100,6 +104,7 @@ public class DecodingStateProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void dispose(IoSession session) throws Exception {
         // Do nothing
     }
