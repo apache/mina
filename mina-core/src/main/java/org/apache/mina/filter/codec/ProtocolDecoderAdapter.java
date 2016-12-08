@@ -34,6 +34,7 @@ public abstract class ProtocolDecoderAdapter implements ProtocolDecoder {
      * Override this method to deal with the closed connection.
      * The default implementation does nothing.
      */
+    @Override
     public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         // Do nothing
     }
@@ -42,6 +43,7 @@ public abstract class ProtocolDecoderAdapter implements ProtocolDecoder {
      * Override this method to dispose all resources related with this decoder.
      * The default implementation does nothing.
      */
+    @Override
     public void dispose(IoSession session) throws Exception {
         // Do nothing
     }

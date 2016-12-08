@@ -100,7 +100,7 @@ import org.apache.mina.core.session.IoSession;
  */
 public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     /** The buffer used to store the data in the session */
-    private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
+    private static final AttributeKey BUFFER = new AttributeKey(CumulativeProtocolDecoder.class, "buffer");
     
     /** A flag set to true if we handle fragmentation accordingly to the TransportMetadata setting. 
      * It can be set to false if needed (UDP with fragments, for instance). the default value is 'true'
@@ -125,6 +125,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      *             if your <tt>doDecode()</tt> returned <tt>true</tt> not
      *             consuming the cumulative buffer.
      */
+    @Override
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (transportMetadataFragmentation && !session.getTransportMetadata().hasFragmentation()) {
             while (in.hasRemaining()) {
@@ -147,11 +148,9 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
                 try {
                     buf.put(in);
                     appended = true;
-                } catch (IllegalStateException e) {
+                } catch (IllegalStateException | IndexOutOfBoundsException e) {
                     // A user called derivation method (e.g. slice()),
                     // which disables auto-expansion of the parent buffer.
-                } catch (IndexOutOfBoundsException e) {
-                    // A user disabled auto-expansion.
                 }
             }
 

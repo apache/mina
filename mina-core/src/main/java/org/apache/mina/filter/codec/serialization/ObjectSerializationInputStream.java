@@ -62,7 +62,9 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
         }
         
         if (classLoader == null) {
-            classLoader = Thread.currentThread().getContextClassLoader();
+            this.classLoader = Thread.currentThread().getContextClassLoader();
+        } else {
+            this.classLoader = classLoader;
         }
 
         if (in instanceof DataInputStream) {
@@ -70,8 +72,6 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
         } else {
             this.in = new DataInputStream(in);
         }
-
-        this.classLoader = classLoader;
     }
 
     /**
@@ -111,6 +111,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object readObject() throws ClassNotFoundException, IOException {
         int objectSize = in.readInt();
         if (objectSize <= 0) {
@@ -133,6 +134,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean readBoolean() throws IOException {
         return in.readBoolean();
     }
@@ -140,6 +142,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public byte readByte() throws IOException {
         return in.readByte();
     }
@@ -147,6 +150,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public char readChar() throws IOException {
         return in.readChar();
     }
@@ -154,6 +158,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public double readDouble() throws IOException {
         return in.readDouble();
     }
@@ -161,6 +166,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public float readFloat() throws IOException {
         return in.readFloat();
     }
@@ -168,6 +174,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readFully(byte[] b) throws IOException {
         in.readFully(b);
     }
@@ -175,6 +182,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readFully(byte[] b, int off, int len) throws IOException {
         in.readFully(b, off, len);
     }
@@ -182,6 +190,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public int readInt() throws IOException {
         return in.readInt();
     }
@@ -191,6 +200,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
      * @deprecated Bytes are not properly converted to chars
      */
     @Deprecated
+    @Override
     public String readLine() throws IOException {
         return in.readLine();
     }
@@ -198,6 +208,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public long readLong() throws IOException {
         return in.readLong();
     }
@@ -205,6 +216,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public short readShort() throws IOException {
         return in.readShort();
     }
@@ -212,6 +224,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public String readUTF() throws IOException {
         return in.readUTF();
     }
@@ -219,6 +232,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public int readUnsignedByte() throws IOException {
         return in.readUnsignedByte();
     }
@@ -226,6 +240,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public int readUnsignedShort() throws IOException {
         return in.readUnsignedShort();
     }
@@ -233,6 +248,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
     /**
      * {@inheritDoc}
      */
+    @Override
     public int skipBytes(int n) throws IOException {
         return in.skipBytes(n);
     }

@@ -32,6 +32,7 @@ public abstract class ProtocolEncoderAdapter implements ProtocolEncoder {
      * Override this method dispose all resources related with this encoder.
      * The default implementation does nothing.
      */
+    @Override
     public void dispose(IoSession session) throws Exception {
         // Do nothing
     }

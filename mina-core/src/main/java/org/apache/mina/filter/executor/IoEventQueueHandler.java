@@ -35,14 +35,26 @@ public interface IoEventQueueHandler extends EventListener {
      * A dummy handler which always accepts event doing nothing particular.
      */
     IoEventQueueHandler NOOP = new IoEventQueueHandler() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean accept(Object source, IoEvent event) {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void offered(Object source, IoEvent event) {
             // NOOP
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void polled(Object source, IoEvent event) {
             // NOOP
         }

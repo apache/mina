@@ -51,6 +51,10 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         int beginPos = in.position();
         int limit = in.limit();
@@ -118,6 +122,7 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         IoBuffer product;
         // When input contained only CR or LF rather than actual data...

@@ -73,7 +73,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
 
     private Random rng = new Random();
 
-    final private Logger logger = LoggerFactory.getLogger(ErrorGeneratingFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(ErrorGeneratingFilter.class);
 
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
@@ -82,6 +82,7 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
             if (writeRequest.getMessage() instanceof IoBuffer) {
                 manipulateIoBuffer(session, (IoBuffer) writeRequest.getMessage());
                 IoBuffer buffer = insertBytesToNewIoBuffer(session, (IoBuffer) writeRequest.getMessage());
+                
                 if (buffer != null) {
                     writeRequest = new DefaultWriteRequest(buffer, writeRequest.getFuture(),
                             writeRequest.getDestination());
@@ -97,29 +98,28 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
                     // later
                     // TODO
                 }
+                
                 if (removePduProbability > rng.nextInt()) {
                     return;
                 }
             }
         }
+        
         nextFilter.filterWrite(session, writeRequest);
     }
 
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
-        if (manipulateReads) {
-            if (message instanceof IoBuffer) {
-                // manipulate bytes
-                manipulateIoBuffer(session, (IoBuffer) message);
-                IoBuffer buffer = insertBytesToNewIoBuffer(session, (IoBuffer) message);
-                if (buffer != null) {
-                    message = buffer;
-                }
-            } else {
-                // manipulate PDU
-                // TODO
+        if (manipulateReads && (message instanceof IoBuffer)) {
+            // manipulate bytes
+            manipulateIoBuffer(session, (IoBuffer) message);
+            IoBuffer buffer = insertBytesToNewIoBuffer(session, (IoBuffer) message);
+            
+            if (buffer != null) {
+                message = buffer;
             }
         }
+        
         nextFilter.messageReceived(session, message);
     }
 
@@ -191,6 +191,9 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * @return The probably that a byte changes
+     */
     public int getChangeByteProbability() {
         return changeByteProbability;
     }
@@ -205,6 +208,9 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         this.changeByteProbability = changeByteProbability;
     }
 
+    /**
+     * @return The probability for generating duplicated PDU
+     */
     public int getDuplicatePduProbability() {
         return duplicatePduProbability;
     }
@@ -217,6 +223,9 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         this.duplicatePduProbability = duplicatePduProbability;
     }
 
+    /**
+     * @return the probability for the insert byte error.
+     */
     public int getInsertByteProbability() {
         return insertByteProbability;
     }
@@ -231,6 +240,9 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         this.insertByteProbability = insertByteProbability;
     }
 
+    /**
+     * @return The number of manipulated reads
+     */
     public boolean isManipulateReads() {
         return manipulateReads;
     }
@@ -244,6 +256,9 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         this.manipulateReads = manipulateReads;
     }
 
+    /**
+     * @return If manipulated writes are expected or not
+     */
     public boolean isManipulateWrites() {
         return manipulateWrites;
     }
@@ -251,12 +266,15 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
     /**
      * Set to true if you want to apply error to the written {@link IoBuffer}
      * 
-     * @param manipulateWrites The umber of manipulated writes
+     * @param manipulateWrites If manipulated writes are expected or not
      */
     public void setManipulateWrites(boolean manipulateWrites) {
         this.manipulateWrites = manipulateWrites;
     }
 
+    /**
+     * @return The probability for the remove byte error
+     */
     public int getRemoveByteProbability() {
         return removeByteProbability;
     }
@@ -272,6 +290,9 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         this.removeByteProbability = removeByteProbability;
     }
 
+    /**
+     * @return The PDU removal probability
+     */
     public int getRemovePduProbability() {
         return removePduProbability;
     }
@@ -284,6 +305,9 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         this.removePduProbability = removePduProbability;
     }
 
+    /**
+     * @return The delay before a resend
+     */
     public int getResendPduLasterProbability() {
         return resendPduLasterProbability;
     }
@@ -296,6 +320,9 @@ public class ErrorGeneratingFilter extends IoFilterAdapter {
         this.resendPduLasterProbability = resendPduLasterProbability;
     }
 
+    /**
+     * @return maximum bytes inserted in a {@link IoBuffer}
+     */
     public int getMaxInsertByte() {
         return maxInsertByte;
     }

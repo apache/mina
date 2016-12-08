@@ -68,12 +68,12 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     private static final IoSession EXIT_SIGNAL = new DummySession();
 
     /** A key stored into the session's attribute for the event tasks being queued */
-    private final AttributeKey TASKS_QUEUE = new AttributeKey(getClass(), "tasksQueue");
+    private static final AttributeKey TASKS_QUEUE = new AttributeKey(OrderedThreadPoolExecutor.class, "tasksQueue");
 
     /** A queue used to store the available sessions */
-    private final BlockingQueue<IoSession> waitingSessions = new LinkedBlockingQueue<IoSession>();
+    private final BlockingQueue<IoSession> waitingSessions = new LinkedBlockingQueue<>();
 
-    private final Set<Worker> workers = new HashSet<Worker>();
+    private final Set<Worker> workers = new HashSet<>();
 
     private volatile int largestPoolSize;
 
@@ -294,14 +294,6 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
      * {@inheritDoc}
      */
     @Override
-    public int getMaximumPoolSize() {
-        return super.getMaximumPoolSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setMaximumPoolSize(int maximumPoolSize) {
         if ((maximumPoolSize <= 0) || (maximumPoolSize < super.getCorePoolSize())) {
             throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
@@ -385,7 +377,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
     public List<Runnable> shutdownNow() {
         shutdown();
 
-        List<Runnable> answer = new ArrayList<Runnable>();
+        List<Runnable> answer = new ArrayList<>();
         IoSession session;
 
         while ((session = waitingSessions.poll()) != null) {
@@ -644,14 +636,6 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
      * {@inheritDoc}
      */
     @Override
-    public int getCorePoolSize() {
-        return super.getCorePoolSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setCorePoolSize(int corePoolSize) {
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
@@ -676,6 +660,10 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
         private Thread thread;
 
+        /**
+         * @inheritedDoc
+         */
+        @Override
         public void run() {
             thread = Thread.currentThread();
 
@@ -720,9 +708,11 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             IoSession session = null;
             long currentTime = System.currentTimeMillis();
             long deadline = currentTime + getKeepAliveTime(TimeUnit.MILLISECONDS);
+            
             for (;;) {
                 try {
                     long waitTime = deadline - currentTime;
+                    
                     if (waitTime <= 0) {
                         break;
                     }
@@ -731,7 +721,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                         session = waitingSessions.poll(waitTime, TimeUnit.MILLISECONDS);
                         break;
                     } finally {
-                        if (session == null) {
+                        if (session != null) {
                             currentTime = System.currentTimeMillis();
                         }
                     }
@@ -740,6 +730,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                     continue;
                 }
             }
+            
             return session;
         }
 
@@ -786,7 +777,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
      */
     private class SessionTasksQueue {
         /**  A queue of ordered event waiting to be processed */
-        private final Queue<Runnable> tasksQueue = new ConcurrentLinkedQueue<Runnable>();
+        private final Queue<Runnable> tasksQueue = new ConcurrentLinkedQueue<>();
 
         /** The current task state */
         private boolean processingCompleted = true;

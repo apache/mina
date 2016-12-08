@@ -45,7 +45,7 @@ import org.apache.mina.core.write.WriteRequest;
  */
 public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
     /** A map containing the estimated size of each Java objects we know for */
-    private final ConcurrentMap<Class<?>, Integer> class2size = new ConcurrentHashMap<Class<?>, Integer>();
+    private final ConcurrentMap<Class<?>, Integer> class2size = new ConcurrentHashMap<>();
 
     /**
      * Create a new instance of this class, injecting the known size of
@@ -66,6 +66,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int estimateSize(IoEvent event) {
         return estimateSize((Object) event) + estimateSize(event.getParameter());
     }
@@ -109,7 +110,7 @@ public class DefaultIoEventSizeEstimator implements IoEventSizeEstimator {
                 return 0;
             }
         } else {
-            visitedClasses = new HashSet<Class<?>>();
+            visitedClasses = new HashSet<>();
         }
 
         visitedClasses.add(clazz);

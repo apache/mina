@@ -35,6 +35,7 @@ public abstract class ConsumeToDynamicTerminatorDecodingState implements Decodin
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         int beginPos = in.position();
         int terminatorPos = -1;
@@ -87,6 +88,7 @@ public abstract class ConsumeToDynamicTerminatorDecodingState implements Decodin
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         IoBuffer product;
         // When input contained only terminator rather than actual data...

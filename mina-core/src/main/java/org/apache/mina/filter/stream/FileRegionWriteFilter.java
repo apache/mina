@@ -54,12 +54,17 @@ import org.apache.mina.core.session.IoSession;
  * @org.apache.xbean.XBean
  */
 public class FileRegionWriteFilter extends AbstractStreamWriteFilter<FileRegion> {
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Class<FileRegion> getMessageClass() {
         return FileRegion.class;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected IoBuffer getNextBuffer(FileRegion fileRegion) throws IOException {
         // If there are no more bytes to read, return null
@@ -77,7 +82,7 @@ public class FileRegionWriteFilter extends AbstractStreamWriteFilter<FileRegion>
 
         // return the buffer
         buffer.flip();
+        
         return buffer;
     }
-
 }

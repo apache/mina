@@ -58,6 +58,7 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ProtocolEncoder getEncoder(IoSession session) {
         return encoder;
     }
@@ -65,6 +66,7 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ProtocolDecoder getDecoder(IoSession session) {
         return decoder;
     }

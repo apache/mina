@@ -38,18 +38,19 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
 
     private int count = 0;
 
+    /**
+     * Creates a new ReferenceCountingFilter instance
+     * 
+     * @param filter the filter we are counting references on
+     */
     public ReferenceCountingFilter(IoFilter filter) {
         this.filter = filter;
     }
 
-    public void init() throws Exception {
-        // no-op, will init on-demand in pre-add if count == 0
-    }
-
-    public void destroy() throws Exception {
-        //no-op, will destroy on-demand in post-remove if count == 0
-    }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         if (0 == count) {
             filter.init();
@@ -60,6 +61,10 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
         filter.onPreAdd(parent, name, nextFilter);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         filter.onPostRemove(parent, name, nextFilter);
 
@@ -70,46 +75,90 @@ public class ReferenceCountingFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
         filter.exceptionCaught(nextFilter, session, cause);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
         filter.filterClose(nextFilter, session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         filter.filterWrite(nextFilter, session, writeRequest);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         filter.messageReceived(nextFilter, session, message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         filter.messageSent(nextFilter, session, writeRequest);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         filter.onPostAdd(parent, name, nextFilter);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void onPreRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         filter.onPreRemove(parent, name, nextFilter);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         filter.sessionClosed(nextFilter, session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         filter.sessionCreated(nextFilter, session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         filter.sessionIdle(nextFilter, session, status);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
         filter.sessionOpened(nextFilter, session);
     }

@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IoEventQueueThrottle implements IoEventQueueHandler {
     /** A logger for this class */
-    private final static Logger LOGGER = LoggerFactory.getLogger(IoEventQueueThrottle.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IoEventQueueThrottle.class);
 
     /** The event size estimator instance */
     private final IoEventSizeEstimator eventSizeEstimator;
@@ -41,18 +41,33 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
 
     private final Object lock = new Object();
 
+    /** The number of events we hold */
     private final AtomicInteger counter = new AtomicInteger();
 
     private int waiters;
 
+    /**
+     * Creates a new IoEventQueueThrottle instance
+     */
     public IoEventQueueThrottle() {
         this(new DefaultIoEventSizeEstimator(), 65536);
     }
 
+    /**
+     * Creates a new IoEventQueueThrottle instance
+     * 
+     * @param threshold The events threshold
+     */
     public IoEventQueueThrottle(int threshold) {
         this(new DefaultIoEventSizeEstimator(), threshold);
     }
 
+    /**
+     * Creates a new IoEventQueueThrottle instance
+     *
+     * @param eventSizeEstimator The IoEventSizeEstimator instance
+     * @param threshold The events threshold
+     */
     public IoEventQueueThrottle(IoEventSizeEstimator eventSizeEstimator, int threshold) {
         if (eventSizeEstimator == null) {
             throw new IllegalArgumentException("eventSizeEstimator");
@@ -63,18 +78,32 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         setThreshold(threshold);
     }
 
+    /**
+     * @return The IoEventSizeEstimator instance
+     */
     public IoEventSizeEstimator getEventSizeEstimator() {
         return eventSizeEstimator;
     }
 
+    /**
+     * @return The events threshold
+     */
     public int getThreshold() {
         return threshold;
     }
 
+    /**
+     * @return The number of events currently held
+     */
     public int getCounter() {
         return counter.get();
     }
 
+    /**
+     * Sets the events threshold
+     * 
+     * @param threshold The events threshold
+     */
     public void setThreshold(int threshold) {
         if (threshold <= 0) {
             throw new IllegalArgumentException("threshold: " + threshold);
@@ -83,10 +112,18 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         this.threshold = threshold;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean accept(Object source, IoEvent event) {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void offered(Object source, IoEvent event) {
         int eventSize = estimateSize(event);
         int currentCounter = counter.addAndGet(eventSize);
@@ -97,6 +134,10 @@ public class IoEventQueueThrottle implements IoEventQueueHandler {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void polled(Object source, IoEvent event) {
         int eventSize = estimateSize(event);
         int currentCounter = counter.addAndGet(-eventSize);

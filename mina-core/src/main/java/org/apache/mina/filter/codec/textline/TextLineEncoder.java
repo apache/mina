@@ -144,6 +144,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         CharsetEncoder encoder = (CharsetEncoder) session.getAttribute(ENCODER);
 
@@ -152,7 +153,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
             session.setAttribute(ENCODER, encoder);
         }
 
-        String value = (message == null ? "" : message.toString());
+        String value = message == null ? "" : message.toString();
         IoBuffer buf = IoBuffer.allocate(value.length()).setAutoExpand(true);
         buf.putString(value, encoder);
 

@@ -32,7 +32,10 @@ import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 
 /**
- * TODO Add documentation
+ * Filter implementation which makes it possible to write Stream
+ * objects directly using {@link IoSession#write(Object)}.
+ * 
+ * @param <T> The type of Stream
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -45,32 +48,42 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
     /**
      * The attribute name used when binding the streaming object to the session.
      */
-    protected final AttributeKey CURRENT_STREAM = new AttributeKey(getClass(), "stream");
+    protected static final AttributeKey CURRENT_STREAM = new AttributeKey(AbstractStreamWriteFilter.class, "stream");
 
-    protected final AttributeKey WRITE_REQUEST_QUEUE = new AttributeKey(getClass(), "queue");
+    protected static final AttributeKey WRITE_REQUEST_QUEUE = new AttributeKey(AbstractStreamWriteFilter.class, "queue");
 
-    protected final AttributeKey CURRENT_WRITE_REQUEST = new AttributeKey(getClass(), "writeRequest");
+    protected static final AttributeKey CURRENT_WRITE_REQUEST = new AttributeKey(AbstractStreamWriteFilter.class, "writeRequest");
 
     private int writeBufferSize = DEFAULT_STREAM_BUFFER_SIZE;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         Class<? extends IoFilterAdapter> clazz = getClass();
+        
         if (parent.contains(clazz)) {
             throw new IllegalStateException("Only one " + clazz.getName() + " is permitted.");
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         // If we're already processing a stream we need to queue the WriteRequest.
         if (session.getAttribute(CURRENT_STREAM) != null) {
             Queue<WriteRequest> queue = getWriteRequestQueue(session);
+            
             if (queue == null) {
-                queue = new ConcurrentLinkedQueue<WriteRequest>();
+                queue = new ConcurrentLinkedQueue<>();
                 session.setAttribute(WRITE_REQUEST_QUEUE, queue);
             }
+            
             queue.add(writeRequest);
+            
             return;
         }
 
@@ -81,6 +94,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
             T stream = getMessageClass().cast(message);
 
             IoBuffer buffer = getNextBuffer(stream);
+            
             if (buffer == null) {
                 // End of stream reached.
                 writeRequest.getFuture().setWritten();
@@ -97,7 +111,7 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
         }
     }
 
-    abstract protected Class<T> getMessageClass();
+    protected abstract Class<T> getMessageClass();
 
     @SuppressWarnings("unchecked")
     private Queue<WriteRequest> getWriteRequestQueue(IoSession session) {
@@ -109,6 +123,9 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
         return (Queue<WriteRequest>) session.removeAttribute(WRITE_REQUEST_QUEUE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         T stream = getMessageClass().cast(session.getAttribute(CURRENT_STREAM));
@@ -125,8 +142,10 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
 
                 // Write queued WriteRequests.
                 Queue<WriteRequest> queue = removeWriteRequestQueue(session);
+                
                 if (queue != null) {
                     WriteRequest wr = queue.poll();
+                    
                     while (wr != null) {
                         filterWrite(nextFilter, session, wr);
                         wr = queue.poll();
@@ -160,8 +179,9 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
         if (writeBufferSize < 1) {
             throw new IllegalArgumentException("writeBufferSize must be at least 1");
         }
+        
         this.writeBufferSize = writeBufferSize;
     }
 
-    abstract protected IoBuffer getNextBuffer(T message) throws IOException;
+    protected abstract IoBuffer getNextBuffer(T message) throws IOException;
 }

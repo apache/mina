@@ -73,6 +73,7 @@ public class ObjectSerializationEncoder extends ProtocolEncoderAdapter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         if (!(message instanceof Serializable)) {
             throw new NotSerializableException();
