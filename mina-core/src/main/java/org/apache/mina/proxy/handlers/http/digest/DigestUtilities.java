@@ -22,7 +22,7 @@ package org.apache.mina.proxy.handlers.http.digest;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.security.sasl.AuthenticationException;
 
@@ -38,8 +38,8 @@ import org.apache.mina.proxy.utils.StringUtilities;
  * @since MINA 2.0.0-M3
  */
 public class DigestUtilities {
-
-    public final static String SESSION_HA1 = DigestUtilities.class + ".SessionHA1";
+    /** The Session digest attribute name */
+    public static final String SESSION_HA1 = DigestUtilities.class + ".SessionHA1";
 
     private static MessageDigest md5;
 
@@ -51,11 +51,14 @@ public class DigestUtilities {
             throw new RuntimeException(e);
         }
     }
-
+    
     /**
      * The supported qualities of protections.
      */
-    public final static String[] SUPPORTED_QOPS = new String[] { "auth", "auth-int" };
+    public static final String[] SUPPORTED_QOPS = new String[] { "auth", "auth-int" };
+    
+    private DigestUtilities() {
+    }
 
     /**
      * Computes the response to the DIGEST challenge.
@@ -71,7 +74,7 @@ public class DigestUtilities {
      * @throws UnsupportedEncodingException If we weren't able to encode to ISO 8859_1 the username or realm,
      * or if we weren't able to encode the charsetName
      */
-    public static String computeResponseValue(IoSession session, HashMap<String, String> map, String method,
+    public static String computeResponseValue(IoSession session, Map<String, String> map, String method,
             String pwd, String charsetName, String body) throws AuthenticationException, UnsupportedEncodingException{
 
         byte[] hA1;

@@ -32,6 +32,9 @@ import java.util.Set;
  * cases in which the primary function is to read data from the Map, not to
  * modify the Map.  Therefore the operations that do not cause a change to this
  * class happen quickly and concurrently.
+ * 
+ * @param <K> The key type
+ * @param <V> The value type
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -40,20 +43,18 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
 
     /**
      * Creates a new instance of CopyOnWriteMap.
-     *
      */
     public CopyOnWriteMap() {
-        internalMap = new HashMap<K, V>();
+        internalMap = new HashMap<>();
     }
 
     /**
      * Creates a new instance of CopyOnWriteMap with the specified initial size
      *
-     * @param initialCapacity
-     *  The initial size of the Map.
+     * @param initialCapacity The initial size of the Map.
      */
     public CopyOnWriteMap(int initialCapacity) {
-        internalMap = new HashMap<K, V>(initialCapacity);
+        internalMap = new HashMap<>(initialCapacity);
     }
 
     /**
@@ -61,12 +62,11 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      * initial data being held by this map is contained in
      * the supplied map.
      *
-     * @param data
-     *  A Map containing the initial contents to be placed into
+     * @param data A Map containing the initial contents to be placed into
      *  this class.
      */
     public CopyOnWriteMap(Map<K, V> data) {
-        internalMap = new HashMap<K, V>(data);
+        internalMap = new HashMap<>(data);
     }
 
     /**
@@ -74,11 +74,13 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
+    @Override
     public V put(K key, V value) {
         synchronized (this) {
-            Map<K, V> newMap = new HashMap<K, V>(internalMap);
+            Map<K, V> newMap = new HashMap<>(internalMap);
             V val = newMap.put(key, value);
             internalMap = newMap;
+            
             return val;
         }
     }
@@ -89,11 +91,13 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#remove(java.lang.Object)
      */
+    @Override
     public V remove(Object key) {
         synchronized (this) {
-            Map<K, V> newMap = new HashMap<K, V>(internalMap);
+            Map<K, V> newMap = new HashMap<>(internalMap);
             V val = newMap.remove(key);
             internalMap = newMap;
+            
             return val;
         }
     }
@@ -104,9 +108,10 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#putAll(java.util.Map)
      */
+    @Override
     public void putAll(Map<? extends K, ? extends V> newData) {
         synchronized (this) {
-            Map<K, V> newMap = new HashMap<K, V>(internalMap);
+            Map<K, V> newMap = new HashMap<>(internalMap);
             newMap.putAll(newData);
             internalMap = newMap;
         }
@@ -117,9 +122,10 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#clear()
      */
+    @Override
     public void clear() {
         synchronized (this) {
-            internalMap = new HashMap<K, V>();
+            internalMap = new HashMap<>();
         }
     }
 
@@ -132,6 +138,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#size()
      */
+    @Override
     public int size() {
         return internalMap.size();
     }
@@ -141,6 +148,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#isEmpty()
      */
+    @Override
     public boolean isEmpty() {
         return internalMap.isEmpty();
     }
@@ -151,6 +159,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#containsKey(java.lang.Object)
      */
+    @Override
     public boolean containsKey(Object key) {
         return internalMap.containsKey(key);
     }
@@ -161,6 +170,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#containsValue(java.lang.Object)
      */
+    @Override
     public boolean containsValue(Object value) {
         return internalMap.containsValue(value);
     }
@@ -171,6 +181,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
      *
      * @see java.util.Map#get(java.lang.Object)
      */
+    @Override
     public V get(Object key) {
         return internalMap.get(key);
     }
@@ -178,6 +189,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     /**
      * This method will return a read-only {@link Set}.
      */
+    @Override
     public Set<K> keySet() {
         return internalMap.keySet();
     }
@@ -185,6 +197,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     /**
      * This method will return a read-only {@link Collection}.
      */
+    @Override
     public Collection<V> values() {
         return internalMap.values();
     }
@@ -192,6 +205,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
     /**
      * This method will return a read-only {@link Set}.
      */
+    @Override
     public Set<Entry<K, V>> entrySet() {
         return internalMap.entrySet();
     }

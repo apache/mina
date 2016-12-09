@@ -26,7 +26,17 @@ package org.apache.mina.proxy.event;
  * @since MINA 2.0.0-M3
  */
 public enum IoSessionEventType {
-    CREATED(1), OPENED(2), IDLE(3), CLOSED(4);
+    /** Session created */
+    CREATED(1), 
+    
+    /** Session opened */
+    OPENED(2), 
+    
+    /** Session Idling */
+    IDLE(3), 
+    
+    /** Session closed*/
+    CLOSED(4);
 
     /**
      * The event type id.
@@ -50,16 +60,20 @@ public enum IoSessionEventType {
     @Override
     public String toString() {
         switch (this) {
-        case CREATED:
-            return "- CREATED event -";
-        case OPENED:
-            return "- OPENED event -";
-        case IDLE:
-            return "- IDLE event -";
-        case CLOSED:
-            return "- CLOSED event -";
-        default:
-            return "- Event Id=" + id + " -";
+            case CREATED:
+                return "- CREATED event -";
+
+            case OPENED:
+                return "- OPENED event -";
+            
+            case IDLE:
+                return "- IDLE event -";
+            
+            case CLOSED:
+                return "- CLOSED event -";
+            
+            default:
+                return "- Event Id=" + id + " -";
         }
     }
 }

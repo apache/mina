@@ -41,8 +41,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @since MINA 2.0.0-M3
  */
 public class NTLMResponses {
-
-    // LAN Manager magic constant used in LM Response calculation
+    /** LAN Manager magic constant used in LM Response calculation */
     public static final byte[] LM_HASH_MAGIC_CONSTANT =
             new byte[]{ 'K', 'G', 'S', '!', '@', '#', '$', '%' };
 
@@ -58,6 +57,7 @@ public class NTLMResponses {
      */
     public static byte[] getLMResponse(String password, byte[] challenge) throws Exception {
         byte[] lmHash = lmHash(password);
+        
         return lmResponse(lmHash, challenge);
     }
 
@@ -73,6 +73,7 @@ public class NTLMResponses {
      */
     public static byte[] getNTLMResponse(String password, byte[] challenge) throws Exception {
         byte[] ntlmHash = ntlmHash(password);
+        
         return lmResponse(ntlmHash, challenge);
     }
 
@@ -120,6 +121,7 @@ public class NTLMResponses {
             byte[] challenge, byte[] clientNonce, long time) throws Exception {
         byte[] ntlmv2Hash = ntlmv2Hash(target, user, password);
         byte[] blob = createBlob(targetInformation, clientNonce, time);
+        
         return lmv2Response(ntlmv2Hash, blob, challenge);
     }
 
@@ -190,6 +192,7 @@ public class NTLMResponses {
         byte[] lmHash = new byte[16];
         System.arraycopy(lowHash, 0, lmHash, 0, 8);
         System.arraycopy(highHash, 0, lmHash, 8, 8);
+        
         return lmHash;
     }
 
@@ -204,6 +207,7 @@ public class NTLMResponses {
     private static byte[] ntlmHash(String password) throws Exception {
         byte[] unicodePassword = password.getBytes("UnicodeLittleUnmarked");
         MessageDigest md4 = MessageDigest.getInstance("MD4");
+        
         return md4.digest(unicodePassword);
     }
 
@@ -220,6 +224,7 @@ public class NTLMResponses {
     private static byte[] ntlmv2Hash(String target, String user, String password) throws Exception {
         byte[] ntlmHash = ntlmHash(password);
         String identity = user.toUpperCase() + target;
+        
         return hmacMD5(identity.getBytes("UnicodeLittleUnmarked"), ntlmHash);
     }
 
@@ -249,6 +254,7 @@ public class NTLMResponses {
         System.arraycopy(lowResponse, 0, lmResponse, 0, 8);
         System.arraycopy(middleResponse, 0, lmResponse, 8, 8);
         System.arraycopy(highResponse, 0, lmResponse, 16, 8);
+        
         return lmResponse;
     }
 
@@ -271,6 +277,7 @@ public class NTLMResponses {
         byte[] lmv2Response = new byte[mac.length + clientData.length];
         System.arraycopy(mac, 0, lmv2Response, 0, mac.length);
         System.arraycopy(clientData, 0, lmv2Response, mac.length, clientData.length);
+        
         return lmv2Response;
     }
 
@@ -294,10 +301,12 @@ public class NTLMResponses {
         time *= 10000; // tenths of a microsecond.
         // convert to little-endian byte array.
         byte[] timestamp = new byte[8];
+        
         for (int i = 0; i < 8; i++) {
             timestamp[i] = (byte) time;
             time >>>= 8;
         }
+        
         byte[] blob = new byte[blobSignature.length + reserved.length + timestamp.length + clientNonce.length
                                + unknown1.length + targetInformation.length + unknown2.length];
         int offset = 0;
@@ -314,6 +323,7 @@ public class NTLMResponses {
         System.arraycopy(targetInformation, 0, blob, offset, targetInformation.length);
         offset += targetInformation.length;
         System.arraycopy(unknown2, 0, blob, offset, unknown2.length);
+        
         return blob;
     }
 
@@ -346,10 +356,11 @@ public class NTLMResponses {
         System.arraycopy(ipad, 0, content, 0, 64);
         System.arraycopy(data, 0, content, 64, data.length);
         MessageDigest md5 = MessageDigest.getInstance("MD5");
-        data = md5.digest(content);
-        content = new byte[data.length + 64];
+        byte[] digestedData = md5.digest(content);
+        content = new byte[digestedData.length + 64];
         System.arraycopy(opad, 0, content, 0, 64);
-        System.arraycopy(data, 0, content, 64, data.length);
+        System.arraycopy(digestedData, 0, content, 64, digestedData.length);
+        
         return md5.digest(content);
     }
 
@@ -376,6 +387,7 @@ public class NTLMResponses {
         material[6] = (byte) (keyBytes[5] << 2 | (keyBytes[6] & 0xff) >>> 6);
         material[7] = (byte) (keyBytes[6] << 1);
         oddParity(material);
+        
         return new SecretKeySpec(material, "DES");
     }
 
@@ -389,6 +401,7 @@ public class NTLMResponses {
         for (int i = 0; i < bytes.length; i++) {
             byte b = bytes[i];
             boolean needsParity = (((b >>> 7) ^ (b >>> 6) ^ (b >>> 5) ^ (b >>> 4) ^ (b >>> 3) ^ (b >>> 2) ^ (b >>> 1)) & 0x01) == 0;
+            
             if (needsParity) {
                 bytes[i] |= (byte) 0x01;
             } else {

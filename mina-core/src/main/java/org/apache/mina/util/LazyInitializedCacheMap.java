@@ -37,6 +37,9 @@ import org.apache.mina.core.buffer.IoBuffer;
  * {@link UnsupportedOperationException} on each method that is not intended to
  * be called by user code for performance reasons.
  * 
+ * @param <K> The key type
+ * @param <V> The value type
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M2
  */
@@ -50,10 +53,19 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     public class NoopInitializer extends LazyInitializer<V> {
         private V value;
 
+        /**
+         * Create a new NoopInitializer instance
+         * 
+         * @param value The value stored in this initializer
+         */
         public NoopInitializer(V value) {
             this.value = value;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public V init() {
             return value;
         }
@@ -64,7 +76,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
      * {@link ConcurrentHashMap}.
      */
     public LazyInitializedCacheMap() {
-        this.cache = new ConcurrentHashMap<K, LazyInitializer<V>>();
+        this.cache = new ConcurrentHashMap<>();
     }
 
     /**
@@ -73,15 +85,17 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
      * 
      * @param map The map to use as a cache
      */
-    public LazyInitializedCacheMap(final ConcurrentHashMap<K, LazyInitializer<V>> map) {
+    public LazyInitializedCacheMap(ConcurrentHashMap<K, LazyInitializer<V>> map) {
         this.cache = map;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public V get(Object key) {
         LazyInitializer<V> c = cache.get(key);
+
         if (c != null) {
             return c.get();
         }
@@ -92,8 +106,10 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public V remove(Object key) {
         LazyInitializer<V> c = cache.remove(key);
+        
         if (c != null) {
             return c.get();
         }
@@ -120,8 +136,10 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
      */
     public V putIfAbsent(K key, LazyInitializer<V> value) {
         LazyInitializer<V> v = cache.get(key);
+        
         if (v == null) {
             v = cache.putIfAbsent(key, value);
+            
             if (v == null) {
                 return value.get();
             }
@@ -133,8 +151,10 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public V put(K key, V value) {
         LazyInitializer<V> c = cache.put(key, new NoopInitializer(value));
+
         if (c != null) {
             return c.get();
         }
@@ -146,6 +166,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
      * Throws {@link UnsupportedOperationException} as this method would imply
      *         performance drops.
      */
+    @Override
     public boolean containsValue(Object value) {
         throw new UnsupportedOperationException();
     }
@@ -154,6 +175,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
      * Throws {@link UnsupportedOperationException} as this method would imply
      *         performance drops.
      */
+    @Override
     public Collection<V> values() {
         throw new UnsupportedOperationException();
     }
@@ -162,6 +184,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
      * Throws {@link UnsupportedOperationException} as this method would imply
      *         performance drops.
      */
+    @Override
     public Set<java.util.Map.Entry<K, V>> entrySet() {
         throw new UnsupportedOperationException();
     }
@@ -169,6 +192,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putAll(Map<? extends K, ? extends V> m) {
         for (Map.Entry<? extends K, ? extends V> e : m.entrySet()) {
             cache.put(e.getKey(), new NoopInitializer(e.getValue()));
@@ -185,6 +209,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clear() {
         cache.clear();
     }
@@ -192,6 +217,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean containsKey(Object key) {
         return cache.containsKey(key);
     }
@@ -199,6 +225,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEmpty() {
         return cache.isEmpty();
     }
@@ -206,6 +233,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<K> keySet() {
         return cache.keySet();
     }
@@ -213,6 +241,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int size() {
         return cache.size();
     }

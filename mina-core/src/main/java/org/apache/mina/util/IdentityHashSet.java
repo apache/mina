@@ -25,21 +25,35 @@ import java.util.Set;
 
 /**
  * An {@link IdentityHashMap}-backed {@link Set}.
+ * 
+ * @param <E> The element type
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IdentityHashSet<E> extends MapBackedSet<E> {
-
     private static final long serialVersionUID = 6948202189467167147L;
 
+    /**
+     * Creates a new IdentityHashSet instance
+     */
     public IdentityHashSet() {
         super(new IdentityHashMap<E, Boolean>());
     }
 
+    /**
+     * Creates a new IdentityHashSet instance
+     * 
+     * @param expectedMaxSize The maximum size for the map
+     */
     public IdentityHashSet(int expectedMaxSize) {
         super(new IdentityHashMap<E, Boolean>(expectedMaxSize));
     }
 
+    /**
+     * Creates a new IdentityHashSet instance
+     * 
+     * @param c The elements to put in the map
+     */
     public IdentityHashSet(Collection<E> c) {
         super(new IdentityHashMap<E, Boolean>(), c);
     }

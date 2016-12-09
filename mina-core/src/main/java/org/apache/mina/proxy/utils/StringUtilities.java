@@ -36,7 +36,9 @@ import javax.security.sasl.SaslException;
  * @since MINA 2.0.0-M3
  */
 public class StringUtilities {
-
+    private StringUtilities(){
+    }
+    
     /**
      * A directive is a parameter of the digest authentication process.
      * Returns the value of a directive from the map. If mandatory is true and the 
@@ -49,9 +51,10 @@ public class StringUtilities {
      * @throws AuthenticationException if mandatory is true and if 
      * directivesMap.get(directive) == null
      */
-    public static String getDirectiveValue(HashMap<String, String> directivesMap, String directive, boolean mandatory)
+    public static String getDirectiveValue(Map<String, String> directivesMap, String directive, boolean mandatory)
             throws AuthenticationException {
         String value = directivesMap.get(directive);
+        
         if (value == null) {
             if (mandatory) {
                 throw new AuthenticationException("\"" + directive + "\" mandatory directive is missing");
@@ -71,8 +74,9 @@ public class StringUtilities {
      * @param sb the output buffer
      * @param directive the directive name to look for
      */
-    public static void copyDirective(HashMap<String, String> directives, StringBuilder sb, String directive) {
+    public static void copyDirective(Map<String, String> directives, StringBuilder sb, String directive) {
         String directiveValue = directives.get(directive);
+        
         if (directiveValue != null) {
             sb.append(directive).append(" = \"").append(directiveValue).append("\", ");
         }
@@ -88,8 +92,9 @@ public class StringUtilities {
      * @param directive the directive name
      * @return the value of the copied directive
      */
-    public static String copyDirective(HashMap<String, String> src, HashMap<String, String> dst, String directive) {
+    public static String copyDirective(Map<String, String> src, Map<String, String> dst, String directive) {
         String directiveValue = src.get(directive);
+        
         if (directiveValue != null) {
             dst.put(directive, directiveValue);
         }
@@ -105,8 +110,8 @@ public class StringUtilities {
      * @return A Map containing the aprsed directives
      * @throws SaslException if the String cannot be parsed according to RFC 2831
      */
-    public static HashMap<String, String> parseDirectives(byte[] buf) throws SaslException {
-        HashMap<String, String> map = new HashMap<String, String>();
+    public static Map<String, String> parseDirectives(byte[] buf) throws SaslException {
+        Map<String, String> map = new HashMap<>();
         boolean gettingKey = true;
         boolean gettingQuotedValue = false;
         boolean expectSeparator = false;
@@ -116,6 +121,7 @@ public class StringUtilities {
         ByteArrayOutputStream value = new ByteArrayOutputStream(10);
 
         int i = skipLws(buf, 0);
+        
         while (i < buf.length) {
             bch = buf[i];
 
@@ -165,6 +171,7 @@ public class StringUtilities {
                 if (bch == '\\') {
                     // quoted-pair = "\" CHAR ==> CHAR
                     ++i; // Skip escape
+                    
                     if (i < buf.length) {
                         value.write(buf[i]);
                         ++i; // Advance
@@ -221,7 +228,7 @@ public class StringUtilities {
      * @throws SaslException if either the key or the value is null or
      * if the key already has a value. 
      */
-    private static void extractDirective(HashMap<String, String> map, String key, String value) throws SaslException {
+    private static void extractDirective(Map<String, String> map, String key, String value) throws SaslException {
         if (map.get(key) != null) {
             throw new SaslException("Peer sent more than one " + key + " directive");
         }
@@ -239,10 +246,10 @@ public class StringUtilities {
      */
     public static boolean isLws(byte b) {
         switch (b) {
-        case 13: // US-ASCII CR, carriage return
-        case 10: // US-ASCII LF, line feed
-        case 32: // US-ASCII SP, space
-        case 9: // US-ASCII HT, horizontal-tab
+            case 13: // US-ASCII CR, carriage return
+            case 10: // US-ASCII LF, line feed
+            case 32: // US-ASCII SP, space
+            case 9: // US-ASCII HT, horizontal-tab
             return true;
         }
 
@@ -321,7 +328,7 @@ public class StringUtilities {
         List<String> values = headers.get(key);
 
         if (values == null) {
-            values = new ArrayList<String>(1);
+            values = new ArrayList<>(1);
             headers.put(key, values);
         }
 

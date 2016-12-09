@@ -46,11 +46,11 @@ import org.slf4j.MDC;
  */
 public class Log4jXmlFormatter extends Formatter {
 
-    private final int DEFAULT_SIZE = 256;
+    private static final int DEFAULT_SIZE = 256;
 
-    private final int UPPER_LIMIT = 2048;
+    private static final int UPPER_LIMIT = 2048;
 
-    private StringBuffer buf = new StringBuffer(DEFAULT_SIZE);
+    private StringBuilder buf = new StringBuilder(DEFAULT_SIZE);
 
     private boolean locationInfo = false;
 
@@ -99,10 +99,11 @@ public class Log4jXmlFormatter extends Formatter {
         // Reset working buffer. If the buffer is too large, then we need a new
         // one in order to avoid the penalty of creating a large array.
         if (buf.capacity() > UPPER_LIMIT) {
-            buf = new StringBuffer(DEFAULT_SIZE);
+            buf = new StringBuilder(DEFAULT_SIZE);
         } else {
             buf.setLength(0);
         }
+        
         buf.append("<log4j:event logger=\"");
         buf.append(Transform.escapeTags(record.getLoggerName()));
         buf.append("\" timestamp=\"");
@@ -122,12 +123,15 @@ public class Log4jXmlFormatter extends Formatter {
 
         if (record.getThrown() != null) {
             String[] s = Transform.getThrowableStrRep(record.getThrown());
+            
             if (s != null) {
                 buf.append("<log4j:throwable><![CDATA[");
+                
                 for (String value : s) {
                     Transform.appendEscapingCDATA(buf, value);
                     buf.append("\r\n");
                 }
+                
                 buf.append("]]></log4j:throwable>\r\n");
             }
         }
@@ -146,13 +150,13 @@ public class Log4jXmlFormatter extends Formatter {
             if (contextMap != null) {
                 Set<String> keySet = contextMap.keySet();
                 
-                if ((keySet != null) && (keySet.size() > 0)) {
+                if ((keySet != null) && !keySet.isEmpty()) {
                     buf.append("<log4j:properties>\r\n");
                     Object[] keys = keySet.toArray();
                     Arrays.sort(keys);
                     
                     for (Object key1 : keys) {
-                        String key = (key1 == null ? "" : key1.toString());
+                        String key = key1 == null ? "" : key1.toString();
                         Object val = contextMap.get(key);
                         
                         if (val != null) {
@@ -167,11 +171,10 @@ public class Log4jXmlFormatter extends Formatter {
                     buf.append("</log4j:properties>\r\n");
                 }
             }
-
         }
+        
         buf.append("</log4j:event>\r\n\r\n");
 
         return buf.toString();
     }
-
 }

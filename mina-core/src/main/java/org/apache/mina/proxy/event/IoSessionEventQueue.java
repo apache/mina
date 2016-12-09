@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class IoSessionEventQueue {
-    private final static Logger logger = LoggerFactory.getLogger(IoSessionEventQueue.class);
+    private static final Logger logger = LoggerFactory.getLogger(IoSessionEventQueue.class);
 
     /**
      * The proxy session object.
@@ -45,8 +45,13 @@ public class IoSessionEventQueue {
     /**
      * Queue of session events which occurred before the proxy handshake had completed.
      */
-    private Queue<IoSessionEvent> sessionEventsQueue = new LinkedList<IoSessionEvent>();
+    private Queue<IoSessionEvent> sessionEventsQueue = new LinkedList<>();
 
+    /**
+     * Creates a new proxyIoSession instance
+     * 
+     * @param proxyIoSession The proxy session instance
+     */
     public IoSessionEventQueue(ProxyIoSession proxyIoSession) {
         this.proxyIoSession = proxyIoSession;
     }
@@ -79,6 +84,7 @@ public class IoSessionEventQueue {
         if (proxyIoSession.getRequest() instanceof SocksProxyRequest) {
             // No reconnection used
             evt.deliverEvent();
+            
             return;
         }
 

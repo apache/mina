@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class IoSessionEvent {
-    private final static Logger logger = LoggerFactory.getLogger(IoSessionEvent.class);
+    private static final Logger logger = LoggerFactory.getLogger(IoSessionEvent.class);
 
     /**
      * The next filter in the chain.
@@ -63,7 +63,7 @@ public class IoSessionEvent {
      * @param session the session
      * @param type the event type
      */
-    public IoSessionEvent(final NextFilter nextFilter, final IoSession session, final IoSessionEventType type) {
+    public IoSessionEvent(NextFilter nextFilter, IoSession session, IoSessionEventType type) {
         this.nextFilter = nextFilter;
         this.session = session;
         this.type = type;
@@ -77,7 +77,7 @@ public class IoSessionEvent {
      * @param session the session
      * @param status the idle status
      */
-    public IoSessionEvent(final NextFilter nextFilter, final IoSession session, final IdleStatus status) {
+    public IoSessionEvent(NextFilter nextFilter, IoSession session, IdleStatus status) {
         this(nextFilter, session, IoSessionEventType.IDLE);
         this.status = status;
     }
@@ -100,21 +100,24 @@ public class IoSessionEvent {
      * @param status the idle status should only be non null only if the event type is 
      * {@link IoSessionEventType#IDLE} 
      */
-    private static void deliverEvent(final NextFilter nextFilter, final IoSession session,
-            final IoSessionEventType type, final IdleStatus status) {
+    private static void deliverEvent(NextFilter nextFilter, IoSession session,
+            IoSessionEventType type, IdleStatus status) {
         switch (type) {
-        case CREATED:
-            nextFilter.sessionCreated(session);
-            break;
-        case OPENED:
-            nextFilter.sessionOpened(session);
-            break;
-        case IDLE:
-            nextFilter.sessionIdle(session, status);
-            break;
-        case CLOSED:
-            nextFilter.sessionClosed(session);
-            break;
+            case CREATED:
+                nextFilter.sessionCreated(session);
+                break;
+
+            case OPENED:
+                nextFilter.sessionOpened(session);
+                break;
+            
+            case IDLE:
+                nextFilter.sessionIdle(session, status);
+                break;
+            
+            case CLOSED:
+                nextFilter.sessionClosed(session);
+                break;
         }
     }
 
@@ -129,6 +132,7 @@ public class IoSessionEvent {
         sb.append(" - [ ").append(session);
         sb.append(", ").append(type);
         sb.append(']');
+        
         return sb.toString();
     }
 
@@ -147,14 +151,14 @@ public class IoSessionEvent {
     }
 
     /**
-     * @return the session on which the event occured.
+     * @return the session on which the event occurred.
      */
     public IoSession getSession() {
         return session;
     }
 
     /**
-     * @return the event type that occured.
+     * @return the event type that occurred.
      */
     public IoSessionEventType getType() {
         return type;

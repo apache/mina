@@ -53,7 +53,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
     /**
      * The challenge directives provided by the server.
      */
-    private HashMap<String, String> directives = null;
+    private Map<String, String> directives = null;
 
     /**
      * The response received to the last request.
@@ -71,13 +71,22 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
         }
     }
 
-    public HttpDigestAuthLogicHandler(final ProxyIoSession proxyIoSession) throws ProxyAuthException {
+    /**
+     * Creates a new HttpDigestAuthLogicHandler instance
+     * 
+     * @param proxyIoSession The Proxy IoSession
+     * @throws ProxyAuthException The Proxy AuthException
+     */
+    public HttpDigestAuthLogicHandler(ProxyIoSession proxyIoSession) throws ProxyAuthException {
         super(proxyIoSession);
 
         ((HttpProxyRequest) request).checkRequiredProperties(HttpProxyConstants.USER_PROPERTY,
                 HttpProxyConstants.PWD_PROPERTY);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doHandshake(NextFilter nextFilter) throws ProxyAuthException {
         logger.debug(" doHandshake()");
@@ -94,7 +103,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
             logger.debug("  sending DIGEST challenge response");
 
             // Build a challenge response
-            HashMap<String, String> map = new HashMap<String, String>();
+            HashMap<String, String> map = new HashMap<>();
             map.put("username", req.getProperties().get(HttpProxyConstants.USER_PROPERTY));
             StringUtilities.copyDirective(directives, map, "realm");
             StringUtilities.copyDirective(directives, map, "uri");
@@ -109,17 +118,20 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
 
             // Check for a supported qop
             String qop = directives.get("qop");
+            
             if (qop != null) {
                 StringTokenizer st = new StringTokenizer(qop, ",");
                 String token = null;
 
                 while (st.hasMoreTokens()) {
                     String tk = st.nextToken();
+                    
                     if ("auth".equalsIgnoreCase(token)) {
                         break;
                     }
 
                     int pos = Arrays.binarySearch(DigestUtilities.SUPPORTED_QOPS, tk);
+                    
                     if (pos > -1) {
                         token = tk;
                     }

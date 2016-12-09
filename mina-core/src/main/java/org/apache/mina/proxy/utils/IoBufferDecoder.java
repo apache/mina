@@ -49,7 +49,7 @@ public class IoBufferDecoder {
         private IoBuffer delimiter;
 
         /**
-         * The currently matched bytes of the delimiter. 
+         * The number of matched delimiters. 
          */
         private int matchCount = 0;
 
@@ -68,34 +68,67 @@ public class IoBufferDecoder {
             decodedBuffer = null;
         }
 
+        /**
+         * @return The current content length of decoded data if in
+         * content-length mode.
+         */
         public int getContentLength() {
             return contentLength;
         }
 
+        /**
+         * Sets the content-length
+         * 
+         * @param contentLength current content length of decoded data
+         */
         public void setContentLength(int contentLength) {
             this.contentLength = contentLength;
         }
 
+        /**
+         * @return The number of matched delimiters.
+         */
         public int getMatchCount() {
             return matchCount;
         }
 
+        /**
+         * Sets the match count
+         * 
+         * @param matchCount The number of matched delimiters.
+         */
         public void setMatchCount(int matchCount) {
             this.matchCount = matchCount;
         }
 
+        /**
+         * @return The decoded data
+         */
         public IoBuffer getDecodedBuffer() {
             return decodedBuffer;
         }
 
+        /**
+         * Sets the decoded data buffer
+         * 
+         * @param decodedBuffer The decoded data
+         */
         public void setDecodedBuffer(IoBuffer decodedBuffer) {
             this.decodedBuffer = decodedBuffer;
         }
 
+        /**
+         * @return The delimiter
+         */
         public IoBuffer getDelimiter() {
             return delimiter;
         }
 
+        /**
+         * Sets the delimiter
+         * 
+         * @param delimiter The delimiter
+         */
         public void setDelimiter(IoBuffer delimiter) {
             this.delimiter = delimiter;
         }
@@ -221,8 +254,10 @@ public class IoBufferDecoder {
 
         while (in.hasRemaining()) {
             byte b = in.get();
+            
             if (delimiter.get(matchCount) == b) {
                 matchCount++;
+                
                 if (matchCount == delimiter.limit()) {
                     // Found a match.
                     int pos = in.position();
