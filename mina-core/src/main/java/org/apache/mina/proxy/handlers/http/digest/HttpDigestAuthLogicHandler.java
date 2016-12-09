@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
 
-    private final static Logger logger = LoggerFactory.getLogger(HttpDigestAuthLogicHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpDigestAuthLogicHandler.class);
 
     /**
      * The challenge directives provided by the server.

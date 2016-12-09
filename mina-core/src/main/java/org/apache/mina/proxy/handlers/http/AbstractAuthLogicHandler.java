@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractAuthLogicHandler {
-    private final static Logger logger = LoggerFactory.getLogger(AbstractAuthLogicHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAuthLogicHandler.class);
 
     /**
      * The request to be handled by the proxy.

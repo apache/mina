@@ -44,27 +44,27 @@ import org.slf4j.LoggerFactory;
  */
 public class Socks5LogicHandler extends AbstractSocksLogicHandler {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(Socks5LogicHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Socks5LogicHandler.class);
 
     /**
      * The selected authentication method attribute key.
      */
-    private final static String SELECTED_AUTH_METHOD = Socks5LogicHandler.class.getName() + ".SelectedAuthMethod";
+    private static final String SELECTED_AUTH_METHOD = Socks5LogicHandler.class.getName() + ".SelectedAuthMethod";
 
     /**
      * The current step in the handshake attribute key.
      */
-    private final static String HANDSHAKE_STEP = Socks5LogicHandler.class.getName() + ".HandshakeStep";
+    private static final String HANDSHAKE_STEP = Socks5LogicHandler.class.getName() + ".HandshakeStep";
 
     /**
      * The Java GSS-API context attribute key.
      */
-    private final static String GSS_CONTEXT = Socks5LogicHandler.class.getName() + ".GSSContext";
+    private static final String GSS_CONTEXT = Socks5LogicHandler.class.getName() + ".GSSContext";
 
     /**
      * Last GSS token received attribute key.
      */
-    private final static String GSS_TOKEN = Socks5LogicHandler.class.getName() + ".GSSToken";
+    private static final String GSS_TOKEN = Socks5LogicHandler.class.getName() + ".GSSToken";
 
     /**
      * @see AbstractSocksLogicHandler#AbstractSocksLogicHandler(ProxyIoSession)
@@ -81,6 +81,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
      * 
      * @param nextFilter the next filter
      */
+    @Override
     public synchronized void doHandshake(final NextFilter nextFilter) {
         LOGGER.debug(" doHandshake()");
 
@@ -282,6 +283,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
             } else if (step == SocksProxyConstants.SOCKS5_AUTH_STEP) {
                 // This step can happen multiple times like in GSSAPI auth for instance
                 buf = encodeAuthenticationPacket(request);
+                
                 // If buf is null then go to the next step
                 if (buf == null) {
                     step = SocksProxyConstants.SOCKS5_REQUEST_STEP;
@@ -307,6 +309,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
      * @param nextFilter the next filter
      * @param buf the buffered data received 
      */
+    @Override
     public synchronized void messageReceived(final NextFilter nextFilter, final IoBuffer buf) {
         try {
             int step = ((Integer) getSession().getAttribute(HANDSHAKE_STEP)).intValue();

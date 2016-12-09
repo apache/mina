@@ -45,6 +45,9 @@ public class NTLMResponses {
     public static final byte[] LM_HASH_MAGIC_CONSTANT =
             new byte[]{ 'K', 'G', 'S', '!', '@', '#', '$', '%' };
 
+    private NTLMResponses() {
+    }
+    
     /**
      * Calculates the LM Response for the given challenge, using the specified
      * password.

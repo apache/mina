@@ -33,8 +33,17 @@ import org.apache.mina.proxy.session.ProxyIoSession;
  * @since MINA 2.0.0-M3
  */
 public enum HttpAuthenticationMethods {
-
-    NO_AUTH(1), BASIC(2), NTLM(3), DIGEST(4);
+    /** No authentication */
+    NO_AUTH(1), 
+    
+    /** Basic authentication */
+    BASIC(2), 
+    
+    /** NTLM (Microsoft) authentication */
+    NTLM(3), 
+    
+    /** Digest authentication */
+    DIGEST(4);
 
     private final int id;
 

@@ -44,6 +44,11 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
      * An object that knows how to expand a <code>CompositeByteArray</code>.
      */
     public interface Expander {
+        /**
+         * Expand a ByteBuffer by minSize bytes
+         * @param cba The ByteBuffer to expand
+         * @param minSize The new added size
+         */
         void expand(CompositeByteArray cba, int minSize);
     }
 
@@ -52,6 +57,10 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
      * 
      */
     public static class NopExpander implements Expander {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void expand(CompositeByteArray cba, int minSize) {
             // Do nothing.
         }
@@ -68,11 +77,21 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
 
         private final int newComponentSize;
 
+        /**
+         * Creates a new ChunkedExpander instance
+         * 
+         * @param baf The byte array factory
+         * @param newComponentSize The new size
+         */
         public ChunkedExpander(ByteArrayFactory baf, int newComponentSize) {
             this.baf = baf;
             this.newComponentSize = newComponentSize;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void expand(CompositeByteArray cba, int minSize) {
             int remaining = minSize;
             while (remaining > 0) {
@@ -88,7 +107,11 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
      * An object that knows how to flush a <code>ByteArray</code>.
      */
     public interface Flusher {
-        // document free() behaviour
+        /**
+         * Flush a byte array
+         * 
+         * @param ba The byte array to flush
+         */
         void flush(ByteArray ba);
     }
 
@@ -156,6 +179,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void skip(int length) {
         cursor.skip(length);
     }
@@ -170,6 +194,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void put(byte b) {
         prepareForAccess(1);
         cursor.put(b);
@@ -178,6 +203,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void put(IoBuffer bb) {
         prepareForAccess(bb.remaining());
         cursor.put(bb);
@@ -186,6 +212,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putShort(short s) {
         prepareForAccess(2);
         cursor.putShort(s);
@@ -194,6 +221,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putInt(int i) {
         prepareForAccess(4);
         cursor.putInt(i);
@@ -202,6 +230,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putLong(long l) {
         prepareForAccess(8);
         cursor.putLong(l);
@@ -210,6 +239,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putFloat(float f) {
         prepareForAccess(4);
         cursor.putFloat(f);
@@ -218,6 +248,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putDouble(double d) {
         prepareForAccess(8);
         cursor.putDouble(d);
@@ -226,6 +257,7 @@ public class CompositeByteArrayRelativeWriter extends CompositeByteArrayRelative
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putChar(char c) {
         prepareForAccess(2);
         cursor.putChar(c);
