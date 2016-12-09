@@ -30,6 +30,10 @@ import org.apache.mina.core.buffer.IoBufferWrapper;
  * @since MINA 2.0.0-M3
  */
 public class ProxyHandshakeIoBuffer extends IoBufferWrapper {
+    /**
+     * Creates a new ProxyHandshakeIoBuffer instance
+     * @param buf The wrapped buffer
+     */
     public ProxyHandshakeIoBuffer(final IoBuffer buf) {
         super(buf);
     }

@@ -54,14 +54,11 @@ public class Transform {
      * @param input The text to be converted.
      * @return The input string with the special characters replaced.
      * */
-    static public String escapeTags(final String input) {
+    public static String escapeTags(String input) {
         // Check if the string is null, zero length or devoid of special characters
         // if so, return what was sent in.
 
-        if (input == null
-                || input.length() == 0
-                || (input.indexOf('"') == -1 && input.indexOf('&') == -1 && input.indexOf('<') == -1 && input
-                        .indexOf('>') == -1)) {
+        if (input == null || input.length() == 0) {
             return input;
         }
 
@@ -69,22 +66,33 @@ public class Transform {
         char ch;
 
         int len = input.length();
+        
         for (int i = 0; i < len; i++) {
             ch = input.charAt(i);
-            if (ch > '>') {
-                buf.append(ch);
-            } else if (ch == '<') {
-                buf.append("&lt;");
-            } else if (ch == '>') {
-                buf.append("&gt;");
-            } else if (ch == '&') {
-                buf.append("&amp;");
-            } else if (ch == '"') {
-                buf.append("&quot;");
-            } else {
-                buf.append(ch);
+            
+            switch ( ch )
+            {
+                case '<' :
+                    buf.append("&lt;");
+                    break;
+                    
+                case '>' :
+                    buf.append("&gt;");
+                    break;
+                    
+                case '&' :
+                    buf.append("&amp;");
+                    break;
+                    
+                case '"' :
+                    buf.append("&quot;");
+                    break;
+
+                default :
+                    buf.append(ch);
             }
         }
+        
         return buf.toString();
     }
 
@@ -97,23 +105,27 @@ public class Transform {
      * section are the responsibility of the calling method.
      * @param str The String that is inserted into an existing CDATA Section within buf.
      * */
-    static public void appendEscapingCDATA(final StringBuffer buf, final String str) {
+    public static void appendEscapingCDATA(final StringBuilder buf, final String str) {
         if (str != null) {
             int end = str.indexOf(CDATA_END);
+            
             if (end < 0) {
                 buf.append(str);
             } else {
                 int start = 0;
+                
                 while (end > -1) {
                     buf.append(str.substring(start, end));
                     buf.append(CDATA_EMBEDED_END);
                     start = end + CDATA_END_LEN;
+                    
                     if (start < str.length()) {
                         end = str.indexOf(CDATA_END, start);
                     } else {
                         return;
                     }
                 }
+                
                 buf.append(str.substring(start));
             }
         }
@@ -130,9 +142,11 @@ public class Transform {
         throwable.printStackTrace(pw);
         pw.flush();
         LineNumberReader reader = new LineNumberReader(new StringReader(sw.toString()));
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        
         try {
             String line = reader.readLine();
+            
             while (line != null) {
                 lines.add(line);
                 line = reader.readLine();
@@ -140,9 +154,10 @@ public class Transform {
         } catch (IOException ex) {
             lines.add(ex.toString());
         }
+        
         String[] rep = new String[lines.size()];
         lines.toArray(rep);
+        
         return rep;
     }
-
 }

@@ -21,10 +21,16 @@ package org.apache.mina.util;
 
 /**
  * A listener for expired object events.
+ * 
+ * @param <E> The event type
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
- * TODO Make this a inner interface of ExpiringMap
  */
 public interface ExpirationListener<E> {
+    /**
+     * Adds a given event to the listener
+     * 
+     * @param expiredObject The expired event
+     */
     void expired(E expiredObject);
 }

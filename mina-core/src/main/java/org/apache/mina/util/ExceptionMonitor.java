@@ -51,10 +51,10 @@ public abstract class ExceptionMonitor {
      */
     public static void setInstance(ExceptionMonitor monitor) {
         if (monitor == null) {
-            monitor = new DefaultExceptionMonitor();
+            instance = new DefaultExceptionMonitor();
+        } else {
+            instance = monitor;
         }
-
-        instance = monitor;
     }
 
     /**
