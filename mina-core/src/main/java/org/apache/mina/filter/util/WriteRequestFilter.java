@@ -19,8 +19,6 @@
  */
 package org.apache.mina.filter.util;
 
-import java.lang.annotation.Inherited;
-
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.IoEventType;

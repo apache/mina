@@ -209,7 +209,6 @@ DatagramConnector {
      */
     // Unused extension points.
     @Override
-    @SuppressWarnings("unchecked")
     protected Iterator<DatagramChannel> allHandles() {
         return Collections.emptyIterator();
     }
@@ -258,7 +257,6 @@ DatagramConnector {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
     protected Iterator<DatagramChannel> selectedHandles() {
         return Collections.emptyIterator();
     }
