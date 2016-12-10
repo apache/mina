@@ -63,6 +63,9 @@ public class StateMachineProxyBuilder {
      */
     private ClassLoader defaultCl = null;
 
+    /**
+     * Creates a new StateMachineProxyBuilder instance
+     */
     public StateMachineProxyBuilder() {
     }
 

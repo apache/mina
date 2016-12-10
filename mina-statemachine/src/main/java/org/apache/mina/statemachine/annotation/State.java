@@ -34,6 +34,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface State {
+    /** The intial state */
     public static final String ROOT = "__root__";
 
     /**

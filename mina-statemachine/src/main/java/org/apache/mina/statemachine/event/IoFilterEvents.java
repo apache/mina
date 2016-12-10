@@ -29,16 +29,37 @@ import org.apache.mina.statemachine.annotation.IoFilterTransition;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum IoFilterEvents {
+    /** The wildcard event */
     ANY(Event.WILDCARD_EVENT_ID),
+    
+    /** The Session Created event */ 
     SESSION_CREATED("sessionCreated"), 
+    
+    /** The Session Opened event */ 
     SESSION_OPENED("sessionOpened"), 
+    
+    /** The Session Closed event */ 
     SESSION_CLOSED("sessionClosed"), 
+    
+    /** The Session Idle event */ 
     SESSION_IDLE("sessionIdle"), 
+    
+    /** The Message Received event */ 
     MESSAGE_RECEIVED("messageReceived"), 
+    
+    /** The Message Sent event */ 
     MESSAGE_SENT("messageSent"), 
+    
+    /** The Exception Caught event */ 
     EXCEPTION_CAUGHT("exceptionCaught"), 
+    
+    /** The Close event */ 
     CLOSE("filterClose"), 
+    
+    /** The Write event */ 
     WRITE("filterWrite"), 
+    
+    /** The Set Traffic Mask event */ 
     SET_TRAFFIC_MASK("filterSetTrafficMask");
 
     private final String value;
