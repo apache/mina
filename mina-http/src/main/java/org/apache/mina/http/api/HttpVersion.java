@@ -22,7 +22,7 @@ package org.apache.mina.http.api;
 /**
  * Type safe enumeration representing HTTP protocol version
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum HttpVersion {
     /**

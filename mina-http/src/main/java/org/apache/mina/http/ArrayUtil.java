@@ -19,18 +19,32 @@
  */
 package org.apache.mina.http;
 
+/**
+ * An utility class for Array manipulations.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class ArrayUtil {
+    private ArrayUtil() {
+    }
 
+    /**
+     * Process an array of String and get rid of every Strings after an empty on.
+     * 
+     * @param array The String[] array to process
+     * @param regex unused
+     * @return The resulting String[] which only contains non-empty Strings up to the first emtpy one
+     */
     public static String[] dropFromEndWhile(String[] array, String regex) {
         for (int i = array.length - 1; i >= 0; i--) {
-            if (!array[i].trim().equals("")) {
+            if (!"".equals(array[i].trim())) {
                 String[] trimmedArray = new String[i + 1];
                 System.arraycopy(array, 0, trimmedArray, 0, i + 1);
+                
                 return trimmedArray;
             }
         }
+        
         return null;
-
     }
-
 }

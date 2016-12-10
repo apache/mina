@@ -25,6 +25,11 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 
+/**
+ * The HTTP server codec
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class HttpServerCodec extends ProtocolCodecFilter {
 
     /** Key for decoder current state */
@@ -36,15 +41,20 @@ public class HttpServerCodec extends ProtocolCodecFilter {
     private static ProtocolEncoder encoder = new HttpServerEncoder();
     private static ProtocolDecoder decoder = new HttpServerDecoder();
 
+    /**
+     * Creates a new HttpServerCodec instance
+     */
     public HttpServerCodec() {
         super(encoder, decoder);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionClosed(IoFilter.NextFilter nextFilter, IoSession session) throws Exception {
         super.sessionClosed(nextFilter, session);
         session.removeAttribute(DECODER_STATE_ATT);
         session.removeAttribute(PARTIAL_HEAD_ATT);
     }
-
 }

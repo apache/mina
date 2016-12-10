@@ -33,23 +33,33 @@ import org.apache.mina.http.api.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An encoder for the HTTP client
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class HttpClientEncoder implements ProtocolEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(HttpClientCodec.class);
     private static final CharsetEncoder ENCODER = Charset.forName("UTF-8").newEncoder();
 
-    public void encode(IoSession session, Object message, ProtocolEncoderOutput out)
-            throws Exception {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         LOG.debug("encode {}", message.getClass().getCanonicalName());
+        
         if (message instanceof HttpRequest) {
             LOG.debug("HttpRequest");
             HttpRequest msg = (HttpRequest)message;
             StringBuilder sb = new StringBuilder(msg.getMethod().toString());
             sb.append(" ");
             sb.append(msg.getRequestPath());
+            
             if (!"".equals(msg.getQueryString())) {
                 sb.append("?");
                 sb.append(msg.getQueryString());
             }
+            
             sb.append(" ");
             sb.append(msg.getProtocolVersion());
             sb.append("\r\n");
@@ -60,10 +70,8 @@ public class HttpClientEncoder implements ProtocolEncoder {
                 sb.append(header.getValue());
                 sb.append("\r\n");
             }
+            
             sb.append("\r\n");
-            // Java 6 >> byte[] bytes = sb.toString().getBytes(Charset.forName("UTF-8"));
-            // byte[] bytes = sb.toString().getBytes();
-            // out.write(ByteBuffer.wrap(bytes));
             IoBuffer buf = IoBuffer.allocate(sb.length()).setAutoExpand(true);
             buf.putString(sb.toString(), ENCODER);
             buf.flip();
@@ -76,12 +84,13 @@ public class HttpClientEncoder implements ProtocolEncoder {
             // end of HTTP content
             // keep alive ?
         }
-
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void dispose(IoSession arg0) throws Exception {
         // TODO Auto-generated method stub
-
     }
-
 }

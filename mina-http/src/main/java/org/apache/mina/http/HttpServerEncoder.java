@@ -33,14 +33,24 @@ import org.apache.mina.http.api.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An encoder for the HTTP server
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class HttpServerEncoder implements ProtocolEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
     private static final CharsetEncoder ENCODER = Charset.forName("UTF-8").newEncoder();
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
-    	LOG.debug("encode {}", message.getClass().getCanonicalName());
+        LOG.debug("encode {}", message.getClass().getCanonicalName());
+    
         if (message instanceof HttpResponse) {
-        	LOG.debug("HttpResponse");
+            LOG.debug("HttpResponse");
             HttpResponse msg = (HttpResponse) message;
             StringBuilder sb = new StringBuilder(msg.getStatus().line());
 
@@ -50,22 +60,26 @@ public class HttpServerEncoder implements ProtocolEncoder {
                 sb.append(header.getValue());
                 sb.append("\r\n");
             }
+            
             sb.append("\r\n");
             IoBuffer buf = IoBuffer.allocate(sb.length()).setAutoExpand(true);
             buf.putString(sb.toString(), ENCODER);
             buf.flip();
             out.write(buf);
         } else if (message instanceof ByteBuffer) {
-        	LOG.debug("Body {}", message);
-        	out.write(message);
+            LOG.debug("Body {}", message);
+            out.write(message);
         } else if (message instanceof HttpEndOfContent) {
-        	LOG.debug("End of Content");
+            LOG.debug("End of Content");
             // end of HTTP content
             // keep alive ?
         }
-
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void dispose(IoSession session) throws Exception {
         // TODO Auto-generated method stub
     }

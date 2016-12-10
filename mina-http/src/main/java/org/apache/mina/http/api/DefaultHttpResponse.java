@@ -21,6 +21,11 @@ package org.apache.mina.http.api;
 
 import java.util.Map;
 
+/**
+ * The default implementation for the HTTP response element.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class DefaultHttpResponse implements HttpResponse {
 
     private final HttpVersion version;
@@ -29,37 +34,72 @@ public class DefaultHttpResponse implements HttpResponse {
 
     private final Map<String, String> headers;
 
+    /**
+     * Creates a new DefaultHttpResponse instance
+     * 
+     * @param version The HTTP version
+     * @param status The HTTP status
+     * @param headers The HTTP headers
+     */
     public DefaultHttpResponse(HttpVersion version, HttpStatus status, Map<String, String> headers) {
         this.version = version;
         this.status = status;
         this.headers = headers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public HttpVersion getProtocolVersion() {
         return version;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getContentType() {
         return headers.get("content-type");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isKeepAlive() {
         // TODO check header and version for keep alive
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getHeader(String name) {
         return headers.get(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean containsHeader(String name) {
         return headers.containsKey(name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, String> getHeaders() {
         return headers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public HttpStatus getStatus() {
         return status;
     }

@@ -21,31 +21,58 @@ package org.apache.mina.http;
 
 import org.apache.mina.http.api.HttpStatus;
 
+/**
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 @SuppressWarnings("serial")
 public class HttpException extends RuntimeException {
-
     private final int statusCode;
 
-    public HttpException(final int statusCode) {
+    /**
+     * Creates a new HttpException instance
+     * 
+     * @param statusCode The associated status code
+     */
+    public HttpException(int statusCode) {
         this(statusCode, "");
     }
     
-    public HttpException(final HttpStatus statusCode) {
+    /**
+     * Creates a new HttpException instance
+     * 
+     * @param statusCode The associated status code
+     */
+    public HttpException(HttpStatus statusCode) {
     	this(statusCode, "");
     }
 
-    public HttpException(final int statusCode, final String message) {
+    /**
+     * Creates a new HttpException instance
+     * 
+     * @param statusCode The associated status code
+     * @param message The error message
+     */
+    public HttpException(int statusCode, String message) {
         super(message);
         this.statusCode = statusCode;
     }
     
-    public HttpException(final HttpStatus statusCode, final String message) {
+    /**
+     * Creates a new HttpException instance
+     * 
+     * @param statusCode The associated status code
+     * @param message The error message
+     */
+    public HttpException(HttpStatus statusCode, String message) {
         super(message);
         this.statusCode = statusCode.code();
     }
 
+    /**
+     * @return The statusCode
+     */
     public int getStatusCode() {
         return statusCode;
     }
-
 }

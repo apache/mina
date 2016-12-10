@@ -22,8 +22,7 @@ package org.apache.mina.http.api;
 /**
  * An HTTP response to an HTTP request
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
- * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface HttpResponse extends HttpMessage {
     /**
