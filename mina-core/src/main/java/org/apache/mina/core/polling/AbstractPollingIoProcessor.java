@@ -539,6 +539,9 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                         session.increaseReadBufferSize();
                     }
                 }
+            } else {
+                // release temporary buffer when read nothing
+                buf.free(); 
             }
 
             if (ret < 0) {
