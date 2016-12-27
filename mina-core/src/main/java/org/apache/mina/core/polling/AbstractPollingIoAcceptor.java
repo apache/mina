@@ -33,23 +33,17 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.mina.core.RuntimeIoException;
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.service.AbstractIoAcceptor;
-import org.apache.mina.core.service.AbstractIoService;
-import org.apache.mina.core.service.IoAcceptor;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
-import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.util.ExceptionMonitor;
 
 /**

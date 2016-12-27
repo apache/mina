@@ -19,10 +19,8 @@
  */
 package org.apache.mina.core.buffer;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
@@ -30,15 +28,12 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.nio.ReadOnlyBufferException;
 import java.nio.ShortBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.EnumSet;
 import java.util.Set;
-
-import org.apache.mina.core.session.IoSession;
 
 /**
  * A byte buffer used by MINA applications.

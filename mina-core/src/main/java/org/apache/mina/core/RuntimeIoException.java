@@ -19,8 +19,6 @@
  */
 package org.apache.mina.core;
 
-import java.io.IOException;
-
 /**
  * A unchecked version of {@link IOException}.
  * <p>

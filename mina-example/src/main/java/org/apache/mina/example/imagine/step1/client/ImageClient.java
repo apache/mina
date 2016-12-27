@@ -25,7 +25,6 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.imagine.step1.ImageRequest;
 import org.apache.mina.example.imagine.step1.ImageResponse;
-import org.apache.mina.example.imagine.step1.server.ImageServer;
 import org.apache.mina.example.imagine.step1.codec.ImageCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.SocketConnector;

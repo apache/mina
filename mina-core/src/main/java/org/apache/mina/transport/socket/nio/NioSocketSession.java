@@ -36,7 +36,6 @@ import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;

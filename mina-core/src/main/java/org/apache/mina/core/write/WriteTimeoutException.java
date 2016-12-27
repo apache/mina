@@ -21,7 +21,6 @@ package org.apache.mina.core.write;
 
 import java.util.Collection;
 
-import org.apache.mina.core.session.IoSessionConfig;
 
 /**
  * An exception which is thrown when write buffer is not flushed for

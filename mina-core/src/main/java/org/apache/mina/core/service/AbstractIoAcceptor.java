@@ -28,10 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import org.apache.mina.core.RuntimeIoException;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 
 /**

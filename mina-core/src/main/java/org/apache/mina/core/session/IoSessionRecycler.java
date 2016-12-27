@@ -21,8 +21,6 @@ package org.apache.mina.core.session;
 
 import java.net.SocketAddress;
 
-import org.apache.mina.core.service.IoService;
-
 /**
  * A connectionless transport can recycle existing sessions by assigning an
  * {@link IoSessionRecycler} to an {@link IoService}.

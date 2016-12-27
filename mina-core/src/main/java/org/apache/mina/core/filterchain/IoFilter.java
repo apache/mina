@@ -19,11 +19,9 @@
  */
 package org.apache.mina.core.filterchain;
 
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.util.ReferenceCountingFilter;
 
 /**
  * A filter which intercepts {@link IoHandler} events like Servlet

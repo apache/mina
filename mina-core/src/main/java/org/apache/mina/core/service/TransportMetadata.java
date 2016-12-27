@@ -22,7 +22,6 @@ package org.apache.mina.core.service;
 import java.net.SocketAddress;
 import java.util.Set;
 
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 
 /**

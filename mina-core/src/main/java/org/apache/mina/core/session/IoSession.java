@@ -22,13 +22,10 @@ package org.apache.mina.core.session;
 import java.net.SocketAddress;
 import java.util.Set;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.future.WriteFuture;
-import org.apache.mina.core.service.IoAcceptor;
-import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
