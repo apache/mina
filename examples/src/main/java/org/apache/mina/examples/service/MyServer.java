@@ -1,5 +1,8 @@
 package org.apache.mina.examples.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -24,11 +27,9 @@ public class MyServer {
 			
 			final SocketAddress address = new InetSocketAddress(9999);
 			acceptor.bind(address);
-			LOG.debug("Running the server for 10 sec");
-			Thread.sleep(10000);
-			LOG.debug("Unbinding the TCP port");
+			new BufferedReader(new InputStreamReader(System.in)).readLine();
 			acceptor.unbind();
-		} catch (final InterruptedException e) {
+		} catch (final IOException e) {
 			LOG.error("Interrupted exception", e);
 		}
 	}

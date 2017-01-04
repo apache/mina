@@ -31,23 +31,14 @@ public class ClientHandler implements IoHandler {
 
 	@Override
 	public void messageReceived(IoSession session, Object message) {
-		LOG.info("message received {" + message + "}");
-		// if (message != null) {
-		// LOG.info("client message => " + message);
-		// session.write(message);
-		// }
-
-		if (message != null) {
-			LOG.info("echoing");
-//			System.out.println("client echoing");
-			session.write(message);
-		}
+		LOG.info("client get message => " + message.toString());
+		System.out.println("client get message => " + message.toString());
 	}
 
 	@Override
 	public void messageSent(IoSession session, Object message) {
 		LOG.info("client send message: " + message.toString());
-//		System.out.println("client send message: " + message.toString());
+		System.out.println("client send message: " + message.toString());
 	}
 
 	@Override

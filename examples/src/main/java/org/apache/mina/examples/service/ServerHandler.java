@@ -1,11 +1,14 @@
 package org.apache.mina.examples.service;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 import org.apache.mina.api.IdleStatus;
 import org.apache.mina.api.IoHandler;
 import org.apache.mina.api.IoService;
 import org.apache.mina.api.IoSession;
+import org.apache.mina.codec.IoBuffer;
+import org.apache.mina.codec.delimited.serialization.JavaNativeMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,14 +18,7 @@ public class ServerHandler implements IoHandler {
 
 	@Override
 	public void sessionOpened(IoSession session) {
-		
-		LOG.info("cccsession opened {" + session + "}");
-
-		final String welcomeStr = "welcome\n";
-		final ByteBuffer bf = ByteBuffer.allocate(welcomeStr.length());
-		bf.put(welcomeStr.getBytes());
-		bf.flip();
-		session.write(bf);
+		LOG.info("server session opened {" + session + "}");
 	}
 
 	@Override
@@ -37,22 +33,24 @@ public class ServerHandler implements IoHandler {
 
 	@Override
 	public void messageReceived(IoSession session, Object message) {
-		// if (message != null) {
-		// LOG.info("server message => " + message);
-		// session.write(message);
-		// }
+		if (message instanceof ByteBuffer) {
+			try {
 
-		if (message != null) {
-			LOG.info("echoing");
-//			System.out.println("server echoing");
-			session.write(message);
+				JavaNativeMessageDecoder<HashMap> decoder = new JavaNativeMessageDecoder<HashMap>();
+				IoBuffer ioBuff = IoBuffer.wrap((ByteBuffer) message);
+				HashMap map = decoder.decode(ioBuff);
+				LOG.info("server decode value => " + map);
+				System.out.println("server decode => " + map);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	@Override
 	public void messageSent(IoSession session, Object message) {
 		LOG.info("send message:" + message.toString());
-//		System.out.println("server send message:" + message.toString());
+		System.out.println("server send message:" + message.toString());
 	}
 
 	@Override
