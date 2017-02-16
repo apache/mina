@@ -55,19 +55,35 @@ abstract class CompositeByteArrayRelativeBase {
     public CompositeByteArrayRelativeBase(CompositeByteArray cba) {
         this.cba = cba;
         cursor = cba.cursor(cba.first(), new CursorListener() {
-
+            
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void enteredFirstComponent(int componentIndex, ByteArray component) {
                 // Do nothing.
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void enteredLastComponent(int componentIndex, ByteArray component) {
                 assert false;
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void enteredNextComponent(int componentIndex, ByteArray component) {
                 cursorPassedFirstComponent();
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void enteredPreviousComponent(int componentIndex, ByteArray component) {
                 assert false;
             }
@@ -76,21 +92,21 @@ abstract class CompositeByteArrayRelativeBase {
     }
 
     /**
-     * {@inheritDoc}
+     * @return The number of remaining bytes
      */
     public final int getRemaining() {
         return cursor.getRemaining();
     }
 
     /**
-     * {@inheritDoc}
+     * @return <TT>TRUE</TT> if there are some more bytes
      */
     public final boolean hasRemaining() {
         return cursor.hasRemaining();
     }
 
     /**
-     * {@inheritDoc}
+     * @return The used byte order (little of big indian)
      */
     public ByteOrder order() {
         return cba.order();
@@ -133,5 +149,4 @@ abstract class CompositeByteArrayRelativeBase {
      * freeing it).
      */
     protected abstract void cursorPassedFirstComponent();
-
 }

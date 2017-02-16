@@ -88,6 +88,7 @@ public class StateMachineTest {
         @Override
         protected boolean doExecute(Event event) {
             event.getContext().setAttribute("success", true);
+            
             return true;
         }
     }
@@ -104,6 +105,7 @@ public class StateMachineTest {
         @Override
         protected boolean doExecute(Event event) {
             StateControl.breakAndContinue();
+            
             return true;
         }
     }
@@ -121,9 +123,13 @@ public class StateMachineTest {
             this.stateId = stateId;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected boolean doExecute(Event event) {
             StateControl.breakAndGotoNow(stateId);
+            
             return true;
         }
     }
@@ -141,9 +147,13 @@ public class StateMachineTest {
             this.stateId = stateId;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected boolean doExecute(Event event) {
             StateControl.breakAndGotoNext(stateId);
+            
             return true;
         }
     }

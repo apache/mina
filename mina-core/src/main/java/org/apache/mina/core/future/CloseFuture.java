@@ -52,20 +52,24 @@ public interface CloseFuture extends IoFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     CloseFuture await() throws InterruptedException;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     CloseFuture awaitUninterruptibly();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     CloseFuture addListener(IoFutureListener<?> listener);
 
     /**
      * {@inheritDoc}
      */
+    @Override
     CloseFuture removeListener(IoFutureListener<?> listener);
 }

@@ -55,6 +55,7 @@ public class SynchronizedProtocolEncoder implements ProtocolEncoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         synchronized (encoder) {
             encoder.encode(session, message, out);
@@ -64,6 +65,7 @@ public class SynchronizedProtocolEncoder implements ProtocolEncoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void dispose(IoSession session) throws Exception {
         synchronized (encoder) {
             encoder.dispose(session);

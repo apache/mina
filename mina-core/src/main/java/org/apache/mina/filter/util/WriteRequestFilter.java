@@ -34,9 +34,13 @@ import org.apache.mina.core.write.WriteRequestWrapper;
  *
  */
 public abstract class WriteRequestFilter extends IoFilterAdapter {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         Object filteredMessage = doFilterWrite(nextFilter, session, writeRequest);
+        
         if (filteredMessage != null && filteredMessage != writeRequest.getMessage()) {
             nextFilter.filterWrite(session, new FilteredWriteRequest(filteredMessage, writeRequest));
         } else {
@@ -44,10 +48,14 @@ public abstract class WriteRequestFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         if (writeRequest instanceof FilteredWriteRequest) {
             FilteredWriteRequest req = (FilteredWriteRequest) writeRequest;
+            
             if (req.getParent() == this) {
                 nextFilter.messageSent(session, req.getParentRequest());
                 return;

@@ -24,10 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An HTTP request
+ * An HTTP request element
  * 
- * @author jvermillar
- * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface HttpRequest extends HttpMessage {
 
@@ -50,6 +49,9 @@ public interface HttpRequest extends HttpMessage {
      */
     String getParameter(String name);
     
+    /**
+     * @return The query part
+     */
     String getQueryString();
 
     /**

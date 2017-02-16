@@ -22,7 +22,6 @@ package org.apache.mina.example.sumup.codec;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.sumup.message.ResultMessage;
-import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 /**
  * A {@link MessageEncoder} that encodes {@link ResultMessage}.

@@ -28,6 +28,8 @@ import java.util.Queue;
 /**
  * A unbounded circular queue based on array.
  * 
+ * @param <E> The type of elements stored inthe queue
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Serializable {
@@ -56,12 +58,17 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
     private int shrinkThreshold;
 
     /**
-     * Construct a new, empty queue.
+     * Construct a new, empty, circular queue.
      */
     public CircularQueue() {
         this(DEFAULT_CAPACITY);
     }
 
+    /**
+     * Construct a new circular queue with an initial capacity.
+     * 
+     * @param initialCapacity The initial capacity of this circular queue
+     */
     public CircularQueue(int initialCapacity) {
         int actualCapacity = normalizeCapacity(initialCapacity);
         items = new Object[actualCapacity];
@@ -93,6 +100,9 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return items.length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         if (!isEmpty()) {
@@ -104,6 +114,10 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     @SuppressWarnings("unchecked")
     public E poll() {
         if (isEmpty()) {
@@ -122,6 +136,10 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return (E) ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean offer(E item) {
         if (item == null) {
             throw new IllegalArgumentException("item");
@@ -133,6 +151,10 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     @SuppressWarnings("unchecked")
     public E peek() {
         if (isEmpty()) {
@@ -142,6 +164,9 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return (E) items[first];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
     public E get(int idx) {
@@ -149,11 +174,17 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return (E) items[getRealIndex(idx)];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isEmpty() {
         return (first == last) && !full;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size() {
         if (full) {
@@ -167,6 +198,9 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return last - first + capacity();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "first=" + first + ", last=" + last + ", size=" + size() + ", mask = " + mask;
@@ -210,6 +244,7 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
             last = oldLen;
             items = tmp;
             mask = tmp.length - 1;
+            
             if (newLen >>> 3 > initialCapacity) {
                 shrinkThreshold = newLen >>> 3;
             }
@@ -218,10 +253,12 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
 
     private void shrinkIfNeeded() {
         int size = size();
+        
         if (size <= shrinkThreshold) {
             // shrink queue
             final int oldLen = items.length;
             int newLen = normalizeCapacity(size);
+            
             if (size == newLen) {
                 newLen <<= 1;
             }
@@ -258,11 +295,17 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean add(E o) {
         return offer(o);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     @Override
     public E set(int idx, E o) {
@@ -274,6 +317,9 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return (E) old;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void add(int idx, E o) {
         if (idx == size()) {
@@ -303,8 +349,11 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         increaseSize();
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @SuppressWarnings("unchecked")
     public E remove(int idx) {
         if (idx == 0) {
             return poll();
@@ -335,6 +384,10 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return (E) removed;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public E remove() {
         if (isEmpty()) {
             throw new NoSuchElementException();
@@ -342,6 +395,10 @@ public class CircularQueue<E> extends AbstractList<E> implements Queue<E>, Seria
         return poll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public E element() {
         if (isEmpty()) {
             throw new NoSuchElementException();

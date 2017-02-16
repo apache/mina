@@ -60,7 +60,7 @@ class IoBufferHexDumper {
      * 
      * @param in the buffer to dump
      * @param lengthLimit the limit at which hex dumping will stop
-     * @return a hex formatted string representation of the <i>in</i> {@link Iobuffer}.
+     * @return a hex formatted string representation of the <i>in</i> {@link IoBuffer}.
      */
     public static String getHexdump(IoBuffer in, int lengthLimit) {
         if (lengthLimit == 0) {

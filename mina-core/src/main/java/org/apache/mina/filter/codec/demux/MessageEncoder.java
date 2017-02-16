@@ -35,7 +35,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
  * @see DemuxingProtocolEncoder
  * @see MessageEncoderFactory
  * 
- * @param T The message type
+ * @param <T> The message type
  */
 public interface MessageEncoder<T> {
     /**

@@ -67,17 +67,9 @@ public class AvailablePortFinder {
      * @throws NoSuchElementException if there are no ports available
      */
     public static int getNextAvailable() {
-        ServerSocket serverSocket = null;
-
-        try {
+        try (ServerSocket serverSocket = new ServerSocket(0)){
             // Here, we simply return an available port found by the system
-            serverSocket = new ServerSocket(0);
-            int port = serverSocket.getLocalPort();
-
-            // Don't forget to close the socket...
-            serverSocket.close();
-
-            return port;
+            return serverSocket.getLocalPort();
         } catch (IOException ioe) {
             throw new NoSuchElementException(ioe.getMessage());
         }
@@ -157,7 +149,7 @@ public class AvailablePortFinder {
             throw new IllegalArgumentException("Invalid port range: " + fromPort + " ~ " + toPort);
         }
 
-        Set<Integer> result = new TreeSet<Integer>();
+        Set<Integer> result = new TreeSet<>();
 
         for (int i = fromPort; i <= toPort; i++) {
             ServerSocket s = null;

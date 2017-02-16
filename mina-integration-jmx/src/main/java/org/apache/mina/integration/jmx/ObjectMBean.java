@@ -106,6 +106,12 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     private static final Map<ObjectName, Object> sources = new ConcurrentHashMap<ObjectName, Object>();
 
+    /**
+     * Get the monitored object
+     * 
+     * @param oname The object name
+     * @return The monitored object
+     */
     public static Object getSource(ObjectName oname) {
         return sources.get(oname);
     }
@@ -296,14 +302,23 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         throw new IllegalStateException();
     }
 
+    /**
+     * @return The monitored object
+     */
     public final T getSource() {
         return source;
     }
 
+    /**
+     * @return The MBrean server
+     */
     public final MBeanServer getServer() {
         return server;
     }
 
+    /**
+     * @return The monitored object name
+     */
     public final ObjectName getName() {
         return name;
     }

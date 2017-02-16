@@ -29,13 +29,28 @@ import org.apache.mina.statemachine.annotation.IoHandlerTransition;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum IoHandlerEvents {
-    ANY(Event.WILDCARD_EVENT_ID), 
+    /** The wildcard event */
+    ANY(Event.WILDCARD_EVENT_ID),
+    
+    /** The Session Created event */
     SESSION_CREATED("sessionCreated"), 
+    
+    /** The Session Opened event */
     SESSION_OPENED("sessionOpened"), 
+    
+    /** The Session Opened event */
     SESSION_CLOSED("sessionClosed"), 
+    
+    /** The Session Idle event */
     SESSION_IDLE("sessionIdle"), 
+    
+    /** The Message Recived event */
     MESSAGE_RECEIVED("messageReceived"), 
+    
+    /** The Message Sent event */
     MESSAGE_SENT("messageSent"), 
+    
+    /** The Exception Caught event */
     EXCEPTION_CAUGHT("exceptionCaught");
 
     private final String value;

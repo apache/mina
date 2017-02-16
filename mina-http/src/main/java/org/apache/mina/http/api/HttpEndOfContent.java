@@ -19,8 +19,15 @@
  */
 package org.apache.mina.http.api;
 
+/**
+ * The HTTP end of content element
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class HttpEndOfContent {
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "HttpEndOfContent";

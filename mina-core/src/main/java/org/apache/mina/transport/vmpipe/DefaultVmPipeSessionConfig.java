@@ -20,7 +20,6 @@
 package org.apache.mina.transport.vmpipe;
 
 import org.apache.mina.core.session.AbstractIoSessionConfig;
-import org.apache.mina.core.session.IoSessionConfig;
 
 /**
  * A default implementation of {@link VmPipeSessionConfig}.
@@ -29,11 +28,6 @@ import org.apache.mina.core.session.IoSessionConfig;
  */
 class DefaultVmPipeSessionConfig extends AbstractIoSessionConfig implements VmPipeSessionConfig {
     DefaultVmPipeSessionConfig() {
-        // Do nothing
-    }
-
-    @Override
-    protected void doSetAll(IoSessionConfig config) {
         // Do nothing
     }
 }

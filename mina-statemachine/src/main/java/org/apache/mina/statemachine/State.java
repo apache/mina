@@ -45,14 +45,18 @@ import org.apache.mina.statemachine.transition.Transition;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class State {
+    /** The state ID */
     private final String id;
 
+    /** The paret state */
     private final State parent;
 
     private List<TransitionHolder> transitionHolders = new ArrayList<TransitionHolder>();
 
+    /** The list of transitions for this state */
     private List<Transition> transitions = Collections.emptyList();
 
+    /** The list of transitions that */
     private List<SelfTransition> onEntries = new ArrayList<SelfTransition>();
 
     private List<SelfTransition> onExits = new ArrayList<SelfTransition>();
@@ -124,7 +128,9 @@ public class State {
         if (onEntrySelfTransaction == null) {
             throw new IllegalArgumentException("transition");
         }
+        
         onEntries.add(onEntrySelfTransaction);
+        
         return this;
     }
 
@@ -138,7 +144,9 @@ public class State {
         if (onExitSelfTransaction == null) {
             throw new IllegalArgumentException("transition");
         }
+        
         onExits.add(onExitSelfTransaction);
+        
         return this;
     }
 

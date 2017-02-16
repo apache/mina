@@ -28,7 +28,9 @@ import java.io.UnsupportedEncodingException;
  * @since MINA 2.0.0-M3
  */
 public class ByteUtilities {
-
+    private ByteUtilities(){
+    }
+    
     /**
      * Returns the integer represented by up to 4 bytes in network byte order.
      * 
@@ -93,7 +95,7 @@ public class ByteUtilities {
      * @param v the short to write
      * @return the Short in a byte[]
      */
-    public final static byte[] writeShort(short v) {
+    public static final byte[] writeShort(short v) {
         return writeShort(v, new byte[2], 0);
     }
 
@@ -106,7 +108,7 @@ public class ByteUtilities {
      * @param offset the offset at which to start writing in the array
      * @return the Short in a byte[]
      */
-    public final static byte[] writeShort(short v, byte[] b, int offset) {
+    public static final byte[] writeShort(short v, byte[] b, int offset) {
         b[offset] = (byte) v;
         b[offset + 1] = (byte) (v >> 8);
 
@@ -119,7 +121,7 @@ public class ByteUtilities {
      * @param v the int to write
      * @return the Int in a byte[]
      */
-    public final static byte[] writeInt(int v) {
+    public static final byte[] writeInt(int v) {
         return writeInt(v, new byte[4], 0);
     }
 
@@ -132,7 +134,7 @@ public class ByteUtilities {
      * @param offset the offset at which to start writing in the array
      * @return the Int in a byte[]
      */
-    public final static byte[] writeInt(int v, byte[] b, int offset) {
+    public static final byte[] writeInt(int v, byte[] b, int offset) {
         b[offset] = (byte) v;
         b[offset + 1] = (byte) (v >> 8);
         b[offset + 2] = (byte) (v >> 16);
@@ -151,7 +153,7 @@ public class ByteUtilities {
      * @param length the number of bytes on which to operate 
      * (should be a multiple of 4)
      */
-    public final static void changeWordEndianess(byte[] b, int offset, int length) {
+    public static final void changeWordEndianess(byte[] b, int offset, int length) {
         byte tmp;
 
         for (int i = offset; i < offset + length; i += 4) {
@@ -174,7 +176,7 @@ public class ByteUtilities {
      * @param length the number of bytes on which to operate 
      * (should be a multiple of 2)
      */
-    public final static void changeByteEndianess(byte[] b, int offset, int length) {
+    public static final void changeByteEndianess(byte[] b, int offset, int length) {
         byte tmp;
 
         for (int i = offset; i < offset + length; i += 2) {
@@ -192,7 +194,7 @@ public class ByteUtilities {
      * @return the result byte array
      * @throws UnsupportedEncodingException if the string is not an OEM string
      */
-    public final static byte[] getOEMStringAsByteArray(String s) throws UnsupportedEncodingException {
+    public static final byte[] getOEMStringAsByteArray(String s) throws UnsupportedEncodingException {
         return s.getBytes("ASCII");
     }
 
@@ -203,7 +205,7 @@ public class ByteUtilities {
      * @return the result byte array
      * @throws UnsupportedEncodingException if the string is not an UTF-16LE string
      */
-    public final static byte[] getUTFStringAsByteArray(String s) throws UnsupportedEncodingException {
+    public static final byte[] getUTFStringAsByteArray(String s) throws UnsupportedEncodingException {
         return s.getBytes("UTF-16LE");
     }
 
@@ -217,7 +219,7 @@ public class ByteUtilities {
      * @return the encoded string as a byte array
      * @throws UnsupportedEncodingException if encoding fails
      */
-    public final static byte[] encodeString(String s, boolean useUnicode) throws UnsupportedEncodingException {
+    public static final byte[] encodeString(String s, boolean useUnicode) throws UnsupportedEncodingException {
         if (useUnicode) {
             return getUTFStringAsByteArray(s);
         }
@@ -326,7 +328,7 @@ public class ByteUtilities {
      * @param testFlag the flag we search the presence of
      * @return true if testFlag is present in the flagset, false otherwise.
      */
-    public final static boolean isFlagSet(int flagSet, int testFlag) {
+    public static final boolean isFlagSet(int flagSet, int testFlag) {
         return (flagSet & testFlag) > 0;
     }
 }

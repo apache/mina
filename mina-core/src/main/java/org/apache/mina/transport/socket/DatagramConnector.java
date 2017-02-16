@@ -34,12 +34,14 @@ public interface DatagramConnector extends IoConnector {
      * is specified in {@link #connect()} method.
      * This method overrides the {@link IoConnector#getDefaultRemoteAddress()} method.
      */
+    @Override
     InetSocketAddress getDefaultRemoteAddress();
 
     /**
      * @return the default configuration of the new FatagramSessions created by 
      * this connect service.
      */
+    @Override
     DatagramSessionConfig getSessionConfig();
     
     /**

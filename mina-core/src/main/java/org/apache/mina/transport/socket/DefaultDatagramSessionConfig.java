@@ -59,6 +59,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#getBroadcast()
      */
+    @Override
     public boolean isBroadcast() {
         return broadcast;
     }
@@ -66,6 +67,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#setBroadcast(boolean)
      */
+    @Override
     public void setBroadcast(boolean broadcast) {
         this.broadcast = broadcast;
     }
@@ -73,6 +75,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#getReuseAddress()
      */
+    @Override
     public boolean isReuseAddress() {
         return reuseAddress;
     }
@@ -80,6 +83,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#setReuseAddress(boolean)
      */
+    @Override
     public void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
     }
@@ -87,6 +91,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#getReceiveBufferSize()
      */
+    @Override
     public int getReceiveBufferSize() {
         return receiveBufferSize;
     }
@@ -94,6 +99,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#setReceiveBufferSize(int)
      */
+    @Override
     public void setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
     }
@@ -101,6 +107,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#getSendBufferSize()
      */
+    @Override
     public int getSendBufferSize() {
         return sendBufferSize;
     }
@@ -108,6 +115,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#setSendBufferSize(int)
      */
+    @Override
     public void setSendBufferSize(int sendBufferSize) {
         this.sendBufferSize = sendBufferSize;
     }
@@ -115,6 +123,7 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#getTrafficClass()
      */
+    @Override
     public int getTrafficClass() {
         return trafficClass;
     }
@@ -122,33 +131,48 @@ public class DefaultDatagramSessionConfig extends AbstractDatagramSessionConfig 
     /**
      * @see DatagramSocket#setTrafficClass(int)
      */
+    @Override
     public void setTrafficClass(int trafficClass) {
         this.trafficClass = trafficClass;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isBroadcastChanged() {
         return broadcast != DEFAULT_BROADCAST;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isReceiveBufferSizeChanged() {
         return receiveBufferSize != DEFAULT_RECEIVE_BUFFER_SIZE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isReuseAddressChanged() {
         return reuseAddress != DEFAULT_REUSE_ADDRESS;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isSendBufferSizeChanged() {
         return sendBufferSize != DEFAULT_SEND_BUFFER_SIZE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isTrafficClassChanged() {
         return trafficClass != DEFAULT_TRAFFIC_CLASS;
     }
-
 }

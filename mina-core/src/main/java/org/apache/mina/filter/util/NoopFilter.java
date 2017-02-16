@@ -32,10 +32,4 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NoopFilter extends IoFilterAdapter {
-    /**
-     * Default Constructor.
-     */
-    public NoopFilter() {
-        super();
-    }
 }

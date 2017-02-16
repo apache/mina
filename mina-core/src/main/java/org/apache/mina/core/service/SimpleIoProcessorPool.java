@@ -30,7 +30,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.AttributeKey;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +78,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoProcessor<S> {
     /** A logger for this class */
-    private final static Logger LOGGER = LoggerFactory.getLogger(SimpleIoProcessorPool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleIoProcessorPool.class);
 
     /** The default pool size, when no size is provided. */
     private static final int DEFAULT_SIZE = Runtime.getRuntime().availableProcessors() + 1;
@@ -168,7 +167,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
         }
 
         // Create the executor if none is provided
-        createdExecutor = (executor == null);
+        createdExecutor = executor == null;
 
         if (createdExecutor) {
             this.executor = Executors.newCachedThreadPool();
@@ -257,6 +256,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void add(S session) {
         getProcessor(session).add(session);
     }
@@ -264,6 +264,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void flush(S session) {
         getProcessor(session).flush(session);
     }
@@ -271,6 +272,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void write(S session, WriteRequest writeRequest) {
         getProcessor(session).write(session, writeRequest);
     }
@@ -278,6 +280,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void remove(S session) {
         getProcessor(session).remove(session);
     }
@@ -285,6 +288,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void updateTrafficControl(S session) {
         getProcessor(session).updateTrafficControl(session);
     }
@@ -292,6 +296,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isDisposed() {
         return disposed;
     }
@@ -299,6 +304,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isDisposing() {
         return disposing;
     }
@@ -306,6 +312,7 @@ public class SimpleIoProcessorPool<S extends AbstractIoSession> implements IoPro
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void dispose() {
         if (disposed) {
             return;

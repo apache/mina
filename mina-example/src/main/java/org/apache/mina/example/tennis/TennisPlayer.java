@@ -19,7 +19,6 @@
  */
 package org.apache.mina.example.tennis;
 
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 
@@ -59,7 +58,7 @@ public class TennisPlayer extends IoHandlerAdapter {
         } else {
             // If the ball is dead, this player loses.
             System.out.println("Player-" + id + ": LOSE");
-            session.close(true);
+            session.closeNow();
         }
     }
 
@@ -71,6 +70,6 @@ public class TennisPlayer extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
         cause.printStackTrace();
-        session.close(true);
+        session.closeNow();
     }
 }

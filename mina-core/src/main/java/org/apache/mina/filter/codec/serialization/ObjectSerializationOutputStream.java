@@ -21,7 +21,6 @@ package org.apache.mina.filter.codec.serialization;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectOutput;
 import java.io.OutputStream;
 
@@ -124,6 +123,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeObject(Object obj) throws IOException {
         IoBuffer buf = IoBuffer.allocate(64, false);
         buf.setAutoExpand(true);
@@ -141,6 +141,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeBoolean(boolean v) throws IOException {
         out.writeBoolean(v);
     }
@@ -148,6 +149,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeByte(int v) throws IOException {
         out.writeByte(v);
     }
@@ -155,6 +157,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeBytes(String s) throws IOException {
         out.writeBytes(s);
     }
@@ -162,6 +165,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeChar(int v) throws IOException {
         out.writeChar(v);
     }
@@ -169,6 +173,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeChars(String s) throws IOException {
         out.writeChars(s);
     }
@@ -176,6 +181,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeDouble(double v) throws IOException {
         out.writeDouble(v);
     }
@@ -183,6 +189,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeFloat(float v) throws IOException {
         out.writeFloat(v);
     }
@@ -190,6 +197,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeInt(int v) throws IOException {
         out.writeInt(v);
     }
@@ -197,6 +205,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeLong(long v) throws IOException {
         out.writeLong(v);
     }
@@ -204,6 +213,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeShort(int v) throws IOException {
         out.writeShort(v);
     }
@@ -211,6 +221,7 @@ public class ObjectSerializationOutputStream extends OutputStream implements Obj
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeUTF(String str) throws IOException {
         out.writeUTF(str);
     }

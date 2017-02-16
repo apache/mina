@@ -31,15 +31,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract base class for decoder state machines. Calls {@link #init()} to
+ * Abstract base class for decoder state machines. Calls init() to
  * get the start {@link DecodingState} of the state machine. Calls 
- * {@link #destroy()} when the state machine has reached its end state or when
+ * destroy() when the state machine has reached its end state or when
  * the session is closed.
  * <p>
  * NOTE: The {@link ProtocolDecoderOutput} used by this class when calling 
  * {@link DecodingState#decode(IoBuffer, ProtocolDecoderOutput)} buffers decoded
  * messages in a {@link List}. Once the state machine has reached its end state
- * this class will call {@link #finishDecode(List, ProtocolDecoderOutput)}. The 
+ * this class will call finishDecode(List, ProtocolDecoderOutput). The 
  * implementation will have to take care of writing the decoded messages to the 
  * real {@link ProtocolDecoderOutput} used by the configured 
  * {@link ProtocolCodecFilter}.
@@ -50,13 +50,21 @@ import org.slf4j.LoggerFactory;
 public abstract class DecodingStateMachine implements DecodingState {
     private final Logger log = LoggerFactory.getLogger(DecodingStateMachine.class);
 
-    private final List<Object> childProducts = new ArrayList<Object>();
+    private final List<Object> childProducts = new ArrayList<>();
 
     private final ProtocolDecoderOutput childOutput = new ProtocolDecoderOutput() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void flush(NextFilter nextFilter, IoSession session) {
             // Do nothing
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void write(Object message) {
             childProducts.add(message);
         }
@@ -99,6 +107,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         DecodingState state = getCurrentState();
 
@@ -146,6 +155,7 @@ public abstract class DecodingStateMachine implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         DecodingState nextState;
         DecodingState state = getCurrentState();

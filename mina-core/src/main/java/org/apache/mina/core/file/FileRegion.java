@@ -49,8 +49,7 @@ public interface FileRegion {
      * {@link #getWrittenBytes()} by the given amount and decreases the value
      * returned by {@link #getRemainingBytes()} by the given {@code amount}.
      * 
-     * @param amount
-     *            The new value for the file position.
+     * @param amount The new value for the file position.
      */
     void update(long amount);
 

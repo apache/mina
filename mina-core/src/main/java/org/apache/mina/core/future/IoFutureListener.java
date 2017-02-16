@@ -21,11 +21,11 @@ package org.apache.mina.core.future;
 
 import java.util.EventListener;
 
-import org.apache.mina.core.session.IoSession;
-
 /**
  * Something interested in being notified when the completion
  * of an asynchronous I/O operation : {@link IoFuture}. 
+ * 
+ * @param <F> The Future type
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -35,8 +35,12 @@ public interface IoFutureListener<F extends IoFuture> extends EventListener {
      * associated with the specified {@link IoFuture}.
      */
     IoFutureListener<IoFuture> CLOSE = new IoFutureListener<IoFuture>() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void operationComplete(IoFuture future) {
-            future.getSession().close(true);
+            future.getSession().closeNow();
         }
     };
 

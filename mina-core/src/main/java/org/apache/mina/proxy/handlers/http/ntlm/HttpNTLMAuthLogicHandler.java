@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(HttpNTLMAuthLogicHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpNTLMAuthLogicHandler.class);
 
     /**
      * The challenge provided by the server.

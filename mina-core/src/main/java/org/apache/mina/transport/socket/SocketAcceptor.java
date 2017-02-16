@@ -38,12 +38,14 @@ public interface SocketAcceptor extends IoAcceptor {
      * necessarily the firstly bound address.
      * This method overrides the {@link IoAcceptor#getLocalAddress()} method.
      */
+    @Override
     InetSocketAddress getLocalAddress();
 
     /**
      * @return a {@link Set} of the local InetSocketAddress which are bound currently.
      * This method overrides the {@link IoAcceptor#getDefaultLocalAddress()} method.
      */
+    @Override
     InetSocketAddress getDefaultLocalAddress();
 
     /**
@@ -87,5 +89,6 @@ public interface SocketAcceptor extends IoAcceptor {
      * @return the default configuration of the new SocketSessions created by 
      * this acceptor service.
      */
+    @Override
     SocketSessionConfig getSessionConfig();
 }

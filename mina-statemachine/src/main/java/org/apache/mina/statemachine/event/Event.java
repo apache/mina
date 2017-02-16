@@ -29,6 +29,7 @@ import org.apache.mina.statemachine.context.StateContext;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class Event {
+    /** The wildcard event */
     public static final String WILDCARD_EVENT_ID = "*";
 
     private final Object id;

@@ -56,6 +56,10 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
         return decoder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         synchronized (decoder) {
             decoder.decode(session, in, out);
@@ -65,6 +69,7 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         synchronized (decoder) {
             decoder.finishDecode(session, out);
@@ -74,6 +79,7 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void dispose(IoSession session) throws Exception {
         synchronized (decoder) {
             decoder.dispose(session);

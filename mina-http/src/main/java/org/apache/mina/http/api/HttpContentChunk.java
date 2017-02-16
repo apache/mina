@@ -22,7 +22,14 @@ package org.apache.mina.http.api;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+/**
+ * The HTTP content chunk object 
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public interface HttpContentChunk {
-
+    /**
+     * @return The list of contents
+     */
     List<ByteBuffer> getContent();
 }

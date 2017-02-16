@@ -28,15 +28,19 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+/**
+ * An utility class for Dates manipulations
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public class DateUtil {
-
-    private final static Locale LOCALE = Locale.US;
-    private final static TimeZone GMT_ZONE;
-    private final static String RFC_1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss zzz";
-    private final static DateFormat RFC_1123_FORMAT;
+    private static final Locale LOCALE = Locale.US;
+    private static final TimeZone GMT_ZONE;
+    private static final String RFC_1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss zzz";
+    private static final DateFormat RFC_1123_FORMAT;
 
     /** Pattern to find digits only. */
-    private final static Pattern DIGIT_PATTERN = Pattern.compile("^\\d+$");
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("^\\d+$");
 
     static {
         RFC_1123_FORMAT = new SimpleDateFormat(DateUtil.RFC_1123_PATTERN, DateUtil.LOCALE);
@@ -44,6 +48,12 @@ public class DateUtil {
         DateUtil.RFC_1123_FORMAT.setTimeZone(DateUtil.GMT_ZONE);
     }
 
+    private DateUtil() {
+    }
+
+    /**
+     * @return The current date as a string
+     */
     public static String getCurrentAsString() {
         synchronized(DateUtil.RFC_1123_FORMAT) {
             return DateUtil.RFC_1123_FORMAT.format(new Date()); //NOPMD
@@ -59,13 +69,13 @@ public class DateUtil {
      *            format.
      * @return the parsed <code>Date</code> in milliseconds.
      */
-    private static long parseDateStringToMilliseconds(final String dateString) {
+    private static long parseDateStringToMilliseconds(String dateString) {
 
         try {
             synchronized (DateUtil.RFC_1123_FORMAT) {
                 return DateUtil.RFC_1123_FORMAT.parse(dateString).getTime(); //NOPMD
             }
-        } catch (final ParseException e) {
+        } catch (ParseException e) {
             return 0;
         }
     }
@@ -80,17 +90,12 @@ public class DateUtil {
      * @return the <code>long</code> value following parse, or zero where not
      *         successful.
      */
-    public static long parseToMilliseconds(final String dateValue) {
-
-        long ms = 0;
-
+    public static long parseToMilliseconds(String dateValue) {
         if (DateUtil.DIGIT_PATTERN.matcher(dateValue).matches()) {
-            ms = Long.parseLong(dateValue);
+            return Long.parseLong(dateValue);
         } else {
-            ms = parseDateStringToMilliseconds(dateValue);
+            return parseDateStringToMilliseconds(dateValue);
         }
-
-        return ms;
     }
 
     /**
@@ -100,9 +105,9 @@ public class DateUtil {
      * @param dateValue the <code>Date</code> represented as milliseconds.
      * @return a <code>String</code> representation of the date.
      */
-    public static String parseToRFC1123(final long dateValue) {
+    public static String parseToRFC1123(long dateValue) {
 
-        final Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(dateValue);
 
         synchronized (DateUtil.RFC_1123_FORMAT) {

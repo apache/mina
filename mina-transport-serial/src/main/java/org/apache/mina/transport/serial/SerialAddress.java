@@ -34,20 +34,82 @@ public class SerialAddress extends SocketAddress {
 
     private static final long serialVersionUID = 1735370510442384505L;
 
+    /**
+     * The number of data bits per byte
+     */
     public enum DataBits {
-        DATABITS_5, DATABITS_6, DATABITS_7, DATABITS_8
+        /** 5 bits per bytes */
+        DATABITS_5, 
+        
+        /** 6 bits per bytes */
+        DATABITS_6, 
+        
+        /** 7 bits per bytes */
+        DATABITS_7,
+        
+        /** 8 bits per bytes */
+        DATABITS_8
     }
 
+     /**
+      * The error detection parity in use
+      *
+      */
     public enum Parity {
-        NONE, ODD, EVEN, MARK, SPACE
+        /** No parity bit sent */
+        NONE, 
+        
+        /** Odd parity */
+        ODD, 
+        
+        /** Even parity */
+        EVEN, 
+        
+        /** Mark signal condition */
+        MARK, 
+        
+        /**Space signal condition  */
+        SPACE
     }
 
+    /**
+     * Stop bits in use
+     */
     public enum StopBits {
-        BITS_1, BITS_2, BITS_1_5
+        /** One bit */
+        BITS_1, 
+        
+        /** Two bits */
+        BITS_2,
+        
+        /** one and half bits */
+        BITS_1_5
     }
 
+    /**
+     * The Flow control flags
+     */
     public enum FlowControl {
-        NONE, RTSCTS_IN, RTSCTS_OUT, RTSCTS_IN_OUT, XONXOFF_IN, XONXOFF_OUT, XONXOFF_IN_OUT
+        /** No flow control */
+        NONE, 
+        
+        /** RTS/CTS IN flow control */
+        RTSCTS_IN, 
+
+        /** RTS/CTS OUT flow control */
+        RTSCTS_OUT, 
+        
+        /** RTS/CTS IN/OUT flow control */
+        RTSCTS_IN_OUT, 
+        
+        /** XON/XOFF IN flow control */
+        XONXOFF_IN, 
+        
+        /** XON/XOFF OUT flow control */
+        XONXOFF_OUT, 
+        
+        /** XON/XOFF IN/OUT flow control */
+        XONXOFF_IN_OUT
     }
 
     private final String name;

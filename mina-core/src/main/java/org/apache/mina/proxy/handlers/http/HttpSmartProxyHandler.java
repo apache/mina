@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
-    private final static Logger logger = LoggerFactory.getLogger(HttpSmartProxyHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpSmartProxyHandler.class);
 
     /**
      * Has the HTTP proxy request been sent ?
@@ -50,6 +50,11 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
      */
     private AbstractAuthLogicHandler authHandler;
 
+    /**
+     * Creates a new HttpSmartProxyHandler instance
+     * 
+     * @param proxyIoSession The Prowxy IoSession
+     */
     public HttpSmartProxyHandler(final ProxyIoSession proxyIoSession) {
         super(proxyIoSession);
     }
@@ -59,6 +64,7 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
      * 
      * @param nextFilter the next filter
      */
+    @Override
     public void doHandshake(final NextFilter nextFilter) throws ProxyAuthException {
         logger.debug(" doHandshake()");
 
@@ -98,7 +104,7 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
         List<String> values = response.getHeaders().get("Proxy-Authenticate");
         ProxyIoSession proxyIoSession = getProxyIoSession();
 
-        if (values == null || values.size() == 0) {
+        if (values == null || values.isEmpty()) {
             authHandler = HttpAuthenticationMethods.NO_AUTH.getNewHandler(proxyIoSession);
 
         } else if (getProxyIoSession().getPreferedOrder() == null) {

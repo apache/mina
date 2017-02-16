@@ -33,53 +33,75 @@ import org.apache.mina.core.write.WriteRequest;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class CommonEventFilter extends IoFilterAdapter {
-
-    public CommonEventFilter() {
-        // Do nothing
-    }
-
     protected abstract void filter(IoFilterEvent event) throws Exception;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_CREATED, session, null));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_OPENED, session, null));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_CLOSED, session, null));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.SESSION_IDLE, session, status));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.EXCEPTION_CAUGHT, session, cause));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_SENT, session, writeRequest));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
         filter(new IoFilterEvent(nextFilter, IoEventType.CLOSE, session, null));

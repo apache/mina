@@ -420,7 +420,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
      * {@inheritDoc}
      */
     @Override
-    protected int write(AprSession session, IoBuffer buf, int length) throws Exception {
+    protected int write(AprSession session, IoBuffer buf, int length) throws IOException {
         int writtenBytes;
         if (buf.isDirect()) {
             writtenBytes = Socket.sendb(session.getDescriptor(), buf.buf(), buf.position(), length);

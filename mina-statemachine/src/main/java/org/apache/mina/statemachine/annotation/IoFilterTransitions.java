@@ -37,5 +37,8 @@ import org.apache.mina.statemachine.StateMachine;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface IoFilterTransitions {
+    /**
+     * @return The list of {@link IoFilterTransition}s
+     */
     IoFilterTransition[] value();
 }

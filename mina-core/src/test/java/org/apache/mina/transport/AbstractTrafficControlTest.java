@@ -163,7 +163,7 @@ public abstract class AbstractTrafficControlTest {
 
         }
 
-        session.close(true).awaitUninterruptibly();
+        session.closeNow().awaitUninterruptibly();
     }
 
     private void write(IoSession session, String s) throws Exception {

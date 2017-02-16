@@ -19,10 +19,8 @@
  */
 package org.apache.mina.core.buffer;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
@@ -30,15 +28,12 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.nio.ReadOnlyBufferException;
 import java.nio.ShortBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.EnumSet;
 import java.util.Set;
-
-import org.apache.mina.core.session.IoSession;
 
 /**
  * A byte buffer used by MINA applications.
@@ -151,6 +146,14 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /** A flag indicating which type of buffer we are using : heap or direct */
     private static boolean useDirectBuffer = false;
+
+    /**
+     * Creates a new instance. This is an empty constructor. It's protected, 
+     * to forbid its usage by the users.
+     */
+    protected IoBuffer() {
+        // Do nothing
+    }
 
     /**
      * @return the allocator used by existing and new buffers
@@ -281,14 +284,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
         newCapacity <<= (newCapacity < requestedCapacity ? 1 : 0);
         
         return newCapacity < 0 ? Integer.MAX_VALUE : newCapacity;
-    }
-
-    /**
-     * Creates a new instance. This is an empty constructor. It's protected, 
-     * to forbid its usage by the users.
-     */
-    protected IoBuffer() {
-        // Do nothing
     }
 
     /**
@@ -1326,9 +1321,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * 
      * @param index the position in the buffer to write the value
      * @param value the int to write
-     * 
-     * @param index The position where to put the unsigned short
-     * @param value The unsigned short to put in the IoBuffer
      * @return the modified IoBuffer
      */
     public abstract IoBuffer putUnsignedShort(int index, int value);
@@ -1372,7 +1364,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param index The position where to put the int
      * @param value The int to put in the IoBuffer
      * @return the modified IoBuffer
-     * @return the modified IoBuffer
      */
     public abstract IoBuffer putInt(int index, int value);
 
@@ -1411,7 +1402,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * 
      * @param index The position where to put the long
      * @param value The long to put in the IoBuffer
-     * @return the modified IoBuffer
      * @return the modified IoBuffer
      */
     public abstract IoBuffer putLong(int index, long value);

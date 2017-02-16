@@ -115,7 +115,6 @@ SocketConnector {
      * 
      * @param processorClass the processor class.
      * @see SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int, java.nio.channels.spi.SelectorProvider)
-     * @see org.apache.mina.core.service.SimpleIoProcessorPool#DEFAULT_SIZE
      * @since 2.0.0-M4
      */
     public NioSocketConnector(Class<? extends IoProcessor<NioSession>> processorClass) {
@@ -143,6 +142,7 @@ SocketConnector {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return NioSocketSession.METADATA;
     }
@@ -150,6 +150,7 @@ SocketConnector {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig) sessionConfig;
     }
@@ -165,6 +166,7 @@ SocketConnector {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
         super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
@@ -317,6 +319,7 @@ SocketConnector {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean hasNext() {
             return i.hasNext();
         }
@@ -324,6 +327,7 @@ SocketConnector {
         /**
          * {@inheritDoc}
          */
+        @Override
         public SocketChannel next() {
             SelectionKey key = i.next();
             return (SocketChannel) key.channel();
@@ -332,6 +336,7 @@ SocketConnector {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void remove() {
             i.remove();
         }

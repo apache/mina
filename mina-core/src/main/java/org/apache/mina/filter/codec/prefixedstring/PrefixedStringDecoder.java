@@ -34,10 +34,11 @@ import java.nio.charset.Charset;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PrefixedStringDecoder extends CumulativeProtocolDecoder {
+    /** The default length for the prefix */
+    public static final int DEFAULT_PREFIX_LENGTH = 4;
 
-    public final static int DEFAULT_PREFIX_LENGTH = 4;
-
-    public final static int DEFAULT_MAX_DATA_LENGTH = 2048;
+    /** The default maximum data length */ 
+    public static final int DEFAULT_MAX_DATA_LENGTH = 2048;
 
     private final Charset charset;
 
@@ -46,7 +47,9 @@ public class PrefixedStringDecoder extends CumulativeProtocolDecoder {
     private int maxDataLength = DEFAULT_MAX_DATA_LENGTH;
 
     /**
-     * @param charset       the charset to use for encoding
+     * Creates a new PrefixedStringDecoder instance
+     * 
+     * @param charset       the {@link Charset} to use for decoding
      * @param prefixLength  the length of the prefix
      * @param maxDataLength maximum number of bytes allowed for a single String
      */
@@ -56,10 +59,21 @@ public class PrefixedStringDecoder extends CumulativeProtocolDecoder {
         this.maxDataLength = maxDataLength;
     }
 
+   /**
+    * Creates a new PrefixedStringDecoder instance
+    * 
+    * @param charset       the {@link Charset} to use for decoding
+    * @param prefixLength  the length of the prefix
+    */
     public PrefixedStringDecoder(Charset charset, int prefixLength) {
         this(charset, prefixLength, DEFAULT_MAX_DATA_LENGTH);
     }
 
+    /**
+    * Creates a new PrefixedStringDecoder instance
+    * 
+    * @param charset       the {@link Charset} to use for decoding
+    */
     public PrefixedStringDecoder(Charset charset) {
         this(charset, DEFAULT_PREFIX_LENGTH);
     }
@@ -106,6 +120,10 @@ public class PrefixedStringDecoder extends CumulativeProtocolDecoder {
         return maxDataLength;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (in.prefixedDataAvailable(prefixLength, maxDataLength)) {
             String msg = in.getPrefixedString(prefixLength, charset.newDecoder());

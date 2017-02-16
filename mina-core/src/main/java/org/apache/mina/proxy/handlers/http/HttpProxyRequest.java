@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpProxyRequest extends ProxyRequest {
-    private final static Logger logger = LoggerFactory.getLogger(HttpProxyRequest.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpProxyRequest.class);
 
     /**
      * The HTTP verb.
@@ -68,7 +68,7 @@ public class HttpProxyRequest extends ProxyRequest {
      * The additionnal properties supplied to use with the proxy for 
      * authentication for example. 
      */
-    private transient Map<String, String> properties;
+    private Map<String, String> properties;
 
     /**
      * Constructor which creates a HTTP/1.0 CONNECT request to the specified 
@@ -189,7 +189,7 @@ public class HttpProxyRequest extends ProxyRequest {
     /**
      * @return the host to which we are connecting.
      */
-    public synchronized final String getHost() {
+    public final synchronized  String getHost() {
         if (host == null) {
             if (getEndpointAddress() != null && !getEndpointAddress().isUnresolved()) {
                 host = getEndpointAddress().getHostName();
@@ -280,7 +280,7 @@ public class HttpProxyRequest extends ProxyRequest {
         if (getHeaders() != null) {
             for (Map.Entry<String, List<String>> header : getHeaders().entrySet()) {
                 if (!hostHeaderFound) {
-                    hostHeaderFound = header.getKey().equalsIgnoreCase("host");
+                    hostHeaderFound = "host".equalsIgnoreCase(header.getKey());
                 }
 
                 for (String value : header.getValue()) {

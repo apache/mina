@@ -28,7 +28,7 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.util.byteaccess.ByteArrayList.Node;
 
 /**
- * A ByteArray composed of other ByteArrays. Optimised for fast relative access
+ * A ByteArray composed of other ByteArrays. Optimized for fast relative access
  * via cursors. Absolute access methods are provided, but may perform poorly.
  *
  * TODO: Write about laziness of cursor implementation - how movement doesn't
@@ -125,8 +125,7 @@ public final class CompositeByteArray extends AbstractByteArray {
      * Adds the specified {@link ByteArray} to the first
      * position in the list
      *
-     * @param ba
-     *  The ByteArray to add to the list
+     * @param ba The ByteArray to add to the list
      */
     public void addFirst(ByteArray ba) {
         addHook(ba);
@@ -136,8 +135,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * Remove the first {@link ByteArray} in the list
      *
-     * @return
-     *  The first ByteArray in the list
+     * @return The first ByteArray in the list
      */
     public ByteArray removeFirst() {
         Node node = bas.removeFirst();
@@ -152,7 +150,7 @@ public final class CompositeByteArray extends AbstractByteArray {
      * TODO: Document free behaviour more thoroughly.
      * 
      * @param index The index from where we will remove bytes
-     * @return$ The resulting byte aaay
+     * @return The resulting byte aaay
      */
     public ByteArray removeTo(int index) {
         if (index < first() || index > last()) {
@@ -176,20 +174,28 @@ public final class CompositeByteArray extends AbstractByteArray {
                 // TODO: Consider using getIoBuffers(), as would avoid
                 // performance problems for nested ComponentByteArrays.
                 IoBuffer bb = component.getSingleIoBuffer();
+                
                 // get the limit of the buffer
                 int originalLimit = bb.limit();
+                
                 // set the position to the beginning of the buffer
                 bb.position(0);
+                
                 // set the limit of the buffer to what is remaining
                 bb.limit(remaining);
+                
                 // create a new IoBuffer, sharing the data with 'bb'
                 IoBuffer bb1 = bb.slice();
+                
                 // set the position at the end of the buffer
                 bb.position(remaining);
+                
                 // gets the limit of the buffer
                 bb.limit(originalLimit);
+                
                 // create a new IoBuffer, sharing teh data with 'bb'
                 IoBuffer bb2 = bb.slice();
+                
                 // create a new ByteArray with 'bb1'
                 ByteArray ba1 = new BufferByteArray(bb1) {
                     @Override
@@ -210,6 +216,7 @@ public final class CompositeByteArray extends AbstractByteArray {
                         componentFinal.free();
                     }
                 };
+                
                 // add the new ByteArray to the CompositeByteArray
                 addFirst(ba2);
             }
@@ -222,8 +229,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * Adds the specified {@link ByteArray} to the end of the list
      *
-     * @param ba
-     *  The ByteArray to add to the end of the list
+     * @param ba The ByteArray to add to the end of the list
      */
     public void addLast(ByteArray ba) {
         addHook(ba);
@@ -233,8 +239,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * Removes the last {@link ByteArray} in the list
      *
-     * @return
-     *  The ByteArray that was removed
+     * @return The ByteArray that was removed
      */
     public ByteArray removeLast() {
         Node node = bas.removeLast();
@@ -245,6 +250,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void free() {
         while (!bas.isEmpty()) {
             Node node = bas.getLast();
@@ -253,28 +259,16 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
     }
 
-    private void checkBounds(int index, int accessSize) {
-        int lower = index;
-        int upper = index + accessSize;
-
-        if (lower < first()) {
-            throw new IndexOutOfBoundsException("Index " + lower + " less than start " + first() + ".");
-        }
-
-        if (upper > last()) {
-            throw new IndexOutOfBoundsException("Index " + upper + " greater than length " + last() + ".");
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
+    @Override
     public Iterable<IoBuffer> getIoBuffers() {
         if (bas.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Collection<IoBuffer> result = new ArrayList<IoBuffer>();
+        Collection<IoBuffer> result = new ArrayList<>();
         Node node = bas.getFirst();
 
         for (IoBuffer bb : node.getByteArray().getIoBuffers()) {
@@ -295,6 +289,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer getSingleIoBuffer() {
         if (byteArrayFactory == null) {
             throw new IllegalStateException(
@@ -308,13 +303,11 @@ public final class CompositeByteArray extends AbstractByteArray {
 
         int actualLength = last() - first();
 
-        {
-            Node node = bas.getFirst();
-            ByteArray ba = node.getByteArray();
+        Node firstNode = bas.getFirst();
+        ByteArray ba = firstNode.getByteArray();
 
-            if (ba.last() == actualLength) {
-                return ba.getSingleIoBuffer();
-            }
+        if (ba.last() == actualLength) {
+            return ba.getSingleIoBuffer();
         }
 
         // Replace all nodes with a single node.
@@ -331,12 +324,14 @@ public final class CompositeByteArray extends AbstractByteArray {
         }
 
         bas.addLast(target);
+        
         return bb;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Cursor cursor() {
         return new CursorImpl();
     }
@@ -344,6 +339,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Cursor cursor(int index) {
         return new CursorImpl(index);
     }
@@ -373,6 +369,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ByteArray slice(int index, int length) {
         return cursor(index).slice(length);
     }
@@ -380,6 +377,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public byte get(int index) {
         return cursor(index).get();
     }
@@ -387,6 +385,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void put(int index, byte b) {
         cursor(index).put(b);
     }
@@ -394,6 +393,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void get(int index, IoBuffer bb) {
         cursor(index).get(bb);
     }
@@ -401,6 +401,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void put(int index, IoBuffer bb) {
         cursor(index).put(bb);
     }
@@ -408,6 +409,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int first() {
         return bas.firstByte();
     }
@@ -415,6 +417,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int last() {
         return bas.lastByte();
     }
@@ -423,8 +426,7 @@ public final class CompositeByteArray extends AbstractByteArray {
      * This method should be called prior to adding any component
      * <code>ByteArray</code> to a composite.
      *
-     * @param ba
-     *  The component to add.
+     * @param ba The component to add.
      */
     private void addHook(ByteArray ba) {
         // Check first() is zero, otherwise cursor might not work.
@@ -432,6 +434,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         if (ba.first() != 0) {
             throw new IllegalArgumentException("Cannot add byte array that doesn't start from 0: " + ba.first());
         }
+        
         // Check order.
         if (order == null) {
             order = ba.order();
@@ -443,6 +446,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ByteOrder order() {
         if (order == null) {
             throw new IllegalStateException("Byte order not yet set.");
@@ -453,6 +457,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void order(ByteOrder order) {
         if (order == null || !order.equals(this.order)) {
             this.order = order;
@@ -468,6 +473,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public short getShort(int index) {
         return cursor(index).getShort();
     }
@@ -475,6 +481,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putShort(int index, short s) {
         cursor(index).putShort(s);
     }
@@ -482,6 +489,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getInt(int index) {
         return cursor(index).getInt();
     }
@@ -489,6 +497,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putInt(int index, int i) {
         cursor(index).putInt(i);
     }
@@ -496,6 +505,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getLong(int index) {
         return cursor(index).getLong();
     }
@@ -503,6 +513,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putLong(int index, long l) {
         cursor(index).putLong(l);
     }
@@ -510,6 +521,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFloat(int index) {
         return cursor(index).getFloat();
     }
@@ -517,6 +529,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putFloat(int index, float f) {
         cursor(index).putFloat(f);
     }
@@ -524,6 +537,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public double getDouble(int index) {
         return cursor(index).getDouble();
     }
@@ -531,6 +545,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putDouble(int index, double d) {
         cursor(index).putDouble(d);
     }
@@ -538,6 +553,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public char getChar(int index) {
         return cursor(index).getChar();
     }
@@ -545,6 +561,7 @@ public final class CompositeByteArray extends AbstractByteArray {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putChar(int index, char c) {
         cursor(index).putChar(c);
     }
@@ -583,6 +600,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int getIndex() {
             return index;
         }
@@ -590,6 +608,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void setIndex(int index) {
             checkBounds(index, 0);
             this.index = index;
@@ -598,6 +617,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void skip(int length) {
             setIndex(index + length);
         }
@@ -605,9 +625,11 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public ByteArray slice(int length) {
             CompositeByteArray slice = new CompositeByteArray(byteArrayFactory);
             int remaining = length;
+
             while (remaining > 0) {
                 prepareForAccess(remaining);
                 int componentSliceSize = Math.min(remaining, componentCursor.getRemaining());
@@ -616,12 +638,14 @@ public final class CompositeByteArray extends AbstractByteArray {
                 index += componentSliceSize;
                 remaining -= componentSliceSize;
             }
+            
             return slice;
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public ByteOrder order() {
             return CompositeByteArray.this.order();
         }
@@ -644,10 +668,12 @@ public final class CompositeByteArray extends AbstractByteArray {
             // Handle missing node.
             if (componentNode == null) {
                 int basMidpoint = (last() - first()) / 2 + first();
+                
                 if (index <= basMidpoint) {
                     // Search from the start.
                     componentNode = bas.getFirst();
                     componentIndex = first();
+                    
                     if (listener != null) {
                         listener.enteredFirstComponent(componentIndex, componentNode.getByteArray());
                     }
@@ -655,6 +681,7 @@ public final class CompositeByteArray extends AbstractByteArray {
                     // Search from the end.
                     componentNode = bas.getLast();
                     componentIndex = last() - componentNode.getByteArray().last();
+                    
                     if (listener != null) {
                         listener.enteredLastComponent(componentIndex, componentNode.getByteArray());
                     }
@@ -665,6 +692,7 @@ public final class CompositeByteArray extends AbstractByteArray {
             while (index < componentIndex) {
                 componentNode = componentNode.getPreviousNode();
                 componentIndex -= componentNode.getByteArray().last();
+                
                 if (listener != null) {
                     listener.enteredPreviousComponent(componentIndex, componentNode.getByteArray());
                 }
@@ -674,6 +702,7 @@ public final class CompositeByteArray extends AbstractByteArray {
             while (index >= componentIndex + componentNode.getByteArray().length()) {
                 componentIndex += componentNode.getByteArray().last();
                 componentNode = componentNode.getNextNode();
+                
                 if (listener != null) {
                     listener.enteredNextComponent(componentIndex, componentNode.getByteArray());
                 }
@@ -681,6 +710,7 @@ public final class CompositeByteArray extends AbstractByteArray {
 
             // Update the cursor.
             int internalComponentIndex = index - componentIndex;
+            
             if (componentNode == oldComponentNode) {
                 // Move existing cursor.
                 componentCursor.setIndex(internalComponentIndex);
@@ -693,6 +723,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int getRemaining() {
             return last() - index + 1;
         }
@@ -700,6 +731,7 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean hasRemaining() {
             return getRemaining() > 0;
         }
@@ -707,16 +739,19 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public byte get() {
             prepareForAccess(1);
             byte b = componentCursor.get();
             index += 1;
+            
             return b;
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public void put(byte b) {
             prepareForAccess(1);
             componentCursor.put(b);
@@ -726,12 +761,14 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void get(IoBuffer bb) {
             while (bb.hasRemaining()) {
                 int remainingBefore = bb.remaining();
                 prepareForAccess(remainingBefore);
                 componentCursor.get(bb);
                 int remainingAfter = bb.remaining();
+                
                 // Advance index by actual amount got.
                 int chunkSize = remainingBefore - remainingAfter;
                 index += chunkSize;
@@ -741,12 +778,14 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void put(IoBuffer bb) {
             while (bb.hasRemaining()) {
                 int remainingBefore = bb.remaining();
                 prepareForAccess(remainingBefore);
                 componentCursor.put(bb);
                 int remainingAfter = bb.remaining();
+                
                 // Advance index by actual amount put.
                 int chunkSize = remainingBefore - remainingAfter;
                 index += chunkSize;
@@ -756,15 +795,19 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public short getShort() {
             prepareForAccess(2);
+
             if (componentCursor.getRemaining() >= 4) {
                 short s = componentCursor.getShort();
                 index += 2;
+                
                 return s;
             } else {
                 byte b0 = get();
                 byte b1 = get();
+                
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
                     return (short) ((b0 << 8) | (b1 & 0xFF));
                 } else {
@@ -776,40 +819,42 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void putShort(short s) {
             prepareForAccess(2);
+            
             if (componentCursor.getRemaining() >= 4) {
                 componentCursor.putShort(s);
                 index += 2;
             } else {
-                byte b0;
-                byte b1;
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    b0 = (byte) ((s >> 8) & 0xff);
-                    b1 = (byte) ((s >> 0) & 0xff);
+                    put((byte) ((s >> 8) & 0xff));
+                    put((byte) (s & 0xff));
                 } else {
-                    b0 = (byte) ((s >> 0) & 0xff);
-                    b1 = (byte) ((s >> 8) & 0xff);
+                    put((byte) (s & 0xff));
+                    put((byte) ((s >> 8) & 0xff));
                 }
-                put(b0);
-                put(b1);
             }
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public int getInt() {
             prepareForAccess(4);
+            
             if (componentCursor.getRemaining() >= 4) {
                 int i = componentCursor.getInt();
                 index += 4;
+                
                 return i;
             } else {
                 byte b0 = get();
                 byte b1 = get();
                 byte b2 = get();
                 byte b3 = get();
+                
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
                     return (b0 << 24) | ((b1 & 0xFF) << 16) | ((b2 & 0xFF) << 8) | (b3 & 0xFF);
                 } else {
@@ -821,42 +866,39 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void putInt(int i) {
             prepareForAccess(4);
+            
             if (componentCursor.getRemaining() >= 4) {
                 componentCursor.putInt(i);
                 index += 4;
             } else {
-                byte b0;
-                byte b1;
-                byte b2;
-                byte b3;
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    b0 = (byte) ((i >> 24) & 0xff);
-                    b1 = (byte) ((i >> 16) & 0xff);
-                    b2 = (byte) ((i >> 8) & 0xff);
-                    b3 = (byte) ((i >> 0) & 0xff);
+                    put((byte) ((i >> 24) & 0xff));
+                    put((byte) ((i >> 16) & 0xff));
+                    put((byte) ((i >> 8) & 0xff));
+                    put((byte) (i & 0xff));
                 } else {
-                    b0 = (byte) ((i >> 0) & 0xff);
-                    b1 = (byte) ((i >> 8) & 0xff);
-                    b2 = (byte) ((i >> 16) & 0xff);
-                    b3 = (byte) ((i >> 24) & 0xff);
+                    put((byte) (i & 0xff));
+                    put((byte) ((i >> 8) & 0xff));
+                    put((byte) ((i >> 16) & 0xff));
+                    put((byte) ((i >> 24) & 0xff));
                 }
-                put(b0);
-                put(b1);
-                put(b2);
-                put(b3);
             }
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public long getLong() {
             prepareForAccess(8);
+            
             if (componentCursor.getRemaining() >= 4) {
                 long l = componentCursor.getLong();
                 index += 8;
+                
                 return l;
             } else {
                 byte b0 = get();
@@ -867,6 +909,7 @@ public final class CompositeByteArray extends AbstractByteArray {
                 byte b5 = get();
                 byte b6 = get();
                 byte b7 = get();
+                
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
                     return ((b0 & 0xFFL) << 56) | ((b1 & 0xFFL) << 48) | ((b2 & 0xFFL) << 40) | ((b3 & 0xFFL) << 32)
                             | ((b4 & 0xFFL) << 24) | ((b5 & 0xFFL) << 16) | ((b6 & 0xFFL) << 8) | (b7 & 0xFFL);
@@ -880,62 +923,50 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void putLong(long l) {
-            //TODO: see if there is some optimizing that can be done here
             prepareForAccess(8);
+            
             if (componentCursor.getRemaining() >= 4) {
                 componentCursor.putLong(l);
                 index += 8;
             } else {
-                byte b0;
-                byte b1;
-                byte b2;
-                byte b3;
-                byte b4;
-                byte b5;
-                byte b6;
-                byte b7;
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
-                    b0 = (byte) ((l >> 56) & 0xff);
-                    b1 = (byte) ((l >> 48) & 0xff);
-                    b2 = (byte) ((l >> 40) & 0xff);
-                    b3 = (byte) ((l >> 32) & 0xff);
-                    b4 = (byte) ((l >> 24) & 0xff);
-                    b5 = (byte) ((l >> 16) & 0xff);
-                    b6 = (byte) ((l >> 8) & 0xff);
-                    b7 = (byte) ((l >> 0) & 0xff);
+                    put((byte) ((l >> 56) & 0xff));
+                    put((byte) ((l >> 48) & 0xff));
+                    put((byte) ((l >> 40) & 0xff));
+                    put((byte) ((l >> 32) & 0xff));
+                    put((byte) ((l >> 24) & 0xff));
+                    put((byte) ((l >> 16) & 0xff));
+                    put((byte) ((l >> 8) & 0xff));
+                    put((byte) (l & 0xff));
                 } else {
-                    b0 = (byte) ((l >> 0) & 0xff);
-                    b1 = (byte) ((l >> 8) & 0xff);
-                    b2 = (byte) ((l >> 16) & 0xff);
-                    b3 = (byte) ((l >> 24) & 0xff);
-                    b4 = (byte) ((l >> 32) & 0xff);
-                    b5 = (byte) ((l >> 40) & 0xff);
-                    b6 = (byte) ((l >> 48) & 0xff);
-                    b7 = (byte) ((l >> 56) & 0xff);
+                    put((byte) (l & 0xff));
+                    put((byte) ((l >> 8) & 0xff));
+                    put((byte) ((l >> 16) & 0xff));
+                    put((byte) ((l >> 24) & 0xff));
+                    put((byte) ((l >> 32) & 0xff));
+                    put((byte) ((l >> 40) & 0xff));
+                    put((byte) ((l >> 48) & 0xff));
+                    put((byte) ((l >> 56) & 0xff));
                 }
-                put(b0);
-                put(b1);
-                put(b2);
-                put(b3);
-                put(b4);
-                put(b5);
-                put(b6);
-                put(b7);
             }
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
         public float getFloat() {
             prepareForAccess(4);
+            
             if (componentCursor.getRemaining() >= 4) {
                 float f = componentCursor.getFloat();
                 index += 4;
                 return f;
             } else {
                 int i = getInt();
+                
                 return Float.intBitsToFloat(i);
             }
         }
@@ -943,8 +974,10 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void putFloat(float f) {
             prepareForAccess(4);
+            
             if (componentCursor.getRemaining() >= 4) {
                 componentCursor.putFloat(f);
                 index += 4;
@@ -957,14 +990,18 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public double getDouble() {
             prepareForAccess(8);
+            
             if (componentCursor.getRemaining() >= 4) {
                 double d = componentCursor.getDouble();
                 index += 8;
+                
                 return d;
             } else {
                 long l = getLong();
+                
                 return Double.longBitsToDouble(l);
             }
         }
@@ -972,8 +1009,10 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void putDouble(double d) {
             prepareForAccess(8);
+            
             if (componentCursor.getRemaining() >= 4) {
                 componentCursor.putDouble(d);
                 index += 8;
@@ -986,15 +1025,19 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public char getChar() {
             prepareForAccess(2);
+            
             if (componentCursor.getRemaining() >= 4) {
                 char c = componentCursor.getChar();
                 index += 2;
+                
                 return c;
             } else {
                 byte b0 = get();
                 byte b1 = get();
+                
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
                     return (char)((b0 << 8) | (b1 & 0xFF));
                 } else {
@@ -1006,25 +1049,55 @@ public final class CompositeByteArray extends AbstractByteArray {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void putChar(char c) {
             prepareForAccess(2);
+            
+            
             if (componentCursor.getRemaining() >= 4) {
                 componentCursor.putChar(c);
                 index += 2;
             } else {
                 byte b0;
                 byte b1;
+                
                 if (order.equals(ByteOrder.BIG_ENDIAN)) {
                     b0 = (byte) ((c >> 8) & 0xff);
-                    b1 = (byte) ((c >> 0) & 0xff);
+                    b1 = (byte) (c & 0xff);
                 } else {
-                    b0 = (byte) ((c >> 0) & 0xff);
+                    b0 = (byte) (c & 0xff);
                     b1 = (byte) ((c >> 8) & 0xff);
                 }
+                
                 put(b0);
                 put(b1);
             }
         }
+        
+        private void checkBounds(int index, int accessSize) {
+            int lower = index;
+            int upper = index + accessSize;
 
+            if (lower < first()) {
+                throw new IndexOutOfBoundsException("Index " + lower + " less than start " + first() + ".");
+            }
+
+            if (upper > last()) {
+                throw new IndexOutOfBoundsException("Index " + upper + " greater than length " + last() + ".");
+            }
+        }
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int h = 17;
+
+        h = h*37 + bas.hashCode();
+        
+        return h;
     }
 }

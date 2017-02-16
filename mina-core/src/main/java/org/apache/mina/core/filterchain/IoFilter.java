@@ -19,11 +19,9 @@
  */
 package org.apache.mina.core.filterchain;
 
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.util.ReferenceCountingFilter;
 
 /**
  * A filter which intercepts {@link IoHandler} events like Servlet
@@ -246,7 +244,7 @@ public interface IoFilter {
     void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception;
 
     /**
-     * Filters {@link IoSession#close(boolean)} method invocation.
+     * Filters {@link IoSession#closeNow()} or a {@link IoSession#closeOnFlush()} method invocations.
      * 
      * @param nextFilter
      *            the {@link NextFilter} for this filter. You can reuse this

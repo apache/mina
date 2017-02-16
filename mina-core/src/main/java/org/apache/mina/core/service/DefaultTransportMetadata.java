@@ -39,6 +39,7 @@ public class DefaultTransportMetadata implements TransportMetadata {
 
     private final boolean connectionless;
 
+    /** The flag indicating that the transport support fragmentation or not */
     private final boolean fragmentation;
 
     private final Class<? extends SocketAddress> addressType;
@@ -47,24 +48,39 @@ public class DefaultTransportMetadata implements TransportMetadata {
 
     private final Set<Class<? extends Object>> envelopeTypes;
 
+    /**
+     * Creates a new DefaultTransportMetadata instance
+     * 
+     * @param providerName The provider name
+     * @param name The name
+     * @param connectionless If the transport is UDP
+     * @param fragmentation If fragmentation is supported
+     * @param addressType The address type (IP V4 or IPV6)
+     * @param sessionConfigType The session configuration type
+     * @param envelopeTypes The types of supported messages
+     */
     public DefaultTransportMetadata(String providerName, String name, boolean connectionless, boolean fragmentation,
             Class<? extends SocketAddress> addressType, Class<? extends IoSessionConfig> sessionConfigType,
             Class<?>... envelopeTypes) {
 
         if (providerName == null) {
             throw new IllegalArgumentException("providerName");
+        } else {
+            this.providerName = providerName.trim().toLowerCase();
+
+            if (this.providerName.length() == 0) {
+                throw new IllegalArgumentException("providerName is empty.");
+            }
         }
+        
         if (name == null) {
             throw new IllegalArgumentException("name");
-        }
-
-        providerName = providerName.trim().toLowerCase();
-        if (providerName.length() == 0) {
-            throw new IllegalArgumentException("providerName is empty.");
-        }
-        name = name.trim().toLowerCase();
-        if (name.length() == 0) {
-            throw new IllegalArgumentException("name is empty.");
+        } else {
+            this.name = name.trim().toLowerCase();
+            
+            if (this.name.length() == 0) {
+                throw new IllegalArgumentException("name is empty.");
+            }
         }
 
         if (addressType == null) {
@@ -83,44 +99,70 @@ public class DefaultTransportMetadata implements TransportMetadata {
             throw new IllegalArgumentException("sessionConfigType");
         }
 
-        this.providerName = providerName;
-        this.name = name;
         this.connectionless = connectionless;
         this.fragmentation = fragmentation;
         this.addressType = addressType;
         this.sessionConfigType = sessionConfigType;
 
-        Set<Class<? extends Object>> newEnvelopeTypes = new IdentityHashSet<Class<? extends Object>>();
+        Set<Class<? extends Object>> newEnvelopeTypes = new IdentityHashSet<>();
         for (Class<? extends Object> c : envelopeTypes) {
             newEnvelopeTypes.add(c);
         }
         this.envelopeTypes = Collections.unmodifiableSet(newEnvelopeTypes);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Class<? extends SocketAddress> getAddressType() {
         return addressType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Set<Class<? extends Object>> getEnvelopeTypes() {
         return envelopeTypes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Class<? extends IoSessionConfig> getSessionConfigType() {
         return sessionConfigType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getProviderName() {
         return providerName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isConnectionless() {
         return connectionless;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean hasFragmentation() {
         return fragmentation;
     }

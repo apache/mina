@@ -25,10 +25,10 @@ import org.apache.mina.core.session.IoSessionConfig;
  * An {@link IoSessionConfig} for serial transport type.
  * All those parameters are extracted from rxtx.org API for more details :
  * http://www.rxtx.org
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface SerialSessionConfig extends IoSessionConfig {
-
     /**
      * Gets the input buffer size. Note that this method is advisory and the underlying OS
      * may choose not to report correct values for the buffer size.
@@ -82,5 +82,4 @@ public interface SerialSessionConfig extends IoSessionConfig {
      * @param bytes minimal amount of byte before producing a new frame, or -1 if disabled
      */
     void setReceiveThreshold(int bytes);
-
 }

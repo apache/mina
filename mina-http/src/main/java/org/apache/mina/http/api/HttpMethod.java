@@ -20,11 +20,32 @@
 package org.apache.mina.http.api;
 
 /**
+ * The HTTP method, one of GET, HEAD, POST, PUT, DELETE, OPTIONS, TRACE, CONNECT
  * 
- * @author The Apache MINA Project (dev@mina.apache.org)
- * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum HttpMethod {
-
-    GET, HEAD, POST, PUT, DELETE, OPTIONS, TRACE, CONNECT
+    /** The GET method */
+    GET, 
+    
+    /** The HEAD method */
+    HEAD, 
+    
+    /** The POST method */
+    POST, 
+    
+    /** The PUT method */
+    PUT, 
+    
+    /** The DELETE method */
+    DELETE, 
+    
+    /** The OPTIONS method */
+    OPTIONS, 
+    
+    /** The TRACE method */
+    TRACE, 
+    
+    /** The CONNECT method */
+    CONNECT
 }

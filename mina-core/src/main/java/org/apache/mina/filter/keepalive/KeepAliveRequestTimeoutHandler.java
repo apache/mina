@@ -70,7 +70,7 @@ public interface KeepAliveRequestTimeoutHandler {
         public void keepAliveRequestTimedOut(KeepAliveFilter filter, IoSession session) throws Exception {
             LOGGER.warn("Closing the session because a keep-alive response "
                     + "message was not received within {} second(s).", filter.getRequestTimeout());
-            session.close(true);
+            session.closeNow();
         }
     };
 

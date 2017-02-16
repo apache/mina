@@ -45,8 +45,6 @@ class AprSocketSession extends AprSession {
 
     /**
      * Create an instance of {@link AprSocketSession}. 
-     * 
-     * {@inheritDoc} 
      */
     AprSocketSession(IoService service, IoProcessor<AprSession> processor, long descriptor) throws Exception {
         super(service, processor, descriptor);

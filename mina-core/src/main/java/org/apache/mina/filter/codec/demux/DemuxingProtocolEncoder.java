@@ -47,17 +47,19 @@ import org.apache.mina.util.IdentityHashSet;
  */
 public class DemuxingProtocolEncoder implements ProtocolEncoder {
 
-    private final AttributeKey STATE = new AttributeKey(getClass(), "state");
+    private static final AttributeKey STATE = new AttributeKey(DemuxingProtocolEncoder.class, "state");
 
     @SuppressWarnings("rawtypes")
-    private final Map<Class<?>, MessageEncoderFactory> type2encoderFactory = new CopyOnWriteMap<Class<?>, MessageEncoderFactory>();
+    private final Map<Class<?>, MessageEncoderFactory> type2encoderFactory = new CopyOnWriteMap<>();
 
     private static final Class<?>[] EMPTY_PARAMS = new Class[0];
 
-    public DemuxingProtocolEncoder() {
-        // Do nothing
-    }
-
+    /**
+     * Add a new message encoder class for a given message type
+     * 
+     * @param messageType The message type
+     * @param encoderClass The encoder class
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void addMessageEncoder(Class<?> messageType, Class<? extends MessageEncoder> encoderClass) {
         if (encoderClass == null) {
@@ -71,6 +73,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
 
         boolean registered = false;
+        
         if (MessageEncoder.class.isAssignableFrom(encoderClass)) {
             addMessageEncoder(messageType, new DefaultConstructorMessageEncoderFactory(encoderClass));
             registered = true;
@@ -81,11 +84,23 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
     }
 
+    /**
+     * Add a new message encoder instance for a given message type
+     * 
+     * @param messageType The message type
+     * @param encoder The encoder instance
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T> void addMessageEncoder(Class<T> messageType, MessageEncoder<? super T> encoder) {
         addMessageEncoder(messageType, new SingletonMessageEncoderFactory(encoder));
     }
 
+    /**
+     * Add a new message encoder factory for a given message type
+     * 
+     * @param messageType The message type
+     * @param factory The encoder factory
+     */
     public <T> void addMessageEncoder(Class<T> messageType, MessageEncoderFactory<? super T> factory) {
         if (messageType == null) {
             throw new IllegalArgumentException("messageType");
@@ -105,6 +120,12 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
     }
 
+    /**
+     * Add a new message encoder class for a list of message types
+     * 
+     * @param messageTypes The message types
+     * @param encoderClass The encoder class
+     */
     @SuppressWarnings("rawtypes")
     public void addMessageEncoder(Iterable<Class<?>> messageTypes, Class<? extends MessageEncoder> encoderClass) {
         for (Class<?> messageType : messageTypes) {
@@ -112,12 +133,24 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
         }
     }
 
+    /**
+     * Add a new message instance class for a list of message types
+     * 
+     * @param messageTypes The message types
+     * @param encoder The encoder instance
+     */
     public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes, MessageEncoder<? super T> encoder) {
         for (Class<? extends T> messageType : messageTypes) {
             addMessageEncoder(messageType, encoder);
         }
     }
 
+    /**
+     * Add a new message encoder factory for a list of message types
+     * 
+     * @param messageTypes The message types
+     * @param factory The encoder factory
+     */
     public <T> void addMessageEncoder(Iterable<Class<? extends T>> messageTypes,
             MessageEncoderFactory<? super T> factory) {
         for (Class<? extends T> messageType : messageTypes) {
@@ -128,6 +161,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         State state = getState(session);
         MessageEncoder<Object> encoder = findEncoder(state, message.getClass());
@@ -145,7 +179,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     @SuppressWarnings("unchecked")
     private MessageEncoder<Object> findEncoder(State state, Class<?> type, Set<Class<?>> triedClasses) {
         @SuppressWarnings("rawtypes")
-        MessageEncoder encoder = null;
+        MessageEncoder encoder;
 
         if (triedClasses != null && triedClasses.contains(type)) {
             return null;
@@ -171,7 +205,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
              */
 
             if (triedClasses == null) {
-                triedClasses = new IdentityHashSet<Class<?>>();
+                triedClasses = new IdentityHashSet<>();
             }
 
             triedClasses.add(type);
@@ -220,6 +254,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void dispose(IoSession session) throws Exception {
         session.removeAttribute(STATE);
     }
@@ -238,10 +273,10 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
 
     private class State {
         @SuppressWarnings("rawtypes")
-        private final ConcurrentHashMap<Class<?>, MessageEncoder> findEncoderCache = new ConcurrentHashMap<Class<?>, MessageEncoder>();
+        private final ConcurrentHashMap<Class<?>, MessageEncoder> findEncoderCache = new ConcurrentHashMap<>();
 
         @SuppressWarnings("rawtypes")
-        private final Map<Class<?>, MessageEncoder> type2encoder = new ConcurrentHashMap<Class<?>, MessageEncoder>();
+        private final Map<Class<?>, MessageEncoder> type2encoder = new ConcurrentHashMap<>();
 
         @SuppressWarnings("rawtypes")
         private State() throws Exception {
@@ -261,6 +296,10 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
             this.encoder = encoder;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public MessageEncoder<T> getEncoder() {
             return encoder;
         }
@@ -280,6 +319,10 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
             this.encoderClass = encoderClass;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public MessageEncoder<T> getEncoder() throws Exception {
             return encoderClass.newInstance();
         }

@@ -39,6 +39,7 @@ public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isClosed() {
         if (isDone()) {
             return ((Boolean) getValue()).booleanValue();
@@ -50,6 +51,7 @@ public class DefaultCloseFuture extends DefaultIoFuture implements CloseFuture {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setClosed() {
         setValue(Boolean.TRUE);
     }

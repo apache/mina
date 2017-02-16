@@ -43,31 +43,45 @@ public class DateEditor extends AbstractPropertyEditor {
             new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH), new SimpleDateFormat("yyyy-MM", Locale.ENGLISH),
             new SimpleDateFormat("yyyy", Locale.ENGLISH), };
 
+    /**
+     * Creates a new DateEditor instance
+     */
     public DateEditor() {
         for (DateFormat f : formats) {
             f.setLenient(true);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String toText(Object value) {
         if (value instanceof Number) {
             long time = ((Number) value).longValue();
+            
             if (time <= 0) {
                 return null;
             }
+            
             value = new Date(time);
         }
+        
         return formats[0].format((Date) value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected Object toValue(String text) throws IllegalArgumentException {
+    protected Object toValue(String text) {
         if (MILLIS.matcher(text).matches()) {
             long time = Long.parseLong(text);
+            
             if (time <= 0) {
                 return null;
             }
+            
             return new Date(time);
         }
 
@@ -75,6 +89,7 @@ public class DateEditor extends AbstractPropertyEditor {
             try {
                 return f.parse(text);
             } catch (ParseException e) {
+                throw new IllegalArgumentException("Wrong date: " + text);
             }
         }
 

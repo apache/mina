@@ -148,7 +148,7 @@ public class PollingIoProcessorTest {
             }
 
             @Override
-            protected int write(NioSession session, IoBuffer buf, int length) throws Exception {
+            protected int write(NioSession session, IoBuffer buf, int length) throws IOException {
                 throw new NoRouteToHostException("No Route To Host Test");
             }
 

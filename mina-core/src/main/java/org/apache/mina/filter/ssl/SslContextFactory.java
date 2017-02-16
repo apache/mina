@@ -88,15 +88,24 @@ public class SslContextFactory {
 
     private int serverSessionTimeout = -1;
 
+    /**
+     * Create a new SSLContext instance,using the {@link KeyManagerFactory} and the
+     * {@link TrustManagerFactory}.
+     *  
+     * @return The created instance
+     * @throws Exception If we weren't able to create the SSLContext insyance
+     */
     public SSLContext newInstance() throws Exception {
         KeyManagerFactory kmf = this.keyManagerFactory;
         TrustManagerFactory tmf = this.trustManagerFactory;
 
         if (kmf == null) {
             String algorithm = keyManagerFactoryAlgorithm;
+            
             if (algorithm == null && keyManagerFactoryAlgorithmUseDefault) {
                 algorithm = KeyManagerFactory.getDefaultAlgorithm();
             }
+            
             if (algorithm != null) {
                 if (keyManagerFactoryProvider == null) {
                     kmf = KeyManagerFactory.getInstance(algorithm);
@@ -108,9 +117,11 @@ public class SslContextFactory {
 
         if (tmf == null) {
             String algorithm = trustManagerFactoryAlgorithm;
+            
             if (algorithm == null && trustManagerFactoryAlgorithmUseDefault) {
                 algorithm = TrustManagerFactory.getDefaultAlgorithm();
             }
+            
             if (algorithm != null) {
                 if (trustManagerFactoryProvider == null) {
                     tmf = TrustManagerFactory.getInstance(algorithm);
@@ -121,21 +132,26 @@ public class SslContextFactory {
         }
 
         KeyManager[] keyManagers = null;
+        
         if (kmf != null) {
             kmf.init(keyManagerFactoryKeyStore, keyManagerFactoryKeyStorePassword);
             keyManagers = kmf.getKeyManagers();
         }
+        
         TrustManager[] trustManagers = null;
+        
         if (tmf != null) {
             if (trustManagerFactoryParameters != null) {
                 tmf.init(trustManagerFactoryParameters);
             } else {
                 tmf.init(trustManagerFactoryKeyStore);
             }
+            
             trustManagers = tmf.getTrustManagers();
         }
 
-        SSLContext context = null;
+        SSLContext context;
+        
         if (provider == null) {
             context = SSLContext.getInstance(protocol);
         } else {
@@ -183,6 +199,7 @@ public class SslContextFactory {
         if (protocol == null) {
             throw new IllegalArgumentException("protocol");
         }
+        
         this.protocol = protocol;
     }
 
@@ -194,8 +211,7 @@ public class SslContextFactory {
      * return by {@link KeyManagerFactory#getDefaultAlgorithm()} will be used.
      * The default value of this property is <tt>true</tt>.
      *
-     * @param useDefault
-     *            <tt>true</tt> or <tt>false</tt>.
+     * @param useDefault <tt>true</tt> or <tt>false</tt>.
      */
     public void setKeyManagerFactoryAlgorithmUseDefault(boolean useDefault) {
         this.keyManagerFactoryAlgorithmUseDefault = useDefault;

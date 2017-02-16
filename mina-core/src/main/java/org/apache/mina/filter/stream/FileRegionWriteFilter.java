@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
+import org.apache.mina.core.session.IoSession;
 
 /**
  * Filter implementation that converts a {@link FileRegion} to {@link IoBuffer}
@@ -53,12 +54,17 @@ import org.apache.mina.core.file.FileRegion;
  * @org.apache.xbean.XBean
  */
 public class FileRegionWriteFilter extends AbstractStreamWriteFilter<FileRegion> {
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Class<FileRegion> getMessageClass() {
         return FileRegion.class;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected IoBuffer getNextBuffer(FileRegion fileRegion) throws IOException {
         // If there are no more bytes to read, return null
@@ -76,7 +82,7 @@ public class FileRegionWriteFilter extends AbstractStreamWriteFilter<FileRegion>
 
         // return the buffer
         buffer.flip();
+        
         return buffer;
     }
-
 }

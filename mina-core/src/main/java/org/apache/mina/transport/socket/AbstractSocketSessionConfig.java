@@ -23,18 +23,18 @@ import org.apache.mina.core.session.AbstractIoSessionConfig;
 import org.apache.mina.core.session.IoSessionConfig;
 
 /**
- * TODO Add documentation
+ * The TCP transport session configuration.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfig implements SocketSessionConfig {
-
-    protected AbstractSocketSessionConfig() {
-        // Do nothing
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected final void doSetAll(IoSessionConfig config) {
+    public void setAll(IoSessionConfig config) {
+        super.setAll(config);
+        
         if (!(config instanceof SocketSessionConfig)) {
             return;
         }

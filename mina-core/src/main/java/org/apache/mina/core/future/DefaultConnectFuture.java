@@ -74,6 +74,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
     /**
      * {@inheritDoc}
      */
+    @Override
     public Throwable getException() {
         Object v = getValue();
         
@@ -87,6 +88,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isConnected() {
         return getValue() instanceof IoSession;
     }
@@ -94,6 +96,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isCanceled() {
         return getValue() == CANCELED;
     }
@@ -101,6 +104,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setSession(IoSession session) {
         if (session == null) {
             throw new IllegalArgumentException("session");
@@ -112,6 +116,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setException(Throwable exception) {
         if (exception == null) {
             throw new IllegalArgumentException("exception");
@@ -123,6 +128,7 @@ public class DefaultConnectFuture extends DefaultIoFuture implements ConnectFutu
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean cancel() {
         return setValue(CANCELED);
     }

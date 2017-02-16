@@ -36,7 +36,7 @@ public class IoSessionPropertyAccessor extends AbstractPropertyAccessor {
     @Override
     protected Object getProperty0(OgnlContext context, Object target, String name) throws OgnlException {
         if (target instanceof IoSession && "attributes".equals(name)) {
-            Map<String, Object> attributes = new TreeMap<String, Object>();
+            Map<String, Object> attributes = new TreeMap<>();
             IoSession s = (IoSession) target;
             for (Object key : s.getAttributeKeys()) {
                 Object value = s.getAttribute(key);

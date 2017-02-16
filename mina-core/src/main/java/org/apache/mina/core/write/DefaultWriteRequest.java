@@ -37,66 +37,130 @@ public class DefaultWriteRequest implements WriteRequest {
 
     /** An empty FUTURE */
     private static final WriteFuture UNUSED_FUTURE = new WriteFuture() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isWritten() {
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setWritten() {
             // Do nothing
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public IoSession getSession() {
             return null;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void join() {
             // Do nothing
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean join(long timeoutInMillis) {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isDone() {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public WriteFuture addListener(IoFutureListener<?> listener) {
             throw new IllegalStateException("You can't add a listener to a dummy future.");
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public WriteFuture removeListener(IoFutureListener<?> listener) {
             throw new IllegalStateException("You can't add a listener to a dummy future.");
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public WriteFuture await() throws InterruptedException {
             return this;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean await(long timeoutMillis) throws InterruptedException {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public WriteFuture awaitUninterruptibly() {
             return this;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean awaitUninterruptibly(long timeout, TimeUnit unit) {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean awaitUninterruptibly(long timeoutMillis) {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public Throwable getException() {
             return null;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setException(Throwable cause) {
             // Do nothing
         }
@@ -151,18 +215,34 @@ public class DefaultWriteRequest implements WriteRequest {
         this.destination = destination;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public WriteFuture getFuture() {
         return future;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Object getMessage() {
         return message;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public WriteRequest getOriginalRequest() {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public SocketAddress getDestination() {
         return destination;
     }
@@ -190,6 +270,10 @@ public class DefaultWriteRequest implements WriteRequest {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isEncoded() {
         return false;
     }

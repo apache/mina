@@ -35,6 +35,8 @@ import org.apache.mina.core.session.IoSession;
  * will lower scalability if building an high performance server. This should only
  * be used with very specific needs in mind.
  * 
+ * @deprecated This class is deprecated
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 @Deprecated
@@ -79,9 +81,8 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * attribute named {@link #HANDLER}.
      * 
      * @see org.apache.mina.core.service.IoHandler#sessionCreated(org.apache.mina.core.session.IoSession)
-     * 
-     * {@inheritDoc}
      */
+    @Override
     public void sessionCreated(IoSession session) throws Exception {
         SingleSessionIoHandler handler = factory.getHandler(session);
         session.setAttribute(HANDLER, handler);
@@ -95,6 +96,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * 
      * {@inheritDoc}
      */
+    @Override
     public void sessionOpened(IoSession session) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.sessionOpened();
@@ -107,6 +109,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * 
      * {@inheritDoc}
      */
+    @Override
     public void sessionClosed(IoSession session) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.sessionClosed();
@@ -119,6 +122,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * 
      * {@inheritDoc}
      */
+    @Override
     public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.sessionIdle(status);
@@ -131,6 +135,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * 
      * {@inheritDoc}
      */
+    @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.exceptionCaught(cause);
@@ -143,6 +148,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * 
      * {@inheritDoc}
      */
+    @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.messageReceived(message);
@@ -155,6 +161,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
      * 
      * {@inheritDoc}
      */
+    @Override
     public void messageSent(IoSession session, Object message) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.messageSent(message);
@@ -163,6 +170,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void inputClosed(IoSession session) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.inputClosed(session);

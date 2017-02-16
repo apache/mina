@@ -41,6 +41,8 @@ public class SpringXBeanTest {
      * Checks to see we can easily configure a NIO based DatagramAcceptor 
      * using XBean-Spring.  Tests various configuration settings for the 
      * NIO based DatagramAcceptor.
+     * 
+     * @throws Exception if e got some error
      */
     @Test
     public void testNioDatagramAcceptor() throws Exception {

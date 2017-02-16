@@ -34,10 +34,11 @@ import java.nio.charset.Charset;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PrefixedStringEncoder extends ProtocolEncoderAdapter {
+    /** The default length for the prefix */
+    public static final int DEFAULT_PREFIX_LENGTH = 4;
 
-    public final static int DEFAULT_PREFIX_LENGTH = 4;
-
-    public final static int DEFAULT_MAX_DATA_LENGTH = 2048;
+    /** The default maximum data length */ 
+    public static final int DEFAULT_MAX_DATA_LENGTH = 2048;
 
     private final Charset charset;
 
@@ -45,20 +46,41 @@ public class PrefixedStringEncoder extends ProtocolEncoderAdapter {
 
     private int maxDataLength = DEFAULT_MAX_DATA_LENGTH;
 
+    /**
+     * Creates a new PrefixedStringEncoder instance
+     * 
+     * @param charset       the {@link Charset} to use for encoding
+     * @param prefixLength  the length of the prefix
+     * @param maxDataLength maximum number of bytes allowed for a single String
+     */
     public PrefixedStringEncoder(Charset charset, int prefixLength, int maxDataLength) {
         this.charset = charset;
         this.prefixLength = prefixLength;
         this.maxDataLength = maxDataLength;
     }
 
+    /**
+     * Creates a new PrefixedStringEncoder instance
+     * 
+     * @param charset       the {@link Charset} to use for encoding
+     * @param prefixLength  the length of the prefix
+     */
     public PrefixedStringEncoder(Charset charset, int prefixLength) {
         this(charset, prefixLength, DEFAULT_MAX_DATA_LENGTH);
     }
 
+    /**
+     * Creates a new PrefixedStringEncoder instance
+     * 
+     * @param charset       the {@link Charset} to use for encoding
+     */
     public PrefixedStringEncoder(Charset charset) {
         this(charset, DEFAULT_PREFIX_LENGTH);
     }
 
+    /**
+     * Creates a new PrefixedStringEncoder instance
+     */
     public PrefixedStringEncoder() {
         this(Charset.defaultCharset());
     }
@@ -108,6 +130,10 @@ public class PrefixedStringEncoder extends ProtocolEncoderAdapter {
         return maxDataLength;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
         String value = (String) message;
         IoBuffer buffer = IoBuffer.allocate(value.length()).setAutoExpand(true);

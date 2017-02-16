@@ -34,42 +34,49 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void init() throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void destroy() throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void onPreRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         nextFilter.sessionCreated(session);
     }
@@ -77,6 +84,7 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
         nextFilter.sessionOpened(session);
     }
@@ -84,6 +92,7 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         nextFilter.sessionClosed(session);
     }
@@ -91,6 +100,7 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         nextFilter.sessionIdle(session, status);
     }
@@ -98,6 +108,7 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
         nextFilter.exceptionCaught(session, cause);
     }
@@ -105,6 +116,7 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
         nextFilter.messageReceived(session, message);
     }
@@ -112,6 +124,7 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         nextFilter.messageSent(session, writeRequest);
     }
@@ -119,6 +132,7 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         nextFilter.filterWrite(session, writeRequest);
     }
@@ -126,6 +140,7 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
         nextFilter.filterClose(session);
     }
@@ -133,10 +148,15 @@ public class IoFilterAdapter implements IoFilter {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void inputClosed(NextFilter nextFilter, IoSession session) throws Exception {
         nextFilter.inputClosed(session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         return this.getClass().getSimpleName();
     }

@@ -49,6 +49,7 @@ public class ChainedIoHandler extends IoHandlerAdapter {
         if (chain == null) {
             throw new IllegalArgumentException("chain");
         }
+        
         this.chain = chain;
     }
 

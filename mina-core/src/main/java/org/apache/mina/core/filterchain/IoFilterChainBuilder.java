@@ -19,8 +19,6 @@
  */
 package org.apache.mina.core.filterchain;
 
-import org.apache.mina.core.session.IoSession;
-
 /**
  * An interface that builds {@link IoFilterChain} in predefined way
  * when {@link IoSession} is created.  You can extract common filter chain
@@ -41,9 +39,16 @@ public interface IoFilterChainBuilder {
      * An implementation which does nothing.
      */
     IoFilterChainBuilder NOOP = new IoFilterChainBuilder() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void buildFilterChain(IoFilterChain chain) throws Exception {
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return "NOOP";

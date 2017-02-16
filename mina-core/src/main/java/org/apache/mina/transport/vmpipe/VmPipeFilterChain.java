@@ -253,7 +253,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
                 session.getLock().lock();
                 if (!session.getCloseFuture().isClosed()) {
                     session.getServiceListeners().fireSessionDestroyed(session);
-                    session.getRemoteSession().close(true);
+                    session.getRemoteSession().closeNow();
                 }
             } finally {
                 session.getLock().unlock();

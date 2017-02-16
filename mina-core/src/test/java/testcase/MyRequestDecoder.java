@@ -49,11 +49,11 @@ public class MyRequestDecoder extends CumulativeProtocolDecoder {
                     logger.debug("Wake up now from a 500 ms sleep for session {}", session.getId());
                 } catch (InterruptedException ignore) {
                 }
-                session.close(true);
+                session.closeNow();
             }
         }).start();
 
-        // sleep so that session.close(true) is already called when decoding continues
+        // sleep so that session.closeNow() is already called when decoding continues
         logger.debug("Sleep for 1000 ms for session {}", session.getId());
         Thread.sleep(1000);
         logger.debug("Wake up now from a 1000 ms sleep for session {}", session.getId());

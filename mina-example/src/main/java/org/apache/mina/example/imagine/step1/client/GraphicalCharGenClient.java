@@ -43,7 +43,6 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import org.apache.mina.example.imagine.step1.ImageRequest;
-import org.apache.mina.example.imagine.step1.server.ImageServer;
 
 /**
  * Swing application that acts as a client of the {@link ImageServer}

@@ -22,7 +22,6 @@ package org.apache.mina.core.service;
 import java.net.SocketAddress;
 
 import org.apache.mina.core.future.ConnectFuture;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionInitializer;
 
 /**
@@ -49,6 +48,7 @@ public interface IoConnector extends IoService {
      * 
      * @deprecated
      */
+    @Deprecated
     int getConnectTimeout();
 
     /**
@@ -62,6 +62,7 @@ public interface IoConnector extends IoService {
      * @deprecated
      * @param connectTimeout The time out for the connection
      */
+    @Deprecated
     void setConnectTimeout(int connectTimeout);
 
     /**

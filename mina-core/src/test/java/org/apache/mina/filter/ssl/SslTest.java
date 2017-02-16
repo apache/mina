@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
@@ -57,6 +58,8 @@ public class SslTest {
     private static InetAddress address;
 
     private static SSLSocketFactory factory;
+    
+    private static NioSocketAcceptor acceptor;
 
     /** A JVM independant KEY_MANAGER_FACTORY algorithm */
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
@@ -86,7 +89,7 @@ public class SslTest {
                 }
                     
                 session.write(sb.toString());
-                session.close(true);
+                session.closeOnFlush();
             }
         }
     }
@@ -96,7 +99,7 @@ public class SslTest {
      * protocol codec filter
      */
     private static void startServer() throws Exception {
-        NioSocketAcceptor acceptor = new NioSocketAcceptor();
+        acceptor = new NioSocketAcceptor();
 
         acceptor.setReuseAddress(true);
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
@@ -104,12 +107,17 @@ public class SslTest {
         // Inject the SSL filter
         SslFilter sslFilter = new SslFilter(createSSLContext());
         filters.addLast("sslFilter", sslFilter);
+        sslFilter.setNeedClientAuth(true);
 
         // Inject the TestLine codec filter
         filters.addLast("text", new ProtocolCodecFilter(new TextLineCodecFactory()));
 
         acceptor.setHandler(new TestHandler());
         acceptor.bind(new InetSocketAddress(port));
+    }
+    
+    private static void stopServer() {
+        acceptor.dispose();
     }
 
     /**
@@ -169,20 +177,91 @@ public class SslTest {
 
     @Test
     public void testSSL() throws Exception {
-        startServer();
-
-        Thread t = new Thread() {
-            public void run() {
-                try {
-                    startClient();
-                } catch (Exception e) {
-                    clientError = e;
+        try {
+            startServer();
+    
+            Thread t = new Thread() {
+                public void run() {
+                    try {
+                        startClient();
+                    } catch (Exception e) {
+                        clientError = e;
+                    }
                 }
+            };
+            t.start();
+            t.join();
+            
+            if (clientError != null) {
+                throw clientError;
             }
-        };
-        t.start();
-        t.join();
-        if (clientError != null)
-            throw clientError;
+        } finally {
+            stopServer();
+        }
+    }
+    
+    
+    @Test
+    public void unsecureClientTryToConnectoToSecureServer() throws Exception {
+        try {
+            startServer(); // Start Server with SSLFilter
+    
+            //Now start a client without any SSL
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        address = InetAddress.getByName("localhost");
+    
+                        Socket socket = new Socket(address, port);
+                        socket.setSoTimeout(10000);
+    
+                        String response = null;
+    
+                        while (response == null) {
+                            try {
+                                System.out.println(socket.isConnected());
+                                // System.out.println("Client sending: hello");
+                                socket.getOutputStream().write("hello                      \n".getBytes());
+                                socket.getOutputStream().flush();
+                                socket.setSoTimeout(1000);
+    
+                                // System.out.println("Client sending: send");
+                                socket.getOutputStream().write("send\n".getBytes());
+                                socket.getOutputStream().flush();
+    
+                                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                                String line = "";
+                                
+                                while ((line = in.readLine()) != null) {
+                                    response = response + line;
+                                }
+                            } catch (SocketTimeoutException timeout) {
+                                // donothing
+                                timeout.printStackTrace();
+                            }
+                        }
+                        
+                        if (response.contains("AAAAAAA")){
+                            throw new IllegalStateException("getting response:" + response);
+                        }
+                        
+                        // System.out.println("Client got: " + line);
+                        socket.close();
+                    } catch (Exception e) {
+                        clientError = e;
+                    }
+                }
+            };
+            
+            t.start();
+            t.join();
+            
+            if (clientError != null) {
+                throw clientError;
+            }
+        } finally {
+            stopServer();
+        }
     }
 }

@@ -51,10 +51,18 @@ public final class SerialConnector extends AbstractIoConnector {
 
     private IdleStatusChecker idleChecker;
 
+    /**
+     * Creates a new SerialConnector instance
+     */
     public SerialConnector() {
         this(null);
     }
 
+    /**
+     * Creates a new SerialConnector instance
+     * 
+     * @param executor The Executor to use internally
+     */
     public SerialConnector(Executor executor) {
         super(new DefaultSerialSessionConfig(), executor);
         log = LoggerFactory.getLogger(SerialConnector.class);
@@ -63,7 +71,6 @@ public final class SerialConnector extends AbstractIoConnector {
         // we schedule the idle status checking task in this service exceutor
         // it will be woke up every seconds
         executeWorker(idleChecker.getNotifyingTask(), "idleStatusChecker");
-
     }
 
     @Override
@@ -78,10 +85,12 @@ public final class SerialConnector extends AbstractIoConnector {
         // looping around found ports
         while (portList.hasMoreElements()) {
             portId = (CommPortIdentifier) portList.nextElement();
+            
             if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
                 if (log.isDebugEnabled()) {
                     log.debug("Serial port discovered : " + portId.getName());
                 }
+                
                 if (portId.getName().equals(portAddress.getName())) {
                     try {
                         if (log.isDebugEnabled()) {
@@ -94,26 +103,31 @@ public final class SerialConnector extends AbstractIoConnector {
                         SerialSessionImpl session = new SerialSessionImpl(this, getListeners(), portAddress, serialPort);
                         initSession(session, future, sessionInitializer);
                         session.start();
+                        
                         return future;
                     } catch (PortInUseException e) {
                         if (log.isDebugEnabled()) {
                             log.debug("Port In Use Exception : ", e);
                         }
+                        
                         return DefaultConnectFuture.newFailedFuture(e);
                     } catch (UnsupportedCommOperationException e) {
                         if (log.isDebugEnabled()) {
                             log.debug("Comm Exception : ", e);
                         }
+                        
                         return DefaultConnectFuture.newFailedFuture(e);
                     } catch (IOException e) {
                         if (log.isDebugEnabled()) {
                             log.debug("IOException : ", e);
                         }
+                        
                         return DefaultConnectFuture.newFailedFuture(e);
                     } catch (TooManyListenersException e) {
                         if (log.isDebugEnabled()) {
                             log.debug("TooManyListenersException : ", e);
                         }
+                        
                         return DefaultConnectFuture.newFailedFuture(e);
                     }
                 }
@@ -123,6 +137,9 @@ public final class SerialConnector extends AbstractIoConnector {
         return DefaultConnectFuture.newFailedFuture(new SerialPortUnavailableException("Serial port not found"));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void dispose0() throws Exception {
         // stop the idle checking task
@@ -139,6 +156,7 @@ public final class SerialConnector extends AbstractIoConnector {
         SerialSessionConfig config = (SerialSessionConfig) getSessionConfig();
 
         long connectTimeout = getConnectTimeoutMillis();
+        
         if (connectTimeout > Integer.MAX_VALUE) {
             connectTimeout = Integer.MAX_VALUE;
         }
@@ -172,6 +190,10 @@ public final class SerialConnector extends AbstractIoConnector {
         return idleChecker;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IoSessionConfig getSessionConfig() {
         return sessionConfig;
     }

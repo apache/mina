@@ -24,14 +24,18 @@ import org.apache.mina.core.RuntimeIoException;
 /**
  * Exception thrown when the serial port can't be open because
  * it doesn't exists.
+ * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SerialPortUnavailableException extends RuntimeIoException {
-
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates a new SerialPortUnavailableException instance
+     * 
+     * @param details The error message
+     */
     public SerialPortUnavailableException(String details) {
         super(details);
     }
-
 }

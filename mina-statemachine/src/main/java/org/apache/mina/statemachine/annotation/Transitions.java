@@ -32,5 +32,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Transitions {
+    /**
+     * @return The list of {@link Transition}s
+     */
     Transition[] value();
 }

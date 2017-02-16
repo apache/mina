@@ -71,9 +71,30 @@ import org.slf4j.MDC;
  */
 
 public class MdcInjectionFilter extends CommonEventFilter {
-
+    /**
+     * This enum lists all the possible keys this filter will process 
+     */
     public enum MdcKey {
-        handlerClass, remoteAddress, localAddress, remoteIp, remotePort, localIp, localPort
+        /** Tha class handling the requests */
+        handlerClass, 
+        
+        /** The remote peer address */
+        remoteAddress, 
+        
+        /** The local address */
+        localAddress, 
+        
+        /** The remote peer IP address */
+        remoteIp, 
+        
+        /** The remote peer port */
+        remotePort, 
+        
+        /** The local IP address */
+        localIp, 
+        
+        /** The local port */
+        localPort
     }
 
     /** key used for storing the context map in the IoSession */
@@ -107,14 +128,20 @@ public class MdcInjectionFilter extends CommonEventFilter {
      * @see #setProperty(org.apache.mina.core.session.IoSession, String, String)
      */
     public MdcInjectionFilter(MdcKey... keys) {
-        Set<MdcKey> keySet = new HashSet<MdcKey>(Arrays.asList(keys));
+        Set<MdcKey> keySet = new HashSet<>(Arrays.asList(keys));
         this.mdcKeys = EnumSet.copyOf(keySet);
     }
 
+    /**
+     * Create a new MdcInjectionFilter instance
+     */
     public MdcInjectionFilter() {
         this.mdcKeys = EnumSet.allOf(MdcKey.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void filter(IoFilterEvent event) throws Exception {
         // since this method can potentially call into itself
@@ -157,8 +184,9 @@ public class MdcInjectionFilter extends CommonEventFilter {
     @SuppressWarnings("unchecked")
     private static Map<String, String> getContext(final IoSession session) {
         Map<String, String> context = (Map<String, String>) session.getAttribute(CONTEXT_KEY);
+        
         if (context == null) {
-            context = new ConcurrentHashMap<String, String>();
+            context = new ConcurrentHashMap<>();
             session.setAttribute(CONTEXT_KEY, context);
         }
         return context;
@@ -174,12 +202,15 @@ public class MdcInjectionFilter extends CommonEventFilter {
         if (mdcKeys.contains(MdcKey.handlerClass)) {
             context.put(MdcKey.handlerClass.name(), session.getHandler().getClass().getName());
         }
+        
         if (mdcKeys.contains(MdcKey.remoteAddress)) {
             context.put(MdcKey.remoteAddress.name(), session.getRemoteAddress().toString());
         }
+        
         if (mdcKeys.contains(MdcKey.localAddress)) {
             context.put(MdcKey.localAddress.name(), session.getLocalAddress().toString());
         }
+        
         if (session.getTransportMetadata().getAddressType() == InetSocketAddress.class) {
             InetSocketAddress remoteAddress = (InetSocketAddress) session.getRemoteAddress();
             InetSocketAddress localAddress = (InetSocketAddress) session.getLocalAddress();
@@ -187,18 +218,28 @@ public class MdcInjectionFilter extends CommonEventFilter {
             if (mdcKeys.contains(MdcKey.remoteIp)) {
                 context.put(MdcKey.remoteIp.name(), remoteAddress.getAddress().getHostAddress());
             }
+            
             if (mdcKeys.contains(MdcKey.remotePort)) {
                 context.put(MdcKey.remotePort.name(), String.valueOf(remoteAddress.getPort()));
             }
+            
             if (mdcKeys.contains(MdcKey.localIp)) {
                 context.put(MdcKey.localIp.name(), localAddress.getAddress().getHostAddress());
             }
+            
             if (mdcKeys.contains(MdcKey.localPort)) {
                 context.put(MdcKey.localPort.name(), String.valueOf(localAddress.getPort()));
             }
         }
     }
 
+    /**
+     * Get the property associated with a given key
+     * 
+     * @param session The {@IoSession} 
+     * @param key The key we are looking at
+     * @return The associated property
+     */
     public static String getProperty(IoSession session, String key) {
         if (key == null) {
             throw new IllegalArgumentException("key should not be null");
@@ -206,6 +247,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
 
         Map<String, String> context = getContext(session);
         String answer = context.get(key);
+        
         if (answer != null) {
             return answer;
         }
@@ -224,18 +266,27 @@ public class MdcInjectionFilter extends CommonEventFilter {
         if (key == null) {
             throw new IllegalArgumentException("key should not be null");
         }
+        
         if (value == null) {
             removeProperty(session, key);
         }
+        
         Map<String, String> context = getContext(session);
         context.put(key, value);
         MDC.put(key, value);
     }
 
+    /**
+     * Remove a property from the context for the given session
+     * This property will be removed from the MDC for all subsequent events
+     * @param session The session for which you want to remove a property
+     * @param key  The name of the property (should not be null)
+     */
     public static void removeProperty(IoSession session, String key) {
         if (key == null) {
             throw new IllegalArgumentException("key should not be null");
         }
+        
         Map<String, String> context = getContext(session);
         context.remove(key);
         MDC.remove(key);

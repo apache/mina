@@ -33,23 +33,17 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.mina.core.RuntimeIoException;
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.service.AbstractIoAcceptor;
-import org.apache.mina.core.service.AbstractIoService;
-import org.apache.mina.core.service.IoAcceptor;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
-import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.util.ExceptionMonitor;
 
 /**
@@ -65,6 +59,8 @@ import org.apache.mina.util.ExceptionMonitor;
  * by the subclassing implementation.
  * 
  * @see NioSocketAcceptor for a example of implementation
+ * @param <H> The type of IoHandler
+ * @param <S> The type of IoSession
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -76,9 +72,9 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
 
     private final boolean createdProcessor;
 
-    private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> registerQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<AcceptorOperationFuture>();
+    private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<>();
 
     private final Map<SocketAddress, H> boundHandles = Collections.synchronizedMap(new HashMap<SocketAddress, H>());
 
@@ -88,7 +84,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     private volatile boolean selectable;
 
     /** The thread responsible of accepting incoming requests */
-    private AtomicReference<Acceptor> acceptorRef = new AtomicReference<Acceptor>();
+    private AtomicReference<Acceptor> acceptorRef = new AtomicReference<>();
 
     protected boolean reuseAddress = false;
 
@@ -144,7 +140,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      *
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
-     * @param processorClass a {@link Class}�of {@link IoProcessor} for the associated {@link IoSession}
+     * @param processorClass a {@link Class} of {@link IoProcessor} for the associated {@link IoSession}
      *            type.
      * @param processorCount the amount of processor to instantiate for the pool
      * @param selectorProvider The SelectorProvider to use
@@ -199,7 +195,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      * events. If a null {@link Executor} is provided, a default one will be
      * created using {@link Executors#newCachedThreadPool()}.
      * 
-     * @see AbstractIoService(IoSessionConfig, Executor)
+     * @see #AbstractIoService(IoSessionConfig, Executor)
      * 
      * @param sessionConfig
      *            the default configuration for the managed {@link IoSession}
@@ -356,8 +352,6 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
         try {
             lock.acquire();
 
-            // Wait a bit to give a chance to the Acceptor thread to do the select()
-            Thread.sleep(10);
             wakeup();
         } finally {
             lock.release();
@@ -373,7 +367,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
         // Update the local addresses.
         // setLocalAddresses() shouldn't be called from the worker thread
         // because of deadlock.
-        Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
+        Set<SocketAddress> newLocalAddresses = new HashSet<>();
 
         for (H handle : boundHandles.values()) {
             newLocalAddresses.add(localAddress(handle));
@@ -437,8 +431,12 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      * The loop is stopped when all the bound handlers are unbound.
      */
     private class Acceptor implements Runnable {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void run() {
-            assert (acceptorRef.get() == this);
+            assert acceptorRef.get() == this;
 
             int nHandles = 0;
 
@@ -447,16 +445,19 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
 
             while (selectable) {
                 try {
+                    // Process the bound sockets to this acceptor.
+                    // this actually sets the selector to OP_ACCEPT,
+                    // and binds to the port on which this class will
+                    // listen on. We do that before the select because 
+                    // the registerQueue containing the new handler is
+                    // already updated at this point.
+                    nHandles += registerHandles();
+
                     // Detect if we have some keys ready to be processed
                     // The select() will be woke up if some new connection
                     // have occurred, or if the selector has been explicitly
                     // woke up
                     int selected = select();
-
-                    // this actually sets the selector to OP_ACCEPT,
-                    // and binds to the port on which this class will
-                    // listen on
-                    nHandles += registerHandles();
 
                     // Now, if the number of registred handles is 0, we can
                     // quit the loop: we don't have any socket listening
@@ -465,16 +466,16 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                         acceptorRef.set(null);
 
                         if (registerQueue.isEmpty() && cancelQueue.isEmpty()) {
-                            assert (acceptorRef.get() != this);
+                            assert acceptorRef.get() != this;
                             break;
                         }
 
                         if (!acceptorRef.compareAndSet(null, this)) {
-                            assert (acceptorRef.get() != this);
+                            assert acceptorRef.get() != this;
                             break;
                         }
 
-                        assert (acceptorRef.get() == this);
+                        assert acceptorRef.get() == this;
                     }
 
                     if (selected > 0) {
@@ -552,109 +553,112 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                 session.getProcessor().add(session);
             }
         }
-    }
 
-    /**
-     * Sets up the socket communications.  Sets items such as:
-     * <p/>
-     * Blocking
-     * Reuse address
-     * Receive buffer size
-     * Bind to listen port
-     * Registers OP_ACCEPT for selector
-     */
-    private int registerHandles() {
-        for (;;) {
-            // The register queue contains the list of services to manage
-            // in this acceptor.
-            AcceptorOperationFuture future = registerQueue.poll();
+        /**
+         * Sets up the socket communications.  Sets items such as:
+         * <p/>
+         * Blocking
+         * Reuse address
+         * Receive buffer size
+         * Bind to listen port
+         * Registers OP_ACCEPT for selector
+         */
+        private int registerHandles() {
+            for (;;) {
+                // The register queue contains the list of services to manage
+                // in this acceptor.
+                AcceptorOperationFuture future = registerQueue.poll();
 
-            if (future == null) {
-                return 0;
-            }
-
-            // We create a temporary map to store the bound handles,
-            // as we may have to remove them all if there is an exception
-            // during the sockets opening.
-            Map<SocketAddress, H> newHandles = new ConcurrentHashMap<SocketAddress, H>();
-            List<SocketAddress> localAddresses = future.getLocalAddresses();
-
-            try {
-                // Process all the addresses
-                for (SocketAddress a : localAddresses) {
-                    H handle = open(a);
-                    newHandles.put(localAddress(handle), handle);
+                if (future == null) {
+                    return 0;
                 }
 
-                // Everything went ok, we can now update the map storing
-                // all the bound sockets.
-                boundHandles.putAll(newHandles);
-
-                // and notify.
-                future.setDone();
-                return newHandles.size();
-            } catch (Exception e) {
-                // We store the exception in the future
-                future.setException(e);
-            } finally {
-                // Roll back if failed to bind all addresses.
-                if (future.getException() != null) {
-                    for (H handle : newHandles.values()) {
-                        try {
-                            close(handle);
-                        } catch (Exception e) {
-                            ExceptionMonitor.getInstance().exceptionCaught(e);
-                        }
-                    }
-
-                    // TODO : add some comment : what is the wakeup() waking up ?
-                    wakeup();
-                }
-            }
-        }
-    }
-
-    /**
-     * This method just checks to see if anything has been placed into the
-     * cancellation queue.  The only thing that should be in the cancelQueue
-     * is CancellationRequest objects and the only place this happens is in
-     * the doUnbind() method.
-     */
-    private int unregisterHandles() {
-        int cancelledHandles = 0;
-        for (;;) {
-            AcceptorOperationFuture future = cancelQueue.poll();
-            if (future == null) {
-                break;
-            }
-
-            // close the channels
-            for (SocketAddress a : future.getLocalAddresses()) {
-                H handle = boundHandles.remove(a);
-
-                if (handle == null) {
-                    continue;
-                }
+                // We create a temporary map to store the bound handles,
+                // as we may have to remove them all if there is an exception
+                // during the sockets opening.
+                Map<SocketAddress, H> newHandles = new ConcurrentHashMap<>();
+                List<SocketAddress> localAddresses = future.getLocalAddresses();
 
                 try {
-                    close(handle);
-                    wakeup(); // wake up again to trigger thread death
+                    // Process all the addresses
+                    for (SocketAddress a : localAddresses) {
+                        H handle = open(a);
+                        newHandles.put(localAddress(handle), handle);
+                    }
+
+                    // Everything went ok, we can now update the map storing
+                    // all the bound sockets.
+                    boundHandles.putAll(newHandles);
+
+                    // and notify.
+                    future.setDone();
+                    
+                    return newHandles.size();
                 } catch (Exception e) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                    // We store the exception in the future
+                    future.setException(e);
                 } finally {
-                    cancelledHandles++;
+                    // Roll back if failed to bind all addresses.
+                    if (future.getException() != null) {
+                        for (H handle : newHandles.values()) {
+                            try {
+                                close(handle);
+                            } catch (Exception e) {
+                                ExceptionMonitor.getInstance().exceptionCaught(e);
+                            }
+                        }
+
+                        // Wake up the selector to be sure we will process the newly bound handle
+                        // and not block forever in the select()
+                        wakeup();
+                    }
                 }
             }
-
-            future.setDone();
         }
 
-        return cancelledHandles;
+        /**
+         * This method just checks to see if anything has been placed into the
+         * cancellation queue.  The only thing that should be in the cancelQueue
+         * is CancellationRequest objects and the only place this happens is in
+         * the doUnbind() method.
+         */
+        private int unregisterHandles() {
+            int cancelledHandles = 0;
+            for (;;) {
+                AcceptorOperationFuture future = cancelQueue.poll();
+                if (future == null) {
+                    break;
+                }
+
+                // close the channels
+                for (SocketAddress a : future.getLocalAddresses()) {
+                    H handle = boundHandles.remove(a);
+
+                    if (handle == null) {
+                        continue;
+                    }
+
+                    try {
+                        close(handle);
+                        wakeup(); // wake up again to trigger thread death
+                    } catch (Exception e) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e);
+                    } finally {
+                        cancelledHandles++;
+                    }
+                }
+
+                future.setDone();
+            }
+
+            return cancelledHandles;
+        }
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public final IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress) {
         throw new UnsupportedOperationException();
     }
@@ -708,6 +712,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketSessionConfig getSessionConfig() {
         return (SocketSessionConfig)sessionConfig;
     }

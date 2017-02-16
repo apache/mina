@@ -19,8 +19,6 @@
  */
 package org.apache.mina.core;
 
-import java.io.IOException;
-
 /**
  * A unchecked version of {@link IOException}.
  * <p>
@@ -33,18 +31,37 @@ import java.io.IOException;
 public class RuntimeIoException extends RuntimeException {
     private static final long serialVersionUID = 9029092241311939548L;
 
+    /**
+     * Create a new RuntimeIoException instance
+     */
     public RuntimeIoException() {
         super();
     }
 
+    /**
+     * Create a new RuntimeIoException instance
+     * 
+     * @param message The error message
+     */
     public RuntimeIoException(String message) {
         super(message);
     }
 
+    /**
+     * Create a new RuntimeIoException instance
+     * 
+     * @param message The error message
+     * @param cause The original exception
+     */
     public RuntimeIoException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Create a new RuntimeIoException instance
+     * 
+     * @param cause The original exception
+     */
     public RuntimeIoException(Throwable cause) {
         super(cause);
     }

@@ -29,7 +29,10 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class SingleByteDecodingState implements DecodingState {
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (in.hasRemaining()) {
             return finishDecode(in.get(), out);
@@ -41,6 +44,7 @@ public abstract class SingleByteDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         throw new ProtocolDecoderException("Unexpected end of session while waiting for a single byte.");
     }

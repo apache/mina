@@ -22,7 +22,6 @@ package org.apache.mina.core.filterchain;
 import java.util.List;
 
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
@@ -222,8 +221,7 @@ public interface IoFilterChain {
     /**
      * Replace the filter with the specified name with the specified new filter.
      * 
-     * @param filter
-     *            The filter to remove
+     * @param filter The filter to remove
      */
     void remove(IoFilter filter);
 
@@ -232,8 +230,7 @@ public interface IoFilterChain {
      * If there's more than one filter with the specified type, the first match
      * will be replaced.
      * 
-     * @param filterType
-     *            The filter class to remove
+     * @param filterType The filter class to remove
      * @return The removed filter
      */
     IoFilter remove(Class<? extends IoFilter> filterType);
@@ -280,8 +277,7 @@ public interface IoFilterChain {
      * users don't need to call this method at all. Please use this method only
      * when you implement a new transport or fire a virtual event.
      * 
-     * @param message
-     *            The received message
+     * @param message The received message
      */
     void fireMessageReceived(Object message);
 
@@ -290,8 +286,7 @@ public interface IoFilterChain {
      * users don't need to call this method at all. Please use this method only
      * when you implement a new transport or fire a virtual event.
      * 
-     * @param request
-     *            The sent request
+     * @param request The sent request
      */
     void fireMessageSent(WriteRequest request);
 
@@ -316,13 +311,12 @@ public interface IoFilterChain {
      * call this method at all. Please use this method only when you implement a
      * new transport or fire a virtual event.
      * 
-     * @param writeRequest
-     *            The message to write
+     * @param writeRequest The message to write
      */
     void fireFilterWrite(WriteRequest writeRequest);
 
     /**
-     * Fires a {@link IoSession#close(boolean)} event. Most users don't need to call this method at
+     * Fires a {@link IoSession#closeNow()} or a {@link IoSession#closeOnFlush()} event. Most users don't need to call this method at
      * all. Please use this method only when you implement a new transport or fire a virtual
      * event.
      */

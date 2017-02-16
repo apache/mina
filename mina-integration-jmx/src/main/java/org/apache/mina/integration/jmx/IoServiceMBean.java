@@ -42,13 +42,21 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
     static String getSessionIdAsString(long l) {
         // ID in MINA is a unsigned 32-bit integer.
         String id = Long.toHexString(l).toUpperCase();
+        
         while (id.length() < 8) {
             id = '0' + id; // padding
         }
+        
         id = "0x" + id;
+        
         return id;
     }
 
+    /**
+     * Creates a new IoServiceMBean instance
+     * 
+     * @param source The IoService to monitor
+     */
     public IoServiceMBean(IoService source) {
         super(source);
     }
@@ -63,6 +71,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
         if (name.equals("findAndRegisterSessions")) {
             IoSessionFinder finder = new IoSessionFinder((String) params[0]);
             Set<IoSession> registeredSessions = new LinkedHashSet<IoSession>();
+            
             for (IoSession s : finder.find(getSource().getManagedSessions().values())) {
                 try {
                     getServer().registerMBean(
@@ -91,6 +100,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
                     LOGGER.warn("Failed to execute '" + command + "' for: " + s, e);
                 }
             }
+            
             return matches;
         }
 

@@ -38,13 +38,13 @@ public class BogusSslContextFactory {
     /**
      * Protocol to use.
      */
-    private static final String PROTOCOL = "TLS";
+    private static final String PROTOCOL = "TLSv1.2";
 
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
 
     static {
-        String algorithm = Security
-                .getProperty("ssl.KeyManagerFactory.algorithm");
+        String algorithm = Security.getProperty("ssl.KeyManagerFactory.algorithm");
+        
         if (algorithm == null) {
             algorithm = KeyManagerFactory.getDefaultAlgorithm();
         }
@@ -53,7 +53,7 @@ public class BogusSslContextFactory {
     }
 
     /**
-     * Bougus Server certificate keystore file name.
+     * Bogus Server certificate keystore file name.
      */
     private static final String BOGUS_KEYSTORE = "bogus.cert";
 
@@ -79,20 +79,20 @@ public class BogusSslContextFactory {
      * @return SSLContext The created SSLContext 
      * @throws GeneralSecurityException If we had an issue creating the SSLContext
      */
-    public static SSLContext getInstance(boolean server)
-            throws GeneralSecurityException {
-        SSLContext retInstance = null;
+    public static SSLContext getInstance(boolean server) throws GeneralSecurityException {
+        SSLContext retInstance;
+        
         if (server) {
             synchronized(BogusSslContextFactory.class) {
                 if (serverInstance == null) {
                     try {
                         serverInstance = createBougusServerSslContext();
                     } catch (Exception ioe) {
-                        throw new GeneralSecurityException(
-                                "Can't create Server SSLContext:" + ioe);
+                        throw new GeneralSecurityException( "Can't create Server SSLContext:" + ioe);
                     }
                 }
             }
+            
             retInstance = serverInstance;
         } else {
             synchronized (BogusSslContextFactory.class) {
@@ -100,19 +100,20 @@ public class BogusSslContextFactory {
                     clientInstance = createBougusClientSslContext();
                 }
             }
+            
             retInstance = clientInstance;
         }
+        
         return retInstance;
     }
 
-    private static SSLContext createBougusServerSslContext()
-            throws GeneralSecurityException, IOException {
+    private static SSLContext createBougusServerSslContext() throws GeneralSecurityException, IOException {
         // Create keystore
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream in = null;
+        
         try {
-            in = BogusSslContextFactory.class
-                    .getResourceAsStream(BOGUS_KEYSTORE);
+            in = BogusSslContextFactory.class.getResourceAsStream(BOGUS_KEYSTORE);
             ks.load(in, BOGUS_PW);
         } finally {
             if (in != null) {
@@ -124,23 +125,20 @@ public class BogusSslContextFactory {
         }
 
         // Set up key manager factory to use our key store
-        KeyManagerFactory kmf = KeyManagerFactory
-                .getInstance(KEY_MANAGER_FACTORY_ALGORITHM);
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KEY_MANAGER_FACTORY_ALGORITHM);
         kmf.init(ks, BOGUS_PW);
 
         // Initialize the SSLContext to work with our key managers.
         SSLContext sslContext = SSLContext.getInstance(PROTOCOL);
-        sslContext.init(kmf.getKeyManagers(),
-                BogusTrustManagerFactory.X509_MANAGERS, null);
+        sslContext.init(kmf.getKeyManagers(), BogusTrustManagerFactory.X509_MANAGERS, null);
 
         return sslContext;
     }
 
-    private static SSLContext createBougusClientSslContext()
-            throws GeneralSecurityException {
+    private static SSLContext createBougusClientSslContext() throws GeneralSecurityException {
         SSLContext context = SSLContext.getInstance(PROTOCOL);
         context.init(null, BogusTrustManagerFactory.X509_MANAGERS, null);
+        
         return context;
     }
-
 }

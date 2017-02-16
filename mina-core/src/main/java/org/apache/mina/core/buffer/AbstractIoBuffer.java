@@ -522,6 +522,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(byte value) {
         autoExpand(1);
         buf().put((byte) (value & 0xff));
@@ -531,6 +532,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(int index, byte value) {
         autoExpand(index, 1);
         buf().put(index, (byte) (value & 0xff));
@@ -540,6 +542,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(short value) {
         autoExpand(1);
         buf().put((byte) (value & 0x00ff));
@@ -549,6 +552,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(int index, short value) {
         autoExpand(index, 1);
         buf().put(index, (byte) (value & 0x00ff));
@@ -558,6 +562,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(int value) {
         autoExpand(1);
         buf().put((byte) (value & 0x000000ff));
@@ -567,6 +572,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(int index, int value) {
         autoExpand(index, 1);
         buf().put(index, (byte) (value & 0x000000ff));
@@ -576,6 +582,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(long value) {
         autoExpand(1);
         buf().put((byte) (value & 0x00000000000000ffL));
@@ -585,6 +592,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IoBuffer putUnsigned(int index, long value) {
         autoExpand(index, 1);
         buf().put(index, (byte) (value & 0x00000000000000ffL));
@@ -828,7 +836,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(byte value) {
         autoExpand(4);
-        buf().putInt((value & 0x00ff));
+        buf().putInt(value & 0x00ff);
         return this;
     }
 
@@ -838,7 +846,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, byte value) {
         autoExpand(index, 4);
-        buf().putInt(index, (value & 0x00ff));
+        buf().putInt(index, value & 0x00ff);
         return this;
     }
 
@@ -848,7 +856,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(short value) {
         autoExpand(4);
-        buf().putInt((value & 0x0000ffff));
+        buf().putInt(value & 0x0000ffff);
         return this;
     }
 
@@ -858,7 +866,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     @Override
     public final IoBuffer putUnsignedInt(int index, short value) {
         autoExpand(index, 4);
-        buf().putInt(index, (value & 0x0000ffff));
+        buf().putInt(index, value & 0x0000ffff);
         return this;
     }
 
@@ -1289,6 +1297,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int compareTo(IoBuffer that) {
         int n = this.position() + Math.min(this.remaining(), that.remaining());
         for (int i = this.position(), j = that.position(); i < n; i++, j++) {
@@ -1438,9 +1447,6 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         return b3 << 16 | b2 << 8 | b1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private int getMediumInt(byte b1, byte b2, byte b3) {
         int ret = b1 << 16 & 0xff0000 | b2 << 8 & 0xff00 | b3 & 0xff;
         // Check to see if the medium int is negative (high bit in b1 set)
@@ -2168,10 +2174,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
         int oldLimit = limit();
         limit(position() + length);
-        ObjectInputStream in = null;
         
-        try {
-            in = new ObjectInputStream(asInputStream()) {
+        try (ObjectInputStream in = new ObjectInputStream(asInputStream()) {
                 @Override
                 protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
                     int type = read();
@@ -2205,19 +2209,11 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         return clazz;
                     }
                 }
-            };
+            }) {
             return in.readObject();
         } catch (IOException e) {
             throw new BufferDataException(e);
         } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ioe) {
-                // Nothing to do
-            }
-            
             limit(oldLimit);
         }
     }
@@ -2229,10 +2225,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     public IoBuffer putObject(Object o) {
         int oldPos = position();
         skip(4); // Make a room for the length field.
-        ObjectOutputStream out = null;
         
-        try {
-            out = new ObjectOutputStream(asOutputStream()) {
+        try (ObjectOutputStream out = new ObjectOutputStream(asOutputStream()) {
                 @Override
                 protected void writeClassDescriptor(ObjectStreamClass desc) throws IOException {
                     Class<?> clazz = desc.forClass();
@@ -2246,19 +2240,11 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         writeUTF(desc.getName());                            
                     }
                 }
-            };
+            }) {
             out.writeObject(o);
             out.flush();
         } catch (IOException e) {
             throw new BufferDataException(e);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ioe) {
-                // Nothing to do
-            }
         }
 
         // Fill the length field
@@ -2496,6 +2482,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public <E extends Enum<E>> E getEnumInt(int index, Class<E> enumClass) {
         return toEnum(enumClass, getInt(index));
     }

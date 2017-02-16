@@ -29,17 +29,37 @@ package org.apache.mina.core.filterchain;
 public class IoFilterLifeCycleException extends RuntimeException {
     private static final long serialVersionUID = -5542098881633506449L;
 
+    /**
+     * Creates a new IoFilterLifeCycleException instance
+     */
     public IoFilterLifeCycleException() {
+        // Default exception
     }
 
+    /**
+     * Creates a new IoFilterLifeCycleException instance
+     * 
+     * @param message The error message
+     */
     public IoFilterLifeCycleException(String message) {
         super(message);
     }
 
+    /**
+     * Creates a new IoFilterLifeCycleException instance
+     * 
+     * @param message The error message
+     * @param cause The original error cause
+     */
     public IoFilterLifeCycleException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Creates a new IoFilterLifeCycleException instance
+     * 
+     * @param cause The original error cause
+     */
     public IoFilterLifeCycleException(Throwable cause) {
         super(cause);
     }

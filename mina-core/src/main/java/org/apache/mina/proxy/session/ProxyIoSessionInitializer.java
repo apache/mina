@@ -27,6 +27,8 @@ import org.apache.mina.core.session.IoSessionInitializer;
  * ProxyIoSessionInitializer.java - {@link IoSessionInitializer} wrapper class to inject the 
  * {@link ProxyIoSession} object that contains all the attributes of the target connection 
  * into the {@link IoSession}.
+ * 
+ * @param <T> The Connection Future type
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @since MINA 2.0.0-M3
@@ -36,16 +38,29 @@ public class ProxyIoSessionInitializer<T extends ConnectFuture> implements IoSes
 
     private final ProxyIoSession proxyIoSession;
 
+    /**
+     * Creates a new ProxyIoSessionInitializer instance
+     * 
+     * @param wrappedSessionInitializer The wrapped session initializer
+     * @param proxyIoSession The ProxyIoSession instance
+     */
     public ProxyIoSessionInitializer(final IoSessionInitializer<T> wrappedSessionInitializer,
             final ProxyIoSession proxyIoSession) {
         this.wrappedSessionInitializer = wrappedSessionInitializer;
         this.proxyIoSession = proxyIoSession;
     }
 
+    /**
+     * @return The ProxyIoSession instance
+     */
     public ProxyIoSession getProxySession() {
         return proxyIoSession;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void initializeSession(final IoSession session, T future) {
         if (wrappedSessionInitializer != null) {
             wrappedSessionInitializer.initializeSession(session, future);

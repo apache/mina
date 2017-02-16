@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * A {@link ConcurrentHashMap}-backed {@link Set}.
+ * 
+ * @param <E> The type of the element stored in the set 
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -33,17 +35,30 @@ public class ConcurrentHashSet<E> extends MapBackedSet<E> {
 
     private static final long serialVersionUID = 8518578988740277828L;
 
+    /**
+     * Creates a new instance of ConcurrentHashSet
+     */
     public ConcurrentHashSet() {
         super(new ConcurrentHashMap<E, Boolean>());
     }
 
-    public ConcurrentHashSet(Collection<E> c) {
-        super(new ConcurrentHashMap<E, Boolean>(), c);
+    /**
+     * Creates a new instance of ConcurrentHashSet, initialized with 
+     * the content of another collection
+     * 
+     * @param collection The collection to inject in this set
+     */
+    public ConcurrentHashSet(Collection<E> collection) {
+        super(new ConcurrentHashMap<E, Boolean>(), collection);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean add(E o) {
-        Boolean answer = ((ConcurrentMap<E, Boolean>) map).putIfAbsent(o, Boolean.TRUE);
+    public boolean add(E element) {
+        Boolean answer = ((ConcurrentMap<E, Boolean>) map).putIfAbsent(element, Boolean.TRUE);
+        
         return answer == null;
     }
 }

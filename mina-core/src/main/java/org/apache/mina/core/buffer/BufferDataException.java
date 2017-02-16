@@ -29,18 +29,36 @@ package org.apache.mina.core.buffer;
 public class BufferDataException extends RuntimeException {
     private static final long serialVersionUID = -4138189188602563502L;
 
+    /**
+     * Create a new BufferDataException instance
+     */
     public BufferDataException() {
         super();
     }
 
+    /**
+     * Create a new BufferDataException instance
+     * 
+     * @param message The exception message
+     */
     public BufferDataException(String message) {
         super(message);
     }
 
+    /**
+     * Create a new BufferDataException instance
+     * 
+     * @param message The exception message
+     * @param cause The original cause
+     */
     public BufferDataException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Create a new BufferDataException instance
+     * @param cause The original cause
+     */
     public BufferDataException(Throwable cause) {
         super(cause);
     }

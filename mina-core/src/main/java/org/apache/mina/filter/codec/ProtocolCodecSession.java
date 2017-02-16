@@ -63,12 +63,20 @@ public class ProtocolCodecSession extends DummySession {
             new UnsupportedOperationException());
 
     private final AbstractProtocolEncoderOutput encoderOutput = new AbstractProtocolEncoderOutput() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public WriteFuture flush() {
             return notWrittenFuture;
         }
     };
 
     private final AbstractProtocolDecoderOutput decoderOutput = new AbstractProtocolDecoderOutput() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void flush(NextFilter nextFilter, IoSession session) {
             // Do nothing
         }

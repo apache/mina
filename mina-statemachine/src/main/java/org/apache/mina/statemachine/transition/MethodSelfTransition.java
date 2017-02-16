@@ -51,6 +51,12 @@ public class MethodSelfTransition extends AbstractSelfTransition {
 
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
 
+    /**
+     * Creates a new MethodSelfTransition instance
+     * 
+     * @param method The method to invoke 
+     * @param target The target object
+     */
     public MethodSelfTransition(Method method, Object target) {
         super();
         this.method = method;

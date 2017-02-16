@@ -91,6 +91,9 @@ public class WriteRequestFilter extends IoFilterAdapter {
         return queueHandler;
     }
 
+    /**
+     * @inheritedDoc
+     */
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
 
@@ -106,6 +109,10 @@ public class WriteRequestFilter extends IoFilterAdapter {
             // We can track the write request only when it has a future.
             queueHandler.offered(this, e);
             writeFuture.addListener(new IoFutureListener<WriteFuture>() {
+                /**
+                 * @inheritedDoc
+                 */
+                @Override
                 public void operationComplete(WriteFuture future) {
                     queueHandler.polled(WriteRequestFilter.this, e);
                 }

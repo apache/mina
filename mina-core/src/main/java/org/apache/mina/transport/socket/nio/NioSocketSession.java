@@ -19,9 +19,12 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.core.RuntimeIoException;
@@ -33,7 +36,6 @@ import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
@@ -47,24 +49,28 @@ class NioSocketSession extends NioSession {
     static final TransportMetadata METADATA = new DefaultTransportMetadata("nio", "socket", false, true,
             InetSocketAddress.class, SocketSessionConfig.class, IoBuffer.class, FileRegion.class);
 
-    private Socket getSocket() {
-        return ((SocketChannel) channel).socket();
-    }
-
     /**
      * 
      * Creates a new instance of NioSocketSession.
      *
      * @param service the associated IoService 
      * @param processor the associated IoProcessor
-     * @param ch the used channel
+     * @param channel the used channel
      */
     public NioSocketSession(IoService service, IoProcessor<NioSession> processor, SocketChannel channel) {
         super(processor, service, channel);
         config = new SessionConfigImpl();
-        this.config.setAll(service.getSessionConfig());
+        config.setAll(service.getSessionConfig());
     }
 
+    private Socket getSocket() {
+        return ((SocketChannel) channel).socket();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return METADATA;
     }
@@ -72,10 +78,14 @@ class NioSocketSession extends NioSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketSessionConfig getConfig() {
         return (SocketSessionConfig) config;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     SocketChannel getChannel() {
         return (SocketChannel) channel;
@@ -84,6 +94,7 @@ class NioSocketSession extends NioSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public InetSocketAddress getRemoteAddress() {
         if (channel == null) {
             return null;
@@ -101,6 +112,7 @@ class NioSocketSession extends NioSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public InetSocketAddress getLocalAddress() {
         if (channel == null) {
             return null;
@@ -115,12 +127,30 @@ class NioSocketSession extends NioSession {
         return (InetSocketAddress) socket.getLocalSocketAddress();
     }
 
+    protected void destroy(NioSession session) throws IOException {
+        ByteChannel ch = session.getChannel();
+        SelectionKey key = session.getSelectionKey();
+        if (key != null) {
+            key.cancel();
+        }
+        ch.close();
+    }
+
     @Override
     public InetSocketAddress getServiceAddress() {
         return (InetSocketAddress) super.getServiceAddress();
     }
 
+    /**
+     * A private class storing a copy of the IoService configuration when the IoSession
+     * is created. That allows the session to have its own configuration setting, over
+     * the IoService default one.
+     */
     private class SessionConfigImpl extends AbstractSocketSessionConfig {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isKeepAlive() {
             try {
                 return getSocket().getKeepAlive();
@@ -129,6 +159,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setKeepAlive(boolean on) {
             try {
                 getSocket().setKeepAlive(on);
@@ -137,6 +171,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isOobInline() {
             try {
                 return getSocket().getOOBInline();
@@ -145,6 +183,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setOobInline(boolean on) {
             try {
                 getSocket().setOOBInline(on);
@@ -153,6 +195,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isReuseAddress() {
             try {
                 return getSocket().getReuseAddress();
@@ -161,6 +207,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setReuseAddress(boolean on) {
             try {
                 getSocket().setReuseAddress(on);
@@ -169,6 +219,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public int getSoLinger() {
             try {
                 return getSocket().getSoLinger();
@@ -177,6 +231,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setSoLinger(int linger) {
             try {
                 if (linger < 0) {
@@ -189,6 +247,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isTcpNoDelay() {
             if (!isConnected()) {
                 return false;
@@ -201,6 +263,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setTcpNoDelay(boolean on) {
             try {
                 getSocket().setTcpNoDelay(on);
@@ -212,6 +278,7 @@ class NioSocketSession extends NioSession {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int getTrafficClass() {
             try {
                 return getSocket().getTrafficClass();
@@ -223,6 +290,7 @@ class NioSocketSession extends NioSession {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void setTrafficClass(int tc) {
             try {
                 getSocket().setTrafficClass(tc);
@@ -231,6 +299,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public int getSendBufferSize() {
             try {
                 return getSocket().getSendBufferSize();
@@ -239,6 +311,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setSendBufferSize(int size) {
             try {
                 getSocket().setSendBufferSize(size);
@@ -247,6 +323,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public int getReceiveBufferSize() {
             try {
                 return getSocket().getReceiveBufferSize();
@@ -255,6 +335,10 @@ class NioSocketSession extends NioSession {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void setReceiveBufferSize(int size) {
             try {
                 getSocket().setReceiveBufferSize(size);
@@ -267,6 +351,7 @@ class NioSocketSession extends NioSession {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isSecured() {
         // If the session does not have a SslFilter, we can return false
         IoFilterChain chain = getFilterChain();

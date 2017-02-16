@@ -29,6 +29,7 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
@@ -97,10 +98,18 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         // Create the inner Factory based on the two parameters
         this.factory = new ProtocolCodecFactory() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public ProtocolEncoder getEncoder(IoSession session) {
                 return encoder;
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public ProtocolDecoder getDecoder(IoSession session) {
                 return decoder;
             }
@@ -159,10 +168,18 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
         // Create the inner factory based on the two parameters.
         this.factory = new ProtocolCodecFactory() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public ProtocolEncoder getEncoder(IoSession session) throws Exception {
                 return encoder;
             }
 
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public ProtocolDecoder getDecoder(IoSession session) throws Exception {
                 return decoder;
             }
@@ -179,6 +196,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         return (ProtocolEncoder) session.getAttribute(ENCODER);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         if (parent.contains(this)) {
@@ -187,6 +207,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPostRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception {
         // Clean everything
@@ -259,6 +282,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         if (writeRequest instanceof EncodedWriteRequest) {
@@ -273,6 +299,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         Object message = writeRequest.getMessage();
@@ -333,6 +362,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         // Call finishDecode() first when a connection is closed.
@@ -364,6 +396,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             super(encodedMessage, future, destination);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isEncoded() {
             return true;
         }
@@ -390,6 +426,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             // Do nothing
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void flush(NextFilter nextFilter, IoSession session) {
             Queue<Object> messageQueue = getMessageQueue();
 
@@ -415,6 +455,10 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             destination = writeRequest.getDestination();
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public WriteFuture flush() {
             Queue<Object> bufferQueue = getMessageQueue();
             WriteFuture future = null;
@@ -435,9 +479,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
             if (future == null) {
                 // Creates an empty writeRequest containing the destination
-                WriteRequest writeRequest = new DefaultWriteRequest(
-                        DefaultWriteRequest.EMPTY_MESSAGE, null, destination);
-                future = DefaultWriteFuture.newNotWrittenFuture(session, new NothingWrittenException(writeRequest));
+                future = DefaultWriteFuture.newNotWrittenFuture(session, new NothingWrittenException(AbstractIoSession.MESSAGE_SENT_REQUEST));
             }
 
             return future;

@@ -49,6 +49,7 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         if (buffer == null) {
             buffer = IoBuffer.allocate(256).setAutoExpand(true);
@@ -64,6 +65,7 @@ public abstract class ConsumeToEndOfSessionDecodingState implements DecodingStat
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         try {
             if (buffer == null) {

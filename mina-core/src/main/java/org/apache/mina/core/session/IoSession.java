@@ -22,13 +22,10 @@ package org.apache.mina.core.session;
 import java.net.SocketAddress;
 import java.util.Set;
 
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.future.WriteFuture;
-import org.apache.mina.core.service.IoAcceptor;
-import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
@@ -180,11 +177,14 @@ public interface IoSession {
      * @return The associated CloseFuture
      * @deprecated Use either the closeNow() or the flushAndClose() methods
      */
+    @Deprecated
     CloseFuture close(boolean immediately);
 
     /**
      * Closes this session immediately.  This operation is asynchronous, it 
      * returns a {@link CloseFuture}.
+     * 
+     * @return The {@link CloseFuture} that can be use to wait for the completion of this operation
      */
     CloseFuture closeNow();
 

@@ -19,7 +19,6 @@
  */
 package org.apache.mina.example.reverser;
 
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 
@@ -32,7 +31,7 @@ public class ReverseProtocolHandler extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
         // Close connection when unexpected exception is caught.
-        session.close(true);
+        session.closeNow();
     }
 
     @Override

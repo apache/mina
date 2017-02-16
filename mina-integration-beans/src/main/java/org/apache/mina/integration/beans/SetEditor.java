@@ -31,13 +31,20 @@ import java.util.Set;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SetEditor extends CollectionEditor {
-
+    /**
+     * Creates a new SetEditor instance
+     * 
+     * @param elementType The Element type
+     */
     public SetEditor(Class<?> elementType) {
         super(elementType);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Collection<Object> newCollection() {
-        return new LinkedHashSet<Object>();
+        return new LinkedHashSet<>();
     }
 }

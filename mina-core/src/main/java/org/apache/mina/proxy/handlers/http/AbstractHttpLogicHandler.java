@@ -46,13 +46,13 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler {
-    private final static Logger LOGGER = LoggerFactory.getLogger(AbstractHttpLogicHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHttpLogicHandler.class);
 
-    private final static String DECODER = AbstractHttpLogicHandler.class.getName() + ".Decoder";
+    private static final String DECODER = AbstractHttpLogicHandler.class.getName() + ".Decoder";
 
-    private final static byte[] HTTP_DELIMITER = new byte[] { '\r', '\n', '\r', '\n' };
+    private static final byte[] HTTP_DELIMITER = new byte[] { '\r', '\n', '\r', '\n' };
 
-    private final static byte[] CRLF_DELIMITER = new byte[] { '\r', '\n' };
+    private static final byte[] CRLF_DELIMITER = new byte[] { '\r', '\n' };
 
     // Parsing vars
 
@@ -114,6 +114,7 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
      * @param nextFilter the next filter
      * @param buf the buffer holding received data
      */
+    @Override
     public synchronized void messageReceived(final NextFilter nextFilter, final IoBuffer buf) throws ProxyAuthException {
         LOGGER.debug(" messageReceived()");
 
@@ -268,7 +269,7 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
             }
         } catch (Exception ex) {
             if (ex instanceof ProxyAuthException) {
-                throw ((ProxyAuthException) ex);
+                throw (ProxyAuthException) ex;
             }
 
             throw new ProxyAuthException("Handshake failed", ex);
@@ -334,15 +335,17 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
 
         // Fires reconnection
         proxyIoSession.getConnector().connect(new IoSessionInitializer<ConnectFuture>() {
+            @Override
             public void initializeSession(final IoSession session, ConnectFuture future) {
                 LOGGER.debug("Initializing new session: {}", session);
                 session.setAttribute(ProxyIoSession.PROXY_SESSION, proxyIoSession);
                 proxyIoSession.setSession(session);
                 LOGGER.debug("  setting up proxyIoSession: {}", proxyIoSession);
-				// Reconnection is done so we send the
-				// request to the proxy
-				proxyIoSession.setReconnectionNeeded(false);
-				writeRequest0(nextFilter, request);
+				        // Reconnection is done so we send the
+				        // request to the proxy
+				        proxyIoSession.setReconnectionNeeded(false);
+				        writeRequest0(nextFilter, request);
+
             }
         });
     }
@@ -374,7 +377,7 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
             throw new Exception("Invalid response code (" + statusLine[1] + "). Response: " + response);
         }
 
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<>();
 
         for (int i = 1; i < responseLines.length; i++) {
             String[] args = responseLines[i].split(":\\s?", 2);

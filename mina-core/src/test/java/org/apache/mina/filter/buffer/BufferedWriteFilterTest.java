@@ -98,6 +98,6 @@ public class BufferedWriteFilterTest {
         // Flush the final byte
         bFilter.flush(sess);
 
-        sess.close(true);
+        sess.closeNow();
     }
 }

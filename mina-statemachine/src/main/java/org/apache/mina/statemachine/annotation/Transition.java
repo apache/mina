@@ -37,6 +37,7 @@ import org.apache.mina.statemachine.event.Event;
 @Target(ElementType.METHOD)
 @TransitionAnnotation(Transitions.class)
 public @interface Transition {
+    /** The self transition */
     public static final String SELF = "__self__";
 
     /**

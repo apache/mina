@@ -93,35 +93,56 @@ DatagramConnector {
      * 
      * @param processorClass the processor class.
      * @see SimpleIoProcessorPool#SimpleIoProcessorPool(Class, Executor, int, java.nio.channels.spi.SelectorProvider)
-     * @see org.apache.mina.core.service.SimpleIoProcessorPool#DEFAULT_SIZE
      * @since 2.0.0-M4
      */
     public NioDatagramConnector(Class<? extends IoProcessor<NioSession>> processorClass) {
         super(new DefaultDatagramSessionConfig(), processorClass);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return NioDatagramSession.METADATA;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public DatagramSessionConfig getSessionConfig() {
         return (DatagramSessionConfig) sessionConfig;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InetSocketAddress getDefaultRemoteAddress() {
         return (InetSocketAddress) super.getDefaultRemoteAddress();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setDefaultRemoteAddress(InetSocketAddress defaultRemoteAddress) {
         super.setDefaultRemoteAddress(defaultRemoteAddress);
     }
 
+    /**
+    @Override
+     * {@inheritDoc}
+     */
     @Override
     protected void init() throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected DatagramChannel newHandle(SocketAddress localAddress) throws Exception {
         DatagramChannel ch = DatagramChannel.open();
@@ -155,12 +176,18 @@ DatagramConnector {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean connect(DatagramChannel handle, SocketAddress remoteAddress) throws Exception {
         handle.connect(remoteAddress);
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected NioSession newSession(IoProcessor<NioSession> processor, DatagramChannel handle) {
         NioSession session = new NioDatagramSession(this, handle, processor);
@@ -168,50 +195,75 @@ DatagramConnector {
         return session;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void close(DatagramChannel handle) throws Exception {
         handle.disconnect();
         handle.close();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     // Unused extension points.
     @Override
-    @SuppressWarnings("unchecked")
     protected Iterator<DatagramChannel> allHandles() {
-        return Collections.EMPTY_LIST.iterator();
+        return Collections.emptyIterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected ConnectionRequest getConnectionRequest(DatagramChannel handle) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void destroy() throws Exception {
         // Do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean finishConnect(DatagramChannel handle) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void register(DatagramChannel handle, ConnectionRequest request) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected int select(int timeout) throws Exception {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    @SuppressWarnings("unchecked")
     protected Iterator<DatagramChannel> selectedHandles() {
-        return Collections.EMPTY_LIST.iterator();
+        return Collections.emptyIterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void wakeup() {
         // Do nothing

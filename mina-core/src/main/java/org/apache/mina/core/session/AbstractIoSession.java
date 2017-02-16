@@ -92,10 +92,13 @@ public abstract class AbstractIoSession implements IoSession {
 
     /**
      * An internal write request object that triggers session close.
-     * 
-     * @see #writeRequestQueue
      */
-    private static final WriteRequest CLOSE_REQUEST = new DefaultWriteRequest(new Object());
+    public static final WriteRequest CLOSE_REQUEST = new DefaultWriteRequest(new Object());
+
+    /**
+     * An internal write request object that triggers message sent events.
+     */
+    public static final WriteRequest MESSAGE_SENT_REQUEST = new DefaultWriteRequest(DefaultWriteRequest.EMPTY_MESSAGE);
 
     private final Object lock = new Object();
 
@@ -313,11 +316,7 @@ public abstract class AbstractIoSession implements IoSession {
      * {@inheritDoc}
      */
     public final CloseFuture close() {
-        try {
-            closeNow();
-        } finally {
-            return closeFuture;
-        }
+        return closeNow();
     }
 
     /**
@@ -327,10 +326,9 @@ public abstract class AbstractIoSession implements IoSession {
         if (!isClosing()) {
             getWriteRequestQueue().offer(this, CLOSE_REQUEST);
             getProcessor().flush(this);
-            return closeFuture;
-        } else {
-            return closeFuture;
         }
+        
+        return closeFuture;
     }
 
     /**
@@ -343,11 +341,39 @@ public abstract class AbstractIoSession implements IoSession {
             }
 
             closing = true;
+            
+            try {
+                destroy();
+            } catch (Exception e) {
+                IoFilterChain filterChain = getFilterChain();
+                filterChain.fireExceptionCaught(e);
+            }
         }
 
         getFilterChain().fireFilterClose();
 
         return closeFuture;
+    }
+    
+    /**
+     * Destroy the session
+     */
+    protected void destroy() {
+        if (writeRequestQueue != null) {
+            while (!writeRequestQueue.isEmpty(this)) {
+                WriteRequest writeRequest = writeRequestQueue.poll(this);
+                
+                if (writeRequest != null) {
+                    WriteFuture writeFuture = writeRequest.getFuture();
+                    
+                    // The WriteRequest may not always have a future : The CLOSE_REQUEST
+                    // and MESSAGE_SENT_REQUEST don't.
+                    if (writeFuture != null) {
+                        writeFuture.setWritten();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -374,8 +400,10 @@ public abstract class AbstractIoSession implements IoSession {
 
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
         ReadFuture future;
+        
         synchronized (readyReadFutures) {
             future = readyReadFutures.poll();
+            
             if (future != null) {
                 if (future.isClosed()) {
                     // Let other readers get notified.
@@ -447,7 +475,7 @@ public abstract class AbstractIoSession implements IoSession {
         Queue<ReadFuture> readyReadFutures = (Queue<ReadFuture>) getAttribute(READY_READ_FUTURES_KEY);
         
         if (readyReadFutures == null) {
-            readyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
+            readyReadFutures = new ConcurrentLinkedQueue<>();
 
             Queue<ReadFuture> oldReadyReadFutures = (Queue<ReadFuture>) setAttributeIfAbsent(READY_READ_FUTURES_KEY,
                     readyReadFutures);
@@ -467,7 +495,7 @@ public abstract class AbstractIoSession implements IoSession {
         Queue<ReadFuture> waitingReadyReadFutures = (Queue<ReadFuture>) getAttribute(WAITING_READ_FUTURES_KEY);
         
         if (waitingReadyReadFutures == null) {
-            waitingReadyReadFutures = new ConcurrentLinkedQueue<ReadFuture>();
+            waitingReadyReadFutures = new ConcurrentLinkedQueue<>();
 
             Queue<ReadFuture> oldWaitingReadyReadFutures = (Queue<ReadFuture>) setAttributeIfAbsent(
                     WAITING_READ_FUTURES_KEY, waitingReadyReadFutures);
@@ -676,7 +704,7 @@ public abstract class AbstractIoSession implements IoSession {
      * @param writeRequestQueue The write request queue
      */
     public final void setWriteRequestQueue(WriteRequestQueue writeRequestQueue) {
-        this.writeRequestQueue = new CloseAwareWriteQueue(writeRequestQueue);
+        this.writeRequestQueue = writeRequestQueue;
     }
 
     /**
@@ -1392,76 +1420,8 @@ public abstract class AbstractIoSession implements IoSession {
                 request.getFuture().setException(cause);
                 session.getFilterChain().fireExceptionCaught(cause);
                 // WriteException is an IOException, so we close the session.
-                session.close(true);
+                session.closeNow();
             }
-        }
-    }
-
-    /**
-     * A queue which handles the CLOSE request.
-     * 
-     * TODO : Check that when closing a session, all the pending requests are
-     * correctly sent.
-     */
-    private class CloseAwareWriteQueue implements WriteRequestQueue {
-
-        private final WriteRequestQueue queue;
-
-        /**
-         * {@inheritDoc}
-         */
-        public CloseAwareWriteQueue(WriteRequestQueue queue) {
-            this.queue = queue;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public synchronized WriteRequest poll(IoSession session) {
-            WriteRequest answer = queue.poll(session);
-
-            if (answer == CLOSE_REQUEST) {
-                AbstractIoSession.this.close( true );
-                dispose(session);
-                answer = null;
-            }
-
-            return answer;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void offer(IoSession session, WriteRequest e) {
-            queue.offer(session, e);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public boolean isEmpty(IoSession session) {
-            return queue.isEmpty(session);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void clear(IoSession session) {
-            queue.clear(session);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void dispose(IoSession session) {
-            queue.dispose(session);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public int size() {
-            return queue.size();
         }
     }
 }

@@ -31,11 +31,17 @@ import java.util.Properties;
  */
 public class PropertiesEditor extends MapEditor {
 
+    /**
+     * Creates a new DateEditor instance
+     */
     public PropertiesEditor() {
         super(String.class, String.class);
         setTrimText(false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Map<Object, Object> newMap() {
         return new Properties();

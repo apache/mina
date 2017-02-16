@@ -32,8 +32,10 @@ import org.apache.mina.statemachine.event.Event;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractTransition implements Transition {
+    /** The accepted event ID */
     private final Object eventId;
 
+    /** The next state, if any */
     private final State nextState;
 
     /**
@@ -58,10 +60,38 @@ public abstract class AbstractTransition implements Transition {
         this.nextState = nextState;
     }
 
+    /**
+     * Creates a new instance with the specified {@link State} as next state 
+     * and for the wild card {@link Event} id.
+     * 
+     * @param nextState the next {@link State}.
+     */
+    public AbstractTransition(State nextState) {
+        this.eventId = Event.WILDCARD_EVENT_ID;
+        this.nextState = nextState;
+    }
+
+    /**
+     * Creates a new instance with a reflexive {@link State} as next state 
+     * and for the wild card {@link Event} id.
+     */
+    public AbstractTransition() {
+        this.eventId = Event.WILDCARD_EVENT_ID;
+        this.nextState = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public State getNextState() {
         return nextState;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean execute(Event event) {
         if (!eventId.equals(Event.WILDCARD_EVENT_ID) && !eventId.equals(event.getId())) {
             return false;

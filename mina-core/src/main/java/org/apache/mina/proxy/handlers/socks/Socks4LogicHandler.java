@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Socks4LogicHandler extends AbstractSocksLogicHandler {
 
-    private final static Logger logger = LoggerFactory.getLogger(Socks4LogicHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(Socks4LogicHandler.class);
 
     /**
      * @see AbstractSocksLogicHandler#AbstractSocksLogicHandler(ProxyIoSession)
@@ -52,6 +52,7 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
      * 
      * @param nextFilter the next filter
      */
+    @Override
     public void doHandshake(final NextFilter nextFilter) {
         logger.debug(" doHandshake()");
 
@@ -112,6 +113,7 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
      * @param nextFilter the next filter
      * @param buf the server response data buffer
      */
+    @Override
     public void messageReceived(final NextFilter nextFilter, final IoBuffer buf) {
         try {
             if (buf.remaining() >= SocksProxyConstants.SOCKS_4_RESPONSE_SIZE) {

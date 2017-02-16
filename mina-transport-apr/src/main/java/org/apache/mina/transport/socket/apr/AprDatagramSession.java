@@ -45,8 +45,6 @@ class AprDatagramSession extends AprSession {
 
     /**
      * Create an instance of {@link AprDatagramSession}. 
-     * 
-     * {@inheritDoc} 
      */
     AprDatagramSession(IoService service, IoProcessor<AprSession> processor, long descriptor,
             InetSocketAddress remoteAddress) throws Exception {

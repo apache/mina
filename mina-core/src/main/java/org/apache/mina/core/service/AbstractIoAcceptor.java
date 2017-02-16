@@ -28,10 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import org.apache.mina.core.RuntimeIoException;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 
 /**
@@ -42,12 +40,12 @@ import org.apache.mina.core.session.IoSessionConfig;
  */
 public abstract class AbstractIoAcceptor extends AbstractIoService implements IoAcceptor {
 
-    private final List<SocketAddress> defaultLocalAddresses = new ArrayList<SocketAddress>();
+    private final List<SocketAddress> defaultLocalAddresses = new ArrayList<>();
 
     private final List<SocketAddress> unmodifiableDefaultLocalAddresses = Collections
             .unmodifiableList(defaultLocalAddresses);
 
-    private final Set<SocketAddress> boundAddresses = new HashSet<SocketAddress>();
+    private final Set<SocketAddress> boundAddresses = new HashSet<>();
 
     private boolean disconnectOnUnbind = true;
 
@@ -80,6 +78,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketAddress getLocalAddress() {
         Set<SocketAddress> localAddresses = getLocalAddresses();
         if (localAddresses.isEmpty()) {
@@ -92,8 +91,9 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final Set<SocketAddress> getLocalAddresses() {
-        Set<SocketAddress> localAddresses = new HashSet<SocketAddress>();
+        Set<SocketAddress> localAddresses = new HashSet<>();
 
         synchronized (boundAddresses) {
             localAddresses.addAll(boundAddresses);
@@ -105,6 +105,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public SocketAddress getDefaultLocalAddress() {
         if (defaultLocalAddresses.isEmpty()) {
             return null;
@@ -115,6 +116,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setDefaultLocalAddress(SocketAddress localAddress) {
         setDefaultLocalAddresses(localAddress);
     }
@@ -122,6 +124,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final List<SocketAddress> getDefaultLocalAddresses() {
         return unmodifiableDefaultLocalAddresses;
     }
@@ -130,6 +133,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
      * {@inheritDoc}
      * @org.apache.xbean.Property nestedType="java.net.SocketAddress"
      */
+    @Override
     public final void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new IllegalArgumentException("localAddresses");
@@ -140,6 +144,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setDefaultLocalAddresses(Iterable<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new IllegalArgumentException("localAddresses");
@@ -151,7 +156,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
                     throw new IllegalStateException("localAddress can't be set while the acceptor is bound.");
                 }
 
-                Collection<SocketAddress> newLocalAddresses = new ArrayList<SocketAddress>();
+                Collection<SocketAddress> newLocalAddresses = new ArrayList<>();
 
                 for (SocketAddress a : localAddresses) {
                     checkAddressType(a);
@@ -172,14 +177,16 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
      * {@inheritDoc}
      * @org.apache.xbean.Property nestedType="java.net.SocketAddress"
      */
+    @Override
     public final void setDefaultLocalAddresses(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses) {
         if (otherLocalAddresses == null) {
             otherLocalAddresses = new SocketAddress[0];
         }
 
-        Collection<SocketAddress> newLocalAddresses = new ArrayList<SocketAddress>(otherLocalAddresses.length + 1);
+        Collection<SocketAddress> newLocalAddresses = new ArrayList<>(otherLocalAddresses.length + 1);
 
         newLocalAddresses.add(firstLocalAddress);
+        
         for (SocketAddress a : otherLocalAddresses) {
             newLocalAddresses.add(a);
         }
@@ -190,6 +197,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final boolean isCloseOnDeactivation() {
         return disconnectOnUnbind;
     }
@@ -197,6 +205,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void setCloseOnDeactivation(boolean disconnectClientsOnUnbind) {
         this.disconnectOnUnbind = disconnectClientsOnUnbind;
     }
@@ -204,6 +213,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void bind() throws IOException {
         bind(getDefaultLocalAddresses());
     }
@@ -211,12 +221,13 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void bind(SocketAddress localAddress) throws IOException {
         if (localAddress == null) {
             throw new IllegalArgumentException("localAddress");
         }
 
-        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(1);
+        List<SocketAddress> localAddresses = new ArrayList<>(1);
         localAddresses.add(localAddress);
         bind(localAddresses);
     }
@@ -224,13 +235,14 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void bind(SocketAddress... addresses) throws IOException {
         if ((addresses == null) || (addresses.length == 0)) {
             bind(getDefaultLocalAddresses());
             return;
         }
 
-        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(2);
+        List<SocketAddress> localAddresses = new ArrayList<>(2);
 
         for (SocketAddress address : addresses) {
             localAddresses.add(address);
@@ -242,6 +254,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void bind(SocketAddress firstLocalAddress, SocketAddress... addresses) throws IOException {
         if (firstLocalAddress == null) {
             bind(getDefaultLocalAddresses());
@@ -252,7 +265,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
             return;
         }
 
-        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(2);
+        List<SocketAddress> localAddresses = new ArrayList<>(2);
         localAddresses.add(firstLocalAddress);
 
         for (SocketAddress address : addresses) {
@@ -265,7 +278,8 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
-    public final void bind(Iterable<? extends SocketAddress> localAddresses) throws IOException {
+    @Override
+public final void bind(Iterable<? extends SocketAddress> localAddresses) throws IOException {
         if (isDisposing()) {
             throw new IllegalStateException("The Accpetor disposed is being disposed.");
         }
@@ -274,7 +288,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
             throw new IllegalArgumentException("localAddresses");
         }
 
-        List<SocketAddress> localAddressesCopy = new ArrayList<SocketAddress>();
+        List<SocketAddress> localAddressesCopy = new ArrayList<>();
 
         for (SocketAddress a : localAddresses) {
             checkAddressType(a);
@@ -303,9 +317,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
                 synchronized (boundAddresses) {
                     boundAddresses.addAll(addresses);
                 }
-            } catch (IOException e) {
-                throw e;
-            } catch (RuntimeException e) {
+            } catch (IOException | RuntimeException e) {
                 throw e;
             } catch (Exception e) {
                 throw new RuntimeIoException("Failed to bind to: " + getLocalAddresses(), e);
@@ -320,6 +332,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void unbind() {
         unbind(getLocalAddresses());
     }
@@ -327,12 +340,13 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void unbind(SocketAddress localAddress) {
         if (localAddress == null) {
             throw new IllegalArgumentException("localAddress");
         }
 
-        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>(1);
+        List<SocketAddress> localAddresses = new ArrayList<>(1);
         localAddresses.add(localAddress);
         unbind(localAddresses);
     }
@@ -340,6 +354,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void unbind(SocketAddress firstLocalAddress, SocketAddress... otherLocalAddresses) {
         if (firstLocalAddress == null) {
             throw new IllegalArgumentException("firstLocalAddress");
@@ -348,7 +363,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
             throw new IllegalArgumentException("otherLocalAddresses");
         }
 
-        List<SocketAddress> localAddresses = new ArrayList<SocketAddress>();
+        List<SocketAddress> localAddresses = new ArrayList<>();
         localAddresses.add(firstLocalAddress);
         Collections.addAll(localAddresses, otherLocalAddresses);
         unbind(localAddresses);
@@ -357,6 +372,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void unbind(Iterable<? extends SocketAddress> localAddresses) {
         if (localAddresses == null) {
             throw new IllegalArgumentException("localAddresses");
@@ -369,7 +385,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
                     return;
                 }
 
-                List<SocketAddress> localAddressesCopy = new ArrayList<SocketAddress>();
+                List<SocketAddress> localAddressesCopy = new ArrayList<>();
                 int specifiedAddressCount = 0;
 
                 for (SocketAddress a : localAddresses) {
@@ -443,13 +459,24 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
         }
     }
 
+    /**
+     * A {@Link IoFuture} 
+     */
     public static class AcceptorOperationFuture extends ServiceOperationFuture {
         private final List<SocketAddress> localAddresses;
 
+        /**
+         * Creates a new AcceptorOperationFuture instance
+         * 
+         * @param localAddresses The list of local addresses to listen to
+         */
         public AcceptorOperationFuture(List<? extends SocketAddress> localAddresses) {
-            this.localAddresses = new ArrayList<SocketAddress>(localAddresses);
+            this.localAddresses = new ArrayList<>(localAddresses);
         }
 
+        /**
+         * @return The list of local addresses we listen to
+         */
         public final List<SocketAddress> getLocalAddresses() {
             return Collections.unmodifiableList(localAddresses);
         }
@@ -457,6 +484,7 @@ public abstract class AbstractIoAcceptor extends AbstractIoService implements Io
         /**
          * @see Object#toString()
          */
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
 

@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 /** No qualifier*/
 class SslHandler {
     /** A logger for this class */
-    private final static Logger LOGGER = LoggerFactory.getLogger(SslHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SslHandler.class);
 
     /** The SSL Filter which has created this handler */
     private final SslFilter sslFilter;
@@ -70,12 +70,12 @@ class SslHandler {
     /** The current session */
     private final IoSession session;
 
-    private final Queue<IoFilterEvent> preHandshakeEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
+    private final Queue<IoFilterEvent> preHandshakeEventQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<IoFilterEvent> filterWriteEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
+    private final Queue<IoFilterEvent> filterWriteEventQueue = new ConcurrentLinkedQueue<>();
 
     /** A queue used to stack all the incoming data until the SSL session is established */
-    private final Queue<IoFilterEvent> messageReceivedEventQueue = new ConcurrentLinkedQueue<IoFilterEvent>();
+    private final Queue<IoFilterEvent> messageReceivedEventQueue = new ConcurrentLinkedQueue<>();
 
     private SSLEngine sslEngine;
 
@@ -400,13 +400,13 @@ class SslHandler {
      * @return buffer with data
      */
     /* no qualifier */IoBuffer fetchAppBuffer() {
-        if (this.appBuffer == null) {
+        if (appBuffer == null) {
             return IoBuffer.allocate(0);
         } else {
-            IoBuffer appBuffer = this.appBuffer.flip();
-            this.appBuffer = null;
+            IoBuffer newAppBuffer = appBuffer.flip();
+            appBuffer = null;
 
-            return appBuffer.shrink();
+            return newAppBuffer.shrink();
         }
     }
 
@@ -417,11 +417,13 @@ class SslHandler {
      */
     /* no qualifier */IoBuffer fetchOutNetBuffer() {
         IoBuffer answer = outNetBuffer;
+        
         if (answer == null) {
             return emptyBuffer;
         }
 
         outNetBuffer = null;
+        
         return answer.shrink();
     }
 
@@ -599,6 +601,7 @@ class SslHandler {
 
                 for (;;) {
                     result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
+                    
                     if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
                         outNetBuffer.capacity(outNetBuffer.capacity() << 1);
                         outNetBuffer.limit(outNetBuffer.capacity());
@@ -662,10 +665,11 @@ class SslHandler {
                     throw newSsle;
                 }
 
-                IoBuffer outNetBuffer = fetchOutNetBuffer();
-                if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
+                IoBuffer currentOutNetBuffer = fetchOutNetBuffer();
+                
+                if (currentOutNetBuffer != null && currentOutNetBuffer.hasRemaining()) {
                     writeFuture = new DefaultWriteFuture(session);
-                    sslFilter.filterWrite(nextFilter, session, new DefaultWriteRequest(outNetBuffer, writeFuture));
+                    sslFilter.filterWrite(nextFilter, session, new DefaultWriteRequest(currentOutNetBuffer, writeFuture));
                 }
             }
         } finally {
@@ -746,8 +750,8 @@ class SslHandler {
 
         SSLEngineResult res;
 
-        Status status = null;
-        HandshakeStatus handshakeStatus = null;
+        Status status;
+        HandshakeStatus handshakeStatus;
 
         do {
             // Decode the incoming data
@@ -810,6 +814,10 @@ class SslHandler {
         return copy;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 

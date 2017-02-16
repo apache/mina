@@ -31,7 +31,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.filterchain.IoFilterChain.Entry;
-import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,16 +59,17 @@ import org.slf4j.LoggerFactory;
  * @org.apache.xbean.XBean
  */
 public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
+    /** The logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultIoFilterChainBuilder.class);
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(DefaultIoFilterChainBuilder.class);
-
+    /** The list of filters */
     private final List<Entry> entries;
 
     /**
      * Creates a new instance with an empty filter list.
      */
     public DefaultIoFilterChainBuilder() {
-        entries = new CopyOnWriteArrayList<Entry>();
+        entries = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -81,7 +81,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         if (filterChain == null) {
             throw new IllegalArgumentException("filterChain");
         }
-        entries = new CopyOnWriteArrayList<Entry>(filterChain.entries);
+        entries = new CopyOnWriteArrayList<>(filterChain.entries);
     }
 
     /**
@@ -140,6 +140,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      */
     public IoFilter get(String name) {
         Entry e = getEntry(name);
+        
         if (e == null) {
             return null;
         }
@@ -155,6 +156,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      */
     public IoFilter get(Class<? extends IoFilter> filterType) {
         Entry e = getEntry(filterType);
+        
         if (e == null) {
             return null;
         }
@@ -168,7 +170,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * @return The list of Filters
      */
     public List<Entry> getAll() {
-        return new ArrayList<Entry>(entries);
+        return new ArrayList<>(entries);
     }
 
     /**
@@ -179,6 +181,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
     public List<Entry> getAllReversed() {
         List<Entry> result = getAll();
         Collections.reverse(result);
+        
         return result;
     }
 
@@ -244,6 +247,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
             Entry base = i.next();
+            
             if (base.getName().equals(baseName)) {
                 register(i.previousIndex(), new EntryImpl(name, filter));
                 break;
@@ -263,6 +267,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
             Entry base = i.next();
+            
             if (base.getName().equals(baseName)) {
                 register(i.nextIndex(), new EntryImpl(name, filter));
                 break;
@@ -283,8 +288,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
             Entry e = i.next();
+            
             if (e.getName().equals(name)) {
                 entries.remove(i.previousIndex());
+                
                 return e.getFilter();
             }
         }
@@ -305,8 +312,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
             Entry e = i.next();
+            
             if (e.getFilter() == filter) {
                 entries.remove(i.previousIndex());
+                
                 return e.getFilter();
             }
         }
@@ -327,8 +336,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
         for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
             Entry e = i.next();
+            
             if (filterType.isAssignableFrom(e.getFilter().getClass())) {
                 entries.remove(i.previousIndex());
+                
                 return e.getFilter();
             }
         }
@@ -336,31 +347,57 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         throw new IllegalArgumentException("Filter not found: " + filterType.getName());
     }
 
+    /**
+     * Replace a filter by a new one.
+     * 
+     * @param name The name of the filter to replace
+     * @param newFilter The new filter to use
+     * @return The replaced filter
+     */
     public synchronized IoFilter replace(String name, IoFilter newFilter) {
         checkBaseName(name);
         EntryImpl e = (EntryImpl) getEntry(name);
         IoFilter oldFilter = e.getFilter();
         e.setFilter(newFilter);
+        
         return oldFilter;
     }
 
+    /**
+     * Replace a filter by a new one.
+     * 
+     * @param oldFilter The filter to replace
+     * @param newFilter The new filter to use
+     */
     public synchronized void replace(IoFilter oldFilter, IoFilter newFilter) {
         for (Entry e : entries) {
             if (e.getFilter() == oldFilter) {
                 ((EntryImpl) e).setFilter(newFilter);
+                
                 return;
             }
         }
+        
         throw new IllegalArgumentException("Filter not found: " + oldFilter.getClass().getName());
     }
 
+    /**
+     * Replace a filter by a new one. We are looking for a filter type,
+     * but if we have more than one with the same type, only the first
+     * found one will be replaced
+     * 
+     * @param oldFilterType The filter type to replace
+     * @param newFilter The new filter to use
+     */
     public synchronized void replace(Class<? extends IoFilter> oldFilterType, IoFilter newFilter) {
         for (Entry e : entries) {
             if (oldFilterType.isAssignableFrom(e.getFilter().getClass())) {
                 ((EntryImpl) e).setFilter(newFilter);
+                
                 return;
             }
         }
+        
         throw new IllegalArgumentException("Filter not found: " + oldFilterType.getName());
     }
 
@@ -390,11 +427,13 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
                     + LinkedHashMap.class.getName() + ".");
         }
 
-        filters = new LinkedHashMap<String, IoFilter>(filters);
+        filters = new LinkedHashMap<>(filters);
+        
         for (Map.Entry<String, ? extends IoFilter> e : filters.entrySet()) {
             if (e.getKey() == null) {
                 throw new IllegalArgumentException("filters contains a null key.");
             }
+            
             if (e.getValue() == null) {
                 throw new IllegalArgumentException("filters contains a null value.");
             }
@@ -402,6 +441,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
         synchronized (this) {
             clear();
+            
             for (Map.Entry<String, ? extends IoFilter> e : filters.entrySet()) {
                 addLast(e.getKey(), e.getValue());
             }
@@ -434,9 +474,11 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
                         LOGGER.debug("{} is an ordered map (guessed from that it implements OrderedMap interface.)",
                                 mapType.getSimpleName());
                     }
+                    
                     return true;
                 }
             }
+            
             type = type.getSuperclass();
         }
 
@@ -457,11 +499,12 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Failed to create a new map instance of '{}'.", mapType.getName(), e);
             }
+            
             return false;
         }
 
         Random rand = new Random();
-        List<String> expectedNames = new ArrayList<String>();
+        List<String> expectedNames = new ArrayList<>();
         IoFilter dummyFilter = new IoFilterAdapter();
         
         for (int i = 0; i < 65536; i++) {
@@ -481,6 +524,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("The specified map didn't pass the insertion order test after {} tries.", (i + 1));
                     }
+                    
                     return false;
                 }
             }
@@ -491,12 +535,19 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void buildFilterChain(IoFilterChain chain) throws Exception {
         for (Entry e : entries) {
             chain.addLast(e.getName(), e.getFilter());
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
@@ -554,6 +605,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             if (name == null) {
                 throw new IllegalArgumentException("name");
             }
+            
             if (filter == null) {
                 throw new IllegalArgumentException("filter");
             }
@@ -562,10 +614,18 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             this.filter = filter;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String getName() {
             return name;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public IoFilter getFilter() {
             return filter;
         }
@@ -574,6 +634,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             this.filter = filter;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public NextFilter getNextFilter() {
             throw new IllegalStateException();
         }
@@ -583,18 +647,34 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             return "(" + getName() + ':' + filter + ')';
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void addAfter(String name, IoFilter filter) {
             DefaultIoFilterChainBuilder.this.addAfter(getName(), name, filter);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void addBefore(String name, IoFilter filter) {
             DefaultIoFilterChainBuilder.this.addBefore(getName(), name, filter);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void remove() {
             DefaultIoFilterChainBuilder.this.remove(getName());
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void replace(IoFilter newFilter) {
             DefaultIoFilterChainBuilder.this.replace(getName(), newFilter);
         }

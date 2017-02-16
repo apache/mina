@@ -148,12 +148,15 @@ public class KeyStoreFactory {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             for (;;) {
-                int data = dataStream.read();
-                if (data < 0) {
+                int readByte = dataStream.read();
+                
+                if (readByte < 0) {
                     break;
                 }
-                out.write(data);
+                
+                out.write(readByte);
             }
+            
             setData(out.toByteArray());
         } finally {
             try {

@@ -31,6 +31,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * A map with expiration.  This class contains a worker thread that will 
  * periodically check this class in order to determine if any objects 
  * should be removed based on the provided time-to-live value.
+ * 
+ * @param <K> The key type
+ * @param <V> The value type
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -90,6 +93,10 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         expirer.setExpirationInterval(expirationInterval);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public V put(K key, V value) {
         ExpiringObject answer = delegate.put(key, new ExpiringObject(key, value, System.currentTimeMillis()));
         
@@ -100,6 +107,10 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         return answer.getValue();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public V get(Object key) {
         ExpiringObject object = delegate.get(key);
 
@@ -112,6 +123,10 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public V remove(Object key) {
         ExpiringObject answer = delegate.remove(key);
         if (answer == null) {
@@ -121,78 +136,151 @@ public class ExpiringMap<K, V> implements Map<K, V> {
         return answer.getValue();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean containsKey(Object key) {
         return delegate.containsKey(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean containsValue(Object value) {
         return delegate.containsValue(value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int size() {
         return delegate.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isEmpty() {
         return delegate.isEmpty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clear() {
         delegate.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return delegate.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Set<K> keySet() {
         return delegate.keySet();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         return delegate.equals(obj);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void putAll(Map<? extends K, ? extends V> inMap) {
         for (Entry<? extends K, ? extends V> e : inMap.entrySet()) {
             this.put(e.getKey(), e.getValue());
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Collection<V> values() {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Set<Map.Entry<K, V>> entrySet() {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Adds a listener in the expiration listeners
+     * 
+     * @param listener The listener to add
+     */
     public void addExpirationListener(ExpirationListener<V> listener) {
         expirationListeners.add(listener);
     }
 
+    /**
+     * Removes a listener from the expiration listeners
+     * 
+     * @param listener The listener to remove
+     */
     public void removeExpirationListener(ExpirationListener<V> listener) {
         expirationListeners.remove(listener);
     }
 
+    /**
+     * @return The Expirer instance
+     */
     public Expirer getExpirer() {
         return expirer;
     }
 
+    /**
+     * Get the interval in which an object will live in the map before it is removed.
+     * 
+     * @return The expiration time in second
+     */
     public int getExpirationInterval() {
         return expirer.getExpirationInterval();
     }
 
+    /**
+     * @return the Time-to-live value in seconds.
+     */
     public int getTimeToLive() {
         return expirer.getTimeToLive();
     }
 
+    /**
+     * Set the interval in which an object will live in the map before it is removed.
+     * 
+     * @param expirationInterval The expiration time in seconds
+     */
     public void setExpirationInterval(int expirationInterval) {
         expirer.setExpirationInterval(expirationInterval);
     }
 
+    /**
+     * Update the value for the time-to-live
+     *
+     * @param timeToLive The time-to-live (seconds)
+     */
     public void setTimeToLive(int timeToLive) {
         expirer.setTimeToLive(timeToLive);
     }
@@ -280,6 +368,10 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             expirerThread.setDaemon(true);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void run() {
             while (running) {
                 processExpires();
@@ -336,6 +428,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
          */
         public void startExpiringIfNotStarted() {
             stateLock.readLock().lock();
+            
             try {
                 if (running) {
                     return;
@@ -345,6 +438,7 @@ public class ExpiringMap<K, V> implements Map<K, V> {
             }
 
             stateLock.writeLock().lock();
+            
             try {
                 if (!running) {
                     running = true;

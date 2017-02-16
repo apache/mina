@@ -67,12 +67,17 @@ public final class AttributeKey implements Serializable {
         return name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
-        int h = 17 * 37 + ((name == null) ? 0 : name.hashCode());
-        return h;
+        return 17 * 37 + ((name == null) ? 0 : name.hashCode());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

@@ -73,7 +73,7 @@ public abstract class AbstractFileRegionTest {
                 @Override
                 public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
                     exception[0] = cause;
-                    session.close(true);
+                    session.closeNow();
                 }
 
                 @Override
@@ -92,7 +92,7 @@ public abstract class AbstractFileRegionTest {
                     }
                     if (index == FILE_SIZE / 4) {
                         success[0] = true;
-                        session.close(true);
+                        session.closeNow();
                     }
                 }
             });
@@ -105,7 +105,7 @@ public abstract class AbstractFileRegionTest {
                 @Override
                 public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
                     exception[0] = cause;
-                    session.close(true);
+                    session.closeNow();
                 }
 
                 @Override

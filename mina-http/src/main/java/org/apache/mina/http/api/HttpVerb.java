@@ -19,7 +19,33 @@
  */
 package org.apache.mina.http.api;
 
+/**
+ * The HTTP verb. One of GET, HEAD, POST, PUT, DELETE, OPTIONS, TRACE and CONNECT.
+ * 
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
 public enum HttpVerb {
-
-    GET, HEAD, POST, PUT, DELETE, OPTIONS, TRACE, CONNECT
+    /** The GET verb */
+    GET, 
+    
+    /** The HEAD verb */
+    HEAD, 
+    
+    /** The POST verb */
+    POST, 
+    
+    /** The PUT verb */
+    PUT, 
+    
+    /** The DELETE verb */
+    DELETE, 
+    
+    /** The OPTIONS verb */
+    OPTIONS, 
+    
+    /** The TRACE verb */
+    TRACE, 
+    
+    /** The CONNECT verb */
+    CONNECT
 }

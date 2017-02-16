@@ -43,20 +43,38 @@ public class RecoverableProtocolDecoderException extends ProtocolDecoderExceptio
 
     private static final long serialVersionUID = -8172624045024880678L;
 
+    /**
+     * Create a new RecoverableProtocolDecoderException instance
+     */
     public RecoverableProtocolDecoderException() {
         // Do nothing
     }
 
+    /**
+     * Create a new RecoverableProtocolDecoderException instance
+     * 
+     * @param message The error message
+     */
     public RecoverableProtocolDecoderException(String message) {
         super(message);
     }
 
+    /**
+     * Create a new RecoverableProtocolDecoderException instance
+     * 
+     * @param cause The original exception
+     */
     public RecoverableProtocolDecoderException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Create a new RecoverableProtocolDecoderException instance
+     * 
+     * @param message The error message
+     * @param cause The original exception
+     */
     public RecoverableProtocolDecoderException(String message, Throwable cause) {
         super(message, cause);
     }
-
 }

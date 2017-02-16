@@ -40,10 +40,10 @@ import org.apache.mina.proxy.handlers.http.HttpSmartProxyHandler;
  * @since MINA 2.0.0-M3
  */
 public class ProxyIoSession {
+    /** The proxy session name */
+    public static final String PROXY_SESSION = ProxyConnector.class.getName() + ".ProxySession";
 
-    public final static String PROXY_SESSION = ProxyConnector.class.getName() + ".ProxySession";
-
-    private final static String DEFAULT_ENCODING = "ISO-8859-1";
+    private static final String DEFAULT_ENCODING = "ISO-8859-1";
 
     /**
      * The list contains the authentication methods to use. 
@@ -281,7 +281,7 @@ public class ProxyIoSession {
     }
 
     /**
-     * @return the used charset name or {@link #DEFAULT_ENCODING} if null.
+     * @return the used charset name or DEFAULT_ENCODING if null.
      */
     public String getCharsetName() {
         if (charsetName == null) {

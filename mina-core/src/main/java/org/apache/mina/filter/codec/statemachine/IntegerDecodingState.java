@@ -35,6 +35,7 @@ public abstract class IntegerDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         int firstByte = 0;
         int secondByte = 0;
@@ -71,6 +72,7 @@ public abstract class IntegerDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         throw new ProtocolDecoderException("Unexpected end of session while waiting for an integer.");
     }

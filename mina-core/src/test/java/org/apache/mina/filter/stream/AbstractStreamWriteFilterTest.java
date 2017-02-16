@@ -434,7 +434,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         @Override
         public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
             LOGGER.info("ReceiverHandler: sessionIdle");
-            session.close(true);
+            session.closeNow();
         }
 
         @Override
@@ -459,7 +459,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
             }
             LOGGER.info("messageReceived: bytesRead = {}", bytesRead);
             if (bytesRead >= size) {
-                session.close(true);
+                session.closeNow();
             }
         }
     }

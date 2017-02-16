@@ -28,18 +28,37 @@ package org.apache.mina.core.session;
 public class IoSessionInitializationException extends RuntimeException {
     private static final long serialVersionUID = -1205810145763696189L;
 
+    /**
+     * Creates a new IoSessionInitializationException instance.
+     */
     public IoSessionInitializationException() {
         super();
     }
 
+    /**
+     * Creates a new IoSessionInitializationException instance.
+     * 
+     * @param message The detail message
+     * @param cause The Exception's cause
+     */
     public IoSessionInitializationException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Creates a new IoSessionInitializationException instance.
+     * 
+     * @param message The detail message
+     */
     public IoSessionInitializationException(String message) {
         super(message);
     }
 
+    /**
+     * Creates a new IoSessionInitializationException instance.
+     * 
+     * @param cause The Exception's cause
+     */
     public IoSessionInitializationException(Throwable cause) {
         super(cause);
     }

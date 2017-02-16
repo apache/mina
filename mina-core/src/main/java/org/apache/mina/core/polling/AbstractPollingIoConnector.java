@@ -26,24 +26,17 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.mina.core.RuntimeIoException;
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.DefaultConnectFuture;
 import org.apache.mina.core.service.AbstractIoConnector;
-import org.apache.mina.core.service.AbstractIoService;
-import org.apache.mina.core.service.IoConnector;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.session.AbstractIoSession;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionInitializer;
-import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.ExceptionMonitor;
 
 /**
@@ -59,16 +52,18 @@ import org.apache.mina.util.ExceptionMonitor;
  * provided by the subclassing implementation.
  * 
  * @see NioSocketConnector for a example of implementation
+ * @param <H> The type of IoHandler
+ * @param <S> The type of IoSession
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H> extends AbstractIoConnector {
+public abstract class AbstractPollingIoConnector<S extends AbstractIoSession, H> extends AbstractIoConnector {
 
-    private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
+    private final Queue<ConnectionRequest> connectQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<ConnectionRequest> cancelQueue = new ConcurrentLinkedQueue<ConnectionRequest>();
+    private final Queue<ConnectionRequest> cancelQueue = new ConcurrentLinkedQueue<>();
 
-    private final IoProcessor<T> processor;
+    private final IoProcessor<S> processor;
 
     private final boolean createdProcessor;
 
@@ -77,7 +72,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
     private volatile boolean selectable;
 
     /** The connector thread */
-    private final AtomicReference<Connector> connectorRef = new AtomicReference<Connector>();
+    private final AtomicReference<Connector> connectorRef = new AtomicReference<>();
 
     /**
      * Constructor for {@link AbstractPollingIoConnector}. You need to provide a
@@ -93,8 +88,8 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      *            a {@link Class} of {@link IoProcessor} for the associated
      *            {@link IoSession} type.
      */
-    protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<T>> processorClass) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass), true);
+    protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass) {
+        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass), true);
     }
 
     /**
@@ -113,9 +108,9 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      * @param processorCount
      *            the amount of processor to instantiate for the pool
      */
-    protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<T>> processorClass,
+    protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass,
             int processorCount) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<T>(processorClass, processorCount), true);
+        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass, processorCount), true);
     }
 
     /**
@@ -133,7 +128,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      *            {@link IoHandler} and processing the chains of
      *            {@link IoFilter}
      */
-    protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, IoProcessor<T> processor) {
+    protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, IoProcessor<S> processor) {
         this(sessionConfig, null, processor, false);
     }
 
@@ -156,7 +151,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      *            {@link IoHandler} and processing the chains of
      *            {@link IoFilter}
      */
-    protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor) {
+    protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<S> processor) {
         this(sessionConfig, executor, processor, false);
     }
 
@@ -182,7 +177,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      *            tagging the processor as automatically created, so it will be
      *            automatically disposed
      */
-    private AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<T> processor,
+    private AbstractPollingIoConnector(IoSessionConfig sessionConfig, Executor executor, IoProcessor<S> processor,
             boolean createdProcessor) {
         super(sessionConfig, executor);
 
@@ -279,7 +274,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
      * @throws Exception
      *             any exception thrown by the underlying systems calls
      */
-    protected abstract T newSession(IoProcessor<T> processor, H handle) throws Exception;
+    protected abstract S newSession(IoProcessor<S> processor, H handle) throws Exception;
 
     /**
      * Close a client socket.
@@ -367,7 +362,7 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             handle = newHandle(localAddress);
             if (connect(handle, remoteAddress)) {
                 ConnectFuture future = new DefaultConnectFuture();
-                T session = newSession(processor, handle);
+                S session = newSession(processor, handle);
                 initSession(session, future, sessionInitializer);
                 // Forward the remaining process to the IoProcessor.
                 session.getProcessor().add(session);
@@ -413,116 +408,13 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         }
     }
 
-    private int registerNew() {
-        int nHandles = 0;
-        for (;;) {
-            ConnectionRequest req = connectQueue.poll();
-            if (req == null) {
-                break;
-            }
-
-            H handle = req.handle;
-            try {
-                register(handle, req);
-                nHandles++;
-            } catch (Exception e) {
-                req.setException(e);
-                try {
-                    close(handle);
-                } catch (Exception e2) {
-                    ExceptionMonitor.getInstance().exceptionCaught(e2);
-                }
-            }
-        }
-        return nHandles;
-    }
-
-    private int cancelKeys() {
-        int nHandles = 0;
-
-        for (;;) {
-            ConnectionRequest req = cancelQueue.poll();
-
-            if (req == null) {
-                break;
-            }
-
-            H handle = req.handle;
-
-            try {
-                close(handle);
-            } catch (Exception e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-            } finally {
-                nHandles++;
-            }
-        }
-
-        if (nHandles > 0) {
-            wakeup();
-        }
-
-        return nHandles;
-    }
-
-    /**
-     * Process the incoming connections, creating a new session for each valid
-     * connection.
-     */
-    private int processConnections(Iterator<H> handlers) {
-        int nHandles = 0;
-
-        // Loop on each connection request
-        while (handlers.hasNext()) {
-            H handle = handlers.next();
-            handlers.remove();
-
-            ConnectionRequest connectionRequest = getConnectionRequest(handle);
-
-            if (connectionRequest == null) {
-                continue;
-            }
-
-            boolean success = false;
-            try {
-                if (finishConnect(handle)) {
-                    T session = newSession(processor, handle);
-                    initSession(session, connectionRequest, connectionRequest.getSessionInitializer());
-                    // Forward the remaining process to the IoProcessor.
-                    session.getProcessor().add(session);
-                    nHandles++;
-                }
-                success = true;
-            } catch (Exception e) {
-                connectionRequest.setException(e);
-            } finally {
-                if (!success) {
-                    // The connection failed, we have to cancel it.
-                    cancelQueue.offer(connectionRequest);
-                }
-            }
-        }
-        return nHandles;
-    }
-
-    private void processTimedOutSessions(Iterator<H> handles) {
-        long currentTime = System.currentTimeMillis();
-
-        while (handles.hasNext()) {
-            H handle = handles.next();
-            ConnectionRequest connectionRequest = getConnectionRequest(handle);
-
-            if ((connectionRequest != null) && (currentTime >= connectionRequest.deadline)) {
-                connectionRequest.setException(new ConnectException("Connection timed out."));
-                cancelQueue.offer(connectionRequest);
-            }
-        }
-    }
-
     private class Connector implements Runnable {
-
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void run() {
-            assert (connectorRef.get() == this);
+            assert connectorRef.get() == this;
 
             int nHandles = 0;
 
@@ -541,16 +433,16 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                         connectorRef.set(null);
 
                         if (connectQueue.isEmpty()) {
-                            assert (connectorRef.get() != this);
+                            assert connectorRef.get() != this;
                             break;
                         }
 
                         if (!connectorRef.compareAndSet(null, this)) {
-                            assert (connectorRef.get() != this);
+                            assert connectorRef.get() != this;
                             break;
                         }
 
-                        assert (connectorRef.get() == this);
+                        assert connectorRef.get() == this;
                     }
 
                     if (selected > 0) {
@@ -596,8 +488,117 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
                 }
             }
         }
+
+        private int registerNew() {
+            int nHandles = 0;
+            for (;;) {
+                ConnectionRequest req = connectQueue.poll();
+                if (req == null) {
+                    break;
+                }
+
+                H handle = req.handle;
+                try {
+                    register(handle, req);
+                    nHandles++;
+                } catch (Exception e) {
+                    req.setException(e);
+                    try {
+                        close(handle);
+                    } catch (Exception e2) {
+                        ExceptionMonitor.getInstance().exceptionCaught(e2);
+                    }
+                }
+            }
+            return nHandles;
+        }
+
+        private int cancelKeys() {
+            int nHandles = 0;
+
+            for (;;) {
+                ConnectionRequest req = cancelQueue.poll();
+
+                if (req == null) {
+                    break;
+                }
+
+                H handle = req.handle;
+
+                try {
+                    close(handle);
+                } catch (Exception e) {
+                    ExceptionMonitor.getInstance().exceptionCaught(e);
+                } finally {
+                    nHandles++;
+                }
+            }
+
+            if (nHandles > 0) {
+                wakeup();
+            }
+
+            return nHandles;
+        }
+
+        /**
+         * Process the incoming connections, creating a new session for each valid
+         * connection.
+         */
+        private int processConnections(Iterator<H> handlers) {
+            int nHandles = 0;
+
+            // Loop on each connection request
+            while (handlers.hasNext()) {
+                H handle = handlers.next();
+                handlers.remove();
+
+                ConnectionRequest connectionRequest = getConnectionRequest(handle);
+
+                if (connectionRequest == null) {
+                    continue;
+                }
+
+                boolean success = false;
+                try {
+                    if (finishConnect(handle)) {
+                        S session = newSession(processor, handle);
+                        initSession(session, connectionRequest, connectionRequest.getSessionInitializer());
+                        // Forward the remaining process to the IoProcessor.
+                        session.getProcessor().add(session);
+                        nHandles++;
+                    }
+                    success = true;
+                } catch (Exception e) {
+                    connectionRequest.setException(e);
+                } finally {
+                    if (!success) {
+                        // The connection failed, we have to cancel it.
+                        cancelQueue.offer(connectionRequest);
+                    }
+                }
+            }
+            return nHandles;
+        }
+
+        private void processTimedOutSessions(Iterator<H> handles) {
+            long currentTime = System.currentTimeMillis();
+
+            while (handles.hasNext()) {
+                H handle = handles.next();
+                ConnectionRequest connectionRequest = getConnectionRequest(handle);
+
+                if ((connectionRequest != null) && (currentTime >= connectionRequest.deadline)) {
+                    connectionRequest.setException(new ConnectException("Connection timed out."));
+                    cancelQueue.offer(connectionRequest);
+                }
+            }
+        }
     }
 
+    /**
+     * A ConnectionRequest's Iouture 
+     */
     public final class ConnectionRequest extends DefaultConnectFuture {
         /** The handle associated with this connection request */
         private final H handle;
@@ -608,6 +609,12 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
         /** The callback to call when the session is initialized */
         private final IoSessionInitializer<? extends ConnectFuture> sessionInitializer;
 
+        /**
+         * Creates a new ConnectionRequest instance
+         * 
+         * @param handle The IoHander
+         * @param callback The IoFuture callback
+         */
         public ConnectionRequest(H handle, IoSessionInitializer<? extends ConnectFuture> callback) {
             this.handle = handle;
             long timeout = getConnectTimeoutMillis();
@@ -621,18 +628,30 @@ public abstract class AbstractPollingIoConnector<T extends AbstractIoSession, H>
             this.sessionInitializer = callback;
         }
 
+        /**
+         * @return The IoHandler instance
+         */
         public H getHandle() {
             return handle;
         }
 
+        /**
+         * @return The connection deadline 
+         */
         public long getDeadline() {
             return deadline;
         }
 
+        /**
+         * @return The session initializer callback
+         */
         public IoSessionInitializer<? extends ConnectFuture> getSessionInitializer() {
             return sessionInitializer;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean cancel() {
             if (!isDone()) {

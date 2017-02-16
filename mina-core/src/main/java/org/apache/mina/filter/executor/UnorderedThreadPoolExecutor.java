@@ -55,12 +55,16 @@ import org.apache.mina.core.session.IoEvent;
 public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private static final Runnable EXIT_SIGNAL = new Runnable() {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void run() {
             throw new Error("This method shouldn't be called. " + "Please file a bug report.");
         }
     };
 
-    private final Set<Worker> workers = new HashSet<Worker>();
+    private final Set<Worker> workers = new HashSet<>();
 
     private volatile int corePoolSize;
 
@@ -76,35 +80,86 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private final IoEventQueueHandler queueHandler;
 
+    /**
+     * Creates a new UnorderedThreadPoolExecutor instance
+     */
     public UnorderedThreadPoolExecutor() {
         this(16);
     }
 
+    /**
+     * Creates a new UnorderedThreadPoolExecutor instance
+     * 
+     * @param maximumPoolSize The maximum number of threads in the pool
+     */
     public UnorderedThreadPoolExecutor(int maximumPoolSize) {
         this(0, maximumPoolSize);
     }
 
+    /**
+     * Creates a new UnorderedThreadPoolExecutor instance
+     * 
+     * @param corePoolSize The initial threads pool size
+     * @param maximumPoolSize The maximum number of threads in the pool
+     */
     public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize) {
         this(corePoolSize, maximumPoolSize, 30, TimeUnit.SECONDS);
     }
 
+    /**
+     * Creates a new UnorderedThreadPoolExecutor instance
+     * 
+     * @param corePoolSize The initial threads pool size
+     * @param maximumPoolSize The maximum number of threads in the pool
+     * @param keepAliveTime The time to keep threads alive
+     * @param unit The time unit for the keepAliveTime
+     */
     public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory());
     }
 
+    /**
+     * Creates a new UnorderedThreadPoolExecutor instance
+     * 
+     * @param corePoolSize The initial threads pool size
+     * @param maximumPoolSize The maximum number of threads in the pool
+     * @param keepAliveTime The time to keep threads alive
+     * @param unit The time unit for the keepAliveTime
+     * @param queueHandler The Event queue handler to use
+     */
     public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             IoEventQueueHandler queueHandler) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler);
     }
 
+    /**
+     * Creates a new UnorderedThreadPoolExecutor instance
+     * 
+     * @param corePoolSize The initial threads pool size
+     * @param maximumPoolSize The maximum number of threads in the pool
+     * @param keepAliveTime The time to keep threads alive
+     * @param unit The time unit for the keepAliveTime
+     * @param threadFactory The Thread factory to use
+     */
     public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory, null);
     }
 
+    /**
+     * Creates a new UnorderedThreadPoolExecutor instance
+     * 
+     * @param corePoolSize The initial threads pool size
+     * @param maximumPoolSize The maximum number of threads in the pool
+     * @param keepAliveTime The time to keep threads alive
+     * @param unit The time unit for the keepAliveTime
+     * @param threadFactory The Thread factory to use
+     * @param queueHandler The Event queue handler to use
+     */
     public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
         super(0, 1, keepAliveTime, unit, new LinkedBlockingQueue<Runnable>(), threadFactory, new AbortPolicy());
+        
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
         }
@@ -114,14 +169,18 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
 
         if (queueHandler == null) {
-            queueHandler = IoEventQueueHandler.NOOP;
+            this.queueHandler = IoEventQueueHandler.NOOP;
+        } else {
+            this.queueHandler = queueHandler;
         }
 
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
-        this.queueHandler = queueHandler;
     }
 
+    /**
+     * @return The Queue handler in use
+     */
     public IoEventQueueHandler getQueueHandler() {
         return queueHandler;
     }
@@ -242,7 +301,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
     public List<Runnable> shutdownNow() {
         shutdown();
 
-        List<Runnable> answer = new ArrayList<Runnable>();
+        List<Runnable> answer = new ArrayList<>();
         Runnable task;
         while ((task = getQueue().poll()) != null) {
             if (task == EXIT_SIGNAL) {
@@ -401,6 +460,10 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
         private Thread thread;
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public void run() {
             thread = Thread.currentThread();
 
@@ -446,9 +509,11 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
             Runnable task = null;
             long currentTime = System.currentTimeMillis();
             long deadline = currentTime + getKeepAliveTime(TimeUnit.MILLISECONDS);
+            
             for (;;) {
                 try {
                     long waitTime = deadline - currentTime;
+                    
                     if (waitTime <= 0) {
                         break;
                     }

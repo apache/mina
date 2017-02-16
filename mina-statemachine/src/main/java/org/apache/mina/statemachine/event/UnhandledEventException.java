@@ -29,6 +29,11 @@ public class UnhandledEventException extends RuntimeException {
 
     private final Event event;
 
+    /**
+     * Creates a new UnhandledEventException instance
+     * 
+     * @param event The unhandled event
+     */
     public UnhandledEventException(Event event) {
         super("Unhandled event: " + event);
         this.event = event;

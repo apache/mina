@@ -35,22 +35,23 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         int highByte = 0;
 
 
         while (in.hasRemaining()) {
             switch (counter) {
-            case 0:
-                highByte = in.getUnsigned();
-                break;
-                
-            case 1:
-                counter = 0;
-                return finishDecode((short) ((highByte << 8) | in.getUnsigned()), out);
-                
-            default:
-                throw new InternalError();
+                case 0:
+                    highByte = in.getUnsigned();
+                    break;
+                    
+                case 1:
+                    counter = 0;
+                    return finishDecode((short) ((highByte << 8) | in.getUnsigned()), out);
+                    
+                default:
+                    throw new InternalError();
             }
 
             counter++;
@@ -61,6 +62,7 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DecodingState finishDecode(ProtocolDecoderOutput out) throws Exception {
         throw new ProtocolDecoderException("Unexpected end of session while waiting for a short integer.");
     }

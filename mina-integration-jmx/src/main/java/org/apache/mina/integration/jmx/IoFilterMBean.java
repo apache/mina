@@ -26,6 +26,11 @@ import org.apache.mina.core.session.IoSession;
  */
 public class IoFilterMBean extends ObjectMBean<IoFilter> {
 
+    /**
+     * Creates a new IoFilterMBean instance
+     * 
+     * @param source The IOFilter to monitor 
+     */
     public IoFilterMBean(IoFilter source) {
         super(source);
     }

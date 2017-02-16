@@ -193,7 +193,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         if (!isConnectionOk(session)) {
             LOGGER.warn("Connections coming in too fast; closing.");
-            session.close(true);
+            session.closeNow();
         }
 
         nextFilter.sessionCreated(session);

@@ -34,14 +34,17 @@ import org.apache.mina.integration.beans.PropertyEditorFactory;
  * OgnlContext ctx = Ognl.createDefaultContext(root);
  * ctx.put(OgnlContext.TYPE_CONVERTER_CONTEXT_KEY, new PropertyTypeConverter());
  * </code></pre>
- * You can also override {@link #getPropertyEditor(Class, String, Class)}
+ * You can also override getPropertyEditor(Class, String, Class)
  * method to have more control over how an appropriate {@link PropertyEditor}
  * is chosen.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PropertyTypeConverter implements TypeConverter {
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     @SuppressWarnings("unchecked")
     public Object convertValue(Map ctx, Object target, Member member, String attrName, Object value, Class toType) {
         if (value == null) {

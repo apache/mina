@@ -41,7 +41,7 @@ public class DIRMINA777Test {
 
     @Test
     public void checkReadFuture() throws Throwable {
-        int port = AvailablePortFinder.getNextAvailable(1025);
+        int port = AvailablePortFinder.getNextAvailable();
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
         acceptor.setHandler(new IoHandlerAdapter() {
@@ -55,6 +55,7 @@ public class DIRMINA777Test {
             }
             
         });
+        
         acceptor.bind(new InetSocketAddress(port));
 
         try {
@@ -62,9 +63,11 @@ public class DIRMINA777Test {
             connector.setHandler(new IoHandlerAdapter());
             ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost", port));
             connectFuture.awaitUninterruptibly();
+            
             if (connectFuture.getException() != null) {
                 throw connectFuture.getException();
             }
+            
             connectFuture.getSession().getConfig().setUseReadOperation(true);
             ReadFuture readFuture = connectFuture.getSession().read();
             readFuture.awaitUninterruptibly();
@@ -74,10 +77,9 @@ public class DIRMINA777Test {
             IoBuffer message = (IoBuffer)readFuture.getMessage();
             assertEquals(1, message.remaining());
             assertEquals(125,message.get());
-            connectFuture.getSession().close(true);
+            connectFuture.getSession().closeNow();
         } finally {
             acceptor.dispose();
         }
     }
-
 }

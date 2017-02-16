@@ -91,7 +91,7 @@ import org.apache.mina.core.session.IoSession;
  * </pre>
  * <p>
  * Please note that this decoder simply forward the call to
- * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)} if the
+ * doDecode(IoSession, IoBuffer, ProtocolDecoderOutput) if the
  * underlying transport doesn't have a packet fragmentation. Whether the
  * transport has fragmentation or not is determined by querying
  * {@link TransportMetadata}.
@@ -99,8 +99,13 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
-
-    private final AttributeKey BUFFER = new AttributeKey(getClass(), "buffer");
+    /** The buffer used to store the data in the session */
+    private static final AttributeKey BUFFER = new AttributeKey(CumulativeProtocolDecoder.class, "buffer");
+    
+    /** A flag set to true if we handle fragmentation accordingly to the TransportMetadata setting. 
+     * It can be set to false if needed (UDP with fragments, for instance). the default value is 'true'
+     */
+    private boolean transportMetadataFragmentation = true;
 
     /**
      * Creates a new instance.
@@ -112,7 +117,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     /**
      * Cumulates content of <tt>in</tt> into internal buffer and forwards
      * decoding request to
-     * {@link #doDecode(IoSession, IoBuffer, ProtocolDecoderOutput)}.
+     * doDecode(IoSession, IoBuffer, ProtocolDecoderOutput).
      * <tt>doDecode()</tt> is invoked repeatedly until it returns <tt>false</tt>
      * and the cumulative buffer is compacted after decoding ends.
      *
@@ -120,8 +125,9 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      *             if your <tt>doDecode()</tt> returned <tt>true</tt> not
      *             consuming the cumulative buffer.
      */
+    @Override
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-        if (!session.getTransportMetadata().hasFragmentation()) {
+        if (transportMetadataFragmentation && !session.getTransportMetadata().hasFragmentation()) {
             while (in.hasRemaining()) {
                 if (!doDecode(session, in, out)) {
                     break;
@@ -142,11 +148,9 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
                 try {
                     buf.put(in);
                     appended = true;
-                } catch (IllegalStateException e) {
+                } catch (IllegalStateException | IndexOutOfBoundsException e) {
                     // A user called derivation method (e.g. slice()),
                     // which disables auto-expansion of the parent buffer.
-                } catch (IndexOutOfBoundsException e) {
-                    // A user disabled auto-expansion.
                 }
             }
 
@@ -240,5 +244,15 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         remainingBuf.put(buf);
 
         session.setAttribute(BUFFER, remainingBuf);
+    }
+    
+    /**
+     * Let the user change the way we handle fragmentation. If set to <tt>false</tt>, the 
+     * decode() method will not check the TransportMetadata fragmentation capability
+     *  
+     * @param transportMetadataFragmentation The flag to set.
+     */
+    public void setTransportMetadataFragmentation(boolean transportMetadataFragmentation) {
+        this.transportMetadataFragmentation = transportMetadataFragmentation;
     }
 }

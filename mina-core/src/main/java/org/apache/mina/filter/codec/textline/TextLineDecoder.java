@@ -40,7 +40,7 @@ import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class TextLineDecoder implements ProtocolDecoder {
-    private final AttributeKey CONTEXT = new AttributeKey(getClass(), "context");
+    private static final AttributeKey CONTEXT = new AttributeKey(TextLineDecoder.class, "context");
 
     private final Charset charset;
 
@@ -191,6 +191,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
         Context ctx = getContext(session);
 
@@ -221,6 +222,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
         // Do nothing
     }
@@ -228,6 +230,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void dispose(IoSession session) throws Exception {
         Context ctx = (Context) session.getAttribute(CONTEXT);
 

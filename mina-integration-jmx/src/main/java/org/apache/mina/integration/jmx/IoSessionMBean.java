@@ -35,7 +35,11 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class IoSessionMBean extends ObjectMBean<IoSession> {
-
+    /**
+     * Creates a new IoSessionMBean instance
+     * 
+     * @param source The IoSession to monitor
+     */
     public IoSessionMBean(IoSession source) {
         super(source);
     }
@@ -44,9 +48,11 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
     protected Object getAttribute0(String fqan) throws Exception {
         if (fqan.equals("attributes")) {
             Map<String, String> answer = new LinkedHashMap<String, String>();
+            
             for (Object key : getSource().getAttributeKeys()) {
                 answer.put(String.valueOf(key), String.valueOf(getSource().getAttribute(key)));
             }
+            
             return answer;
         }
 
@@ -60,6 +66,7 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
             ObjectName filterRef = (ObjectName) params[1];
             IoFilter filter = getFilter(filterRef);
             getSource().getFilterChain().addFirst(filterName, filter);
+            
             return null;
         }
 
@@ -68,6 +75,7 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
             ObjectName filterRef = (ObjectName) params[1];
             IoFilter filter = getFilter(filterRef);
             getSource().getFilterChain().addLast(filterName, filter);
+            
             return null;
         }
 
@@ -86,12 +94,14 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
             ObjectName filterRef = (ObjectName) params[2];
             IoFilter filter = getFilter(filterRef);
             getSource().getFilterChain().addAfter(filterBaseName, filterName, filter);
+            
             return null;
         }
 
         if (name.equals("removeFilter")) {
             String filterName = (String) params[0];
             getSource().getFilterChain().remove(filterName);
+            
             return null;
         }
 
@@ -100,9 +110,11 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
 
     private IoFilter getFilter(ObjectName filterRef) throws MBeanException {
         Object object = ObjectMBean.getSource(filterRef);
+        
         if (object == null) {
             throw new MBeanException(new IllegalArgumentException("MBean not found: " + filterRef));
         }
+        
         if (!(object instanceof IoFilter)) {
             throw new MBeanException(new IllegalArgumentException("MBean '" + filterRef + "' is not an IoFilter."));
         }
