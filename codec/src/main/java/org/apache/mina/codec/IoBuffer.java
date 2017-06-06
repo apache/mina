@@ -174,7 +174,7 @@ public final class IoBuffer {
      * instance.
      * <p>
      * Further reads on the returned InputStream move the reading head of the
-     * {@link IoBuffer} instance used for it's creation
+     * {@link IoBuffer} instance used for its creation
      * 
      * @return an input stream
      */

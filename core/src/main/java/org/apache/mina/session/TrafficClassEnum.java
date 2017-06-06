@@ -46,7 +46,7 @@ public enum TrafficClassEnum {
 
     /**
      * Get back the Enum value fro the integer value
-     * @param value The interger value we are looking for
+     * @param value The integer value we are looking for
      * @return The Enum value
      */
     public static TrafficClassEnum valueOf(int value) {
