@@ -80,6 +80,7 @@
               org.apache.mina.core.session;version=${project.version},
               org.apache.mina.filter.executor;version=${project.version},
               org.apache.mina.integration.beans;version=${project.version},
+              org.apache.mina.integration.ognl;version=${project.version},
               org.slf4j;version=${osgi-min-version.slf4j.api}
             </Import-Package>
           </instructions>
