@@ -30,9 +30,11 @@ import org.apache.mina.statemachine.context.StateContext;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultEventFactory implements EventFactory {
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Event create(StateContext context, Method method, Object[] arguments) {
         return new Event(method.getName(), context, arguments);
     }
-
 }

@@ -59,12 +59,15 @@ public class Event {
         if (id == null) {
             throw new IllegalArgumentException("id");
         }
+        
         if (context == null) {
             throw new IllegalArgumentException("context");
         }
+        
         if (arguments == null) {
             throw new IllegalArgumentException("arguments");
         }
+        
         this.id = id;
         this.context = context;
         this.arguments = arguments;
@@ -92,6 +95,7 @@ public class Event {
         return arguments;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         

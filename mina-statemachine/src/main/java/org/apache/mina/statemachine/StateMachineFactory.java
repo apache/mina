@@ -36,11 +36,9 @@ import org.apache.mina.statemachine.annotation.OnEntry;
 import org.apache.mina.statemachine.annotation.OnExit;
 import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.annotation.TransitionAnnotation;
-import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.MethodSelfTransition;
 import org.apache.mina.statemachine.transition.MethodTransition;
-import org.apache.mina.statemachine.transition.SelfTransition;
 
 /**
  * Creates {@link StateMachine}s by reading {@link org.apache.mina.statemachine.annotation.State},
@@ -79,10 +77,12 @@ public class StateMachineFactory {
      */
     public static StateMachineFactory getInstance(Class<? extends Annotation> transitionAnnotation) {
         TransitionAnnotation a = transitionAnnotation.getAnnotation(TransitionAnnotation.class);
+        
         if (a == null) {
             throw new IllegalArgumentException("The annotation class " + transitionAnnotation
                     + " has not been annotated with the " + TransitionAnnotation.class.getName() + " annotation");
         }
+        
         return new StateMachineFactory(transitionAnnotation, a.value(), OnEntry.class, OnExit.class);
 
     }
@@ -139,12 +139,12 @@ public class StateMachineFactory {
      */
     public StateMachine create(String start, Object handler, Object... handlers) {
 
-        Map<String, State> states = new HashMap<String, State>();
-        List<Object> handlersList = new ArrayList<Object>(1 + handlers.length);
+        Map<String, State> states = new HashMap<>();
+        List<Object> handlersList = new ArrayList<>(1 + handlers.length);
         handlersList.add(handler);
         handlersList.addAll(Arrays.asList(handlers));
 
-        LinkedList<Field> fields = new LinkedList<Field>();
+        LinkedList<Field> fields = new LinkedList<>();
         for (Object h : handlersList) {
             fields.addAll(getFields(h instanceof Class ? (Class<?>) h : h.getClass()));
         }
@@ -177,24 +177,28 @@ public class StateMachineFactory {
         if (m.isAnnotationPresent(OnEntry.class)) {
             OnEntry onEntryAnnotation = (OnEntry) m.getAnnotation(onEntrySelfTransitionAnnotation);
             State state = states.get(onEntryAnnotation.value());
+            
             if (state == null) {
                 throw new StateMachineCreationException("Error encountered "
                         + "when processing onEntry annotation in method " + m + ". state " + onEntryAnnotation.value()
                         + " not Found.");
 
             }
+            
             state.addOnEntrySelfTransaction(new MethodSelfTransition(m, handler));
         }
 
         if (m.isAnnotationPresent(OnExit.class)) {
             OnExit onExitAnnotation = (OnExit) m.getAnnotation(onExitSelfTransitionAnnotation);
             State state = states.get(onExitAnnotation.value());
+            
             if (state == null) {
                 throw new StateMachineCreationException("Error encountered "
                         + "when processing onExit annotation in method " + m + ". state " + onExitAnnotation.value()
                         + " not Found.");
 
             }
+            
             state.addOnExitSelfTransaction(new MethodSelfTransition(m, handler));
         }
 
@@ -207,6 +211,7 @@ public class StateMachineFactory {
 
         Method[] methods = handler.getClass().getDeclaredMethods();
         Arrays.sort(methods, new Comparator<Method>() {
+            @Override
             public int compare(Method m1, Method m2) {
                 return m1.toString().compareTo(m2.toString());
             }
@@ -215,11 +220,13 @@ public class StateMachineFactory {
         for (Method m : methods) {
             setupSelfTransitions(m, onEntrySelfTransitionAnnotation, onExitSelfTransitionAnnotation, states, handler);
 
-            List<TransitionWrapper> transitionAnnotations = new ArrayList<TransitionWrapper>();
+            List<TransitionWrapper> transitionAnnotations = new ArrayList<>();
+            
             if (m.isAnnotationPresent(transitionAnnotation)) {
                 transitionAnnotations.add(new TransitionWrapper(transitionAnnotation, m
                         .getAnnotation(transitionAnnotation)));
             }
+            
             if (m.isAnnotationPresent(transitionsAnnotation)) {
                 transitionAnnotations.addAll(Arrays.asList(new TransitionsWrapper(transitionAnnotation,
                         transitionsAnnotation, m.getAnnotation(transitionsAnnotation)).value()));
@@ -231,20 +238,24 @@ public class StateMachineFactory {
 
             for (TransitionWrapper annotation : transitionAnnotations) {
                 Object[] eventIds = annotation.on();
+                
                 if (eventIds.length == 0) {
-                    throw new StateMachineCreationException("Error encountered " + "when processing method " + m
+                    throw new StateMachineCreationException("Error encountered when processing method " + m
                             + ". No event ids specified.");
                 }
+                
                 if (annotation.in().length == 0) {
-                    throw new StateMachineCreationException("Error encountered " + "when processing method " + m
+                    throw new StateMachineCreationException("Error encountered when processing method " + m
                             + ". No states specified.");
                 }
 
                 State next = null;
+                
                 if (!annotation.next().equals(Transition.SELF)) {
                     next = states.get(annotation.next());
+                    
                     if (next == null) {
-                        throw new StateMachineCreationException("Error encountered " + "when processing method " + m
+                        throw new StateMachineCreationException("Error encountered when processing method " + m
                                 + ". Unknown next state: " + annotation.next() + ".");
                     }
                 }
@@ -253,13 +264,16 @@ public class StateMachineFactory {
                     if (event == null) {
                         event = Event.WILDCARD_EVENT_ID;
                     }
+                    
                     if (!(event instanceof String)) {
                         event = event.toString();
                     }
+                    
                     for (String in : annotation.in()) {
                         State state = states.get(in);
+                        
                         if (state == null) {
-                            throw new StateMachineCreationException("Error encountered " + "when processing method "
+                            throw new StateMachineCreationException("Error encountered when processing method "
                                     + m + ". Unknown state: " + in + ".");
                         }
 
@@ -271,7 +285,7 @@ public class StateMachineFactory {
     }
 
     static List<Field> getFields(Class<?> clazz) {
-        LinkedList<Field> fields = new LinkedList<Field>();
+        LinkedList<Field> fields = new LinkedList<>();
 
         for (Field f : clazz.getDeclaredFields()) {
             if (!f.isAnnotationPresent(org.apache.mina.statemachine.annotation.State.class)) {
@@ -280,8 +294,8 @@ public class StateMachineFactory {
 
             if ((f.getModifiers() & Modifier.STATIC) == 0 || (f.getModifiers() & Modifier.FINAL) == 0
                     || !f.getType().equals(String.class)) {
-                throw new StateMachineCreationException("Error encountered when " + "processing field " + f
-                        + ". Only static final " + "String fields can be used with the @State " + "annotation.");
+                throw new StateMachineCreationException("Error encountered when processing field " + f
+                        + ". Only static final String fields can be used with the @State annotation.");
             }
 
             if (!f.isAccessible()) {
@@ -295,24 +309,27 @@ public class StateMachineFactory {
     }
 
     static State[] createStates(List<Field> fields) {
-        LinkedHashMap<String, State> states = new LinkedHashMap<String, State>();
+        LinkedHashMap<String, State> states = new LinkedHashMap<>();
 
         while (!fields.isEmpty()) {
             int size = fields.size();
             int numStates = states.size();
+            
             for (int i = 0; i < size; i++) {
                 Field f = fields.remove(0);
 
                 String value = null;
+                
                 try {
                     value = (String) f.get(null);
                 } catch (IllegalAccessException iae) {
-                    throw new StateMachineCreationException("Error encountered when " + "processing field " + f + ".",
+                    throw new StateMachineCreationException("Error encountered when processing field " + f + ".",
                             iae);
                 }
 
                 org.apache.mina.statemachine.annotation.State stateAnnotation = f
                         .getAnnotation(org.apache.mina.statemachine.annotation.State.class);
+                
                 if (stateAnnotation.value().equals(org.apache.mina.statemachine.annotation.State.ROOT)) {
                     states.put(value, new State(value));
                 } else if (states.containsKey(stateAnnotation.value())) {
@@ -330,7 +347,7 @@ public class StateMachineFactory {
              */
             if (states.size() == numStates) {
                 throw new StateMachineCreationException("Error encountered while creating "
-                        + "FSM. The following fields specify non-existing " + "parent states: " + fields);
+                        + "FSM. The following fields specify non-existing parent states: " + fields);
             }
         }
 
@@ -367,6 +384,7 @@ public class StateMachineFactory {
         private <T> T getParameter(String name, Class<T> returnType) {
             try {
                 Method m = transitionClazz.getMethod(name);
+                
                 if (!returnType.isAssignableFrom(m.getReturnType())) {
                     throw new NoSuchMethodException();
                 }
@@ -395,9 +413,11 @@ public class StateMachineFactory {
         TransitionWrapper[] value() {
             Annotation[] annos = getParameter("value", Annotation[].class);
             TransitionWrapper[] wrappers = new TransitionWrapper[annos.length];
+            
             for (int i = 0; i < annos.length; i++) {
                 wrappers[i] = new TransitionWrapper(transitionClazz, annos[i]);
             }
+            
             return wrappers;
         }
 
@@ -405,9 +425,11 @@ public class StateMachineFactory {
         private <T> T getParameter(String name, Class<T> returnType) {
             try {
                 Method m = transitionsclazz.getMethod(name);
+                
                 if (!returnType.isAssignableFrom(m.getReturnType())) {
                     throw new NoSuchMethodException();
                 }
+                
                 return (T) m.invoke(annotation);
             } catch (Exception e) {
                 throw new StateMachineCreationException("Could not get parameter '" + name

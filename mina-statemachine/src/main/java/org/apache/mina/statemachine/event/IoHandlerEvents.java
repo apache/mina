@@ -19,9 +19,6 @@
  */
 package org.apache.mina.statemachine.event;
 
-import org.apache.mina.core.service.IoHandler;
-import org.apache.mina.statemachine.annotation.IoHandlerTransition;
-
 /**
  * Defines all possible MINA {@link IoHandler} events for use in {@link IoHandlerTransition}
  * annotations.
@@ -44,11 +41,14 @@ public enum IoHandlerEvents {
     /** The Session Idle event */
     SESSION_IDLE("sessionIdle"), 
     
-    /** The Message Recived event */
+    /** The Message Received event */
     MESSAGE_RECEIVED("messageReceived"), 
     
     /** The Message Sent event */
     MESSAGE_SENT("messageSent"), 
+    
+    /** The InputClosed event */
+    INPUT_CLOSED("inputClosed"), 
     
     /** The Exception Caught event */
     EXCEPTION_CAUGHT("exceptionCaught");

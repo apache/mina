@@ -19,9 +19,6 @@
  */
 package org.apache.mina.statemachine.event;
 
-import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.statemachine.annotation.IoFilterTransition;
-
 /**
  * Defines all possible MINA {@link IoFilter} events for use in {@link IoFilterTransition}
  * annotations.
@@ -58,6 +55,9 @@ public enum IoFilterEvents {
     
     /** The Write event */ 
     WRITE("filterWrite"), 
+    
+    /** The InputClosed event */
+    INPUT_CLOSED("inputClosed"),
     
     /** The Set Traffic Mask event */ 
     SET_TRAFFIC_MASK("filterSetTrafficMask");

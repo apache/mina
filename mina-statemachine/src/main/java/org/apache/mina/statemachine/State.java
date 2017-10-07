@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.SelfTransition;
 import org.apache.mina.statemachine.transition.Transition;
 
@@ -48,18 +47,19 @@ public class State {
     /** The state ID */
     private final String id;
 
-    /** The paret state */
+    /** The parent state */
     private final State parent;
 
-    private List<TransitionHolder> transitionHolders = new ArrayList<TransitionHolder>();
+    private List<TransitionHolder> transitionHolders = new ArrayList<>();
 
     /** The list of transitions for this state */
     private List<Transition> transitions = Collections.emptyList();
 
-    /** The list of transitions that */
-    private List<SelfTransition> onEntries = new ArrayList<SelfTransition>();
+    /** The list of entry transitions on a state */
+    private List<SelfTransition> onEntries = new ArrayList<>();
 
-    private List<SelfTransition> onExits = new ArrayList<SelfTransition>();
+    /** The list of exit transition from a state */
+    private List<SelfTransition> onExits = new ArrayList<>();
 
     /**
      * Creates a new {@link State} with the specified id.
@@ -151,7 +151,8 @@ public class State {
     }
 
     private void updateTransitions() {
-        transitions = new ArrayList<Transition>(transitionHolders.size());
+        transitions = new ArrayList<>(transitionHolders.size());
+        
         for (TransitionHolder holder : transitionHolders) {
             transitions.add(holder.transition);
         }
@@ -240,6 +241,7 @@ public class State {
             this.weight = weight;
         }
 
+        @Override
         public int compareTo(TransitionHolder o) {
             return (weight > o.weight) ? 1 : (weight < o.weight ? -1 : 0);
         }

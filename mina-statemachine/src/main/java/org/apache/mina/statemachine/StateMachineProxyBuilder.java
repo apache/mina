@@ -225,9 +225,11 @@ public class StateMachineProxyBuilder {
             if ("hashCode".equals(method.getName()) && args == null) {
                 return Integer.valueOf(System.identityHashCode(proxy));
             }
+            
             if ("equals".equals(method.getName()) && args.length == 1) {
                 return Boolean.valueOf(proxy == args[0]);
             }
+            
             if ("toString".equals(method.getName()) && args == null) {
                 return (name != null ? name : proxy.getClass().getName()) + "@"
                         + Integer.toHexString(System.identityHashCode(proxy));
@@ -238,6 +240,7 @@ public class StateMachineProxyBuilder {
             }
 
             args = args == null ? EMPTY_ARGUMENTS : args;
+            
             if (interceptor != null) {
                 args = interceptor.modify(args);
             }
@@ -248,7 +251,8 @@ public class StateMachineProxyBuilder {
                 if (ignoreStateContextLookupFailure) {
                     return null;
                 }
-                throw new IllegalStateException("Cannot determine state " + "context for method invocation: " + method);
+                
+                throw new IllegalStateException("Cannot determine state context for method invocation: " + method);
             }
 
             Event event = eventFactory.create(context, method, args);

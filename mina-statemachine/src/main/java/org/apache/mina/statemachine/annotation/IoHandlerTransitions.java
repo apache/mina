@@ -24,9 +24,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.mina.core.service.IoHandler;
-import org.apache.mina.statemachine.StateMachine;
-
 /**
  * Annotation used to annotate a method with several {@link IoHandlerTransition}s.
  * This should be used when creating {@link StateMachine}s for MINA's 

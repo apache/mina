@@ -20,7 +20,6 @@
 package org.apache.mina.statemachine.transition;
 
 import org.apache.mina.statemachine.State;
-import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.event.Event;
 
 /**
@@ -111,7 +110,8 @@ public abstract class AbstractTransition implements Transition {
      *         next {@link State}. <tt>false</tt> otherwise.
      */
     protected abstract boolean doExecute(Event event);
-
+    
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -141,6 +141,7 @@ public abstract class AbstractTransition implements Transition {
         }
     }
 
+    @Override
     public int hashCode() {
         int h = 17;
         
@@ -155,11 +156,13 @@ public abstract class AbstractTransition implements Transition {
         return h;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
         sb.append("eventId=").append(eventId);
         sb.append(",nextState=").append(nextState);
+        
         return sb.toString();
     }
 }

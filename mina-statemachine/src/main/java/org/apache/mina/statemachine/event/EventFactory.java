@@ -21,7 +21,6 @@ package org.apache.mina.statemachine.event;
 
 import java.lang.reflect.Method;
 
-import org.apache.mina.statemachine.StateMachineProxyBuilder;
 import org.apache.mina.statemachine.context.StateContext;
 
 /**
@@ -35,12 +34,9 @@ public interface EventFactory {
      * Creates a new {@link Event} from the specified method and method
      * arguments.
      * 
-     * @param context
-     *            the current {@link StateContext}.
-     * @param method
-     *            the method being invoked.
-     * @param arguments
-     *            the method arguments.
+     * @param context the current {@link StateContext}.
+     * @param method the method being invoked.
+     * @param arguments the method arguments.
      * @return the {@link Event} object.
      */
     Event create(StateContext context, Method method, Object[] arguments);
