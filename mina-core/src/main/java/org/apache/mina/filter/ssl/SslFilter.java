@@ -516,9 +516,10 @@ public class SslFilter extends IoFilterAdapter {
                 IoBuffer buf = (IoBuffer) message;
 
                 try {
-                    /*if (sslHandler.isOutboundDone()) {
+                    if (sslHandler.isOutboundDone()) {
+                        sslHandler.destroy();
                         throw new SSLException("Outbound done");
-                    }*/
+                    }
                     
                     // forward read encrypted data to SSL handler
                     sslHandler.messageReceived(nextFilter, buf.buf());
