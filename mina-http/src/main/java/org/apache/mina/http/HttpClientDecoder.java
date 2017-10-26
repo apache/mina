@@ -216,8 +216,8 @@ public class HttpClientDecoder implements ProtocolDecoder {
         String requestLine = headerFields[0];
         Map<String, String> generalHeaders = new HashMap<>();
 
-        for (int i = 1; i < headerFields.length; i++) {
-            String[] header = HEADER_VALUE_PATTERN.split(headerFields[i]);
+        for (String headerField:headerFields) {
+            String[] header = HEADER_VALUE_PATTERN.split(headerField);
             generalHeaders.put(header[0].toLowerCase(), header[1]);
         }
 
@@ -225,9 +225,8 @@ public class HttpClientDecoder implements ProtocolDecoder {
         HttpStatus status = null;
         int statusCode = Integer.parseInt(elements[1]);
         
-        for (int i = 0; i < HttpStatus.values().length; i++) {
-            status = HttpStatus.values()[i];
-            if (statusCode == status.code()) {
+        for (HttpStatus httpStatus:HttpStatus.values()) {
+            if (statusCode == httpStatus.code()) {
                 
                 break;
             }
