@@ -19,8 +19,10 @@
  */
 package org.apache.mina.core.buffer;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
@@ -34,6 +36,8 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.EnumSet;
 import java.util.Set;
+
+import org.apache.mina.core.session.IoSession;
 
 /**
  * A byte buffer used by MINA applications.
@@ -1083,9 +1087,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param value The medium int value to be written
      * 
      * @return the modified IoBuffer
-     * 
-     * @throws BufferOverflowException If there are fewer than three bytes remaining in this buffer
-     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract IoBuffer putMediumInt(int value);
 
@@ -1105,8 +1106,6 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @throws IndexOutOfBoundsException
      *             If <tt>index</tt> is negative or not smaller than the
      *             buffer's limit, minus three
-     * 
-     * @throws ReadOnlyBufferException If this buffer is read-only
      */
     public abstract IoBuffer putMediumInt(int index, int value);
 
