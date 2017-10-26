@@ -695,8 +695,9 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                         for (Iterator<S> i = allSessions(); i.hasNext();) {
                             IoSession session = i.next();
 
+                            scheduleRemove((S) session);
+
                             if (session.isActive()) {
-                                scheduleRemove((S) session);
                                 hasKeys = true;
                             }
                         }
@@ -1085,8 +1086,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             return localWrittenBytes;
         }
 
-        private int writeBuffer(S session, WriteRequest req, boolean hasFragmentation, int maxLength, long currentTime)
-                throws Exception {
+        private int writeBuffer(S session, WriteRequest req, boolean hasFragmentation, int maxLength, long currentTime) throws Exception {
             IoBuffer buf = (IoBuffer) req.getMessage();
             int localWrittenBytes = 0;
 
@@ -1102,34 +1102,43 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 try {
                     localWrittenBytes = write(session, buf, length);
                 } catch (IOException ioe) {
+                    ioe.printStackTrace();
+
                     // We have had an issue while trying to send data to the
                     // peer : let's close the session.
                     buf.free();
                     session.closeNow();
-                    removeNow(session);
+                    this.removeNow(session);
 
                     return 0;
                 }
-            }
 
-            session.increaseWrittenBytes(localWrittenBytes, currentTime);
+                session.increaseWrittenBytes(localWrittenBytes, currentTime);
 
-            // Now, forward the original message
-            if (!buf.hasRemaining() || (!hasFragmentation && (localWrittenBytes != 0))) {
-                // Buffer has been sent, clear the current request.
-                Object originalMessage = req.getOriginalRequest().getMessage();
+                // Now, forward the original message
+                if (!buf.hasRemaining() || (!hasFragmentation && (localWrittenBytes != 0))) {
+                    WriteRequest originalRequest = req.getOriginalRequest();
 
-                if (originalMessage instanceof IoBuffer) {
-                    buf = (IoBuffer) req.getOriginalRequest().getMessage();
+                    if (originalRequest != null) {
+                        Object originalMessage = originalRequest.getMessage();
 
-                    int pos = buf.position();
-                    buf.reset();
-                    fireMessageSent(session, req);
-                    // And set it back to its position
-                    buf.position(pos);
-                } else {
-                    fireMessageSent(session, req);
+                        if (originalMessage instanceof IoBuffer) {
+                            buf = (IoBuffer) originalMessage;
+
+                            int pos = buf.position();
+                            buf.reset();
+                            this.fireMessageSent(session, req);
+                            // And set it back to its position
+                            buf.position(pos);
+                        } else {
+                            this.fireMessageSent(session, req);
+                        }
+                    } else {
+                        this.fireMessageSent(session, req);
+                    }
                 }
+            } else {
+                this.fireMessageSent(session, req);
             }
 
             return localWrittenBytes;

@@ -865,8 +865,7 @@ public void fireFilterWrite(WriteRequest writeRequest) {
     private class HeadFilter extends IoFilterAdapter {
         @SuppressWarnings("unchecked")
         @Override
-        public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-
+      public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
 
             // Maintain counters.
@@ -881,7 +880,9 @@ public void fireFilterWrite(WriteRequest writeRequest) {
                 if (remaining > 0) {
                     s.increaseScheduledWriteBytes(remaining);
                 }
-            } else {
+            }
+
+            if (!writeRequest.isEncoded()) {
                 s.increaseScheduledWriteMessages();
             }
 
@@ -899,6 +900,7 @@ public void fireFilterWrite(WriteRequest writeRequest) {
                 s.getWriteRequestQueue().offer(s, writeRequest);
             }
         }
+
 
         @SuppressWarnings("unchecked")
         @Override
