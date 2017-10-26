@@ -30,6 +30,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.session.AbstractIoSession;
 import org.apache.mina.core.session.AttributeKey;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

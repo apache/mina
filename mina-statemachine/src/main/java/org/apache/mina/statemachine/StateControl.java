@@ -19,6 +19,9 @@
  */
 package org.apache.mina.statemachine;
 
+import org.apache.mina.statemachine.event.Event;
+import org.apache.mina.statemachine.transition.Transition;
+
 /**
  * Allows for programmatic control of a state machines execution.
  * <p>

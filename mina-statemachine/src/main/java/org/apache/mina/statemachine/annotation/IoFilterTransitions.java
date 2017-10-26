@@ -24,6 +24,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.statemachine.StateMachine;
+
 /**
  * Annotation used to annotate a method with several {@link IoFilterTransition}s.
  * This should be used when creating {@link StateMachine}s for MINA's 

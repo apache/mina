@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.SelfTransition;
 import org.apache.mina.statemachine.transition.Transition;
 

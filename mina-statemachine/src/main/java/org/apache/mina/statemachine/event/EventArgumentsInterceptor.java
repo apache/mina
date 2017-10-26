@@ -19,6 +19,8 @@
  */
 package org.apache.mina.statemachine.event;
 
+import org.apache.mina.statemachine.StateMachine;
+
 /**
  * Intercepts the {@link Event} arguments before the {@link Event} is passed
  * to the {@link StateMachine} and allows for the arguments to be modified.

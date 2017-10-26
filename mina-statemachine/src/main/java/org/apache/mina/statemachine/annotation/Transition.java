@@ -24,6 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.event.Event;
 
 /**

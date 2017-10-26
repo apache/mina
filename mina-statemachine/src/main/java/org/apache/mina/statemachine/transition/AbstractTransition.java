@@ -20,6 +20,7 @@
 package org.apache.mina.statemachine.transition;
 
 import org.apache.mina.statemachine.State;
+import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.event.Event;
 
 /**

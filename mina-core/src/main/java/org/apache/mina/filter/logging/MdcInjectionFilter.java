@@ -236,7 +236,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
     /**
      * Get the property associated with a given key
      * 
-     * @param session The {@IoSession} 
+     * @param session The {@link IoSession} 
      * @param key The key we are looking at
      * @return The associated property
      */

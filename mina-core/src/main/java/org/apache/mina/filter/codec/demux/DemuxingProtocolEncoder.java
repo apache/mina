@@ -87,6 +87,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     /**
      * Add a new message encoder instance for a given message type
      * 
+     * @param <T> The message type
      * @param messageType The message type
      * @param encoder The encoder instance
      */
@@ -98,6 +99,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     /**
      * Add a new message encoder factory for a given message type
      * 
+     * @param <T> The message type
      * @param messageType The message type
      * @param factory The encoder factory
      */
@@ -136,6 +138,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     /**
      * Add a new message instance class for a list of message types
      * 
+     * @param <T> The message type
      * @param messageTypes The message types
      * @param encoder The encoder instance
      */
@@ -148,6 +151,7 @@ public class DemuxingProtocolEncoder implements ProtocolEncoder {
     /**
      * Add a new message encoder factory for a list of message types
      * 
+     * @param <T> The message type
      * @param messageTypes The message types
      * @param factory The encoder factory
      */

@@ -27,6 +27,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.core.filterchain.DefaultIoFilterChain;
+import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.AbstractIoAcceptor;
 import org.apache.mina.core.service.DefaultTransportMetadata;

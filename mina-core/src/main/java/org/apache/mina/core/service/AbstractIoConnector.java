@@ -21,6 +21,7 @@ package org.apache.mina.core.service;
 
 import java.net.SocketAddress;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFuture;

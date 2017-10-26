@@ -92,7 +92,7 @@ public class WriteRequestFilter extends IoFilterAdapter {
     }
 
     /**
-     * @inheritedDoc
+     * {@inheritDoc}
      */
     @Override
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {

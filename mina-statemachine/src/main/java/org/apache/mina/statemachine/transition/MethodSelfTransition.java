@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.apache.mina.statemachine.State;
+import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.context.StateContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

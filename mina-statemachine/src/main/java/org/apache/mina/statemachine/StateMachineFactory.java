@@ -36,9 +36,11 @@ import org.apache.mina.statemachine.annotation.OnEntry;
 import org.apache.mina.statemachine.annotation.OnExit;
 import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.annotation.TransitionAnnotation;
+import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.MethodSelfTransition;
 import org.apache.mina.statemachine.transition.MethodTransition;
+import org.apache.mina.statemachine.transition.SelfTransition;
 
 /**
  * Creates {@link StateMachine}s by reading {@link org.apache.mina.statemachine.annotation.State},

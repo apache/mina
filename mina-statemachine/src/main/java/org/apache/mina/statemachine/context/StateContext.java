@@ -20,6 +20,7 @@
 package org.apache.mina.statemachine.context;
 
 import org.apache.mina.statemachine.State;
+import org.apache.mina.statemachine.StateMachine;
 
 /**
  * {@link StateContext} objects are used to store the current {@link State} and

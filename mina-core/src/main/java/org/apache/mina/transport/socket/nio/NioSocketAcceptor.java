@@ -33,7 +33,10 @@ import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.polling.AbstractPollingIoAcceptor;
+import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
+import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
@@ -270,7 +273,6 @@ implements SocketAcceptor {
      * 
      * @return The number of keys having their ready-operation set updated
      * @throws IOException If an I/O error occurs
-     * @throws ClosedSelectorException If this selector is closed
      */
     @Override
     protected int select() throws Exception {

@@ -19,6 +19,9 @@
  */
 package org.apache.mina.statemachine.event;
 
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.statemachine.annotation.IoFilterTransition;
+
 /**
  * Defines all possible MINA {@link IoFilter} events for use in {@link IoFilterTransition}
  * annotations.

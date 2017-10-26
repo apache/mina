@@ -21,6 +21,7 @@ package org.apache.mina.statemachine.event;
 
 import java.lang.reflect.Method;
 
+import org.apache.mina.statemachine.StateMachineProxyBuilder;
 import org.apache.mina.statemachine.context.StateContext;
 
 /**

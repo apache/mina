@@ -19,6 +19,9 @@
  */
 package org.apache.mina.statemachine.event;
 
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.statemachine.annotation.IoHandlerTransition;
+
 /**
  * Defines all possible MINA {@link IoHandler} events for use in {@link IoHandlerTransition}
  * annotations.

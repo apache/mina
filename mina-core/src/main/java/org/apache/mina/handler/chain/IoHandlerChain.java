@@ -297,20 +297,20 @@ public class IoHandlerChain implements IoHandlerCommand {
     }
 
     /**
-     * Checks if the chain of {@IoHandlerCommand} contains a {@IoHandlerCommand} by its name
+     * Checks if the chain of {@link IoHandlerCommand} contains a {@link IoHandlerCommand} by its name
      * 
-     * @param name The {@IoHandlerCommand} name
-     * @return <tt>TRUE</tt> if the {@IoHandlerCommand} is found in the chain
+     * @param name The {@link IoHandlerCommand} name
+     * @return <tt>TRUE</tt> if the {@link IoHandlerCommand} is found in the chain
      */
     public boolean contains(String name) {
         return getEntry(name) != null;
     }
 
     /**
-     * Checks if the chain of {@IoHandlerCommand} contains a specific {@IoHandlerCommand}
+     * Checks if the chain of {@link IoHandlerCommand} contains a specific {@link IoHandlerCommand}
      * 
-     * @param command The {@IoHandlerCommand} we are looking for
-     * @return <tt>TRUE</tt> if the {@IoHandlerCommand} is found in the chain
+     * @param command The {@link IoHandlerCommand} we are looking for
+     * @return <tt>TRUE</tt> if the {@link IoHandlerCommand} is found in the chain
      */
     public boolean contains(IoHandlerCommand command) {
         Entry e = head.nextEntry;
@@ -324,10 +324,10 @@ public class IoHandlerChain implements IoHandlerCommand {
     }
 
     /**
-     * Checks if the chain of {@IoHandlerCommand} contains a specific {@IoHandlerCommand}
+     * Checks if the chain of {@link IoHandlerCommand} contains a specific {@link IoHandlerCommand}
      * 
-     * @param commandType The type of {@IoHandlerCommand} we are looking for
-     * @return <tt>TRUE</tt> if the {@IoHandlerCommand} is found in the chain
+     * @param commandType The type of {@link IoHandlerCommand} we are looking for
+     * @return <tt>TRUE</tt> if the {@link IoHandlerCommand} is found in the chain
      */
     public boolean contains(Class<? extends IoHandlerCommand> commandType) {
         Entry e = head.nextEntry;

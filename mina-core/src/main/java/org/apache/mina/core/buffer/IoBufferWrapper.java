@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core.buffer;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -38,7 +39,7 @@ import java.util.Set;
 /**
  * A {@link IoBuffer} that wraps a buffer and proxies any operations to it.
  * <p>
- * You can think this class like a {@link FilterOutputStream}.  All operations
+ * You can think this class like a {@link FileOutputStream}.  All operations
  * are proxied by default so that you can extend this class and override existing
  * operations selectively.  You can introduce new operations, too.
  *
