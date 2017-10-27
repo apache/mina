@@ -39,7 +39,7 @@ public class ExpiringMapTest {
      * the Expirer, then sleep long enough so that the
      * Expirer can clean up the map.
      *
-     * @throws java.lang.Exception
+     * @throws Exception If the setup failed
      */
     @Before
     public void setUp() throws Exception {

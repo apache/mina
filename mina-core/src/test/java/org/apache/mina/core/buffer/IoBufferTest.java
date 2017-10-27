@@ -426,8 +426,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test that we can't allocate a buffser with a negative value
-     * @throws Exception
+     * Test that we can't allocate a buffer with a negative value
+     * @throws Exception If allocation failed
      */
     @Test(expected=IllegalArgumentException.class)
     public void testAllocateNegative() throws Exception {

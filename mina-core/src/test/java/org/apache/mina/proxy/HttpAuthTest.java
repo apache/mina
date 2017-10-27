@@ -29,7 +29,7 @@ import org.apache.mina.proxy.handlers.http.digest.DigestUtilities;
 import org.junit.Test;
 
 /**
- * HttpAuthTest.java - JUNIT tests of the HTTP Basic & Digest authentication mechanisms.
+ * HttpAuthTest.java - JUNIT tests of the HTTP Basic &amp; Digest authentication mechanisms.
  * See <a href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a> .
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>

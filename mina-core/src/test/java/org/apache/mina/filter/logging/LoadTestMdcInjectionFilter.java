@@ -36,7 +36,8 @@ public class LoadTestMdcInjectionFilter {
      * The MdcInjectionFilterTest is unstable, it fails sporadically (and only on Windows ?)
      * This is a quick and dirty program to run the MdcInjectionFilterTest many times.
      * To be removed once we consider DIRMINA-784 to be fixed
-     *
+     * 
+     * @param args Unused
      */
     public static void main(String[] args) {
         TestRunner runner = new TestRunner();

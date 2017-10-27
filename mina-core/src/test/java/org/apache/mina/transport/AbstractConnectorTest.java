@@ -131,6 +131,8 @@ public abstract class AbstractConnectorTest {
 
     /**
      * Test to make sure the SessionCallback gets invoked before IoHandler.sessionCreated.
+     * 
+     * @throws Exception is the test failed
      */
     @Test
     public void testSessionCallbackInvocation() throws Exception {

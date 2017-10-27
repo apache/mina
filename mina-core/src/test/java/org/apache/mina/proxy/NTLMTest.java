@@ -45,6 +45,8 @@ public class NTLMTest {
 
     /**
      * Tests bytes manipulations.
+     * 
+     * @throws UnsupportedEncodingException If the encoding is not supported
      */
     @Test
     public void testEncoding() throws UnsupportedEncodingException {
@@ -108,6 +110,8 @@ public class NTLMTest {
     /**
      * Tests creating a type 3 message.
      * WARNING: Will silently fail if no MD4 digest provider is available.
+     * 
+     * @throws Exception If the test failed
      */
     @Test
     public void testType3Message() throws Exception {
@@ -189,6 +193,8 @@ public class NTLMTest {
     /**
      * Tests response computing.
      * WARNING: Will silently fail if no MD4 digest provider is available.
+     * 
+     * @throws Exception If the test failed
      */
     @Test
     public void testResponses() throws Exception {

@@ -155,6 +155,8 @@ public class SslDIRMINA937Test {
 
     /**
      * Test is ignore as it will cause the build to fail
+     * 
+     * @throws Exception If the test failed
      */
     @Test
     @Ignore("This test is not yet fully functionnal, it servers as the basis for validating DIRMINA-937")
