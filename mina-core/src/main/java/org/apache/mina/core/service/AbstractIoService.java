@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractIoService implements IoService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIoService.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractIoService.class);
 
     /**
      * The unique number identifying the Service. It's incremented
