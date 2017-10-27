@@ -190,13 +190,29 @@ implements SocketAcceptor {
         }
 
         // accept the connection from the client
-        SocketChannel ch = handle.accept();
+        try {
+            SocketChannel ch = handle.accept();
+    
+            if (ch == null) {
+                return null;
+            }
 
-        if (ch == null) {
+            return new NioSocketSession(this, processor, ch);
+        } catch (Throwable t) {
+            LOGGER.error("Error Calling Accept on Socket - Sleeping Acceptor Thread. Check the ulimit parameter", t);
+            try {
+                // Sleep 50 ms, so that the select does not spin like crazy doing nothing but eating CPU
+                // This is typically what will happen if we don't have any more File handle on the server
+                // Check the ulimit parameter
+                // NOTE : this is a workaround, there is no way we can handle this exception in any smarter way...
+                Thread.sleep(50L);
+            } catch (InterruptedException ie) {
+                // Nothing to do
+            }
+
+            // No session when we have met an exception
             return null;
         }
-
-        return new NioSocketSession(this, processor, ch);
     }
 
     /**
