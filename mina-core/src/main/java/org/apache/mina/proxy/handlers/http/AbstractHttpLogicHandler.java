@@ -27,7 +27,6 @@ import java.util.Map;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.future.ConnectFuture;
-import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionInitializer;
 import org.apache.mina.proxy.AbstractProxyLogicHandler;
@@ -341,15 +340,10 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
                 session.setAttribute(ProxyIoSession.PROXY_SESSION, proxyIoSession);
                 proxyIoSession.setSession(session);
                 LOGGER.debug("  setting up proxyIoSession: {}", proxyIoSession);
-                future.addListener(new IoFutureListener<ConnectFuture>() {
-                    @Override
-                    public void operationComplete(ConnectFuture future) {
-                        // Reconnection is done so we send the
-                        // request to the proxy
-                        proxyIoSession.setReconnectionNeeded(false);
-                        writeRequest0(nextFilter, request);
-                    }
-                });
+                // Reconnection is done so we send the
+                // request to the proxy
+                proxyIoSession.setReconnectionNeeded(false);
+                writeRequest0(nextFilter, request);
             }
         });
     }
@@ -376,8 +370,8 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
             throw new Exception("Invalid response status line (" + statusLine + "). Response: " + response);
         }
 
-        // Status code is 3 digits
-        if (!statusLine[1].matches("^\\d\\d\\d")) {
+        // Status line [1] is 3 digits, space and optional error text
+        if (!statusLine[1].matches("^\\d\\d\\d.*")) {
             throw new Exception("Invalid response code (" + statusLine[1] + "). Response: " + response);
         }
 
