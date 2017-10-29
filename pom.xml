@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
-    <version>17</version>
+    <version>18</version>
     <relativePath />
   </parent>
 
@@ -92,51 +92,51 @@
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
 
     <!-- Maven Plugins -->
-    <version.apache.rat.plugin>0.11</version.apache.rat.plugin>
+    <version.apache.rat.plugin>0.12</version.apache.rat.plugin>
     <version.api.plugin>3.3.9</version.api.plugin>
-    <version.assembly.plugin>2.5.3</version.assembly.plugin>
-    <version.build.helper.plugin>1.9.1</version.build.helper.plugin>
-    <version.bundle.plugin>2.5.3</version.bundle.plugin>
-    <version.changes.plugin>2.11</version.changes.plugin>
-    <version.checkstyle.plugin>2.13</version.checkstyle.plugin>
-    <version.clean.plugin>2.6.1</version.clean.plugin>
-    <version.clirr.plugin>2.6.1</version.clirr.plugin>
-    <version.cobertura.plugin>2.6</version.cobertura.plugin>
-    <version.compiler.plugin>3.2</version.compiler.plugin>
+    <version.assembly.plugin>3.1.0</version.assembly.plugin>
+    <version.build.helper.plugin>3.0.0</version.build.helper.plugin>
+    <version.bundle.plugin>3.3.0</version.bundle.plugin>
+    <version.changes.plugin>2.12.1</version.changes.plugin>
+    <version.checkstyle.plugin>2.17</version.checkstyle.plugin>
+    <version.clean.plugin>3.0.0</version.clean.plugin>
+    <version.clirr.plugin>2.8</version.clirr.plugin>
+    <version.cobertura.plugin>2.7</version.cobertura.plugin>
+    <version.compiler.plugin>3.7.0</version.compiler.plugin>
     <version.dashboard.plugin>1.0.0-beta-1</version.dashboard.plugin>
-    <version.dependency.plugin>2.9</version.dependency.plugin>
+    <version.dependency.plugin>3.0.2</version.dependency.plugin>
     <version.deploy.plugin>2.8.2</version.deploy.plugin>
-    <version.docck.plugin>1.0</version.docck.plugin>
-    <version.eclipse.plugin>2.9</version.eclipse.plugin>
-    <version.enforcer.plugin>1.3.1</version.enforcer.plugin>
-    <version.findbugs.plugin>3.0.0</version.findbugs.plugin>
-    <version.gpg.plugin>1.5</version.gpg.plugin>
+    <version.docck.plugin>1.1</version.docck.plugin>
+    <version.eclipse.plugin>2.10</version.eclipse.plugin>
+    <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
+    <version.findbugs.plugin>3.0.5</version.findbugs.plugin>
+    <version.gpg.plugin>1.6</version.gpg.plugin>
     <version.install.plugin>2.5.2</version.install.plugin>
-    <version.jar.plugin>2.5</version.jar.plugin>
+    <version.jar.plugin>3.0.2</version.jar.plugin>
     <version.javancss.plugin>2.1</version.javancss.plugin>
-    <version.javadoc.plugin>2.10.1</version.javadoc.plugin>
+    <version.javadoc.plugin>3.0.0-M1</version.javadoc.plugin>
     <version.jdepend.plugin>2.0</version.jdepend.plugin>
     <version.jxr.plugin>2.5</version.jxr.plugin>
     <version.model.plugin>3.3.9</version.model.plugin>
-    <version.plexus.utils>3.0.24</version.plexus.utils>
-    <version.plugin.plugin>3.4</version.plugin.plugin>
-    <version.pmd.plugin>3.3</version.pmd.plugin>
+    <version.plexus.utils>3.1.0</version.plexus.utils>
+    <version.plugin.plugin>3.5</version.plugin.plugin>
+    <version.pmd.plugin>3.8</version.pmd.plugin>
     <version.project.plugin>3.0-alpha-2</version.project.plugin>
-    <version.project.info.report.plugin>2.7</version.project.info.report.plugin>
+    <version.project.info.report.plugin>2.9</version.project.info.report.plugin>
     <version.rat.maven.plugin>1.0-alpha-3</version.rat.maven.plugin>
-    <version.release.plugin>2.5.1</version.release.plugin>
+    <version.release.plugin>2.5.3</version.release.plugin>
     <version.remote.resources.plugin>1.5</version.remote.resources.plugin>
-    <version.resources.plugin>2.7</version.resources.plugin>
-    <version.scm.plugin>1.9.2</version.scm.plugin>
-    <version.site.plugin>3.4</version.site.plugin>
-    <version.source.plugin>2.4</version.source.plugin>
-    <version.shade.plugin>2.4.3</version.shade.plugin>
-    <version.surefire.plugin>2.18.1</version.surefire.plugin>
-    <version.surfire.report.plugin>2.18.1</version.surfire.report.plugin>
+    <version.resources.plugin>3.0.2</version.resources.plugin>
+    <version.scm.plugin>1.9.5</version.scm.plugin>
+    <version.site.plugin>3.6</version.site.plugin>
+    <version.source.plugin>3.0.1</version.source.plugin>
+    <version.shade.plugin>3.1.0</version.shade.plugin>
+    <version.surefire.plugin>2.20.1</version.surefire.plugin>
+    <version.surfire.report.plugin>2.20.1</version.surfire.report.plugin>
     <version.taglist.plugin>2.4</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
-    <version.versions.plugin>2.1</version.versions.plugin>
-    <version.xbean.plugin>4.1</version.xbean.plugin>
+    <version.versions.plugin>2.5</version.versions.plugin>
+    <version.xbean.plugin>4.5</version.xbean.plugin>
 
     <!-- Jars -->
     <version.easymock>2.5.2</version.easymock>
@@ -150,10 +150,10 @@
     <version.pmd>4.3</version.pmd>
     <version.rmock>2.0.2</version.rmock>
     <version.slf4j.api>1.7.21</version.slf4j.api>
-    <version.slf4j.log4j12>1.7.21</version.slf4j.log4j12>
-    <version.slf4j.jcl.over.slf4j>1.7.21</version.slf4j.jcl.over.slf4j>
+    <version.slf4j.log4j12>1.7.25</version.slf4j.log4j12>
+    <version.slf4j.jcl.over.slf4j>1.7.25</version.slf4j.jcl.over.slf4j>
     <version.springframework>2.5.6.SEC03</version.springframework>
-    <version.tomcat.jni>9.0.0.M11</version.tomcat.jni>
+    <version.tomcat.jni>9.0.1</version.tomcat.jni>
     <version.xbean.spring>4.5</version.xbean.spring>
 
     <!-- OSGi minimum versions -->
