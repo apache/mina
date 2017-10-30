@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -108,15 +109,16 @@ public class ConnectorTest extends AbstractTest {
     private void testConnector(IoConnector connector, boolean useLocalAddress)
             throws Exception {
         IoSession session = null;
+        
         if (!useLocalAddress) {
             ConnectFuture future = connector.connect(new InetSocketAddress(
-                    "127.0.0.1", port));
+                InetAddress.getByName(null), port));
             future.awaitUninterruptibly();
             session = future.getSession();
         } else {
             int clientPort = AvailablePortFinder.getNextAvailable();
             ConnectFuture future = connector.connect(
-                    new InetSocketAddress("127.0.0.1", port),
+                    new InetSocketAddress(InetAddress.getByName(null), port),
                     new InetSocketAddress(clientPort));
             future.awaitUninterruptibly();
             session = future.getSession();

@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -79,7 +80,7 @@ public class DatagramSessionIdleTest {
         acceptor.setHandler(new TestHandler());
         acceptor.bind(bindAddress);
         IoSession session = acceptor.newSession(
-                new InetSocketAddress("127.0.0.1", AvailablePortFinder.getNextAvailable()), bindAddress);
+                new InetSocketAddress(InetAddress.getByName(null), AvailablePortFinder.getNextAvailable()), bindAddress);
 
         //check properties to be copied from acceptor to session
         assertEquals(BOTH_IDLE_TIME, session.getConfig().getBothIdleTime());

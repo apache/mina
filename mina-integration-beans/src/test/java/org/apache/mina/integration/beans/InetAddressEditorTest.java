@@ -57,6 +57,6 @@ public class InetAddressEditorTest {
     @Test
     public void testSetAsTextWithIpAddress() throws Exception {
         editor.setAsText("127.0.0.1");
-        assertEquals(InetAddress.getByName("127.0.0.1"), editor.getValue());
+        assertEquals(InetAddress.getByName(null), editor.getValue());
     }
 }

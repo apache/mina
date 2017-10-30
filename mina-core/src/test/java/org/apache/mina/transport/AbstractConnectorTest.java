@@ -25,6 +25,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -162,7 +163,7 @@ public abstract class AbstractConnectorTest {
                 }
             });
 
-            ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port),
+            ConnectFuture future = connector.connect(new InetSocketAddress(InetAddress.getByName(null), port),
                     new IoSessionInitializer<ConnectFuture>() {
                         public void initializeSession(IoSession session, ConnectFuture future) {
                             assertions[callbackInvoked] = true;
