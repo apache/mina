@@ -495,13 +495,4 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
         // Here, we assume that this is the case.
         return true;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int allSessionsCount()
-    {
-        return allSessions.size();
-    }
 }
