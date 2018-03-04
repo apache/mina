@@ -52,6 +52,7 @@ public class AbstractIoServiceDIRMINA1076Test {
         long startTime = System.currentTimeMillis();
         // without DIRMINA-1076 fixed, the test will hang after short time
         while ( System.currentTimeMillis() < startTime + 10000 ) {
+            final CountDownLatch disposalLatch = new CountDownLatch( 1 );
             Thread thread = new Thread() {
 
                 public void run() {
@@ -106,10 +107,12 @@ public class AbstractIoServiceDIRMINA1076Test {
 
                     closeFuture.awaitUninterruptibly();
                     acceptor.dispose( true );
+                    disposalLatch.countDown();
                 }
             };
             thread.setDaemon( true );
             thread.start();
+            disposalLatch.await();
             thread.join( 1000 );
 
             if ( thread.isAlive() ) {
