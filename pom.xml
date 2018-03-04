@@ -774,12 +774,6 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${version.surefire.plugin}</version>
-        <configuration>
-          <excludes>
-            <exclude>**/Abstract*</exclude>
-            <exclude>**/*RegressionTest*</exclude>
-          </excludes>
-        </configuration>
       </plugin>
 
       <plugin>

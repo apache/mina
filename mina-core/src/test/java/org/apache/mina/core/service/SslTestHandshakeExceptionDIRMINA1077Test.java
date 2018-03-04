@@ -155,6 +155,7 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
         // without DIRMINA-1076/1077 fixed, the test will hang after short time
         while (System.currentTimeMillis() < startTime + 10000) {
             try {
+                port = AvailablePortFinder.getNextAvailable();
                 startServer();
                 
                 Thread t = new Thread() {
