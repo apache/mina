@@ -45,6 +45,7 @@ import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Test a SSL session and provoke HandshakeException.
@@ -105,7 +106,7 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
         acceptor.dispose(true);
     }
 
-    private void startAndStopClient( int port ) throws Exception {
+    private void startAndStopClient( int port, CountDownLatch disposalLatch ) throws Exception {
         NioSocketConnector nioSocketConnector = new NioSocketConnector();
         nioSocketConnector.setHandler(new TestHandler());
         DefaultIoFilterChainBuilder filters = nioSocketConnector.getFilterChain();
@@ -121,6 +122,7 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
         connect.awaitUninterruptibly();
 //        System.out.println( "Closing connection..." );
         nioSocketConnector.dispose( true );
+        disposalLatch.countDown();
 //        System.out.println( "Connection closed!" );
     }
 
@@ -157,17 +159,19 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
         while (System.currentTimeMillis() < startTime + 10000) {
             try {
                 final int port = AvailablePortFinder.getNextAvailable();
+                final CountDownLatch disposalLatch = new CountDownLatch( 1 );
                 startServer( port );
                 
                 Thread t = new Thread() {
                     public void run() {
                         try {
-                            startAndStopClient( port );
+                            startAndStopClient( port, disposalLatch );
                         } catch ( Exception e ) {}
                     }
                 };
                 t.setDaemon( true );
                 t.start();
+                disposalLatch.await();
                 t.join( 1000 );
 
                 if ( t.isAlive() ) {
