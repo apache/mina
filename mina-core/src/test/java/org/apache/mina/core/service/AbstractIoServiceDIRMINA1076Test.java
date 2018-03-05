@@ -70,7 +70,7 @@ public class AbstractIoServiceDIRMINA1076Test {
                     try {
                         acceptor.bind( new InetSocketAddress( nextAvailable ) );
                     } catch ( IOException e1 ) {
-                        // ignore
+                        throw new RuntimeException( e1 );
                     }
 
                     final NioSocketConnector connector = new NioSocketConnector();
@@ -106,6 +106,7 @@ public class AbstractIoServiceDIRMINA1076Test {
                     connector.dispose( true );
 
                     closeFuture.awaitUninterruptibly();
+                    acceptor.unbind();
                     acceptor.dispose( true );
                     disposalLatch.countDown();
                 }

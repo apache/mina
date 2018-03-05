@@ -53,7 +53,7 @@ import java.security.Security;
  * @author chrjohn
  */
 public class SslTestHandshakeExceptionDIRMINA1077Test {
-    private int port = AvailablePortFinder.getNextAvailable();
+
     private static InetAddress address;
     private static NioSocketAcceptor acceptor;
 
@@ -82,7 +82,7 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
      * Starts a Server with the SSL Filter and a simple text line 
      * protocol codec filter
      */
-    private void startServer() throws Exception {
+    private void startServer( int port ) throws Exception {
         acceptor = new NioSocketAcceptor();
 
         acceptor.setReuseAddress(true);
@@ -101,10 +101,11 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
     }
     
     private static void stopServer() {
+        acceptor.unbind();
         acceptor.dispose(true);
     }
 
-    private void startAndStopClient() throws Exception {
+    private void startAndStopClient( int port ) throws Exception {
         NioSocketConnector nioSocketConnector = new NioSocketConnector();
         nioSocketConnector.setHandler(new TestHandler());
         DefaultIoFilterChainBuilder filters = nioSocketConnector.getFilterChain();
@@ -155,13 +156,13 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
         // without DIRMINA-1076/1077 fixed, the test will hang after short time
         while (System.currentTimeMillis() < startTime + 10000) {
             try {
-                port = AvailablePortFinder.getNextAvailable();
-                startServer();
+                final int port = AvailablePortFinder.getNextAvailable();
+                startServer( port );
                 
                 Thread t = new Thread() {
                     public void run() {
                         try {
-                            startAndStopClient();
+                            startAndStopClient( port );
                         } catch ( Exception e ) {}
                     }
                 };
