@@ -240,6 +240,13 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * @return {@link Iterator} of {@link IoSession}
      */
     protected abstract Iterator<S> allSessions();
+    
+    /**
+     * Get the number of {@Link IoSession} polled by this {@Link IoProcessor}
+     *
+     * @return the number of sessions attached to this {@Link IoProcessor}
+     */
+    protected abstract int allSessionsCount();
 
     /**
      * Get an {@link Iterator} for the list of {@link IoSession} found selected
@@ -596,7 +603,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
         public void run() {
             assert processorRef.get() == this;
 
-            int nSessions = 0;
             lastIdleCheckTime = System.currentTimeMillis();
             int nbTries = 10;
 
@@ -641,9 +647,31 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     } else {
                         nbTries = 10;
                     }
-
+                    
                     // Manage newly created session first
-                    nSessions += handleNewSessions();
+                    if(handleNewSessions() == 0) {
+                        // Get a chance to exit the infinite loop if there are no
+                        // more sessions on this Processor
+                        if (allSessionsCount() == 0) {
+                            processorRef.set(null);
+
+                            if (newSessions.isEmpty() && isSelectorEmpty()) {
+                                // newSessions.add() precedes startupProcessor
+                                assert processorRef.get() != this;
+                                break;
+                            }
+
+                            assert processorRef.get() != this;
+
+                            if (!processorRef.compareAndSet(null, this)) {
+                                // startupProcessor won race, so must exit processor
+                                assert processorRef.get() != this;
+                                break;
+                            }
+
+                            assert processorRef.get() == this;
+                        }
+                    }
 
                     updateTrafficMask();
 
@@ -654,39 +682,17 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                         // the MDCFilter test...
                         process();
                     }
-
+                    
                     // Write the pending requests
                     long currentTime = System.currentTimeMillis();
                     flush(currentTime);
-
-                    // And manage removed sessions
-                    nSessions -= removeSessions();
-
+                    
                     // Last, not least, send Idle events to the idle sessions
                     notifyIdleSessions(currentTime);
-
-                    // Get a chance to exit the infinite loop if there are no
-                    // more sessions on this Processor
-                    if (nSessions == 0) {
-                        processorRef.set(null);
-
-                        if (newSessions.isEmpty() && isSelectorEmpty()) {
-                            // newSessions.add() precedes startupProcessor
-                            assert processorRef.get() != this;
-                            break;
-                        }
-
-                        assert processorRef.get() != this;
-
-                        if (!processorRef.compareAndSet(null, this)) {
-                            // startupProcessor won race, so must exit processor
-                            assert processorRef.get() != this;
-                            break;
-                        }
-
-                        assert processorRef.get() == this;
-                    }
-
+                    
+                    // And manage removed sessions
+                    removeSessions();
+                    
                     // Disconnect all sessions immediately if disposal has been
                     // requested so that we exit this loop eventually.
                     if (isDisposing()) {
@@ -702,9 +708,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                             }
                         }
 
-                        if (hasKeys) {
-                            wakeup();
-                        }
+                        wakeup();
                     }
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop

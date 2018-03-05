@@ -61,6 +61,11 @@ public class PollingIoProcessorTest {
             protected Iterator<NioSession> allSessions() {
                 return proc.allSessions();
             }
+            
+            @Override
+            protected int allSessionsCount() {
+                return proc.allSessionsCount();
+            }
 
             @Override
             protected void destroy(NioSession session) throws Exception {

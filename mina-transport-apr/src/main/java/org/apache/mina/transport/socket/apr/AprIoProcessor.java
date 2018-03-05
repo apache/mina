@@ -230,6 +230,14 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
     protected Iterator<AprSession> allSessions() {
         return allSessions.values().iterator();
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int allSessionsCount() {
+    	return allSessions.size();
+    }
 
     /**
      * {@inheritDoc}

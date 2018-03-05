@@ -159,6 +159,12 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             selectorLock.readLock().unlock();
         }
     }
+    
+    @Override
+    protected int allSessionsCount()
+    {
+        return selector.keys().size();
+    }
 
     @SuppressWarnings("synthetic-access")
     @Override
