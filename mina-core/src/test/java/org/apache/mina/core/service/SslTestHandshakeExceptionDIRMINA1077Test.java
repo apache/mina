@@ -32,6 +32,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -152,6 +153,7 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
     }
 
     @Test(timeout=15000)
+    @Ignore
     public void testSSL() throws Exception {
         long startTime = System.currentTimeMillis();
         // without DIRMINA-1076/1077 fixed, the test will hang after short time
