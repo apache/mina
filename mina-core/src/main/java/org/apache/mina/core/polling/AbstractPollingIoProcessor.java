@@ -242,9 +242,9 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     protected abstract Iterator<S> allSessions();
     
     /**
-     * Get the number of {@Link IoSession} polled by this {@Link IoProcessor}
+     * Get the number of {@link IoSession} polled by this {@link IoProcessor}
      *
-     * @return the number of sessions attached to this {@Link IoProcessor}
+     * @return the number of sessions attached to this {@link IoProcessor}
      */
     protected abstract int allSessionsCount();
 
