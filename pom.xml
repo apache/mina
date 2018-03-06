@@ -93,7 +93,7 @@
 
     <!-- Maven Plugins -->
     <version.apache.rat.plugin>0.12</version.apache.rat.plugin>
-    <version.api.plugin>3.3.9</version.api.plugin>
+    <version.api.plugin>3.5.2</version.api.plugin>
     <version.assembly.plugin>3.1.0</version.assembly.plugin>
     <version.build.helper.plugin>3.0.0</version.build.helper.plugin>
     <version.bundle.plugin>3.3.0</version.bundle.plugin>
@@ -117,7 +117,7 @@
     <version.javadoc.plugin>3.0.0-M1</version.javadoc.plugin>
     <version.jdepend.plugin>2.0</version.jdepend.plugin>
     <version.jxr.plugin>2.5</version.jxr.plugin>
-    <version.model.plugin>3.3.9</version.model.plugin>
+    <version.model.plugin>3.5.2</version.model.plugin>
     <version.plexus.utils>3.1.0</version.plexus.utils>
     <version.plugin.plugin>3.5</version.plugin.plugin>
     <version.pmd.plugin>3.8</version.pmd.plugin>
@@ -140,13 +140,13 @@
 
     <!-- Jars -->
     <version.easymock>2.5.2</version.easymock>
-    <version.jboss.javassist>3.7.ga</version.jboss.javassist>
+    <version.jboss.javassist>3.8.0.GA</version.jboss.javassist>
     <version.jdom>1.0</version.jdom>
     <version.jmock>1.2.0</version.jmock>
     <version.junit>4.12</version.junit>
     <version.jzlib>1.1.3</version.jzlib>
     <version.log4j>1.2.17</version.log4j>
-    <version.ognl>3.1.11</version.ognl>
+    <version.ognl>3.2.4</version.ognl>
     <version.pmd>4.3</version.pmd>
     <version.rmock>2.0.2</version.rmock>
     <version.slf4j.api>1.7.25</version.slf4j.api>
@@ -154,7 +154,7 @@
     <version.slf4j.jcl.over.slf4j>1.7.25</version.slf4j.jcl.over.slf4j>
     <version.springframework>2.5.6.SEC03</version.springframework>
     <version.tomcat.jni>9.0.5</version.tomcat.jni>
-    <version.xbean.spring>4.5</version.xbean.spring>
+    <version.xbean.spring>4.6</version.xbean.spring>
 
     <!-- OSGi minimum versions -->
     <osgi-min-version.slf4j.api>1.7</osgi-min-version.slf4j.api>
