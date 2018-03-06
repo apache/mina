@@ -57,6 +57,7 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
 
     private static InetAddress address;
     private static NioSocketAcceptor acceptor;
+    private volatile int port = 0;
 
     /** A JVM independant KEY_MANAGER_FACTORY algorithm */
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
@@ -158,9 +159,18 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
         // without DIRMINA-1076/1077 fixed, the test will hang after short time
         while (System.currentTimeMillis() < startTime + 10000) {
             try {
-                final int port = AvailablePortFinder.getNextAvailable();
                 final CountDownLatch disposalLatch = new CountDownLatch( 1 );
-                startServer( port );
+                boolean successfulBind = false;
+                while ( !successfulBind ) {
+                    port = AvailablePortFinder.getNextAvailable();
+                    try {
+                        startServer( port );
+                        successfulBind = true;
+                    } catch ( Exception e ) {
+                        System.err.println( "Could not bind to address, retrying..." );
+                        stopServer();
+                    }
+                }
                 
                 Thread t = new Thread() {
                     public void run() {

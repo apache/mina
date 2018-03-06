@@ -66,11 +66,16 @@ public class AbstractIoServiceDIRMINA1076Test {
 
                     acceptor.getSessionConfig().setReadBufferSize( 2048 );
                     acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
-                    int nextAvailable = AvailablePortFinder.getNextAvailable();
-                    try {
-                        acceptor.bind( new InetSocketAddress( nextAvailable ) );
-                    } catch ( IOException e1 ) {
-                        throw new RuntimeException( e1 );
+                    boolean successfulBind = false;
+                    int nextAvailable = 0;
+                    while ( !successfulBind ) {
+                        nextAvailable = AvailablePortFinder.getNextAvailable();
+                        try {
+                            acceptor.bind( new InetSocketAddress( nextAvailable ) );
+                            successfulBind = true;
+                        } catch ( IOException e1 ) {
+                            System.err.println( "Could not bind to address, retrying..." );
+                        }
                     }
 
                     final NioSocketConnector connector = new NioSocketConnector();
