@@ -39,6 +39,7 @@ import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,7 @@ public class ConnectorTest extends AbstractTest {
     }
 
     @Test
+    @Ignore
     public void testTCPWithSSL() throws Exception {
         useSSL = true;
         // Create a connector
