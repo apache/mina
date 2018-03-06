@@ -24,6 +24,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.sumup.message.AbstractMessage;
 import org.apache.mina.example.sumup.message.ResultMessage;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.demux.MessageDecoder;
 
 /**
  * A {@link MessageDecoder} that decodes {@link ResultMessage}.

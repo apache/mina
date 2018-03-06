@@ -62,7 +62,7 @@ public class TcpSslClient extends IoHandlerAdapter {
 
     /**
      * Create the TcpClient's instance
-     * @throws GeneralSecurityException 
+     * @throws GeneralSecurityException When a SSL error is met
      */
     public TcpSslClient() throws GeneralSecurityException {
         connector = new NioSocketConnector();
