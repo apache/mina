@@ -136,7 +136,7 @@
     <version.taglist.plugin>2.4</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
     <version.versions.plugin>2.5</version.versions.plugin>
-    <version.xbean.plugin>4.5</version.xbean.plugin>
+    <version.xbean.plugin>4.6</version.xbean.plugin>
 
     <!-- Jars -->
     <version.easymock>2.5.2</version.easymock>
@@ -149,11 +149,11 @@
     <version.ognl>3.1.11</version.ognl>
     <version.pmd>4.3</version.pmd>
     <version.rmock>2.0.2</version.rmock>
-    <version.slf4j.api>1.7.21</version.slf4j.api>
+    <version.slf4j.api>1.7.25</version.slf4j.api>
     <version.slf4j.log4j12>1.7.25</version.slf4j.log4j12>
     <version.slf4j.jcl.over.slf4j>1.7.25</version.slf4j.jcl.over.slf4j>
     <version.springframework>2.5.6.SEC03</version.springframework>
-    <version.tomcat.jni>9.0.1</version.tomcat.jni>
+    <version.tomcat.jni>9.0.5</version.tomcat.jni>
     <version.xbean.spring>4.5</version.xbean.spring>
 
     <!-- OSGi minimum versions -->
@@ -825,14 +825,14 @@
           <dependency>
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-ssh</artifactId>
-            <version>2.1</version>
+            <version>3.0.0</version>
           </dependency>
 
           <!-- Add support for 'scpexe' -->
           <dependency>
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-ssh-external</artifactId>
-            <version>2.1</version>
+            <version>3.0.0</version>
           </dependency>
         </dependencies>
       </plugin>
