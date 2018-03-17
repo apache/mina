@@ -41,7 +41,7 @@ public class FilenameFileRegion extends DefaultFileRegion {
      * @param channel The channel over the file
      * @throws IOException If we got an IO error
      */
-    public FilenameFileRegion(File file, FileChannel channel) throws IOException {
+    public FilenameFileRegion(File file, FileChannel channel) {
         this(file, channel, 0, file.length());
     }
 

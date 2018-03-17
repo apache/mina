@@ -1926,7 +1926,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param enumClass the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public abstract <E extends Enum<E>> EnumSet<E> getEnumSet(Class<E> enumClass);
+    public abstract <E extends Enum<E>> Set<E> getEnumSet(Class<E> enumClass);
 
     /**
      * Reads a byte sized bit vector and converts it to an {@link EnumSet}.
@@ -1937,7 +1937,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param enumClass the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public abstract <E extends Enum<E>> EnumSet<E> getEnumSet(int index, Class<E> enumClass);
+    public abstract <E extends Enum<E>> Set<E> getEnumSet(int index, Class<E> enumClass);
 
     /**
      * Reads a short sized bit vector and converts it to an {@link EnumSet}.
@@ -1947,7 +1947,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param enumClass the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public abstract <E extends Enum<E>> EnumSet<E> getEnumSetShort(Class<E> enumClass);
+    public abstract <E extends Enum<E>> Set<E> getEnumSetShort(Class<E> enumClass);
 
     /**
      * Reads a short sized bit vector and converts it to an {@link EnumSet}.
@@ -1958,7 +1958,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param enumClass the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public abstract <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index, Class<E> enumClass);
+    public abstract <E extends Enum<E>> Set<E> getEnumSetShort(int index, Class<E> enumClass);
 
     /**
      * Reads an int sized bit vector and converts it to an {@link EnumSet}.
@@ -1968,7 +1968,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param enumClass the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public abstract <E extends Enum<E>> EnumSet<E> getEnumSetInt(Class<E> enumClass);
+    public abstract <E extends Enum<E>> Set<E> getEnumSetInt(Class<E> enumClass);
 
     /**
      * Reads an int sized bit vector and converts it to an {@link EnumSet}.
@@ -1979,7 +1979,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param enumClass the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public abstract <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index, Class<E> enumClass);
+    public abstract <E extends Enum<E>> Set<E> getEnumSetInt(int index, Class<E> enumClass);
 
     /**
      * Reads a long sized bit vector and converts it to an {@link EnumSet}.
@@ -1989,7 +1989,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param enumClass the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public abstract <E extends Enum<E>> EnumSet<E> getEnumSetLong(Class<E> enumClass);
+    public abstract <E extends Enum<E>> Set<E> getEnumSetLong(Class<E> enumClass);
 
     /**
      * Reads a long sized bit vector and converts it to an {@link EnumSet}.
@@ -2000,7 +2000,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param enumClass the enum class used to create the EnumSet
      * @return the EnumSet representation of the bit vector
      */
-    public abstract <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index, Class<E> enumClass);
+    public abstract <E extends Enum<E>> Set<E> getEnumSetLong(int index, Class<E> enumClass);
 
     /**
      * Writes the specified {@link Set} to the buffer as a byte sized bit

@@ -28,7 +28,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -120,7 +119,7 @@ class SslHandler {
     private ReentrantLock sslLock = new ReentrantLock();
     
     /** A counter of schedules events */
-    private final AtomicInteger scheduled_events = new AtomicInteger(0);
+    private final AtomicInteger scheduledEvents = new AtomicInteger(0);
 
     /**
      * Create a new SSL Handler, and initialize it.
@@ -128,7 +127,7 @@ class SslHandler {
      * @param sslContext
      * @throws SSLException
      */
-    /* no qualifier */SslHandler(SslFilter sslFilter, IoSession session) throws SSLException {
+    /* no qualifier */SslHandler(SslFilter sslFilter, IoSession session) {
         this.sslFilter = sslFilter;
         this.session = session;
     }
@@ -306,7 +305,7 @@ class SslHandler {
     }
 
     /* no qualifier */void flushScheduledEvents() {
-        scheduled_events.incrementAndGet();
+        scheduledEvents.incrementAndGet();
 
         // Fire events only when the lock is available for this handler.
         if (sslLock.tryLock()) {
@@ -325,7 +324,7 @@ class SslHandler {
                         NextFilter nextFilter = event.getNextFilter();
                         nextFilter.messageReceived(session, event.getParameter());
                     }
-                } while (scheduled_events.decrementAndGet() > 0);
+                } while (scheduledEvents.decrementAndGet() > 0);
             } finally {
                 sslLock.unlock();
             }
@@ -342,11 +341,7 @@ class SslHandler {
      */
     /* no qualifier */void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
         if (LOGGER.isDebugEnabled()) {
-            if (!isOutboundDone()) {
-                LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
-            } else {
-                LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
-            }
+            LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
         }
 
         // append buf to inNetBuffer
@@ -749,9 +744,7 @@ class SslHandler {
         }
 
         SSLEngineResult res;
-
         Status status;
-        HandshakeStatus handshakeStatus;
 
         do {
             // Decode the incoming data

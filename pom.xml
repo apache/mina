@@ -24,12 +24,12 @@
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
-    <version>18</version>
+    <version>19</version>
     <relativePath />
   </parent>
 
   <prerequisites>
-    <maven>3.0.3</maven>
+    <maven>3.0.5</maven>
   </prerequisites>
 
   <organization>

@@ -33,7 +33,6 @@ import java.nio.ShortBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
-import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -1348,7 +1347,7 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSet(Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSet(Class<E> enumClass) {
         return buf.getEnumSet(enumClass);
     }
 
@@ -1356,7 +1355,7 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSet(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSet(int index, Class<E> enumClass) {
         return buf.getEnumSet(index, enumClass);
     }
 
@@ -1364,7 +1363,7 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetShort(Class<E> enumClass) {
         return buf.getEnumSetShort(enumClass);
     }
 
@@ -1372,7 +1371,7 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetShort(int index, Class<E> enumClass) {
         return buf.getEnumSetShort(index, enumClass);
     }
 
@@ -1380,7 +1379,7 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetInt(Class<E> enumClass) {
         return buf.getEnumSetInt(enumClass);
     }
 
@@ -1388,7 +1387,7 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetInt(int index, Class<E> enumClass) {
         return buf.getEnumSetInt(index, enumClass);
     }
 
@@ -1396,7 +1395,7 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetLong(Class<E> enumClass) {
         return buf.getEnumSetLong(enumClass);
     }
 
@@ -1404,7 +1403,7 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetLong(int index, Class<E> enumClass) {
         return buf.getEnumSetLong(index, enumClass);
     }
 

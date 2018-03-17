@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +88,7 @@ public class SslFilterTest {
         }
         acceptor.getFilterChain().addLast(
                 "codec",
-                new ProtocolCodecFilter(new TextLineCodecFactory(Charset
-                        .forName("UTF-8"))));
+                new ProtocolCodecFilter(new TextLineCodecFactory(StandardCharsets.UTF_8)));
 
         EchoHandler handler = new EchoHandler();
         acceptor.setHandler(handler);
@@ -134,7 +134,7 @@ public class SslFilterTest {
     }
 
     private int writeMessage(Socket socket, String message) throws Exception {
-        byte request[] = message.getBytes("UTF-8");
+        byte request[] = message.getBytes(StandardCharsets.UTF_8);
         socket.getOutputStream().write(request);
         return request.length;
     }

@@ -42,6 +42,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -875,9 +876,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     @Override
     public final IoBuffer putUnsignedInt(int value) {
-        autoExpand(4);
-        buf().putInt(value);
-        return this;
+        return putInt(value);
     }
 
     /**
@@ -885,9 +884,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     @Override
     public final IoBuffer putUnsignedInt(int index, int value) {
-        autoExpand(index, 4);
-        buf().putInt(index, value);
-        return this;
+        return putInt(index, value);
     }
 
     /**
@@ -935,9 +932,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     @Override
     public final IoBuffer putUnsignedShort(short value) {
-        autoExpand(2);
-        buf().putShort(value);
-        return this;
+        return putShort(value);
     }
 
     /**
@@ -945,9 +940,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      */
     @Override
     public final IoBuffer putUnsignedShort(int index, short value) {
-        autoExpand(index, 2);
-        buf().putShort(index, value);
-        return this;
+        return putShort(index, value);
     }
 
     /**
@@ -1605,7 +1598,10 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             return "";
         }
 
-        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
+        boolean utf16 = 
+                decoder.charset().equals(StandardCharsets.UTF_16) ||
+                decoder.charset().equals(StandardCharsets.UTF_16BE) ||
+                decoder.charset().equals(StandardCharsets.UTF_16LE);
 
         int oldPos = position();
         int oldLimit = limit();
@@ -1713,7 +1709,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             return "";
         }
 
-        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
+        boolean utf16 = decoder.charset().equals(StandardCharsets.UTF_16) ||
+                decoder.charset().equals(StandardCharsets.UTF_16BE) ||
+                decoder.charset().equals(StandardCharsets.UTF_16LE);
 
         if (utf16 && (fieldSize & 1) != 0) {
             throw new IllegalArgumentException("fieldSize is not even.");
@@ -1861,7 +1859,10 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
         autoExpand(fieldSize);
 
-        boolean utf16 = encoder.charset().name().startsWith("UTF-16");
+        boolean utf16 = encoder.charset().equals(StandardCharsets.UTF_16) ||
+                encoder.charset().equals(StandardCharsets.UTF_16BE) ||
+                encoder.charset().equals(StandardCharsets.UTF_16LE);
+
 
         if (utf16 && (fieldSize & 1) != 0) {
             throw new IllegalArgumentException("fieldSize is not even.");
@@ -1960,7 +1961,10 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             return "";
         }
 
-        boolean utf16 = decoder.charset().name().startsWith("UTF-16");
+        boolean utf16 = decoder.charset().equals(StandardCharsets.UTF_16) ||
+                decoder.charset().equals(StandardCharsets.UTF_16BE) ||
+                decoder.charset().equals(StandardCharsets.UTF_16LE);
+
 
         if (utf16 && (fieldSize & 1) != 0) {
             throw new BufferDataException("fieldSize is not even for a UTF-16 string.");
@@ -2564,7 +2568,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSet(Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSet(Class<E> enumClass) {
         return toEnumSet(enumClass, get() & BYTE_MASK);
     }
 
@@ -2572,7 +2576,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSet(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSet(int index, Class<E> enumClass) {
         return toEnumSet(enumClass, get(index) & BYTE_MASK);
     }
 
@@ -2580,7 +2584,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetShort(Class<E> enumClass) {
         return toEnumSet(enumClass, getShort() & SHORT_MASK);
     }
 
@@ -2588,7 +2592,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetShort(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetShort(int index, Class<E> enumClass) {
         return toEnumSet(enumClass, getShort(index) & SHORT_MASK);
     }
 
@@ -2596,7 +2600,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetInt(Class<E> enumClass) {
         return toEnumSet(enumClass, getInt() & INT_MASK);
     }
 
@@ -2604,7 +2608,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetInt(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetInt(int index, Class<E> enumClass) {
         return toEnumSet(enumClass, getInt(index) & INT_MASK);
     }
 
@@ -2612,7 +2616,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetLong(Class<E> enumClass) {
         return toEnumSet(enumClass, getLong());
     }
 
@@ -2620,7 +2624,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public <E extends Enum<E>> EnumSet<E> getEnumSetLong(int index, Class<E> enumClass) {
+    public <E extends Enum<E>> Set<E> getEnumSetLong(int index, Class<E> enumClass) {
         return toEnumSet(enumClass, getLong(index));
     }
 

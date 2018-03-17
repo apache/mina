@@ -20,7 +20,7 @@
 package org.apache.mina.example.reverser;
 
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
@@ -43,8 +43,7 @@ public class Main {
         acceptor.getFilterChain().addLast("logger", new LoggingFilter());
         acceptor.getFilterChain().addLast(
                 "codec",
-                new ProtocolCodecFilter(new TextLineCodecFactory(Charset
-                        .forName("UTF-8"))));
+                new ProtocolCodecFilter(new TextLineCodecFactory(StandardCharsets.UTF_8)));
 
         // Bind
         acceptor.setHandler(new ReverseProtocolHandler());

@@ -37,6 +37,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -62,7 +63,7 @@ public class AbstractIoServiceDIRMINA1076Test {
                     final IoAcceptor acceptor = new NioSocketAcceptor();
                     acceptor.getFilterChain()
                             .addLast( "codec",
-                                      new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName( "UTF-8" ) ) ) );
+                                      new ProtocolCodecFilter( new TextLineCodecFactory( StandardCharsets.UTF_8 ) ) );
 
                     acceptor.setHandler( new ServerHandler() );
 
@@ -83,7 +84,7 @@ public class AbstractIoServiceDIRMINA1076Test {
                     connector.setHandler( new ClientHandler() );
                     connector.getFilterChain()
                              .addLast( "codec",
-                                       new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName( "UTF-8" ) ) ) );
+                                       new ProtocolCodecFilter( new TextLineCodecFactory( StandardCharsets.UTF_8 ) ) );
 
                     // Start communication.
                     ConnectFuture cf = connector.connect( new InetSocketAddress( "localhost", nextAvailable ) );

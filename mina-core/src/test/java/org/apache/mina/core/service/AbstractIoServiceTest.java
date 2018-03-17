@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -59,7 +59,7 @@ public class AbstractIoServiceTest {
 
         acceptor.getFilterChain().addLast("logger", new LoggingFilter());
         acceptor.getFilterChain().addLast("codec",
-                new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
+                new ProtocolCodecFilter(new TextLineCodecFactory(StandardCharsets.UTF_8)));
 
         acceptor.setHandler(new ServerHandler());
 
@@ -76,7 +76,7 @@ public class AbstractIoServiceTest {
         connector.setHandler(new ClientHandler());
         connector.getFilterChain().addLast("logger", new LoggingFilter());
         connector.getFilterChain().addLast("codec",
-                new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
+                new ProtocolCodecFilter(new TextLineCodecFactory(StandardCharsets.UTF_8)));
 
         // Start communication.
         ConnectFuture cf = connector.connect(new InetSocketAddress("localhost", 9123));
