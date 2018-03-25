@@ -25,6 +25,9 @@ package org.apache.mina.http.api;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum HttpMethod {
+    /** The OPTIONS method */
+    OPTIONS, 
+    
     /** The GET method */
     GET, 
     
@@ -37,14 +40,29 @@ public enum HttpMethod {
     /** The PUT method */
     PUT, 
     
+    /** The PATCH method */
+    PATCH,
+    
+    /** The COPY method */
+    COPY,
+    
+    /** The MOVE method */
+    MOVE,
+    
     /** The DELETE method */
     DELETE, 
     
-    /** The OPTIONS method */
-    OPTIONS, 
+    /** The LINK method */
+    LINK,
     
+    /** The UNLINK method */
+    UNLINK,
+        
     /** The TRACE method */
     TRACE, 
+    
+    /** The WRAPPED method */
+    WRAPPED,
     
     /** The CONNECT method */
     CONNECT
