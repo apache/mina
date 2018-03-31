@@ -451,6 +451,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
     @SuppressWarnings("unchecked")
     private boolean isOrderedMap(Map<String,? extends IoFilter> map) {
+        if (map == null) {
+            return false;
+        }
+        
         Class<?> mapType = map.getClass();
         
         if (LinkedHashMap.class.isAssignableFrom(mapType)) {
