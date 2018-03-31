@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
