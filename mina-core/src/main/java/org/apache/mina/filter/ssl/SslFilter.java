@@ -159,7 +159,10 @@ public class SslFilter extends IoFilterAdapter {
     private final boolean autoStart;
 
     /** A flag used to determinate if the handshake should start immediately */
-    private static final boolean START_HANDSHAKE = true;
+    public static final boolean START_HANDSHAKE = true;
+
+    /** A flag used to determinate if the handshake should wait for the client to initiate the handshake */
+    public static final boolean CLIENT_HANDSHAKE = false;
 
     private boolean client;
 
@@ -173,7 +176,8 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
-     * The handshake will start immediately.
+     * The handshake will start immediately after the filter has been added
+     * to the chain.
      * 
      * @param sslContext The SSLContext to use
      */
@@ -184,7 +188,8 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
      * If the <tt>autostart</tt> flag is set to <tt>true</tt>, the
-     * handshake will start immediately.
+     * handshake will start immediately after the filter has been added
+     * to the chain.
      * 
      * @param sslContext The SSLContext to use
      * @param autoStart The flag used to tell the filter to start the handshake immediately
