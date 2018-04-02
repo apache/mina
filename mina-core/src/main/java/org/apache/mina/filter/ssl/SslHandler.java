@@ -592,15 +592,13 @@ class SslHandler {
                 SSLEngineResult result;
                 createOutNetBuffer(0);
 
-                for (;;) {
+                result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
+
+                while ( result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW ) {
+                    outNetBuffer.capacity(outNetBuffer.capacity() << 1);
+                    outNetBuffer.limit(outNetBuffer.capacity());
+
                     result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
-                    
-                    if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-                        outNetBuffer.capacity(outNetBuffer.capacity() << 1);
-                        outNetBuffer.limit(outNetBuffer.capacity());
-                    } else {
-                        break;
-                    }
                 }
 
                 outNetBuffer.flip();
