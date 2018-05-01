@@ -62,7 +62,7 @@ public class AcceptorTest extends AbstractTest {
     }
 
     private void testTCP0(Socket client) throws Exception {
-        client.setSoTimeout(3000);
+        client.setSoTimeout(300000);
         byte[] writeBuf = new byte[16];
 
         for (int i = 0; i < 10; i++) {

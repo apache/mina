@@ -30,6 +30,7 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
 import org.apache.mina.core.session.IoSessionInitializer;
+import org.apache.mina.filter.FilterEvent;
 
 /**
  * A base implementation of {@link IoConnector}.
@@ -311,6 +312,14 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
                      */
                     @Override
                     public void inputClosed(IoSession session) throws Exception {
+                        // Empty handler
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public void event(IoSession session, FilterEvent event) throws Exception {
                         // Empty handler
                     }
                 });

@@ -35,6 +35,7 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
+import org.apache.mina.filter.FilterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -558,6 +559,14 @@ public class DefaultIoFilterChain implements IoFilterChain {
         callNextSessionOpened(head, session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fireEvent(FilterEvent event) {
+        callNextFilterEvent(head, session, event);
+    }
+
     private void callNextSessionOpened(Entry entry, IoSession session) {
         try {
             IoFilter filter = entry.getFilter();
@@ -765,6 +774,19 @@ public void fireFilterWrite(WriteRequest writeRequest) {
             IoFilter filter = entry.getFilter();
             NextFilter nextFilter = entry.getNextFilter();
             filter.filterClose(nextFilter, session);
+        } catch (Exception e) {
+            fireExceptionCaught(e);
+        } catch (Error e) {
+            fireExceptionCaught(e);
+            throw e;
+        }
+    }
+
+    private void callNextFilterEvent(Entry entry, IoSession session, FilterEvent event) {
+        try {
+            IoFilter filter = entry.getFilter();
+            NextFilter nextFilter = entry.getNextFilter();
+            filter.event(nextFilter, session, event);
         } catch (Exception e) {
             fireExceptionCaught(e);
         } catch (Error e) {
@@ -1024,6 +1046,11 @@ public void fireFilterWrite(WriteRequest writeRequest) {
         public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
             nextFilter.filterClose(session);
         }
+        
+        @Override
+        public void event(NextFilter nextFilter, IoSession session, FilterEvent event) throws Exception {
+            session.getHandler().event(session, event);
+        }
     }
 
     private final class EntryImpl implements Entry {
@@ -1139,6 +1166,15 @@ public void fireFilterWrite(WriteRequest writeRequest) {
                 public void filterClose(IoSession session) {
                     Entry nextEntry = EntryImpl.this.prevEntry;
                     callPreviousFilterClose(nextEntry, session);
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public void event(IoSession session, FilterEvent event) {
+                    Entry nextEntry = EntryImpl.this.nextEntry;
+                    callNextFilterEvent(nextEntry, session, event);
                 }
 
                 /**

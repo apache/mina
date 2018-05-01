@@ -133,20 +133,6 @@ public class SslFilter extends IoFilterAdapter {
      */
     public static final AttributeKey PEER_ADDRESS = new AttributeKey(SslFilter.class, "peerAddress");
 
-    /**
-     * A special message object which is emitted with a {@link IoHandler#messageReceived(IoSession, Object)}
-     * event when the session is secured and its {@link #USE_NOTIFICATION}
-     * attribute is set.
-     */
-    public static final SslFilterMessage SESSION_SECURED = new SslFilterMessage("SESSION_SECURED");
-
-    /**
-     * A special message object which is emitted with a {@link IoHandler#messageReceived(IoSession, Object)}
-     * event when the session is not secure anymore and its {@link #USE_NOTIFICATION}
-     * attribute is set.
-     */
-    public static final SslFilterMessage SESSION_UNSECURED = new SslFilterMessage("SESSION_UNSECURED");
-
     /** An attribute containing the next filter */
     private static final AttributeKey NEXT_FILTER = new AttributeKey(SslFilter.class, "nextFilter");
 
@@ -786,9 +772,8 @@ public class SslFilter extends IoFilterAdapter {
                 sslHandler.destroy();
             }
 
-            if (session.containsAttribute(USE_NOTIFICATION)) {
-                sslHandler.scheduleMessageReceived(nextFilter, SESSION_UNSECURED);
-            }
+            // Inform that the session is not any more secured
+            session.getFilterChain().fireEvent(SslEvent.UNSECURED);
         } catch (SSLException se) {
             sslHandler.release();
             throw se;

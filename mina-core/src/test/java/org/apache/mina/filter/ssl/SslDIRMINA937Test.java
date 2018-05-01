@@ -35,6 +35,7 @@ import javax.net.ssl.TrustManagerFactory;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.FilterEvent;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -117,18 +118,15 @@ public class SslDIRMINA937Test {
         filters.addLast("sslFilter", sslFilter);
         connector.setHandler(new IoHandlerAdapter() {
             @Override
-            public void sessionCreated(IoSession session) throws Exception {
-                session.setAttribute(SslFilter.USE_NOTIFICATION, Boolean.TRUE);
+            public void messageReceived(IoSession session, Object message) throws Exception {
             }
 
             @Override
-            public void messageReceived(IoSession session, Object message) throws Exception {
-                if (message == SslFilter.SESSION_SECURED) {
+            public void event(IoSession session, FilterEvent event) throws Exception {
+                if (event == SslEvent.UNSECURED ) {
                     counter.countDown();
                 }
             }
-
-
         });
         connector.connect(new InetSocketAddress("localhost", port));
     }

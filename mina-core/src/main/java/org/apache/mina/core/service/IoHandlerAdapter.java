@@ -21,6 +21,7 @@ package org.apache.mina.core.service;
 
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.FilterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,5 +100,13 @@ public class IoHandlerAdapter implements IoHandler {
     @Override
     public void inputClosed(IoSession session) throws Exception {
         session.closeNow();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void event(IoSession session, FilterEvent event) throws Exception {
+        // Empty handler
     }
 }

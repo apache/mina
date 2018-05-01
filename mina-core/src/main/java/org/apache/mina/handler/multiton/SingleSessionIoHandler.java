@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.FilterEvent;
 
 /**
  * A session handler without an {@link IoSession} parameter for simplicity.
@@ -123,4 +124,13 @@ public interface SingleSessionIoHandler {
      */
     void messageSent(Object message) throws Exception;
 
+
+    /**
+     * Invoked when a filter event is fired. Each filter might sent a different event,
+     * this is very application specific.
+     * 
+     * @param event The event to process
+     * @throws Exception If we get an exception while processing the event 
+     */
+    void event(FilterEvent event) throws Exception;
 }

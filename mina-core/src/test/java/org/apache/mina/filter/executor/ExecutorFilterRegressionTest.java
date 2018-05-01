@@ -29,6 +29,7 @@ import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.FilterEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -161,6 +162,10 @@ public class ExecutorFilterRegressionTest {
         }
 
         public void sessionCreated(IoSession session) {
+            // Do nothing
+        }
+        
+        public void event(IoSession session, FilterEvent event) {
             // Do nothing
         }
     }
