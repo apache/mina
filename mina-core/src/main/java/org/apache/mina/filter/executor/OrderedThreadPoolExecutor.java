@@ -197,8 +197,8 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
         }
 
         // Now, we can setup the pool sizes
-        super.setCorePoolSize(corePoolSize);
         super.setMaximumPoolSize(maximumPoolSize);
+        super.setCorePoolSize(corePoolSize);
 
         // The queueHandler might be null.
         if (eventQueueHandler == null) {
