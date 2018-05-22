@@ -27,36 +27,36 @@ package org.apache.mina.core.buffer;
  */
 class IoBufferHexDumper {
 
-	/**
-	 * The high digits lookup table.
-	 */
-	private static final byte[] highDigits;
+    /**
+     * The high digits lookup table.
+     */
+    private static final byte[] highDigits;
 
-	/**
-	 * The low digits lookup table.
-	 */
-	private static final byte[] lowDigits;
+    /**
+     * The low digits lookup table.
+     */
+    private static final byte[] lowDigits;
 
-	/**
-	 * Initialize lookup tables.
-	 */
-	static {
-		final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    /**
+     * Initialize lookup tables.
+     */
+    static {
+        final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-		int i;
-		byte[] high = new byte[256];
-		byte[] low = new byte[256];
+        int i;
+        byte[] high = new byte[256];
+        byte[] low = new byte[256];
 
-		for (i = 0; i < 256; i++) {
-			high[i] = digits[i >>> 4];
-			low[i] = digits[i & 0x0F];
-		}
+        for (i = 0; i < 256; i++) {
+            high[i] = digits[i >>> 4];
+            low[i] = digits[i & 0x0F];
+        }
 
-		highDigits = high;
-		lowDigits = low;
-	}
+        highDigits = high;
+        lowDigits = low;
+    }
 
-	/**
+    /**
      * Dumps an {@link IoBuffer} to a hex formatted string.
      * 
      * @param in the buffer to dump
