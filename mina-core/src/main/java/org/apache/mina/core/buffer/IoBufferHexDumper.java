@@ -20,42 +20,43 @@
 package org.apache.mina.core.buffer;
 
 /**
- * Provides utility methods to dump an {@link IoBuffer} into a hex formatted string.
+ * Provides utility methods to dump an {@link IoBuffer} into a hex formatted
+ * string.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 class IoBufferHexDumper {
 
-    /**
-     * The high digits lookup table.
-     */
-    private static final byte[] highDigits;
+	/**
+	 * The high digits lookup table.
+	 */
+	private static final byte[] highDigits;
 
-    /**
-     * The low digits lookup table.
-     */
-    private static final byte[] lowDigits;
+	/**
+	 * The low digits lookup table.
+	 */
+	private static final byte[] lowDigits;
 
-    /**
-     * Initialize lookup tables.
-     */
-    static {
-        final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+	/**
+	 * Initialize lookup tables.
+	 */
+	static {
+		final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-        int i;
-        byte[] high = new byte[256];
-        byte[] low = new byte[256];
+		int i;
+		byte[] high = new byte[256];
+		byte[] low = new byte[256];
 
-        for (i = 0; i < 256; i++) {
-            high[i] = digits[i >>> 4];
-            low[i] = digits[i & 0x0F];
-        }
+		for (i = 0; i < 256; i++) {
+			high[i] = digits[i >>> 4];
+			low[i] = digits[i & 0x0F];
+		}
 
-        highDigits = high;
-        lowDigits = low;
-    }
+		highDigits = high;
+		lowDigits = low;
+	}
 
-    /**
+	/**
      * Dumps an {@link IoBuffer} to a hex formatted string.
      * 
      * @param in the buffer to dump
@@ -67,12 +68,15 @@ class IoBufferHexDumper {
             throw new IllegalArgumentException("lengthLimit: " + lengthLimit + " (expected: 1+)");
         }
 
-        boolean truncate = in.remaining() > lengthLimit;
+        int limit = in.limit();
+        int pos = in.position();
+        
+        boolean truncate = limit - pos > lengthLimit;
         int size;
         if (truncate) {
             size = lengthLimit;
         } else {
-            size = in.remaining();
+            size = limit - pos;
         }
 
         if (size == 0) {
@@ -81,23 +85,18 @@ class IoBufferHexDumper {
 
         StringBuilder out = new StringBuilder(size * 3 + 3);
 
-        int mark = in.position();
-
         // fill the first
-        int byteValue = in.get() & 0xFF;
+        int byteValue = in.get(pos++) & 0xFF;
         out.append((char) highDigits[byteValue]);
         out.append((char) lowDigits[byteValue]);
-        size--;
 
         // and the others, too
-        for (; size > 0; size--) {
+        for (; pos < limit; ) {
             out.append(' ');
-            byteValue = in.get() & 0xFF;
+            byteValue = in.get(pos++) & 0xFF;
             out.append((char) highDigits[byteValue]);
             out.append((char) lowDigits[byteValue]);
         }
-
-        in.position(mark);
 
         if (truncate) {
             out.append("...");
