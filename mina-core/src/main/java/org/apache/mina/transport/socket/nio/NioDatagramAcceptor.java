@@ -303,7 +303,9 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
 
             readBuf.flip();
 
-            session.getFilterChain().fireMessageReceived(readBuf);
+            if (!session.isReadSuspended()) {
+                session.getFilterChain().fireMessageReceived(readBuf);
+            }
         }
     }
 
@@ -820,7 +822,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
      */
     @Override
     public void updateTrafficControl(NioSession session) {
-        throw new UnsupportedOperationException();
+        // Nothing to do
     }
 
     protected void wakeup() {
