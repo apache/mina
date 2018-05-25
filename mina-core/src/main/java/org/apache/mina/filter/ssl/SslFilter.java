@@ -488,6 +488,23 @@ public class SslFilter extends IoFilterAdapter {
             nextFilter.sessionClosed(session);
         }
     }
+    
+    
+    @Override
+    public void inputClosed(NextFilter nextFilter, IoSession session) throws Exception {
+        SslHandler sslHandler = getSslSessionHandler(session);
+
+        try {
+            synchronized (sslHandler) {
+                // release resources
+                sslHandler.destroy();
+            }
+        } finally {
+            // notify closed session
+            nextFilter.inputClosed(session);
+        }
+    }
+
 
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws SSLException {
