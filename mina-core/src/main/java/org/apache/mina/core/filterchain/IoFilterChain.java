@@ -326,9 +326,11 @@ public interface IoFilterChain {
     
     
     /**
-     * Fires a {@link IoHandler#event()} event. Most users don't need to call this method at
+     * Fires a {@link IoHandler#event(IoSession, FilterEvent)} event. Most users don't need to call this method at
      * all. Please use this method only when you implement a new transport or fire a virtual
      * event.
+     * 
+     * @param event The specific event being fired
      */
     void fireEvent(FilterEvent event);
 

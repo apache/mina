@@ -111,7 +111,7 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * A session attribute key that makes this filter to emit a
      * {@link IoHandler#messageReceived(IoSession, Object)} event with a
-     * special message ({@link #SESSION_SECURED} or {@link #SESSION_UNSECURED}).
+     * special message ({@link SslEvent#SECURED} or {@link SslEvent#UNSECURED}).
      * This is a marker attribute, which means that you can put whatever as its
      * value. ({@link Boolean#TRUE} is preferred.)  By default, this filter
      * doesn't emit any events related with SSL session flow control.

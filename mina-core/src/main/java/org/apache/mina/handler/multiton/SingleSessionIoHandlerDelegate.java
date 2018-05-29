@@ -179,7 +179,7 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
 
     /**
      * Delegates the method call to the
-     * {@link SingleSessionIoHandler#fire(event)} method of the handler
+     * {@link SingleSessionIoHandler#event(FilterEvent)} method of the handler
      * assigned to this session.
      * 
      * {@inheritDoc}
