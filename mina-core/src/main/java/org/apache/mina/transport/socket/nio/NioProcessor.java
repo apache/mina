@@ -283,7 +283,7 @@ public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         SelectionKey key = session.getSelectionKey();
 
         if (key == null) {
-            // The channel is not yet registred to a selector
+            // The channel is not yet regisetred to a selector
             return SessionState.OPENING;
         }
 

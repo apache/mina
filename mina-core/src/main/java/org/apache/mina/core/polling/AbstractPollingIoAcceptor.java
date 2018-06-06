@@ -465,7 +465,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                     // woke up
                     int selected = select();
 
-                    // Now, if the number of registred handles is 0, we can
+                    // Now, if the number of registered handles is 0, we can
                     // quit the loop: we don't have any socket listening
                     // for incoming connection.
                     if (nHandles == 0) {

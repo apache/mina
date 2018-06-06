@@ -199,20 +199,20 @@ implements SocketAcceptor {
 
             return new NioSocketSession(this, processor, ch);
         } catch (Throwable t) {
-        	if(t.getMessage().equals("Too many open files")) {
-	            LOGGER.error("Error Calling Accept on Socket - Sleeping Acceptor Thread. Check the ulimit parameter", t);
-	            try {
-	                // Sleep 50 ms, so that the select does not spin like crazy doing nothing but eating CPU
-	                // This is typically what will happen if we don't have any more File handle on the server
-	                // Check the ulimit parameter
-	                // NOTE : this is a workaround, there is no way we can handle this exception in any smarter way...
-	                Thread.sleep(50L);
-	            } catch (InterruptedException ie) {
-	                // Nothing to do
-	            }
-        	} else {
-        		throw t;
-        	}
+            if(t.getMessage().equals("Too many open files")) {
+                LOGGER.error("Error Calling Accept on Socket - Sleeping Acceptor Thread. Check the ulimit parameter", t);
+                try {
+                    // Sleep 50 ms, so that the select does not spin like crazy doing nothing but eating CPU
+                    // This is typically what will happen if we don't have any more File handle on the server
+                    // Check the ulimit parameter
+                    // NOTE : this is a workaround, there is no way we can handle this exception in any smarter way...
+                    Thread.sleep(50L);
+                } catch (InterruptedException ie) {
+                    // Nothing to do
+                }
+            } else {
+                throw t;
+            }
 
             // No session when we have met an exception
             return null;
