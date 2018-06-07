@@ -540,10 +540,6 @@ class SslHandler {
                 if (firstSSLNegociation) {
                     firstSSLNegociation = false;
                     
-                    if (session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
-                        scheduleMessageReceived(nextFilter, SslFilter.SESSION_SECURED);
-                    }
-                    
                     nextFilter.event(session, SslEvent.SECURED);
                 }
 
