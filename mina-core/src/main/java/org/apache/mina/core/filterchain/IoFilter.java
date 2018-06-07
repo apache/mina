@@ -23,7 +23,6 @@ import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.FilterEvent;
 import org.apache.mina.filter.util.ReferenceCountingFilter;
 
 /**
@@ -270,18 +269,6 @@ public interface IoFilter {
      * @throws Exception If an error occurred while processing the event
      */
     void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception;
-    
-    /**
-     * Propagate an event up to the {@link IoHandler}
-     * 
-     * @param nextFilter
-     *            the {@link NextFilter} for this filter. You can reuse this
-     *            object until this filter is removed from the chain.
-     * @param session The {@link IoSession} which has to process this invocation
-     * @param event The event to propagate
-     * @throws Exception If an error occurred while processing the event
-     */
-    void event(NextFilter nextFilter, IoSession session, FilterEvent event) throws Exception;
 
     /**
      * Represents the next {@link IoFilter} in {@link IoFilterChain}.
@@ -360,13 +347,5 @@ public interface IoFilter {
          * @param session The {@link IoSession} which has to process this invocation
          */
         void filterClose(IoSession session);
-
-        /**
-         * Forwards an event to next filter.
-         * 
-         * @param session The {@link IoSession} which has to process this invocation
-         * @param event The event to propagate
-         */
-        void event(IoSession session, FilterEvent event);
     }
 }

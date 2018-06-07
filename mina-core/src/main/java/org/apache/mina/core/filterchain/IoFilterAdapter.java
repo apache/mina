@@ -22,7 +22,6 @@ package org.apache.mina.core.filterchain;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.FilterEvent;
 
 /**
  * An adapter class for {@link IoFilter}.  You can extend
@@ -152,14 +151,6 @@ public class IoFilterAdapter implements IoFilter {
     @Override
     public void inputClosed(NextFilter nextFilter, IoSession session) throws Exception {
         nextFilter.inputClosed(session);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void event(NextFilter nextFilter, IoSession session, FilterEvent event) throws Exception {
-        nextFilter.event(session, event);
     }
 
     /**

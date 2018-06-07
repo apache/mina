@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.FilterEvent;
 
 /**
  * Handles all I/O events fired by MINA.
@@ -112,14 +111,4 @@ public interface IoHandler {
      * @throws Exception If we get an exception while closing the input
      */
     void inputClosed(IoSession session) throws Exception;
-    
-    /**
-     * Invoked when a filter event is fired. Each filter might sent a different event,
-     * this is very application specific.
-     * 
-     * @param session The session for which we have an event to process
-     * @param event The event to process
-     * @throws Exception If we get an exception while processing the event 
-     */
-    void event(IoSession session, FilterEvent event) throws Exception;
 }

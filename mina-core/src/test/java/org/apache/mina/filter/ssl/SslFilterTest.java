@@ -36,7 +36,6 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.FilterEvent;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -65,8 +64,6 @@ abstract class AbstractNextFilter implements NextFilter {
     public void messageSent(IoSession session, WriteRequest writeRequest) { }
 
     public void filterClose(IoSession session) { }
-
-    public void event(IoSession session, FilterEvent event) { }
 
     public String toString() {
         return null;

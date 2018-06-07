@@ -537,14 +537,9 @@ class SslHandler {
                 handshakeComplete = true;
 
                 // Send the SECURE message only if it's the first SSL handshake
-                if (firstSSLNegociation) {
-                    firstSSLNegociation = false;
-                    
-                    if (session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
-                        scheduleMessageReceived(nextFilter, SslFilter.SESSION_SECURED);
-                    }
-                    
-                    nextFilter.event(session, SslEvent.SECURED);
+                if (firstSSLNegociation && session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
+                    // SESSION_SECURED is fired only when it's the first handshake
+                    scheduleMessageReceived(nextFilter, SslFilter.SESSION_SECURED);
                 }
 
                 if (LOGGER.isDebugEnabled()) {

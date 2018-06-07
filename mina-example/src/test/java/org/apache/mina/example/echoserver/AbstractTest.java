@@ -29,7 +29,6 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
-import org.apache.mina.filter.FilterEvent;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
@@ -158,10 +157,6 @@ public abstract class AbstractTest {
                         buf.reset();
                         super.messageReceived(session, buf);
                     }
-                }
-                
-                public void fire(IoSession session, FilterEvent event) {
-                    System.out.println( event );
                 }
             });
 

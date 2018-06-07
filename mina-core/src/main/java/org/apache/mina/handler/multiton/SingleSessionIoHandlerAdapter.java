@@ -21,7 +21,6 @@ package org.apache.mina.handler.multiton;
 
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.FilterEvent;
 
 /**
  * Adapter class for implementors of the {@link SingleSessionIoHandler}
@@ -123,14 +122,6 @@ public class SingleSessionIoHandlerAdapter implements SingleSessionIoHandler {
      */
     @Override
     public void sessionOpened() throws Exception {
-        // Do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void event(FilterEvent event) throws Exception {
         // Do nothing
     }
 }

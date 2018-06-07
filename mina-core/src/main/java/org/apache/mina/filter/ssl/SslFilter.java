@@ -792,8 +792,6 @@ public class SslFilter extends IoFilterAdapter {
                 sslHandler.scheduleMessageReceived(nextFilter, SESSION_UNSECURED);
             }
             
-            // Inform that the session is not any more secured
-            session.getFilterChain().fireEvent(SslEvent.UNSECURED);
         } catch (SSLException se) {
             sslHandler.release();
             throw se;

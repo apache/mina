@@ -23,7 +23,6 @@ import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.FilterEvent;
 
 /**
  * An {@link IoHandler} implementation which delegates all requests to
@@ -175,18 +174,5 @@ public class SingleSessionIoHandlerDelegate implements IoHandler {
     public void inputClosed(IoSession session) throws Exception {
         SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
         handler.inputClosed(session);
-    }
-
-    /**
-     * Delegates the method call to the
-     * {@link SingleSessionIoHandler#event(FilterEvent)} method of the handler
-     * assigned to this session.
-     * 
-     * {@inheritDoc}
-     */
-    @Override
-    public void event(IoSession session, FilterEvent event) throws Exception {
-        SingleSessionIoHandler handler = (SingleSessionIoHandler) session.getAttribute(HANDLER);
-        handler.event(event);
     }
 }

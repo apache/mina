@@ -26,7 +26,6 @@ import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.FilterEvent;
 
 /**
  * A container of {@link IoFilter}s that forwards {@link IoHandler} events
@@ -323,16 +322,6 @@ public interface IoFilterChain {
      * event.
      */
     void fireFilterClose();
-    
-    
-    /**
-     * Fires a {@link IoHandler#event(IoSession, FilterEvent)} event. Most users don't need to call this method at
-     * all. Please use this method only when you implement a new transport or fire a virtual
-     * event.
-     * 
-     * @param event The specific event being fired
-     */
-    void fireEvent(FilterEvent event);
 
     /**
      * Represents a name-filter pair that an {@link IoFilterChain} contains.
