@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -741,6 +742,7 @@ class SslHandler {
 
         SSLEngineResult res;
         Status status;
+        HandshakeStatus localHandshakeStatus;
 
         do {
             // Decode the incoming data
@@ -748,7 +750,7 @@ class SslHandler {
             status = res.getStatus();
 
             // We can be processing the Handshake
-            handshakeStatus = res.getHandshakeStatus();
+            localHandshakeStatus = res.getHandshakeStatus();
 
             if (status == SSLEngineResult.Status.BUFFER_OVERFLOW) {
                 // We have to grow the target buffer, it's too small.
@@ -765,8 +767,8 @@ class SslHandler {
                 continue;
             }
         } while (((status == SSLEngineResult.Status.OK) || (status == SSLEngineResult.Status.BUFFER_OVERFLOW))
-                && ((handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) || 
-                        (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
+                && ((localHandshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) || 
+                        (localHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
 
         return res;
     }
