@@ -1106,8 +1106,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 try {
                     localWrittenBytes = write(session, buf, length);
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
-
                     // We have had an issue while trying to send data to the
                     // peer : let's close the session.
                     buf.free();
