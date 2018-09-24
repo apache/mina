@@ -44,7 +44,7 @@ public class HttpException extends RuntimeException {
      * @param statusCode The associated status code
      */
     public HttpException(HttpStatus statusCode) {
-    	this(statusCode, "");
+        this(statusCode, "");
     }
 
     /**

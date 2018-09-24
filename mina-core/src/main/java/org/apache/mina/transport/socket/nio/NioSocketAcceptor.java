@@ -33,7 +33,10 @@ import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.polling.AbstractPollingIoAcceptor;
+import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoProcessor;
+import org.apache.mina.core.service.IoService;
+import org.apache.mina.core.service.SimpleIoProcessorPool;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.transport.socket.DefaultSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketAcceptor;
@@ -187,13 +190,33 @@ implements SocketAcceptor {
         }
 
         // accept the connection from the client
-        SocketChannel ch = handle.accept();
+        try {
+            SocketChannel ch = handle.accept();
+    
+            if (ch == null) {
+                return null;
+            }
 
-        if (ch == null) {
+            return new NioSocketSession(this, processor, ch);
+        } catch (Throwable t) {
+            if(t.getMessage().equals("Too many open files")) {
+                LOGGER.error("Error Calling Accept on Socket - Sleeping Acceptor Thread. Check the ulimit parameter", t);
+                try {
+                    // Sleep 50 ms, so that the select does not spin like crazy doing nothing but eating CPU
+                    // This is typically what will happen if we don't have any more File handle on the server
+                    // Check the ulimit parameter
+                    // NOTE : this is a workaround, there is no way we can handle this exception in any smarter way...
+                    Thread.sleep(50L);
+                } catch (InterruptedException ie) {
+                    // Nothing to do
+                }
+            } else {
+                throw t;
+            }
+
+            // No session when we have met an exception
             return null;
         }
-
-        return new NioSocketSession(this, processor, ch);
     }
 
     /**
@@ -270,7 +293,6 @@ implements SocketAcceptor {
      * 
      * @return The number of keys having their ready-operation set updated
      * @throws IOException If an I/O error occurs
-     * @throws ClosedSelectorException If this selector is closed
      */
     @Override
     protected int select() throws Exception {

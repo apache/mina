@@ -132,7 +132,6 @@ DatagramConnector {
     }
 
     /**
-    @Override
      * {@inheritDoc}
      */
     @Override

@@ -19,6 +19,8 @@
  */
 package org.apache.mina.core.future;
 
+import org.apache.mina.core.session.IoSession;
+
 /**
  * An {@link IoFuture} for {@link IoSession#read() asynchronous read requests}. 
  *

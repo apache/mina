@@ -35,29 +35,49 @@ public abstract class AbstractStateContext implements StateContext {
 
     private Map<Object, Object> attributes = null;
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Object getAttribute(Object key) {
         return getAttributes().get(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public State getCurrentState() {
         return currentState;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setAttribute(Object key, Object value) {
         getAttributes().put(key, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setCurrentState(State state) {
         currentState = state;
     }
 
     protected Map<Object, Object> getAttributes() {
         if (attributes == null) {
-            attributes = new HashMap<Object, Object>();
+            attributes = new HashMap<>();
         }
         return attributes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         

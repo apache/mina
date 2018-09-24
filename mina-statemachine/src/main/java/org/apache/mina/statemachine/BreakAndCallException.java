@@ -41,6 +41,7 @@ class BreakAndCallException extends BreakException {
         if (stateId == null) {
             throw new IllegalArgumentException("stateId");
         }
+        
         this.stateId = stateId;
         this.returnToStateId = returnToStateId;
         this.now = now;

@@ -120,7 +120,7 @@ class SslHandler {
     private ReentrantLock sslLock = new ReentrantLock();
     
     /** A counter of schedules events */
-    private final AtomicInteger scheduled_events = new AtomicInteger(0);
+    private final AtomicInteger scheduledEvents = new AtomicInteger(0);
 
     /**
      * Create a new SSL Handler, and initialize it.
@@ -128,7 +128,7 @@ class SslHandler {
      * @param sslContext
      * @throws SSLException
      */
-    /* no qualifier */SslHandler(SslFilter sslFilter, IoSession session) throws SSLException {
+    /* no qualifier */SslHandler(SslFilter sslFilter, IoSession session) {
         this.sslFilter = sslFilter;
         this.session = session;
     }
@@ -182,8 +182,6 @@ class SslHandler {
 
         // TODO : we may not need to call this method...
         // However, if we don't call it here, the tests are failing. Why?
-        sslEngine.beginHandshake();
-
         handshakeStatus = sslEngine.getHandshakeStatus();
 
         // Default value
@@ -306,7 +304,7 @@ class SslHandler {
     }
 
     /* no qualifier */void flushScheduledEvents() {
-        scheduled_events.incrementAndGet();
+        scheduledEvents.incrementAndGet();
 
         // Fire events only when the lock is available for this handler.
         if (sslLock.tryLock()) {
@@ -325,7 +323,7 @@ class SslHandler {
                         NextFilter nextFilter = event.getNextFilter();
                         nextFilter.messageReceived(session, event.getParameter());
                     }
-                } while (scheduled_events.decrementAndGet() > 0);
+                } while (scheduledEvents.decrementAndGet() > 0);
             } finally {
                 sslLock.unlock();
             }
@@ -342,11 +340,7 @@ class SslHandler {
      */
     /* no qualifier */void messageReceived(NextFilter nextFilter, ByteBuffer buf) throws SSLException {
         if (LOGGER.isDebugEnabled()) {
-            if (!isOutboundDone()) {
-                LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
-            } else {
-                LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
-            }
+            LOGGER.debug("{} Processing the received message", sslFilter.getSessionInfo(session));
         }
 
         // append buf to inNetBuffer
@@ -536,7 +530,6 @@ class SslHandler {
         for (;;) {
             switch (handshakeStatus) {
             case FINISHED:
-            case NOT_HANDSHAKING:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} processing the FINISHED state", sslFilter.getSessionInfo(session));
                 }
@@ -547,7 +540,6 @@ class SslHandler {
                 // Send the SECURE message only if it's the first SSL handshake
                 if (firstSSLNegociation && session.containsAttribute(SslFilter.USE_NOTIFICATION)) {
                     // SESSION_SECURED is fired only when it's the first handshake
-                    firstSSLNegociation = false;
                     scheduleMessageReceived(nextFilter, SslFilter.SESSION_SECURED);
                 }
 
@@ -585,6 +577,7 @@ class SslHandler {
                 break;
 
             case NEED_WRAP:
+            case NOT_HANDSHAKING:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} processing the NEED_WRAP state", sslFilter.getSessionInfo(session));
                 }
@@ -599,15 +592,13 @@ class SslHandler {
                 SSLEngineResult result;
                 createOutNetBuffer(0);
 
-                for (;;) {
+                result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
+
+                while ( result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW ) {
+                    outNetBuffer.capacity(outNetBuffer.capacity() << 1);
+                    outNetBuffer.limit(outNetBuffer.capacity());
+
                     result = sslEngine.wrap(emptyBuffer.buf(), outNetBuffer.buf());
-                    
-                    if (result.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-                        outNetBuffer.capacity(outNetBuffer.capacity() << 1);
-                        outNetBuffer.limit(outNetBuffer.capacity());
-                    } else {
-                        break;
-                    }
                 }
 
                 outNetBuffer.flip();
@@ -749,9 +740,8 @@ class SslHandler {
         }
 
         SSLEngineResult res;
-
         Status status;
-        HandshakeStatus handshakeStatus;
+        HandshakeStatus localHandshakeStatus;
 
         do {
             // Decode the incoming data
@@ -759,7 +749,7 @@ class SslHandler {
             status = res.getStatus();
 
             // We can be processing the Handshake
-            handshakeStatus = res.getHandshakeStatus();
+            localHandshakeStatus = res.getHandshakeStatus();
 
             if (status == SSLEngineResult.Status.BUFFER_OVERFLOW) {
                 // We have to grow the target buffer, it's too small.
@@ -776,8 +766,8 @@ class SslHandler {
                 continue;
             }
         } while (((status == SSLEngineResult.Status.OK) || (status == SSLEngineResult.Status.BUFFER_OVERFLOW))
-                && ((handshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) || 
-                        (handshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
+                && ((localHandshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) || 
+                        (localHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
 
         return res;
     }

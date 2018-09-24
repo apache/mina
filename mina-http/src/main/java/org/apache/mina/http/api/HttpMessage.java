@@ -58,6 +58,8 @@ public interface HttpMessage {
     String getHeader(String name);
 
     /**
+     * Tells if the message contains some header
+     * 
      * @param name the Header's name we are looking for
      * @return <tt>true</tt> if the HTTP header with the specified name exists in this request.
      */

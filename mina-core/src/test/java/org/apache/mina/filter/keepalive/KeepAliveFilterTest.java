@@ -23,6 +23,7 @@ import static org.apache.mina.filter.keepalive.KeepAliveRequestTimeoutHandler.EX
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -116,7 +117,7 @@ public class KeepAliveFilterTest {
             }
         });
 
-        ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port)).awaitUninterruptibly();
+        ConnectFuture future = connector.connect(new InetSocketAddress(InetAddress.getByName(null), port)).awaitUninterruptibly();
         IoSession session = future.getSession();
         assertNotNull(session);
 

@@ -20,8 +20,8 @@
 package org.apache.mina.http;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpServerEncoder implements ProtocolEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
-    private static final CharsetEncoder ENCODER = Charset.forName("UTF-8").newEncoder();
+    private static final CharsetEncoder ENCODER = StandardCharsets.UTF_8.newEncoder();
 
     /**
      * {@inheritDoc}

@@ -21,7 +21,7 @@ package org.apache.mina.example.gettingstarted.timeserver;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
@@ -56,7 +56,7 @@ public class MinaTimeServer {
         
         // Add two filters : a logger and a codec
         acceptor.getFilterChain().addLast( "logger", new LoggingFilter() );
-        acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName( "UTF-8" ))));
+        acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory( StandardCharsets.UTF_8)));
    
         // Attach the business logic to the server
         acceptor.setHandler( new TimeServerHandler() );

@@ -38,7 +38,10 @@ public class HttpServerCodec extends ProtocolCodecFilter {
     /** Key for the partial HTTP requests head */
     private static final String PARTIAL_HEAD_ATT = "http.ph";
 
+    /** The encoder instance */
     private static ProtocolEncoder encoder = new HttpServerEncoder();
+    
+    /** The decoder instance */
     private static ProtocolDecoder decoder = new HttpServerDecoder();
 
     /**

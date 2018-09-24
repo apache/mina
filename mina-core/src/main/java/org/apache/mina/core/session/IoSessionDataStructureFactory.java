@@ -19,6 +19,9 @@
  */
 package org.apache.mina.core.session;
 
+import java.util.Comparator;
+
+import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 
 /**

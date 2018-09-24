@@ -37,5 +37,4 @@ public class AmbiguousMethodException extends RuntimeException {
     public AmbiguousMethodException(String methodName) {
         super(methodName);
     }
-
 }

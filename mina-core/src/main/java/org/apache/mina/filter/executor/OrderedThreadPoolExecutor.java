@@ -192,13 +192,13 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
         }
 
-        if ((maximumPoolSize == 0) || (maximumPoolSize < corePoolSize)) {
+        if ((maximumPoolSize <= 0) || (maximumPoolSize < corePoolSize)) {
             throw new IllegalArgumentException("maximumPoolSize: " + maximumPoolSize);
         }
 
         // Now, we can setup the pool sizes
-        super.setCorePoolSize(corePoolSize);
         super.setMaximumPoolSize(maximumPoolSize);
+        super.setCorePoolSize(corePoolSize);
 
         // The queueHandler might be null.
         if (eventQueueHandler == null) {

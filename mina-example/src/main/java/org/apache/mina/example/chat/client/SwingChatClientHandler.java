@@ -19,6 +19,7 @@
  */
 package org.apache.mina.example.chat.client;
 
+import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.chat.ChatCommand;

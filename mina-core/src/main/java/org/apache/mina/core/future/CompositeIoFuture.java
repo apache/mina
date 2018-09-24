@@ -21,6 +21,8 @@ package org.apache.mina.core.future;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.mina.core.IoUtil;
+
 /**
  * An {@link IoFuture} of {@link IoFuture}s.  It is useful when you want to
  * get notified when all {@link IoFuture}s are complete.  It is not recommended

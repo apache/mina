@@ -21,6 +21,7 @@ package org.apache.mina.example.proxy.telnet;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 import org.apache.mina.core.RuntimeIoException;
@@ -100,8 +101,7 @@ public class ProxyTelnetTestClient {
         LineDelimiter delim = new LineDelimiter("\r\n");
         targetConnector.getFilterChain().addLast(
                 "codec",
-                new ProtocolCodecFilter(new TextLineCodecFactory(Charset
-                        .forName("UTF-8"), delim, delim)));
+                new ProtocolCodecFilter(new TextLineCodecFactory(StandardCharsets.UTF_8, delim, delim)));
 
         connector.setHandler(new TelnetSessionHandler());
 

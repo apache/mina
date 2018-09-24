@@ -65,12 +65,10 @@ public class DateUtil {
      * format to a <code>long</code> representing the number of milliseconds
      * since epoch.
      * 
-     * @param dateString a date <code>String</code> in the <em>RFC 1123</em>
-     *            format.
+     * @param dateString a date <code>String</code> in the <em>RFC 1123</em> format.
      * @return the parsed <code>Date</code> in milliseconds.
      */
     private static long parseDateStringToMilliseconds(String dateString) {
-
         try {
             synchronized (DateUtil.RFC_1123_FORMAT) {
                 return DateUtil.RFC_1123_FORMAT.parse(dateString).getTime(); //NOPMD
@@ -87,8 +85,7 @@ public class DateUtil {
      * parse the <code>String</code> as a <em>RFC 1123</em> date.
      * 
      * @param dateValue the value to parse.
-     * @return the <code>long</code> value following parse, or zero where not
-     *         successful.
+     * @return the <code>long</code> value following parse, or zero where not successful.
      */
     public static long parseToMilliseconds(String dateValue) {
         if (DateUtil.DIGIT_PATTERN.matcher(dateValue).matches()) {
@@ -127,5 +124,4 @@ public class DateUtil {
             return RFC_1123_FORMAT.format(date); //NOPMD
         }
     }
-
 }

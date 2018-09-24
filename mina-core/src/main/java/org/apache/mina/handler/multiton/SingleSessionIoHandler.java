@@ -122,5 +122,4 @@ public interface SingleSessionIoHandler {
      * @see IoHandler#messageSent(IoSession, Object)
      */
     void messageSent(Object message) throws Exception;
-
 }

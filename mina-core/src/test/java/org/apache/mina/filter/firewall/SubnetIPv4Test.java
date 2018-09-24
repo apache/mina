@@ -90,7 +90,7 @@ public class SubnetIPv4Test {
 
     @Test
     public void testToStringLiteral() throws UnknownHostException {
-        InetAddress a = InetAddress.getByName("127.0.0.1");
+        InetAddress a = InetAddress.getByName(null);
         Subnet mask = new Subnet(a, 32);
 
         assertEquals("127.0.0.1/32", mask.toString());

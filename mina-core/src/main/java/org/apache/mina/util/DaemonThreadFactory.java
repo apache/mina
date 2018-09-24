@@ -17,35 +17,27 @@
  *  under the License.
  *
  */
-package org.apache.mina.statemachine;
+package org.apache.mina.util;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
- * Exception used internally by {@link StateControl}.
+ * A Thread Factory that creates Daemon threads
+ * 
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-class BreakAndGotoException extends BreakException {
-    private static final long serialVersionUID = 711671882187950113L;
-
-    private final String stateId;
-
-    private final boolean now;
-
-    public BreakAndGotoException(String stateId, boolean now) {
-        if (stateId == null) {
-            throw new IllegalArgumentException("stateId");
-        }
+public class DaemonThreadFactory implements ThreadFactory {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Thread newThread(Runnable runnable) {
+        // Create daemon threads.
+        Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+        thread.setDaemon(true);
         
-        this.stateId = stateId;
-        this.now = now;
+        return thread;
     }
-
-    public boolean isNow() {
-        return now;
-    }
-
-    public String getStateId() {
-        return stateId;
-    }
-
 }

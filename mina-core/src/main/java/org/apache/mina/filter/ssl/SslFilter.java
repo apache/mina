@@ -159,7 +159,10 @@ public class SslFilter extends IoFilterAdapter {
     private final boolean autoStart;
 
     /** A flag used to determinate if the handshake should start immediately */
-    private static final boolean START_HANDSHAKE = true;
+    public static final boolean START_HANDSHAKE = true;
+
+    /** A flag used to determinate if the handshake should wait for the client to initiate the handshake */
+    public static final boolean CLIENT_HANDSHAKE = false;
 
     private boolean client;
 
@@ -173,7 +176,8 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
-     * The handshake will start immediately.
+     * The handshake will start immediately after the filter has been added
+     * to the chain.
      * 
      * @param sslContext The SSLContext to use
      */
@@ -184,7 +188,8 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
      * If the <tt>autostart</tt> flag is set to <tt>true</tt>, the
-     * handshake will start immediately.
+     * handshake will start immediately after the filter has been added
+     * to the chain.
      * 
      * @param sslContext The SSLContext to use
      * @param autoStart The flag used to tell the filter to start the handshake immediately
@@ -294,6 +299,26 @@ public class SslFilter extends IoFilterAdapter {
             return !sslHandler.isOutboundDone();
         }
     }
+
+    /**
+     * @return <tt>true</tt> if and only if the conditions for
+     * {@link #isSslStarted(IoSession)} are met, and the handhake has
+     * completed.
+     *
+     * @param session the session we want to check
+     */
+    public boolean isSecured(IoSession session) {
+        SslHandler sslHandler = (SslHandler) session.getAttribute(SSL_HANDLER);
+
+        if (sslHandler == null) {
+            return false;
+        }
+
+        synchronized (sslHandler) {
+            return !sslHandler.isOutboundDone() && sslHandler.isHandshakeComplete();
+        }
+    }
+
 
     /**
      * Stops the SSL session by sending TLS <tt>close_notify</tt> message to
@@ -496,6 +521,11 @@ public class SslFilter extends IoFilterAdapter {
                 IoBuffer buf = (IoBuffer) message;
 
                 try {
+                    if (sslHandler.isOutboundDone()) {
+                        sslHandler.destroy();
+                        throw new SSLException("Outbound done");
+                    }
+                    
                     // forward read encrypted data to SSL handler
                     sslHandler.messageReceived(nextFilter, buf.buf());
 
@@ -740,25 +770,28 @@ public class SslFilter extends IoFilterAdapter {
 
         // if already shut down
         try {
-            if (!sslHandler.closeOutbound()) {
-                return DefaultWriteFuture.newNotWrittenFuture(session, new IllegalStateException(
-                        "SSL session is shut down already."));
-            }
-
-            // there might be data to write out here?
-            future = sslHandler.writeNetBuffer(nextFilter);
-
-            if (future == null) {
-                future = DefaultWriteFuture.newWrittenFuture(session);
-            }
-
-            if (sslHandler.isInboundDone()) {
-                sslHandler.destroy();
+            synchronized(sslHandler) {
+                if (!sslHandler.closeOutbound()) {
+                    return DefaultWriteFuture.newNotWrittenFuture(session, new IllegalStateException(
+                            "SSL session is shut down already."));
+                }
+    
+                // there might be data to write out here?
+                future = sslHandler.writeNetBuffer(nextFilter);
+    
+                if (future == null) {
+                    future = DefaultWriteFuture.newWrittenFuture(session);
+                }
+    
+                if (sslHandler.isInboundDone()) {
+                    sslHandler.destroy();
+                }
             }
 
             if (session.containsAttribute(USE_NOTIFICATION)) {
                 sslHandler.scheduleMessageReceived(nextFilter, SESSION_UNSECURED);
             }
+            
         } catch (SSLException se) {
             sslHandler.release();
             throw se;
@@ -801,8 +834,10 @@ public class SslFilter extends IoFilterAdapter {
             throw new IllegalStateException();
         }
 
-        if (sslHandler.getSslFilter() != this) {
-            throw new IllegalArgumentException("Not managed by this filter.");
+        synchronized(sslHandler) {
+            if (sslHandler.getSslFilter() != this) {
+                throw new IllegalArgumentException("Not managed by this filter.");
+            }
         }
 
         return sslHandler;

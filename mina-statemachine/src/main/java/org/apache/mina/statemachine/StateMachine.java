@@ -21,11 +21,12 @@ package org.apache.mina.statemachine;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.event.Event;
@@ -55,14 +56,16 @@ public class StateMachine {
     private final Map<String, State> states;
 
     private final ThreadLocal<Boolean> processingThreadLocal = new ThreadLocal<Boolean>() {
+        @Override
         protected Boolean initialValue() {
             return Boolean.FALSE;
         }
     };
 
     private final ThreadLocal<LinkedList<Event>> eventQueueThreadLocal = new ThreadLocal<LinkedList<Event>>() {
+        @Override
         protected LinkedList<Event> initialValue() {
-            return new LinkedList<Event>();
+            return new LinkedList<>();
         }
     };
 
@@ -74,10 +77,12 @@ public class StateMachine {
      * @param startStateId the id of the start {@link State}.
      */
     public StateMachine(State[] states, String startStateId) {
-        this.states = new HashMap<String, State>();
+        this.states = new HashMap<>();
+        
         for (State s : states) {
             this.states.put(s.getId(), s);
         }
+        
         this.startState = getState(startStateId);
     }
 
@@ -99,11 +104,13 @@ public class StateMachine {
      * @return the {@link State}
      * @throws NoSuchStateException if no matching {@link State} could be found.
      */
-    public State getState(String id) throws NoSuchStateException {
+    public State getState(String id) {
         State state = states.get(id);
+        
         if (state == null) {
             throw new NoSuchStateException(id);
         }
+        
         return state;
     }
 
@@ -138,21 +145,22 @@ public class StateMachine {
                  * event.
                  */
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("State machine called recursively. Queuing event " + event + " for later processing.");
+                    LOGGER.debug("State machine called recursively. Queuing event {} for later processing.", event);
                 }
             } else {
                 processingThreadLocal.set(true);
+                
                 try {
                     if (context.getCurrentState() == null) {
                         context.setCurrentState(startState);
                     }
+                    
                     processEvents(eventQueue);
                 } finally {
                     processingThreadLocal.set(false);
                 }
             }
         }
-
     }
 
     private void processEvents(LinkedList<Event> eventQueue) {
@@ -168,82 +176,91 @@ public class StateMachine {
 
         for (Transition t : state.getTransitions()) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Trying transition " + t);
+                LOGGER.debug("Trying transition {}", t);
             }
 
             try {
                 if (t.execute(event)) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Transition " + t + " executed successfully.");
+                        LOGGER.debug("Transition {} executed successfully.", t);
                     }
+                    
                     setCurrentState(context, t.getNextState());
 
                     return;
                 }
             } catch (BreakAndContinueException bace) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("BreakAndContinueException thrown in " + "transition " + t
-                            + ". Continuing with next transition.");
+                    LOGGER.debug("BreakAndContinueException thrown in transition {}. Continuing with next transition.", t);
                 }
             } catch (BreakAndGotoException bage) {
                 State newState = getState(bage.getStateId());
 
                 if (bage.isNow()) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("BreakAndGotoException thrown in " + "transition " + t + ". Moving to state "
-                                + newState.getId() + " now.");
+                        LOGGER.debug("BreakAndGotoException thrown in transition {}. Moving to state {} now", t,
+                            newState.getId());
                     }
+                    
                     setCurrentState(context, newState);
                     handle(newState, event);
                 } else {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("BreakAndGotoException thrown in " + "transition " + t + ". Moving to state "
-                                + newState.getId() + " next.");
+                        LOGGER.debug("BreakAndGotoException thrown in transition {}. Moving to state {} next.",
+                                t, newState.getId());
                     }
+                    
                     setCurrentState(context, newState);
                 }
+                
                 return;
             } catch (BreakAndCallException bace) {
                 State newState = getState(bace.getStateId());
 
-                Stack<State> callStack = getCallStack(context);
+                Deque<State> callStack = getCallStack(context);
                 State returnTo = bace.getReturnToStateId() != null ? getState(bace.getReturnToStateId()) : context
                         .getCurrentState();
                 callStack.push(returnTo);
 
                 if (bace.isNow()) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("BreakAndCallException thrown in " + "transition " + t + ". Moving to state "
-                                + newState.getId() + " now.");
+                        LOGGER.debug("BreakAndCallException thrown in transition {}. Moving to state {} now.",
+                                t, newState.getId());
                     }
+                    
                     setCurrentState(context, newState);
                     handle(newState, event);
                 } else {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("BreakAndCallException thrown in " + "transition " + t + ". Moving to state "
-                                + newState.getId() + " next.");
+                        LOGGER.debug("BreakAndCallException thrown in transition {}. Moving to state {} next.",
+                                t, newState.getId());
                     }
+                    
                     setCurrentState(context, newState);
                 }
+                
                 return;
             } catch (BreakAndReturnException bare) {
-                Stack<State> callStack = getCallStack(context);
+                Deque<State> callStack = getCallStack(context);
                 State newState = callStack.pop();
 
                 if (bare.isNow()) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("BreakAndReturnException thrown in " + "transition " + t + ". Moving to state "
-                                + newState.getId() + " now.");
+                        LOGGER.debug("BreakAndReturnException thrown in transition {}. Moving to state {} now.",
+                                t, newState.getId());
                     }
+                    
                     setCurrentState(context, newState);
                     handle(newState, event);
                 } else {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("BreakAndReturnException thrown in " + "transition " + t + ". Moving to state "
-                                + newState.getId() + " next.");
+                        LOGGER.debug("BreakAndReturnException thrown in transition {}. Moving to state {} next.",
+                                t, newState.getId());
                     }
+                    
                     setCurrentState(context, newState);
                 }
+                
                 return;
             }
         }
@@ -252,7 +269,6 @@ public class StateMachine {
          * No transition could handle the event. Try with the parent state if
          * there is one.
          */
-
         if (state.getParent() != null) {
             handle(state.getParent(), event);
         } else {
@@ -260,13 +276,15 @@ public class StateMachine {
         }
     }
 
-    private Stack<State> getCallStack(StateContext context) {
+    private Deque<State> getCallStack(StateContext context) {
         @SuppressWarnings("unchecked")
-        Stack<State> callStack = (Stack<State>) context.getAttribute(CALL_STACK);
+        Deque<State> callStack = (Deque<State>) context.getAttribute(CALL_STACK);
+        
         if (callStack == null) {
-            callStack = new Stack<State>();
+            callStack = new ConcurrentLinkedDeque<>();
             context.setAttribute(CALL_STACK, callStack);
         }
+        
         return callStack;
     }
 
@@ -274,10 +292,11 @@ public class StateMachine {
         if (newState != null) {
             if (LOGGER.isDebugEnabled()) {
                 if (newState != context.getCurrentState()) {
-                    LOGGER.debug("Leaving state " + context.getCurrentState().getId());
-                    LOGGER.debug("Entering state " + newState.getId());
+                    LOGGER.debug("Leaving state {}", context.getCurrentState().getId());
+                    LOGGER.debug("Entering state {}", newState.getId());
                 }
             }
+            
             executeOnExits(context, context.getCurrentState());
             executeOnEntries(context, newState);
             context.setCurrentState(newState);
@@ -288,16 +307,19 @@ public class StateMachine {
         List<SelfTransition> onExits = state.getOnExitSelfTransitions();
         boolean isExecuted = false;
 
-        if (onExits != null)
+        if (onExits != null) {
             for (SelfTransition selfTransition : onExits) {
                 selfTransition.execute(context, state);
+                
                 if (LOGGER.isDebugEnabled()) {
                     isExecuted = true;
-                    LOGGER.debug("Executing onEntry action for " + state.getId());
+                    LOGGER.debug("Executing onEntry action for {}", state.getId());
                 }
             }
+        }
+        
         if (LOGGER.isDebugEnabled() && !isExecuted) {
-            LOGGER.debug("No onEntry action for " + state.getId());
+            LOGGER.debug("No onEntry action for {}", state.getId());
 
         }
     }
@@ -306,19 +328,19 @@ public class StateMachine {
         List<SelfTransition> onEntries = state.getOnEntrySelfTransitions();
         boolean isExecuted = false;
 
-        if (onEntries != null)
+        if (onEntries != null) {
             for (SelfTransition selfTransition : onEntries) {
                 selfTransition.execute(context, state);
+                
                 if (LOGGER.isDebugEnabled()) {
                     isExecuted = true;
-                    LOGGER.debug("Executing onExit action for " + state.getId());
+                    LOGGER.debug("Executing onExit action for {}", state.getId());
                 }
             }
-        if (LOGGER.isDebugEnabled() && !isExecuted) {
-            LOGGER.debug("No onEntry action for " + state.getId());
-
         }
-
+        
+        if (LOGGER.isDebugEnabled() && !isExecuted) {
+            LOGGER.debug("No onEntry action for {}", state.getId());
+        }
     }
-
 }

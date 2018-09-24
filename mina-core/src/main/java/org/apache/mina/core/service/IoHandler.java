@@ -19,6 +19,8 @@
  */
 package org.apache.mina.core.service;
 
+import java.io.IOException;
+
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 

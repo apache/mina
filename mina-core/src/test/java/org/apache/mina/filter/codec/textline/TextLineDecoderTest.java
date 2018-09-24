@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
@@ -40,9 +41,9 @@ import org.junit.Test;
 public class TextLineDecoderTest {
     @Test
     public void testNormalDecode() throws Exception {
-        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"), LineDelimiter.WINDOWS);
+        TextLineDecoder decoder = new TextLineDecoder(StandardCharsets.UTF_8, LineDelimiter.WINDOWS);
 
-        CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+        CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
         ProtocolCodecSession session = new ProtocolCodecSession();
         ProtocolDecoderOutput out = session.getDecoderOutput();
         IoBuffer in = IoBuffer.allocate(16);
@@ -85,7 +86,7 @@ public class TextLineDecoderTest {
         assertEquals("ABC\r", session.getDecoderOutputQueue().poll());
 
         // Test splitted long delimiter
-        decoder = new TextLineDecoder(Charset.forName("UTF-8"), new LineDelimiter("\n\n\n"));
+        decoder = new TextLineDecoder(StandardCharsets.UTF_8, new LineDelimiter("\n\n\n"));
         in.clear();
         in.putString("PQR\n", encoder);
         in.flip();
@@ -104,7 +105,7 @@ public class TextLineDecoderTest {
         assertEquals("PQR", session.getDecoderOutputQueue().poll());
 
         // Test splitted long delimiter which produces two output
-        decoder = new TextLineDecoder(Charset.forName("UTF-8"), new LineDelimiter("\n\n\n"));
+        decoder = new TextLineDecoder(StandardCharsets.UTF_8, new LineDelimiter("\n\n\n"));
         in.clear();
         in.putString("PQR\n", encoder);
         in.flip();
@@ -124,7 +125,7 @@ public class TextLineDecoderTest {
         assertEquals("STU", session.getDecoderOutputQueue().poll());
 
         // Test splitted long delimiter mixed with partial non-delimiter.
-        decoder = new TextLineDecoder(Charset.forName("UTF-8"), new LineDelimiter("\n\n\n"));
+        decoder = new TextLineDecoder(StandardCharsets.UTF_8, new LineDelimiter("\n\n\n"));
         in.clear();
         in.putString("PQR\n", encoder);
         in.flip();
@@ -145,9 +146,9 @@ public class TextLineDecoderTest {
     }
 
     public void testAutoDecode() throws Exception {
-        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"), LineDelimiter.AUTO);
+        TextLineDecoder decoder = new TextLineDecoder(StandardCharsets.UTF_8, LineDelimiter.AUTO);
 
-        CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+        CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
         ProtocolCodecSession session = new ProtocolCodecSession();
         ProtocolDecoderOutput out = session.getDecoderOutput();
         IoBuffer in = IoBuffer.allocate(16);
@@ -257,10 +258,10 @@ public class TextLineDecoderTest {
     }
 
     public void testOverflow() throws Exception {
-        TextLineDecoder decoder = new TextLineDecoder(Charset.forName("UTF-8"), LineDelimiter.AUTO);
+        TextLineDecoder decoder = new TextLineDecoder(StandardCharsets.UTF_8, LineDelimiter.AUTO);
         decoder.setMaxLineLength(3);
 
-        CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+        CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
         ProtocolCodecSession session = new ProtocolCodecSession();
         ProtocolDecoderOutput out = session.getDecoderOutput();
         IoBuffer in = IoBuffer.allocate(16);

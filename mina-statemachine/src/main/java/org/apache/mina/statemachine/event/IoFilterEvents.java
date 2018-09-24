@@ -59,6 +59,9 @@ public enum IoFilterEvents {
     /** The Write event */ 
     WRITE("filterWrite"), 
     
+    /** The InputClosed event */
+    INPUT_CLOSED("inputClosed"),
+    
     /** The Set Traffic Mask event */ 
     SET_TRAFFIC_MASK("filterSetTrafficMask");
 

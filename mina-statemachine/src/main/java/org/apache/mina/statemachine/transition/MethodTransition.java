@@ -26,7 +26,6 @@ import java.util.Arrays;
 import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.StateMachine;
 import org.apache.mina.statemachine.StateMachineFactory;
-import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.event.Event;
 import org.slf4j.Logger;
@@ -189,11 +188,16 @@ public class MethodTransition extends AbstractTransition {
         return target;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean doExecute(Event event) {
         Class<?>[] types = method.getParameterTypes();
 
         if (types.length == 0) {
             invokeMethod(EMPTY_ARGUMENTS);
+            
             return true;
         }
 
@@ -204,13 +208,17 @@ public class MethodTransition extends AbstractTransition {
         Object[] args = new Object[types.length];
 
         int i = 0;
+        
         if (match(types[i], event, Event.class)) {
             args[i++] = event;
         }
+        
         if (i < args.length && match(types[i], event.getContext(), StateContext.class)) {
             args[i++] = event.getContext();
         }
+        
         Object[] eventArgs = event.getArguments();
+        
         for (int j = 0; i < args.length && j < eventArgs.length; j++) {
             if (match(types[i], eventArgs[j], Object.class)) {
                 args[i++] = eventArgs[j];
@@ -231,28 +239,36 @@ public class MethodTransition extends AbstractTransition {
             if (paramType.equals(Boolean.TYPE)) {
                 return arg instanceof Boolean;
             }
+            
             if (paramType.equals(Integer.TYPE)) {
                 return arg instanceof Integer;
             }
+            
             if (paramType.equals(Long.TYPE)) {
                 return arg instanceof Long;
             }
+            
             if (paramType.equals(Short.TYPE)) {
                 return arg instanceof Short;
             }
+            
             if (paramType.equals(Byte.TYPE)) {
                 return arg instanceof Byte;
             }
+            
             if (paramType.equals(Double.TYPE)) {
                 return arg instanceof Double;
             }
+            
             if (paramType.equals(Float.TYPE)) {
                 return arg instanceof Float;
             }
+            
             if (paramType.equals(Character.TYPE)) {
                 return arg instanceof Character;
             }
         }
+        
         return argType.isAssignableFrom(paramType) && paramType.isAssignableFrom(arg.getClass());
     }
 
@@ -261,17 +277,20 @@ public class MethodTransition extends AbstractTransition {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Executing method " + method + " with arguments " + Arrays.asList(arguments));
             }
+            
             method.invoke(target, arguments);
         } catch (InvocationTargetException ite) {
             if (ite.getCause() instanceof RuntimeException) {
                 throw (RuntimeException) ite.getCause();
             }
+            
             throw new MethodInvocationException(method, ite);
         } catch (IllegalAccessException iae) {
             throw new MethodInvocationException(method, iae);
         }
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -286,6 +305,7 @@ public class MethodTransition extends AbstractTransition {
         return method.equals(that.method) && target.equals(that.target);
     }
 
+    @Override
     public int hashCode() {
         int h = 17;
         h = h*37 + super.hashCode();
@@ -295,6 +315,7 @@ public class MethodTransition extends AbstractTransition {
         return h;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         

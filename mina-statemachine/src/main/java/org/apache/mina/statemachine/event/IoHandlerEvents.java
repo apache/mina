@@ -44,11 +44,14 @@ public enum IoHandlerEvents {
     /** The Session Idle event */
     SESSION_IDLE("sessionIdle"), 
     
-    /** The Message Recived event */
+    /** The Message Received event */
     MESSAGE_RECEIVED("messageReceived"), 
     
     /** The Message Sent event */
     MESSAGE_SENT("messageSent"), 
+    
+    /** The InputClosed event */
+    INPUT_CLOSED("inputClosed"), 
     
     /** The Exception Caught event */
     EXCEPTION_CAUGHT("exceptionCaught");

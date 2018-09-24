@@ -19,6 +19,8 @@
  */
 package org.apache.mina.core.session;
 
+import java.util.concurrent.BlockingQueue;
+
 /**
  * The configuration of {@link IoSession}.
  *

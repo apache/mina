@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -45,7 +46,7 @@ public class AcceptorTest extends AbstractTest {
 
     @Test
     public void testTCP() throws Exception {
-        testTCP0(new Socket("127.0.0.1", port));
+        testTCP0(new Socket(InetAddress.getByName(null), port));
     }
 
     @Test
@@ -61,7 +62,7 @@ public class AcceptorTest extends AbstractTest {
     }
 
     private void testTCP0(Socket client) throws Exception {
-        client.setSoTimeout(3000);
+        client.setSoTimeout(300000);
         byte[] writeBuf = new byte[16];
 
         for (int i = 0; i < 10; i++) {
@@ -103,7 +104,7 @@ public class AcceptorTest extends AbstractTest {
 
     public void testUDP() throws Exception {
         DatagramSocket client = new DatagramSocket();
-        client.connect(new InetSocketAddress("127.0.0.1", port));
+        client.connect(new InetSocketAddress(InetAddress.getByName(null), port));
         client.setSoTimeout(500);
 
         byte[] writeBuf = new byte[16];

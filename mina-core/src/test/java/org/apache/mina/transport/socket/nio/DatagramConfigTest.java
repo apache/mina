@@ -22,6 +22,7 @@ package org.apache.mina.transport.socket.nio;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -80,7 +81,7 @@ public class DatagramConfigTest {
 
         try {
             connector.setHandler(new IoHandlerAdapter());
-            ConnectFuture future = connector.connect(new InetSocketAddress("127.0.0.1", port));
+            ConnectFuture future = connector.connect(new InetSocketAddress(InetAddress.getByName(null), port));
             future.awaitUninterruptibly();
 
             WriteFuture writeFuture = future.getSession().write(IoBuffer.allocate(16).putInt(0).flip());

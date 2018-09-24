@@ -240,6 +240,13 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * @return {@link Iterator} of {@link IoSession}
      */
     protected abstract Iterator<S> allSessions();
+    
+    /**
+     * Get the number of {@link IoSession} polled by this {@link IoProcessor}
+     *
+     * @return the number of sessions attached to this {@link IoProcessor}
+     */
+    protected abstract int allSessionsCount();
 
     /**
      * Get an {@link Iterator} for the list of {@link IoSession} found selected
@@ -596,7 +603,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
         public void run() {
             assert processorRef.get() == this;
 
-            int nSessions = 0;
             lastIdleCheckTime = System.currentTimeMillis();
             int nbTries = 10;
 
@@ -641,9 +647,31 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     } else {
                         nbTries = 10;
                     }
-
+                    
                     // Manage newly created session first
-                    nSessions += handleNewSessions();
+                    if(handleNewSessions() == 0) {
+                        // Get a chance to exit the infinite loop if there are no
+                        // more sessions on this Processor
+                        if (allSessionsCount() == 0) {
+                            processorRef.set(null);
+
+                            if (newSessions.isEmpty() && isSelectorEmpty()) {
+                                // newSessions.add() precedes startupProcessor
+                                assert processorRef.get() != this;
+                                break;
+                            }
+
+                            assert processorRef.get() != this;
+
+                            if (!processorRef.compareAndSet(null, this)) {
+                                // startupProcessor won race, so must exit processor
+                                assert processorRef.get() != this;
+                                break;
+                            }
+
+                            assert processorRef.get() == this;
+                        }
+                    }
 
                     updateTrafficMask();
 
@@ -654,39 +682,17 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                         // the MDCFilter test...
                         process();
                     }
-
+                    
                     // Write the pending requests
                     long currentTime = System.currentTimeMillis();
                     flush(currentTime);
-
-                    // And manage removed sessions
-                    nSessions -= removeSessions();
-
+                    
                     // Last, not least, send Idle events to the idle sessions
                     notifyIdleSessions(currentTime);
-
-                    // Get a chance to exit the infinite loop if there are no
-                    // more sessions on this Processor
-                    if (nSessions == 0) {
-                        processorRef.set(null);
-
-                        if (newSessions.isEmpty() && isSelectorEmpty()) {
-                            // newSessions.add() precedes startupProcessor
-                            assert processorRef.get() != this;
-                            break;
-                        }
-
-                        assert processorRef.get() != this;
-
-                        if (!processorRef.compareAndSet(null, this)) {
-                            // startupProcessor won race, so must exit processor
-                            assert processorRef.get() != this;
-                            break;
-                        }
-
-                        assert processorRef.get() == this;
-                    }
-
+                    
+                    // And manage removed sessions
+                    removeSessions();
+                    
                     // Disconnect all sessions immediately if disposal has been
                     // requested so that we exit this loop eventually.
                     if (isDisposing()) {
@@ -695,15 +701,14 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                         for (Iterator<S> i = allSessions(); i.hasNext();) {
                             IoSession session = i.next();
 
+                            scheduleRemove((S) session);
+
                             if (session.isActive()) {
-                                scheduleRemove((S) session);
                                 hasKeys = true;
                             }
                         }
 
-                        if (hasKeys) {
-                            wakeup();
-                        }
+                        wakeup();
                     }
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
@@ -1085,8 +1090,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             return localWrittenBytes;
         }
 
-        private int writeBuffer(S session, WriteRequest req, boolean hasFragmentation, int maxLength, long currentTime)
-                throws Exception {
+        private int writeBuffer(S session, WriteRequest req, boolean hasFragmentation, int maxLength, long currentTime) throws Exception {
             IoBuffer buf = (IoBuffer) req.getMessage();
             int localWrittenBytes = 0;
 
@@ -1106,30 +1110,37 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // peer : let's close the session.
                     buf.free();
                     session.closeNow();
-                    removeNow(session);
+                    this.removeNow(session);
 
                     return 0;
                 }
-            }
 
-            session.increaseWrittenBytes(localWrittenBytes, currentTime);
+                session.increaseWrittenBytes(localWrittenBytes, currentTime);
 
-            // Now, forward the original message
-            if (!buf.hasRemaining() || (!hasFragmentation && (localWrittenBytes != 0))) {
-                // Buffer has been sent, clear the current request.
-                Object originalMessage = req.getOriginalRequest().getMessage();
+                // Now, forward the original message
+                if (!buf.hasRemaining() || (!hasFragmentation && (localWrittenBytes != 0))) {
+                    WriteRequest originalRequest = req.getOriginalRequest();
 
-                if (originalMessage instanceof IoBuffer) {
-                    buf = (IoBuffer) req.getOriginalRequest().getMessage();
+                    if (originalRequest != null) {
+                        Object originalMessage = originalRequest.getMessage();
 
-                    int pos = buf.position();
-                    buf.reset();
-                    fireMessageSent(session, req);
-                    // And set it back to its position
-                    buf.position(pos);
-                } else {
-                    fireMessageSent(session, req);
+                        if (originalMessage instanceof IoBuffer) {
+                            buf = (IoBuffer) originalMessage;
+
+                            int pos = buf.position();
+                            buf.reset();
+                            this.fireMessageSent(session, req);
+                            // And set it back to its position
+                            buf.position(pos);
+                        } else {
+                            this.fireMessageSent(session, req);
+                        }
+                    } else {
+                        this.fireMessageSent(session, req);
+                    }
                 }
+            } else {
+                this.fireMessageSent(session, req);
             }
 
             return localWrittenBytes;

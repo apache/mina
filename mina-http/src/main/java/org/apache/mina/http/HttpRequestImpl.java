@@ -36,15 +36,19 @@ import org.apache.mina.http.api.HttpVersion;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class HttpRequestImpl implements HttpRequest {
-    
+    /** The HTTP version */
     private final HttpVersion version;
 
+    /** The HTTP method */
     private final HttpMethod method;
 
+    /** The requested path */
     private final String requestedPath;
     
+    /** The query string */
     private final String queryString;
 
+    /** The set of headers */
     private final Map<String, String> headers;
 
     /**
@@ -145,18 +149,23 @@ public class HttpRequestImpl implements HttpRequest {
     public Map<String, List<String>> getParameters() {
         Map<String, List<String>> parameters = new HashMap<>();
         String[] params = queryString.split("&");
+        
         if (params.length == 1) {
             return parameters;
         }
-        for (int i = 0; i < params.length; i++) {
-            String[] param = params[i].split("=");
+        
+        for (String parameter:params) {
+            String[] param = parameter.split("=");
             String name = param[0];
             String value = param.length == 2 ? param[1] : "";
+            
             if (!parameters.containsKey(name)) {
                 parameters.put(name, new ArrayList<String>());
             }
+            
             parameters.get(name).add(value);
         }
+        
         return parameters;
     }
     

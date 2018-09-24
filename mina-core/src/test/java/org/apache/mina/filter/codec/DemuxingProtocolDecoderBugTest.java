@@ -96,6 +96,7 @@ public class DemuxingProtocolDecoderBugTest {
 
     /**
      * Test a decoding with fragmentation
+     * @throws Exception If the test failed
      */
     @Test
     public void testFragmentedTransport() throws Exception {
@@ -104,6 +105,7 @@ public class DemuxingProtocolDecoderBugTest {
 
     /**
      * Test a decoding without fragmentation
+     * @throws Exception If the test failed
      */
     @Test
     public void testNonFragmentedTransport() throws Exception {

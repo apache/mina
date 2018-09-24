@@ -35,6 +35,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface TransitionAnnotation {
-    /** The specific annotation class */
+    /** 
+     * The specific annotation class
+     * 
+     * @return The annotated class 
+     **/
     Class<? extends Annotation> value();
 }

@@ -19,7 +19,8 @@
  */
 package org.apache.mina.filter.ssl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
@@ -116,7 +117,6 @@ public class SslDIRMINA937Test {
         //sslFilter.setEnabledCipherSuites(getClientCipherSuites());
         filters.addLast("sslFilter", sslFilter);
         connector.setHandler(new IoHandlerAdapter() {
-            @Override
             public void sessionCreated(IoSession session) throws Exception {
                 session.setAttribute(SslFilter.USE_NOTIFICATION, Boolean.TRUE);
             }
@@ -127,8 +127,6 @@ public class SslDIRMINA937Test {
                     counter.countDown();
                 }
             }
-
-
         });
         connector.connect(new InetSocketAddress("localhost", port));
     }
@@ -155,6 +153,8 @@ public class SslDIRMINA937Test {
 
     /**
      * Test is ignore as it will cause the build to fail
+     * 
+     * @throws Exception If the test failed
      */
     @Test
     @Ignore("This test is not yet fully functionnal, it servers as the basis for validating DIRMINA-937")

@@ -21,7 +21,7 @@ package org.apache.mina.filter.codec.textline;
 
 import static org.junit.Assert.assertEquals;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecSession;
@@ -36,7 +36,7 @@ import org.junit.Test;
 public class TextLineEncoderTest {
     @Test
     public void testEncode() throws Exception {
-        TextLineEncoder encoder = new TextLineEncoder(Charset.forName("UTF-8"), LineDelimiter.WINDOWS);
+        TextLineEncoder encoder = new TextLineEncoder(StandardCharsets.UTF_8, LineDelimiter.WINDOWS);
         ProtocolCodecSession session = new ProtocolCodecSession();
         ProtocolEncoderOutput out = session.getEncoderOutput();
 

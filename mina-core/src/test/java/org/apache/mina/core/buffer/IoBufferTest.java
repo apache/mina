@@ -34,6 +34,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
@@ -426,8 +427,8 @@ public class IoBufferTest {
     }
 
     /**
-     * Test that we can't allocate a buffser with a negative value
-     * @throws Exception
+     * Test that we can't allocate a buffer with a negative value
+     * @throws Exception If allocation failed
      */
     @Test(expected=IllegalArgumentException.class)
     public void testAllocateNegative() throws Exception {
@@ -580,7 +581,7 @@ public class IoBufferTest {
         IoBuffer buf = IoBuffer.allocate(16);
         CharsetDecoder decoder;
 
-        Charset charset = Charset.forName("UTF-8");
+        Charset charset = StandardCharsets.UTF_8;
         buf.clear();
         buf.putString("hello", charset.newEncoder());
         buf.put((byte) 0);
@@ -901,7 +902,7 @@ public class IoBufferTest {
                 IoBuffer buffer = IoBuffer.allocate(1);
                 buffer.setAutoExpand(true);
 
-                Charset charset = Charset.forName("UTF-8");
+                Charset charset = StandardCharsets.UTF_8;
 
                 CharsetEncoder encoder = charset.newEncoder();
 

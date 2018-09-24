@@ -37,7 +37,7 @@ public class ArrayUtil {
      */
     public static String[] dropFromEndWhile(String[] array, String regex) {
         for (int i = array.length - 1; i >= 0; i--) {
-            if (!"".equals(array[i].trim())) {
+            if (array[i].trim().length() != 0) {
                 String[] trimmedArray = new String[i + 1];
                 System.arraycopy(array, 0, trimmedArray, 0, i + 1);
                 

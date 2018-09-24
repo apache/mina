@@ -123,14 +123,17 @@ public class AuthenticationHandler {
     public void sessionClosed(NextFilter nextFilter, IoSession session) {
         nextFilter.sessionClosed(session);
     }
+    
     @IoFilterTransition(on = EXCEPTION_CAUGHT, in = DONE)
     public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) {
         nextFilter.exceptionCaught(session, cause);
     }
+    
     @IoFilterTransition(on = MESSAGE_RECEIVED, in = DONE)
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) {
         nextFilter.messageReceived(session, message);
     }
+    
     @IoFilterTransition(on = MESSAGE_SENT, in = DONE)
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) {
         nextFilter.messageSent(session, writeRequest);
@@ -140,8 +143,14 @@ public class AuthenticationHandler {
     public void filterClose(NextFilter nextFilter, IoSession session) {
         nextFilter.filterClose(session);
     }
+    
     @IoFilterTransition(on = WRITE, in = ROOT)
     public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) {
         nextFilter.filterWrite(session, writeRequest);
+    }
+    
+    @IoFilterTransition(on = INPUT_CLOSED, in = ROOT)
+    public void inputClosed(NextFilter nextFilter, IoSession session) {
+        nextFilter.inputClosed(session);
     }
 }

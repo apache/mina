@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>mina-parent</artifactId>
-    <version>2.0.17-SNAPSHOT</version>
+    <version>2.0.20-SNAPSHOT</version>
   </parent>
 
   <artifactId>mina-integration-jmx</artifactId>
@@ -80,6 +80,7 @@
               org.apache.mina.core.session;version=${project.version},
               org.apache.mina.filter.executor;version=${project.version},
               org.apache.mina.integration.beans;version=${project.version},
+              org.apache.mina.integration.ognl;version=${project.version},
               org.slf4j;version=${osgi-min-version.slf4j.api}
             </Import-Package>
           </instructions>
