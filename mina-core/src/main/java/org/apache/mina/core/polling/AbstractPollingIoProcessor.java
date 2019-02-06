@@ -1157,7 +1157,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 filterChain.fireExceptionCaught(e);
             } finally {
                 try {
-                    clearWriteRequestQueue(session);
                     ((AbstractIoService) session.getService()).getListeners().fireSessionDestroyed(session);
                 } catch (Exception e) {
                     // The session was either destroyed or not at this point.
@@ -1166,6 +1165,8 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // the return value by bubbling up.
                     IoFilterChain filterChain = session.getFilterChain();
                     filterChain.fireExceptionCaught(e);
+                } finally {
+                    clearWriteRequestQueue(session);
                 }
             }
 
