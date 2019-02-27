@@ -38,7 +38,7 @@
   </organization>
 
   <groupId>org.apache.mina</groupId>
-  <version>2.1.1-SNAPSHOT</version>
+  <version>2.1.0-SNAPSHOT</version>
   <artifactId>mina-parent</artifactId>
   <name>Apache MINA</name>
   <packaging>pom</packaging>
@@ -52,9 +52,9 @@
   </issueManagement>
 
   <scm>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/mina.git</connection>
+    <connection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</connection>
     <url>https://github.com/apache/mina/tree/2.0</url>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/mina.git</developerConnection>
+    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -105,7 +105,7 @@
     <version.compiler.plugin>3.8.0</version.compiler.plugin>
     <version.dashboard.plugin>1.0.0-beta-1</version.dashboard.plugin>
     <version.dependency.plugin>3.1.1</version.dependency.plugin>
-    <version.deploy.plugin>2.8.2</version.deploy.plugin>
+    <version.deploy.plugin>3.0.0-M1</version.deploy.plugin>
     <version.docck.plugin>1.1</version.docck.plugin>
     <version.eclipse.plugin>2.10</version.eclipse.plugin>
     <version.enforcer.plugin>3.0.0-M2</version.enforcer.plugin>
@@ -792,9 +792,6 @@
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
-          <tagBase>
-            https://svn.apache.org/repos/asf/mina/mina/tags
-          </tagBase>
           <preparationGoals>clean install</preparationGoals>
           <goals>clean deploy</goals>
           <mavenExecutorId>forked-path</mavenExecutorId>
