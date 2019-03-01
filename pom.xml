@@ -127,7 +127,7 @@
     <version.release.plugin>2.5.3</version.release.plugin>
     <version.remote.resources.plugin>1.6.0</version.remote.resources.plugin>
     <version.resources.plugin>3.1.0</version.resources.plugin>
-    <version.scm.plugin>1.11.1</version.scm.plugin>
+    <version.scm.plugin>1.9.5</version.scm.plugin>
     <version.site.plugin>3.7.1</version.site.plugin>
     <version.source.plugin>3.0.1</version.source.plugin>
     <version.shade.plugin>3.2.1</version.shade.plugin>
