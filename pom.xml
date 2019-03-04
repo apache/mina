@@ -38,7 +38,7 @@
   </organization>
 
   <groupId>org.apache.mina</groupId>
-  <version>2.1.0</version>
+  <version>2.1.1-SNAPSHOT</version>
   <artifactId>mina-parent</artifactId>
   <name>Apache MINA</name>
   <packaging>pom</packaging>
@@ -55,7 +55,7 @@
     <connection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</connection>
     <url>https://github.com/apache/mina/tree/${project.scm.tag}</url>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</developerConnection>
-    <tag>2.1.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
