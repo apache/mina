@@ -53,7 +53,7 @@
 
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</connection>
-    <url>https://github.com/apache/mina/tree/2.0</url>
+    <url>https://github.com/apache/mina/tree/${project.scm.tag}</url>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
