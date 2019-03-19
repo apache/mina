@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class HttpServerDecoder implements ProtocolDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(HttpServerCodec.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerCodec.class);
 
     /** Key for decoder current state */
     private static final String DECODER_STATE_ATT = "http.ds";
@@ -90,7 +90,10 @@ public class HttpServerDecoder implements ProtocolDecoder {
         
         switch (state) {
             case HEAD:
-                LOG.debug("decoding HEAD");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("decoding HEAD");
+                }
+                
                 // grab the stored a partial HEAD request
                 ByteBuffer oldBuffer = (ByteBuffer) session.getAttribute(PARTIAL_HEAD_ATT);
                 // concat the old buffer and the new incoming one
@@ -98,7 +101,10 @@ public class HttpServerDecoder implements ProtocolDecoder {
                 msg = IoBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg).flip();
                 
             case NEW:
-                LOG.debug("decoding NEW");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("decoding NEW");
+                }
+                
                 HttpRequestImpl rq = parseHttpRequestHead(msg.buf());
     
                 if (rq == null) {
@@ -116,12 +122,18 @@ public class HttpServerDecoder implements ProtocolDecoder {
                     String contentLen = rq.getHeader("content-length");
     
                     if (contentLen != null) {
-                        LOG.debug("found content len : {}", contentLen);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("found content len : {}", contentLen);
+                        }
+                        
                         session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(contentLen));
                         session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
                         // fallthrough, process body immediately
                     } else {
-                        LOG.debug("request without content");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("request without content");
+                        }
+                        
                         session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
                         out.write(new HttpEndOfContent());
                         break;
@@ -129,7 +141,10 @@ public class HttpServerDecoder implements ProtocolDecoder {
                 }
     
             case BODY:
-                LOG.debug("decoding BODY: {} bytes", msg.remaining());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("decoding BODY: {} bytes", msg.remaining());
+                }
+                
                 int chunkSize = msg.remaining();
                 
                 // send the chunk of body
@@ -146,7 +161,10 @@ public class HttpServerDecoder implements ProtocolDecoder {
                 remaining -= chunkSize;
     
                 if (remaining <= 0) {
-                    LOG.debug("end of HTTP body");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("end of HTTP body");
+                    }
+                    
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
                     session.removeAttribute(BODY_REMAINING_BYTES);
                     out.write(new HttpEndOfContent());

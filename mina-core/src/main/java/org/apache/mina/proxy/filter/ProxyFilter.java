@@ -153,12 +153,16 @@ public class ProxyFilter extends IoFilterAdapter {
                 nextFilter.messageReceived(session, buf);
 
             } else {
-                LOGGER.debug(" Data Read: {} ({})", handler, buf);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(" Data Read: {} ({})", handler, buf);
+                }
 
                 // Keep sending handshake data to the handler until we run out
                 // of data or the handshake is finished
                 while (buf.hasRemaining() && !handler.isHandshakeComplete()) {
-                    LOGGER.debug(" Pre-handshake - passing to handler");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(" Pre-handshake - passing to handler");
+                    }
 
                     int pos = buf.position();
                     handler.messageReceived(nextFilter, buf);
@@ -171,7 +175,9 @@ public class ProxyFilter extends IoFilterAdapter {
 
                 // Pass on any remaining data to the next filter
                 if (buf.hasRemaining()) {
-                    LOGGER.debug(" Passing remaining data to next filter");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(" Passing remaining data to next filter");
+                    }
 
                     nextFilter.messageReceived(session, buf);
                 }
@@ -210,7 +216,9 @@ public class ProxyFilter extends IoFilterAdapter {
                 // Handshake is done - write data as normal
                 nextFilter.filterWrite(session, writeRequest);
             } else if (isHandshakeData) {
-                LOGGER.debug("   handshake data: {}", writeRequest.getMessage());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("   handshake data: {}", writeRequest.getMessage());
+                }
 
                 // Writing handshake data
                 nextFilter.filterWrite(session, writeRequest);
@@ -218,10 +226,15 @@ public class ProxyFilter extends IoFilterAdapter {
                 // Writing non-handshake data before the handshake finished
                 if (!session.isConnected()) {
                     // Not even connected - ignore
-                    LOGGER.debug(" Write request on closed session. Request ignored.");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(" Write request on closed session. Request ignored.");
+                    }
                 } else {
                     // Queue the data to be sent as soon as the handshake completes
-                    LOGGER.debug(" Handshaking is not complete yet. Buffering write request.");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(" Handshaking is not complete yet. Buffering write request.");
+                    }
+                    
                     handler.enqueueWriteRequest(nextFilter, writeRequest);
                 }
             }
@@ -263,9 +276,16 @@ public class ProxyFilter extends IoFilterAdapter {
      */
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-        LOGGER.debug("Session created: " + session);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Session created: " + session);
+        }
+        
         ProxyIoSession proxyIoSession = (ProxyIoSession) session.getAttribute(ProxyIoSession.PROXY_SESSION);
-        LOGGER.debug("  get proxyIoSession: " + proxyIoSession);
+        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("  get proxyIoSession: " + proxyIoSession);
+        }
+        
         proxyIoSession.setProxyFilter(this);
 
         // Create a HTTP proxy handler and start handshake.

@@ -70,7 +70,9 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
      */
     @Override
     public void doHandshake(NextFilter nextFilter) throws ProxyAuthException {
-        LOGGER.debug(" doHandshake()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" doHandshake()");
+        }
 
         if (step > 0 && challengePacket == null) {
             throw new IllegalStateException("NTLM Challenge packet not received");
@@ -84,7 +86,9 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
         String workstation = req.getProperties().get(HttpProxyConstants.WORKSTATION_PROPERTY);
 
         if (step > 0) {
-            LOGGER.debug("  sending NTLM challenge response");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("  sending NTLM challenge response");
+            }
 
             byte[] challenge = NTLMUtilities.extractChallengeFromType2Message(challengePacket);
             int serverFlags = NTLMUtilities.extractFlagsFromType2Message(challengePacket);
@@ -99,7 +103,9 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
                     "NTLM " + new String(Base64.encodeBase64(authenticationPacket)), true);
 
         } else {
-            LOGGER.debug("  sending NTLM negotiation packet");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("  sending NTLM negotiation packet");
+            }
 
             byte[] negotiationPacket = NTLMUtilities.createType1Message(workstation, domain, null, null);
             StringUtilities.addValueToHeader(headers, "Proxy-Authorization",

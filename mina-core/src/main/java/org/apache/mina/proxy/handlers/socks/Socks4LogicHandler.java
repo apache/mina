@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Socks4LogicHandler extends AbstractSocksLogicHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(Socks4LogicHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Socks4LogicHandler.class);
 
     /**
      * @see AbstractSocksLogicHandler#AbstractSocksLogicHandler(ProxyIoSession)
@@ -54,7 +54,9 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
      */
     @Override
     public void doHandshake(final NextFilter nextFilter) {
-        logger.debug(" doHandshake()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" doHandshake()");
+        }
 
         // Send request
         writeRequest(nextFilter, request);
@@ -93,10 +95,12 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
                 buf.put(SocksProxyConstants.TERMINATOR);
             }
 
-            if (isV4ARequest) {
-                logger.debug("  sending SOCKS4a request");
-            } else {
-                logger.debug("  sending SOCKS4 request");
+            if (LOGGER.isDebugEnabled()) {
+                if (isV4ARequest) {
+                    LOGGER.debug("  sending SOCKS4a request");
+                } else {
+                    LOGGER.debug("  sending SOCKS4 request");
+                }
             }
 
             buf.flip();

@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @org.apache.xbean.XBean
  */
 public final class BufferedWriteFilter extends IoFilterAdapter {
-    private final Logger logger = LoggerFactory.getLogger(BufferedWriteFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BufferedWriteFilter.class);
 
     /**
      * Default buffer size value in bytes.
@@ -196,7 +196,11 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
             tmp = buf.duplicate();
             buf.clear();
         }
-        logger.debug("Flushing buffer: {}", tmp);
+        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Flushing buffer: {}", tmp);
+        }
+        
         nextFilter.filterWrite(session, new DefaultWriteRequest(tmp));
     }
 

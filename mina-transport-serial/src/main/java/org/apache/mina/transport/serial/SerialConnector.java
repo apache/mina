@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public final class SerialConnector extends AbstractIoConnector {
-    private final Logger log;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SerialConnector.class);
 
     private IdleStatusChecker idleChecker;
 
@@ -65,7 +65,6 @@ public final class SerialConnector extends AbstractIoConnector {
      */
     public SerialConnector(Executor executor) {
         super(new DefaultSerialSessionConfig(), executor);
-        log = LoggerFactory.getLogger(SerialConnector.class);
 
         idleChecker = new IdleStatusChecker();
         // we schedule the idle status checking task in this service exceutor
@@ -87,14 +86,14 @@ public final class SerialConnector extends AbstractIoConnector {
             portId = (CommPortIdentifier) portList.nextElement();
             
             if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Serial port discovered : " + portId.getName());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Serial port discovered : " + portId.getName());
                 }
                 
                 if (portId.getName().equals(portAddress.getName())) {
                     try {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Serial port found : " + portId.getName());
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Serial port found : " + portId.getName());
                         }
 
                         SerialPort serialPort = initializePort("Apache MINA", portId, portAddress);
@@ -106,26 +105,26 @@ public final class SerialConnector extends AbstractIoConnector {
                         
                         return future;
                     } catch (PortInUseException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Port In Use Exception : ", e);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Port In Use Exception : ", e);
                         }
                         
                         return DefaultConnectFuture.newFailedFuture(e);
                     } catch (UnsupportedCommOperationException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Comm Exception : ", e);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Comm Exception : ", e);
                         }
                         
                         return DefaultConnectFuture.newFailedFuture(e);
                     } catch (IOException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("IOException : ", e);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("IOException : ", e);
                         }
                         
                         return DefaultConnectFuture.newFailedFuture(e);
                     } catch (TooManyListenersException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("TooManyListenersException : ", e);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("TooManyListenersException : ", e);
                         }
                         
                         return DefaultConnectFuture.newFailedFuture(e);

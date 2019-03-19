@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class IoSessionEvent {
-    private static final Logger logger = LoggerFactory.getLogger(IoSessionEvent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IoSessionEvent.class);
 
     /**
      * The next filter in the chain.
@@ -86,7 +86,10 @@ public class IoSessionEvent {
      * Delivers this event to the next filter.
      */
     public void deliverEvent() {
-        logger.debug("Delivering event {}", this);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Delivering event {}", this);
+        }
+        
         deliverEvent(this.nextFilter, this.session, this.type, this.status);
     }
 

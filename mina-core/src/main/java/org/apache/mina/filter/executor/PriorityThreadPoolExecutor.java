@@ -460,6 +460,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
         sb.append("Adding event ").append(event.getType()).append(" to session ").append(event.getSession().getId());
         boolean first = true;
         sb.append("\nQueue : [");
+        
         for (Runnable elem : queue) {
             if (first) {
                 first = false;
@@ -469,8 +470,12 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
 
             sb.append(((IoEvent) elem).getType()).append(", ");
         }
+        
         sb.append("]\n");
-        LOGGER.debug(sb.toString());
+        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(sb.toString());
+        }
     }
 
     /**

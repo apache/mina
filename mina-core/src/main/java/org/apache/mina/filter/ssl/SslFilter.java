@@ -440,7 +440,9 @@ public class SslFilter extends IoFilterAdapter {
             throw new IllegalStateException(msg);
         }
 
-        LOGGER.debug("Adding the SSL Filter {} to the chain", name);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Adding the SSL Filter {} to the chain", name);
+        }
 
         IoSession session = parent.getSession();
         session.setAttribute(NEXT_FILTER, nextFilter);
@@ -735,7 +737,10 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     private void initiateHandshake(NextFilter nextFilter, IoSession session) throws SSLException {
-        LOGGER.debug("{} : Starting the first handshake", getSessionInfo(session));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("{} : Starting the first handshake", getSessionInfo(session));
+        }
+        
         SslHandler sslHandler = getSslSessionHandler(session);
 
         try {

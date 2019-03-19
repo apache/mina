@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class IoSessionEventQueue {
-    private static final Logger logger = LoggerFactory.getLogger(IoSessionEventQueue.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IoSessionEventQueue.class);
 
     /**
      * The proxy session object.
@@ -63,7 +63,10 @@ public class IoSessionEventQueue {
         synchronized (sessionEventsQueue) {
             // Free queue
             sessionEventsQueue.clear();
-            logger.debug("Event queue CLEARED");
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Event queue CLEARED");
+            }
         }
     }
 
@@ -79,7 +82,9 @@ public class IoSessionEventQueue {
      * @param evt the event to enqueue
      */
     public void enqueueEventIfNecessary(final IoSessionEvent evt) {
-        logger.debug("??? >> Enqueue {}", evt);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("??? >> Enqueue {}", evt);
+        }
 
         if (proxyIoSession.getRequest() instanceof SocksProxyRequest) {
             // No reconnection used
@@ -122,7 +127,10 @@ public class IoSessionEventQueue {
             IoSessionEvent evt;
 
             while ((evt = sessionEventsQueue.poll()) != null) {
-                logger.debug(" Flushing buffered event: {}", evt);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(" Flushing buffered event: {}", evt);
+                }
+                
                 evt.deliverEvent();
             }
         }
@@ -135,7 +143,10 @@ public class IoSessionEventQueue {
      */
     private void enqueueSessionEvent(final IoSessionEvent evt) {
         synchronized (sessionEventsQueue) {
-            logger.debug("Enqueuing event: {}", evt);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Enqueuing event: {}", evt);
+            }
+            
             sessionEventsQueue.offer(evt);
         }
     }

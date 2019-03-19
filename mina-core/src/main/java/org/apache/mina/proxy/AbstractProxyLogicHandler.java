@@ -104,7 +104,9 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
         // write net data
         ProxyHandshakeIoBuffer writeBuffer = new ProxyHandshakeIoBuffer(data);
 
-        LOGGER.debug("   session write: {}", writeBuffer);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("   session write: {}", writeBuffer);
+        }
 
         WriteFuture writeFuture = new DefaultWriteFuture(getSession());
         getProxyFilter().writeData(nextFilter, getSession(), new DefaultWriteRequest(writeBuffer, writeFuture), true);
@@ -133,7 +135,9 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
         ProxyIoSession proxyIoSession = getProxyIoSession();
         proxyIoSession.getConnector().fireConnected(proxyIoSession.getSession()).awaitUninterruptibly();
 
-        LOGGER.debug("  handshake completed");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("  handshake completed");
+        }
 
         // Connected OK
         try {
@@ -150,7 +154,9 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
      * @throws Exception If we can't flush the pending write requests
      */
     protected synchronized void flushPendingWriteRequests() throws Exception {
-        LOGGER.debug(" flushPendingWriteRequests()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" flushPendingWriteRequests()");
+        }
 
         if (writeRequestQueue == null) {
             return;
@@ -158,7 +164,9 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
 
         Event scheduledWrite;
         while ((scheduledWrite = writeRequestQueue.poll()) != null) {
-            LOGGER.debug(" Flushing buffered write request: {}", scheduledWrite.data);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(" Flushing buffered write request: {}", scheduledWrite.data);
+            }
 
             getProxyFilter().filterWrite(scheduledWrite.nextFilter, getSession(), (WriteRequest) scheduledWrite.data);
         }

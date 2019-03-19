@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpDigestAuthLogicHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpDigestAuthLogicHandler.class);
 
     /**
      * The challenge directives provided by the server.
@@ -89,7 +89,9 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
      */
     @Override
     public void doHandshake(NextFilter nextFilter) throws ProxyAuthException {
-        logger.debug(" doHandshake()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" doHandshake()");
+        }
 
         if (step > 0 && directives == null) {
             throw new ProxyAuthException("Authentication challenge not received");
@@ -100,7 +102,9 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
                 : new HashMap<String, List<String>>();
 
         if (step > 0) {
-            logger.debug("  sending DIGEST challenge response");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("  sending DIGEST challenge response");
+            }
 
             // Build a challenge response
             HashMap<String, String> map = new HashMap<>();
