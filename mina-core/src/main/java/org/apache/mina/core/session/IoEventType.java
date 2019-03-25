@@ -53,4 +53,10 @@ public enum IoEventType {
     
     /** A close has occured */
     CLOSE,
+    
+    /** The Input part of the socket has been closed */
+    INPUT_CLOSED,
+    
+    /** A generic event has been generated */
+    EVENT
 }

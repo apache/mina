@@ -35,7 +35,6 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.NothingWrittenException;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.core.write.WriteRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -293,12 +292,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
             return;
         }
 
-        if (writeRequest instanceof MessageWriteRequest) {
-            MessageWriteRequest wrappedRequest = (MessageWriteRequest) writeRequest;
-            nextFilter.messageSent(session, wrappedRequest.getParentRequest());
-        } else {
-            nextFilter.messageSent(session, writeRequest);
-        }
+        nextFilter.messageSent(session, writeRequest);
     }
 
     /**
@@ -341,15 +335,11 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
 
                 // Flush only when the buffer has remaining.
                 if (!(encodedMessage instanceof IoBuffer) || ((IoBuffer) encodedMessage).hasRemaining()) {
-                    SocketAddress destination = writeRequest.getDestination();
-                    WriteRequest encodedWriteRequest = new EncodedWriteRequest(encodedMessage, null, destination);
+                    writeRequest.setMessage(encodedMessage);
 
-                    nextFilter.filterWrite(session, encodedWriteRequest);
+                    nextFilter.filterWrite(session, writeRequest);
                 }
             }
-
-            // Call the next filter
-            nextFilter.filterWrite(session, new MessageWriteRequest(writeRequest));
         } catch (Exception e) {
             ProtocolEncoderException pee;
 
@@ -404,22 +394,6 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
         @Override
         public boolean isEncoded() {
             return true;
-        }
-    }
-
-    private static class MessageWriteRequest extends WriteRequestWrapper {
-        public MessageWriteRequest(WriteRequest writeRequest) {
-            super(writeRequest);
-        }
-
-        @Override
-        public Object getMessage() {
-            return EMPTY_BUFFER;
-        }
-
-        @Override
-        public String toString() {
-            return "MessageWriteRequest, parent : " + super.toString();
         }
     }
 

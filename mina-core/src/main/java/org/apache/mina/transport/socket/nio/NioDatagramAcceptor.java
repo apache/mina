@@ -873,7 +873,6 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                 if (buf.remaining() == 0) {
                     // Clear and fire event
                     session.setCurrentWriteRequest(null);
-                    buf.reset();
                     session.getFilterChain().fireMessageSent(writeRequest);
                     continue;
                 }
@@ -898,7 +897,6 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                     // Clear and fire event
                     session.setCurrentWriteRequest(null);
                     writtenBytes += localWrittenBytes;
-                    buf.reset();
                     session.getFilterChain().fireMessageSent(writeRequest);
 
                     break;

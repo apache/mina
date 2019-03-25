@@ -61,6 +61,7 @@ public class ZlibTest {
             IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
             String strOutput = byteUncompressed.getString(Charset.forName("UTF8").newDecoder());
             assertTrue(strOutput.equals(strInput));
+            byteInput.flip();
         }
     }
 
@@ -115,6 +116,8 @@ public class ZlibTest {
                 String strOutput = byteUncompressed.getString(Charset.forName("UTF8").newDecoder());
                 assertTrue(strOutput.equals(strInput));
             }
+            
+            byteInput.flip();
         }
         // check if the last compressed data block can be decompressed
         // successfully.

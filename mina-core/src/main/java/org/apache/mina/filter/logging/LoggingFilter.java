@@ -210,7 +210,7 @@ public class LoggingFilter extends IoFilterAdapter {
 
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-        log(messageSentLevel, "SENT: {}", writeRequest.getOriginalRequest().getMessage());
+        log(messageSentLevel, "SENT: {}", writeRequest.getOriginalMessage());
         nextFilter.messageSent(session, writeRequest);
     }
 

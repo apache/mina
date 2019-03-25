@@ -52,6 +52,11 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
     }
 
     @Override
+    public void messageSent(IoSession session, Object message) {
+        System.out.println( message );
+    }
+
+    @Override
     public void messageReceived(IoSession session, Object message) {
         Logger log = LoggerFactory.getLogger(ChatProtocolHandler.class);
         log.info("received: " + message);

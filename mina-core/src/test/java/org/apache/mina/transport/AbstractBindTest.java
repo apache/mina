@@ -296,9 +296,7 @@ public abstract class AbstractBindTest {
 
             IoBuffer rb = (IoBuffer) message;
             // Write the received data back to remote peer
-            IoBuffer wb = IoBuffer.allocate(rb.remaining());
-            wb.put(rb);
-            wb.flip();
+            IoBuffer wb = rb.duplicate();
             session.write(wb);
         }
     }

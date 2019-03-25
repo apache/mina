@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filter.keepalive;
 
+import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterChain;
@@ -420,7 +421,14 @@ public class KeepAliveFilter extends IoFilterAdapter {
      */
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-        Object message = writeRequest.getMessage();
+        Object message = writeRequest.getOriginalMessage();
+        
+        if (message == null)
+        {
+            if (writeRequest.getMessage() instanceof IoBuffer) {
+                message = ((IoBuffer)writeRequest.getMessage()).duplicate().flip();
+            }
+        }
         
         if (!isKeepAliveMessage(session, message)) {
             nextFilter.messageSent(session, writeRequest);

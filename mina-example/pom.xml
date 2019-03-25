@@ -58,6 +58,13 @@
     </dependency>
 
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mina-filter-compression</artifactId>
+      <version>${project.version}</version>
+      <type>bundle</type>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring</artifactId>
     </dependency>

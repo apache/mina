@@ -104,6 +104,7 @@ public class CompressionFilterTest {
         // prepare the input data
         IoBuffer buf = IoBuffer.wrap(strCompress.getBytes("UTF8"));
         IoBuffer actualOutput = actualDeflater.deflate(buf);
+        buf.flip();
         WriteRequest writeRequest = new DefaultWriteRequest(buf);
 
         // record all the mock calls

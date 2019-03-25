@@ -157,25 +157,25 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                     messageSentTimerWorker = new TimerWorker();
                     profileMessageSent = true;
                     break;
+                    
+                case SESSION_CLOSED:
+                    sessionClosedTimerWorker = new TimerWorker();
+                    profileSessionClosed = true;
+                    break;
     
                 case SESSION_CREATED:
                     sessionCreatedTimerWorker = new TimerWorker();
                     profileSessionCreated = true;
                     break;
-    
-                case SESSION_OPENED:
-                    sessionOpenedTimerWorker = new TimerWorker();
-                    profileSessionOpened = true;
-                    break;
-    
+                    
                 case SESSION_IDLE:
                     sessionIdleTimerWorker = new TimerWorker();
                     profileSessionIdle = true;
                     break;
     
-                case SESSION_CLOSED:
-                    sessionClosedTimerWorker = new TimerWorker();
-                    profileSessionClosed = true;
+                case SESSION_OPENED:
+                    sessionOpenedTimerWorker = new TimerWorker();
+                    profileSessionOpened = true;
                     break;
                     
                 default : 
@@ -217,7 +217,16 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 return;
+                
+            case SESSION_CLOSED:
+                profileSessionClosed = true;
     
+                if (sessionClosedTimerWorker == null) {
+                    sessionClosedTimerWorker = new TimerWorker();
+                }
+    
+                return;
+
             case SESSION_CREATED:
                 profileSessionCreated = true;
     
@@ -226,16 +235,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 return;
-    
-            case SESSION_OPENED:
-                profileSessionOpened = true;
-    
-                if (sessionOpenedTimerWorker == null) {
-                    sessionOpenedTimerWorker = new TimerWorker();
-                }
-    
-                return;
-    
+                
             case SESSION_IDLE:
                 profileSessionIdle = true;
     
@@ -245,11 +245,11 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
     
                 return;
     
-            case SESSION_CLOSED:
-                profileSessionClosed = true;
+            case SESSION_OPENED:
+                profileSessionOpened = true;
     
-                if (sessionClosedTimerWorker == null) {
-                    sessionClosedTimerWorker = new TimerWorker();
+                if (sessionOpenedTimerWorker == null) {
+                    sessionOpenedTimerWorker = new TimerWorker();
                 }
     
                 return;
@@ -273,21 +273,21 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
             case MESSAGE_SENT:
                 profileMessageSent = false;
                 return;
+                
+            case SESSION_CLOSED:
+                profileSessionClosed = false;
+                return;
     
             case SESSION_CREATED:
                 profileSessionCreated = false;
                 return;
-    
-            case SESSION_OPENED:
-                profileSessionOpened = false;
-                return;
-    
+                
             case SESSION_IDLE:
                 profileSessionIdle = false;
                 return;
     
-            case SESSION_CLOSED:
-                profileSessionClosed = false;
+            case SESSION_OPENED:
+                profileSessionOpened = false;
                 return;
                 
             default:
@@ -509,6 +509,13 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 break;
+                
+            case SESSION_CLOSED:
+                if (profileSessionClosed) {
+                    return sessionClosedTimerWorker.getAverage();
+                }
+    
+                break;
     
             case SESSION_CREATED:
                 if (profileSessionCreated) {
@@ -516,14 +523,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 break;
-    
-            case SESSION_OPENED:
-                if (profileSessionOpened) {
-                    return sessionOpenedTimerWorker.getAverage();
-                }
-    
-                break;
-    
+                
             case SESSION_IDLE:
                 if (profileSessionIdle) {
                     return sessionIdleTimerWorker.getAverage();
@@ -531,9 +531,9 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
     
                 break;
     
-            case SESSION_CLOSED:
-                if (profileSessionClosed) {
-                    return sessionClosedTimerWorker.getAverage();
+            case SESSION_OPENED:
+                if (profileSessionOpened) {
+                    return sessionOpenedTimerWorker.getAverage();
                 }
     
                 break;
@@ -569,10 +569,24 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 break;
+                
+            case SESSION_CLOSED:
+                if (profileSessionClosed) {
+                    return sessionClosedTimerWorker.getCallsNumber();
+                }
+                
+                break;
     
             case SESSION_CREATED:
                 if (profileSessionCreated) {
                     return sessionCreatedTimerWorker.getCallsNumber();
+                }
+    
+                break;
+                
+            case SESSION_IDLE:
+                if (profileSessionIdle) {
+                    return sessionIdleTimerWorker.getCallsNumber();
                 }
     
                 break;
@@ -584,20 +598,6 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
     
                 break;
     
-            case SESSION_IDLE:
-                if (profileSessionIdle) {
-                    return sessionIdleTimerWorker.getCallsNumber();
-                }
-    
-                break;
-    
-            case SESSION_CLOSED:
-                if (profileSessionClosed) {
-                    return sessionClosedTimerWorker.getCallsNumber();
-                }
-    
-                break;
-                
             default:
                 break;
         }
@@ -629,6 +629,13 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 break;
+                
+            case SESSION_CLOSED:
+                if (profileSessionClosed) {
+                    return sessionClosedTimerWorker.getTotal();
+                }
+    
+                break;
     
             case SESSION_CREATED:
                 if (profileSessionCreated) {
@@ -636,24 +643,17 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 break;
-    
-            case SESSION_OPENED:
-                if (profileSessionOpened) {
-                    return sessionOpenedTimerWorker.getTotal();
-                }
-    
-                break;
-    
+                
             case SESSION_IDLE:
                 if (profileSessionIdle) {
                     return sessionIdleTimerWorker.getTotal();
                 }
     
                 break;
-    
-            case SESSION_CLOSED:
-                if (profileSessionClosed) {
-                    return sessionClosedTimerWorker.getTotal();
+
+            case SESSION_OPENED:
+                if (profileSessionOpened) {
+                    return sessionOpenedTimerWorker.getTotal();
                 }
     
                 break;
@@ -689,10 +689,24 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 break;
-    
+                
+            case SESSION_CLOSED:
+                if (profileSessionClosed) {
+                    return sessionClosedTimerWorker.getMinimum();
+                }
+
+                break;
+
             case SESSION_CREATED:
                 if (profileSessionCreated) {
                     return sessionCreatedTimerWorker.getMinimum();
+                }
+    
+                break;
+                
+            case SESSION_IDLE:
+                if (profileSessionIdle) {
+                    return sessionIdleTimerWorker.getMinimum();
                 }
     
                 break;
@@ -702,20 +716,6 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                     return sessionOpenedTimerWorker.getMinimum();
                 }
     
-                break;
-    
-            case SESSION_IDLE:
-                if (profileSessionIdle) {
-                    return sessionIdleTimerWorker.getMinimum();
-                }
-    
-                break;
-    
-            case SESSION_CLOSED:
-                if (profileSessionClosed) {
-                    return sessionClosedTimerWorker.getMinimum();
-                }
-
                 break;
                 
             default:
@@ -749,6 +749,13 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 break;
+                
+            case SESSION_CLOSED:
+                if (profileSessionClosed) {
+                    return sessionClosedTimerWorker.getMaximum();
+                }
+    
+                break;
     
             case SESSION_CREATED:
                 if (profileSessionCreated) {
@@ -756,14 +763,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
                 }
     
                 break;
-    
-            case SESSION_OPENED:
-                if (profileSessionOpened) {
-                    return sessionOpenedTimerWorker.getMaximum();
-                }
-    
-                break;
-    
+                
             case SESSION_IDLE:
                 if (profileSessionIdle) {
                     return sessionIdleTimerWorker.getMaximum();
@@ -771,9 +771,9 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
     
                 break;
     
-            case SESSION_CLOSED:
-                if (profileSessionClosed) {
-                    return sessionClosedTimerWorker.getMaximum();
+            case SESSION_OPENED:
+                if (profileSessionOpened) {
+                    return sessionOpenedTimerWorker.getMaximum();
                 }
     
                 break;

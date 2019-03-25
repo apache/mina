@@ -22,6 +22,7 @@ package org.apache.mina.core.write;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoSession;
@@ -166,10 +167,19 @@ public class DefaultWriteRequest implements WriteRequest {
         }
     };
 
-    private final Object message;
+    /** 
+     * The original message as it was written by the IoHandler. It will be sent back
+     * in the messageSent event 
+     */ 
+    private final Object originalMessage;
 
+    /** The message that will ultimately be written to the remote peer */ 
+    private Object message;
+
+    /** The associated Future */
     private final WriteFuture future;
 
+    /** The peer destination (useless ???) */
     private final SocketAddress destination;
 
     /**
@@ -211,6 +221,15 @@ public class DefaultWriteRequest implements WriteRequest {
         }
 
         this.message = message;
+        
+        if (message instanceof IoBuffer) {
+            // duplicate it, so that any modification made on it
+            // won't change the original message
+            this.originalMessage = ((IoBuffer)message).duplicate();
+        } else {
+            originalMessage = message;
+        }
+        
         this.future = future;
         this.destination = destination;
     }
@@ -229,6 +248,26 @@ public class DefaultWriteRequest implements WriteRequest {
     @Override
     public Object getMessage() {
         return message;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setMessage(Object modifiedMessage) {
+        message = modifiedMessage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getOriginalMessage() {
+        if (originalMessage != null) {
+            return originalMessage;
+        } else {
+            return message;
+        }
     }
 
     /**
@@ -258,10 +297,9 @@ public class DefaultWriteRequest implements WriteRequest {
         if (message.getClass().getName().equals(Object.class.getName())) {
             sb.append("CLOSE_REQUEST");
         } else {
-            if (getDestination() == null) {
-                sb.append(message);
-            } else {
-                sb.append(message);
+            sb.append(originalMessage);
+
+            if (getDestination() != null) {
                 sb.append(" => ");
                 sb.append(getDestination());
             }

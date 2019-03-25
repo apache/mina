@@ -173,7 +173,7 @@ class Zlib {
         }
 
         byte[] inBytes = new byte[inBuffer.remaining()];
-        inBuffer.get(inBytes).flip();
+        inBuffer.get(inBytes);
 
         // according to spec, destination buffer should be 0.1% larger
         // than source length plus 12 bytes. We add a single byte to safeguard

@@ -34,6 +34,7 @@ import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.core.write.WriteToClosedSessionException;
+import org.apache.mina.filter.FilterEvent;
 
 /**
  * TODO Add documentation
@@ -87,43 +88,71 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
         IoEventType type = e.getType();
         Object data = e.getParameter();
 
-        if (type == IoEventType.MESSAGE_RECEIVED) {
-            if (sessionOpened && (!session.isReadSuspended()) && session.getLock().tryLock()) {
-                try {
-                    if (session.isReadSuspended()) {
-                        session.receivedMessageQueue.add(data);
-                    } else {
-                        super.fireMessageReceived(data);
+        switch (type) {
+            case EVENT:
+                super.fireEvent((FilterEvent) data);
+                break;
+                
+            case EXCEPTION_CAUGHT:
+                super.fireExceptionCaught((Throwable) data);
+                break;
+                
+            case CLOSE:
+                super.fireFilterClose();
+                break;
+                
+            case INPUT_CLOSED:
+                super.fireInputClosed();
+                break;
+
+            case MESSAGE_SENT:
+                super.fireMessageSent((WriteRequest) data);
+                break;
+                
+            case MESSAGE_RECEIVED:
+                if (sessionOpened && (!session.isReadSuspended()) && session.getLock().tryLock()) {
+                    try {
+                        if (session.isReadSuspended()) {
+                            session.receivedMessageQueue.add(data);
+                        } else {
+                            super.fireMessageReceived(data);
+                        }
+                    } finally {
+                        session.getLock().unlock();
                     }
+                } else {
+                    session.receivedMessageQueue.add(data);
+                }
+                
+                break;
+                
+            case SESSION_CLOSED:
+                flushPendingDataQueues(session);
+                super.fireSessionClosed();
+                break;
+                
+            case SESSION_CREATED:
+                session.getLock().lock();
+                try {
+                    super.fireSessionCreated();
                 } finally {
                     session.getLock().unlock();
                 }
-            } else {
-                session.receivedMessageQueue.add(data);
-            }
-        } else if (type == IoEventType.WRITE) {
-            super.fireFilterWrite((WriteRequest) data);
-        } else if (type == IoEventType.MESSAGE_SENT) {
-            super.fireMessageSent((WriteRequest) data);
-        } else if (type == IoEventType.EXCEPTION_CAUGHT) {
-            super.fireExceptionCaught((Throwable) data);
-        } else if (type == IoEventType.SESSION_IDLE) {
-            super.fireSessionIdle((IdleStatus) data);
-        } else if (type == IoEventType.SESSION_OPENED) {
-            super.fireSessionOpened();
-            sessionOpened = true;
-        } else if (type == IoEventType.SESSION_CREATED) {
-            session.getLock().lock();
-            try {
-                super.fireSessionCreated();
-            } finally {
-                session.getLock().unlock();
-            }
-        } else if (type == IoEventType.SESSION_CLOSED) {
-            flushPendingDataQueues(session);
-            super.fireSessionClosed();
-        } else if (type == IoEventType.CLOSE) {
-            super.fireFilterClose();
+                
+                break;
+                
+            case SESSION_IDLE:
+                super.fireSessionIdle((IdleStatus) data);
+                break;
+                
+            case SESSION_OPENED:
+                super.fireSessionOpened();
+                sessionOpened = true;
+                break;
+                
+            case WRITE:
+                super.fireFilterWrite((WriteRequest) data);
+                break;
         }
     }
 
@@ -133,8 +162,18 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
     }
 
     @Override
+    public void fireEvent(FilterEvent event) {
+        pushEvent(new IoEvent(IoEventType.EVENT, getSession(), event));
+    }
+
+    @Override
     public void fireFilterClose() {
         pushEvent(new IoEvent(IoEventType.CLOSE, getSession(), null));
+    }
+
+    @Override
+    public void fireInputClosed() {
+        pushEvent(new IoEvent(IoEventType.INPUT_CLOSED, getSession(), null));
     }
 
     @Override

@@ -63,7 +63,7 @@ public class ExecutorFilterRegressionTest {
         final EventOrderCounter[] sessions = new EventOrderCounter[] { new EventOrderCounter(),
                 new EventOrderCounter(), new EventOrderCounter(), new EventOrderCounter(), new EventOrderCounter(),
                 new EventOrderCounter(), new EventOrderCounter(), new EventOrderCounter(), new EventOrderCounter(),
-                new EventOrderCounter(), };
+                new EventOrderCounter()};
         final int loop = 1000000;
         final int end = sessions.length - 1;
         final ExecutorFilter filter = this.filter;

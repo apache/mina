@@ -129,29 +129,30 @@ public class KeepAliveFilterTest {
         connector.dispose();
     }
 
-    static boolean checkRequest(IoBuffer message) {
-        IoBuffer buff = message;
-        boolean check = buff.get() == 1;
-        buff.rewind();
-        return check;
+    static boolean checkRequest(Object message) {
+        if (message instanceof IoBuffer ) {
+            IoBuffer buff = (IoBuffer)message;
+            boolean check = buff.get() == 1;
+            buff.rewind();
+            return check;
+        } else {
+            return false;
+        }
     }
 
-    static boolean checkResponse(IoBuffer message) {
-        IoBuffer buff = message;
-        boolean check = buff.get() == 2;
-        buff.rewind();
-        return check;
+    static boolean checkResponse(Object message) {
+        if (message instanceof IoBuffer ) {
+            IoBuffer buff = (IoBuffer)message;
+            boolean check = buff.get() == 2;
+            buff.rewind();
+            return check;
+        } else {
+            return false;
+        }
     }
 
     // Inner classes -------------------------------------------------
     private final class ServerFactory implements KeepAliveMessageFactory {
-        /**
-         * Default constructor
-         */
-        public ServerFactory() {
-            super();
-        }
-
         public Object getRequest(IoSession session) {
             return null;
         }
@@ -161,28 +162,15 @@ public class KeepAliveFilterTest {
         }
 
         public boolean isRequest(IoSession session, Object message) {
-            if (message instanceof IoBuffer) {
-                return checkRequest((IoBuffer) message);
-            }
-            return false;
+            return checkRequest(message);
         }
 
         public boolean isResponse(IoSession session, Object message) {
-            if (message instanceof IoBuffer) {
-                return checkResponse((IoBuffer) message);
-            }
-            return false;
+            return checkResponse(message);
         }
     }
 
     private final class ClientFactory implements KeepAliveMessageFactory {
-        /**
-         * Default constructor
-         */
-        public ClientFactory() {
-            super();
-        }
-
         public Object getRequest(IoSession session) {
             return PING.duplicate();
         }
@@ -192,17 +180,11 @@ public class KeepAliveFilterTest {
         }
 
         public boolean isRequest(IoSession session, Object message) {
-            if (message instanceof IoBuffer) {
-                return checkRequest((IoBuffer) message);
-            }
-            return false;
+            return checkRequest(message);
         }
 
         public boolean isResponse(IoSession session, Object message) {
-            if (message instanceof IoBuffer) {
-                return checkResponse((IoBuffer) message);
-            }
-            return false;
+            return checkResponse(message);
         }
     }
 }

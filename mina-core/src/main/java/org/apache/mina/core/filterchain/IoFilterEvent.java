@@ -25,6 +25,7 @@ import org.apache.mina.core.session.IoEvent;
 import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.FilterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +83,23 @@ public class IoFilterEvent extends IoEvent {
         }
 
         switch (type) {
+            case CLOSE:
+                nextFilter.filterClose(session);
+                break;
+    
+            case EVENT:
+                nextFilter.event(session, (FilterEvent)getParameter());
+                break;
+                
+            case EXCEPTION_CAUGHT:
+                Throwable throwable = (Throwable) getParameter();
+                nextFilter.exceptionCaught(session, throwable);
+                break;
+    
+            case INPUT_CLOSED:
+                nextFilter.inputClosed(session);
+                break;
+                
             case MESSAGE_RECEIVED:
                 Object parameter = getParameter();
                 nextFilter.messageReceived(session, parameter);
@@ -92,18 +110,12 @@ public class IoFilterEvent extends IoEvent {
                 nextFilter.messageSent(session, writeRequest);
                 break;
     
-            case WRITE:
-                writeRequest = (WriteRequest) getParameter();
-                nextFilter.filterWrite(session, writeRequest);
+            case SESSION_CLOSED:
+                nextFilter.sessionClosed(session);
                 break;
-    
-            case CLOSE:
-                nextFilter.filterClose(session);
-                break;
-    
-            case EXCEPTION_CAUGHT:
-                Throwable throwable = (Throwable) getParameter();
-                nextFilter.exceptionCaught(session, throwable);
+                
+            case SESSION_CREATED:
+                nextFilter.sessionCreated(session);
                 break;
     
             case SESSION_IDLE:
@@ -114,14 +126,11 @@ public class IoFilterEvent extends IoEvent {
                 nextFilter.sessionOpened(session);
                 break;
     
-            case SESSION_CREATED:
-                nextFilter.sessionCreated(session);
+            case WRITE:
+                writeRequest = (WriteRequest) getParameter();
+                nextFilter.filterWrite(session, writeRequest);
                 break;
-    
-            case SESSION_CLOSED:
-                nextFilter.sessionClosed(session);
-                break;
-    
+
             default:
                 throw new IllegalArgumentException("Unknown event type: " + type);
         }

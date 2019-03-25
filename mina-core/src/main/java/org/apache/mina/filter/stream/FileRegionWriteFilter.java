@@ -73,7 +73,7 @@ public class FileRegionWriteFilter extends AbstractStreamWriteFilter<FileRegion>
         }
 
         // Allocate the buffer for reading from the file
-        final int bufferSize = (int) Math.min(getWriteBufferSize(), fileRegion.getRemainingBytes());
+        int bufferSize = (int) Math.min(getWriteBufferSize(), fileRegion.getRemainingBytes());
         IoBuffer buffer = IoBuffer.allocate(bufferSize);
 
         // Read from the file

@@ -23,11 +23,11 @@ import java.io.IOException;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.util.WriteRequestFilter;
 
 /**
  * An {@link IoFilter} which compresses all data using
@@ -55,7 +55,7 @@ import org.apache.mina.filter.util.WriteRequestFilter;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class CompressionFilter extends WriteRequestFilter {
+public class CompressionFilter extends IoFilterAdapter {
     /**
      * Max compression level.  Will give the highest compression ratio, but
      * will also take more cpu time and is the slowest.
@@ -137,6 +137,20 @@ public class CompressionFilter extends WriteRequestFilter {
         this.compressInbound = compressInbound;
         this.compressOutbound = compressOutbound;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+        Object compressedMessage = doFilterWrite(nextFilter, session, writeRequest);
+        
+        if (compressedMessage != null && compressedMessage != writeRequest.getMessage()) {
+            writeRequest.setMessage( compressedMessage );
+        }
+        
+        nextFilter.filterWrite(session, writeRequest);
+    }
 
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
@@ -146,19 +160,26 @@ public class CompressionFilter extends WriteRequestFilter {
         }
 
         Zlib inflater = (Zlib) session.getAttribute(INFLATER);
+        
         if (inflater == null) {
             throw new IllegalStateException();
         }
 
         IoBuffer inBuffer = (IoBuffer) message;
-        IoBuffer outBuffer = inflater.inflate(inBuffer);
-        nextFilter.messageReceived(session, outBuffer);
+        nextFilter.messageReceived(session, inflater.inflate(inBuffer));
+    }
+    
+    /**
+     * {@inheritDoc}
+     *
+    @Override
+    public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+        nextFilter.messageSent(session, writeRequest);
     }
 
     /*
      * @see org.apache.mina.core.IoFilter#filterWrite(org.apache.mina.core.IoFilter.NextFilter, org.apache.mina.core.IoSession, org.apache.mina.core.IoFilter.WriteRequest)
      */
-    @Override
     protected Object doFilterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest)
             throws IOException {
         if (!compressOutbound) {
@@ -172,11 +193,13 @@ public class CompressionFilter extends WriteRequestFilter {
         }
 
         Zlib deflater = (Zlib) session.getAttribute(DEFLATER);
+        
         if (deflater == null) {
             throw new IllegalStateException();
         }
 
         IoBuffer inBuffer = (IoBuffer) writeRequest.getMessage();
+        
         if (!inBuffer.hasRemaining()) {
             // Ignore empty buffers
             return null;

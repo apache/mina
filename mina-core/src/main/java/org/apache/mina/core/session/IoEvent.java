@@ -20,6 +20,7 @@
 package org.apache.mina.core.session;
 
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.FilterEvent;
 
 /**
  * An I/O event or an I/O request that MINA provides.
@@ -93,6 +94,22 @@ public class IoEvent implements Runnable {
      */
     public void fire() {
         switch ( type ) {
+            case CLOSE:
+                session.getFilterChain().fireFilterClose();
+                break;
+
+            case EVENT:
+                session.getFilterChain().fireEvent((FilterEvent)getParameter());
+                break;
+                
+            case EXCEPTION_CAUGHT:
+                session.getFilterChain().fireExceptionCaught((Throwable) getParameter());
+                break;
+                
+            case INPUT_CLOSED:
+                session.getFilterChain().fireInputClosed();
+                break;
+                
             case MESSAGE_RECEIVED:
                 session.getFilterChain().fireMessageReceived(getParameter());
                 break;
@@ -101,16 +118,12 @@ public class IoEvent implements Runnable {
                 session.getFilterChain().fireMessageSent((WriteRequest) getParameter());
                 break;
                 
-            case WRITE:
-                session.getFilterChain().fireFilterWrite((WriteRequest) getParameter());
+            case SESSION_CLOSED:
+                session.getFilterChain().fireSessionClosed();
                 break;
                 
-            case CLOSE:
-                session.getFilterChain().fireFilterClose();
-                break;
-                
-            case EXCEPTION_CAUGHT:
-                session.getFilterChain().fireExceptionCaught((Throwable) getParameter());
+            case SESSION_CREATED:
+                session.getFilterChain().fireSessionCreated();
                 break;
                 
             case SESSION_IDLE:
@@ -121,12 +134,8 @@ public class IoEvent implements Runnable {
                 session.getFilterChain().fireSessionOpened();
                 break;
                 
-            case SESSION_CREATED:
-                session.getFilterChain().fireSessionCreated();
-                break;
-                
-            case SESSION_CLOSED:
-                session.getFilterChain().fireSessionClosed();
+            case WRITE:
+                session.getFilterChain().fireFilterWrite((WriteRequest) getParameter());
                 break;
                 
             default:

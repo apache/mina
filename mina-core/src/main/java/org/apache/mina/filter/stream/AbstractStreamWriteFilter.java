@@ -105,7 +105,6 @@ public abstract class AbstractStreamWriteFilter<T> extends IoFilterAdapter {
 
                 nextFilter.filterWrite(session, new DefaultWriteRequest(buffer));
             }
-
         } else {
             nextFilter.filterWrite(session, writeRequest);
         }

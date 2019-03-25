@@ -20,7 +20,6 @@
 package org.apache.mina.core.file;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**

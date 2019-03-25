@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
+import org.apache.mina.filter.compression.CompressionFilter;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -48,6 +49,9 @@ public class Main {
         if (USE_SSL) {
             addSSLSupport(chain);
         }
+        
+        // Add the compressor filter
+        chain.addLast( "Compressor", new CompressionFilter() );
 
         // Bind
         acceptor.setHandler(new EchoProtocolHandler());

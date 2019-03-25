@@ -1117,27 +1117,9 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
 
                 session.increaseWrittenBytes(localWrittenBytes, currentTime);
 
-                // Now, forward the original message
+                // Now, forward the original message if ity has been fully sent
                 if (!buf.hasRemaining() || (!hasFragmentation && (localWrittenBytes != 0))) {
-                    WriteRequest originalRequest = req.getOriginalRequest();
-
-                    if (originalRequest != null) {
-                        Object originalMessage = originalRequest.getMessage();
-
-                        if (originalMessage instanceof IoBuffer) {
-                            buf = (IoBuffer) originalMessage;
-
-                            int pos = buf.position();
-                            buf.reset();
-                            this.fireMessageSent(session, req);
-                            // And set it back to its position
-                            buf.position(pos);
-                        } else {
-                            this.fireMessageSent(session, req);
-                        }
-                    } else {
-                        this.fireMessageSent(session, req);
-                    }
+                    this.fireMessageSent(session, req);
                 }
             } else {
                 this.fireMessageSent(session, req);

@@ -25,6 +25,7 @@ import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.filter.compression.CompressionFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
 import org.apache.mina.filter.ssl.SslFilter;
@@ -40,7 +41,7 @@ public class Main {
     private static final int PORT = 1234;
 
     /** Set this to true if you want to make the server SSL */
-    private static final boolean USE_SSL = false;
+    private static final boolean USE_SSL = true;
 
     public static void main(String[] args) throws Exception {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
@@ -53,6 +54,9 @@ public class Main {
         if (USE_SSL) {
             addSSLSupport(chain);
         }
+
+        // Add the compression filter
+        chain.addLast( "Compressor", new CompressionFilter() );
 
         chain.addLast("codec", new ProtocolCodecFilter(
                 new TextLineCodecFactory()));

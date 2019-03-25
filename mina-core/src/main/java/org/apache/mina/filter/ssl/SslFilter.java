@@ -42,7 +42,6 @@ import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.core.write.WriteRequestWrapper;
 import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -555,12 +554,7 @@ public class SslFilter extends IoFilterAdapter {
 
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) {
-        if (writeRequest instanceof EncryptedWriteRequest) {
-            EncryptedWriteRequest wrappedRequest = (EncryptedWriteRequest) writeRequest;
-            nextFilter.messageSent(session, wrappedRequest.getParentRequest());
-        } else {
-            // ignore extra buffers used for handshaking
-        }
+        nextFilter.messageSent(session, writeRequest.getOriginalRequest());
     }
 
     @Override
@@ -651,11 +645,10 @@ public class SslFilter extends IoFilterAdapter {
                         sslHandler.scheduleFilterWrite(nextFilter, writeRequest);
                     } else if (sslHandler.isHandshakeComplete()) {
                         // SSL encrypt
-                        buf.mark();
                         sslHandler.encrypt(buf.buf());
                         IoBuffer encryptedBuffer = sslHandler.fetchOutNetBuffer();
-                        sslHandler.scheduleFilterWrite(nextFilter, new EncryptedWriteRequest(writeRequest,
-                                encryptedBuffer));
+                        writeRequest.setMessage( encryptedBuffer );
+                        sslHandler.scheduleFilterWrite(nextFilter, writeRequest);
                     } else {
                         if (session.isConnected()) {
                             // Handshake not complete yet.
@@ -848,20 +841,6 @@ public class SslFilter extends IoFilterAdapter {
         @Override
         public String toString() {
             return name;
-        }
-    }
-
-    private static class EncryptedWriteRequest extends WriteRequestWrapper {
-        private final IoBuffer encryptedMessage;
-
-        private EncryptedWriteRequest(WriteRequest writeRequest, IoBuffer encryptedMessage) {
-            super(writeRequest);
-            this.encryptedMessage = encryptedMessage;
-        }
-
-        @Override
-        public Object getMessage() {
-            return encryptedMessage;
         }
     }
 }

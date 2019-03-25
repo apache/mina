@@ -742,7 +742,7 @@ public class DefaultIoFilterChain implements IoFilterChain {
      * {@inheritDoc}
      */
     @Override
-public void fireFilterWrite(WriteRequest writeRequest) {
+    public void fireFilterWrite(WriteRequest writeRequest) {
         callPreviousFilterWrite(tail, session, writeRequest);
     }
 
@@ -888,7 +888,7 @@ public void fireFilterWrite(WriteRequest writeRequest) {
     private class HeadFilter extends IoFilterAdapter {
         @SuppressWarnings("unchecked")
         @Override
-      public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+        public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
 
             // Maintain counters.
@@ -897,7 +897,6 @@ public void fireFilterWrite(WriteRequest writeRequest) {
                 // I/O processor implementation will call buffer.reset()
                 // it after the write operation is finished, because
                 // the buffer will be specified with messageSent event.
-                buffer.mark();
                 int remaining = buffer.remaining();
 
                 if (remaining > 0) {
@@ -905,9 +904,7 @@ public void fireFilterWrite(WriteRequest writeRequest) {
                 }
             }
 
-            if (!writeRequest.isEncoded()) {
-                s.increaseScheduledWriteMessages();
-            }
+            s.increaseScheduledWriteMessages();
 
             WriteRequestQueue writeRequestQueue = s.getWriteRequestQueue();
 
@@ -923,7 +920,6 @@ public void fireFilterWrite(WriteRequest writeRequest) {
                 s.getWriteRequestQueue().offer(s, writeRequest);
             }
         }
-
 
         @SuppressWarnings("unchecked")
         @Override
@@ -1005,7 +1001,7 @@ public void fireFilterWrite(WriteRequest writeRequest) {
         public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
             AbstractIoSession s = (AbstractIoSession) session;
 
-            if (!(message instanceof IoBuffer) || !((IoBuffer) message).hasRemaining()) {
+            if (message instanceof IoBuffer && !((IoBuffer) message).hasRemaining()) {
                 s.increaseReadMessages(System.currentTimeMillis());
             }
 
@@ -1026,25 +1022,16 @@ public void fireFilterWrite(WriteRequest writeRequest) {
 
         @Override
         public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-            ((AbstractIoSession) session).increaseWrittenMessages(writeRequest, System.currentTimeMillis());
+            long now = System.currentTimeMillis();
+            ((AbstractIoSession) session).increaseWrittenMessages(writeRequest, now);
 
             // Update the statistics
             if (session.getService() instanceof AbstractIoService) {
-                ((AbstractIoService) session.getService()).getStatistics().updateThroughput(System.currentTimeMillis());
+                ((AbstractIoService) session.getService()).getStatistics().updateThroughput(now);
             }
 
             // Propagate the message
-            session.getHandler().messageSent(session, writeRequest.getMessage());
-        }
-
-        @Override
-        public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-            nextFilter.filterWrite(session, writeRequest);
-        }
-
-        @Override
-        public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
-            nextFilter.filterClose(session);
+            session.getHandler().messageSent(session, writeRequest.getOriginalMessage());
         }
         
         @Override

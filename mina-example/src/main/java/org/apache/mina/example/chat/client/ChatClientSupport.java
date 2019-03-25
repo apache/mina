@@ -31,6 +31,7 @@ import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.filter.compression.CompressionFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
@@ -69,6 +70,9 @@ public class ChatClientSupport {
                     new TextLineCodecFactory());
             
             connector.getFilterChain().addLast("mdc", new MdcInjectionFilter());
+            
+            // Add the compression filter
+            connector.getFilterChain().addLast( "Compression", new CompressionFilter() );
             connector.getFilterChain().addLast("codec", CODEC_FILTER);
             connector.getFilterChain().addLast("logger", LOGGING_FILTER);
 
@@ -101,9 +105,7 @@ public class ChatClientSupport {
 
     public void broadcast(String message) {
         try {
-            for ( int i = 0; i < 1000000; i++) {
-                session.write("BROADCAST " + message + i);
-            }
+            session.write("BROADCAST " + message);
         } catch ( Exception e ) {
             e.printStackTrace();
         }
