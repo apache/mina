@@ -41,6 +41,7 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.slf4j.Logger;
@@ -554,7 +555,12 @@ public class SslFilter extends IoFilterAdapter {
 
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) {
-        nextFilter.messageSent(session, writeRequest.getOriginalRequest());
+        if (writeRequest instanceof EncryptedWriteRequest) {
+            EncryptedWriteRequest wrappedRequest = (EncryptedWriteRequest) writeRequest;
+            nextFilter.messageSent(session, wrappedRequest.getParentRequest());
+        } else {
+            // ignore extra buffers used for handshaking
+        }
     }
 
     @Override
@@ -648,7 +654,8 @@ public class SslFilter extends IoFilterAdapter {
                         sslHandler.encrypt(buf.buf());
                         IoBuffer encryptedBuffer = sslHandler.fetchOutNetBuffer();
                         writeRequest.setMessage( encryptedBuffer );
-                        sslHandler.scheduleFilterWrite(nextFilter, writeRequest);
+                        sslHandler.scheduleFilterWrite(nextFilter, new EncryptedWriteRequest(writeRequest,
+                            encryptedBuffer));
                     } else {
                         if (session.isConnected()) {
                             // Handshake not complete yet.
@@ -841,6 +848,46 @@ public class SslFilter extends IoFilterAdapter {
         @Override
         public String toString() {
             return name;
+        }
+    }
+    
+    /**
+     * A private class used to store encrypted messages. This is necessary
+     * to be able to emit the messageSent event with the proper original
+     * message, but not for handshake messages, which will be swallowed.
+     *
+     */
+    private static class EncryptedWriteRequest extends DefaultWriteRequest {
+        // Thee encrypted messagee
+        private final IoBuffer encryptedMessage;
+        
+        // The original message
+        private WriteRequest parentRequest;
+
+        /**
+         * Create a new instance of an EncryptedWriteRequest
+         * @param writeRequest The parent request
+         * @param encryptedMessage The encrypted message
+         */
+        private EncryptedWriteRequest(WriteRequest writeRequest, IoBuffer encryptedMessage) {
+            super(encryptedMessage);
+            parentRequest = writeRequest;
+            this.encryptedMessage = encryptedMessage;
+        }
+
+        /**
+         * @return teh encrypted message
+         */
+        @Override
+        public Object getMessage() {
+            return encryptedMessage;
+        }
+
+        /**
+         * @return The parent WriteRequest
+         */
+        public WriteRequest getParentRequest() {
+            return parentRequest;
         }
     }
 }

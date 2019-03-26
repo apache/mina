@@ -264,6 +264,13 @@ class SslHandler {
         return handshakeComplete;
     }
 
+    /**
+     * Check if handshake is on going.
+     */
+    /* no qualifier */boolean notHandshaking() {
+        return handshakeStatus == HandshakeStatus.FINISHED || handshakeStatus == HandshakeStatus.NOT_HANDSHAKING;
+    }
+
     /* no qualifier */boolean isInboundDone() {
         return sslEngine == null || sslEngine.isInboundDone();
     }
