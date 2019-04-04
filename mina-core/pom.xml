@@ -59,6 +59,7 @@
               org.apache.mina.core.service;version=${project.version};-noimport:=true,
               org.apache.mina.core.session;version=${project.version};-noimport:=true,
               org.apache.mina.core.write;version=${project.version};-noimport:=true,
+              org.apache.mina.filter;version=${project.version};-noimport:=true,
               org.apache.mina.filter.buffer;version=${project.version};-noimport:=true,
               org.apache.mina.filter.codec;version=${project.version};-noimport:=true,
               org.apache.mina.filter.codec.demux;version=${project.version};-noimport:=true,
