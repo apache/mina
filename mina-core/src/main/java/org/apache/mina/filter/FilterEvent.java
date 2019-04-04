@@ -20,7 +20,7 @@
 package org.apache.mina.filter;
 
 /**
- * An empty interface that each Filter that are going to send a specific event must implement.
+ * An empty interface that each Filter that is going to send a specific event must implement.
  *   
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
