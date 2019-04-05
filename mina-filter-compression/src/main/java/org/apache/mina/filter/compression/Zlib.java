@@ -153,6 +153,8 @@ class Zlib {
                     }
                 }
             } while (zStream.avail_in > 0);
+            
+            cleanUp();
         }
 
         return outBuffer.flip();
@@ -198,6 +200,8 @@ class Zlib {
 
             IoBuffer outBuf = IoBuffer.wrap(outBytes, 0, zStream.next_out_index);
 
+            cleanUp();
+            
             return outBuf;
         }
     }
