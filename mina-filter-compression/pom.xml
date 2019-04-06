@@ -65,13 +65,13 @@
               org.apache.mina.filter.compression;version=${project.version};-noimport:=true
             </Export-Package>
             <Import-Package>
-			  org.apache.mina.core.buffer;version=${project.version},
-			  org.apache.mina.core.filterchain;version=${project.version},
-			  org.apache.mina.core.session;version=${project.version},
-			  org.apache.mina.core.write;version=${project.version},
-			  org.apache.mina.filter.util;version=${project.version},
-			  com.jcraft.jzlib;version=${version.jzlib},
-			  org.slf4j;version=${osgi-min-version.slf4j.api}
+              org.apache.mina.core.buffer;version=${project.version},
+              org.apache.mina.core.filterchain;version=${project.version},
+              org.apache.mina.core.session;version=${project.version},
+              org.apache.mina.core.write;version=${project.version},
+              org.apache.mina.filter.util;version=${project.version},
+              com.jcraft.jzlib;version=${version.jzlib},
+              org.slf4j;version=${osgi-min-version.slf4j.api}
             </Import-Package>
           </instructions>
         </configuration>
