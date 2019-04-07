@@ -44,6 +44,7 @@ public class BlacklistFilter extends IoFilterAdapter {
     /** The list of blocked addresses */
     private final List<Subnet> blacklist = new CopyOnWriteArrayList<Subnet>();
 
+    /** A logger for this class */ 
     private final static Logger LOGGER = LoggerFactory.getLogger(BlacklistFilter.class);
 
     /**
@@ -60,9 +61,8 @@ public class BlacklistFilter extends IoFilterAdapter {
 
         blacklist.clear();
 
-        for (int i = 0; i < addresses.length; i++) {
-            InetAddress addr = addresses[i];
-            block(addr);
+        for (InetAddress address:addresses) {
+            block(address);
         }
     }
 
@@ -178,6 +178,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         blacklist.remove(subnet);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) {
         if (!isBlocked(session)) {
@@ -188,6 +191,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
         if (!isBlocked(session)) {
@@ -198,6 +204,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         if (!isBlocked(session)) {
@@ -208,6 +217,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         if (!isBlocked(session)) {
@@ -218,6 +230,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) {
         if (!isBlocked(session)) {
@@ -228,6 +243,9 @@ public class BlacklistFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
         if (!isBlocked(session)) {

@@ -41,8 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class StateMachineProxyBuilder {
-    private static final Logger log = LoggerFactory.getLogger(StateMachineProxyBuilder.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(StateMachineProxyBuilder.class);
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
 
     private StateContextLookup contextLookup = new SingletonStateContextLookup();
@@ -235,10 +234,10 @@ public class StateMachineProxyBuilder {
                         + Integer.toHexString(System.identityHashCode(proxy));
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("Method invoked: " + method);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Method invoked: " + method);
             }
-
+            
             args = args == null ? EMPTY_ARGUMENTS : args;
             
             if (interceptor != null) {

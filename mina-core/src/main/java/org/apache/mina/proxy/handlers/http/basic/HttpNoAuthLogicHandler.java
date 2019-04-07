@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
-    private static final Logger logger = LoggerFactory.getLogger(HttpNoAuthLogicHandler.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpNoAuthLogicHandler.class);
+    
     /**
      * Build an HttpNoAuthLogicHandler
      * 
@@ -52,7 +52,9 @@ public class HttpNoAuthLogicHandler extends AbstractAuthLogicHandler {
      */
     @Override
     public void doHandshake(final NextFilter nextFilter) throws ProxyAuthException {
-        logger.debug(" doHandshake()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" doHandshake()");
+        }
 
         // Just send the request, no authentication needed
         writeRequest(nextFilter, (HttpProxyRequest) request);

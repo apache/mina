@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class HttpClientEncoder implements ProtocolEncoder {
-    private static final Logger LOG = LoggerFactory.getLogger(HttpClientCodec.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientCodec.class);
     private static final CharsetEncoder ENCODER = StandardCharsets.UTF_8.newEncoder();
 
     /**
@@ -46,10 +46,15 @@ public class HttpClientEncoder implements ProtocolEncoder {
      */
     @Override
     public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
-        LOG.debug("encode {}", message.getClass().getCanonicalName());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("encode {}", message.getClass().getCanonicalName());
+        }
         
         if (message instanceof HttpRequest) {
-            LOG.debug("HttpRequest");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("HttpRequest");
+            }
+            
             HttpRequest msg = (HttpRequest)message;
             StringBuilder sb = new StringBuilder(msg.getMethod().toString());
             sb.append(" ");
@@ -77,10 +82,15 @@ public class HttpClientEncoder implements ProtocolEncoder {
             buf.flip();
             out.write(buf);
         } else if (message instanceof ByteBuffer) {
-            LOG.debug("Body");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Body");
+            }
+            
             out.write(message);
         } else if (message instanceof HttpEndOfContent) {
-            LOG.debug("End of Content");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("End of Content");
+            }
             // end of HTTP content
             // keep alive ?
         }

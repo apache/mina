@@ -48,8 +48,8 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class DecodingStateMachine implements DecodingState {
-    private final Logger log = LoggerFactory.getLogger(DecodingStateMachine.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecodingStateMachine.class);
+    
     private final List<Object> childProducts = new ArrayList<>();
 
     private final ProtocolDecoderOutput childOutput = new ProtocolDecoderOutput() {
@@ -175,7 +175,10 @@ public abstract class DecodingStateMachine implements DecodingState {
             }
         } catch (Exception e) {
             state = null;
-            log.debug("Ignoring the exception caused by a closed session.", e);
+            
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Ignoring the exception caused by a closed session.", e);
+            }
         } finally {
             this.currentState = state;
             nextState = finishDecode(childProducts, out);
@@ -196,7 +199,9 @@ public abstract class DecodingStateMachine implements DecodingState {
         try {
             destroy();
         } catch (Exception e2) {
-            log.warn("Failed to destroy a decoding state machine.", e2);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn("Failed to destroy a decoding state machine.", e2);
+            }
         }
     }
 

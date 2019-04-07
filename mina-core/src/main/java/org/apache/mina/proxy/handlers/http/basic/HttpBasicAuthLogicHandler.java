@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
-    private static final Logger logger = LoggerFactory.getLogger(HttpBasicAuthLogicHandler.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpBasicAuthLogicHandler.class);
+    
     /**
      * Build an HttpBasicAuthLogicHandler
      * 
@@ -62,7 +62,9 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
      */
     @Override
     public void doHandshake(final NextFilter nextFilter) throws ProxyAuthException {
-        logger.debug(" doHandshake()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" doHandshake()");
+        }
 
         if (step > 0) {
             throw new ProxyAuthException("Authentication request already sent");

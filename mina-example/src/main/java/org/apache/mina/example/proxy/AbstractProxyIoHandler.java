@@ -38,7 +38,7 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
     public static final String OTHER_IO_SESSION = AbstractProxyIoHandler.class.getName()+".OtherIoSession";
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractProxyIoHandler.class);
-    
+
     /**
      * {@inheritDoc}
      */

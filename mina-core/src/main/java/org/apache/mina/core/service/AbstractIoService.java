@@ -335,9 +335,15 @@ public abstract class AbstractIoService implements IoService {
             if (awaitTermination) {
 
                 try {
-                    LOGGER.debug("awaitTermination on {} called by thread=[{}]", this, Thread.currentThread().getName());
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("awaitTermination on {} called by thread=[{}]", this, Thread.currentThread().getName());
+                    }
+                    
                     e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
-                    LOGGER.debug("awaitTermination on {} finished", this);
+                    
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("awaitTermination on {} finished", this);
+                    }
                 } catch (InterruptedException e1) {
                     LOGGER.warn("awaitTermination on [{}] was interrupted", this);
                     // Restore the interrupted status

@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
-    private static final Logger logger = LoggerFactory.getLogger(HttpSmartProxyHandler.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpSmartProxyHandler.class);
+    
     /**
      * Has the HTTP proxy request been sent ?
      */
@@ -66,7 +66,9 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
      */
     @Override
     public void doHandshake(final NextFilter nextFilter) throws ProxyAuthException {
-        logger.debug(" doHandshake()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" doHandshake()");
+        }
 
         if (authHandler != null) {
             authHandler.doHandshake(nextFilter);
@@ -76,7 +78,9 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
                 throw new ProxyAuthException("Authentication request already sent");
             }
 
-            logger.debug("  sending HTTP request");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("  sending HTTP request");
+            }
 
             // Compute request headers
             HttpProxyRequest req = (HttpProxyRequest) getProxyIoSession().getRequest();
@@ -130,7 +134,9 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
                 try {
                     authHandler = HttpAuthenticationMethods.getNewHandler(method, proxyIoSession);
                 } catch (Exception ex) {
-                    logger.debug("Following exception occured:", ex);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Following exception occured:", ex);
+                    }
                 }
             }
 
@@ -165,7 +171,9 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
                             break;
                         }
                     } catch (Exception ex) {
-                        logger.debug("Following exception occured:", ex);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Following exception occured:", ex);
+                        }
                     }
                 }
             }

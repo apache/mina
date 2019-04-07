@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class HttpClientDecoder implements ProtocolDecoder {
-    private static final Logger LOG = LoggerFactory.getLogger(HttpClientCodec.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientCodec.class);
+    
     /** Key for decoder current state */
     private static final String DECODER_STATE_ATT = "http.ds";
 
@@ -96,7 +96,10 @@ public class HttpClientDecoder implements ProtocolDecoder {
         
         switch (state) {
             case HEAD:
-                LOG.debug("decoding HEAD");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("decoding HEAD");
+                }
+                
                 // grab the stored a partial HEAD request
                 ByteBuffer oldBuffer = (ByteBuffer)session.getAttribute(PARTIAL_HEAD_ATT);
                 // concat the old buffer and the new incoming one
@@ -104,7 +107,10 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 // now let's decode like it was a new message
     
             case NEW:
-                LOG.debug("decoding NEW");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("decoding NEW");
+                }
+                
                 DefaultHttpResponse rp = parseHttpReponseHead(msg.buf());
     
                 if (rp == null) {
@@ -118,16 +124,25 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 } else {
                     out.write(rp);
                     // is it a response with some body content ?
-                    LOG.debug("response with content");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("response with content");
+                    }
+                    
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
     
                     String contentLen = rp.getHeader("content-length");
     
                     if (contentLen != null) {
-                        LOG.debug("found content len : {}", contentLen);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("found content len : {}", contentLen);
+                        }
+                        
                         session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(contentLen));
                     } else if ("chunked".equalsIgnoreCase(rp.getHeader("transfer-encoding"))) {
-                        LOG.debug("no content len but chunked");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("no content len but chunked");
+                        }
+                        
                         session.setAttribute(BODY_CHUNKED, Boolean.TRUE);
                     } else if ("close".equalsIgnoreCase(rp.getHeader("connection"))) {
                         session.closeNow();
@@ -139,7 +154,10 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 break;
     
             case BODY:
-                LOG.debug("decoding BODY: {} bytes", msg.remaining());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("decoding BODY: {} bytes", msg.remaining());
+                }
+                
                 int chunkSize = msg.remaining();
                 
                 // send the chunk of body
@@ -165,7 +183,10 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 }
     
                 if (remaining <= 0 ) {
-                    LOG.debug("end of HTTP body");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("end of HTTP body");
+                    }
+                    
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
                     session.removeAttribute(BODY_REMAINING_BYTES);
                     

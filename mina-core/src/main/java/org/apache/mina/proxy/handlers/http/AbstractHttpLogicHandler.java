@@ -115,7 +115,9 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
      */
     @Override
     public synchronized void messageReceived(final NextFilter nextFilter, final IoBuffer buf) throws ProxyAuthException {
-        LOGGER.debug(" messageReceived()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(" messageReceived()");
+        }
 
         IoBufferDecoder decoder = (IoBufferDecoder) getSession().getAttribute(DECODER);
         if (decoder == null) {
@@ -135,8 +137,10 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
                 String responseHeader = responseData.getString(getProxyIoSession().getCharset().newDecoder());
                 entityBodyStartPosition = responseData.position();
 
-                LOGGER.debug("  response header received:\n{}",
-                        responseHeader.replace("\r", "\\r").replace("\n", "\\n\n"));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("  response header received:\n{}",
+                            responseHeader.replace("\r", "\\r").replace("\n", "\\n\n"));
+                }
 
                 // Parse the response
                 parsedResponse = decodeResponse(responseHeader);
@@ -174,7 +178,10 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
                 if ("chunked".equalsIgnoreCase(StringUtilities.getSingleValuedHeader(parsedResponse.getHeaders(),
                         "Transfer-Encoding"))) {
                     // Handle Transfer-Encoding: Chunked
-                    LOGGER.debug("Retrieving additional http response chunks");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Retrieving additional http response chunks");
+                    }
+                    
                     hasChunkedData = true;
                     waitingChunkedData = true;
                 }
@@ -244,8 +251,10 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
 
             responseData.flip();
 
-            LOGGER.debug("  end of response received:\n{}",
-                    responseData.getString(getProxyIoSession().getCharset().newDecoder()));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("  end of response received:\n{}",
+                        responseData.getString(getProxyIoSession().getCharset().newDecoder()));
+            }
 
             // Retrieve entity body content
             responseData.position(entityBodyStartPosition);
@@ -311,7 +320,9 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
             String data = request.toHttpString();
             IoBuffer buf = IoBuffer.wrap(data.getBytes(getProxyIoSession().getCharsetName()));
 
-            LOGGER.debug("   write:\n{}", data.replace("\r", "\\r").replace("\n", "\\n\n"));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("   write:\n{}", data.replace("\r", "\\r").replace("\n", "\\n\n"));
+            }
 
             writeData(nextFilter, buf);
 
@@ -328,7 +339,9 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
      * @param request the http request
      */
     private void reconnect(final NextFilter nextFilter, final HttpProxyRequest request) {
-        LOGGER.debug("Reconnecting to proxy ...");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Reconnecting to proxy ...");
+        }
 
         final ProxyIoSession proxyIoSession = getProxyIoSession();
 
@@ -336,10 +349,17 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
         proxyIoSession.getConnector().connect(new IoSessionInitializer<ConnectFuture>() {
             @Override
             public void initializeSession(final IoSession session, ConnectFuture future) {
-                LOGGER.debug("Initializing new session: {}", session);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Initializing new session: {}", session);
+                }
+                
                 session.setAttribute(ProxyIoSession.PROXY_SESSION, proxyIoSession);
                 proxyIoSession.setSession(session);
-                LOGGER.debug("  setting up proxyIoSession: {}", proxyIoSession);
+                
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("  setting up proxyIoSession: {}", proxyIoSession);
+                }
+                
                 // Reconnection is done so we send the
                 // request to the proxy
                 proxyIoSession.setReconnectionNeeded(false);
@@ -356,7 +376,9 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
      * @throws Exception If we get an error while decoding the response
      */
     protected HttpProxyResponse decodeResponse(final String response) throws Exception {
-        LOGGER.debug("  parseResponse()");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("  parseResponse()");
+        }
 
         // Break response into lines
         String[] responseLines = response.split(HttpProxyConstants.CRLF);

@@ -493,8 +493,10 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
 
         // Last resort: try to create a new instance and test if it maintains
         // the insertion order.
-        LOGGER.debug("Last resort; trying to create a new map instance with a "
-                + "default constructor and test if insertion order is maintained.");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Last resort; trying to create a new map instance with a "
+                    + "default constructor and test if insertion order is maintained.");
+        }
 
         Map<String,IoFilter> newMap;
         
@@ -535,7 +537,9 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
             }
         }
 
-        LOGGER.debug("The specified map passed the insertion order test.");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("The specified map passed the insertion order test.");
+        }
         
         return true;
     }

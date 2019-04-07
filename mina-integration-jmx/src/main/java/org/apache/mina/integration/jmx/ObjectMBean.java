@@ -532,7 +532,10 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         try {
             property = getAttribute(object, attrName, pdesc.getPropertyType());
         } catch (Exception e) {
-            LOGGER.debug("Unexpected exception.", e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Unexpected exception.", e);
+            }
+            
             return;
         }
 

@@ -163,7 +163,10 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
             try {
                 if (clients.containsKey(addr.getAddress().getHostAddress())) {
 
-                    LOGGER.debug("This is not a new client");
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("This is not a new client");
+                    }
+                    
                     Long lastConnTime = clients.get(addr.getAddress().getHostAddress());
 
                     clients.put(addr.getAddress().getHostAddress(), now);

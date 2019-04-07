@@ -55,14 +55,20 @@ public class BufferedWriteFilterTest {
 
             @Override
             public void filterClose(NextFilter nextFilter, IoSession session) throws Exception {
-                LOGGER.debug("Filter closed !");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Filter closed !");
+                }
+                
                 assertEquals(3, counter);
             }
 
             @Override
             public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest)
                     throws Exception {
-                LOGGER.debug("New buffered message written !");
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("New buffered message written !");
+                }
+                
                 counter++;
                 try {
                     IoBuffer buf = (IoBuffer) writeRequest.getMessage();

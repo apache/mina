@@ -230,7 +230,9 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
      */
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
-        LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session.getId());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Processing a MESSAGE_RECEIVED for session {}", session.getId());
+        }
 
         if (!(message instanceof IoBuffer)) {
             nextFilter.messageReceived(session, message);

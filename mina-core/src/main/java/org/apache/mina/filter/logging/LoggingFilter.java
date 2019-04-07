@@ -29,10 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Logs all MINA protocol events.  Each event can be
- * tuned to use a different level based on the user's specific requirements.  Methods
- * are in place that allow the user to use either the get or set method for each event
- * and pass in the {@link IoEventType} and the {@link LogLevel}.
+ * Logs MINA protocol events.  Each event can be tuned to use a different level based on 
+ * the user's specific requirements.  Methods are in place that allow the user to use 
+ * either the get or set method for each event and pass in the {@link IoEventType} and 
+ * the {@link LogLevel}.
  *
  * By default, all events are logged to the {@link LogLevel#INFO} level except
  * {@link IoFilterAdapter#exceptionCaught(IoFilter.NextFilter, IoSession, Throwable)},
@@ -196,42 +196,67 @@ public class LoggingFilter extends IoFilterAdapter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void exceptionCaught(NextFilter nextFilter, IoSession session, Throwable cause) throws Exception {
         log(exceptionCaughtLevel, "EXCEPTION :", cause);
         nextFilter.exceptionCaught(session, cause);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageReceived(NextFilter nextFilter, IoSession session, Object message) throws Exception {
+        // Note: the way the IoBuffer method is implemented, logging an instance of
+        // an instance will not change its position. It's safe.
         log(messageReceivedLevel, "RECEIVED: {}", message);
         nextFilter.messageReceived(session, message);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
+        // Note: the way the IoBuffer method is implemented, logging an instance of
+        // an instance will not change its position. It's safe.
         log(messageSentLevel, "SENT: {}", writeRequest.getOriginalRequest().getMessage());
         nextFilter.messageSent(session, writeRequest);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
         log(sessionCreatedLevel, "CREATED");
         nextFilter.sessionCreated(session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
         log(sessionOpenedLevel, "OPENED");
         nextFilter.sessionOpened(session);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionIdle(NextFilter nextFilter, IoSession session, IdleStatus status) throws Exception {
         log(sessionIdleLevel, "IDLE");
         nextFilter.sessionIdle(session, status);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
         log(sessionClosedLevel, "CLOSED");

@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractAuthLogicHandler {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractAuthLogicHandler.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAuthLogicHandler.class);
+    
     /**
      * The request to be handled by the proxy.
      */
@@ -94,7 +94,9 @@ public abstract class AbstractAuthLogicHandler {
      * @throws ProxyAuthException If we get an error during the proxy authentication
      */
     protected void writeRequest(final NextFilter nextFilter, final HttpProxyRequest request) throws ProxyAuthException {
-        logger.debug("  sending HTTP request");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("  sending HTTP request");
+        }
 
         ((AbstractHttpLogicHandler) proxyIoSession.getHandler()).writeRequest(nextFilter, request);
     }

@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
  * @since MINA 2.0.0-M3
  */
 public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
-    private final static Logger logger = LoggerFactory.getLogger(AbstractProxyIoHandler.class);
-
+    private final static Logger LOGGER = LoggerFactory.getLogger(AbstractProxyIoHandler.class);
+    
     /**
      * Method called only when handshake has completed.
      * 
@@ -57,7 +57,9 @@ public abstract class AbstractProxyIoHandler extends IoHandlerAdapter {
                 || proxyIoSession.getHandler().isHandshakeComplete()) {
             proxySessionOpened(session);
         } else {
-            logger.debug("Filtered session opened event !");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Filtered session opened event !");
+            }
         }
     }
 }

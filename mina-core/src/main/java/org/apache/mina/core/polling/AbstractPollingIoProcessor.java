@@ -1117,7 +1117,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
 
                 session.increaseWrittenBytes(localWrittenBytes, currentTime);
 
-                // Now, forward the original message
+                // Now, forward the original message if it has been fully sent
                 if (!buf.hasRemaining() || (!hasFragmentation && (localWrittenBytes != 0))) {
                     WriteRequest originalRequest = req.getOriginalRequest();
 
