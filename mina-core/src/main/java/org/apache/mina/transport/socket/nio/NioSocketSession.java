@@ -19,12 +19,9 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import org.apache.mina.core.RuntimeIoException;
@@ -125,15 +122,6 @@ class NioSocketSession extends NioSession {
         }
 
         return (InetSocketAddress) socket.getLocalSocketAddress();
-    }
-
-    protected void destroy(NioSession session) throws IOException {
-        ByteChannel ch = session.getChannel();
-        SelectionKey key = session.getSelectionKey();
-        if (key != null) {
-            key.cancel();
-        }
-        ch.close();
     }
 
     @Override
