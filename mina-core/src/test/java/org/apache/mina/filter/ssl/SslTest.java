@@ -152,7 +152,6 @@ public class SslTest {
         String line = in.readLine();
         //System.out.println("Client got: " + line);
         socket.close();
-
     }
 
     private static SSLContext createSSLContext() throws IOException, GeneralSecurityException {

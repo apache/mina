@@ -33,6 +33,7 @@ import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
+import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.filterchain.IoFilterEvent;
@@ -42,6 +43,7 @@ import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.ssl.SslFilter.EncryptedWriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -528,9 +530,34 @@ class SslHandler {
          * UNDERFLOW - Need to read more data from the socket. It's normal.
          * CLOSED - The other peer closed the socket. Also normal.
          */
-        if (status == SSLEngineResult.Status.BUFFER_OVERFLOW) {
-            throw new SSLException("SSLEngine error during decrypt: " + status + " inNetBuffer: " + inNetBuffer
+        switch (status) {
+            case BUFFER_OVERFLOW:
+                throw new SSLException("SSLEngine error during decrypt: " + status + " inNetBuffer: " + inNetBuffer
                     + "appBuffer: " + appBuffer);
+            case CLOSED:
+                Exception exception =new RuntimeIoException("SSL/TLS close_notify received");
+                
+                // Empty the Ssl queue
+                for (IoFilterEvent event:filterWriteEventQueue) {
+                    EncryptedWriteRequest writeRequest = (EncryptedWriteRequest)event.getParameter();
+                    WriteFuture writeFuture = writeRequest.getParentRequest().getFuture();
+                    writeFuture.setException(exception);
+                    writeFuture.notifyAll();
+                }
+                
+                // Empty the session queue
+                while (!session.getWriteRequestQueue().isEmpty(session)) {
+                    WriteRequest writeRequest = session.getWriteRequestQueue().poll( session );
+                    WriteFuture writeFuture = writeRequest.getFuture();
+                    writeFuture.setException(exception);
+                    writeFuture.notifyAll();
+                }
+                
+                // We *must* shutdown session
+                session.closeNow();
+                break;
+            default: 
+                break;
         }
     }
 
@@ -595,8 +622,7 @@ class SslHandler {
                 }
 
                 // First make sure that the out buffer is completely empty.
-                // Since we
-                // cannot call wrap with data left on the buffer
+                // Since we cannot call wrap with data left on the buffer
                 if (outNetBuffer != null && outNetBuffer.hasRemaining()) {
                     return;
                 }

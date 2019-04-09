@@ -857,7 +857,7 @@ public class SslFilter extends IoFilterAdapter {
      * message, but not for handshake messages, which will be swallowed.
      *
      */
-    private static class EncryptedWriteRequest extends DefaultWriteRequest {
+    /* package protected */ static class EncryptedWriteRequest extends DefaultWriteRequest {
         // Thee encrypted messagee
         private final IoBuffer encryptedMessage;
         
