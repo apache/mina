@@ -169,14 +169,6 @@ public class CompressionFilter extends IoFilterAdapter {
         nextFilter.messageReceived(session, inflater.inflate(inBuffer));
     }
     
-    /**
-     * {@inheritDoc}
-     *
-    @Override
-    public void messageSent(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) throws Exception {
-        nextFilter.messageSent(session, writeRequest);
-    }
-
     /*
      * @see org.apache.mina.core.IoFilter#filterWrite(org.apache.mina.core.IoFilter.NextFilter, org.apache.mina.core.IoSession, org.apache.mina.core.IoFilter.WriteRequest)
      */
