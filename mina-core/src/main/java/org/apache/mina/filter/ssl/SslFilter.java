@@ -889,5 +889,13 @@ public class SslFilter extends IoFilterAdapter {
         public WriteRequest getParentRequest() {
             return parentRequest;
         }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public WriteFuture getFuture() {
+            return parentRequest.getFuture();
+        }
     }
 }
