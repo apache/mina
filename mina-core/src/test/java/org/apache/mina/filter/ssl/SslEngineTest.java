@@ -3,9 +3,13 @@ package org.apache.mina.filter.ssl;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
+import java.util.Deque;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -17,10 +21,93 @@ import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SslEngineTest
 {
+    private BlockingDeque<ByteBuffer> clientQueue = new LinkedBlockingDeque<>(); 
+    private BlockingDeque<ByteBuffer> serverQueue = new LinkedBlockingDeque<>(); 
+
+    private class Handshaker implements Runnable {
+        private SSLEngine sslEngine;
+        private ByteBuffer workBuffer;
+        private ByteBuffer emptyBuffer= ByteBuffer.allocate(0);
+        
+        private void push(Deque<ByteBuffer> queue, ByteBuffer buffer) {
+            ByteBuffer result = ByteBuffer.allocate(buffer.capacity());
+            result.put(buffer);
+            queue.addFirst(result);
+        }
+        
+        public void run()
+        {
+            HandshakeStatus handshakeStatus = sslEngine.getHandshakeStatus();
+            SSLEngineResult result;
+
+            try
+            {
+                while (handshakeStatus != HandshakeStatus.FINISHED) {
+                    switch (handshakeStatus)
+                    {
+                        case NEED_TASK:
+                            break;
+                            
+                        case NEED_UNWRAP:
+                            // The SSLEngine waits for some input.
+                            // We may have received too few data (TCP fragmentation)
+                            // 
+                            ByteBuffer data = serverQueue.takeLast();
+                            result = sslEngine.unwrap(data, workBuffer);
+                            
+                            while (result.getStatus()  == SSLEngineResult.Status.BUFFER_UNDERFLOW) {
+                                // We need more data, until then, wait.
+                                //ByteBuffer data = serverQueue.takeLast();
+                                result = sslEngine.unwrap(data, workBuffer);
+                            }
+                            
+                            handshakeStatus = sslEngine.getHandshakeStatus();
+                            break;
+
+                        case NEED_WRAP:
+                        case NOT_HANDSHAKING:
+                            result = sslEngine.wrap(emptyBuffer, workBuffer);
+    
+                            workBuffer.flip();
+                            
+                            if (workBuffer.hasRemaining()) {
+                                push(clientQueue, workBuffer);
+                                workBuffer.clear();
+                            }
+                            
+                            handshakeStatus = result.getHandshakeStatus();
+                            
+                            break;
+    
+                        case FINISHED:
+                        
+                    }
+                }
+            }
+            catch ( SSLException e )
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch ( InterruptedException e )
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
+        public Handshaker(SSLEngine sslEngine) {
+            this.sslEngine = sslEngine;
+            int packetBufferSize = sslEngine.getSession().getPacketBufferSize();
+            workBuffer = ByteBuffer.allocate(packetBufferSize);
+        }
+    }
+    
     /** A JVM independant KEY_MANAGER_FACTORY algorithm */
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
 
@@ -243,11 +330,15 @@ public class SslEngineTest
     
     
     private HandshakeStatus handshake(SSLEngine sslEngine, HandshakeStatus expected, 
-        IoBuffer inBuffer, IoBuffer outBuffer) throws SSLException {
+        IoBuffer inBuffer, IoBuffer outBuffer, boolean dumpBuffer) throws SSLException {
         HandshakeStatus handshakeStatus = handshake(sslEngine, inBuffer, outBuffer);
 
         if ( handshakeStatus != expected) {
             fail();
+        }
+        
+        if (dumpBuffer) {
+            System.out.println("Message:" + outBuffer);
         }
         
         return handshakeStatus;
@@ -255,6 +346,7 @@ public class SslEngineTest
 
     
     @Test
+    @Ignore
     public void testSSL() throws Exception {
         // Initialise the client SSLEngine
         SSLContext sslContextClient = createSSLContext();
@@ -273,52 +365,122 @@ public class SslEngineTest
         outNetBufferServer = IoBuffer.allocate(packetBufferSize).setAutoExpand(true);
         
         sslEngineServer.setUseClientMode(false);
+        
+        Handshaker handshakerClient = new Handshaker( sslEngineClient );
+        Handshaker handshakerServer = new Handshaker( sslEngineServer );
+        
+        handshakerServer.run();
 
         HandshakeStatus handshakeStatusClient = sslEngineClient.getHandshakeStatus();
         HandshakeStatus handshakeStatusServer = sslEngineServer.getHandshakeStatus();
-        
-        // Start the server
-        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_UNWRAP, inNetBufferServer, outNetBufferServer);
-        
-        // Now start the client
-        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_UNWRAP, inNetBufferClient, outNetBufferClient);
-        
-        // 'Read' the CLIENT_HELLO to the server
-        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_TASK, outNetBufferClient, outNetBufferServer);
 
-        // Create the SERVER_HELLO message
+    // <<< Server
+        // Start the server
+        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_UNWRAP, 
+            null, outNetBufferServer, false);
+        
+    // >>> Client
+        // Now start the client, which will generate a CLIENT_HELLO,
+        // stored into the outNetBufferClient
+        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_UNWRAP, 
+            null, outNetBufferClient, true);
+        
+    // <<< Server
+        // Process the CLIENT_HELLO on the server
+        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_TASK, 
+            outNetBufferClient, outNetBufferServer, false);
+
+        // Process the tasks on the server, prepare the SERVER_HELLO message
         handshakeStatusServer = doTasks(sslEngineServer);
         
-        // We should get back the message  
+        // We should be ready to generate the SERVER_HELLO message
         if ( handshakeStatusServer != HandshakeStatus.NEED_WRAP) {
             fail();
         }
         
-        // 'Send' the SERVER_HELLO message to the client
+        // Get the SERVER_HELLO message, with all the associated messages
+        // ([Certificate], [ServerKeyExchange], [CertificateRequest], ServerHelloDone)
         outNetBufferServer.clear();
-        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_UNWRAP, null, outNetBufferServer);
+        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_UNWRAP, 
+            null, outNetBufferServer, true);
         
-        // 'Read' the SERVER_HELLO message on the client
-        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_TASK, outNetBufferServer, inNetBufferClient);
-        
-        // Create the  message
+    // >>> Client
+        // Process the SERVER_HELLO message on the client
+        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_TASK, 
+            outNetBufferServer, inNetBufferClient, false);
+    
+        // Prepare the client response
         handshakeStatusClient = doTasks(sslEngineClient);
-        
-        // We should get back the message  
+    
+        // We should get back the Client messages ([Certificate],
+        // ClientKeyExchange, [CertificateVerify])
         if ( handshakeStatusClient != HandshakeStatus.NEED_WRAP) {
             fail();
         }
-        
-        // 'Send' the SERVER_HELLO message to the client
+    
+        // Generate the [Certificate], ClientKeyExchange, [CertificateVerify] messages
         outNetBufferClient.clear();
-        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_WRAP, null, outNetBufferClient);
+        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_WRAP, 
+            null, outNetBufferClient, true);
         
-        // 'Send' the CLIENT_KEY_EXCHANGE message to the server
-        outNetBufferClient.clear();
-        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_WRAP, null, outNetBufferClient);
+    // <<< Server
+        // Process the CLIENT_KEY_EXCHANGE on the server
+        outNetBufferServer.clear();
+        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_TASK, 
+            outNetBufferClient, outNetBufferServer, false);
+
+        // Do the controls
+        handshakeStatusServer = doTasks(sslEngineServer);
         
-        // 'Send' the ALERT message to the server
+        // The server is waiting for more
+        if ( handshakeStatusServer != HandshakeStatus.NEED_UNWRAP) {
+            fail();
+        }
+
+    // >>> Client
+        // The CHANGE_CIPHER_SPEC message generation
         outNetBufferClient.clear();
-        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_UNWRAP, null, outNetBufferClient);
+        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_WRAP, 
+            null, outNetBufferClient, true);
+
+    // <<< Server
+        // Process the CHANGE_CIPHER_SPEC on the server
+        outNetBufferServer.clear();
+        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_UNWRAP, 
+            outNetBufferClient, outNetBufferServer, false);
+
+    // >>> Client
+        // Generate the FINISHED message on thee client
+        outNetBufferClient.clear();
+        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_UNWRAP, 
+            null, outNetBufferClient, true);
+
+    // <<< Server
+        // Process the client FINISHED message
+        outNetBufferServer.clear();
+        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_WRAP, 
+            outNetBufferClient, outNetBufferServer, false);
+
+        // Generate the CHANGE_CIPHER_SPEC message on the server
+        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.NEED_WRAP, 
+            null, outNetBufferServer, true);
+        
+    // >>> Client
+        // Process the server CHANGE_SCIPHER_SPEC message on the client
+        outNetBufferClient.clear();
+        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NEED_UNWRAP, 
+            outNetBufferServer, outNetBufferClient, false);
+
+    // <<< Server
+        // Generate the server FINISHED message
+        outNetBufferServer.clear();
+        handshakeStatusServer = handshake(sslEngineServer, HandshakeStatus.FINISHED, 
+            null, outNetBufferServer, true);
+
+    // >>> Client
+        // Process the server FINISHED message on the client
+        outNetBufferClient.clear();
+        handshakeStatusClient = handshake(sslEngineClient, HandshakeStatus.NOT_HANDSHAKING, 
+            outNetBufferServer, outNetBufferClient, false);
     }
 }
