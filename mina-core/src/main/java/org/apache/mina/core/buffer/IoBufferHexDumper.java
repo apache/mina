@@ -41,67 +41,65 @@ class IoBufferHexDumper {
      * Initialize lookup tables.
      */
     static {
-        final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+	final byte[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-        int i;
-        byte[] high = new byte[256];
-        byte[] low = new byte[256];
+	int i;
+	byte[] high = new byte[256];
+	byte[] low = new byte[256];
 
-        for (i = 0; i < 256; i++) {
-            high[i] = digits[i >>> 4];
-            low[i] = digits[i & 0x0F];
-        }
+	for (i = 0; i < 256; i++) {
+	    high[i] = digits[i >>> 4];
+	    low[i] = digits[i & 0x0F];
+	}
 
-        highDigits = high;
-        lowDigits = low;
+	highDigits = high;
+	lowDigits = low;
     }
 
     /**
      * Dumps an {@link IoBuffer} to a hex formatted string.
      * 
-     * @param in the buffer to dump
-     * @param lengthLimit the limit at which hex dumping will stop
-     * @return a hex formatted string representation of the <i>in</i> {@link IoBuffer}.
+     * @param in
+     *            the buffer to dump
+     * @param length
+     *            the limit at which hex dumping will stop
+     * @return a hex formatted string representation of the <i>in</i>
+     *         {@link IoBuffer}.
      */
-    public static String getHexdump(IoBuffer in, int lengthLimit) {
-        if (lengthLimit == 0) {
-            throw new IllegalArgumentException("lengthLimit: " + lengthLimit + " (expected: 1+)");
-        }
+    public static String getHexdump(IoBuffer in, int length) {
+	if (length < 0) {
+	    throw new IllegalArgumentException("length: " + length + " must be non-negative number");
+	}
 
-        int limit = in.limit();
-        int pos = in.position();
-        
-        boolean truncate = limit - pos > lengthLimit;
-        int size;
-        if (truncate) {
-            size = lengthLimit;
-        } else {
-            size = limit - pos;
-        }
+	int pos = in.position();
+	int rem = in.limit() - pos;
+	int items = Math.min(rem, length);
 
-        if (size == 0) {
-            return "empty";
-        }
+	if (items == 0) {
+	    return "";
+	}
 
-        StringBuilder out = new StringBuilder(size * 3 + 3);
+	int lim = pos + items;
 
-        // fill the first
-        int byteValue = in.get(pos++) & 0xFF;
-        out.append((char) highDigits[byteValue]);
-        out.append((char) lowDigits[byteValue]);
+	StringBuilder out = new StringBuilder((items * 3) + 6);
 
-        // and the others, too
-        for (; pos < limit; ) {
-            out.append(' ');
-            byteValue = in.get(pos++) & 0xFF;
-            out.append((char) highDigits[byteValue]);
-            out.append((char) lowDigits[byteValue]);
-        }
+	/* first sequence to align the spaces */{
+	    int byteValue = in.get(pos++) & 0xFF;
+	    out.append((char) highDigits[byteValue]);
+	    out.append((char) lowDigits[byteValue]);
+	}
 
-        if (truncate) {
-            out.append("...");
-        }
+	/* loop remainder */for (; pos < lim;) {
+	    out.append(' ');
+	    int byteValue = in.get(pos++) & 0xFF;
+	    out.append((char) highDigits[byteValue]);
+	    out.append((char) lowDigits[byteValue]);
+	}
 
-        return out.toString();
+	if (items != rem) {
+	    out.append("...");
+	}
+
+	return out.toString();
     }
 }
