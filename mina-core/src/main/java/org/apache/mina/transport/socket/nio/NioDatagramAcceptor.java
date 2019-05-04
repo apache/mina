@@ -258,27 +258,34 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     }
 
     private void processReadySessions(Set<SelectionKey> handles) {
-        Iterator<SelectionKey> iterator = handles.iterator();
+	final Iterator<SelectionKey> iterator = handles.iterator();
 
-        while (iterator.hasNext()) {
-            SelectionKey key = iterator.next();
-            DatagramChannel handle = (DatagramChannel) key.channel();
-            iterator.remove();
+	while (iterator.hasNext()) {
+	    try {
+		final SelectionKey key = iterator.next();
+		final DatagramChannel handle = (DatagramChannel) key.channel();
 
-            try {
-                if (key.isValid() && key.isReadable()) {
-                    readHandle(handle);
-                }
+		if (key.isValid()) {
+		    if (key.isReadable()) {
+			readHandle(handle);
+		    }
 
-                if (key.isValid() && key.isWritable()) {
-                    for (IoSession session : getManagedSessions().values()) {
-                        scheduleFlush((NioSession) session);
-                    }
-                }
-            } catch (Exception e) {
-                ExceptionMonitor.getInstance().exceptionCaught(e);
-            }
-        }
+		    if (key.isWritable()) {
+			for (IoSession session : getManagedSessions().values()) {
+			    final NioSession x = (NioSession) session;
+			    if (x.getChannel() == handle) {
+				scheduleFlush(x);
+			    }
+			}
+		    }
+		}
+
+	    } catch (Exception e) {
+		ExceptionMonitor.getInstance().exceptionCaught(e);
+	    } finally {
+		iterator.remove();
+	    }
+	}
     }
 
     private boolean scheduleFlush(NioSession session) {
