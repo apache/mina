@@ -114,8 +114,10 @@ public class SslFilterTest {
                 // filterWriteEventQueue.
                 Future<?> write_scheduler = executor.submit(new Runnable() {
                     public void run() {
-                        test_class.scheduleFilterWrite(write_filter, new DefaultWriteRequest(new byte[] {}));
-                        test_class.flushScheduledEvents();
+                	synchronized(test_class) {
+                	    test_class.scheduleFilterWrite(write_filter, new DefaultWriteRequest(new byte[] {}));
+                	    test_class.flushFilterWrite();
+                	}
                     }
                 });
                 
@@ -128,8 +130,11 @@ public class SslFilterTest {
             public void filterWrite(IoSession session, WriteRequest writeRequest) { }
         };
         
-        test_class.scheduleMessageReceived(receive_filter, new byte[] {});
-        test_class.flushScheduledEvents();
+        synchronized(test_class) {
+            test_class.scheduleMessageReceived(receive_filter, new byte[] {});
+        }
+        
+        test_class.flushMessageReceived();
         
         assertEquals(1, message_received_messages.size());
         assertEquals(1, filter_write_requests.size());

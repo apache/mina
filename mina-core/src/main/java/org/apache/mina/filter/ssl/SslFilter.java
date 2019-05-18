@@ -223,9 +223,9 @@ public class SslFilter extends IoFilterAdapter {
                 } else {
                     started = false;
                 }
+                sslHandler.flushFilterWrite();
             }
-
-            sslHandler.flushScheduledEvents();
+            sslHandler.flushMessageReceived();
         } catch (SSLException se) {
             sslHandler.release();
             throw se;
@@ -322,9 +322,8 @@ public class SslFilter extends IoFilterAdapter {
         try {
             synchronized (sslHandler) {
                 future = initiateClosure(nextFilter, session);
+                sslHandler.flushFilterWrite();
             }
-
-            sslHandler.flushScheduledEvents();
         } catch (SSLException se) {
             sslHandler.release();
             throw se;
@@ -499,58 +498,58 @@ public class SslFilter extends IoFilterAdapter {
 
         SslHandler sslHandler = getSslSessionHandler(session);
 
-        synchronized (sslHandler) {
-            if (!isSslStarted(session) && sslHandler.isInboundDone()) {
-                // The SSL session must be established first before we
-                // can push data to the application. Store the incoming
-                // data into a queue for a later processing
-                sslHandler.scheduleMessageReceived(nextFilter, message);
-            } else {
-                IoBuffer buf = (IoBuffer) message;
+	synchronized (sslHandler) {
+	    if (!isSslStarted(session) && sslHandler.isInboundDone()) {
+		// The SSL session must be established first before we
+		// can push data to the application. Store the incoming
+		// data into a queue for a later processing
+		sslHandler.scheduleMessageReceived(nextFilter, message);
+	    } else {
+		IoBuffer buf = (IoBuffer) message;
 
-                try {
-                    if (sslHandler.isOutboundDone()) {
-                        sslHandler.destroy();
-                        throw new SSLException("Outbound done");
-                    }
-                    
-                    // forward read encrypted data to SSL handler
-                    sslHandler.messageReceived(nextFilter, buf.buf());
+		try {
+		    if (sslHandler.isOutboundDone()) {
+			sslHandler.destroy();
+			throw new SSLException("Outbound done");
+		    }
 
-                    // Handle data to be forwarded to application or written to net
-                    handleSslData(nextFilter, sslHandler);
+		    // forward read encrypted data to SSL handler
+		    sslHandler.messageReceived(nextFilter, buf.buf());
 
-                    if (sslHandler.isInboundDone()) {
-                        if (sslHandler.isOutboundDone()) {
-                            sslHandler.destroy();
-                        } else {
-                            initiateClosure(nextFilter, session);
-                        }
+		    // Handle data to be forwarded to application or written to net
+		    handleSslData(nextFilter, sslHandler);
 
-                        if (buf.hasRemaining()) {
-                            // Forward the data received after closure.
-                            sslHandler.scheduleMessageReceived(nextFilter, buf);
-                        }
-                    }
-                } catch (SSLException ssle) {
-                    if (!sslHandler.isHandshakeComplete()) {
-                        SSLException newSsle = new SSLHandshakeException("SSL handshake failed.");
-                        newSsle.initCause(ssle);
-                        ssle = newSsle;
-                        
-                        // Close the session immediately, the handshake has failed
-                        session.closeNow();
-                    } else {
-                        // Free the SSL Handler buffers
-                        sslHandler.release();
-                    }
+		    if (sslHandler.isInboundDone()) {
+			if (sslHandler.isOutboundDone()) {
+			    sslHandler.destroy();
+			} else {
+			    initiateClosure(nextFilter, session);
+			}
 
-                    throw ssle;
-                }
-            }
-        }
+			if (buf.hasRemaining()) {
+			    // Forward the data received after closure.
+			    sslHandler.scheduleMessageReceived(nextFilter, buf);
+			}
+		    }
+		} catch (SSLException ssle) {
+		    if (!sslHandler.isHandshakeComplete()) {
+			SSLException newSsle = new SSLHandshakeException("SSL handshake failed.");
+			newSsle.initCause(ssle);
+			ssle = newSsle;
 
-        sslHandler.flushScheduledEvents();
+			// Close the session immediately, the handshake has failed
+			session.closeNow();
+		    } else {
+			// Free the SSL Handler buffers
+			sslHandler.release();
+		    }
+
+		    throw ssle;
+		}
+	    }
+	}
+	
+	sslHandler.flushMessageReceived();
     }
 
     @Override
@@ -665,10 +664,9 @@ public class SslFilter extends IoFilterAdapter {
                         needsFlush = false;
                     }
                 }
-            }
-
-            if (needsFlush) {
-                sslHandler.flushScheduledEvents();
+                if (needsFlush) {
+                    sslHandler.flushFilterWrite();
+                }
             }
         } catch (SSLException se) {
             sslHandler.release();
@@ -700,9 +698,8 @@ public class SslFilter extends IoFilterAdapter {
                         }
                     });
                 }
+                sslHandler.flushFilterWrite();
             }
-
-            sslHandler.flushScheduledEvents();
         } catch (SSLException se) {
             sslHandler.release();
             throw se;
@@ -746,9 +743,9 @@ public class SslFilter extends IoFilterAdapter {
         try {
             synchronized (sslHandler) {
                 sslHandler.handshake(nextFilter);
+                sslHandler.flushFilterWrite();
             }
-
-            sslHandler.flushScheduledEvents();
+            sslHandler.flushMessageReceived();
         } catch (SSLException se) {
             sslHandler.release();
             throw se;

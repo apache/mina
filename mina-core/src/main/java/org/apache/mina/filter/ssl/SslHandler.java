@@ -118,12 +118,6 @@ class SslHandler {
      * for data being produced during the handshake). */
     private boolean writingEncryptedData;
 
-    /** A lock to protect the SSL flush of events */
-    private ReentrantLock sslLock = new ReentrantLock();
-    
-    /** A counter of schedules events */
-    private final AtomicInteger scheduledEvents = new AtomicInteger(0);
-
     /**
      * Create a new SSL Handler, and initialize it.
      *
@@ -305,6 +299,18 @@ class SslHandler {
         filterWriteEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.WRITE, session, writeRequest));
     }
 
+    /* no qualifier */void flushFilterWrite() {
+        // Fire events only when the lock is available for this handler.
+        IoFilterEvent event;
+    
+        // We need synchronization here inevitably because filterWrite can be
+        // called simultaneously and cause 'bad record MAC' integrity error.
+        while ((event = filterWriteEventQueue.poll()) != null) {
+            NextFilter nextFilter = event.getNextFilter();
+            nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
+        }
+    }
+
     /**
      * Push the newly received data into a queue, waiting for the SSL session
      * to be fully established
@@ -315,32 +321,14 @@ class SslHandler {
     /* no qualifier */void scheduleMessageReceived(NextFilter nextFilter, Object message) {
         messageReceivedEventQueue.add(new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message));
     }
+    
+    /* no qualifier */void flushMessageReceived() {
+	IoFilterEvent event;
 
-    /* no qualifier */void flushScheduledEvents() {
-        scheduledEvents.incrementAndGet();
-
-        // Fire events only when the lock is available for this handler.
-        if (sslLock.tryLock()) {
-            IoFilterEvent event;
-            
-            try {
-                do {
-                    // We need synchronization here inevitably because filterWrite can be
-                    // called simultaneously and cause 'bad record MAC' integrity error.
-                    while ((event = filterWriteEventQueue.poll()) != null) {
-                        NextFilter nextFilter = event.getNextFilter();
-                        nextFilter.filterWrite(session, (WriteRequest) event.getParameter());
-                    }
-            
-                    while ((event = messageReceivedEventQueue.poll()) != null) {
-                        NextFilter nextFilter = event.getNextFilter();
-                        nextFilter.messageReceived(session, event.getParameter());
-                    }
-                } while (scheduledEvents.decrementAndGet() > 0);
-            } finally {
-                sslLock.unlock();
-            }
-        }
+	while ((event = messageReceivedEventQueue.poll()) != null) {
+	    NextFilter nextFilter = event.getNextFilter();
+	    nextFilter.messageReceived(session, event.getParameter());
+	}
     }
 
     /**
