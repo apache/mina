@@ -1170,7 +1170,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // The first unwritten empty buffer must be
                     // forwarded to the filter chain.
                     if (buf.hasRemaining()) {
-                        buf.reset();
                         failedRequests.add(req);
                     } else {
                         IoFilterChain filterChain = session.getFilterChain();
