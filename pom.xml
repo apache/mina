@@ -19,7 +19,7 @@
   under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache</groupId>
@@ -34,7 +34,7 @@
 
   <organization>
     <name>Apache MINA Project</name>
-    <url>http://mina.apache.org/</url>
+    <url>https://mina.apache.org/</url>
   </organization>
 
   <groupId>org.apache.mina</groupId>
@@ -43,18 +43,18 @@
   <name>Apache MINA</name>
   <packaging>pom</packaging>
 
-  <url>http://mina.apache.org/</url>
+  <url>https://mina.apache.org/</url>
   <inceptionYear>2004</inceptionYear>
 
   <issueManagement>
     <system>jira</system>
-    <url>http://issues.apache.org/jira/browse/DIRMINA</url>
+    <url>https://issues.apache.org/jira/browse/DIRMINA</url>
   </issueManagement>
 
   <scm>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/mina.git</connection>
+    <connection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</connection>
     <url>https://github.com/apache/mina/tree/2.0</url>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/mina.git</developerConnection>
+    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -79,7 +79,7 @@
   <licenses>
     <license>
       <name>Apache 2.0 License</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
