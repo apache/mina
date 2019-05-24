@@ -205,28 +205,20 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     /**
      * Creates a new instance of a PrioritisedOrderedThreadPoolExecutor.
      *
-     * @param corePoolSize
-     *            The initial pool sizePoolSize
-     * @param maximumPoolSize
-     *            The maximum pool size
-     * @param keepAliveTime
-     *            Default duration for a thread
-     * @param unit
-     *            Time unit used for the keepAlive value
-     * @param threadFactory
-     *            The factory used to create threads
-     * @param eventQueueHandler
-     *            The queue used to store events
+     * @param corePoolSize The initial pool sizePoolSize
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param threadFactory The factory used to create threads
+     * @param eventQueueHandler The queue used to store events
      */
     public PriorityThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventQueueHandler eventQueueHandler, Comparator<IoSession> comparator) {
-        // We have to initialize the pool with default values (0 and 1) in order
-        // to
-        // handle the exception in a better way. We can't add a try {} catch()
-        // {}
+        // We have to initialise the pool with default values (0 and 1) in order
+        // to handle the exception in a better way. We can't add a try {} catch() {}
         // around the super() call.
-        super(DEFAULT_INITIAL_THREAD_POOL_SIZE, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), threadFactory,
-                new AbortPolicy());
+        super(DEFAULT_INITIAL_THREAD_POOL_SIZE, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), 
+            threadFactory, new AbortPolicy());
 
         if (corePoolSize < DEFAULT_INITIAL_THREAD_POOL_SIZE) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);
@@ -260,12 +252,12 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     /**
      * Get the session's tasks queue.
      */
-    private SessionQueue getSessionTasksQueue(IoSession session) {
-        SessionQueue queue = (SessionQueue) session.getAttribute(TASKS_QUEUE);
+    private SessionTasksQueue getSessionTasksQueue(IoSession session) {
+        SessionTasksQueue queue = (SessionTasksQueue) session.getAttribute(TASKS_QUEUE);
 
         if (queue == null) {
-            queue = new SessionQueue();
-            SessionQueue oldQueue = (SessionQueue) session.setAttributeIfAbsent(TASKS_QUEUE, queue);
+            queue = new SessionTasksQueue();
+            SessionTasksQueue oldQueue = (SessionTasksQueue) session.setAttributeIfAbsent(TASKS_QUEUE, queue);
 
             if (oldQueue != null) {
                 queue = oldQueue;
@@ -436,7 +428,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
                 continue;
             }
 
-            SessionQueue sessionTasksQueue = (SessionQueue) entry.getSession().getAttribute(TASKS_QUEUE);
+            SessionTasksQueue sessionTasksQueue = (SessionTasksQueue) entry.getSession().getAttribute(TASKS_QUEUE);
 
             synchronized (sessionTasksQueue.tasksQueue) {
 
@@ -496,10 +488,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
         IoSession session = event.getSession();
 
         // Get the session's queue of events
-        SessionQueue sessionTasksQueue = getSessionTasksQueue(session);
-        Queue<Runnable> tasksQueue = sessionTasksQueue.tasksQueue;
-
-        boolean offerSession;
+        SessionTasksQueue sessionTasksQueue = getSessionTasksQueue(session);
 
         // propose the new event to the event queue handler. If we
         // use a throttle queue handler, the message may be rejected
@@ -508,30 +497,22 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
 
         if (offerEvent) {
             // Ok, the message has been accepted
-            synchronized (tasksQueue) {
+            synchronized (sessionTasksQueue.tasksQueue) {
                 // Inject the event into the executor taskQueue
-                tasksQueue.offer(event);
+                sessionTasksQueue.tasksQueue.offer(event);
 
                 if (sessionTasksQueue.processingCompleted) {
                     sessionTasksQueue.processingCompleted = false;
-                    offerSession = true;
-                } else {
-                    offerSession = false;
+                    // Processing of the tasks queue of this session is currently not
+                    // scheduled or underway. As new tasks have now been added, the
+                    // session needs to be offered for processing.
+                    waitingSessions.offer(new SessionEntry(session, comparator));
                 }
 
                 if (LOGGER.isDebugEnabled()) {
-                    print(tasksQueue, event);
+                    print(sessionTasksQueue.tasksQueue, event);
                 }
             }
-        } else {
-            offerSession = false;
-        }
-
-        if (offerSession) {
-            // As the tasksQueue was empty, the task has been executed
-            // immediately, so we can move the session to the queue
-            // of sessions waiting for completion.
-            waitingSessions.offer(new SessionEntry(session, comparator));
         }
 
         addWorkerIfNecessary();
@@ -666,7 +647,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
         checkTaskType(task);
         IoEvent event = (IoEvent) task;
         IoSession session = event.getSession();
-        SessionQueue sessionTasksQueue = (SessionQueue) session.getAttribute(TASKS_QUEUE);
+        SessionTasksQueue sessionTasksQueue = (SessionTasksQueue) session.getAttribute(TASKS_QUEUE);
 
         if (sessionTasksQueue == null) {
             return false;
@@ -791,7 +772,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
             return null;
         }
 
-        private void runTasks(SessionQueue sessionTasksQueue) {
+        private void runTasks(SessionTasksQueue sessionTasksQueue) {
             for (;;) {
                 Runnable task;
                 Queue<Runnable> tasksQueue = sessionTasksQueue.tasksQueue;
@@ -832,7 +813,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
      * A class used to store the ordered list of events to be processed by the
      * session, and the current task state.
      */
-    private class SessionQueue {
+    private class SessionTasksQueue {
         /** A queue of ordered event waiting to be processed */
         private final Queue<Runnable> tasksQueue = new ConcurrentLinkedQueue<>();
 

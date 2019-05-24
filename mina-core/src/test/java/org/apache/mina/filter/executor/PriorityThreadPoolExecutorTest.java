@@ -53,16 +53,16 @@ public class PriorityThreadPoolExecutorTest {
      */
     @Test
     public void fifoEntryTestNoComparatorSameSession() throws Exception {
-	// Set up fixture.
-	final IoSession session = new DummySession();
-	final PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(session, null);
-	final PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(session, null);
-
-	// Execute system under test.
-	final int result = first.compareTo(last);
-
-	// Verify results.
-	assertEquals("Without a comparator, entries of the same session are expected to be equal.", 0, result);
+        // Set up fixture.
+        IoSession session = new DummySession();
+        PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(session, null);
+        PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(session, null);
+    
+        // Execute system under test.
+        int result = first.compareTo(last);
+    
+        // Verify results.
+        assertEquals("Without a comparator, entries of the same session are expected to be equal.", 0, result);
     }
 
     /**
@@ -75,16 +75,16 @@ public class PriorityThreadPoolExecutorTest {
      */
     @Test
     public void fifoEntryTestNoComparatorDifferentSession() throws Exception {
-	// Set up fixture (the order in which the entries are created is
-	// relevant here!)
-	final PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), null);
-	final PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), null);
-
-	// Execute system under test.
-	final int result = first.compareTo(last);
-
-	// Verify results.
-	assertTrue("Without a comparator, the first entry created should be the first entry out. Expected a negative result, instead, got: " + result, result < 0);
+        // Set up fixture (the order in which the entries are created is
+        // relevant here!)
+        PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), null);
+        PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), null);
+        
+        // Execute system under test.
+        int result = first.compareTo(last);
+        
+        // Verify results.
+        assertTrue("Without a comparator, the first entry created should be the first entry out. Expected a negative result, instead, got: " + result, result < 0);
     }
 
     /**
@@ -98,24 +98,25 @@ public class PriorityThreadPoolExecutorTest {
      */
     @Test
     public void fifoEntryTestWithComparatorSameSession() throws Exception {
-	// Set up fixture.
-	final IoSession session = new DummySession();
-	final int predeterminedResult = 3853;
-	final Comparator<IoSession> comparator = new Comparator<IoSession>() {
-	    @Override
-	    public int compare(IoSession o1, IoSession o2) {
-		return predeterminedResult;
-	    }
-	};
-
-	final PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(session, comparator);
-	final PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(session, comparator);
-
-	// Execute system under test.
-	final int result = first.compareTo(last);
-
-	// Verify results.
-	assertEquals("With a comparator, entries of the same session are expected to be equal.", 0, result);
+        // Set up fixture.
+        IoSession session = new DummySession();
+        final int predeterminedResult = 3853;
+        
+        Comparator<IoSession> comparator = new Comparator<IoSession>() {
+            @Override
+            public int compare(IoSession o1, IoSession o2) {
+                return predeterminedResult;
+            }
+        };
+        
+        PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(session, comparator);
+        PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(session, comparator);
+        
+        // Execute system under test.
+        int result = first.compareTo(last);
+        
+        // Verify results.
+        assertEquals("With a comparator, entries of the same session are expected to be equal.", 0, result);
     }
 
     /**
@@ -129,23 +130,25 @@ public class PriorityThreadPoolExecutorTest {
      */
     @Test
     public void fifoEntryTestComparatorDifferentSession() throws Exception {
-	// Set up fixture (the order in which the entries are created is
-	// relevant here!)
-	final int predeterminedResult = 3853;
-	final Comparator<IoSession> comparator = new Comparator<IoSession>() {
-	    @Override
-	    public int compare(IoSession o1, IoSession o2) {
-		return predeterminedResult;
-	    }
-	};
-	final PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), comparator);
-	final PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), comparator);
-
-	// Execute system under test.
-	final int result = first.compareTo(last);
-
-	// Verify results.
-	assertEquals("With a comparator, comparing entries of different sessions is expected to yield the comparator result.", predeterminedResult, result);
+        // Set up fixture (the order in which the entries are created is
+        // relevant here!)
+        final int predeterminedResult = 3853;
+        
+        Comparator<IoSession> comparator = new Comparator<IoSession>() {
+            @Override
+            public int compare(IoSession o1, IoSession o2) {
+                return predeterminedResult;
+            }
+        };
+        
+        PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), comparator);
+        PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), comparator);
+        
+        // Execute system under test.
+        int result = first.compareTo(last);
+        
+        // Verify results.
+        assertEquals("With a comparator, comparing entries of different sessions is expected to yield the comparator result.", predeterminedResult, result);
     }
 
     /**
@@ -164,150 +167,144 @@ public class PriorityThreadPoolExecutorTest {
      */
     @Test
     public void testPrioritisation() throws Throwable {
-	// Set up fixture.
-	final MockWorkFilter nextFilter = new MockWorkFilter();
-	final List<LastActivityTracker> sessions = new ArrayList<>();
-	for (int i = 0; i < 10; i++) {
-	    sessions.add(new LastActivityTracker());
-	}
-	final LastActivityTracker preferredSession = sessions.get(4); // prefer
-								      // an
-								      // arbitrary
-								      // session
-								      // (but
-								      // not the
-								      // first
-								      // or last
-								      // session,
-								      // for
-								      // good
-								      // measure).
-	final Comparator<IoSession> comparator = new UnfairComparator(preferredSession);
-	final int maximumPoolSize = 1; // keep this low, to force resource
-				       // contention.
-	final int amountOfTasks = 400;
-
-	final ExecutorService executor = new PriorityThreadPoolExecutor(maximumPoolSize, comparator);
-	final ExecutorFilter filter = new ExecutorFilter(executor);
-
-	// Execute system under test.
-	int sessionIndex = 0;
-	for (int i = 0; i < amountOfTasks; i++) {
-	    if (++sessionIndex >= sessions.size()) {
-		sessionIndex = 0;
-	    }
-
-	    filter.messageReceived(nextFilter, sessions.get(sessionIndex), null);
-
-	    if (nextFilter.throwable != null) {
-		throw nextFilter.throwable;
-	    }
-	}
-
-	executor.shutdown();
-
-	// Verify results.
-	executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-
-	for (final LastActivityTracker session : sessions) {
-	    if (session != preferredSession) {
-		assertTrue("All other sessions should have finished later than the preferred session (but at least one did not).", session.lastActivity > preferredSession.lastActivity);
-	    }
-	}
+        // Set up fixture.
+        MockWorkFilter nextFilter = new MockWorkFilter();
+        List<LastActivityTracker> sessions = new ArrayList<>();
+        
+        for (int i = 0; i < 10; i++) {
+            sessions.add(new LastActivityTracker());
+        }
+        
+        LastActivityTracker preferredSession = sessions.get(4); // prefer an arbitrary session
+                                                                // (but not the first or last
+                                                                // session, for good measure).
+        Comparator<IoSession> comparator = new UnfairComparator(preferredSession);
+        int maximumPoolSize = 1; // keep this low, to force resource contention.
+        int amountOfTasks = 400;
+        
+        ExecutorService executor = new PriorityThreadPoolExecutor(maximumPoolSize, comparator);
+        ExecutorFilter filter = new ExecutorFilter(executor);
+        
+        // Execute system under test.
+        int sessionIndex = 0;
+        for (int i = 0; i < amountOfTasks; i++) {
+            if (++sessionIndex >= sessions.size()) {
+                sessionIndex = 0;
+            }
+        
+            filter.messageReceived(nextFilter, sessions.get(sessionIndex), null);
+        
+            if (nextFilter.throwable != null) {
+                throw nextFilter.throwable;
+            }
+        }
+        
+        executor.shutdown();
+        
+        // Verify results.
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        
+        for (LastActivityTracker session : sessions) {
+            if (session != preferredSession) {
+                assertTrue("All other sessions should have finished later than the preferred session (but at least one did not).", 
+                    session.lastActivity > preferredSession.lastActivity);
+            }
+        }
     }
 
     /**
      * A comparator that prefers a particular session.
      */
     private static class UnfairComparator implements Comparator<IoSession> {
-	private final IoSession preferred;
-
-	public UnfairComparator(IoSession preferred) {
-	    this.preferred = preferred;
-	}
-
-	@Override
-	public int compare(IoSession o1, IoSession o2) {
-	    if (o1 == preferred) {
-		return -1;
-	    }
-
-	    if (o2 == preferred) {
-		return 1;
-	    }
-
-	    return 0;
-	}
+        private IoSession preferred;
+        
+        public UnfairComparator(IoSession preferred) {
+            this.preferred = preferred;
+        }
+        
+        @Override
+        public int compare(IoSession o1, IoSession o2) {
+            if (o1 == preferred) {
+                System.out.println( "session1 preferred" );
+                return -1;
+            }
+        
+            if (o2 == preferred) {
+                System.out.println( "session2 preferred" + ", o2="  + o2 + " preferred=" + preferred );
+                return 1;
+            }
+        
+            return 0;
+        }
     }
 
     /**
      * A session that tracks the timestamp of last activity.
      */
     private static class LastActivityTracker extends DummySession {
-	long lastActivity = System.currentTimeMillis();
+        long lastActivity = System.currentTimeMillis();
 
-	public synchronized void setLastActivity() {
-	    lastActivity = System.currentTimeMillis();
-	}
+        public synchronized void setLastActivity() {
+            lastActivity = System.currentTimeMillis();
+        }
     }
 
     /**
      * A filter that simulates a non-negligible amount of work.
      */
     private static class MockWorkFilter implements IoFilter.NextFilter {
-	Throwable throwable;
-
-	public void sessionOpened(IoSession session) {
-	    // Do nothing
-	}
-
-	public void sessionClosed(IoSession session) {
-	    // Do nothing
-	}
-
-	public void sessionIdle(IoSession session, IdleStatus status) {
-	    // Do nothing
-	}
-
-	public void exceptionCaught(IoSession session, Throwable cause) {
-	    // Do nothing
-	}
-
-	public void inputClosed(IoSession session) {
-	    // Do nothing
-	}
-
-	public void messageReceived(IoSession session, Object message) {
-	    try {
-		Thread.sleep(20); // mimic work.
-		((LastActivityTracker) session).setLastActivity();
-	    } catch (Exception e) {
-		if (this.throwable == null) {
-		    this.throwable = e;
-		}
-	    }
-	}
-
-	public void messageSent(IoSession session, WriteRequest writeRequest) {
-	    // Do nothing
-	}
-
-	public void filterWrite(IoSession session, WriteRequest writeRequest) {
-	    // Do nothing
-	}
-
-	public void filterClose(IoSession session) {
-	    // Do nothing
-	}
-
-	public void sessionCreated(IoSession session) {
-	    // Do nothing
-	}
-
-	@Override
-	public void event(IoSession session, FilterEvent event) {
-	    // TODO Auto-generated method stub
-
-	}
+        Throwable throwable;
+        
+        public void sessionOpened(IoSession session) {
+            // Do nothing
+        }
+        
+        public void sessionClosed(IoSession session) {
+            // Do nothing
+        }
+        
+        public void sessionIdle(IoSession session, IdleStatus status) {
+            // Do nothing
+        }
+        
+        public void exceptionCaught(IoSession session, Throwable cause) {
+            // Do nothing
+        }
+        
+        public void inputClosed(IoSession session) {
+            // Do nothing
+        }
+        
+        public void messageReceived(IoSession session, Object message) {
+            try {
+                Thread.sleep(20); // mimic work.
+                ((LastActivityTracker) session).setLastActivity();
+            } catch (Exception e) {
+                if (this.throwable == null) {
+                    this.throwable = e;
+                }
+            }
+        }
+        
+        public void messageSent(IoSession session, WriteRequest writeRequest) {
+            // Do nothing
+        }
+        
+        public void filterWrite(IoSession session, WriteRequest writeRequest) {
+            // Do nothing
+        }
+        
+        public void filterClose(IoSession session) {
+            // Do nothing
+        }
+        
+        public void sessionCreated(IoSession session) {
+            // Do nothing
+        }
+        
+        @Override
+        public void event(IoSession session, FilterEvent event) {
+            // TODO Auto-generated method stub
+        }
     }
 }
