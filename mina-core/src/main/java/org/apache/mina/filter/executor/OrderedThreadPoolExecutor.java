@@ -448,6 +448,9 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
         // Get the session's queue of events
         SessionTasksQueue sessionTasksQueue = getSessionTasksQueue(session);
+        Queue<Runnable> tasksQueue = sessionTasksQueue.tasksQueue;
+
+        boolean offerSession;
 
         // propose the new event to the event queue handler. If we
         // use a throttle queue handler, the message may be rejected
@@ -456,22 +459,30 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
 
         if (offerEvent) {
             // Ok, the message has been accepted
-            synchronized (sessionTasksQueue.tasksQueue) {
+            synchronized (tasksQueue) {
                 // Inject the event into the executor taskQueue
-                sessionTasksQueue.tasksQueue.offer(event);
+                tasksQueue.offer(event);
 
                 if (sessionTasksQueue.processingCompleted) {
                     sessionTasksQueue.processingCompleted = false;
-                    // Processing of the tasks queue of this session is currently not
-                    // scheduled or underway. As new tasks have now been added, the
-                    // session needs to be offered for processing.
-                    waitingSessions.offer(session);
+                    offerSession = true;
+                } else {
+                    offerSession = false;
                 }
 
                 if (LOGGER.isDebugEnabled()) {
-                    print(sessionTasksQueue.tasksQueue, event);
+                    print(tasksQueue, event);
                 }
             }
+        } else {
+            offerSession = false;
+        }
+
+        if (offerSession) {
+            // As the tasksQueue was empty, the task has been executed
+            // immediately, so we can move the session to the queue
+            // of sessions waiting for completion.
+            waitingSessions.offer(session);
         }
 
         addWorkerIfNecessary();
