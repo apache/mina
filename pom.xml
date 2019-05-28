@@ -53,9 +53,9 @@
 
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</connection>
-    <url>https://github.com/apache/mina/tree/${project.scm.tag}</url>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</developerConnection>
-    <tag>HEAD</tag>
+    <url>https://github.com/apache/mina/tree/${project.scm.tag}</url>
+    <tag>2.1.X</tag>
   </scm>
 
   <distributionManagement>
@@ -760,7 +760,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>${version.compiler.plugin}</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <source>1.7</source>
@@ -773,12 +772,10 @@
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>${version.surefire.plugin}</version>
       </plugin>
 
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>${version.source.plugin}</version>
         <executions>
           <execution>
             <id>attach-source</id>
@@ -803,7 +800,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>${version.bundle.plugin}</version>
         <inherited>true</inherited>
         <extensions>true</extensions>
         <configuration>
