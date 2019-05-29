@@ -16,68 +16,68 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.apache.mina</groupId>
-        <artifactId>mina-parent</artifactId>
-        <version>2.0.22-SNAPSHOT</version>
-    </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.mina</groupId>
+    <artifactId>mina-parent</artifactId>
+    <version>2.0.22-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>mina-legal</artifactId>
-    <name>Apache MINA Legal</name>
-    <url>https://mina.apache.org</url>
-    <packaging>jar</packaging>
+  <artifactId>mina-legal</artifactId>
+  <name>Apache MINA Legal</name>
+  <url>https://mina.apache.org</url>
+  <packaging>jar</packaging>
 
-    <properties>
-        <maven.test.skip>true</maven.test.skip>
-    </properties>
+  <properties>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <optional>true</optional>
-        </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <optional>true</optional>
+    </dependency>
 
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>${version.plexus.utils}</version>
-            <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>${version.plexus.utils}</version>
+      <optional>true</optional>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>${version.api.plugin}</version>
-            <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${version.api.plugin}</version>
+      <optional>true</optional>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <version>${version.model.plugin}</version>
-            <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>${version.model.plugin}</version>
+      <optional>true</optional>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-            <version>${version.project.plugin}</version>
-            <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>${version.project.plugin}</version>
+      <optional>true</optional>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-shade-plugin</artifactId>
-            <version>${version.shade.plugin}</version>
-            <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>${version.shade.plugin}</version>
+      <optional>true</optional>
+    </dependency>
 
-        <dependency>
-            <groupId>pmd</groupId>
-            <artifactId>pmd</artifactId>
-        </dependency>
-    </dependencies>
+    <dependency>
+      <groupId>pmd</groupId>
+      <artifactId>pmd</artifactId>
+    </dependency>
+  </dependencies>
 </project>
