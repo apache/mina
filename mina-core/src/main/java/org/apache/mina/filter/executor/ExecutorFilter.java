@@ -138,9 +138,13 @@ public class ExecutorFilter extends IoFilterAdapter {
     private static final boolean NOT_MANAGEABLE_EXECUTOR = false;
 
     /** A list of default EventTypes to be handled by the executor */
-    private static final IoEventType[] DEFAULT_EVENT_SET = new IoEventType[] { IoEventType.EXCEPTION_CAUGHT,
-            IoEventType.MESSAGE_RECEIVED, IoEventType.MESSAGE_SENT, IoEventType.SESSION_CLOSED,
-            IoEventType.SESSION_IDLE, IoEventType.SESSION_OPENED };
+    private static final IoEventType[] DEFAULT_EVENT_SET = new IoEventType[] { 
+        IoEventType.EXCEPTION_CAUGHT, 
+        IoEventType.MESSAGE_RECEIVED, 
+        IoEventType.MESSAGE_SENT, 
+        IoEventType.SESSION_CLOSED,
+        IoEventType.SESSION_IDLE, 
+        IoEventType.SESSION_OPENED };
 
     /**
      * (Convenience constructor) Creates a new instance with a new
@@ -150,10 +154,10 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     public ExecutorFilter() {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(BASE_THREAD_NUMBER, DEFAULT_MAX_POOL_SIZE, DEFAULT_KEEPALIVE_TIME,
-                TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(BASE_THREAD_NUMBER, DEFAULT_MAX_POOL_SIZE, 
+            DEFAULT_KEEPALIVE_TIME, TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR);
     }
 
@@ -167,10 +171,10 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     public ExecutorFilter(int maximumPoolSize) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(BASE_THREAD_NUMBER, maximumPoolSize, DEFAULT_KEEPALIVE_TIME,
-                TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(BASE_THREAD_NUMBER, maximumPoolSize, 
+            DEFAULT_KEEPALIVE_TIME, TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR);
     }
 
@@ -185,10 +189,10 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     public ExecutorFilter(int corePoolSize, int maximumPoolSize) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(corePoolSize, maximumPoolSize, DEFAULT_KEEPALIVE_TIME,
-                TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            DEFAULT_KEEPALIVE_TIME, TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR);
     }
 
@@ -203,10 +207,10 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
-                Executors.defaultThreadFactory(), null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            keepAliveTime, unit, Executors.defaultThreadFactory(), null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR);
     }
 
@@ -223,10 +227,10 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             IoEventQueueHandler queueHandler) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
-                Executors.defaultThreadFactory(), queueHandler);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR);
     }
 
@@ -243,10 +247,10 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory,
-                null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            keepAliveTime, unit, threadFactory, null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR);
     }
 
@@ -264,10 +268,10 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
         // Create a new default Executor
-        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
-                threadFactory, queueHandler);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            keepAliveTime, unit, threadFactory, queueHandler);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR);
     }
 
@@ -279,10 +283,10 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     public ExecutorFilter(IoEventType... eventTypes) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(BASE_THREAD_NUMBER, DEFAULT_MAX_POOL_SIZE, DEFAULT_KEEPALIVE_TIME,
-                TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(BASE_THREAD_NUMBER, DEFAULT_MAX_POOL_SIZE, 
+            DEFAULT_KEEPALIVE_TIME, TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR, eventTypes);
     }
 
@@ -295,10 +299,10 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     public ExecutorFilter(int maximumPoolSize, IoEventType... eventTypes) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(BASE_THREAD_NUMBER, maximumPoolSize, DEFAULT_KEEPALIVE_TIME,
-                TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(BASE_THREAD_NUMBER, maximumPoolSize, 
+            DEFAULT_KEEPALIVE_TIME, TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR, eventTypes);
     }
 
@@ -312,10 +316,10 @@ public class ExecutorFilter extends IoFilterAdapter {
      */
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, IoEventType... eventTypes) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(corePoolSize, maximumPoolSize, DEFAULT_KEEPALIVE_TIME,
-                TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            DEFAULT_KEEPALIVE_TIME, TimeUnit.SECONDS, Executors.defaultThreadFactory(), null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR, eventTypes);
     }
 
@@ -332,10 +336,10 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             IoEventType... eventTypes) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
-                Executors.defaultThreadFactory(), null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            keepAliveTime, unit, Executors.defaultThreadFactory(), null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR, eventTypes);
     }
 
@@ -353,10 +357,10 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             IoEventQueueHandler queueHandler, IoEventType... eventTypes) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
-                Executors.defaultThreadFactory(), queueHandler);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            keepAliveTime, unit, Executors.defaultThreadFactory(), queueHandler);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR, eventTypes);
     }
 
@@ -374,10 +378,10 @@ public class ExecutorFilter extends IoFilterAdapter {
     public ExecutorFilter(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventType... eventTypes) {
         // Create a new default Executor
-        Executor newExecutor = createDefaultExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, threadFactory,
-                null);
+        Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, 
+            keepAliveTime, unit, threadFactory, null);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR, eventTypes);
     }
 
@@ -399,7 +403,7 @@ public class ExecutorFilter extends IoFilterAdapter {
         Executor newExecutor = new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
                 threadFactory, queueHandler);
 
-        // Initialize the filter
+        // Initialise the filter
         init(newExecutor, MANAGEABLE_EXECUTOR, eventTypes);
     }
 
@@ -409,7 +413,7 @@ public class ExecutorFilter extends IoFilterAdapter {
      * @param executor the user's managed Executor to use in this filter
      */
     public ExecutorFilter(Executor executor) {
-        // Initialize the filter
+        // Initialise the filter
         init(executor, NOT_MANAGEABLE_EXECUTOR);
     }
 
@@ -420,26 +424,8 @@ public class ExecutorFilter extends IoFilterAdapter {
      * @param eventTypes The event for which the executor will be used
      */
     public ExecutorFilter(Executor executor, IoEventType... eventTypes) {
-        // Initialize the filter
+        // Initialise the filter
         init(executor, NOT_MANAGEABLE_EXECUTOR, eventTypes);
-    }
-
-    /**
-     * Create an OrderedThreadPool executor.
-     *
-     * @param corePoolSize The initial pool sizePoolSize
-     * @param maximumPoolSize The maximum pool size
-     * @param keepAliveTime Default duration for a thread
-     * @param unit Time unit used for the keepAlive value
-     * @param threadFactory The factory used to create threads
-     * @param queueHandler The queue used to store events
-     * @return An instance of the created Executor
-     */
-    private Executor createDefaultExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-            ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
-        // Create a new Executor
-        return new OrderedThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit,
-                threadFactory, queueHandler);
     }
 
     /**

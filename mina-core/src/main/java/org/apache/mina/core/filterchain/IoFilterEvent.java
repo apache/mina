@@ -43,6 +43,7 @@ public class IoFilterEvent extends IoEvent {
     /** A speedup for logs */
     private static final boolean DEBUG = LOGGER.isDebugEnabled();
 
+    /** The filter to call next */
     private final NextFilter nextFilter;
 
     /**
