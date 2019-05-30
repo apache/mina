@@ -848,6 +848,9 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
          */
         public double getAverage() {
             synchronized (lock) {
+            	if (callsNumber.get() == 0l) {
+            		return 0.0;
+            	}
                 // There are two operations, we need to synchronize the block
                 return total.longValue() / callsNumber.longValue();
             }
