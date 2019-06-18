@@ -118,17 +118,16 @@ public class NTLMUtilities implements NTLMConstants {
         // an exception and deal with the special cases.
         try {
             Process pr = Runtime.getRuntime().exec("cmd /C ver");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-            pr.waitFor();
-
             String line;
 
-            // We loop as we may have blank lines.
-            do {
-                line = reader.readLine();
-            } while ((line != null) && (line.length() != 0));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()))) {
+	            pr.waitFor();
 
-            reader.close();
+	            // We loop as we may have blank lines.
+	            do {
+	                line = reader.readLine();
+	            } while ((line != null) && (line.length() != 0));
+            }
 
             // If line is null, we must not go any farther
             if (line == null) {
