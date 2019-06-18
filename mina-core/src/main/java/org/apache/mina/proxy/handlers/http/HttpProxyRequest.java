@@ -290,7 +290,7 @@ public class HttpProxyRequest extends ProxyRequest {
                 }
             }
 
-            if (!hostHeaderFound && getHttpVersion() == HttpProxyConstants.HTTP_1_1) {
+            if (!hostHeaderFound && HttpProxyConstants.HTTP_1_1.equals(getHttpVersion())) {
                 sb.append("Host: ").append(getHost()).append(HttpProxyConstants.CRLF);
             }
         }
