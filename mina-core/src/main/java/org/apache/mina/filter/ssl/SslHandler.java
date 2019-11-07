@@ -43,6 +43,7 @@ import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.filter.ssl.SslFilter.EncryptedWriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -534,13 +535,15 @@ class SslHandler {
                 }
                 
                 // Empty the session queue
-                while (!session.getWriteRequestQueue().isEmpty(session)) {
-                    WriteRequest writeRequest = session.getWriteRequestQueue().poll( session );
-                    WriteFuture writeFuture = writeRequest.getFuture();
-                    writeFuture.setException(exception);
-                    writeFuture.notifyAll();
-                }
-                
+                WriteRequestQueue queue = session.getWriteRequestQueue();
+                WriteRequest request = null;
+               
+    	    	while ((request = queue.poll(session)) != null) {
+    	    	    WriteFuture writeFuture = request.getFuture();
+    	    	    writeFuture.setException(exception);
+    	    	    writeFuture.notifyAll();
+        	}
+                    
                 // We *must* shutdown session
                 session.closeNow();
                 break;
