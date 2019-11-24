@@ -910,7 +910,9 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 }
 
                 // Reset the Schedule for flush flag for this session,
-                // as we are flushing it now
+                // as we are flushing it now.  This allows another thread
+                // to enqueue data to be written without corrupting the
+                // selector interest state.
                 session.unscheduledForFlush();
 
                 SessionState state = getState(session);
