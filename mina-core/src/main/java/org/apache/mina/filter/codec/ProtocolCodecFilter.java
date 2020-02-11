@@ -281,7 +281,7 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 }
             }
         }
-		in.free();
+		//in.free();
     }
 
     /**

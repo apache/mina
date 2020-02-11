@@ -169,8 +169,8 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
                 buf = newBuf;
 
                 // Update the session attribute.
-				IoBuffer oldBuf = (IoBuffer) session.getAttribute(BUFFER);
-				if (oldBuf != null) oldBuf.free();
+				//IoBuffer oldBuf = (IoBuffer) session.getAttribute(BUFFER);
+				//if (oldBuf != null) oldBuf.free();
                 session.setAttribute(BUFFER, buf);
             }
         } else {
@@ -247,8 +247,8 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         remainingBuf.order(buf.order());
         remainingBuf.put(buf);
 
-		IoBuffer oldBuf = (IoBuffer) session.getAttribute(BUFFER);
-		if (oldBuf != null) oldBuf.free();
+        IoBuffer oldBuf = (IoBuffer) session.removeAttribute(BUFFER);
+  		if (oldBuf != null) oldBuf.free();
         session.setAttribute(BUFFER, remainingBuf);
     }
     

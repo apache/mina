@@ -57,7 +57,7 @@ public abstract class AbstractProtocolEncoderOutput implements ProtocolEncoderOu
         if (encodedMessage instanceof IoBuffer) {
             IoBuffer buf = (IoBuffer) encodedMessage;
             if (buf.hasRemaining()) {
-                messageQueue.offer(buf);
+                messageQueue.offer(buf.duplicate());
             } else {
                 throw new IllegalArgumentException("buf is empty. Forgot to call flip()?");
             }

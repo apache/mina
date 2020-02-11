@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.filterchain.IoFilterEvent;
@@ -563,8 +564,13 @@ public class ExecutorFilter extends IoFilterAdapter {
     @Override
     public final void messageReceived(NextFilter nextFilter, IoSession session, Object message) {
         if (eventTypes.contains(IoEventType.MESSAGE_RECEIVED)) {
-            IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message);
-            fireEvent(event);
+        	if (message instanceof IoBuffer) {
+        		IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, ((IoBuffer)message).duplicate());
+        		fireEvent(event);
+        	} else {
+                IoFilterEvent event = new IoFilterEvent(nextFilter, IoEventType.MESSAGE_RECEIVED, session, message);
+                fireEvent(event);
+        	}
         } else {
             nextFilter.messageReceived(session, message);
         }
