@@ -100,6 +100,7 @@ public abstract class AbstractProtocolEncoderOutput implements ProtocolEncoderOu
             }
 
             newBuf.put(buf);
+			buf.free();
         }
 
         // Push the new buffer finally.
