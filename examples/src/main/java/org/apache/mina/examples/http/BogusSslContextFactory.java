@@ -37,6 +37,7 @@ public class BogusSslContextFactory {
 
     /**
      * Protocol to use.
+     * TLS is not secure 
      */
     private static final String PROTOCOL = "TLS";
 
