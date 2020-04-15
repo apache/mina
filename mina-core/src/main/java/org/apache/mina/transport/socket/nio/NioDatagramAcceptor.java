@@ -896,8 +896,10 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                     // Kernel buffer is full or wrote too much
                     setInterestedInWrite(session, true);
 
-                    session.getWriteRequestQueue().offer(session, writeRequest);
+                    writeRequestQueue.offer(session, writeRequest);
                     scheduleFlush(session);
+                    
+                    break;
                 } else {
                     setInterestedInWrite(session, false);
 
