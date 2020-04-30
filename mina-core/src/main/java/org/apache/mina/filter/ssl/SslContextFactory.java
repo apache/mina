@@ -36,7 +36,7 @@ import javax.net.ssl.TrustManagerFactory;
  * If no properties are set the returned {@link SSLContext} will
  * be equivalent to what the following creates:
  * <pre>
- *      SSLContext c = SSLContext.getInstance( "TLS" );
+ *      SSLContext c = SSLContext.getInstance( "TLSv1.2" );
  *      c.init(null, null, null);
  * </pre>
  * <p>
@@ -52,7 +52,7 @@ public class SslContextFactory {
 
     private String provider = null;
 
-    private String protocol = "TLS";
+    private String protocol = "TLSv1.2";
 
     private SecureRandom secureRandom = null;
 
