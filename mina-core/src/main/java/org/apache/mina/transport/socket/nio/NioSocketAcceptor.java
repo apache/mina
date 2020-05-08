@@ -266,10 +266,8 @@ implements SocketAcceptor {
             } catch (IOException ioe) {
                 // Add some info regarding the address we try to bind to the
                 // message
-                String newMessage = "Error while binding on " + localAddress + "\n" + "original message : "
-                        + ioe.getMessage();
-                Exception e = new IOException(newMessage);
-                e.initCause(ioe.getCause());
+                String newMessage = "Error while binding on " + localAddress;
+                Exception e = new IOException(newMessage, ioe);
 
                 // And close the channel
                 channel.close();
