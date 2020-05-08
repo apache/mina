@@ -221,7 +221,7 @@ public class DefaultWriteRequest implements WriteRequest {
         }
 
         this.message = message;
-        originalMessage = message;
+        this.originalMessage = message;
         
         if (message instanceof IoBuffer) {
             // duplicate it, so that any modification made on it
