@@ -44,7 +44,7 @@ import org.apache.mina.core.session.SessionState;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
+public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     /** The selector associated with this processor */
     private Selector selector;
     
