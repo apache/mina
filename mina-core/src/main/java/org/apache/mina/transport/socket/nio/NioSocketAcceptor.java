@@ -49,11 +49,11 @@ import org.apache.mina.transport.socket.SocketSessionConfig;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public final class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel>
+public class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, ServerSocketChannel>
 implements SocketAcceptor {
 
-    private volatile Selector selector;
-    private volatile SelectorProvider selectorProvider = null;
+    protected volatile Selector selector;
+    protected volatile SelectorProvider selectorProvider = null;
 
     /**
      * Constructor for {@link NioSocketAcceptor} using default parameters (multiple thread model).
