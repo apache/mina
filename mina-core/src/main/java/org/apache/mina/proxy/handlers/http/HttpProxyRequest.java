@@ -102,7 +102,7 @@ public class HttpProxyRequest extends ProxyRequest {
     public HttpProxyRequest(final InetSocketAddress endpointAddress, final String httpVersion,
             final Map<String, List<String>> headers) {
         this.httpVerb = HttpProxyConstants.CONNECT;
-        if (!endpointAddress.isUnresolved()) {
+        if (endpointAddress.isUnresolved()) {
             this.httpURI = endpointAddress.getHostName() + ":" + endpointAddress.getPort();
         } else {
             this.httpURI = endpointAddress.getAddress().getHostAddress() + ":" + endpointAddress.getPort();

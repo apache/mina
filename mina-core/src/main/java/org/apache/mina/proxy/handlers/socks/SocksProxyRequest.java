@@ -159,7 +159,7 @@ public class SocksProxyRequest extends ProxyRequest {
         if (host == null) {
             InetSocketAddress adr = getEndpointAddress();
 
-            if (adr != null && !adr.isUnresolved()) {
+            if (adr != null && adr.isUnresolved()) {
                 host = getEndpointAddress().getHostName();
             }
         }
