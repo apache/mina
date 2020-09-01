@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
+import java.net.SocketOption;
 import java.net.StandardSocketOptions;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -31,6 +32,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 import org.apache.mina.core.polling.AbstractPollingIoAcceptor;
@@ -251,17 +253,17 @@ implements SocketAcceptor {
             socket.setReuseAddress(isReuseAddress());
             
             // Set the SND BUFF
-	    if (config.getSendBufferSize() != -1) {
-		channel.setOption(StandardSocketOptions.SO_SNDBUF, config.getSendBufferSize());
-	    }
+		    if (config.getSendBufferSize() != -1 && channel.supportedOptions().contains(StandardSocketOptions.SO_SNDBUF)) {
+		    	channel.setOption(StandardSocketOptions.SO_SNDBUF, config.getSendBufferSize());
+		    }
 
-	    // Set the RCV BUFF
-	    if (config.getReceiveBufferSize() != -1) {
-		channel.setOption(StandardSocketOptions.SO_RCVBUF, config.getReceiveBufferSize());
-	    }
+		    // Set the RCV BUFF
+		    if (config.getReceiveBufferSize() != -1 && channel.supportedOptions().contains(StandardSocketOptions.SO_RCVBUF)) {
+		    	channel.setOption(StandardSocketOptions.SO_RCVBUF, config.getReceiveBufferSize());
+		    }
 
             // and bind.
-            try {
+		    try {
                 socket.bind(localAddress, getBacklog());
             } catch (IOException ioe) {
                 // Add some info regarding the address we try to bind to the
