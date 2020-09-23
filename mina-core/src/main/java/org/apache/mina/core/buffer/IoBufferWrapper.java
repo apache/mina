@@ -817,19 +817,6 @@ public class IoBufferWrapper extends IoBuffer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getHexDump() {
-		return buf.getHexDump();
-	}
-
-	@Override
-	public String getHexDump(int lengthLimit, boolean pretty) {
-		return buf.getHexDump(lengthLimit, pretty);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public String getString(int fieldSize, CharsetDecoder decoder) throws CharacterCodingException {
 		return buf.getString(fieldSize, decoder);
 	}
@@ -1216,14 +1203,6 @@ public class IoBufferWrapper extends IoBuffer {
 	public IoBuffer putMediumInt(int index, int value) {
 		buf.putMediumInt(index, value);
 		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getHexDump(int lengthLimit) {
-		return buf.getHexDump(lengthLimit);
 	}
 
 	/**

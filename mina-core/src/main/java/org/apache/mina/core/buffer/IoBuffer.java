@@ -1512,28 +1512,42 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 	 * 
 	 * @return hexidecimal representation of this buffer
 	 */
-	public abstract String getHexDump();
+	public String getHexDump() {
+		return this.getHexDump(this.remaining(), false);
+	}
+
+	/**
+	 * Returns hexdump of this buffer. The data and pointer are not changed as a
+	 * result of this method call.
+	 * 
+	 * @return hexidecimal representation of this buffer
+	 */
+	public String getHexDump(boolean pretty) {
+		return getHexDump(this.remaining(), pretty);
+	}
 
 	/**
 	 * Return hexdump of this buffer with limited length.
 	 * 
-	 * @param lengthLimit The maximum number of bytes to dump from the current
-	 *                    buffer position.
+	 * @param length The maximum number of bytes to dump from the current buffer
+	 *               position.
 	 * @return hexidecimal representation of this buffer
 	 */
-	public abstract String getHexDump(int lengthLimit);
+	public String getHexDump(int length) {
+		return getHexDump(length, false);
+	}
 
 	/**
 	 * Return hexdump of this buffer with limited length.
 	 * 
-	 * @param lengthLimit The maximum number of bytes to dump from the current
-	 *                    buffer position.
-	 * 
-	 * @param pretty      Produces multi-line pretty hex dumps
-	 * 
+	 * @param length The maximum number of bytes to dump from the current buffer
+	 *               position.
 	 * @return hexidecimal representation of this buffer
 	 */
-	public abstract String getHexDump(int lengthLimit, boolean pretty);
+	public String getHexDump(int length, boolean pretty) {
+		return (pretty) ? IoBufferHexDumper.getPrettyHexDumpSlice(this, this.position(), length)
+				: IoBufferHexDumper.getHexDumpSlice(this, this.position(), length);
+	}
 
 	// //////////////////////////////
 	// String getters and putters //

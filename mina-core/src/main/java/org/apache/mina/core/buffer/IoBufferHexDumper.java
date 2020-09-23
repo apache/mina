@@ -20,6 +20,7 @@
 package org.apache.mina.core.buffer;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Provides utility methods to dump an {@link IoBuffer} into a hex formatted
@@ -32,21 +33,25 @@ class IoBufferHexDumper {
 	/**
 	 * Dumps an {@link IoBuffer} to a hex formatted string.
 	 * 
-	 * @param in     the buffer to dump
-	 * @param length the limit at which hex dumping will stop
+	 * @param buf    the buffer to dump
+	 * @param offset the starting position to begin reading the hex dump
+	 * @param length the number of bytes to dump
 	 * @return a hex formatted string representation of the <i>in</i>
 	 *         {@link IoBuffer}.
 	 */
-	public static String getHexdump(IoBuffer in, int length) {
-		if (length < 0) {
-			throw new IllegalArgumentException("length: " + length + " must be non-negative number");
+	public static String getHexDumpSlice(final IoBuffer buf, final int offset, final int length) {
+		if (buf == null) {
+			throw new IllegalArgumentException();
 		}
 
-		int pos = in.position();
-		int rem = in.limit() - pos;
-		int items = Math.min(rem, length);
+		if (length < 0 || offset < 0 || offset + length > buf.limit()) {
+			throw new IndexOutOfBoundsException();
+		}
 
-		if (items == 0) {
+		int pos = offset;
+		int items = Math.min(offset + length, offset + buf.limit()) - pos;
+
+		if (items <= 0) {
 			return "";
 		}
 
@@ -55,7 +60,7 @@ class IoBufferHexDumper {
 		StringBuilder out = new StringBuilder((items * 3) + 6);
 
 		for (;;) {
-			int byteValue = in.get(pos++) & 0xFF;
+			int byteValue = buf.get(pos++) & 0xFF;
 			out.append((char) hexDigit[(byteValue >> 4) & 0x0F]);
 			out.append((char) hexDigit[byteValue & 0xf]);
 
@@ -66,39 +71,32 @@ class IoBufferHexDumper {
 			}
 		}
 
-		if (items != rem) {
-			out.append("...");
-		}
-
 		return out.toString();
-	}
-
-	/**
-	 * Produces a verbose hex dump from the {@link ReadableBuffer}
-	 *
-	 * @return The formatted String representing the content between position() and
-	 *         limit().
-	 */
-	public static final String getPrettyHexDump(final IoBuffer buf) {
-		return getPrettyHexDump(buf, buf.position(), buf.remaining());
 	}
 
 	/**
 	 * Produces a verbose hex dump
 	 *
-	 * @param start   initial position which to read bytes
+	 * @param offset initial position which to read bytes
 	 *
 	 * @param length number of bytes to display
 	 *
 	 * @return The formatted String representing the content between (offset) and
 	 *         (offset+count)
 	 */
-	public static final String getPrettyHexDump(final IoBuffer buf, final int start, final int length) {
-		final int len = Math.min(length, buf.limit() - start);
+	public static final String getPrettyHexDumpSlice(final IoBuffer buf, final int offset, final int length) {
+		if (buf == null) {
+			throw new IllegalArgumentException();
+		}
 
+		if (length < 0 || offset < 0 || offset + length > buf.limit()) {
+			throw new IndexOutOfBoundsException();
+		}
+
+		final int len = Math.min(length, buf.limit() - offset);
 		final byte[] bytes = new byte[len];
 
-		int o = start;
+		int o = offset;
 
 		for (int i = 0; i < len; i++) {
 			bytes[i] = buf.get(o++);
@@ -109,9 +107,9 @@ class IoBufferHexDumper {
 		sb.append("Source ");
 		sb.append(buf);
 		sb.append(" showing index ");
-		sb.append(start);
+		sb.append(offset);
 		sb.append(" through ");
-		sb.append((start + length));
+		sb.append((offset + length));
 		sb.append("\n");
 		sb.append(toPrettyHexDump(bytes, 0, bytes.length));
 
@@ -131,8 +129,12 @@ class IoBufferHexDumper {
 	 * @return string hex dump
 	 */
 	public static final String toPrettyHexDump(final byte[] data, final int pos, final int len) {
-		if ((data == null) || ((pos < 0) | (len < 0)) || ((pos + len) > data.length)) {
-			throw new IllegalArgumentException("byte[] is null || pos < 0 || len < 0 || pos + len > byte[].length");
+		if (data == null) {
+			throw new IllegalArgumentException();
+		}
+
+		if (len < 0 || pos < 0 || pos + len > data.length) {
+			throw new IndexOutOfBoundsException();
 		}
 
 		final StringBuilder b = new StringBuilder();
@@ -141,7 +143,6 @@ class IoBufferHexDumper {
 
 		for (int i = pos, c = 0, line = 16; i < len; i += line) {
 			b.append(String.format("%06d", Integer.valueOf(c)) + "  ");
-
 			b.append(toPrettyHexDumpLine(data, i, Math.min((pos + len) - i, line), 8, line));
 
 			if ((i + line) < len) {
@@ -222,8 +223,8 @@ class IoBufferHexDumper {
 		return b.toString();
 	}
 
-	private static final char hexDigit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
-			'f' };
+	private static final char hexDigit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+			'F' };
 
 	public static final String toHex(final byte b) {
 		// Returns hex String representation of byte
