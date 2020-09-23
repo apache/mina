@@ -19,7 +19,8 @@
  */
 
 /**
- * Classes that implement IoFilter and provide Secure Sockets Layer functionality.
+ * Classes that implement IoFilter and provide Secure Sockets Layer
+ * functionality.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

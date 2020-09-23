@@ -40,150 +40,150 @@ import java.security.cert.CertificateException;
  */
 public class KeyStoreFactory {
 
-    private String type = "JKS";
+	private String type = "JKS";
 
-    private String provider = null;
+	private String provider = null;
 
-    private char[] password = null;
+	private char[] password = null;
 
-    private byte[] data = null;
+	private byte[] data = null;
 
-    /**
-     * Creates a new {@link KeyStore}. This method will be called
-     * by the base class when Spring creates a bean using this FactoryBean.
-     *
-     * @return a new {@link KeyStore} instance.
-     * @throws KeyStoreException If we can't create an instance of the KeyStore for the given type
-     * @throws NoSuchProviderException If we don't have the provider registered to create the KeyStore
-     * @throws NoSuchAlgorithmException If the KeyStore algorithm cannot be used
-     * @throws CertificateException If the KeyStore certificate cannot be loaded 
-     * @throws IOException If the KeyStore cannot be loaded
-     */
-    public KeyStore newInstance() throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException,
-            CertificateException, IOException {
-        if (data == null) {
-            throw new IllegalStateException("data property is not set.");
-        }
+	/**
+	 * Creates a new {@link KeyStore}. This method will be called by the base class
+	 * when Spring creates a bean using this FactoryBean.
+	 *
+	 * @return a new {@link KeyStore} instance.
+	 * @throws KeyStoreException        If we can't create an instance of the
+	 *                                  KeyStore for the given type
+	 * @throws NoSuchProviderException  If we don't have the provider registered to
+	 *                                  create the KeyStore
+	 * @throws NoSuchAlgorithmException If the KeyStore algorithm cannot be used
+	 * @throws CertificateException     If the KeyStore certificate cannot be loaded
+	 * @throws IOException              If the KeyStore cannot be loaded
+	 */
+	public KeyStore newInstance() throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException,
+			CertificateException, IOException {
+		if (data == null) {
+			throw new IllegalStateException("data property is not set.");
+		}
 
-        KeyStore ks;
-        if (provider == null) {
-            ks = KeyStore.getInstance(type);
-        } else {
-            ks = KeyStore.getInstance(type, provider);
-        }
+		KeyStore ks;
+		if (provider == null) {
+			ks = KeyStore.getInstance(type);
+		} else {
+			ks = KeyStore.getInstance(type, provider);
+		}
 
-        InputStream is = new ByteArrayInputStream(data);
-        
-        try {
-            ks.load(is, password);
-        } finally {
-            try {
-                is.close();
-            } catch (IOException ignored) {
-                // Do nothing
-            }
-        }
+		InputStream is = new ByteArrayInputStream(data);
 
-        return ks;
-    }
+		try {
+			ks.load(is, password);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException ignored) {
+				// Do nothing
+			}
+		}
 
-    /**
-     * Sets the type of key store to create. The default is to create a
-     * JKS key store.
-     *
-     * @param type the type to use when creating the key store.
-     * @throws IllegalArgumentException if the specified value is
-     *         <code>null</code>.
-     */
-    public void setType(String type) {
-        if (type == null) {
-            throw new IllegalArgumentException("type");
-        }
-        this.type = type;
-    }
+		return ks;
+	}
 
-    /**
-     * Sets the key store password. If this value is <code>null</code> no
-     * password will be used to check the integrity of the key store.
-     *
-     * @param password the password or <code>null</code> if no password is
-     *        needed.
-     */
-    public void setPassword(String password) {
-        if (password != null) {
-            this.password = password.toCharArray();
-        } else {
-            this.password = null;
-        }
-    }
+	/**
+	 * Sets the type of key store to create. The default is to create a JKS key
+	 * store.
+	 *
+	 * @param type the type to use when creating the key store.
+	 * @throws IllegalArgumentException if the specified value is <code>null</code>.
+	 */
+	public void setType(String type) {
+		if (type == null) {
+			throw new IllegalArgumentException("type");
+		}
+		this.type = type;
+	}
 
-    /**
-     * Sets the name of the provider to use when creating the key store. The
-     * default is to use the platform default provider.
-     *
-     * @param provider the name of the provider, e.g. <tt>"SUN"</tt>.
-     */
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
+	/**
+	 * Sets the key store password. If this value is <code>null</code> no password
+	 * will be used to check the integrity of the key store.
+	 *
+	 * @param password the password or <code>null</code> if no password is needed.
+	 */
+	public void setPassword(String password) {
+		if (password != null) {
+			this.password = password.toCharArray();
+		} else {
+			this.password = null;
+		}
+	}
 
-    /**
-     * Sets the data which contains the key store.
-     *
-     * @param data the byte array that contains the key store
-     */
-    public void setData(byte[] data) {
-        byte[] copy = new byte[data.length];
-        System.arraycopy(data, 0, copy, 0, data.length);
-        this.data = copy;
-    }
+	/**
+	 * Sets the name of the provider to use when creating the key store. The default
+	 * is to use the platform default provider.
+	 *
+	 * @param provider the name of the provider, e.g. <tt>"SUN"</tt>.
+	 */
+	public void setProvider(String provider) {
+		this.provider = provider;
+	}
 
-    /**
-     * Sets the data which contains the key store.
-     *
-     * @param dataStream the {@link InputStream} that contains the key store
-     * @throws IOException If we can't process the stream
-     */
-    private void setData(InputStream dataStream) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            for (;;) {
-                int readByte = dataStream.read();
-                
-                if (readByte < 0) {
-                    break;
-                }
-                
-                out.write(readByte);
-            }
-            
-            setData(out.toByteArray());
-        } finally {
-            try {
-                dataStream.close();
-            } catch (IOException e) {
-                // Ignore.
-            }
-        }
-    }
+	/**
+	 * Sets the data which contains the key store.
+	 *
+	 * @param data the byte array that contains the key store
+	 */
+	public void setData(byte[] data) {
+		byte[] copy = new byte[data.length];
+		System.arraycopy(data, 0, copy, 0, data.length);
+		this.data = copy;
+	}
 
-    /**
-     * Sets the data which contains the key store.
-     *
-     * @param dataFile the {@link File} that contains the key store
-     * @throws IOException If we can't process the file
-     */
-    public void setDataFile(File dataFile) throws IOException {
-        setData(new BufferedInputStream(new FileInputStream(dataFile)));
-    }
+	/**
+	 * Sets the data which contains the key store.
+	 *
+	 * @param dataStream the {@link InputStream} that contains the key store
+	 * @throws IOException If we can't process the stream
+	 */
+	private void setData(InputStream dataStream) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			for (;;) {
+				int readByte = dataStream.read();
 
-    /**
-     * Sets the data which contains the key store.
-     *
-     * @param dataUrl the {@link URL} that contains the key store.
-     * @throws IOException If we can't process the URL
-     */
-    public void setDataUrl(URL dataUrl) throws IOException {
-        setData(dataUrl.openStream());
-    }
+				if (readByte < 0) {
+					break;
+				}
+
+				out.write(readByte);
+			}
+
+			setData(out.toByteArray());
+		} finally {
+			try {
+				dataStream.close();
+			} catch (IOException e) {
+				// Ignore.
+			}
+		}
+	}
+
+	/**
+	 * Sets the data which contains the key store.
+	 *
+	 * @param dataFile the {@link File} that contains the key store
+	 * @throws IOException If we can't process the file
+	 */
+	public void setDataFile(File dataFile) throws IOException {
+		setData(new BufferedInputStream(new FileInputStream(dataFile)));
+	}
+
+	/**
+	 * Sets the data which contains the key store.
+	 *
+	 * @param dataUrl the {@link URL} that contains the key store.
+	 * @throws IOException If we can't process the URL
+	 */
+	public void setDataUrl(URL dataUrl) throws IOException {
+		setData(dataUrl.openStream());
+	}
 }
