@@ -537,12 +537,15 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
             if (readBytes > 0) {
                 IoFilterChain filterChain = session.getFilterChain();
                 filterChain.fireMessageReceived(buf);
+                buf.free();
                 buf = null;
 
                 if (hasFragmentation) {
                     if (readBytes << 1 < config.getReadBufferSize()) {
+                    	if (LOG.isDebugEnabled()) LOG.debug("Decrease read buffer size: current: " + config.getReadBufferSize());
                         session.decreaseReadBufferSize();
                     } else if (readBytes == config.getReadBufferSize()) {
+                    	if (LOG.isDebugEnabled()) LOG.debug("Increase read buffer size: current: " + config.getReadBufferSize());
                         session.increaseReadBufferSize();
                     }
                 }
