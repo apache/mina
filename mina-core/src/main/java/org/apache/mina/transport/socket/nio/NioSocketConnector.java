@@ -242,7 +242,7 @@ SocketConnector {
 
         int receiveBufferSize = (getSessionConfig()).getReceiveBufferSize();
 
-        if (receiveBufferSize > 65535) {
+        if (receiveBufferSize > 0) {
             ch.socket().setReceiveBufferSize(receiveBufferSize);
         }
 
