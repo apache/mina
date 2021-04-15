@@ -1545,8 +1545,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 	 * @return hexidecimal representation of this buffer
 	 */
 	public String getHexDump(int length, boolean pretty) {
-		return (pretty) ? IoBufferHexDumper.getPrettyHexDumpSlice(this, this.position(), length)
-				: IoBufferHexDumper.getHexDumpSlice(this, this.position(), length);
+		return (pretty) ? IoBufferHexDumper.getPrettyHexDumpSlice(this, this.position(), Math.min(this.remaining(), length))
+				: IoBufferHexDumper.getHexDumpSlice(this, this.position(), Math.min(this.remaining(), length));
 	}
 
 	// //////////////////////////////

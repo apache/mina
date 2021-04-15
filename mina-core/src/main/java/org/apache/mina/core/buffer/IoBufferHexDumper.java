@@ -20,7 +20,6 @@
 package org.apache.mina.core.buffer;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Provides utility methods to dump an {@link IoBuffer} into a hex formatted
