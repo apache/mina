@@ -19,10 +19,8 @@
  */
 package org.apache.mina.filter.codec;
 
+import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.apache.mina.core.buffer.IoBuffer;
 
 /**
  * A {@link ProtocolEncoderOutput} based on queue.
@@ -30,80 +28,25 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractProtocolEncoderOutput implements ProtocolEncoderOutput {
-    /** The queue where the decoded messages are stored */
-    private final Queue<Object> messageQueue = new ConcurrentLinkedQueue<>();
+	/** The queue where the decoded messages are stored */
+	protected final Queue<Object> messageQueue = new ArrayDeque<>();
 
-    private boolean buffersOnly = true;
+	/**
+	 * Creates an instance of AbstractProtocolEncoderOutput
+	 */
+	public AbstractProtocolEncoderOutput() {
+		// Do nothing
+	}
 
-    /**
-     * Creates an instance of AbstractProtocolEncoderOutput
-     */
-    public AbstractProtocolEncoderOutput() {
-        // Do nothing
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void write(Object message) {
+		if (message == null) {
+			throw new IllegalArgumentException("message");
+		}
 
-    /**
-     * @return The message queue
-     */
-    public Queue<Object> getMessageQueue() {
-        return messageQueue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void write(Object encodedMessage) {
-        if (encodedMessage instanceof IoBuffer) {
-            IoBuffer buf = (IoBuffer) encodedMessage;
-            if (buf.hasRemaining()) {
-                messageQueue.offer(buf);
-            } else {
-                throw new IllegalArgumentException("buf is empty. Forgot to call flip()?");
-            }
-        } else {
-            messageQueue.offer(encodedMessage);
-            buffersOnly = false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void mergeAll() {
-        if (!buffersOnly) {
-            throw new IllegalStateException("the encoded message list contains a non-buffer.");
-        }
-
-        final int size = messageQueue.size();
-
-        if (size < 2) {
-            // no need to merge!
-            return;
-        }
-
-        // Get the size of merged BB
-        int sum = 0;
-        for (Object b : messageQueue) {
-            sum += ((IoBuffer) b).remaining();
-        }
-
-        // Allocate a new BB that will contain all fragments
-        IoBuffer newBuf = IoBuffer.allocate(sum);
-
-        // and merge all.
-        for (;;) {
-            IoBuffer buf = (IoBuffer) messageQueue.poll();
-            if (buf == null) {
-                break;
-            }
-
-            newBuf.put(buf);
-        }
-
-        // Push the new buffer finally.
-        newBuf.flip();
-        messageQueue.add(newBuf);
-    }
+		messageQueue.offer(message);
+	}
 }
