@@ -23,8 +23,6 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -324,12 +322,12 @@ class SslHandler {
     }
     
     /* no qualifier */void flushMessageReceived() {
-	IoFilterEvent event;
-
-	while ((event = messageReceivedEventQueue.poll()) != null) {
-	    NextFilter nextFilter = event.getNextFilter();
-	    nextFilter.messageReceived(session, event.getParameter());
-	}
+        IoFilterEvent event;
+    
+        while ((event = messageReceivedEventQueue.poll()) != null) {
+            NextFilter nextFilter = event.getNextFilter();
+            nextFilter.messageReceived(session, event.getParameter());
+        }
     }
 
     /**
