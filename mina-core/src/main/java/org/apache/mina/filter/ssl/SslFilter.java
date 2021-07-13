@@ -22,6 +22,7 @@ package org.apache.mina.filter.ssl;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -497,59 +498,69 @@ public class SslFilter extends IoFilterAdapter {
         }
 
         SslHandler sslHandler = getSslSessionHandler(session);
+        AtomicBoolean canPushMessage = new AtomicBoolean( false );
+        
+        // The SslHandler instance is *guaranteed* to nit be null here
 
-	synchronized (sslHandler) {
-	    if (!isSslStarted(session) && sslHandler.isInboundDone()) {
-		// The SSL session must be established first before we
-		// can push data to the application. Store the incoming
-		// data into a queue for a later processing
-		sslHandler.scheduleMessageReceived(nextFilter, message);
-	    } else {
-		IoBuffer buf = (IoBuffer) message;
-
-		try {
-		    if (sslHandler.isOutboundDone()) {
-			sslHandler.destroy();
-			throw new SSLException("Outbound done");
-		    }
-
-		    // forward read encrypted data to SSL handler
-		    sslHandler.messageReceived(nextFilter, buf.buf());
-
-		    // Handle data to be forwarded to application or written to net
-		    handleSslData(nextFilter, sslHandler);
-
-		    if (sslHandler.isInboundDone()) {
-			if (sslHandler.isOutboundDone()) {
-			    sslHandler.destroy();
-			} else {
-			    initiateClosure(nextFilter, session);
-			}
-
-			if (buf.hasRemaining()) {
-			    // Forward the data received after closure.
-			    sslHandler.scheduleMessageReceived(nextFilter, buf);
-			}
-		    }
-		} catch (SSLException ssle) {
-		    if (!sslHandler.isHandshakeComplete()) {
-			SSLException newSsle = new SSLHandshakeException("SSL handshake failed.");
-			newSsle.initCause(ssle);
-			ssle = newSsle;
-
-			// Close the session immediately, the handshake has failed
-			session.closeNow();
-		    } else {
-			// Free the SSL Handler buffers
-			sslHandler.release();
-		    }
-
-		    throw ssle;
-		}
-	    }
-	}
-	
-	sslHandler.flushMessageReceived();
+        synchronized (sslHandler) {
+            if (sslHandler.isOutboundDone() && sslHandler.isInboundDone()) {
+                // We aren't handshaking here. Let's push the message to the next filter
+                
+                // Note: we can push the message to the queue immediately, 
+                // but don't do so in the synchronized block. We use a protected
+                // flag to do so.
+                canPushMessage.set( true );
+            } else {
+                canPushMessage.set( false );
+                IoBuffer buf = (IoBuffer) message;
+                
+                try {
+                    if (sslHandler.isOutboundDone()) {
+                        sslHandler.destroy();
+                        throw new SSLException("Outbound done");
+                    }
+                
+                    // forward read encrypted data to SSL handler
+                    sslHandler.messageReceived(nextFilter, buf.buf());
+                    
+                    // Handle data to be forwarded to application or written to net
+                    handleSslData(nextFilter, sslHandler);
+                    
+                    if (sslHandler.isInboundDone()) {
+                        if (sslHandler.isOutboundDone()) {
+                            sslHandler.destroy();
+                        } else {
+                            initiateClosure(nextFilter, session);
+                        }
+                    
+                        if (buf.hasRemaining()) {
+                            // Forward the data received after closure.
+                            sslHandler.scheduleMessageReceived(nextFilter, buf);
+                        }
+                    }
+                } catch (SSLException ssle) {
+                    if (!sslHandler.isHandshakeComplete()) {
+                        SSLException newSsle = new SSLHandshakeException("SSL handshake failed.");
+                        newSsle.initCause(ssle);
+                        ssle = newSsle;
+            
+                        // Close the session immediately, the handshake has failed
+                        session.closeNow();
+                    } else {
+                        // Free the SSL Handler buffers
+                        sslHandler.release();
+                    }
+                
+                    throw ssle;
+                }
+            }
+        }
+    
+        if (canPushMessage.get()) {
+            nextFilter.messageReceived(session, message);
+        } else {
+            sslHandler.flushMessageReceived();
+        }
     }
 
     @Override
