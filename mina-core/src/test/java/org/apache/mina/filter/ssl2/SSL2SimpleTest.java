@@ -70,8 +70,6 @@ public class SSL2SimpleTest {
 		connect_future.awaitUninterruptibly();
 
 		final IoSession client_socket = connect_future.getSession();
-		
-		client_socket.write(createWriteRequest()).awaitUninterruptibly();
 
 		try {
 			Thread.sleep(1000);
@@ -79,7 +77,15 @@ public class SSL2SimpleTest {
 
 		}
 
-		client_socket.closeOnFlush().awaitUninterruptibly();
+		client_socket.write(createWriteRequest());
+
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+
+		}
+
+		client_socket.closeNow();
 
 		socket_connector.dispose();
 
@@ -98,7 +104,7 @@ public class SSL2SimpleTest {
 		}
 	}
 
-	public static WriteRequest createWriteRequest() {
+	public static IoBuffer createWriteRequest() {
 		// HTTP request
 		StringBuilder http = new StringBuilder();
 		http.append("GET / HTTP/1.0\r\n");
@@ -109,6 +115,6 @@ public class SSL2SimpleTest {
 		message.put(http.toString().getBytes());
 		message.flip();
 
-		return new DefaultWriteRequest(message);
+		return message;
 	}
 }

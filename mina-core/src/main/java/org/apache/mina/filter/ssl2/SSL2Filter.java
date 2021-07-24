@@ -34,7 +34,6 @@ import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.util.BasicThreadFactory;
-import org.apache.mina.util.StackInspector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +57,8 @@ public class SSL2Filter extends IoFilterAdapter {
 	 */
 	protected static final Logger LOGGER = LoggerFactory.getLogger(SSL2Filter.class);
 
-	protected static final Executor EXECUTOR = new ThreadPoolExecutor(2, 4, 100, TimeUnit.MILLISECONDS,
-			new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec"));
+	protected static final Executor EXECUTOR = new ThreadPoolExecutor(2, 2, 100, TimeUnit.MILLISECONDS,
+			new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec", true));
 
 	protected static final AttributeKey SSL_HANDLER = new AttributeKey(SSL2Filter.class, "handler");
 
@@ -195,8 +194,6 @@ public class SSL2Filter extends IoFilterAdapter {
 
 		LOGGER.debug("session openend {}", session);
 
-		StackInspector.get().printStackTrace();
-
 		SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
 
 		if (x == null) {
@@ -238,6 +235,9 @@ public class SSL2Filter extends IoFilterAdapter {
 
 	@Override
 	public void filterWrite(NextFilter next, IoSession session, WriteRequest writeRequest) throws Exception {
+
+		LOGGER.debug("session write {}", session);
+
 		if (writeRequest instanceof EncryptedWriteRequest) {
 			super.filterWrite(next, session, writeRequest);
 		} else {

@@ -138,6 +138,9 @@ public abstract class SSL2Handler {
 			b.append("server");
 		}
 
+		b.append(", status=");
+		b.append(this.mEngine.getHandshakeStatus());
+
 		b.append("]");
 
 		return b.toString();
