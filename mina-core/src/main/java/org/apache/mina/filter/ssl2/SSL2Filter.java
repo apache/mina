@@ -48,15 +48,13 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SSL2Filter extends IoFilterAdapter {
-	/**
-	 * The logger
-	 */
+
+	public static final AttributeKey SSL_HANDLER = new AttributeKey(SSL2Filter.class, "handler");
+
 	protected static final Logger LOGGER = LoggerFactory.getLogger(SSL2Filter.class);
 
 	protected static final Executor EXECUTOR = new ThreadPoolExecutor(2, 2, 100, TimeUnit.MILLISECONDS,
 			new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec", true));
-
-	protected static final AttributeKey SSL_HANDLER = new AttributeKey(SSL2Filter.class, "handler");
 
 	protected final SSLContext mContext;
 

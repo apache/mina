@@ -10,6 +10,7 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.ssl.SslEvent;
 
 public class SSL2HandlerG0 extends SSL2Handler {
 
@@ -18,8 +19,29 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 */
 	static protected final int MAX_UNACK_MESSAGES = 6;
 
+	/**
+	 * Indicates whether the first handshake was completed
+	 */
+	protected boolean mHandshakeComplete = false;
+
 	public SSL2HandlerG0(SSLEngine p, Executor e, IoSession s) {
 		super(p, e, s);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isOpen() {
+		return this.mEngine.isOutboundDone() == false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isConnected() {
+		return this.mHandshakeComplete && isOpen();
 	}
 
 	/**
@@ -105,6 +127,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} lreceive() - handshake finished, flushing pending requests", toString());
 				}
+				this.lfinish(next);
 				this.lflush(next);
 				break;
 		}
@@ -163,7 +186,6 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 */
 	@SuppressWarnings("incomplete-switch")
 	synchronized protected boolean lwrite(final NextFilter next, final WriteRequest request) throws SSLException {
-
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("{} lwrite() - source {}", toString(), request);
 		}
@@ -230,6 +252,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} lwrite() - handshake finished, flushing pending requests", toString());
 				}
+				this.lfinish(next);
 				if (this.lwrite(next, request)) {
 					this.lflush(next);
 					return true;
@@ -293,11 +316,17 @@ public class SSL2HandlerG0 extends SSL2Handler {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} lwrite() - handshake finished, flushing pending requests", toString());
 				}
+				this.lfinish(next);
 				this.lflush(next);
 				break;
 		}
 
 		return result.bytesProduced() > 0;
+	}
+
+	synchronized protected void lfinish(final NextFilter next) {
+		this.mHandshakeComplete = true;
+		next.event(this.mSession, SslEvent.SECURED);
 	}
 
 	/**

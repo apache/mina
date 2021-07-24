@@ -74,6 +74,16 @@ public abstract class SSL2Handler {
 	}
 
 	/**
+	 * {@code true} if the encryption session is open
+	 */
+	abstract public boolean isOpen();
+
+	/**
+	 * {@code true} if the encryption session is connected and secure
+	 */
+	abstract public boolean isConnected();
+
+	/**
 	 * Opens the encryption session, this may include sending the initial handshake
 	 * message
 	 * 
@@ -153,8 +163,8 @@ public abstract class SSL2Handler {
 			b.append("server");
 		}
 
-		b.append(", status=");
-		b.append(this.mEngine.getHandshakeStatus());
+		b.append(", connected=");
+		b.append(this.isConnected());
 
 		b.append("]");
 
