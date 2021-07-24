@@ -1,32 +1,19 @@
 package org.apache.mina.filter.ssl2;
 
-import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 
 public class EncryptedWriteRequest extends DefaultWriteRequest {
 
 	// The original message
-	private WriteRequest parentRequest;
+	private WriteRequest originalRequest;
 
 	public EncryptedWriteRequest(Object encodedMessage, WriteRequest parent) {
-		super(encodedMessage, null);
+		super(encodedMessage, parent != null ? parent.getFuture() : null);
+		this.originalRequest = parent != null ? parent : this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isEncoded() {
-		return true;
-	}
-
-	public WriteRequest getParentRequest() {
-		return this.parentRequest;
-	}
-
-	@Override
-	public WriteFuture getFuture() {
-		return (this.getParentRequest() != null) ? this.getParentRequest().getFuture() : super.getFuture();
+	public WriteRequest getOriginalRequest() {
+		return this.originalRequest;
 	}
 }

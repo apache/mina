@@ -19,6 +19,7 @@
  */
 package org.apache.mina.filter.ssl2;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -38,16 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An SSL filter that encrypts and decrypts the data exchanged in the session.
- * Adding this filter triggers SSL handshake procedure immediately by sending a
- * SSL 'hello' message, so you don't need to call {@link #startSsl(IoSession)}
- * manually unless you are implementing StartTLS (see below). If you don't want
- * the handshake procedure to start immediately, please specify {@code false} as
- * {@code autoStart} parameter in the constructor.
+ * An SSL Filter which simplifies and controls the flow of encrypted information
+ * on the filter-chain.
  * <p>
- * This filter uses an {@link SSLEngine} which was introduced in Java 5, so Java
- * version 5 or above is mandatory to use this filter. And please note that this
- * filter only works for TCP/IP connections.
+ * The initial handshake is automatically enabled for "client" sessions once the
+ * filter is added to the filter-chain and the session is connected.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -160,15 +156,6 @@ public class SSL2Filter extends IoFilterAdapter {
 		this.mEnabledProtocols = protocols;
 	}
 
-	/**
-	 * Executed just before the filter is added into the chain, we do :
-	 * <ul>
-	 * <li>check that we don't have a SSL filter already present
-	 * <li>we update the next filter
-	 * <li>we create the SSL handler helper class
-	 * <li>and we store it into the session's Attributes
-	 * </ul>
-	 */
 	@Override
 	public void onPreAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
 		// Check that we don't have a SSL filter already present in the chain
@@ -184,34 +171,47 @@ public class SSL2Filter extends IoFilterAdapter {
 	}
 
 	@Override
-	public void onPreRemove(IoFilterChain parent, String name, NextFilter next) throws Exception {
+	public void onPostAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
 		IoSession session = parent.getSession();
-		session.removeAttribute(SSL_HANDLER);
+		if (session.isConnected()) {
+			this.sessionConnected(next, session);
+		}
+		super.onPostAdd(parent, name, next);
 	}
 
 	@Override
-	public void sessionOpened(NextFilter next, IoSession session) throws Exception {
+	public void onPreRemove(IoFilterChain parent, String name, NextFilter next) throws Exception {
+		IoSession session = parent.getSession();
+		SSL2Handler x = SSL2Handler.class.cast(session.removeAttribute(SSL_HANDLER));
+		if (x != null) {
+			x.close(next);
+		}
+	}
 
-		LOGGER.debug("session openend {}", session);
-
+	protected void sessionConnected(NextFilter next, IoSession session) throws Exception {
 		SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
 
 		if (x == null) {
-			SSLEngine e = mContext.createSSLEngine();
-
+			InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
+			SSLEngine e = mContext.createSSLEngine(s.getHostString(), s.getPort());
 			e.setNeedClientAuth(mNeedClientAuth);
 			e.setWantClientAuth(mWantClientAuth);
 			e.setEnabledCipherSuites(mEnabledCipherSuites);
 			e.setEnabledProtocols(mEnabledProtocols);
 			e.setUseClientMode(!session.isServer());
-
 			x = new SSL2HandlerG0(e, EXECUTOR, session);
-
 			session.setAttribute(SSL_HANDLER, x);
 		}
 
 		x.open(next);
-		
+	}
+
+	@Override
+	public void sessionOpened(NextFilter next, IoSession session) throws Exception {
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("session {} openend", session);
+
+		this.sessionConnected(next, session);
 		super.sessionOpened(next, session);
 	}
 
@@ -222,29 +222,32 @@ public class SSL2Filter extends IoFilterAdapter {
 	}
 
 	@Override
-	public void messageSent(NextFilter next, IoSession session, WriteRequest writeRequest) throws Exception {
-		if (writeRequest instanceof EncryptedWriteRequest) {
-			EncryptedWriteRequest e = EncryptedWriteRequest.class.cast(writeRequest);
+	public void messageSent(NextFilter next, IoSession session, WriteRequest request) throws Exception {
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("session {} sent {}", session, request);
+
+		if (request instanceof EncryptedWriteRequest) {
+			EncryptedWriteRequest e = EncryptedWriteRequest.class.cast(request);
 			SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
-			x.ack(next, writeRequest);
-			if (e.getParentRequest() != null) {
-				next.messageSent(session, e.getParentRequest());
+			x.ack(next, request);
+			if (e.getOriginalRequest() != e) {
+				next.messageSent(session, e.getOriginalRequest());
 			}
 		} else {
-			super.messageSent(next, session, writeRequest);
+			super.messageSent(next, session, request);
 		}
 	}
 
 	@Override
-	public void filterWrite(NextFilter next, IoSession session, WriteRequest writeRequest) throws Exception {
+	public void filterWrite(NextFilter next, IoSession session, WriteRequest request) throws Exception {
 
-		LOGGER.debug("session write {}", session);
+		LOGGER.debug("session {} write {}", session, request);
 
-		if (writeRequest instanceof EncryptedWriteRequest) {
-			super.filterWrite(next, session, writeRequest);
+		if (request instanceof EncryptedWriteRequest) {
+			super.filterWrite(next, session, request);
 		} else {
 			SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
-			x.write(next, writeRequest);
+			x.write(next, request);
 		}
 	}
 }

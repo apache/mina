@@ -77,13 +77,7 @@ public class SSL2SimpleTest {
 //
 //		}
 
-		client_socket.write(createWriteRequest());
-
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-
-		}
+		client_socket.write(createMosaicRequest()).awaitUninterruptibly();
 
 		client_socket.closeNow();
 
@@ -104,7 +98,18 @@ public class SSL2SimpleTest {
 		}
 	}
 
-	public static IoBuffer createWriteRequest() {
+	public static IoBuffer createMosaicRequest() {
+		// HTTP request
+		IoBuffer message = IoBuffer.allocate(100 * 1024);
+		while (message.hasRemaining()) {
+			message.putInt(0xFF332211);
+		}
+		message.flip();
+
+		return message;
+	}
+
+	public static IoBuffer createHttpRequest() {
 		// HTTP request
 		StringBuilder http = new StringBuilder();
 		http.append("GET / HTTP/1.0\r\n");

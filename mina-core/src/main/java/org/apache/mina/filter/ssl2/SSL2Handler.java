@@ -18,6 +18,21 @@ import org.slf4j.LoggerFactory;
 public abstract class SSL2Handler {
 
 	/**
+	 * Minimum size of encoder buffer in packets
+	 */
+	static protected final int MIN_ENCODER_PACKETS = 2;
+
+	/**
+	 * Maximum size of encoder buffer in packets
+	 */
+	static protected final int MAX_ENCODER_PACKETS = 8;
+
+	/**
+	 * Zero length buffer used to prime the ssl engine
+	 */
+	static protected final IoBuffer ZERO = IoBuffer.allocate(0, true);
+
+	/**
 	 * Static logger
 	 */
 	static protected final Logger LOGGER = LoggerFactory.getLogger(SSL2Handler.class);
@@ -25,7 +40,7 @@ public abstract class SSL2Handler {
 	/**
 	 * Write Requests which are enqueued prior to the completion of the handshaking
 	 */
-	protected final Deque<WriteRequest> mWriteQueue = new ConcurrentLinkedDeque<>();
+	protected final Deque<WriteRequest> mEncodeQueue = new ConcurrentLinkedDeque<>();
 
 	/**
 	 * Requests which have been sent to the socket and waiting acknowledgment
@@ -200,7 +215,8 @@ public abstract class SSL2Handler {
 		SSLSession session = this.mEngine.getHandshakeSession();
 		if (session == null)
 			session = this.mEngine.getSession();
-		int packets = Math.max(2, Math.min(16, 1 + (estimate / session.getApplicationBufferSize())));
+		int packets = Math.max(MIN_ENCODER_PACKETS,
+				Math.min(MAX_ENCODER_PACKETS, 1 + (estimate / session.getApplicationBufferSize())));
 		return IoBuffer.allocate(packets * session.getPacketBufferSize());
 	}
 

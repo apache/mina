@@ -4,7 +4,6 @@ import java.util.concurrent.Executor;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -14,36 +13,42 @@ import org.apache.mina.core.write.WriteRequest;
 
 public class SSL2HandlerG0 extends SSL2Handler {
 
+	/**
+	 * Maximum number of messages waiting acknowledgement
+	 */
+	static protected final int MAX_UNACK_MESSAGES = 6;
+
 	public SSL2HandlerG0(SSLEngine p, Executor e, IoSession s) {
 		super(p, e, s);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	synchronized public void open(final NextFilter next) throws SSLException {
 		if (this.mEngine.getUseClientMode()) {
-
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} open() - begin handshaking", toString());
 			}
-
 			this.mEngine.beginHandshake();
 			this.lwrite(next);
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	synchronized public void receive(final NextFilter next, final IoBuffer message) throws SSLException {
-
+		final IoBuffer source = resume_decode_buffer(message);
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("{} receive() - source {}", toString(), message);
+			LOGGER.debug("{} receive() - source {}", toString(), source);
 		}
-
-		final IoBuffer input = resume_decode_buffer(message);
-
 		try {
-			while (lreceive(next, input) && message.hasRemaining()) {
-				// spin
+			while (lreceive(next, source) && message.hasRemaining()) {
+				// loop until the message is consumed
 			}
 		} finally {
-			save_decode_buffer(input);
+			save_decode_buffer(source);
 		}
 	}
 
@@ -63,7 +68,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			LOGGER.debug("{} lreceive() - source {}", toString(), message);
 		}
 
-		final IoBuffer source = message == null ? IoBuffer.allocate(0) : message;
+		final IoBuffer source = message == null ? ZERO : message;
 		final IoBuffer dest = allocate_app_buffer(source.remaining());
 
 		final SSLEngineResult result = mEngine.unwrap(source.buf(), dest.buf());
@@ -77,11 +82,9 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			dest.free();
 		} else {
 			dest.flip();
-
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} lreceive() - result {}", toString(), dest);
 			}
-
 			next.messageReceived(this.mSession, dest);
 		}
 
@@ -109,30 +112,42 @@ public class SSL2HandlerG0 extends SSL2Handler {
 		return result.bytesConsumed() > 0;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	synchronized public void ack(final NextFilter next, final WriteRequest request) throws SSLException {
-
+		if (this.mAckQueue.remove(request)) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("{} ack() - {}", toString(), request);
+			}
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("{} ack() - checking to see if any messages can be flushed", toString(), request);
+			}
+			this.lflush(next);
+		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	synchronized public void write(final NextFilter next, final WriteRequest request) throws SSLException {
-
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("{} write() - source {}", toString(), request);
 		}
 
-		if (this.mWriteQueue.isEmpty()) {
+		if (this.mEncodeQueue.isEmpty()) {
 			if (lwrite(next, request) == false) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
+					LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(),
+							request);
 				}
-
-				this.mWriteQueue.add(request);
+				this.mEncodeQueue.add(request);
 			}
 		} else {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
 			}
-
-			this.mWriteQueue.add(request);
+			this.mEncodeQueue.add(request);
 		}
 	}
 
@@ -142,7 +157,8 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * @param request
 	 * @param session
 	 * @param next
-	 * @return {@code true} if the WriteRequest was successfully written
+	 * @return {@code true} if the WriteRequest was fully consumed; otherwise
+	 *         {@code false}
 	 * @throws SSLException
 	 */
 	@SuppressWarnings("incomplete-switch")
@@ -166,19 +182,35 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			dest.free();
 		} else {
 			if (result.bytesConsumed() == 0) {
-				next.filterWrite(this.mSession, new EncryptedWriteRequest(dest, null));
+				EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("{} lwrite() - result {}", toString(), encrypted);
+				}
+				next.filterWrite(this.mSession, encrypted);
 			} else {
 				// then we probably consumed some data
 				dest.flip();
 				if (source.hasRemaining()) {
-					next.filterWrite(this.mSession, new EncryptedWriteRequest(dest, null));
-					lwrite(next, request); // write additional chunks
+					EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
+					this.mAckQueue.add(encrypted);
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("{} lwrite() - result {}", toString(), encrypted);
+					}
+					next.filterWrite(this.mSession, encrypted);
+					if (this.mAckQueue.size() < MAX_UNACK_MESSAGES) {
+						return lwrite(next, request); // write additional chunks
+					}
+					return false;
 				} else {
 					source.rewind();
-					next.filterWrite(this.mSession, new EncryptedWriteRequest(dest, request));
+					EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, request);
+					this.mAckQueue.add(encrypted);
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("{} lwrite() - result {}", toString(), encrypted);
+					}
+					next.filterWrite(this.mSession, encrypted);
+					return true;
 				}
-
-				return true;
 			}
 		}
 
@@ -206,7 +238,6 @@ public class SSL2HandlerG0 extends SSL2Handler {
 		}
 
 		return false;
-
 	}
 
 	/**
@@ -224,7 +255,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			LOGGER.debug("{} lwrite() - internal", toString());
 		}
 
-		final IoBuffer source = IoBuffer.allocate(0);
+		final IoBuffer source = ZERO;
 		final IoBuffer dest = allocate_encode_buffer(source.remaining());
 
 		final SSLEngineResult result = this.mEngine.wrap(source.buf(), dest.buf());
@@ -234,15 +265,13 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					result.bytesProduced());
 		}
 
-		if (dest.position() == 0) {
+		if (result.bytesProduced() == 0) {
 			dest.free();
 		} else {
 			dest.flip();
-
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} lwrite() - result {}", toString(), dest);
 			}
-
 			final EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
 			next.filterWrite(this.mSession, encrypted);
 		}
@@ -271,8 +300,14 @@ public class SSL2HandlerG0 extends SSL2Handler {
 		return result.bytesProduced() > 0;
 	}
 
+	/**
+	 * Flushes the encode queue
+	 * 
+	 * @param next
+	 * @throws SSLException
+	 */
 	synchronized protected void lflush(final NextFilter next) throws SSLException {
-		if (this.mWriteQueue.isEmpty()) {
+		if (this.mEncodeQueue.isEmpty()) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} flush() - no saved messages", toString());
 			}
@@ -280,15 +315,20 @@ public class SSL2HandlerG0 extends SSL2Handler {
 		}
 
 		WriteRequest current = null;
-
-		while ((current = this.mWriteQueue.poll()) != null) {
+		while ((this.mAckQueue.size() < MAX_UNACK_MESSAGES) && (current = this.mEncodeQueue.poll()) != null) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("{} flush() - {}", toString(), current);
+			}
 			if (lwrite(next, current) == false) {
-				this.mWriteQueue.addFirst(current);
+				this.mEncodeQueue.addFirst(current);
 				break;
 			}
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	synchronized public void close(final NextFilter next) throws SSLException {
 		if (mEngine.isOutboundDone())
 			return;
