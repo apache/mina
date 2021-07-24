@@ -71,16 +71,16 @@ public class SSL2SimpleTest {
 
 		final IoSession client_socket = connect_future.getSession();
 
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-
-		}
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e) {
+//
+//		}
 
 		client_socket.write(createWriteRequest());
 
 		try {
-			Thread.sleep(100);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 
 		}

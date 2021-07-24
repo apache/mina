@@ -119,8 +119,21 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			LOGGER.debug("{} write() - source {}", toString(), request);
 		}
 
-		this.mWriteQueue.add(request);
-		this.lflush(next);
+		if (this.mWriteQueue.isEmpty()) {
+			if (lwrite(next, request) == false) {
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
+				}
+
+				this.mWriteQueue.add(request);
+			}
+		} else {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
+			}
+
+			this.mWriteQueue.add(request);
+		}
 	}
 
 	/**

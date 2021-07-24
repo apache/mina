@@ -211,6 +211,8 @@ public class SSL2Filter extends IoFilterAdapter {
 		}
 
 		x.open(next);
+		
+		super.sessionOpened(next, session);
 	}
 
 	@Override
