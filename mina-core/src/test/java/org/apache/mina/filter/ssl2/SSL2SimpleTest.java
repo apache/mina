@@ -2,6 +2,7 @@ package org.apache.mina.filter.ssl2;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -20,8 +21,6 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.write.DefaultWriteRequest;
-import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.ssl.SslDIRMINA937Test;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
@@ -63,23 +62,24 @@ public class SSL2SimpleTest {
 		socket_connector.getFilterChain().addFirst("ssl", filter);
 		socket_connector.setHandler(new DebugFilter());
 
-		final InetSocketAddress server_address = new InetSocketAddress("0.0.0.0", 53301);
-		socket_acceptor.bind(server_address);
+		socket_acceptor.bind(new InetSocketAddress("0.0.0.0", 0));
+
+		final SocketAddress server_address = socket_acceptor.getLocalAddress();
 
 		final IoFuture connect_future = socket_connector.connect(server_address);
 		connect_future.awaitUninterruptibly();
 
 		final IoSession client_socket = connect_future.getSession();
 
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//
-//		}
-
 		client_socket.write(createMosaicRequest()).awaitUninterruptibly();
 
-		client_socket.closeNow();
+		try {
+			Thread.sleep(250);
+		} catch (InterruptedException e) {
+			// ignore
+		}
+
+		client_socket.closeNow().awaitUninterruptibly();
 
 		socket_connector.dispose();
 
