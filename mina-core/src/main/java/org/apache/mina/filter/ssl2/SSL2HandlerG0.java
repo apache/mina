@@ -39,6 +39,13 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 */
 	protected boolean mHandshakeStarted = false;
 
+	/**
+	 * Instantiates a new handler
+	 * 
+	 * @param p engine
+	 * @param e executor
+	 * @param s session
+	 */
 	public SSL2HandlerG0(SSLEngine p, Executor e, IoSession s) {
 		super(p, e, s);
 	}
@@ -95,12 +102,11 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	/**
 	 * Process a received message
 	 * 
-	 * @param message received data
-	 * @param session user session
-	 * @param next    filter
+	 * @param next
+	 * @param message
+	 * 
 	 * @throws SSLException
 	 */
-	@SuppressWarnings("incomplete-switch")
 	protected void qreceive(final NextFilter next, final IoBuffer message) throws SSLException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("{} qreceive() - source {}", toString(), message);
@@ -210,11 +216,12 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	/**
 	 * Attempts to encode the WriteRequest and write the data to the IoSession
 	 * 
-	 * @param request
-	 * @param session
 	 * @param next
+	 * @param request
+	 * 
 	 * @return {@code true} if the WriteRequest was fully consumed; otherwise
 	 *         {@code false}
+	 * 
 	 * @throws SSLException
 	 */
 	@SuppressWarnings("incomplete-switch")
@@ -237,11 +244,13 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			dest.free();
 		} else {
 			if (result.bytesConsumed() == 0) {
+				// an handshaking message must have been produced
 				EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} qwrite() - result {}", toString(), encrypted);
 				}
 				next.filterWrite(this.mSession, encrypted);
+				// do not return because we want to enter the handshake switch
 			} else {
 				// then we probably consumed some data
 				dest.flip();
@@ -266,6 +275,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					next.filterWrite(this.mSession, encrypted);
 					return true;
 				}
+				// we return because there is not reason to enter the handshake switch
 			}
 		}
 
@@ -299,9 +309,10 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	/**
 	 * Attempts to generate a handshake message and write the data to the IoSession
 	 * 
-	 * @param session
 	 * @param next
+	 * 
 	 * @return {@code true} if a message was generated and written
+	 * 
 	 * @throws SSLException
 	 */
 	synchronized protected boolean qwrite(NextFilter next) throws SSLException {
@@ -321,9 +332,12 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * If FAST_HANDSHAKE is enabled, this method will recursively loop in order to
 	 * combine multiple messages into one buffer.
 	 * 
-	 * @param session
 	 * @param next
+	 * @param source
+	 * @param dest
+	 * 
 	 * @return {@code true} if a message was generated and written
+	 * 
 	 * @throws SSLException
 	 */
 	@SuppressWarnings("incomplete-switch")
@@ -418,6 +432,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * Flushes the encode queue
 	 * 
 	 * @param next
+	 * 
 	 * @throws SSLException
 	 */
 	synchronized protected void lflush(final NextFilter next) throws SSLException {

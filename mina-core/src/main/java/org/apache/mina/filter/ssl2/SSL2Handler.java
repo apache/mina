@@ -67,6 +67,13 @@ public abstract class SSL2Handler {
 	 */
 	protected IoBuffer mReceiveBuffer;
 
+	/**
+	 * Instantiates a new handler
+	 * 
+	 * @param p engine
+	 * @param e executor
+	 * @param s session
+	 */
 	public SSL2Handler(SSLEngine p, Executor e, IoSession s) {
 		this.mEngine = p;
 		this.mExecutor = e;

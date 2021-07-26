@@ -31,7 +31,7 @@ public class SSL2SimpleTest {
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
 			UnrecoverableKeyException, CertificateException, IOException {
-		// System.setProperty("javax.net.debug", "all");
+		System.setProperty("javax.net.debug", "all");
 
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -39,13 +39,15 @@ public class SSL2SimpleTest {
 		KeyStore ks = KeyStore.getInstance("JKS");
 		KeyStore ts = KeyStore.getInstance("JKS");
 
-		ks.load(SslDIRMINA937Test.class.getResourceAsStream("keystore.sslTest"), "password".toCharArray());
-		ts.load(SslDIRMINA937Test.class.getResourceAsStream("truststore.sslTest"), "password".toCharArray());
+		final char[] password = "password".toCharArray();
 
-		kmf.init(ks, "password".toCharArray());
+		ks.load(SSL2SimpleTest.class.getResourceAsStream("keystore.jks"), password);
+		ts.load(SSL2SimpleTest.class.getResourceAsStream("truststore.jks"), password);
+
+		kmf.init(ks, password);
 		tmf.init(ts);
 
-		final SSLContext context = SSLContext.getInstance("TLS");
+		final SSLContext context = SSLContext.getInstance("TLSv1.3");
 		context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
 
 		final SSL2Filter filter = new SSL2Filter(context);
