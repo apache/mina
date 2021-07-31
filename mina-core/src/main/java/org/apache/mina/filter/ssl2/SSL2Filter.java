@@ -183,7 +183,7 @@ public class SSL2Filter extends IoFilterAdapter {
 	public void onPostAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
 		IoSession session = parent.getSession();
 		if (session.isConnected()) {
-			this.sessionConnected(next, session);
+			this.onConnected(next, session);
 		}
 		super.onPostAdd(parent, name, next);
 	}
@@ -209,7 +209,7 @@ public class SSL2Filter extends IoFilterAdapter {
 	 * @param session
 	 * @throws Exception
 	 */
-	protected void sessionConnected(NextFilter next, IoSession session) throws Exception {
+	protected void onConnected(NextFilter next, IoSession session) throws Exception {
 		SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
 
 		if (x == null) {
@@ -220,11 +220,22 @@ public class SSL2Filter extends IoFilterAdapter {
 			e.setEnabledCipherSuites(mEnabledCipherSuites);
 			e.setEnabledProtocols(mEnabledProtocols);
 			e.setUseClientMode(!session.isServer());
+			this.onEngineCreated(session, e);
 			x = new SSL2HandlerG0(e, EXECUTOR, session);
 			session.setAttribute(SSL_HANDLER, x);
 		}
 
 		x.open(next);
+	}
+
+	/**
+	 * Customization handler for init of the engine
+	 * 
+	 * @param session
+	 * @param engine
+	 */
+	protected void onEngineCreated(IoSession session, SSLEngine engine) {
+		
 	}
 
 	/**
@@ -235,7 +246,7 @@ public class SSL2Filter extends IoFilterAdapter {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("session {} openend", session);
 
-		this.sessionConnected(next, session);
+		this.onConnected(next, session);
 		super.sessionOpened(next, session);
 	}
 
