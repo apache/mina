@@ -59,17 +59,8 @@ import org.apache.mina.core.session.IoSession;
  */
 public class ProtocolCodecSession extends DummySession {
 
-    private final WriteFuture notWrittenFuture = DefaultWriteFuture.newNotWrittenFuture(this,
-            new UnsupportedOperationException());
-
     private final AbstractProtocolEncoderOutput encoderOutput = new AbstractProtocolEncoderOutput() {
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public WriteFuture flush() {
-            return notWrittenFuture;
-        }
+
     };
 
     private final AbstractProtocolDecoderOutput decoderOutput = new AbstractProtocolDecoderOutput() {
@@ -101,7 +92,7 @@ public class ProtocolCodecSession extends DummySession {
      * @return the {@link Queue} of the buffered encoder output.
      */
     public Queue<Object> getEncoderOutputQueue() {
-        return encoderOutput.getMessageQueue();
+        return encoderOutput.messageQueue;
     }
 
     /**
@@ -116,6 +107,6 @@ public class ProtocolCodecSession extends DummySession {
      * @return the {@link Queue} of the buffered decoder output.
      */
     public Queue<Object> getDecoderOutputQueue() {
-        return decoderOutput.getMessageQueue();
+        return decoderOutput.messageQueue;
     }
 }
