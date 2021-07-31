@@ -20,6 +20,7 @@
 package org.apache.mina.filter.ssl2;
 
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -39,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An SSL Filter which simplifies and controls the flow of encrypted information
+ * An simple SSL processor which performs flow control of encrypted information
  * on the filter-chain.
  * <p>
  * The initial handshake is automatically enabled for "client" sessions once the
@@ -49,34 +50,43 @@ import org.slf4j.LoggerFactory;
  */
 public class SSL2Filter extends IoFilterAdapter {
 
-	public static final AttributeKey SSL_HANDLER = new AttributeKey(SSL2Filter.class, "handler");
+	/**
+	 * Returns the SSL2Handler object
+	 */
+	static public final AttributeKey SSL_HANDLER = new AttributeKey(SSL2Filter.class, "handler");
 
-	protected static final Logger LOGGER = LoggerFactory.getLogger(SSL2Filter.class);
+	/**
+	 * The presence of this attribute in a session indicates that the session is
+	 * secured.
+	 */
+	static public final AttributeKey SSL_SECURED = new AttributeKey(SSL2Filter.class, "status");
 
-	protected static final Executor EXECUTOR = new ThreadPoolExecutor(2, 2, 100, TimeUnit.MILLISECONDS,
+	/**
+	 * The logger
+	 */
+	static protected final Logger LOGGER = LoggerFactory.getLogger(SSL2Filter.class);
+
+	/**
+	 * Task executor for processing handshakes
+	 */
+	static protected final Executor EXECUTOR = new ThreadPoolExecutor(2, 2, 100, TimeUnit.MILLISECONDS,
 			new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec", true));
 
 	protected final SSLContext mContext;
-
 	protected boolean mNeedClientAuth;
-
 	protected boolean mWantClientAuth;
-
 	protected String[] mEnabledCipherSuites;
-
 	protected String[] mEnabledProtocols;
 
 	/**
 	 * Creates a new SSL filter using the specified {@link SSLContext}.
 	 * 
-	 * @param sslContext The SSLContext to use
+	 * @param context The SSLContext to use
 	 */
-	public SSL2Filter(SSLContext sslContext) {
-		if (sslContext == null) {
-			throw new IllegalArgumentException("SSLContext is null");
-		}
+	public SSL2Filter(SSLContext context) {
+		Objects.requireNonNull(context, "ssl must not be null");
 
-		this.mContext = sslContext;
+		this.mContext = context;
 	}
 
 	/**
@@ -158,9 +168,7 @@ public class SSL2Filter extends IoFilterAdapter {
 	public void onPreAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
 		// Check that we don't have a SSL filter already present in the chain
 		if (parent.contains(SSL2Filter.class)) {
-			String msg = "Only one SSL filter is permitted in a chain.";
-			LOGGER.error(msg);
-			throw new IllegalStateException(msg);
+			throw new IllegalStateException("Only one SSL filter is permitted in a chain");
 		}
 
 		if (LOGGER.isDebugEnabled()) {
@@ -168,6 +176,9 @@ public class SSL2Filter extends IoFilterAdapter {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onPostAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
 		IoSession session = parent.getSession();
@@ -177,15 +188,27 @@ public class SSL2Filter extends IoFilterAdapter {
 		super.onPostAdd(parent, name, next);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onPreRemove(IoFilterChain parent, String name, NextFilter next) throws Exception {
 		IoSession session = parent.getSession();
+		session.removeAttribute(SSL_SECURED);
 		SSL2Handler x = SSL2Handler.class.cast(session.removeAttribute(SSL_HANDLER));
 		if (x != null) {
 			x.close(next);
 		}
 	}
 
+	/**
+	 * Internal method for performing post-connect operations; this can be triggered
+	 * during normal connect event or after the filter is added to the chain.
+	 * 
+	 * @param next
+	 * @param session
+	 * @throws Exception
+	 */
 	protected void sessionConnected(NextFilter next, IoSession session) throws Exception {
 		SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
 
@@ -204,6 +227,9 @@ public class SSL2Filter extends IoFilterAdapter {
 		x.open(next);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void sessionOpened(NextFilter next, IoSession session) throws Exception {
 		if (LOGGER.isDebugEnabled())
@@ -213,16 +239,24 @@ public class SSL2Filter extends IoFilterAdapter {
 		super.sessionOpened(next, session);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void messageReceived(NextFilter next, IoSession session, Object message) throws Exception {
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("session {} received {}", session, message);
 		SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
 		x.receive(next, IoBuffer.class.cast(message));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void messageSent(NextFilter next, IoSession session, WriteRequest request) throws Exception {
 		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("session {} sent {}", session, request);
+			LOGGER.debug("session {} ack {}", session, request);
 
 		if (request instanceof EncryptedWriteRequest) {
 			EncryptedWriteRequest e = EncryptedWriteRequest.class.cast(request);
@@ -236,10 +270,13 @@ public class SSL2Filter extends IoFilterAdapter {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void filterWrite(NextFilter next, IoSession session, WriteRequest request) throws Exception {
-
-		LOGGER.debug("session {} write {}", session, request);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("session {} write {}", session, request);
 
 		if (request instanceof EncryptedWriteRequest) {
 			super.filterWrite(next, session, request);

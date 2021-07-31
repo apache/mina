@@ -425,6 +425,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 */
 	synchronized protected void lfinish(final NextFilter next) {
 		this.mHandshakeComplete = true;
+		this.mSession.setAttribute(SSL2Filter.SSL_SECURED, this);
 		next.event(this.mSession, SslEvent.SECURED);
 	}
 
@@ -459,14 +460,14 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * {@inheritDoc}
 	 */
 	synchronized public void close(final NextFilter next) throws SSLException {
-		if (mEngine.isOutboundDone())
+		if (this.mEngine.isOutboundDone())
 			return;
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("{} close() - closing session", toString());
 		}
 
-		mEngine.closeOutbound();
+		this.mEngine.closeOutbound();
 		this.qwrite(next);
 	}
 

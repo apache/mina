@@ -344,12 +344,6 @@ class NioSocketSession extends NioSession {
 	 */
 	@Override
 	public final boolean isSecured() {
-		SslFilter s = SslFilter.class.cast(getFilterChain().get(SslFilter.class));
-		if (s != null) {
-			return s.isSecured(this);
-		} else {
-			SSL2Handler x = SSL2Handler.class.cast(this.getAttribute(SSL2Filter.SSL_HANDLER));
-			return x != null ? x.isConnected() : false;
-		}
+		return (this.getAttribute(SSL2Filter.SSL_SECURED) != null);
 	}
 }
