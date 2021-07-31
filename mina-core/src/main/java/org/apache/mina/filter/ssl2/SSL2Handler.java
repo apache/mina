@@ -20,12 +20,12 @@ public abstract class SSL2Handler {
 	/**
 	 * Minimum size of encoder buffer in packets
 	 */
-	static protected final int MIN_ENCODER_PACKETS = 2;
+	static protected final int MIN_ENCODER_BUFFER_PACKETS = 2;
 
 	/**
 	 * Maximum size of encoder buffer in packets
 	 */
-	static protected final int MAX_ENCODER_PACKETS = 8;
+	static protected final int MAX_ENCODER_BUFFER_PACKETS = 8;
 
 	/**
 	 * Zero length buffer used to prime the ssl engine
@@ -65,7 +65,7 @@ public abstract class SSL2Handler {
 	/**
 	 * Progressive decoder buffer
 	 */
-	protected IoBuffer mReceiveBuffer;
+	protected IoBuffer mDecodeBuffer;
 
 	/**
 	 * Instantiates a new handler
@@ -185,19 +185,19 @@ public abstract class SSL2Handler {
 	 * @return buffer to decode
 	 */
 	protected IoBuffer resume_decode_buffer(IoBuffer source) {
-		if (mReceiveBuffer == null)
+		if (mDecodeBuffer == null)
 			if (source == null)
 				return IoBuffer.allocate(0);
 			else
 				return source;
 		else {
 			if (source != null) {
-				mReceiveBuffer.expand(source.remaining());
-				mReceiveBuffer.put(source);
+				mDecodeBuffer.expand(source.remaining());
+				mDecodeBuffer.put(source);
 				source.free();
 			}
-			mReceiveBuffer.flip();
-			return mReceiveBuffer;
+			mDecodeBuffer.flip();
+			return mDecodeBuffer;
 		}
 	}
 
@@ -210,15 +210,15 @@ public abstract class SSL2Handler {
 	protected void save_decode_buffer(IoBuffer source) {
 		if (source.hasRemaining()) {
 			if (source.isDerived()) {
-				this.mReceiveBuffer = IoBuffer.allocate(source.remaining());
-				this.mReceiveBuffer.put(source);
+				this.mDecodeBuffer = IoBuffer.allocate(source.remaining());
+				this.mDecodeBuffer.put(source);
 			} else {
 				source.compact();
-				this.mReceiveBuffer = source;
+				this.mDecodeBuffer = source;
 			}
 		} else {
 			source.free();
-			this.mReceiveBuffer = null;
+			this.mDecodeBuffer = null;
 		}
 	}
 
@@ -232,8 +232,8 @@ public abstract class SSL2Handler {
 		SSLSession session = this.mEngine.getHandshakeSession();
 		if (session == null)
 			session = this.mEngine.getSession();
-		int packets = Math.max(MIN_ENCODER_PACKETS,
-				Math.min(MAX_ENCODER_PACKETS, 1 + (estimate / session.getApplicationBufferSize())));
+		int packets = Math.max(MIN_ENCODER_BUFFER_PACKETS,
+				Math.min(MAX_ENCODER_BUFFER_PACKETS, 1 + (estimate / session.getApplicationBufferSize())));
 		return IoBuffer.allocate(packets * session.getPacketBufferSize());
 	}
 

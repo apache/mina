@@ -1,5 +1,6 @@
 package org.apache.mina.filter.ssl2;
 
+import java.nio.BufferOverflowException;
 import java.util.concurrent.Executor;
 
 import javax.net.ssl.SSLEngine;
@@ -13,6 +14,11 @@ import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.ssl.SslEvent;
 
 public class SSL2HandlerG0 extends SSL2Handler {
+
+	/**
+	 * Maximum number of queued messages waiting for encoding
+	 */
+	static protected final int MAX_QUEUED_MESSAGES = 64;
 
 	/**
 	 * Maximum number of messages waiting acknowledgement
@@ -203,11 +209,17 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(),
 							request);
 				}
+				if (this.mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
+					throw new BufferOverflowException();
+				}
 				this.mEncodeQueue.add(request);
 			}
 		} else {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
+			}
+			if (this.mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
+				throw new BufferOverflowException();
 			}
 			this.mEncodeQueue.add(request);
 		}
