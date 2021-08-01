@@ -217,8 +217,12 @@ public class SSL2Filter extends IoFilterAdapter {
 			SSLEngine e = mContext.createSSLEngine(s.getHostString(), s.getPort());
 			e.setNeedClientAuth(mNeedClientAuth);
 			e.setWantClientAuth(mWantClientAuth);
-			e.setEnabledCipherSuites(mEnabledCipherSuites);
-			e.setEnabledProtocols(mEnabledProtocols);
+			if (this.mEnabledCipherSuites != null) {
+				e.setEnabledCipherSuites(this.mEnabledCipherSuites);
+			}
+			if (this.mEnabledProtocols != null) {
+				e.setEnabledProtocols(this.mEnabledProtocols);
+			}
 			e.setUseClientMode(!session.isServer());
 			this.onEngineCreated(session, e);
 			x = new SSL2HandlerG0(e, EXECUTOR, session);
@@ -235,7 +239,7 @@ public class SSL2Filter extends IoFilterAdapter {
 	 * @param engine
 	 */
 	protected void onEngineCreated(IoSession session, SSLEngine engine) {
-		
+
 	}
 
 	/**
