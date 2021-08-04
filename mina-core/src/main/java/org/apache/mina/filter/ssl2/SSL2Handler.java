@@ -186,12 +186,14 @@ public abstract class SSL2Handler {
 	 */
 	protected IoBuffer resume_decode_buffer(IoBuffer source) {
 		if (mDecodeBuffer == null)
-			if (source == null)
+			if (source == null) {
 				return ZERO;
-			else
+			} else {
+				mDecodeBuffer = source;
 				return source;
+			}
 		else {
-			if (source != null) {
+			if (source != null && source != ZERO) {
 				mDecodeBuffer.expand(source.remaining());
 				mDecodeBuffer.put(source);
 				source.free();
@@ -207,7 +209,7 @@ public abstract class SSL2Handler {
 	 * @param source the buffer previously returned by
 	 *               {@link #resume_decode_buffer(IoBuffer)}
 	 */
-	protected void save_decode_buffer(IoBuffer source) {
+	protected void suspend_decode_buffer(IoBuffer source) {
 		if (source.hasRemaining()) {
 			if (source.isDerived()) {
 				this.mDecodeBuffer = IoBuffer.allocate(source.remaining());
@@ -217,7 +219,9 @@ public abstract class SSL2Handler {
 				this.mDecodeBuffer = source;
 			}
 		} else {
-			source.free();
+			if (source != ZERO) {
+				source.free();
+			}
 			this.mDecodeBuffer = null;
 		}
 	}

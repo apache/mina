@@ -106,9 +106,14 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			try {
 				this.qreceive(next, source);
 			} finally {
-				save_decode_buffer(source);
+				suspend_decode_buffer(source);
 				this.mDecodeThread = null;
 			}
+		} else {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("{} receive() - recursion", toString());
+			}
+			this.qreceive(next, this.mDecodeBuffer);
 		}
 	}
 
@@ -125,7 +130,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			LOGGER.debug("{} qreceive() - source {}", toString(), message);
 		}
 
-		final IoBuffer source = message == null ? ZERO : message;
+		final IoBuffer source = message;
 		final IoBuffer dest = allocate_app_buffer(source.remaining());
 
 		final SSLEngineResult result = mEngine.unwrap(source.buf(), dest.buf());
@@ -146,6 +151,15 @@ public class SSL2HandlerG0 extends SSL2Handler {
 		}
 
 		switch (result.getHandshakeStatus()) {
+			case NEED_UNWRAP:
+			case NEED_UNWRAP_AGAIN:
+				if (result.bytesConsumed() != 0 && message.hasRemaining()) {
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("{} qreceive() - handshake needs unwrap, looping", toString());
+					}
+					this.qreceive(next, message);
+				}
+				break;
 			case NEED_TASK:
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} qreceive() - handshake needs task, scheduling", toString());
@@ -163,10 +177,9 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					LOGGER.debug("{} qreceive() - handshake finished, flushing queue", toString());
 				}
 				this.lfinish(next);
-			case NEED_UNWRAP:
-			case NEED_UNWRAP_AGAIN:
+				break;
 			case NOT_HANDSHAKING:
-				if (result.bytesProduced() != 0 && message.hasRemaining()) {
+				if ((result.bytesProduced() != 0 || result.bytesConsumed() != 0) && message.hasRemaining()) {
 					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug("{} qreceive() - trying to decode more messages, looping", toString());
 					}
@@ -430,9 +443,12 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			this.mHandshakeComplete = true;
 			this.mSession.setAttribute(SSL2Filter.SSL_SECURED, this);
 			next.event(this.mSession, SslEvent.SECURED);
-			this.flush(next);
-			this.receive(next, ZERO);
 		}
+		/**
+		 * There exists a bug in the JDK which emits FINISHED twice instead of once.
+		 */
+		this.receive(next, ZERO);
+		this.flush(next);
 	}
 
 	/**
