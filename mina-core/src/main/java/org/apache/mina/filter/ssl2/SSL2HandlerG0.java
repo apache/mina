@@ -45,6 +45,9 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 */
 	protected boolean mHandshakeStarted = false;
 
+	/**
+	 * Holds the decoder thread reference
+	 */
 	protected Thread mDecodeThread = null;
 
 	/**
@@ -132,8 +135,6 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					result.bytesConsumed(), result.bytesProduced(), result.getStatus(), result.getHandshakeStatus());
 		}
 
-		final boolean success = result.bytesConsumed() != 0;
-
 		if (result.bytesProduced() == 0) {
 			dest.free();
 		} else {
@@ -165,7 +166,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			case NEED_UNWRAP:
 			case NEED_UNWRAP_AGAIN:
 			case NOT_HANDSHAKING:
-				if (success && message.hasRemaining()) {
+				if (result.bytesProduced() != 0 && message.hasRemaining()) {
 					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug("{} qreceive() - trying to decode more messages, looping", toString());
 					}
@@ -273,7 +274,6 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					}
 					return false;
 				} else {
-					source.rewind();
 					EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, request);
 					this.mAckQueue.add(encrypted);
 					if (LOGGER.isDebugEnabled()) {
