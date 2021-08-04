@@ -45,6 +45,8 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 */
 	protected boolean mHandshakeStarted = false;
 
+	protected Thread mDecodeThread = null;
+
 	/**
 	 * Instantiates a new handler
 	 * 
@@ -83,7 +85,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					LOGGER.debug("{} open() - begin handshaking", toString());
 				}
 				this.mEngine.beginHandshake();
-				this.qwrite(next);
+				this.write(next);
 			}
 		}
 	}
@@ -92,16 +94,18 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * {@inheritDoc}
 	 */
 	synchronized public void receive(final NextFilter next, final IoBuffer message) throws SSLException {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("{} receive() - message {}", toString(), message);
-		}
-		final IoBuffer source = resume_decode_buffer(message);
-		try {
-			if (source.hasRemaining()) {
-				this.qreceive(next, source);
+		if (this.mDecodeThread == null) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("{} receive() - message {}", toString(), message);
 			}
-		} finally {
-			save_decode_buffer(source);
+			this.mDecodeThread = Thread.currentThread();
+			final IoBuffer source = resume_decode_buffer(message);
+			try {
+				this.qreceive(next, source);
+			} finally {
+				save_decode_buffer(source);
+				this.mDecodeThread = null;
+			}
 		}
 	}
 
@@ -141,15 +145,6 @@ public class SSL2HandlerG0 extends SSL2Handler {
 		}
 
 		switch (result.getHandshakeStatus()) {
-			case NEED_UNWRAP:
-			case NEED_UNWRAP_AGAIN:
-				if (success && source.hasRemaining()) {
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("{} qreceive() - handshake needs unwrap, looping", toString());
-					}
-					this.qreceive(next, message);
-				}
-				break;
 			case NEED_TASK:
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} qreceive() - handshake needs task, scheduling", toString());
@@ -160,15 +155,15 @@ public class SSL2HandlerG0 extends SSL2Handler {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} qreceive() - handshake needs wrap, invoking write", toString());
 				}
-				this.qwrite(next);
+				this.write(next);
 				break;
 			case FINISHED:
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} qreceive() - handshake finished, flushing queue", toString());
 				}
 				this.lfinish(next);
-				this.lflush(next);
-				break;
+			case NEED_UNWRAP:
+			case NEED_UNWRAP_AGAIN:
 			case NOT_HANDSHAKING:
 				if (success && message.hasRemaining()) {
 					if (LOGGER.isDebugEnabled()) {
@@ -191,7 +186,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} ack() - checking to see if any messages can be flushed", toString(), request);
 			}
-			this.lflush(next);
+			this.flush(next);
 		}
 	}
 
@@ -308,11 +303,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					LOGGER.debug("{} qwrite() - handshake finished, flushing queue", toString());
 				}
 				this.lfinish(next);
-				if (this.qwrite(next, request)) {
-					this.lflush(next);
-					return true;
-				}
-				break;
+				return this.qwrite(next, request);
 		}
 
 		return false;
@@ -327,14 +318,13 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * 
 	 * @throws SSLException
 	 */
-	synchronized protected boolean qwrite(NextFilter next) throws SSLException {
+	synchronized public boolean write(NextFilter next) throws SSLException {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("{} qwrite() - internal", toString());
+			LOGGER.debug("{} write() - internal", toString());
 		}
 
 		final IoBuffer source = ZERO;
 		final IoBuffer dest = allocate_encode_buffer(source.remaining());
-
 		return lwrite(next, source, dest);
 	}
 
@@ -410,7 +400,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} lwrite() - handshake needs wrap, looping", toString());
 				}
-				this.qwrite(next);
+				this.write(next);
 				break;
 			case NEED_TASK:
 				if (LOGGER.isDebugEnabled()) {
@@ -423,7 +413,6 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					LOGGER.debug("{} lwrite() - handshake finished, flushing queue", toString());
 				}
 				this.lfinish(next);
-				this.lflush(next);
 				break;
 		}
 
@@ -434,11 +423,16 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * Marks the handshake as complete and emits any signals
 	 * 
 	 * @param next
+	 * @throws SSLException
 	 */
-	synchronized protected void lfinish(final NextFilter next) {
-		this.mHandshakeComplete = true;
-		this.mSession.setAttribute(SSL2Filter.SSL_SECURED, this);
-		next.event(this.mSession, SslEvent.SECURED);
+	synchronized protected void lfinish(final NextFilter next) throws SSLException {
+		if (this.mHandshakeComplete == false) {
+			this.mHandshakeComplete = true;
+			this.mSession.setAttribute(SSL2Filter.SSL_SECURED, this);
+			next.event(this.mSession, SslEvent.SECURED);
+			this.flush(next);
+			this.receive(next, ZERO);
+		}
 	}
 
 	/**
@@ -448,7 +442,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * 
 	 * @throws SSLException
 	 */
-	synchronized protected void lflush(final NextFilter next) throws SSLException {
+	synchronized public void flush(final NextFilter next) throws SSLException {
 		if (this.mEncodeQueue.isEmpty()) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} flush() - no saved messages", toString());
@@ -480,7 +474,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 		}
 
 		this.mEngine.closeOutbound();
-		this.qwrite(next);
+		this.write(next);
 	}
 
 	protected void schedule_task(final NextFilter next) {
@@ -514,7 +508,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 					LOGGER.debug("{} task() - writing handshake messages", toString());
 				}
 
-				qwrite(next);
+				write(next);
 			} catch (SSLException e) {
 				e.printStackTrace();
 			}

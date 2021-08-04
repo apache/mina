@@ -187,7 +187,7 @@ public abstract class SSL2Handler {
 	protected IoBuffer resume_decode_buffer(IoBuffer source) {
 		if (mDecodeBuffer == null)
 			if (source == null)
-				return IoBuffer.allocate(0);
+				return ZERO;
 			else
 				return source;
 		else {
