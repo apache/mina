@@ -28,6 +28,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.Queue;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.AbstractProtocolDecoderOutput;
@@ -236,6 +237,28 @@ public class HttpServerDecoderTest {
 		assertTrue(out.getQueue().poll() instanceof HttpRequest);
 		assertTrue(out.getQueue().poll() instanceof IoBuffer);
 		assertTrue(out.getQueue().poll() instanceof IoBuffer);
+		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+	}
+
+	@Test
+	public void testDIRMINA1035HeadersWithColons() throws Exception {
+		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+		buffer.putString("GET / HTTP/1.0\r\nHost: localhost\r\n", encoder);
+		buffer.putString("SomeHeaderA: Value-A\r\n", encoder);
+		buffer.putString("SomeHeaderB: Value-B:Has:Some:Colons\r\n", encoder);
+		buffer.putString("SomeHeaderC: Value-C\r\n", encoder);
+		buffer.putString("SomeHeaderD:\r\n\r\n", encoder);
+		buffer.rewind();
+		while (buffer.hasRemaining()) {
+			decoder.decode(session, buffer, out);
+		}
+		assertEquals(2, out.getQueue().size());
+		HttpRequest request = (HttpRequest) out.getQueue().poll();
+		assertEquals("Value-A", request.getHeader("SomeHeaderA".toLowerCase()));
+		assertEquals("Value-B:Has:Some:Colons", request.getHeader("SomeHeaderB".toLowerCase()));
+		assertEquals("Value-C", request.getHeader("SomeHeaderC".toLowerCase()));
+		assertEquals("", request.getHeader("SomeHeaderD".toLowerCase()));
 		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
 	}
 
