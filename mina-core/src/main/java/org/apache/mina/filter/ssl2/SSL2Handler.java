@@ -11,6 +11,7 @@ import javax.net.ssl.SSLSession;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRejectedException;
 import org.apache.mina.core.write.WriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,18 +141,19 @@ public abstract class SSL2Handler {
 	 * @param next
 	 * 
 	 * @throws SSLException
+	 * @throws WriteRejectedException when the session is closing
 	 */
-	abstract public void write(NextFilter next, final WriteRequest request) throws SSLException;
+	abstract public void write(NextFilter next, final WriteRequest request) throws SSLException, WriteRejectedException;
 
 	/**
 	 * Closes the encryption session and writes any required messages
 	 * 
-	 * @param session
 	 * @param next
+	 * @param linger if true, write any queued messages before closing
 	 * 
 	 * @throws SSLException
 	 */
-	abstract public void close(NextFilter next) throws SSLException;
+	abstract public void close(NextFilter next, final boolean linger) throws SSLException;
 
 	/**
 	 * {@inheritDoc}

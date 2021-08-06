@@ -1,6 +1,7 @@
 package org.apache.mina.filter.ssl2;
 
 import java.nio.BufferOverflowException;
+import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 import javax.net.ssl.SSLEngine;
@@ -10,6 +11,7 @@ import javax.net.ssl.SSLException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteRejectedException;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.ssl.SslEvent;
 
@@ -46,7 +48,17 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	protected boolean mHandshakeStarted = false;
 
 	/**
-	 * Holds the decoder thread reference
+	 * Indicates that the outbound is closing
+	 */
+	protected boolean mOutboundClosing = false;
+
+	/**
+	 * Indicates that previously queued messages should be written before closing
+	 */
+	protected boolean mOutboundLinger = false;
+
+	/**
+	 * Holds the decoder thread reference; used for recursion detection
 	 */
 	protected Thread mDecodeThread = null;
 
@@ -207,9 +219,14 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	/**
 	 * {@inheritDoc}
 	 */
-	synchronized public void write(final NextFilter next, final WriteRequest request) throws SSLException {
+	synchronized public void write(final NextFilter next, final WriteRequest request)
+			throws SSLException, WriteRejectedException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("{} write() - source {}", toString(), request);
+		}
+
+		if (this.mOutboundClosing) {
+			throw new WriteRejectedException(request, "closing");
 		}
 
 		if (this.mEncodeQueue.isEmpty()) {
@@ -357,6 +374,10 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 */
 	@SuppressWarnings("incomplete-switch")
 	protected boolean lwrite(NextFilter next, IoBuffer source, IoBuffer dest) throws SSLException {
+		if (this.mOutboundClosing && this.mEngine.isOutboundDone()) {
+			return false;
+		}
+
 		final SSLEngineResult result = this.mEngine.wrap(source.buf(), dest.buf());
 
 		if (LOGGER.isDebugEnabled()) {
@@ -441,7 +462,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	synchronized protected void lfinish(final NextFilter next) throws SSLException {
 		if (this.mHandshakeComplete == false) {
 			this.mHandshakeComplete = true;
-			this.mSession.setAttribute(SSL2Filter.SSL_SECURED, this);
+			this.mSession.setAttribute(SSL2Filter.SSL_SECURED, this.mEngine.getSession());
 			next.event(this.mSession, SslEvent.SECURED);
 		}
 		/**
@@ -459,7 +480,11 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * @throws SSLException
 	 */
 	synchronized public void flush(final NextFilter next) throws SSLException {
-		if (this.mEncodeQueue.isEmpty()) {
+		if (this.mOutboundClosing && this.mOutboundLinger == false) {
+			return;
+		}
+
+		if (this.mEncodeQueue.size() != 0) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} flush() - no saved messages", toString());
 			}
@@ -476,21 +501,37 @@ public class SSL2HandlerG0 extends SSL2Handler {
 				break;
 			}
 		}
+
+		if (this.mOutboundClosing && this.mEncodeQueue.size() == 0) {
+			this.mEngine.closeOutbound();
+			this.write(next);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	synchronized public void close(final NextFilter next) throws SSLException {
-		if (this.mEngine.isOutboundDone())
+	synchronized public void close(final NextFilter next, final boolean linger) throws SSLException {
+		if (this.mOutboundClosing)
 			return;
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("{} close() - closing session", toString());
 		}
 
-		this.mEngine.closeOutbound();
-		this.write(next);
+		this.mOutboundLinger = linger;
+		this.mOutboundClosing = true;
+		if (linger == false) {
+			if (this.mEncodeQueue.size() != 0) {
+				next.exceptionCaught(this.mSession,
+						new WriteRejectedException(new ArrayList<>(this.mEncodeQueue), "closing"));
+				this.mEncodeQueue.clear();
+			}
+			this.mEngine.closeOutbound();
+			this.write(next);
+		} else {
+			this.flush(next);
+		}
 	}
 
 	protected void schedule_task(final NextFilter next) {

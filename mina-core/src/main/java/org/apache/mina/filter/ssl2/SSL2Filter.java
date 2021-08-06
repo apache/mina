@@ -49,17 +49,16 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SSL2Filter extends IoFilterAdapter {
-
-	/**
-	 * Returns the SSL2Handler object
-	 */
-	static public final AttributeKey SSL_HANDLER = new AttributeKey(SSL2Filter.class, "handler");
-
 	/**
 	 * The presence of this attribute in a session indicates that the session is
 	 * secured.
 	 */
 	static public final AttributeKey SSL_SECURED = new AttributeKey(SSL2Filter.class, "status");
+
+	/**
+	 * Returns the SSL2Handler object
+	 */
+	static protected final AttributeKey SSL_HANDLER = new AttributeKey(SSL2Filter.class, "handler");
 
 	/**
 	 * The logger
@@ -194,11 +193,7 @@ public class SSL2Filter extends IoFilterAdapter {
 	@Override
 	public void onPreRemove(IoFilterChain parent, String name, NextFilter next) throws Exception {
 		IoSession session = parent.getSession();
-		session.removeAttribute(SSL_SECURED);
-		SSL2Handler x = SSL2Handler.class.cast(session.removeAttribute(SSL_HANDLER));
-		if (x != null) {
-			x.close(next);
-		}
+		onClose(next, session, false);
 	}
 
 	/**
@@ -209,7 +204,7 @@ public class SSL2Filter extends IoFilterAdapter {
 	 * @param session
 	 * @throws Exception
 	 */
-	protected void onConnected(NextFilter next, IoSession session) throws Exception {
+	synchronized protected void onConnected(NextFilter next, IoSession session) throws Exception {
 		SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
 
 		if (x == null) {
@@ -222,6 +217,14 @@ public class SSL2Filter extends IoFilterAdapter {
 		x.open(next);
 	}
 
+	synchronized protected void onClose(NextFilter next, IoSession session, boolean linger) throws Exception {
+		session.removeAttribute(SSL_SECURED);
+		SSL2Handler x = SSL2Handler.class.cast(session.removeAttribute(SSL_HANDLER));
+		if (x != null) {
+			x.close(next, linger);
+		}
+	}
+	
 	/**
 	 * Customization handler for creating the engine
 	 * 
@@ -254,6 +257,17 @@ public class SSL2Filter extends IoFilterAdapter {
 
 		this.onConnected(next, session);
 		super.sessionOpened(next, session);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void sessionClosed(NextFilter next, IoSession session) throws Exception {
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("session {} closed", session);
+		this.onClose(next, session, false);
+		super.sessionClosed(next, session);
 	}
 
 	/**
