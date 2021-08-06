@@ -213,18 +213,8 @@ public class SSL2Filter extends IoFilterAdapter {
 		SSL2Handler x = SSL2Handler.class.cast(session.getAttribute(SSL_HANDLER));
 
 		if (x == null) {
-			InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
-			SSLEngine e = mContext.createSSLEngine(s.getHostString(), s.getPort());
-			e.setNeedClientAuth(mNeedClientAuth);
-			e.setWantClientAuth(mWantClientAuth);
-			if (this.mEnabledCipherSuites != null) {
-				e.setEnabledCipherSuites(this.mEnabledCipherSuites);
-			}
-			if (this.mEnabledProtocols != null) {
-				e.setEnabledProtocols(this.mEnabledProtocols);
-			}
-			e.setUseClientMode(!session.isServer());
-			this.onEngineCreated(session, e);
+			final InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
+			final SSLEngine e = this.createEngine(session, s);
 			x = new SSL2HandlerG0(e, EXECUTOR, session);
 			session.setAttribute(SSL_HANDLER, x);
 		}
@@ -233,13 +223,25 @@ public class SSL2Filter extends IoFilterAdapter {
 	}
 
 	/**
-	 * Customization handler for init of the engine
+	 * Customization handler for creating the engine
 	 * 
 	 * @param session
-	 * @param engine
+	 * @param s
+	 * @return an SSLEngine
 	 */
-	protected void onEngineCreated(IoSession session, SSLEngine engine) {
-
+	protected SSLEngine createEngine(IoSession session, InetSocketAddress s) {
+		SSLEngine e = (s != null) ? mContext.createSSLEngine(s.getHostString(), s.getPort())
+				: mContext.createSSLEngine();
+		e.setNeedClientAuth(mNeedClientAuth);
+		e.setWantClientAuth(mWantClientAuth);
+		if (this.mEnabledCipherSuites != null) {
+			e.setEnabledCipherSuites(this.mEnabledCipherSuites);
+		}
+		if (this.mEnabledProtocols != null) {
+			e.setEnabledProtocols(this.mEnabledProtocols);
+		}
+		e.setUseClientMode(!session.isServer());
+		return e;
 	}
 
 	/**
