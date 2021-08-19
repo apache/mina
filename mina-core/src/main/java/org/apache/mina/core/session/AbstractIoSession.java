@@ -249,6 +249,11 @@ public abstract class AbstractIoSession implements IoSession {
         // Always false...
         return false;
     }
+    
+	@Override
+	public boolean isServer() {
+		return (getService() instanceof IoAcceptor);
+	}
 
     /**
      * {@inheritDoc}

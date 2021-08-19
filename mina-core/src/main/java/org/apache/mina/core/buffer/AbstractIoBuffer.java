@@ -1317,6 +1317,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 		} else {
 			buf.append("HeapBuffer");
 		}
+		buf.append("@");
+		buf.append(Integer.toHexString(super.hashCode()));
 		buf.append("[pos=");
 		buf.append(position());
 		buf.append(" lim=");

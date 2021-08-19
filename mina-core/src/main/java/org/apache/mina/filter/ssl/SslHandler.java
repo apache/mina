@@ -43,6 +43,7 @@ import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.filter.ssl.SslFilter.EncryptedWriteRequest;
+import org.apache.mina.filter.ssl2.SSL2Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -567,7 +568,7 @@ class SslHandler {
                 // Send the SECURE message only if it's the first SSL handshake
                 if (firstSSLNegociation) {
                     firstSSLNegociation = false;
-                    
+                    this.session.setAttribute(SSL2Filter.SSL_SECURED, this);
                     nextFilter.event(session, SslEvent.SECURED);
                 }
 

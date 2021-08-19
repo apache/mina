@@ -930,23 +930,23 @@ public class DefaultIoFilterChain implements IoFilterChain {
 
     private static class TailFilter extends IoFilterAdapter {
         @Override
-        public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
-            try {
-                session.getHandler().sessionCreated(session);
-            } finally {
-                // Notify the related future.
-                ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
+		public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
+			session.getHandler().sessionCreated(session);
+		}
 
-                if (future != null) {
-                    future.setSession(session);
-                }
-            }
-        }
+		@Override
+		public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
+			try {
+				session.getHandler().sessionOpened(session);
+			} finally {
+				// Notify the related future.
+				ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
 
-        @Override
-        public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
-            session.getHandler().sessionOpened(session);
-        }
+				if (future != null) {
+					future.setSession(session);
+				}
+			}
+		}
 
         @Override
         public void sessionClosed(NextFilter nextFilter, IoSession session) throws Exception {
