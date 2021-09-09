@@ -257,7 +257,7 @@ public class SSLHandlerG0 extends SSLHandler {
 		}
 
 		if (this.mEncodeQueue.isEmpty()) {
-			if (qwrite(next, request) == false) {
+			if (this.qwrite(next, request) == false) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(),
 							request);
@@ -511,7 +511,7 @@ public class SSLHandlerG0 extends SSLHandler {
 			return;
 		}
 
-		if (this.mEncodeQueue.size() != 0) {
+		if (this.mEncodeQueue.size() == 0) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} flush() - no saved messages", toString());
 			}
@@ -523,7 +523,7 @@ public class SSLHandlerG0 extends SSLHandler {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("{} flush() - {}", toString(), current);
 			}
-			if (qwrite(next, current) == false) {
+			if (this.qwrite(next, current) == false) {
 				this.mEncodeQueue.addFirst(current);
 				break;
 			}
