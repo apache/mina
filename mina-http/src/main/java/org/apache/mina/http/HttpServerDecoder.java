@@ -194,7 +194,7 @@ public class HttpServerDecoder implements ProtocolDecoder {
     }
 
     private HttpRequestImpl parseHttpRequestHead(ByteBuffer buffer) {
-        String raw = new String(buffer.array(), 0, buffer.limit());
+        String raw = new String(buffer.array(), buffer.position(), buffer.remaining());
         String[] headersAndBody = RAW_VALUE_PATTERN.split(raw, -1);
 
         if (headersAndBody.length <= 1) {
