@@ -575,8 +575,7 @@ public abstract class AbstractIoSession implements IoSession {
         filterChain.fireFilterWrite(writeRequest);
 
         // TODO : This is not our business ! The caller has created a
-        // FileChannel,
-        // he has to close it !
+        // FileChannel and has to close it !
         if (openedFileChannel != null) {
             // If we opened a FileChannel, it needs to be closed when the write
             // has completed

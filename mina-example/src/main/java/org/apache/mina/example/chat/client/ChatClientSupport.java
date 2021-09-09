@@ -28,12 +28,12 @@ import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
-import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.compression.CompressionFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
@@ -79,8 +79,7 @@ public class ChatClientSupport {
             if (useSsl) {
                 SSLContext sslContext = BogusSslContextFactory
                         .getInstance(false);
-                SslFilter sslFilter = new SslFilter(sslContext);
-                sslFilter.setUseClientMode(true);
+                SSLFilter sslFilter = new SSLFilter(sslContext);
                 connector.getFilterChain().addFirst("sslFilter", sslFilter);
             }
 

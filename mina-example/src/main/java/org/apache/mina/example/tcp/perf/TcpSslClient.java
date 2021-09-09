@@ -32,7 +32,7 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
@@ -70,8 +70,7 @@ public class TcpSslClient extends IoHandlerAdapter {
         // Inject teh SSL filter
         SSLContext sslContext = BogusSslContextFactory
             .getInstance(false);
-        SslFilter sslFilter = new SslFilter(sslContext);
-        sslFilter.setUseClientMode(true);
+        SSLFilter sslFilter = new SSLFilter(sslContext);
         connector.getFilterChain().addFirst("sslFilter", sslFilter);
 
         connector.setHandler(this);

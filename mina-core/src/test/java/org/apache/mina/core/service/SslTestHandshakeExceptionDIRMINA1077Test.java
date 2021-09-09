@@ -22,24 +22,6 @@ package org.apache.mina.core.service;
 
 import static org.junit.Assert.fail;
 
-import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
-import org.apache.mina.core.future.ConnectFuture;
-import org.apache.mina.core.service.AbstractIoService;
-import org.apache.mina.core.service.IoHandlerAdapter;
-import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
-import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.apache.mina.util.AvailablePortFinder;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -48,6 +30,22 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Security;
 import java.util.concurrent.CountDownLatch;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import org.apache.mina.util.AvailablePortFinder;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Test a SSL session and provoke HandshakeException.
@@ -92,7 +90,7 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
 
         // Inject the SSL filter
-        SslFilter sslFilter = new SslFilter(createSSLContext(true));
+        SSLFilter sslFilter = new SSLFilter(createSSLContext(true));
         filters.addLast("sslFilter", sslFilter);
         sslFilter.setNeedClientAuth(true);
 
@@ -113,8 +111,7 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
         DefaultIoFilterChainBuilder filters = nioSocketConnector.getFilterChain();
 
         // Inject the SSL filter
-        SslFilter sslFilter = new SslFilter(createSSLContext(false));
-        sslFilter.setUseClientMode( true );
+        SSLFilter sslFilter = new SSLFilter(createSSLContext(false));
         filters.addLast("sslFilter", sslFilter);
 
         address = InetAddress.getByName("localhost");

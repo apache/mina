@@ -28,7 +28,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.compression.CompressionFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
-import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
@@ -72,7 +72,7 @@ public class Main {
 
     private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
             throws Exception {
-        SslFilter sslFilter = new SslFilter(BogusSslContextFactory
+    	SSLFilter sslFilter = new SSLFilter(BogusSslContextFactory
                 .getInstance(true));
         chain.addLast("sslFilter", sslFilter);
         System.out.println("SSL ON");

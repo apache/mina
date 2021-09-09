@@ -29,7 +29,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
-import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 /**
@@ -136,7 +136,7 @@ public class TcpSslServer extends IoHandlerAdapter {
         
         // Inject the SSL filter
         DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
-        SslFilter sslFilter = new SslFilter(BogusSslContextFactory
+        SSLFilter sslFilter = new SSLFilter(BogusSslContextFactory
             .getInstance(true));
         chain.addLast("sslFilter", sslFilter);
 

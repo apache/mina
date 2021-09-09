@@ -1,4 +1,23 @@
-package org.apache.mina.filter.ssl2;
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ *
+ */
+package org.apache.mina.filter.ssl;
 
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
@@ -13,9 +32,17 @@ import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRejectedException;
 import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.ssl.SslEvent;
 
-public class SSL2HandlerG0 extends SSL2Handler {
+/**
+ * Default implementation of SSLHandler
+ * <p>
+ * The concurrency model is enforced using a simple mutex to ensure that the
+ * state of the decode buffer and closure is concurrent with the SSLEngine.
+ * 
+ * @author Jonathan Valliere
+ * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ */
+public class SSLHandlerG0 extends SSLHandler {
 
 	/**
 	 * Maximum number of queued messages waiting for encoding
@@ -69,7 +96,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	 * @param e executor
 	 * @param s session
 	 */
-	public SSL2HandlerG0(SSLEngine p, Executor e, IoSession s) {
+	public SSLHandlerG0(SSLEngine p, Executor e, IoSession s) {
 		super(p, e, s);
 	}
 
@@ -462,8 +489,8 @@ public class SSL2HandlerG0 extends SSL2Handler {
 	synchronized protected void lfinish(final NextFilter next) throws SSLException {
 		if (this.mHandshakeComplete == false) {
 			this.mHandshakeComplete = true;
-			this.mSession.setAttribute(SSL2Filter.SSL_SECURED, this.mEngine.getSession());
-			next.event(this.mSession, SslEvent.SECURED);
+			this.mSession.setAttribute(SSLFilter.SSL_SECURED, this.mEngine.getSession());
+			next.event(this.mSession, SSLEvent.SECURED);
 		}
 		/**
 		 * There exists a bug in the JDK which emits FINISHED twice instead of once.
@@ -518,9 +545,14 @@ public class SSL2HandlerG0 extends SSL2Handler {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("{} close() - closing session", toString());
 		}
+		
+		if (this.mHandshakeComplete) {
+			next.event(this.mSession, SSLEvent.UNSECURED);
+		}
 
 		this.mOutboundLinger = linger;
 		this.mOutboundClosing = true;
+
 		if (linger == false) {
 			if (this.mEncodeQueue.size() != 0) {
 				next.exceptionCaught(this.mSession,
@@ -542,7 +574,7 @@ public class SSL2HandlerG0 extends SSL2Handler {
 				this.mExecutor.execute(new Runnable() {
 					@Override
 					public void run() {
-						SSL2HandlerG0.this.execute_task(next);
+						SSLHandlerG0.this.execute_task(next);
 					}
 				});
 			}

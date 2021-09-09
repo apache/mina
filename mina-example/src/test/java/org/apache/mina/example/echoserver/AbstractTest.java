@@ -30,7 +30,7 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.FilterEvent;
-import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -122,7 +122,7 @@ public abstract class AbstractTest {
                         try {
                             session.getFilterChain().addFirst(
                                     "SSL",
-                                    new SslFilter(BogusSslContextFactory
+                                    new SSLFilter(BogusSslContextFactory
                                             .getInstance(true)));
                         } catch (GeneralSecurityException e) {
                             LOGGER.error("", e);
@@ -143,16 +143,13 @@ public abstract class AbstractTest {
                     
                     buf.mark();
 
-                    if (session.getFilterChain().contains("SSL")
+                    if (session.isSecured()
                             && buf.remaining() == 1 && buf.get() == (byte) '.') {
                         LOGGER.info("TLS Reentrance");
-                        ((SslFilter) session.getFilterChain().get("SSL"))
-                                .startSsl(session);
 
                         // Send a response
                         buf.capacity(1);
                         buf.flip();
-                        session.setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE);
                         session.write(buf);
                     } else {
                         buf.reset();

@@ -24,7 +24,7 @@ import java.net.InetSocketAddress;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
 import org.apache.mina.filter.compression.CompressionFilter;
-import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
@@ -68,7 +68,7 @@ public class Main {
 
     private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
             throws Exception {
-        SslFilter sslFilter = new SslFilter(BogusSslContextFactory
+    	SSLFilter sslFilter = new SSLFilter(BogusSslContextFactory
                 .getInstance(true));
         chain.addLast("sslFilter", sslFilter);
         System.out.println("SSL ON");

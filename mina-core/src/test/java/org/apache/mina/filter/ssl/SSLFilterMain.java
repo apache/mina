@@ -1,4 +1,4 @@
-package org.apache.mina.filter.ssl2;
+package org.apache.mina.filter.ssl;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -21,13 +21,12 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.ssl.SslDIRMINA937Test;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SSL2SimpleTest {
+public class SSLFilterMain {
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
 			UnrecoverableKeyException, CertificateException, IOException {
@@ -41,8 +40,8 @@ public class SSL2SimpleTest {
 
 		final char[] password = "password".toCharArray();
 
-		ks.load(SSL2SimpleTest.class.getResourceAsStream("keystore.jks"), password);
-		ts.load(SSL2SimpleTest.class.getResourceAsStream("truststore.jks"), password);
+		ks.load(SSLFilterMain.class.getResourceAsStream("keystore.jks"), password);
+		ts.load(SSLFilterMain.class.getResourceAsStream("truststore.jks"), password);
 
 		kmf.init(ks, password);
 		tmf.init(ts);
@@ -50,7 +49,7 @@ public class SSL2SimpleTest {
 		final SSLContext context = SSLContext.getInstance("TLSv1.3");
 		context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
 
-		final SSL2Filter filter = new SSL2Filter(context);
+		final SSLFilter filter = new SSLFilter(context);
 		filter.setEnabledCipherSuites(new String[] { "TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384" });
 		filter.setEnabledProtocols(new String[] { "TLSv1.3" });
 

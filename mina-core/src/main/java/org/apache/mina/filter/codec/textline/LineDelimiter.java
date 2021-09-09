@@ -38,7 +38,7 @@ public class LineDelimiter {
     /** the line delimiter constant of the current O/S. */
     public static final LineDelimiter DEFAULT;
 
-    /** Compute the default delimiter on he current OS */
+    /** Compute the default delimiter on the current OS */
     static {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         PrintWriter out = new PrintWriter(bout, true);

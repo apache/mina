@@ -38,7 +38,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.ssl.SslFilter;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.junit.After;
@@ -80,9 +80,9 @@ public class SslFilterTest {
         // Workaround to fix TLS issue : http://java.sun.com/javase/javaseforbusiness/docs/TLSReadme.html
         java.lang.System.setProperty( "sun.security.ssl.allowUnsafeRenegotiation", "true" );
 
-        SslFilter sslFilter = null;
+        SSLFilter sslFilter = null;
         if (useSSL) {
-            sslFilter = new SslFilter(BogusSslContextFactory.getInstance(true));
+            sslFilter = new SSLFilter(BogusSslContextFactory.getInstance(true));
             acceptor.getFilterChain().addLast("sslFilter", sslFilter);
         }
         acceptor.getFilterChain().addLast(

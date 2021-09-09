@@ -19,14 +19,11 @@
  */
 package org.apache.mina.filter.ssl;
 
-import org.apache.mina.filter.FilterEvent;
+import org.apache.mina.core.write.WriteRequest;
 
 /**
- * A SSL event sent by {@link SslFilter} when the session is secured or not
- * secured.
- * 
- * @author <a href="http://mina.apache.org">Apache MINA Project</a>
+ * Interface used to designate WriteRequest objects which should not be encrypted.
  */
-public enum SslEvent implements FilterEvent {
-	SECURED, UNSECURED
+public interface DisableEncryptWriteRequest extends WriteRequest {
+
 }

@@ -27,16 +27,12 @@ import java.nio.channels.SocketChannel;
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.file.FileRegion;
-import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.filterchain.IoFilterChain;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.filter.ssl2.SSL2Filter;
-import org.apache.mina.filter.ssl2.SSL2Handler;
+import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 
@@ -344,6 +340,6 @@ class NioSocketSession extends NioSession {
 	 */
 	@Override
 	public final boolean isSecured() {
-		return (this.getAttribute(SSL2Filter.SSL_SECURED) != null);
+		return (this.getAttribute(SSLFilter.SSL_SECURED) != null);
 	}
 }

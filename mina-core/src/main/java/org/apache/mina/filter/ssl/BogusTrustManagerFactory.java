@@ -70,6 +70,7 @@ public class BogusTrustManagerFactory extends TrustManagerFactory {
 	/**
 	 * Creates a new BogusTrustManagerFactory instance
 	 */
+	@SuppressWarnings("deprecation")
 	public BogusTrustManagerFactory() {
 		super(new BogusTrustManagerFactorySpi(), new Provider("MinaBogus", 1.0, "") {
 			private static final long serialVersionUID = -4024169055312053827L;

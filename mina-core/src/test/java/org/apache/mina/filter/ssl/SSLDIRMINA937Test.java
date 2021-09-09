@@ -50,7 +50,7 @@ import org.junit.Test;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SslDIRMINA937Test {
+public class SSLDIRMINA937Test {
     /** A static port used for his test, chosen to avoid collisions */
     private static final int port = AvailablePortFinder.getNextAvailable(5555);
 
@@ -92,7 +92,7 @@ public class SslDIRMINA937Test {
 
         // Inject the SSL filter
         SSLContext context = createSSLContext("TLSv1");
-        SslFilter sslFilter = new SslFilter(context);
+        SSLFilter sslFilter = new SSLFilter(context);
         sslFilter.setEnabledProtocols(new String[] { "TLSv1" });
         //sslFilter.setEnabledCipherSuites(getServerCipherSuites(context.getDefaultSSLParameters().getCipherSuites()));
         filters.addLast("sslFilter", sslFilter);
@@ -111,9 +111,8 @@ public class SslDIRMINA937Test {
         NioSocketConnector connector = new NioSocketConnector();
         
         DefaultIoFilterChainBuilder filters = connector.getFilterChain();
-        SslFilter sslFilter = new SslFilter(createSSLContext("TLSv1.1"));
+        SSLFilter sslFilter = new SSLFilter(createSSLContext("TLSv1.1"));
         sslFilter.setEnabledProtocols(new String[] { "TLSv1.1" });
-        sslFilter.setUseClientMode(true);
         //sslFilter.setEnabledCipherSuites(getClientCipherSuites());
         filters.addLast("sslFilter", sslFilter);
         connector.setHandler(new IoHandlerAdapter() {
@@ -123,7 +122,7 @@ public class SslDIRMINA937Test {
 
             @Override
             public void event(IoSession session, FilterEvent event) throws Exception {
-                if (event == SslEvent.UNSECURED ) {
+                if (event == SSLEvent.UNSECURED ) {
                     counter.countDown();
                 }
             }
@@ -141,8 +140,8 @@ public class SslDIRMINA937Test {
         KeyStore ks = KeyStore.getInstance("JKS");
         KeyStore ts = KeyStore.getInstance("JKS");
 
-        ks.load(SslDIRMINA937Test.class.getResourceAsStream("keystore.sslTest"), passphrase);
-        ts.load(SslDIRMINA937Test.class.getResourceAsStream("truststore.sslTest"), passphrase);
+        ks.load(SSLDIRMINA937Test.class.getResourceAsStream("keystore.sslTest"), passphrase);
+        ts.load(SSLDIRMINA937Test.class.getResourceAsStream("truststore.sslTest"), passphrase);
 
         kmf.init(ks, passphrase);
         tmf.init(ts);
