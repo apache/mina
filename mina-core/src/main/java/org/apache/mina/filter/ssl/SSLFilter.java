@@ -229,12 +229,12 @@ public class SSLFilter extends IoFilterAdapter {
 	/**
 	 * Customization handler for creating the engine
 	 * 
-	 * @param session
-	 * @param s
+	 * @param session source session
+	 * @param addr socket address used for fast reconnect
 	 * @return an SSLEngine
 	 */
-	protected SSLEngine createEngine(IoSession session, InetSocketAddress s) {
-		SSLEngine e = (s != null) ? mContext.createSSLEngine(s.getHostString(), s.getPort())
+	protected SSLEngine createEngine(IoSession session, InetSocketAddress addr) {
+		SSLEngine e = (addr != null) ? mContext.createSSLEngine(addr.getHostString(), addr.getPort())
 				: mContext.createSSLEngine();
 		e.setNeedClientAuth(mNeedClientAuth);
 		e.setWantClientAuth(mWantClientAuth);
