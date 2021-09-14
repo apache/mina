@@ -72,9 +72,8 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
     protected void writeRequest(final NextFilter nextFilter, final SocksProxyRequest request) {
         try {
             boolean isV4ARequest = Arrays.equals(request.getIpAddress(), SocksProxyConstants.FAKE_IP);
-            byte[] userID = request.getUserName().getBytes("ASCII");
-            byte[] host = isV4ARequest ? request.getHost().getBytes("ASCII") : null;
-
+            byte[] userID = request.getUserName() != null ? request.getUserName().getBytes("ASCII") : null;
+            byte[] host = request.getHost() != null ? request.getHost().getBytes("ASCII") : null;           
             int len = 9 + userID.length;
 
             if (isV4ARequest) {
