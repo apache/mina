@@ -20,6 +20,7 @@
 package org.apache.mina.http;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.charset.CharacterCodingException;
@@ -41,6 +42,8 @@ public class HttpServerDecoderTest {
 
     private static final ProtocolDecoder decoder = new HttpServerDecoder();
 
+    private static final String DECODER_STATE_ATT = "http.ds";
+    
     /*
      * Use a single session for all requests in order to test state management better
      */
@@ -294,5 +297,27 @@ public class HttpServerDecoderTest {
         HttpRequest request = (HttpRequest) out.getMessageQueue().poll();
         assertEquals("localhost", request.getHeader("host"));
         assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+    }
+    
+    @Test
+    public void dosOnRequestWithAdditionalData() throws Exception {
+        AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
+            public void flush(NextFilter nextFilter, IoSession session) {
+            }
+        };
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost:localhost  \r\n\r\ndummy", encoder);
+        buffer.rewind();
+        int prevBufferPosition = buffer.position();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+            assertNotEquals("Buffer at new position", prevBufferPosition, buffer.position());
+            prevBufferPosition = buffer.position();
+        }
+        assertEquals(2, out.getMessageQueue().size());
+        HttpRequest request = (HttpRequest) out.getMessageQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+        session.removeAttribute(DECODER_STATE_ATT); // This test leaves session in HEAD state, crashing following test
     }
 }
