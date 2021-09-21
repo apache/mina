@@ -20,6 +20,7 @@
 package org.apache.mina.http;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.charset.CharacterCodingException;
@@ -28,7 +29,6 @@ import java.nio.charset.CharsetEncoder;
 import java.util.Queue;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.AbstractProtocolDecoderOutput;
@@ -38,6 +38,8 @@ import org.apache.mina.http.api.HttpRequest;
 import org.junit.Test;
 
 public class HttpServerDecoderTest {
+	private static final String DECODER_STATE_ATT = "http.ds";
+
 	private static final CharsetEncoder encoder = Charset.forName("US-ASCII").newEncoder(); //$NON-NLS-1$
 
 	private static final ProtocolDecoder decoder = new HttpServerDecoder();
@@ -305,5 +307,24 @@ public class HttpServerDecoderTest {
 		HttpRequest request = (HttpRequest) out.getQueue().poll();
 		assertEquals("localhost", request.getHeader("host"));
 		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+	}
+
+	@Test
+	public void dosOnRequestWithAdditionalData() throws Exception {
+		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+		buffer.putString("GET / HTTP/1.0\r\nHost:localhost  \r\n\r\ndummy", encoder);
+		buffer.rewind();
+		int prevBufferPosition = buffer.position();
+		while (buffer.hasRemaining()) {
+			decoder.decode(session, buffer, out);
+			assertNotEquals("Buffer at new position", prevBufferPosition, buffer.position());
+			prevBufferPosition = buffer.position();
+		}
+		assertEquals(2, out.getQueue().size());
+		HttpRequest request = (HttpRequest) out.getQueue().poll();
+		assertEquals("localhost", request.getHeader("host"));
+		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+		session.removeAttribute(DECODER_STATE_ATT); // This test leaves session in HEAD state, crashing following test
 	}
 }
