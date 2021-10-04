@@ -43,6 +43,7 @@ import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.util.AvailablePortFinder;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -156,13 +157,18 @@ public abstract class AbstractBindTest {
     }
 
     @Test
-    public void testManyTimes() throws IOException {
+    public void testManyTimes() throws IOException, InterruptedException {
         bind(true);
 
-        for (int i = 0; i < 1024; i++) {
-            acceptor.unbind();
-            acceptor.bind();
-        }
+		for (int i = 0; i < 1024; i++) {
+			Assert.assertTrue("Bound addresses is empty", acceptor.getLocalAddresses().size() > 0);
+			acceptor.unbind();
+			Thread.sleep(1);
+			Assert.assertTrue("Bound addresses is not empty", acceptor.getLocalAddresses().size() == 0);
+			acceptor.bind();
+		}
+
+        acceptor.unbind();
     }
 
     @Test
