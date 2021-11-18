@@ -460,10 +460,10 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.compiler.plugin}</version>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>1.8</source>
+            <target>1.8</target>
             <optimize>true</optimize>
-            <showDeprecations>true</showDeprecations>
+            <showDeprecation>true</showDeprecation>
             <encoding>ISO-8859-1</encoding>
           </configuration>
         </plugin>
