@@ -40,8 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A SSL processor which performs flow control of encrypted information
- * on the filter-chain.
+ * A SSL processor which performs flow control of encrypted information on the
+ * filter-chain.
  * <p>
  * The initial handshake is automatically enabled for "client" sessions once the
  * filter is added to the filter-chain and the session is connected.
@@ -51,8 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SSLFilter extends IoFilterAdapter {
 	/**
-	 * The presence of this attribute in a session indicates that the session is
-	 * secured.
+	 * SSLSession object when the session is secured, otherwise null.
 	 */
 	static public final AttributeKey SSL_SECURED = new AttributeKey(SSLFilter.class, "status");
 
@@ -73,8 +72,8 @@ public class SSLFilter extends IoFilterAdapter {
 			new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec", true));
 
 	protected final SSLContext mContext;
-	protected boolean mNeedClientAuth;
-	protected boolean mWantClientAuth;
+	protected boolean mNeedClientAuth = false;
+	protected boolean mWantClientAuth = false;
 	protected String[] mEnabledCipherSuites;
 	protected String[] mEnabledProtocols;
 
@@ -230,7 +229,7 @@ public class SSLFilter extends IoFilterAdapter {
 	 * Customization handler for creating the engine
 	 * 
 	 * @param session source session
-	 * @param addr socket address used for fast reconnect
+	 * @param addr    socket address used for fast reconnect
 	 * @return an SSLEngine
 	 */
 	protected SSLEngine createEngine(IoSession session, InetSocketAddress addr) {
