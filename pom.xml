@@ -158,6 +158,9 @@
 
     <!-- OSGi minimum versions -->
     <osgi-min-version.slf4j.api>1.7</osgi-min-version.slf4j.api>
+    
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
   </properties>
 
   <modules>
@@ -390,34 +393,42 @@
       </modules>
     </profile>
 
-    <profile>
-      <id>apache-release</id>
+	<profile>
+		<id>apache-release</id>
+		<build>
+			<plugins>
+				<plugin>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<executions>
+						<execution>
+							<phase>install</phase>
+							<goals>
+								<goal>javadoc</goal>
+							</goals>
+							<configuration>
+								<aggregate>true</aggregate>
+								<!-- additionalparam>-Xdoclint:none</additionalparam -->
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</build>
+		<modules>
+			<module>distribution</module>
+		</modules>
+	</profile>
 
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>install</phase>
-
-                <goals>
-                  <goal>javadoc</goal>
-                </goals>
-                <configuration>
-                  <aggregate>true</aggregate>
-                  <!-- additionalparam>-Xdoclint:none</additionalparam -->
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-      
-      <modules>
-        <module>distribution</module>
-      </modules>
-    </profile>
+	<!-- use JDK8 compilation for JDK9+ compiler -->
+	<profile>
+		<id>java-8-compilation</id>
+		<activation>
+			<jdk>[9,)</jdk>
+		</activation>
+		<properties>
+			<maven.compiler.release>8</maven.compiler.release>
+		</properties>
+	</profile>
 
   </profiles>
   
@@ -460,9 +471,7 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.compiler.plugin}</version>
           <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
-            <optimize>true</optimize>
+	        <optimize>true</optimize>
             <showDeprecation>true</showDeprecation>
             <encoding>ISO-8859-1</encoding>
           </configuration>
@@ -788,8 +797,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <encoding>UTF-8</encoding>
-          <source>1.7</source>
-          <target>1.7</target>
           <debug>true</debug>
           <optimize>true</optimize>
           <showDeprecations>true</showDeprecations>
