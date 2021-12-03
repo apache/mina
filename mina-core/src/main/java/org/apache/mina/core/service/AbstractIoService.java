@@ -177,7 +177,7 @@ public abstract class AbstractIoService implements IoService {
 
     private volatile boolean disposed;
 
-    private IoServiceStatistics stats = new IoServiceStatistics(this);
+    private final IoServiceStatistics stats = new IoServiceStatistics(this);
 
     /**
      * Constructor for {@link AbstractIoService}. You need to provide a default
