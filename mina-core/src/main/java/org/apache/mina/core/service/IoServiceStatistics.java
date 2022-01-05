@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class IoServiceStatistics {
 
-    private IoService service;
+    private final IoService service;
 
     /** The number of bytes read per second */
     private double readBytesThroughput;
@@ -89,10 +89,9 @@ public class IoServiceStatistics {
 
     private int scheduledWriteMessages;
 
-    /** The time (in second) between the computation of the service's statistics */
-    private final AtomicInteger throughputCalculationInterval = new AtomicInteger(3);
-
     private final Lock throughputCalculationLock = new ReentrantLock();
+    
+    private final Config config = new Config();
 
     /**
      * Creates a new IoServiceStatistics instance
@@ -125,6 +124,14 @@ public class IoServiceStatistics {
      *         occurred.
      */
     public final long getLastIoTime() {
+        if (!config.isStatisticsCalcEnabled) {
+            return 0;
+        }
+
+        if (!config.isLastReadTimeCalcEnabled || !config.isLastWriteTimeCalcEnabled) {
+            return 0;
+        }
+        
         throughputCalculationLock.lock();
 
         try {
@@ -138,6 +145,10 @@ public class IoServiceStatistics {
      * @return The time in millis when the last read operation occurred.
      */
     public final long getLastReadTime() {
+        if (!config.isStatisticsCalcEnabled || !config.isLastReadTimeCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -151,6 +162,10 @@ public class IoServiceStatistics {
      * @return The time in millis when the last write operation occurred.
      */
     public final long getLastWriteTime() {
+        if (!config.isStatisticsCalcEnabled || !config.isLastWriteTimeCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -164,6 +179,10 @@ public class IoServiceStatistics {
      * @return The number of bytes this service has read so far
      */
     public final long getReadBytes() {
+        if (!config.isStatisticsCalcEnabled || !config.isReadBytesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -177,6 +196,10 @@ public class IoServiceStatistics {
      * @return The number of bytes this service has written so far
      */
     public final long getWrittenBytes() {
+        if (!config.isStatisticsCalcEnabled || !config.isWrittenBytesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -190,6 +213,10 @@ public class IoServiceStatistics {
      * @return The number of messages this services has read so far
      */
     public final long getReadMessages() {
+        if (!config.isStatisticsCalcEnabled || !config.isReadMessagesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -203,6 +230,10 @@ public class IoServiceStatistics {
      * @return The number of messages this service has written so far
      */
     public final long getWrittenMessages() {
+        if (!config.isStatisticsCalcEnabled || !config.isWrittenMessagesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -216,6 +247,10 @@ public class IoServiceStatistics {
      * @return The number of read bytes per second.
      */
     public final double getReadBytesThroughput() {
+        if (!config.isStatisticsCalcEnabled || !(config.isReadBytesCalcEnabled)) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -230,7 +265,11 @@ public class IoServiceStatistics {
      * @return The number of written bytes per second.
      */
     public final double getWrittenBytesThroughput() {
-        throughputCalculationLock.lock();
+        if (!config.isStatisticsCalcEnabled || !config.isWrittenBytesCalcEnabled) {
+            return 0;
+        }
+
+	throughputCalculationLock.lock();
 
         try {
             resetThroughput();
@@ -244,6 +283,10 @@ public class IoServiceStatistics {
      * @return The number of read messages per second.
      */
     public final double getReadMessagesThroughput() {
+        if (!config.isStatisticsCalcEnabled || !config.isReadMessagesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -258,6 +301,10 @@ public class IoServiceStatistics {
      * @return The number of written messages per second.
      */
     public final double getWrittenMessagesThroughput() {
+        if (!config.isStatisticsCalcEnabled || !config.isWrittenMessagesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -273,6 +320,10 @@ public class IoServiceStatistics {
      *         been started.
      */
     public final double getLargestReadBytesThroughput() {
+        if (!config.isStatisticsCalcEnabled || !config.isReadBytesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -287,6 +338,10 @@ public class IoServiceStatistics {
      *         has been started.
      */
     public final double getLargestWrittenBytesThroughput() {
+        if (!config.isStatisticsCalcEnabled || !config.isWrittenBytesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -301,6 +356,10 @@ public class IoServiceStatistics {
      *         has been started.
      */
     public final double getLargestReadMessagesThroughput() {
+        if (!config.isStatisticsCalcEnabled || !config.isReadMessagesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -315,6 +374,10 @@ public class IoServiceStatistics {
      *         service has been started.
      */
     public final double getLargestWrittenMessagesThroughput() {
+        if (!config.isStatisticsCalcEnabled || !config.isWrittenMessagesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -329,7 +392,7 @@ public class IoServiceStatistics {
      *         default value is <tt>3</tt> seconds.
      */
     public final int getThroughputCalculationInterval() {
-        return throughputCalculationInterval.get();
+        return config.getThroughputCalculationInterval();
     }
 
     /**
@@ -337,7 +400,7 @@ public class IoServiceStatistics {
      * The default value is <tt>3</tt> seconds.
      */
     public final long getThroughputCalculationIntervalInMillis() {
-        return throughputCalculationInterval.get() * 1000L;
+        return config.getThroughputCalculationIntervalInMillis();
     }
 
     /**
@@ -347,11 +410,7 @@ public class IoServiceStatistics {
      * @param throughputCalculationInterval The interval between two calculation
      */
     public final void setThroughputCalculationInterval(int throughputCalculationInterval) {
-        if (throughputCalculationInterval < 0) {
-            throw new IllegalArgumentException("throughputCalculationInterval: " + throughputCalculationInterval);
-        }
-
-        this.throughputCalculationInterval.set(throughputCalculationInterval);
+        config.setThroughputCalculationInterval(throughputCalculationInterval);
     }
 
     /**
@@ -361,6 +420,10 @@ public class IoServiceStatistics {
      *            The last time a read has occurred
      */
     protected final void setLastReadTime(long lastReadTime) {
+        if (!config.isStatisticsCalcEnabled || !config.isLastReadTimeCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -377,6 +440,10 @@ public class IoServiceStatistics {
      *            The last time a write has occurred
      */
     protected final void setLastWriteTime(long lastWriteTime) {
+        if (!config.isStatisticsCalcEnabled || !config.isLastWriteTimeCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -405,13 +472,22 @@ public class IoServiceStatistics {
      * @param currentTime The current time
      */
     public void updateThroughput(long currentTime) {
+        if (!config.isStatisticsCalcEnabled) {
+            return;
+        }
+
+        long minInterval = config.getThroughputCalculationIntervalInMillis();
+
+        if (minInterval == 0) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
             int interval = (int) (currentTime - lastThroughputCalculationTime);
-            long minInterval = getThroughputCalculationIntervalInMillis();
 
-            if ((minInterval == 0) || (interval < minInterval)) {
+            if (interval < minInterval) {
                 return;
             }
 
@@ -457,6 +533,14 @@ public class IoServiceStatistics {
      *            The date those bytes were read
      */
     public final void increaseReadBytes(long nbBytesRead, long currentTime) {
+        if (!config.isStatisticsCalcEnabled) {
+            return;
+        }
+
+        if (!config.isReadBytesCalcEnabled && !config.isLastReadTimeCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -475,6 +559,14 @@ public class IoServiceStatistics {
      *            The time the message has been read
      */
     public final void increaseReadMessages(long currentTime) {
+        if (!config.isStatisticsCalcEnabled) {
+            return;
+        }
+
+        if (!config.isReadMessagesCalcEnabled && !config.isLastReadTimeCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -495,6 +587,14 @@ public class IoServiceStatistics {
      *            The date those bytes were written
      */
     public final void increaseWrittenBytes(int nbBytesWritten, long currentTime) {
+        if (!config.isStatisticsCalcEnabled) {
+            return;
+        }
+
+        if (!config.isWrittenBytesCalcEnabled && !config.isLastWriteTimeCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -513,6 +613,14 @@ public class IoServiceStatistics {
      *            The date the message were written
      */
     public final void increaseWrittenMessages(long currentTime) {
+        if (!config.isStatisticsCalcEnabled) {
+            return;
+        }
+
+        if (!config.isWrittenMessagesCalcEnabled && !config.isLastWriteTimeCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -527,6 +635,10 @@ public class IoServiceStatistics {
      * @return The count of bytes scheduled for write.
      */
     public final int getScheduledWriteBytes() {
+        if (!config.isStatisticsCalcEnabled || !config.isScheduledWriteBytesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -542,6 +654,10 @@ public class IoServiceStatistics {
      * @param increment The number of added bytes fro write
      */
     public final void increaseScheduledWriteBytes(int increment) {
+        if (!config.isStatisticsCalcEnabled || !config.isScheduledWriteBytesCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -555,6 +671,10 @@ public class IoServiceStatistics {
      * @return the count of messages scheduled for write.
      */
     public final int getScheduledWriteMessages() {
+        if (!config.isStatisticsCalcEnabled || !config.isScheduledWriteMessagesCalcEnabled) {
+            return 0;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -568,6 +688,10 @@ public class IoServiceStatistics {
      * Increments the count of messages scheduled for write.
      */
     public final void increaseScheduledWriteMessages() {
+        if (!config.isStatisticsCalcEnabled || !config.isScheduledWriteMessagesCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -581,6 +705,10 @@ public class IoServiceStatistics {
      * Decrements the count of messages scheduled for write.
      */
     public final void decreaseScheduledWriteMessages() {
+        if (!config.isStatisticsCalcEnabled || !config.isScheduledWriteMessagesCalcEnabled) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
@@ -596,12 +724,222 @@ public class IoServiceStatistics {
      * @param lastThroughputCalculationTime The time at which throughput counters where updated.
      */
     protected void setLastThroughputCalculationTime(long lastThroughputCalculationTime) {
+        if (!config.isStatisticsCalcEnabled) {
+            return;
+        }
+
+        if (config.getThroughputCalculationInterval() == 0) {
+            return;
+        }
+
         throughputCalculationLock.lock();
 
         try {
             this.lastThroughputCalculationTime = lastThroughputCalculationTime;
         } finally {
             throughputCalculationLock.unlock();
+        }
+    }
+
+    /**
+     * @return The configuration of IoServiceStatistics
+     */
+    public final Config getConfig() {
+        return config;
+    }
+
+    /**
+     * This is a configuration for IoServiceStatistics. It allows configuring which statistics should be calculated.
+     * Disabling statistics calculation improves performance as each operation of IoServiceStatistics is blocking.
+     */
+    public final static class Config {
+        private volatile boolean isReadBytesCalcEnabled = true;
+        private volatile boolean isWrittenBytesCalcEnabled = true;
+        private volatile boolean isReadMessagesCalcEnabled = true;
+        private volatile boolean isWrittenMessagesCalcEnabled = true;
+        private volatile boolean isLastReadTimeCalcEnabled = true;
+        private volatile boolean isLastWriteTimeCalcEnabled = true;
+        private volatile boolean isScheduledWriteBytesCalcEnabled = true;
+        private volatile boolean isScheduledWriteMessagesCalcEnabled = true;
+
+        /** The time (in second) between the computation of the service's statistics */
+        private final AtomicInteger throughputCalculationInterval = new AtomicInteger(3);
+
+        private volatile boolean isStatisticsCalcEnabled = true;
+
+        /**
+         * @return Is IoServiceStatistics calculations enabled
+         */
+        public boolean isStatisticsCalcEnabled() {
+            return isStatisticsCalcEnabled;
+        }
+
+        /**
+         * Enable/disable IoServiceStatistics calculations for all parameters
+         *
+         * @param statisticsCalcEnabled Enabled/disabled boolean value
+         */
+        public void setStatisticsCalcEnabled(boolean statisticsCalcEnabled) {
+            isStatisticsCalcEnabled = statisticsCalcEnabled;
+        }
+
+        /**
+         * @return Is the number of read bytes calculation enabled
+         */
+        public boolean isReadBytesCalcEnabled() {
+            return isReadBytesCalcEnabled;
+        }
+
+        /**
+         * Enable/disable the number of read bytes calculation
+         *
+         * @param readBytesCalcEnabled Enabled/disabled boolean value
+         */
+        public void setReadBytesCalcEnabled(boolean readBytesCalcEnabled) {
+            isReadBytesCalcEnabled = readBytesCalcEnabled;
+        }
+
+        /**
+         * @return Is the number of written bytes calculation enabled
+         */
+        public boolean isWrittenBytesCalcEnabled() {
+            return isWrittenBytesCalcEnabled;
+        }
+
+        /**
+         * Enable/disable the number of written bytes calculation
+         *
+         * @param writtenBytesCalcEnabled Enabled/disabled boolean value
+         */
+        public void setWrittenBytesCalcEnabled(boolean writtenBytesCalcEnabled) {
+            isWrittenBytesCalcEnabled = writtenBytesCalcEnabled;
+        }
+
+        /**
+         * @return Is the number of read messages calculation enabled
+         */
+        public boolean isReadMessagesCalcEnabled() {
+            return isReadMessagesCalcEnabled;
+        }
+
+        /**
+         * Enable/disable the number of read messages calculation
+         *
+         * @param readMessagesCalcEnabled Enabled/disabled boolean value
+         */
+        public void setReadMessagesCalcEnabled(boolean readMessagesCalcEnabled) {
+            isReadMessagesCalcEnabled = readMessagesCalcEnabled;
+        }
+
+        /**
+         * @return Is the number of written messages calculation enabled
+         */
+        public boolean isWrittenMessagesCalcEnabled() {
+            return isWrittenMessagesCalcEnabled;
+        }
+
+        /**
+         * Enable/disable the number of written messages calculation
+         *
+         * @param writtenMessagesCalcEnabled Enabled/disabled boolean value
+         */
+        public void setWrittenMessagesCalcEnabled(boolean writtenMessagesCalcEnabled) {
+            isWrittenMessagesCalcEnabled = writtenMessagesCalcEnabled;
+        }
+
+        /**
+         * @return Is the last read time calculation enabled
+         */
+        public boolean isLastReadTimeCalcEnabled() {
+            return isLastReadTimeCalcEnabled;
+        }
+
+        /**
+         * Enable/disable the last read time calculation
+         *
+         * @param lastReadTimeCalcEnabled Enabled/disabled boolean value
+         */
+        public void setLastReadTimeCalcEnabled(boolean lastReadTimeCalcEnabled) {
+            isLastReadTimeCalcEnabled = lastReadTimeCalcEnabled;
+        }
+
+        /**
+         *
+         * @return Is the last write time calculation enabled
+         */
+        public boolean isLastWriteTimeCalcEnabled() {
+            return isLastWriteTimeCalcEnabled;
+        }
+
+        /**
+         * Enable/disable the last write time calculation
+         *
+         * @param lastWriteTimeCalcEnabled Enabled/disabled boolean value
+         */
+        public void setLastWriteTimeCalcEnabled(boolean lastWriteTimeCalcEnabled) {
+            isLastWriteTimeCalcEnabled = lastWriteTimeCalcEnabled;
+        }
+
+        /**
+         * @return Is scheduled for write the number of bytes calculation enabled
+         */
+        public boolean isScheduledWriteBytesCalcEnabled() {
+            return isScheduledWriteBytesCalcEnabled;
+        }
+
+        /**
+         * Enable/disable scheduled for write the number of bytes calculation
+         *
+         * @param scheduledWriteBytesCalcEnabled Enabled/disabled boolean value
+         */
+        public void setScheduledWriteBytesCalcEnabled(boolean scheduledWriteBytesCalcEnabled) {
+            isScheduledWriteBytesCalcEnabled = scheduledWriteBytesCalcEnabled;
+        }
+
+        /**
+         * @return Is scheduled for write the number of messages calculation enabled
+         */
+        public boolean isScheduledWriteMessagesCalcEnabled() {
+            return isScheduledWriteMessagesCalcEnabled;
+        }
+
+        /**
+         * Enable/disable scheduled for write messages calculation
+         *
+         * @param scheduledWriteMessagesCalcEnabled Enabled/disabled boolean value
+         */
+        public void setScheduledWriteMessagesCalcEnabled(boolean scheduledWriteMessagesCalcEnabled) {
+            isScheduledWriteMessagesCalcEnabled = scheduledWriteMessagesCalcEnabled;
+        }
+
+        /**
+         * @return the interval (seconds) between each throughput calculation. The
+         *         default value is <tt>3</tt> seconds.
+         */
+        public int getThroughputCalculationInterval() {
+            return throughputCalculationInterval.get();
+        }
+
+        /**
+         * @return the interval (milliseconds) between each throughput calculation.
+         * The default value is <tt>3</tt> seconds.
+         */
+        public long getThroughputCalculationIntervalInMillis() {
+            return throughputCalculationInterval.get() * 1000L;
+        }
+
+        /**
+         * Sets the interval (seconds) between each throughput calculation.  The
+         * default value is <tt>3</tt> seconds.
+         *
+         * @param throughputCalculationInterval The interval between two calculation
+         */
+        public void setThroughputCalculationInterval(int throughputCalculationInterval) {
+            if (throughputCalculationInterval < 0) {
+                throw new IllegalArgumentException("throughputCalculationInterval: " + throughputCalculationInterval);
+            }
+
+            this.throughputCalculationInterval.set(throughputCalculationInterval);
         }
     }
 }
