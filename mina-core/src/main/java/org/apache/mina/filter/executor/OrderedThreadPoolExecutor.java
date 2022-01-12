@@ -693,13 +693,11 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                         break;
                     }
 
-                    try {
-                        if (session != null) {
-                            runTasks(getSessionTasksQueue(session));
-                        }
-                    } finally {
-                        idleWorkers.incrementAndGet();
+                    if (session != null) {
+                        runTasks(getSessionTasksQueue(session));
                     }
+
+                    idleWorkers.incrementAndGet();
                 }
             } finally {
                 synchronized (workers) {
