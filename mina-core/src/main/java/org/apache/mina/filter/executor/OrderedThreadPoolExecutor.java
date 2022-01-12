@@ -682,8 +682,6 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                     if (session == null) {
                         synchronized (workers) {
                             if (workers.size() > getCorePoolSize()) {
-                                // Remove now to prevent duplicate exit.
-                                // workers.remove(this);
                                 break;
                             }
                         }
