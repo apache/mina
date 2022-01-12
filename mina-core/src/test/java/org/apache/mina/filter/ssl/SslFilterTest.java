@@ -114,10 +114,10 @@ public class SslFilterTest {
                 // filterWriteEventQueue.
                 Future<?> write_scheduler = executor.submit(new Runnable() {
                     public void run() {
-                	synchronized(test_class) {
-                	    test_class.scheduleFilterWrite(write_filter, new DefaultWriteRequest(new byte[] {}));
-                	    test_class.flushFilterWrite();
-                	}
+                        synchronized(test_class) {
+                            test_class.scheduleFilterWrite(write_filter, new DefaultWriteRequest(new byte[] {}));
+                            test_class.flushFilterWrite();
+                        }
                     }
                 });
                 

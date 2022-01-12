@@ -255,12 +255,13 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
             Worker worker = new Worker();
             Thread thread = getThreadFactory().newThread(worker);
 
+            workers.add(worker);
+
             // As we have added a new thread, it's considered as idle.
             idleWorkers.incrementAndGet();
 
             // Now, we can start it.
             thread.start();
-            workers.add(worker);
 
             if (workers.size() > largestPoolSize) {
                 largestPoolSize = workers.size();
@@ -682,7 +683,7 @@ public class OrderedThreadPoolExecutor extends ThreadPoolExecutor {
                         synchronized (workers) {
                             if (workers.size() > getCorePoolSize()) {
                                 // Remove now to prevent duplicate exit.
-                                workers.remove(this);
+                                // workers.remove(this);
                                 break;
                             }
                         }

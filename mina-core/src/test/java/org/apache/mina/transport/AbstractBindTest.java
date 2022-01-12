@@ -81,6 +81,9 @@ public abstract class AbstractBindTest {
         // because test will fail in port 1-1023 if user run this test
         // as a normal user.
         port = AvailablePortFinder.getNextAvailable();
+        
+        System.out.println( "Used port: " + port );
+        
         socketBound = false;
         try {
             acceptor.setDefaultLocalAddress(createSocketAddress(port));

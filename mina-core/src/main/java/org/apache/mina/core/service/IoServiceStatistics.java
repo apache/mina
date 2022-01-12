@@ -269,7 +269,7 @@ public class IoServiceStatistics {
             return 0;
         }
 
-	throughputCalculationLock.lock();
+        throughputCalculationLock.lock();
 
         try {
             resetThroughput();

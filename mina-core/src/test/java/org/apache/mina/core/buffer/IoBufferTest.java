@@ -101,6 +101,8 @@ public class IoBufferTest {
         buffer.put("012345".getBytes());
         buffer.flip();
         
+        assertEquals(0, buffer.position());
+        assertEquals(6, buffer.limit());
         assertEquals(6, buffer.remaining());
         
         // See if we can expand with a lower number of remaining bytes. We should not.

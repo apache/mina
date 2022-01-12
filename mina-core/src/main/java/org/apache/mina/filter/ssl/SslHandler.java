@@ -536,11 +536,11 @@ class SslHandler {
                 WriteRequestQueue queue = session.getWriteRequestQueue();
                 WriteRequest request = null;
                
-    	    	while ((request = queue.poll(session)) != null) {
-    	    	    WriteFuture writeFuture = request.getFuture();
-    	    	    writeFuture.setException(exception);
-    	    	    writeFuture.notifyAll();
-        	}
+                while ((request = queue.poll(session)) != null) {
+                    WriteFuture writeFuture = request.getFuture();
+                    writeFuture.setException(exception);
+                    writeFuture.notifyAll();
+                }
                     
                 // We *must* shutdown session
                 session.closeNow();
