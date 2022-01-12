@@ -19,14 +19,31 @@
  */
 package org.apache.mina.filter.executor;
 
-import org.apache.mina.core.session.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.mina.core.session.AttributeKey;
+import org.apache.mina.core.session.DummySession;
+import org.apache.mina.core.session.IoEvent;
+import org.apache.mina.core.session.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ThreadPoolExecutor} that maintains the order of {@link IoEvent}s
@@ -304,12 +321,13 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
             Worker worker = new Worker();
             Thread thread = getThreadFactory().newThread(worker);
 
+            workers.add(worker);
+
             // As we have added a new thread, it's considered as idle.
             idleWorkers.incrementAndGet();
 
             // Now, we can start it.
             thread.start();
-            workers.add(worker);
 
             if (workers.size() > largestPoolSize) {
                 largestPoolSize = workers.size();
@@ -730,8 +748,6 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
                     if (session == null) {
                         synchronized (workers) {
                             if (workers.size() > getCorePoolSize()) {
-                                // Remove now to prevent duplicate exit.
-                                workers.remove(this);
                                 break;
                             }
                         }
@@ -741,13 +757,11 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
                         break;
                     }
 
-                    try {
-                        if (session != null) {
-                            runTasks(getSessionTasksQueue(session));
-                        }
-                    } finally {
-                        idleWorkers.incrementAndGet();
+                    if (session != null) {
+                        runTasks(getSessionTasksQueue(session));
                     }
+
+                    idleWorkers.incrementAndGet();
                 }
             } finally {
                 synchronized (workers) {
