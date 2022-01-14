@@ -792,6 +792,11 @@ class SslHandler {
                 appBuffer.expand(newCapacity);
                 continue;
             }
+
+            if ( inNetBuffer.position() == inNetBuffer.limit()) {
+                // Nothing more in the incoming data, let's get out
+                break;
+            }
         } while (((status == SSLEngineResult.Status.OK) || (status == SSLEngineResult.Status.BUFFER_OVERFLOW))
                 && ((localHandshakeStatus == SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING) || 
                         (localHandshakeStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP)));
