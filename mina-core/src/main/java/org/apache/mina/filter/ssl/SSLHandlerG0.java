@@ -177,14 +177,19 @@ public class SSLHandlerG0 extends SSLHandler {
 			LOGGER.debug("{} receive_loop() - source {}", toString(), message);
 		}
 
+		if (mEngine.isInboundDone()) {
+			throw new IllegalStateException("closed");
+		}
+
 		final IoBuffer source = message;
 		final IoBuffer dest = allocate_app_buffer(source.remaining());
 
 		final SSLEngineResult result = mEngine.unwrap(source.buf(), dest.buf());
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("{} receive_loop() - bytes-consumed {}, bytes-produced {}, status {}, handshake {}", toString(),
-					result.bytesConsumed(), result.bytesProduced(), result.getStatus(), result.getHandshakeStatus());
+			LOGGER.debug("{} receive_loop() - bytes-consumed {}, bytes-produced {}, status {}, handshake {}",
+					toString(), result.bytesConsumed(), result.bytesProduced(), result.getStatus(),
+					result.getHandshakeStatus());
 		}
 
 		if (result.bytesProduced() == 0) {
@@ -467,7 +472,7 @@ public class SSLHandlerG0 extends SSLHandler {
 		switch (result.getHandshakeStatus()) {
 			case NEED_UNWRAP:
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("{} lwrwrite_handshake_loopite() - handshake needs unwrap, invoking receive",
+					LOGGER.debug("{} write_handshake_loop() - handshake needs unwrap, invoking receive",
 							toString());
 				}
 				this.receive(next, ZERO);
