@@ -55,6 +55,11 @@ public class SSLHandlerG0 extends SSLHandler {
 	static protected final int MAX_UNACK_MESSAGES = 6;
 
 	/**
+	 * Writes the SSL Closure messages after a close request
+	 */
+	static protected final boolean ENABLE_SOFT_CLOSURE = true;
+
+	/**
 	 * Enable aggregation of handshake messages
 	 */
 	static protected final boolean ENABLE_FAST_HANDSHAKE = true;
@@ -472,8 +477,7 @@ public class SSLHandlerG0 extends SSLHandler {
 		switch (result.getHandshakeStatus()) {
 			case NEED_UNWRAP:
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("{} write_handshake_loop() - handshake needs unwrap, invoking receive",
-							toString());
+					LOGGER.debug("{} write_handshake_loop() - handshake needs unwrap, invoking receive", toString());
 				}
 				this.receive(next, ZERO);
 				break;
@@ -551,7 +555,9 @@ public class SSLHandlerG0 extends SSLHandler {
 
 		if (this.mOutboundClosing && this.mEncodeQueue.size() == 0) {
 			this.mEngine.closeOutbound();
-			this.write_handshake(next);
+			if (ENABLE_SOFT_CLOSURE) {
+				this.write_handshake(next);
+			}
 		}
 	}
 
@@ -580,7 +586,9 @@ public class SSLHandlerG0 extends SSLHandler {
 				this.mEncodeQueue.clear();
 			}
 			this.mEngine.closeOutbound();
-			this.write_handshake(next);
+			if (ENABLE_SOFT_CLOSURE) {
+				this.write_handshake(next);
+			}
 		} else {
 			this.flush(next);
 		}
