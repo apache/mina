@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.example.echoserver.ssl;
+package org.apache.mina.example.tcp.perf;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ import javax.net.ssl.SSLContext;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class BogusSslContextFactory {
+public class BogusSSLContextFactory {
 
     /**
      * Protocol to use.
@@ -58,10 +58,10 @@ public class BogusSslContextFactory {
     private static final String BOGUS_KEYSTORE = "bogus.cert";
 
     // NOTE: The keystore was generated using keytool:
-    //   keytool -genkey -alias bogus -keysize 512 -validity 3650
-    //           -keyalg RSA -dname "CN=bogus.com, OU=XXX CA,
-    //               O=Bogus Inc, L=Stockholm, S=Stockholm, C=SE"
-    //           -keypass boguspw -storepass boguspw -keystore bogus.cert
+    // keytool -genkey -alias bogus -keysize 2048 -validity 3650 
+    //         -keyalg RSA -dname "CN=bogus.com, OU=XXX CA,
+    //               O=Bogus Inc, L=Stockholm, S=Stockholm, C=SE" 
+    //         -keypass boguspw -storepass boguspw -keystore bogus.cert
 
     /**
      * Bougus keystore password.
@@ -83,21 +83,22 @@ public class BogusSslContextFactory {
         SSLContext retInstance;
         
         if (server) {
-            synchronized(BogusSslContextFactory.class) {
+            synchronized(BogusSSLContextFactory.class) {
                 if (serverInstance == null) {
                     try {
-                        serverInstance = createBougusServerSslContext();
+                        serverInstance = createBougusServerSSLContext();
                     } catch (Exception ioe) {
-                        throw new GeneralSecurityException( "Can't create Server SSLContext:" + ioe);
+                        throw new GeneralSecurityException(
+                                "Can't create Server SSLContext:" + ioe);
                     }
                 }
             }
             
             retInstance = serverInstance;
         } else {
-            synchronized (BogusSslContextFactory.class) {
+            synchronized (BogusSSLContextFactory.class) {
                 if (clientInstance == null) {
-                    clientInstance = createBougusClientSslContext();
+                    clientInstance = createBougusClientSSLContext();
                 }
             }
             
@@ -107,13 +108,13 @@ public class BogusSslContextFactory {
         return retInstance;
     }
 
-    private static SSLContext createBougusServerSslContext() throws GeneralSecurityException, IOException {
+    private static SSLContext createBougusServerSSLContext() throws GeneralSecurityException, IOException {
         // Create keystore
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream in = null;
         
         try {
-            in = BogusSslContextFactory.class.getResourceAsStream(BOGUS_KEYSTORE);
+            in = BogusSSLContextFactory.class.getResourceAsStream(BOGUS_KEYSTORE);
             ks.load(in, BOGUS_PW);
         } finally {
             if (in != null) {
@@ -135,7 +136,7 @@ public class BogusSslContextFactory {
         return sslContext;
     }
 
-    private static SSLContext createBougusClientSslContext() throws GeneralSecurityException {
+    private static SSLContext createBougusClientSSLContext() throws GeneralSecurityException {
         SSLContext context = SSLContext.getInstance(PROTOCOL);
         context.init(null, BogusTrustManagerFactory.X509_MANAGERS, null);
         

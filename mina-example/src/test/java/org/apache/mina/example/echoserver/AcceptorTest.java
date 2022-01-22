@@ -31,8 +31,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
-import org.apache.mina.example.echoserver.ssl.SslServerSocketFactory;
-import org.apache.mina.example.echoserver.ssl.SslSocketFactory;
+import org.apache.mina.example.echoserver.ssl.SSLServerSocketFactory;
+import org.apache.mina.example.echoserver.ssl.SSLSocketFactory;
 import org.junit.Test;
 
 /**
@@ -55,9 +55,9 @@ public class AcceptorTest extends AbstractTest {
         useSSL = true;
 
         // Create a echo client with SSL factory and test it.
-        SslSocketFactory.setSslEnabled(true);
-        SslServerSocketFactory.setSslEnabled(true);
-        testTCP0(SslSocketFactory.getSocketFactory().createSocket(
+        SSLSocketFactory.setSslEnabled(true);
+        SSLServerSocketFactory.setSslEnabled(true);
+        testTCP0(SSLSocketFactory.getSocketFactory().createSocket(
                 "localhost", port));
     }
 

@@ -68,7 +68,7 @@ public class TcpSslClient extends IoHandlerAdapter {
         connector = new NioSocketConnector();
 
         // Inject teh SSL filter
-        SSLContext sslContext = BogusSslContextFactory
+        SSLContext sslContext = BogusSSLContextFactory
             .getInstance(false);
         SSLFilter sslFilter = new SSLFilter(sslContext);
         connector.getFilterChain().addFirst("sslFilter", sslFilter);

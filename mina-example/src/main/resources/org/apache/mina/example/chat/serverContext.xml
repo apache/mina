@@ -49,7 +49,7 @@
   <bean id="bogusTrustManagerFactory" class="org.apache.mina.filter.ssl.BogusTrustManagerFactory"/>
   
   <!-- SSLContext to be used -->
-  <bean id="sslContextFactory"  class="org.apache.mina.filter.ssl.SslContextFactory">
+  <bean id="sslContextFactory"  class="org.apache.mina.filter.ssl.SSLContextFactory">
     <property name="protocol" value="TLS"/>
     <property name="keyManagerFactoryAlgorithm" value="SunX509"/>
     <property name="keyManagerFactoryKeyStore"><ref local="keyStore"/></property>
@@ -75,7 +75,7 @@
 
   <bean id="loggingFilter" class="org.apache.mina.filter.logging.LoggingFilter" />
 
-  <bean id="sslFilter" class="org.apache.mina.filter.ssl.SslFilter">
+  <bean id="sslFilter" class="org.apache.mina.filter.ssl.SSLFilter">
     <constructor-arg ref="sslContext"/>
   </bean>
 

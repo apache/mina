@@ -163,7 +163,7 @@ public abstract class AbstractBindTest {
 		for (int i = 0; i < 1024; i++) {
 			Assert.assertTrue("Bound addresses is empty", acceptor.getLocalAddresses().size() > 0);
 			acceptor.unbind();
-			Thread.sleep(1);
+			Thread.sleep(5);
 			Assert.assertTrue("Bound addresses is not empty", acceptor.getLocalAddresses().size() == 0);
 			acceptor.bind();
 		}

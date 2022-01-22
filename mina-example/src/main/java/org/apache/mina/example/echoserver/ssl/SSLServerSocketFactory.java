@@ -32,14 +32,14 @@ import javax.net.ServerSocketFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SslServerSocketFactory extends javax.net.ServerSocketFactory {
+public class SSLServerSocketFactory extends javax.net.ServerSocketFactory {
     private static boolean sslEnabled = false;
 
     private static javax.net.ServerSocketFactory sslFactory = null;
 
     private static ServerSocketFactory factory = null;
 
-    public SslServerSocketFactory() {
+    public SSLServerSocketFactory() {
         super();
     }
 
@@ -65,7 +65,7 @@ public class SslServerSocketFactory extends javax.net.ServerSocketFactory {
         if (isSslEnabled()) {
             if (sslFactory == null) {
                 try {
-                    sslFactory = BogusSslContextFactory.getInstance(true)
+                    sslFactory = BogusSSLContextFactory.getInstance(true)
                             .getServerSocketFactory();
                 } catch (GeneralSecurityException e) {
                     IOException ioe = new IOException(
@@ -77,7 +77,7 @@ public class SslServerSocketFactory extends javax.net.ServerSocketFactory {
             return sslFactory;
         } else {
             if (factory == null) {
-                factory = new SslServerSocketFactory();
+                factory = new SSLServerSocketFactory();
             }
             return factory;
         }

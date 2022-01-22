@@ -22,7 +22,7 @@ package org.apache.mina.example.chat;
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
-import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
+import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.compression.CompressionFilter;
@@ -72,7 +72,7 @@ public class Main {
 
     private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
             throws Exception {
-    	SSLFilter sslFilter = new SSLFilter(BogusSslContextFactory
+    	SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
                 .getInstance(true));
         chain.addLast("sslFilter", sslFilter);
         System.out.println("SSL ON");

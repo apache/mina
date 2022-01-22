@@ -53,7 +53,7 @@ import org.junit.Test;
  * 
  * @author chrjohn
  */
-public class SslTestHandshakeExceptionDIRMINA1077Test {
+public class SSLTestHandshakeExceptionDIRMINA1077Test {
     private int port = AvailablePortFinder.getNextAvailable();
     private static InetAddress address;
     private static NioSocketAcceptor acceptor;
@@ -136,11 +136,11 @@ public class SslTestHandshakeExceptionDIRMINA1077Test {
 
         // use empty keystore to provoke handshake exception
         if (emptyKeystore) {
-            ks.load(SslTestHandshakeExceptionDIRMINA1077Test.class.getResourceAsStream("emptykeystore.sslTest"), passphrase);
+            ks.load(SSLTestHandshakeExceptionDIRMINA1077Test.class.getResourceAsStream("emptykeystore.sslTest"), passphrase);
         } else {
-            ks.load(SslTestHandshakeExceptionDIRMINA1077Test.class.getResourceAsStream("keystore.sslTest"), passphrase);
+            ks.load(SSLTestHandshakeExceptionDIRMINA1077Test.class.getResourceAsStream("keystore.sslTest"), passphrase);
         }
-        ts.load(SslTestHandshakeExceptionDIRMINA1077Test.class.getResourceAsStream("truststore.sslTest"), passphrase);
+        ts.load(SSLTestHandshakeExceptionDIRMINA1077Test.class.getResourceAsStream("truststore.sslTest"), passphrase);
 
         kmf.init(ks, passphrase);
         tmf.init(ts);

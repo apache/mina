@@ -54,7 +54,7 @@ import org.junit.Test;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SslFilterTest {
+public class SSLFilterTest {
 
 	private int port;
 	private SocketAcceptor acceptor;
@@ -87,7 +87,7 @@ public class SslFilterTest {
 
 		SSLFilter sslFilter = null;
 		if (useSSL) {
-			sslFilter = new SSLFilter(BogusSslContextFactory.getInstance(true));
+			sslFilter = new SSLFilter(BogusSSLContextFactory.getInstance(true));
 			acceptor.getFilterChain().addLast("sslFilter", sslFilter);
 		}
 		acceptor.getFilterChain().addLast("codec",

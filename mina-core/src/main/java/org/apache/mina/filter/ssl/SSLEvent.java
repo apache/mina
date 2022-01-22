@@ -22,7 +22,7 @@ package org.apache.mina.filter.ssl;
 import org.apache.mina.filter.FilterEvent;
 
 /**
- * A SSL event sent by {@link SslFilter} when the session is secured or not
+ * A SSL event sent by {@link SSLFilter} when the session is secured or not
  * secured.
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>

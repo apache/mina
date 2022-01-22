@@ -395,7 +395,7 @@ public interface IoSession {
     boolean isClosing();
     
     /**
-     * @return <tt>true</tt> if the session has started and initialized a SslEngine,
+     * @return <tt>true</tt> if the session has started and initialized a SSLEngine,
      * <tt>false</tt> if the session is not yet secured (the handshake is not completed)
      * or if SSL is not set for this session, or if SSL is not even an option.
      */

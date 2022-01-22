@@ -28,7 +28,7 @@ import java.security.GeneralSecurityException;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.example.echoserver.ssl.BogusSslContextFactory;
+import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
 import org.apache.mina.filter.FilterEvent;
 import org.apache.mina.filter.ssl.SSLFilter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -122,7 +122,7 @@ public abstract class AbstractTest {
                         try {
                             session.getFilterChain().addFirst(
                                     "SSL",
-                                    new SSLFilter(BogusSslContextFactory
+                                    new SSLFilter(BogusSSLContextFactory
                                             .getInstance(true)));
                         } catch (GeneralSecurityException e) {
                             LOGGER.error("", e);
