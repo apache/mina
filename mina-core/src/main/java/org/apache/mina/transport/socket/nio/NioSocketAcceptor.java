@@ -230,8 +230,8 @@ implements SocketAcceptor {
     protected ServerSocketChannel open(SocketAddress localAddress) throws Exception {
         // Creates the listening ServerSocket
 
-	SocketSessionConfig config = this.getSessionConfig();
-	
+    SocketSessionConfig config = this.getSessionConfig();
+    
         ServerSocketChannel channel = null;
 
         if (selectorProvider != null) {
@@ -253,17 +253,17 @@ implements SocketAcceptor {
             socket.setReuseAddress(isReuseAddress());
             
             // Set the SND BUFF
-		    if (config.getSendBufferSize() != -1 && channel.supportedOptions().contains(StandardSocketOptions.SO_SNDBUF)) {
-		    	channel.setOption(StandardSocketOptions.SO_SNDBUF, config.getSendBufferSize());
-		    }
+            if (config.getSendBufferSize() != -1 && channel.supportedOptions().contains(StandardSocketOptions.SO_SNDBUF)) {
+                channel.setOption(StandardSocketOptions.SO_SNDBUF, config.getSendBufferSize());
+            }
 
-		    // Set the RCV BUFF
-		    if (config.getReceiveBufferSize() != -1 && channel.supportedOptions().contains(StandardSocketOptions.SO_RCVBUF)) {
-		    	channel.setOption(StandardSocketOptions.SO_RCVBUF, config.getReceiveBufferSize());
-		    }
+            // Set the RCV BUFF
+            if (config.getReceiveBufferSize() != -1 && channel.supportedOptions().contains(StandardSocketOptions.SO_RCVBUF)) {
+                channel.setOption(StandardSocketOptions.SO_RCVBUF, config.getReceiveBufferSize());
+            }
 
             // and bind.
-		    try {
+            try {
                 socket.bind(localAddress, getBacklog());
             } catch (IOException ioe) {
                 // Add some info regarding the address we try to bind to the

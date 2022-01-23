@@ -56,142 +56,142 @@ import org.junit.Test;
  */
 public class SSLFilterTest {
 
-	private int port;
-	private SocketAcceptor acceptor;
+    private int port;
+    private SocketAcceptor acceptor;
 
-	@Before
-	public void setUp() throws Exception {
-		acceptor = new NioSocketAcceptor();
-	}
+    @Before
+    public void setUp() throws Exception {
+        acceptor = new NioSocketAcceptor();
+    }
 
-	@After
-	public void tearDown() throws Exception {
-		acceptor.setCloseOnDeactivation(true);
-		acceptor.dispose();
-	}
+    @After
+    public void tearDown() throws Exception {
+        acceptor.setCloseOnDeactivation(true);
+        acceptor.dispose();
+    }
 
-	@Test
-	public void testMessageSentIsCalled() throws Exception {
-		testMessageSentIsCalled(false);
-	}
+    @Test
+    public void testMessageSentIsCalled() throws Exception {
+        testMessageSentIsCalled(false);
+    }
 
-	@Test
-	public void testMessageSentIsCalled_With_SSL() throws Exception {
-		testMessageSentIsCalled(true);
-	}
+    @Test
+    public void testMessageSentIsCalled_With_SSL() throws Exception {
+        testMessageSentIsCalled(true);
+    }
 
-	private void testMessageSentIsCalled(boolean useSSL) throws Exception {
-		// Workaround to fix TLS issue :
-		// http://java.sun.com/javase/javaseforbusiness/docs/TLSReadme.html
-		java.lang.System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
+    private void testMessageSentIsCalled(boolean useSSL) throws Exception {
+        // Workaround to fix TLS issue :
+        // http://java.sun.com/javase/javaseforbusiness/docs/TLSReadme.html
+        java.lang.System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
 
-		SSLFilter sslFilter = null;
-		if (useSSL) {
-			sslFilter = new SSLFilter(BogusSSLContextFactory.getInstance(true));
-			acceptor.getFilterChain().addLast("sslFilter", sslFilter);
-		}
-		acceptor.getFilterChain().addLast("codec",
-				new ProtocolCodecFilter(new TextLineCodecFactory(StandardCharsets.UTF_8)));
+        SSLFilter sslFilter = null;
+        if (useSSL) {
+            sslFilter = new SSLFilter(BogusSSLContextFactory.getInstance(true));
+            acceptor.getFilterChain().addLast("sslFilter", sslFilter);
+        }
+        acceptor.getFilterChain().addLast("codec",
+                new ProtocolCodecFilter(new TextLineCodecFactory(StandardCharsets.UTF_8)));
 
-		EchoHandler handler = new EchoHandler();
-		acceptor.setHandler(handler);
-		acceptor.bind(new InetSocketAddress(0));
-		port = acceptor.getLocalAddress().getPort();
-		// System.out.println("MINA server started.");
+        EchoHandler handler = new EchoHandler();
+        acceptor.setHandler(handler);
+        acceptor.bind(new InetSocketAddress(0));
+        port = acceptor.getLocalAddress().getPort();
+        // System.out.println("MINA server started.");
 
-		Socket socket = getClientSocket(useSSL);
+        Socket socket = getClientSocket(useSSL);
 
-		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-		BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        BufferedWriter output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-		output.write("test-1\n");
-		output.flush();
+        output.write("test-1\n");
+        output.flush();
 
-		assert input.readLine().equals("test-1");
+        assert input.readLine().equals("test-1");
 
-		if (useSSL) {
-			// Test renegotiation
-			SSLSocket ss = (SSLSocket) socket;
-			// ss.getSession().invalidate();
-			ss.startHandshake();
-		}
+        if (useSSL) {
+            // Test renegotiation
+            SSLSocket ss = (SSLSocket) socket;
+            // ss.getSession().invalidate();
+            ss.startHandshake();
+        }
 
-		output.write("test-2\n");
-		output.flush();
+        output.write("test-2\n");
+        output.flush();
 
-		assert input.readLine().equals("test-2");
+        assert input.readLine().equals("test-2");
 
-		if (useSSL) {
-			// Read SSL close notify.
-			while (socket.getInputStream().read() >= 0) {
-				continue;
-			}
-		}
+        if (useSSL) {
+            // Read SSL close notify.
+            while (socket.getInputStream().read() >= 0) {
+                continue;
+            }
+        }
 
-		socket.close();
-		while (acceptor.getManagedSessions().size() != 0) {
-			Thread.sleep(100);
-		}
+        socket.close();
+        while (acceptor.getManagedSessions().size() != 0) {
+            Thread.sleep(100);
+        }
 
-		// System.out.println("handler: " + handler.sentMessages);
-		assertEquals("handler should have sent 2 messages:", 2, handler.sentMessages.size());
-		assertTrue(handler.sentMessages.contains("test-1"));
-		assertTrue(handler.sentMessages.contains("test-2"));
-	}
+        // System.out.println("handler: " + handler.sentMessages);
+        assertEquals("handler should have sent 2 messages:", 2, handler.sentMessages.size());
+        assertTrue(handler.sentMessages.contains("test-1"));
+        assertTrue(handler.sentMessages.contains("test-2"));
+    }
 
-	private int writeMessage(Socket socket, String message) throws Exception {
-		byte request[] = message.getBytes(StandardCharsets.UTF_8);
-		socket.getOutputStream().write(request);
-		return request.length;
-	}
+    private int writeMessage(Socket socket, String message) throws Exception {
+        byte request[] = message.getBytes(StandardCharsets.UTF_8);
+        socket.getOutputStream().write(request);
+        return request.length;
+    }
 
-	private Socket getClientSocket(boolean ssl) throws Exception {
-		if (ssl) {
-			SSLContext ctx = SSLContext.getInstance("TLS");
-			ctx.init(null, trustManagers, null);
-			return ctx.getSocketFactory().createSocket("localhost", port);
-		}
-		return new Socket("localhost", port);
-	}
+    private Socket getClientSocket(boolean ssl) throws Exception {
+        if (ssl) {
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            ctx.init(null, trustManagers, null);
+            return ctx.getSocketFactory().createSocket("localhost", port);
+        }
+        return new Socket("localhost", port);
+    }
 
-	private static class EchoHandler extends IoHandlerAdapter {
+    private static class EchoHandler extends IoHandlerAdapter {
 
-		List<String> sentMessages = new ArrayList<String>();
+        List<String> sentMessages = new ArrayList<String>();
 
-		@Override
-		public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-			// cause.printStackTrace();
-		}
+        @Override
+        public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+            // cause.printStackTrace();
+        }
 
-		@Override
-		public void messageReceived(IoSession session, Object message) throws Exception {
-			session.write(message);
-		}
+        @Override
+        public void messageReceived(IoSession session, Object message) throws Exception {
+            session.write(message);
+        }
 
-		@Override
-		public void messageSent(IoSession session, Object message) throws Exception {
-			sentMessages.add(message.toString());
+        @Override
+        public void messageSent(IoSession session, Object message) throws Exception {
+            sentMessages.add(message.toString());
 
-			if (sentMessages.size() >= 2) {
-				session.closeNow();
-			}
-		}
-	}
+            if (sentMessages.size() >= 2) {
+                session.closeNow();
+            }
+        }
+    }
 
-	TrustManager[] trustManagers = new TrustManager[] { new TrustAnyone() };
+    TrustManager[] trustManagers = new TrustManager[] { new TrustAnyone() };
 
-	private static class TrustAnyone implements X509TrustManager {
-		public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
-				throws CertificateException {
-		}
+    private static class TrustAnyone implements X509TrustManager {
+        public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
+                throws CertificateException {
+        }
 
-		public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
-				throws CertificateException {
-		}
+        public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
+                throws CertificateException {
+        }
 
-		public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-			return new java.security.cert.X509Certificate[0];
-		}
-	}
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return new java.security.cert.X509Certificate[0];
+        }
+    }
 
 }

@@ -208,15 +208,15 @@ public class HttpServerDecoder implements ProtocolDecoder {
         String requestLine = headerFields[0];
         Map<String, String> generalHeaders = new HashMap<>();
 
-		for (String header : headerFields) {
-			int firstColon = header.indexOf(':');
-			if (firstColon > 0) {
-				generalHeaders.put(header.substring(0, firstColon).toLowerCase(),
-						header.substring(firstColon + 1).trim());
-			} else {
-				generalHeaders.put(header.trim(), "");
-			}
-		}
+        for (String header : headerFields) {
+            int firstColon = header.indexOf(':');
+            if (firstColon > 0) {
+                generalHeaders.put(header.substring(0, firstColon).toLowerCase(),
+                        header.substring(firstColon + 1).trim());
+            } else {
+                generalHeaders.put(header.trim(), "");
+            }
+        }
 
         String[] elements = REQUEST_LINE_PATTERN.split(requestLine);
         HttpMethod method = HttpMethod.valueOf(elements[0]);

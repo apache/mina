@@ -26,53 +26,53 @@ package org.apache.mina.util;
  * @author Jonathan Valliere
  */
 public class StackInspector extends RuntimeException {
-	static public final StackTraceElement callee() {
-		return Thread.currentThread().getStackTrace()[3];
-	}
+    static public final StackTraceElement callee() {
+        return Thread.currentThread().getStackTrace()[3];
+    }
 
-	static public final StackInspector get(String message) {
-		try {
-			throw new StackInspector(message);
-		} catch (StackInspector e0) {
-			return e0;
-		}
-	}
+    static public final StackInspector get(String message) {
+        try {
+            throw new StackInspector(message);
+        } catch (StackInspector e0) {
+            return e0;
+        }
+    }
 
-	static public final StackInspector get(Throwable cause) {
-		try {
-			throw new StackInspector(cause);
-		} catch (StackInspector e0) {
-			return e0;
-		}
-	}
+    static public final StackInspector get(Throwable cause) {
+        try {
+            throw new StackInspector(cause);
+        } catch (StackInspector e0) {
+            return e0;
+        }
+    }
 
-	static public final StackInspector get() {
-		try {
-			throw new StackInspector("Stack from Thread: " + Thread.currentThread().getName());
-		} catch (StackInspector e0) {
-			return e0;
-		}
-	}
+    static public final StackInspector get() {
+        try {
+            throw new StackInspector("Stack from Thread: " + Thread.currentThread().getName());
+        } catch (StackInspector e0) {
+            return e0;
+        }
+    }
 
-	static private final long serialVersionUID = 1L;
+    static private final long serialVersionUID = 1L;
 
-	StackInspector() {
+    StackInspector() {
 
-	}
+    }
 
-	StackInspector(String message) {
-		super(message);
-	}
+    StackInspector(String message) {
+        super(message);
+    }
 
-	StackInspector(Throwable cause) {
-		super(cause);
-	}
+    StackInspector(Throwable cause) {
+        super(cause);
+    }
 
-	StackInspector(String message, Throwable cause) {
-		super(message, cause);
-	}
+    StackInspector(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	StackInspector(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    StackInspector(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

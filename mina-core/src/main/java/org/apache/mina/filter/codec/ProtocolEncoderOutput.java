@@ -30,13 +30,13 @@ import org.apache.mina.core.file.FileRegion;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface ProtocolEncoderOutput {
-	/**
-	 * Callback for {@link ProtocolEncoder} to generate an encoded message such as
-	 * an {@link IoBuffer}. {@link ProtocolEncoder} must call {@link #write(Object)}
-	 * for each encoded message.
-	 *
-	 * @param message the encoded message, typically an {@link IoBuffer} or a
-	 *                {@link FileRegion}.
-	 */
-	void write(Object message);
+    /**
+     * Callback for {@link ProtocolEncoder} to generate an encoded message such as
+     * an {@link IoBuffer}. {@link ProtocolEncoder} must call {@link #write(Object)}
+     * for each encoded message.
+     *
+     * @param message the encoded message, typically an {@link IoBuffer} or a
+     *                {@link FileRegion}.
+     */
+    void write(Object message);
 }

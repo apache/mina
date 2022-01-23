@@ -198,9 +198,14 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
 
             Worker worker = new Worker();
             Thread thread = getThreadFactory().newThread(worker);
-            idleWorkers.incrementAndGet();
-            thread.start();
+
             workers.add(worker);
+
+            // As we have added a new thread, it's considered as idle.
+            idleWorkers.incrementAndGet();
+
+            // Now, we can start it.
+            thread.start();
 
             if (workers.size() > largestPoolSize) {
                 largestPoolSize = workers.size();
@@ -487,14 +492,12 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
                         break;
                     }
 
-                    try {
-                        if (task != null) {
-                            queueHandler.polled(UnorderedThreadPoolExecutor.this, (IoEvent) task);
-                            runTask(task);
-                        }
-                    } finally {
-                        idleWorkers.incrementAndGet();
+                    if (task != null) {
+                        queueHandler.polled(UnorderedThreadPoolExecutor.this, (IoEvent) task);
+                        runTask(task);
                     }
+
+                    idleWorkers.incrementAndGet();
                 }
             } finally {
                 synchronized (workers) {

@@ -250,10 +250,10 @@ public abstract class AbstractIoSession implements IoSession {
         return false;
     }
     
-	@Override
-	public boolean isServer() {
-		return (getService() instanceof IoAcceptor);
-	}
+    @Override
+    public boolean isServer() {
+        return (getService() instanceof IoAcceptor);
+    }
 
     /**
      * {@inheritDoc}

@@ -72,7 +72,7 @@ public class Main {
 
     private static void addSSLSupport(DefaultIoFilterChainBuilder chain)
             throws Exception {
-    	SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
+        SSLFilter sslFilter = new SSLFilter(BogusSSLContextFactory
                 .getInstance(true));
         chain.addLast("sslFilter", sslFilter);
         System.out.println("SSL ON");

@@ -121,12 +121,12 @@ public class NTLMUtilities implements NTLMConstants {
             String line;
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()))) {
-	            pr.waitFor();
+                pr.waitFor();
 
-	            // We loop as we may have blank lines.
-	            do {
-	                line = reader.readLine();
-	            } while ((line != null) && (line.length() != 0));
+                // We loop as we may have blank lines.
+                do {
+                    line = reader.readLine();
+                } while ((line != null) && (line.length() != 0));
             }
 
             // If line is null, we must not go any farther

@@ -28,7 +28,7 @@ import java.io.Serializable;
  * 
  * <pre>
  * private static final AttributeKey PROCESSOR = new AttributeKey(
- * 	SimpleIoProcessorPool.class, &quot;processor&quot;);
+ *     SimpleIoProcessorPool.class, &quot;processor&quot;);
  * </pre>
  * 
  * This will create the <b>SimpleIoProcessorPool.processor@7DE45C99</b> key

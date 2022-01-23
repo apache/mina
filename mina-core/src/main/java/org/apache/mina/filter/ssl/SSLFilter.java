@@ -50,270 +50,270 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SSLFilter extends IoFilterAdapter {
-	/**
-	 * SSLSession object when the session is secured, otherwise null.
-	 */
-	static public final AttributeKey SSL_SECURED = new AttributeKey(SSLFilter.class, "status");
+    /**
+     * SSLSession object when the session is secured, otherwise null.
+     */
+    static public final AttributeKey SSL_SECURED = new AttributeKey(SSLFilter.class, "status");
 
-	/**
-	 * Returns the SSL2Handler object
-	 */
-	static protected final AttributeKey SSL_HANDLER = new AttributeKey(SSLFilter.class, "handler");
+    /**
+     * Returns the SSL2Handler object
+     */
+    static protected final AttributeKey SSL_HANDLER = new AttributeKey(SSLFilter.class, "handler");
 
-	/**
-	 * The logger
-	 */
-	static protected final Logger LOGGER = LoggerFactory.getLogger(SSLFilter.class);
+    /**
+     * The logger
+     */
+    static protected final Logger LOGGER = LoggerFactory.getLogger(SSLFilter.class);
 
-	/**
-	 * Task executor for processing handshakes
-	 */
-	static protected final Executor EXECUTOR = new ThreadPoolExecutor(2, 2, 100, TimeUnit.MILLISECONDS,
-			new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec", true));
+    /**
+     * Task executor for processing handshakes
+     */
+    static protected final Executor EXECUTOR = new ThreadPoolExecutor(2, 2, 100, TimeUnit.MILLISECONDS,
+            new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec", true));
 
-	protected final SSLContext mContext;
-	protected boolean mNeedClientAuth = false;
-	protected boolean mWantClientAuth = false;
-	protected String[] mEnabledCipherSuites;
-	protected String[] mEnabledProtocols;
+    protected final SSLContext mContext;
+    protected boolean mNeedClientAuth = false;
+    protected boolean mWantClientAuth = false;
+    protected String[] mEnabledCipherSuites;
+    protected String[] mEnabledProtocols;
 
-	/**
-	 * Creates a new SSL filter using the specified {@link SSLContext}.
-	 * 
-	 * @param context The SSLContext to use
-	 */
-	public SSLFilter(SSLContext context) {
-		Objects.requireNonNull(context, "ssl must not be null");
+    /**
+     * Creates a new SSL filter using the specified {@link SSLContext}.
+     * 
+     * @param context The SSLContext to use
+     */
+    public SSLFilter(SSLContext context) {
+        Objects.requireNonNull(context, "ssl must not be null");
 
-		this.mContext = context;
-	}
+        this.mContext = context;
+    }
 
-	/**
-	 * @return <tt>true</tt> if the engine will <em>require</em> client
-	 *         authentication. This option is only useful to engines in the server
-	 *         mode.
-	 */
-	public boolean isNeedClientAuth() {
-		return mNeedClientAuth;
-	}
+    /**
+     * @return <tt>true</tt> if the engine will <em>require</em> client
+     *         authentication. This option is only useful to engines in the server
+     *         mode.
+     */
+    public boolean isNeedClientAuth() {
+        return mNeedClientAuth;
+    }
 
-	/**
-	 * Configures the engine to <em>require</em> client authentication. This option
-	 * is only useful for engines in the server mode.
-	 * 
-	 * @param needClientAuth A flag set when we need to authenticate the client
-	 */
-	public void setNeedClientAuth(boolean needClientAuth) {
-		this.mNeedClientAuth = needClientAuth;
-	}
+    /**
+     * Configures the engine to <em>require</em> client authentication. This option
+     * is only useful for engines in the server mode.
+     * 
+     * @param needClientAuth A flag set when we need to authenticate the client
+     */
+    public void setNeedClientAuth(boolean needClientAuth) {
+        this.mNeedClientAuth = needClientAuth;
+    }
 
-	/**
-	 * @return <tt>true</tt> if the engine will <em>request</em> client
-	 *         authentication. This option is only useful to engines in the server
-	 *         mode.
-	 */
-	public boolean isWantClientAuth() {
-		return mWantClientAuth;
-	}
+    /**
+     * @return <tt>true</tt> if the engine will <em>request</em> client
+     *         authentication. This option is only useful to engines in the server
+     *         mode.
+     */
+    public boolean isWantClientAuth() {
+        return mWantClientAuth;
+    }
 
-	/**
-	 * Configures the engine to <em>request</em> client authentication. This option
-	 * is only useful for engines in the server mode.
-	 * 
-	 * @param wantClientAuth A flag set when we want to check the client
-	 *                       authentication
-	 */
-	public void setWantClientAuth(boolean wantClientAuth) {
-		this.mWantClientAuth = wantClientAuth;
-	}
+    /**
+     * Configures the engine to <em>request</em> client authentication. This option
+     * is only useful for engines in the server mode.
+     * 
+     * @param wantClientAuth A flag set when we want to check the client
+     *                       authentication
+     */
+    public void setWantClientAuth(boolean wantClientAuth) {
+        this.mWantClientAuth = wantClientAuth;
+    }
 
-	/**
-	 * @return the list of cipher suites to be enabled when {@link SSLEngine} is
-	 *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
-	 */
-	public String[] getEnabledCipherSuites() {
-		return mEnabledCipherSuites;
-	}
+    /**
+     * @return the list of cipher suites to be enabled when {@link SSLEngine} is
+     *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public String[] getEnabledCipherSuites() {
+        return mEnabledCipherSuites;
+    }
 
-	/**
-	 * Sets the list of cipher suites to be enabled when {@link SSLEngine} is
-	 * initialized.
-	 *
-	 * @param cipherSuites <tt>null</tt> means 'use {@link SSLEngine}'s default.'
-	 */
-	public void setEnabledCipherSuites(String[] cipherSuites) {
-		this.mEnabledCipherSuites = cipherSuites;
-	}
+    /**
+     * Sets the list of cipher suites to be enabled when {@link SSLEngine} is
+     * initialized.
+     *
+     * @param cipherSuites <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public void setEnabledCipherSuites(String[] cipherSuites) {
+        this.mEnabledCipherSuites = cipherSuites;
+    }
 
-	/**
-	 * @return the list of protocols to be enabled when {@link SSLEngine} is
-	 *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
-	 */
-	public String[] getEnabledProtocols() {
-		return mEnabledProtocols;
-	}
+    /**
+     * @return the list of protocols to be enabled when {@link SSLEngine} is
+     *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public String[] getEnabledProtocols() {
+        return mEnabledProtocols;
+    }
 
-	/**
-	 * Sets the list of protocols to be enabled when {@link SSLEngine} is
-	 * initialized.
-	 *
-	 * @param protocols <tt>null</tt> means 'use {@link SSLEngine}'s default.'
-	 */
-	public void setEnabledProtocols(String[] protocols) {
-		this.mEnabledProtocols = protocols;
-	}
+    /**
+     * Sets the list of protocols to be enabled when {@link SSLEngine} is
+     * initialized.
+     *
+     * @param protocols <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public void setEnabledProtocols(String[] protocols) {
+        this.mEnabledProtocols = protocols;
+    }
 
-	@Override
-	public void onPreAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
-		// Check that we don't have a SSL filter already present in the chain
-		if (parent.contains(SSLFilter.class)) {
-			throw new IllegalStateException("Only one SSL filter is permitted in a chain");
-		}
+    @Override
+    public void onPreAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
+        // Check that we don't have a SSL filter already present in the chain
+        if (parent.contains(SSLFilter.class)) {
+            throw new IllegalStateException("Only one SSL filter is permitted in a chain");
+        }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Adding the SSL Filter {} to the chain", name);
-		}
-	}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Adding the SSL Filter {} to the chain", name);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onPostAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
-		IoSession session = parent.getSession();
-		if (session.isConnected()) {
-			this.onConnected(next, session);
-		}
-		super.onPostAdd(parent, name, next);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onPostAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
+        IoSession session = parent.getSession();
+        if (session.isConnected()) {
+            this.onConnected(next, session);
+        }
+        super.onPostAdd(parent, name, next);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onPreRemove(IoFilterChain parent, String name, NextFilter next) throws Exception {
-		IoSession session = parent.getSession();
-		this.onClose(next, session, false);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onPreRemove(IoFilterChain parent, String name, NextFilter next) throws Exception {
+        IoSession session = parent.getSession();
+        this.onClose(next, session, false);
+    }
 
-	/**
-	 * Internal method for performing post-connect operations; this can be triggered
-	 * during normal connect event or after the filter is added to the chain.
-	 * 
-	 * @param next
-	 * @param session
-	 * @throws Exception
-	 */
-	synchronized protected void onConnected(NextFilter next, IoSession session) throws Exception {
-		SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+    /**
+     * Internal method for performing post-connect operations; this can be triggered
+     * during normal connect event or after the filter is added to the chain.
+     * 
+     * @param next
+     * @param session
+     * @throws Exception
+     */
+    synchronized protected void onConnected(NextFilter next, IoSession session) throws Exception {
+        SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
 
-		if (x == null) {
-			final InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
-			final SSLEngine e = this.createEngine(session, s);
-			x = new SSLHandlerG0(e, EXECUTOR, session);
-			session.setAttribute(SSL_HANDLER, x);
-		}
+        if (x == null) {
+            final InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
+            final SSLEngine e = this.createEngine(session, s);
+            x = new SSLHandlerG0(e, EXECUTOR, session);
+            session.setAttribute(SSL_HANDLER, x);
+        }
 
-		x.open(next);
-	}
+        x.open(next);
+    }
 
-	synchronized protected void onClose(NextFilter next, IoSession session, boolean linger) throws Exception {
-		session.removeAttribute(SSL_SECURED);
-		SSLHandler x = SSLHandler.class.cast(session.removeAttribute(SSL_HANDLER));
-		if (x != null) {
-			x.close(next, linger);
-		}
-	}
+    synchronized protected void onClose(NextFilter next, IoSession session, boolean linger) throws Exception {
+        session.removeAttribute(SSL_SECURED);
+        SSLHandler x = SSLHandler.class.cast(session.removeAttribute(SSL_HANDLER));
+        if (x != null) {
+            x.close(next, linger);
+        }
+    }
 
-	/**
-	 * Customization handler for creating the engine
-	 * 
-	 * @param session source session
-	 * @param addr    socket address used for fast reconnect
-	 * @return an SSLEngine
-	 */
-	protected SSLEngine createEngine(IoSession session, InetSocketAddress addr) {
-		SSLEngine e = (addr != null) ? mContext.createSSLEngine(addr.getHostString(), addr.getPort())
-				: mContext.createSSLEngine();
-		e.setNeedClientAuth(mNeedClientAuth);
-		e.setWantClientAuth(mWantClientAuth);
-		if (this.mEnabledCipherSuites != null) {
-			e.setEnabledCipherSuites(this.mEnabledCipherSuites);
-		}
-		if (this.mEnabledProtocols != null) {
-			e.setEnabledProtocols(this.mEnabledProtocols);
-		}
-		e.setUseClientMode(!session.isServer());
-		return e;
-	}
+    /**
+     * Customization handler for creating the engine
+     * 
+     * @param session source session
+     * @param addr    socket address used for fast reconnect
+     * @return an SSLEngine
+     */
+    protected SSLEngine createEngine(IoSession session, InetSocketAddress addr) {
+        SSLEngine e = (addr != null) ? mContext.createSSLEngine(addr.getHostString(), addr.getPort())
+                : mContext.createSSLEngine();
+        e.setNeedClientAuth(mNeedClientAuth);
+        e.setWantClientAuth(mWantClientAuth);
+        if (this.mEnabledCipherSuites != null) {
+            e.setEnabledCipherSuites(this.mEnabledCipherSuites);
+        }
+        if (this.mEnabledProtocols != null) {
+            e.setEnabledProtocols(this.mEnabledProtocols);
+        }
+        e.setUseClientMode(!session.isServer());
+        return e;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void sessionOpened(NextFilter next, IoSession session) throws Exception {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("session {} openend", session);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sessionOpened(NextFilter next, IoSession session) throws Exception {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("session {} openend", session);
 
-		this.onConnected(next, session);
-		super.sessionOpened(next, session);
-	}
+        this.onConnected(next, session);
+        super.sessionOpened(next, session);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void sessionClosed(NextFilter next, IoSession session) throws Exception {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("session {} closed", session);
-		this.onClose(next, session, false);
-		super.sessionClosed(next, session);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sessionClosed(NextFilter next, IoSession session) throws Exception {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("session {} closed", session);
+        this.onClose(next, session, false);
+        super.sessionClosed(next, session);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void messageReceived(NextFilter next, IoSession session, Object message) throws Exception {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("session {} received {}", session, message);
-		SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
-		x.receive(next, IoBuffer.class.cast(message));
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void messageReceived(NextFilter next, IoSession session, Object message) throws Exception {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("session {} received {}", session, message);
+        SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+        x.receive(next, IoBuffer.class.cast(message));
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void messageSent(NextFilter next, IoSession session, WriteRequest request) throws Exception {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("session {} ack {}", session, request);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void messageSent(NextFilter next, IoSession session, WriteRequest request) throws Exception {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("session {} ack {}", session, request);
 
-		if (request instanceof EncryptedWriteRequest) {
-			EncryptedWriteRequest e = EncryptedWriteRequest.class.cast(request);
-			SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
-			x.ack(next, request);
-			if (e.getOriginalRequest() != e) {
-				next.messageSent(session, e.getOriginalRequest());
-			}
-		} else {
-			super.messageSent(next, session, request);
-		}
-	}
+        if (request instanceof EncryptedWriteRequest) {
+            EncryptedWriteRequest e = EncryptedWriteRequest.class.cast(request);
+            SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            x.ack(next, request);
+            if (e.getOriginalRequest() != e) {
+                next.messageSent(session, e.getOriginalRequest());
+            }
+        } else {
+            super.messageSent(next, session, request);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void filterWrite(NextFilter next, IoSession session, WriteRequest request) throws Exception {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("session {} write {}", session, request);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void filterWrite(NextFilter next, IoSession session, WriteRequest request) throws Exception {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("session {} write {}", session, request);
 
-		if (request instanceof EncryptedWriteRequest || request instanceof DisableEncryptWriteRequest) {
-			super.filterWrite(next, session, request);
-		} else {
-			SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
-			x.write(next, request);
-		}
-	}
+        if (request instanceof EncryptedWriteRequest || request instanceof DisableEncryptWriteRequest) {
+            super.filterWrite(next, session, request);
+        } else {
+            SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            x.write(next, request);
+        }
+    }
 }

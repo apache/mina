@@ -38,293 +38,293 @@ import org.apache.mina.http.api.HttpRequest;
 import org.junit.Test;
 
 public class HttpServerDecoderTest {
-	private static final String DECODER_STATE_ATT = "http.ds";
+    private static final String DECODER_STATE_ATT = "http.ds";
 
-	private static final CharsetEncoder encoder = Charset.forName("US-ASCII").newEncoder(); //$NON-NLS-1$
+    private static final CharsetEncoder encoder = Charset.forName("US-ASCII").newEncoder(); //$NON-NLS-1$
 
-	private static final ProtocolDecoder decoder = new HttpServerDecoder();
+    private static final ProtocolDecoder decoder = new HttpServerDecoder();
 
-	/*
-	 * Use a single session for all requests in order to test state management
-	 * better
-	 */
-	private static IoSession session = new DummySession();
+    /*
+     * Use a single session for all requests in order to test state management
+     * better
+     */
+    private static IoSession session = new DummySession();
 
-	/**
-	 * Build an IO buffer containing a simple minimal HTTP request.
-	 * 
-	 * @param method the HTTP method
-	 * @param body   the option body
-	 * @return the built IO buffer
-	 * @throws CharacterCodingException if encoding fails
-	 */
-	protected static IoBuffer getRequestBuffer(String method, String body) throws CharacterCodingException {
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString(method + " / HTTP/1.1\r\nHost: dummy\r\n", encoder);
+    /**
+     * Build an IO buffer containing a simple minimal HTTP request.
+     * 
+     * @param method the HTTP method
+     * @param body   the option body
+     * @return the built IO buffer
+     * @throws CharacterCodingException if encoding fails
+     */
+    protected static IoBuffer getRequestBuffer(String method, String body) throws CharacterCodingException {
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString(method + " / HTTP/1.1\r\nHost: dummy\r\n", encoder);
 
-		if (body != null) {
-			buffer.putString("Content-Length: " + body.length() + "\r\n\r\n", encoder);
-			buffer.putString(body, encoder);
-		} else {
-			buffer.putString("\r\n", encoder);
-		}
+        if (body != null) {
+            buffer.putString("Content-Length: " + body.length() + "\r\n\r\n", encoder);
+            buffer.putString(body, encoder);
+        } else {
+            buffer.putString("\r\n", encoder);
+        }
 
-		buffer.rewind();
+        buffer.rewind();
 
-		return buffer;
-	}
+        return buffer;
+    }
 
-	protected static IoBuffer getRequestBuffer(String method) throws CharacterCodingException {
-		return getRequestBuffer(method, null);
-	}
+    protected static IoBuffer getRequestBuffer(String method) throws CharacterCodingException {
+        return getRequestBuffer(method, null);
+    }
 
-	protected static class ProtocolDecoderQueue extends AbstractProtocolDecoderOutput {
-		public Queue<Object> getQueue() {
-			return this.messageQueue;
-		}
-	}
+    protected static class ProtocolDecoderQueue extends AbstractProtocolDecoderOutput {
+        public Queue<Object> getQueue() {
+            return this.messageQueue;
+        }
+    }
 
-	/**
-	 * Execute an HTPP request and return the queue of messages.
-	 * 
-	 * @param method the HTTP method
-	 * @param body   the optional body
-	 * @return the protocol output and its queue of messages
-	 * @throws Exception if error occurs (encoding,...)
-	 */
-	protected static ProtocolDecoderQueue executeRequest(String method, String body) throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+    /**
+     * Execute an HTPP request and return the queue of messages.
+     * 
+     * @param method the HTTP method
+     * @param body   the optional body
+     * @return the protocol output and its queue of messages
+     * @throws Exception if error occurs (encoding,...)
+     */
+    protected static ProtocolDecoderQueue executeRequest(String method, String body) throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
 
-		IoBuffer buffer = getRequestBuffer(method, body); // $NON-NLS-1$
+        IoBuffer buffer = getRequestBuffer(method, body); // $NON-NLS-1$
 
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
 
-		return out;
-	}
+        return out;
+    }
 
-	@Test
-	public void testGetRequestWithoutBody() throws Exception {
-		ProtocolDecoderQueue out = executeRequest("GET", null);
-		assertEquals(2, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testGetRequestWithoutBody() throws Exception {
+        ProtocolDecoderQueue out = executeRequest("GET", null);
+        assertEquals(2, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testGetRequestBody() throws Exception {
-		ProtocolDecoderQueue out = executeRequest("GET", "body");
-		assertEquals(3, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof IoBuffer);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testGetRequestBody() throws Exception {
+        ProtocolDecoderQueue out = executeRequest("GET", "body");
+        assertEquals(3, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testPutRequestWithoutBody() throws Exception {
-		ProtocolDecoderQueue out = executeRequest("PUT", null);
-		assertEquals(2, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testPutRequestWithoutBody() throws Exception {
+        ProtocolDecoderQueue out = executeRequest("PUT", null);
+        assertEquals(2, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testPutRequestBody() throws Exception {
-		ProtocolDecoderQueue out = executeRequest("PUT", "body");
-		assertEquals(3, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof IoBuffer);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testPutRequestBody() throws Exception {
+        ProtocolDecoderQueue out = executeRequest("PUT", "body");
+        assertEquals(3, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testPostRequestWithoutBody() throws Exception {
-		ProtocolDecoderQueue out = executeRequest("POST", null);
-		assertEquals(2, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testPostRequestWithoutBody() throws Exception {
+        ProtocolDecoderQueue out = executeRequest("POST", null);
+        assertEquals(2, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testPostRequestBody() throws Exception {
-		ProtocolDecoderQueue out = executeRequest("POST", "body");
-		assertEquals(3, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof IoBuffer);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testPostRequestBody() throws Exception {
+        ProtocolDecoderQueue out = executeRequest("POST", "body");
+        assertEquals(3, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testDeleteRequestWithoutBody() throws Exception {
-		ProtocolDecoderQueue out = executeRequest("DELETE", null);
-		assertEquals(2, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testDeleteRequestWithoutBody() throws Exception {
+        ProtocolDecoderQueue out = executeRequest("DELETE", null);
+        assertEquals(2, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testDeleteRequestBody() throws Exception {
-		ProtocolDecoderQueue out = executeRequest("DELETE", "body");
-		assertEquals(3, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof IoBuffer);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testDeleteRequestBody() throws Exception {
+        ProtocolDecoderQueue out = executeRequest("DELETE", "body");
+        assertEquals(3, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testDIRMINA965NoContent() throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("dummy\r\n\r\n", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		assertEquals(2, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testDIRMINA965NoContent() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("dummy\r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testDIRMINA965WithContent() throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("dummy\r\nContent-Length: 1\r\n\r\nA", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
+    @Test
+    public void testDIRMINA965WithContent() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("dummy\r\nContent-Length: 1\r\n\r\nA", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
 
-		assertEquals(3, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof IoBuffer);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+        assertEquals(3, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testDIRMINA965WithContentOnTwoChunks() throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("dummy\r\nContent-Length: 2\r\n\r\nA", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("B", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		assertEquals(4, out.getQueue().size());
-		assertTrue(out.getQueue().poll() instanceof HttpRequest);
-		assertTrue(out.getQueue().poll() instanceof IoBuffer);
-		assertTrue(out.getQueue().poll() instanceof IoBuffer);
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testDIRMINA965WithContentOnTwoChunks() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.1\r\nHost: ", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("dummy\r\nContent-Length: 2\r\n\r\nA", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("B", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(4, out.getQueue().size());
+        assertTrue(out.getQueue().poll() instanceof HttpRequest);
+        assertTrue(out.getQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getQueue().poll() instanceof IoBuffer);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void testDIRMINA1035HeadersWithColons() throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("GET / HTTP/1.0\r\nHost: localhost\r\n", encoder);
-		buffer.putString("SomeHeaderA: Value-A\r\n", encoder);
-		buffer.putString("SomeHeaderB: Value-B:Has:Some:Colons\r\n", encoder);
-		buffer.putString("SomeHeaderC: Value-C\r\n", encoder);
-		buffer.putString("SomeHeaderD:\r\n\r\n", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		assertEquals(2, out.getQueue().size());
-		HttpRequest request = (HttpRequest) out.getQueue().poll();
-		assertEquals("Value-A", request.getHeader("SomeHeaderA".toLowerCase()));
-		assertEquals("Value-B:Has:Some:Colons", request.getHeader("SomeHeaderB".toLowerCase()));
-		assertEquals("Value-C", request.getHeader("SomeHeaderC".toLowerCase()));
-		assertEquals("", request.getHeader("SomeHeaderD".toLowerCase()));
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void testDIRMINA1035HeadersWithColons() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost: localhost\r\n", encoder);
+        buffer.putString("SomeHeaderA: Value-A\r\n", encoder);
+        buffer.putString("SomeHeaderB: Value-B:Has:Some:Colons\r\n", encoder);
+        buffer.putString("SomeHeaderC: Value-C\r\n", encoder);
+        buffer.putString("SomeHeaderD:\r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getQueue().size());
+        HttpRequest request = (HttpRequest) out.getQueue().poll();
+        assertEquals("Value-A", request.getHeader("SomeHeaderA".toLowerCase()));
+        assertEquals("Value-B:Has:Some:Colons", request.getHeader("SomeHeaderB".toLowerCase()));
+        assertEquals("Value-C", request.getHeader("SomeHeaderC".toLowerCase()));
+        assertEquals("", request.getHeader("SomeHeaderD".toLowerCase()));
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void verifyThatHeaderWithoutLeadingSpaceIsSupported() throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("GET / HTTP/1.0\r\nHost:localhost\r\n\r\n", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		assertEquals(2, out.getQueue().size());
-		HttpRequest request = (HttpRequest) out.getQueue().poll();
-		assertEquals("localhost", request.getHeader("host"));
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void verifyThatHeaderWithoutLeadingSpaceIsSupported() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost:localhost\r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getQueue().size());
+        HttpRequest request = (HttpRequest) out.getQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void verifyThatLeadingSpacesAreRemovedFromHeader() throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("GET / HTTP/1.0\r\nHost:  localhost\r\n\r\n", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		assertEquals(2, out.getQueue().size());
-		HttpRequest request = (HttpRequest) out.getQueue().poll();
-		assertEquals("localhost", request.getHeader("host"));
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void verifyThatLeadingSpacesAreRemovedFromHeader() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost:  localhost\r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getQueue().size());
+        HttpRequest request = (HttpRequest) out.getQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void verifyThatTrailingSpacesAreRemovedFromHeader() throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("GET / HTTP/1.0\r\nHost:localhost  \r\n\r\n", encoder);
-		buffer.rewind();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-		}
-		assertEquals(2, out.getQueue().size());
-		HttpRequest request = (HttpRequest) out.getQueue().poll();
-		assertEquals("localhost", request.getHeader("host"));
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-	}
+    @Test
+    public void verifyThatTrailingSpacesAreRemovedFromHeader() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost:localhost  \r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getQueue().size());
+        HttpRequest request = (HttpRequest) out.getQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
 
-	@Test
-	public void dosOnRequestWithAdditionalData() throws Exception {
-		ProtocolDecoderQueue out = new ProtocolDecoderQueue();
-		IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
-		buffer.putString("GET / HTTP/1.0\r\nHost:localhost  \r\n\r\ndummy", encoder);
-		buffer.rewind();
-		int prevBufferPosition = buffer.position();
-		while (buffer.hasRemaining()) {
-			decoder.decode(session, buffer, out);
-			assertNotEquals("Buffer at new position", prevBufferPosition, buffer.position());
-			prevBufferPosition = buffer.position();
-		}
-		assertEquals(2, out.getQueue().size());
-		HttpRequest request = (HttpRequest) out.getQueue().poll();
-		assertEquals("localhost", request.getHeader("host"));
-		assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-		session.removeAttribute(DECODER_STATE_ATT); // This test leaves session in HEAD state, crashing following test
-	}
+    @Test
+    public void dosOnRequestWithAdditionalData() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost:localhost  \r\n\r\ndummy", encoder);
+        buffer.rewind();
+        int prevBufferPosition = buffer.position();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+            assertNotEquals("Buffer at new position", prevBufferPosition, buffer.position());
+            prevBufferPosition = buffer.position();
+        }
+        assertEquals(2, out.getQueue().size());
+        HttpRequest request = (HttpRequest) out.getQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+        session.removeAttribute(DECODER_STATE_ATT); // This test leaves session in HEAD state, crashing following test
+    }
 }

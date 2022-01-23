@@ -28,35 +28,34 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Jonathan Valliere
  */
 public class BasicThreadFactory implements java.util.concurrent.ThreadFactory {
-	public final AtomicInteger count = new AtomicInteger(0);
-	public final String name;
+    public final AtomicInteger count = new AtomicInteger(0);
+    public final String name;
 
-	public final boolean deamon;
-	public final int priority;
+    public final boolean deamon;
+    public final int priority;
 
-	public BasicThreadFactory(String basename, boolean daemon, int priority) {
-		this.name = basename;
-		this.deamon = daemon;
-		this.priority = priority;
-	}
+    public BasicThreadFactory(String basename, boolean daemon, int priority) {
+        this.name = basename;
+        this.deamon = daemon;
+        this.priority = priority;
+    }
 
-	public BasicThreadFactory(String basename, boolean daemon) {
-		this(basename, daemon, Thread.NORM_PRIORITY);
-	}
+    public BasicThreadFactory(String basename, boolean daemon) {
+        this(basename, daemon, Thread.NORM_PRIORITY);
+    }
 
-	public BasicThreadFactory(String basename) {
-		this(basename, false, Thread.NORM_PRIORITY);
-	}
+    public BasicThreadFactory(String basename) {
+        this(basename, false, Thread.NORM_PRIORITY);
+    }
 
-	@Override
-	public Thread newThread(Runnable pool) {
-		Thread t = new Thread(pool);
+    @Override
+    public Thread newThread(Runnable pool) {
+        Thread t = new Thread(pool);
 
-		t.setName(this.name + "-" + this.count.getAndIncrement());
-		t.setPriority(this.priority);
-		t.setDaemon(this.deamon);
+        t.setName(this.name + "-" + this.count.getAndIncrement());
+        t.setPriority(this.priority);
+        t.setDaemon(this.deamon);
 
-		return t;
-	}
-
+        return t;
+    }
 }

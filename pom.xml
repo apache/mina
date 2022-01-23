@@ -393,42 +393,42 @@
       </modules>
     </profile>
 
-	<profile>
-		<id>apache-release</id>
-		<build>
-			<plugins>
-				<plugin>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<executions>
-						<execution>
-							<phase>install</phase>
-							<goals>
-								<goal>javadoc</goal>
-							</goals>
-							<configuration>
-								<aggregate>true</aggregate>
-								<!-- additionalparam>-Xdoclint:none</additionalparam -->
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</build>
-		<modules>
-			<module>distribution</module>
-		</modules>
-	</profile>
+  <profile>
+    <id>apache-release</id>
+    <build>
+      <plugins>
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>install</phase>
+              <goals>
+                <goal>javadoc</goal>
+              </goals>
+              <configuration>
+                <aggregate>true</aggregate>
+                <!-- additionalparam>-Xdoclint:none</additionalparam -->
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+    <modules>
+      <module>distribution</module>
+    </modules>
+  </profile>
 
-	<!-- use JDK8 compilation for JDK9+ compiler -->
-	<profile>
-		<id>java-8-compilation</id>
-		<activation>
-			<jdk>[9,)</jdk>
-		</activation>
-		<properties>
-			<maven.compiler.release>8</maven.compiler.release>
-		</properties>
-	</profile>
+  <!-- use JDK8 compilation for JDK9+ compiler -->
+  <profile>
+    <id>java-8-compilation</id>
+    <activation>
+      <jdk>[9,)</jdk>
+    </activation>
+    <properties>
+      <maven.compiler.release>8</maven.compiler.release>
+    </properties>
+  </profile>
 
   </profiles>
   
@@ -471,7 +471,7 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.compiler.plugin}</version>
           <configuration>
-	        <optimize>true</optimize>
+          <optimize>true</optimize>
             <showDeprecation>true</showDeprecation>
             <encoding>ISO-8859-1</encoding>
           </configuration>

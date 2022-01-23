@@ -28,5 +28,5 @@ import org.apache.mina.filter.FilterEvent;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum SSLEvent implements FilterEvent {
-	SECURED, UNSECURED
+    SECURED, UNSECURED
 }

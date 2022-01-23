@@ -31,37 +31,37 @@ import org.apache.mina.core.session.IoSession;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public abstract class AbstractProtocolDecoderOutput implements ProtocolDecoderOutput {
-	/** The queue where decoded messages are stored */
-	protected final Queue<Object> messageQueue = new ArrayDeque<>();
+    /** The queue where decoded messages are stored */
+    protected final Queue<Object> messageQueue = new ArrayDeque<>();
 
-	/**
-	 * Creates a new instance of a AbstractProtocolDecoderOutput
-	 */
-	public AbstractProtocolDecoderOutput() {
-		// Do nothing
-	}
+    /**
+     * Creates a new instance of a AbstractProtocolDecoderOutput
+     */
+    public AbstractProtocolDecoderOutput() {
+        // Do nothing
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void write(Object message) {
-		if (message == null) {
-			throw new IllegalArgumentException("message");
-		}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void write(Object message) {
+        if (message == null) {
+            throw new IllegalArgumentException("message");
+        }
 
-		messageQueue.add(message);
-	}
+        messageQueue.add(message);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void flush(NextFilter nextFilter, IoSession session) {
-		Object message = null;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void flush(NextFilter nextFilter, IoSession session) {
+        Object message = null;
 
-		while ((message = messageQueue.poll()) != null) {
-			nextFilter.messageReceived(session, message);
-		}
-	}
+        while ((message = messageQueue.poll()) != null) {
+            nextFilter.messageReceived(session, message);
+        }
+    }
 }
