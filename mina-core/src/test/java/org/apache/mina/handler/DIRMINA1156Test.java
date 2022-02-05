@@ -46,6 +46,8 @@ public class DIRMINA1156Test
     /**
      * Tests the state of {@link OrderedThreadPoolExecutor#idleWorkers} and {@link OrderedThreadPoolExecutor#workers}
      * after an {@link Error} is thrown by a session's handler that was invoked through an OrderedThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testOrderedThreadPoolExecutorSessionHandlerThrowingError() throws Exception
@@ -93,6 +95,8 @@ public class DIRMINA1156Test
      * Tests the state of {@link OrderedThreadPoolExecutor#idleWorkers} and {@link OrderedThreadPoolExecutor#workers}
      * after a {@link RuntimeException} is thrown by a session's handler that was invoked through an
      * OrderedThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testOrderedThreadPoolExecutorSessionHandlerThrowingRuntimeException() throws Exception
@@ -140,6 +144,8 @@ public class DIRMINA1156Test
      * Tests the state of {@link OrderedThreadPoolExecutor#idleWorkers} and {@link OrderedThreadPoolExecutor#workers}
      * after a (checked) {@link Exception} is thrown by a session's handler that was invoked through an
      * OrderedThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testOrderedThreadPoolExecutorSessionHandlerThrowingCheckedException() throws Exception
@@ -186,6 +192,8 @@ public class DIRMINA1156Test
     /**
      * Tests the state of {@link UnorderedThreadPoolExecutor#idleWorkers} and {@link UnorderedThreadPoolExecutor#workers}
      * after an {@link Error} is thrown by a session's handler that was invoked through an UnorderedThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testUnorderedThreadPoolExecutorSessionHandlerThrowingError() throws Exception
@@ -233,6 +241,8 @@ public class DIRMINA1156Test
      * Tests the state of {@link UnorderedThreadPoolExecutor#idleWorkers} and {@link UnorderedThreadPoolExecutor#workers}
      * after a {@link RuntimeException} is thrown by a session's handler that was invoked through an
      * UnorderedThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testUnorderedThreadPoolExecutorSessionHandlerThrowingRuntimeException() throws Exception
@@ -280,6 +290,8 @@ public class DIRMINA1156Test
      * Tests the state of {@link UnorderedThreadPoolExecutor#idleWorkers} and {@link UnorderedThreadPoolExecutor#workers}
      * after a (checked) {@link Exception} is thrown by a session's handler that was invoked through an
      * UnorderedThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testUnorderedThreadPoolExecutorSessionHandlerThrowingCheckedException() throws Exception
@@ -326,6 +338,8 @@ public class DIRMINA1156Test
     /**
      * Tests the state of {@link PriorityThreadPoolExecutor#idleWorkers} and {@link PriorityThreadPoolExecutor#workers}
      * after an {@link Error} is thrown by a session's handler that was invoked through an PriorityThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testPriorityThreadPoolExecutorSessionHandlerThrowingError() throws Exception
@@ -373,6 +387,8 @@ public class DIRMINA1156Test
      * Tests the state of {@link PriorityThreadPoolExecutor#idleWorkers} and {@link PriorityThreadPoolExecutor#workers}
      * after a {@link RuntimeException} is thrown by a session's handler that was invoked through an
      * PriorityThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testPriorityThreadPoolExecutorSessionHandlerThrowingRuntimeException() throws Exception
@@ -420,6 +436,8 @@ public class DIRMINA1156Test
      * Tests the state of {@link PriorityThreadPoolExecutor#idleWorkers} and {@link PriorityThreadPoolExecutor#workers}
      * after a (checked) {@link Exception} is thrown by a session's handler that was invoked through an
      * PriorityThreadPoolExecutor.
+     * 
+     * @throws Exception exception
      */
     @Test
     public void testPriorityThreadPoolExecutorSessionHandlerThrowingCheckedException() throws Exception
