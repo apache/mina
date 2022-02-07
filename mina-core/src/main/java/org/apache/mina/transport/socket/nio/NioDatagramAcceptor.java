@@ -258,34 +258,34 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     }
 
     private void processReadySessions(Set<SelectionKey> handles) {
-	final Iterator<SelectionKey> iterator = handles.iterator();
+        Iterator<SelectionKey> iterator = handles.iterator();
 
-	while (iterator.hasNext()) {
-	    try {
-		final SelectionKey key = iterator.next();
-		final DatagramChannel handle = (DatagramChannel) key.channel();
-
-		if (key.isValid()) {
-		    if (key.isReadable()) {
-			readHandle(handle);
-		    }
-
-		    if (key.isWritable()) {
-			for (IoSession session : getManagedSessions().values()) {
-			    final NioSession x = (NioSession) session;
-			    if (x.getChannel() == handle) {
-				scheduleFlush(x);
-			    }
-			}
-		    }
-		}
-
-	    } catch (Exception e) {
-		ExceptionMonitor.getInstance().exceptionCaught(e);
-	    } finally {
-		iterator.remove();
-	    }
-	}
+        while (iterator.hasNext()) {
+            try {
+                SelectionKey key = iterator.next();
+                DatagramChannel handle = (DatagramChannel) key.channel();
+                
+                if (key.isValid()) {
+                    if (key.isReadable()) {
+                        readHandle(handle);
+                    }
+                
+                    if (key.isWritable()) {
+                        for (IoSession session : getManagedSessions().values()) {
+                            NioSession nioSession = (NioSession) session;
+                            
+                            if (nioSession.getChannel() == handle) {
+                                scheduleFlush(nioSession);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                ExceptionMonitor.getInstance().exceptionCaught(e);
+            } finally {
+                iterator.remove();
+            }
+        }
     }
 
     private boolean scheduleFlush(NioSession session) {
@@ -897,8 +897,10 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                     // Kernel buffer is full or wrote too much
                     setInterestedInWrite(session, true);
 
-                    session.getWriteRequestQueue().offer(session, writeRequest);
+                    writeRequestQueue.offer(session, writeRequest);
                     scheduleFlush(session);
+                    
+                    break;
                 } else {
                     setInterestedInWrite(session, false);
 
