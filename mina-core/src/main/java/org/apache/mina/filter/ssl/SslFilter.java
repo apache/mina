@@ -237,9 +237,11 @@ public class SslFilter extends IoFilterAdapter {
                 } else {
                     started = false;
                 }
+
+                sslHandler.flushFilterWrite();
             }
 
-            sslHandler.flushScheduledEvents();
+            sslHandler.flushMessageReceived();
         } catch (SSLException se) {
             sslHandler.release();
             throw se;
@@ -336,9 +338,8 @@ public class SslFilter extends IoFilterAdapter {
         try {
             synchronized (sslHandler) {
                 future = initiateClosure(nextFilter, session);
+                sslHandler.flushFilterWrite();
             }
-
-            sslHandler.flushScheduledEvents();
         } catch (SSLException se) {
             sslHandler.release();
             throw se;
@@ -564,7 +565,7 @@ public class SslFilter extends IoFilterAdapter {
             }
         }
 
-        sslHandler.flushScheduledEvents();
+        sslHandler.flushMessageReceived();
     }
 
     @Override
@@ -679,10 +680,10 @@ public class SslFilter extends IoFilterAdapter {
                         needsFlush = false;
                     }
                 }
-            }
 
-            if (needsFlush) {
-                sslHandler.flushScheduledEvents();
+                if (needsFlush) {
+                    sslHandler.flushFilterWrite();
+                }
             }
         } catch (SSLException se) {
             sslHandler.release();
@@ -714,9 +715,10 @@ public class SslFilter extends IoFilterAdapter {
                         }
                     });
                 }
+
+                sslHandler.flushFilterWrite();
             }
 
-            sslHandler.flushScheduledEvents();
         } catch (SSLException se) {
             sslHandler.release();
             throw se;
@@ -760,9 +762,10 @@ public class SslFilter extends IoFilterAdapter {
         try {
             synchronized (sslHandler) {
                 sslHandler.handshake(nextFilter);
+                sslHandler.flushFilterWrite();
             }
 
-            sslHandler.flushScheduledEvents();
+            sslHandler.flushMessageReceived();
         } catch (SSLException se) {
             sslHandler.release();
             throw se;
