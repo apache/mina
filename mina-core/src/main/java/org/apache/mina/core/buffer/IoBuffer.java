@@ -1511,24 +1511,49 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Returns hexdump of this buffer. The data and pointer are not changed as a
      * result of this method call.
      * 
-     * @return hexidecimal representation of this buffer
+     * @return hexadecimal representation of this buffer
      */
-    public abstract String getHexDump();
+    public String getHexDump() {
+        return this.getHexDump(remaining(), false);
+    }
+
+    /**
+     * Returns hexdump of this buffer. The data and pointer are not changed as a
+     * result of this method call.
+     * 
+     * @param pretty      Produces multi-line pretty hex dumps
+     * @return hexadecimal representation of this buffer
+     */
+    public String getHexDump(boolean pretty) {
+        return getHexDump(remaining(), pretty);
+    }
 
     /**
      * Return hexdump of this buffer with limited length.
      * 
-     * @param lengthLimit
-     *            The maximum number of bytes to dump from the current buffer
-     *            position.
+     * @param length The maximum number of bytes to dump from the current buffer
+     *               position.
      * @return hexidecimal representation of this buffer
      */
-    public abstract String getHexDump(int lengthLimit);
+    public String getHexDump(int length) {
+        return getHexDump(length, false);
+    }
 
+    /**
+     * Return hexdump of this buffer with limited length.
+     * 
+     * @param length The maximum number of bytes to dump from the current buffer
+     *               position.
+     * @return hexidecimal representation of this buffer
+     */
+    public String getHexDump(int length, boolean pretty) {
+        return (pretty) ? IoBufferHexDumper.getPrettyHexDumpSlice(this, position(), Math.min(remaining(), length))
+            : IoBufferHexDumper.getHexDumpSlice(this, position(), Math.min(remaining(), length));
+    }
+    
     // //////////////////////////////
     // String getters and putters //
     // //////////////////////////////
-
     /**
      * Reads a <code>NUL</code>-terminated string from this buffer using the
      * specified <code>decoder</code> and returns it. This method reads until

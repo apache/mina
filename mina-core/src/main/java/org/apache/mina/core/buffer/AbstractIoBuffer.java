@@ -1577,22 +1577,6 @@ public abstract class AbstractIoBuffer extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public String getHexDump() {
-        return this.getHexDump(Integer.MAX_VALUE);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getHexDump(int lengthLimit) {
-        return IoBufferHexDumper.getHexdump(this, lengthLimit);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getString(CharsetDecoder decoder) throws CharacterCodingException {
         if (!hasRemaining()) {
             return "";

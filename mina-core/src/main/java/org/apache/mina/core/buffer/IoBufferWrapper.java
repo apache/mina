@@ -816,14 +816,6 @@ public class IoBufferWrapper extends IoBuffer {
      * {@inheritDoc}
      */
     @Override
-    public String getHexDump() {
-        return buf.getHexDump();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getString(int fieldSize, CharsetDecoder decoder) throws CharacterCodingException {
         return buf.getString(fieldSize, decoder);
     }
