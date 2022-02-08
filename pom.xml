@@ -158,7 +158,10 @@
 
     <!-- OSGi minimum versions -->
     <osgi-min-version.slf4j.api>1.7</osgi-min-version.slf4j.api>
-  </properties>
+    
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+   </properties>
 
   <modules>
     <module>mina-legal</module>
@@ -419,6 +422,16 @@
       </modules>
     </profile>
 
+    <!-- use JDK8 compilation for JDK9+ compiler -->
+    <profile>
+      <id>java-8-compilation</id>
+      <activation>
+        <jdk>[9,)</jdk>
+      </activation>
+      <properties>
+        <maven.compiler.release>8</maven.compiler.release>
+      </properties>
+    </profile>
   </profiles>
   
   <build>
@@ -460,10 +473,10 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.compiler.plugin}</version>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>1.8</source>
+            <target>1.8</target>
             <optimize>true</optimize>
-            <showDeprecations>true</showDeprecations>
+            <showDeprecation>true</showDeprecation>
             <encoding>ISO-8859-1</encoding>
           </configuration>
         </plugin>
