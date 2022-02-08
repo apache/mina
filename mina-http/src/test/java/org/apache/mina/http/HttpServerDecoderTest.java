@@ -243,6 +243,32 @@ public class HttpServerDecoderTest {
     }
     
     @Test
+    public void testDIRMINA1035HeadersWithColons() throws Exception {
+        AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
+            public void flush(NextFilter nextFilter, IoSession session) {
+            }
+        };
+
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nHost: localhost\r\n", encoder);
+        buffer.putString("SomeHeaderA: Value-A\r\n", encoder);
+        buffer.putString("SomeHeaderB: Value-B:Has:Some:Colons\r\n", encoder);
+        buffer.putString("SomeHeaderC: Value-C\r\n", encoder);
+        buffer.putString("SomeHeaderD:\r\n\r\n", encoder);
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getMessageQueue().size());
+        HttpRequest request = (HttpRequest) out.getMessageQueue().poll();
+        assertEquals("Value-A", request.getHeader("SomeHeaderA".toLowerCase()));
+        assertEquals("Value-B:Has:Some:Colons", request.getHeader("SomeHeaderB".toLowerCase()));
+        assertEquals("Value-C", request.getHeader("SomeHeaderC".toLowerCase()));
+        assertEquals("", request.getHeader("SomeHeaderD".toLowerCase()));
+        assertTrue(out.getMessageQueue().poll() instanceof HttpEndOfContent);
+    }
+
+    @Test
     public void verifyThatHeaderWithoutLeadingSpaceIsSupported() throws Exception {
         AbstractProtocolDecoderOutput out = new AbstractProtocolDecoderOutput() {
             public void flush(NextFilter nextFilter, IoSession session) {
