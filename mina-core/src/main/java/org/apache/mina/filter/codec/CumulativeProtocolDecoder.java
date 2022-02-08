@@ -234,7 +234,11 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     }
 
     private void removeSessionBuffer(IoSession session) {
-        session.removeAttribute(BUFFER);
+        IoBuffer buf = (IoBuffer) session.removeAttribute(BUFFER);
+        
+        if (buf != null) {
+            buf.free();
+        }
     }
 
     private void storeRemainingInSession(IoBuffer buf, IoSession session) {
