@@ -11,3 +11,6 @@ bin/
 .deployables
 .clover
 META-INF/
+Dockerfile
+Jenkinsfile
+
