@@ -251,12 +251,12 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
             socket.setReuseAddress(isReuseAddress());
 
             // Set the SND BUFF
-            if (config.getSendBufferSize() != -1) {
+            if (config.getSendBufferSize() != -1 && channel.supportedOptions().contains(StandardSocketOptions.SO_SNDBUF)) {
                 channel.setOption(StandardSocketOptions.SO_SNDBUF, config.getSendBufferSize());
             }
 
             // Set the RCV BUFF
-            if (config.getReceiveBufferSize() != -1) {
+            if (config.getReceiveBufferSize() != -1 && channel.supportedOptions().contains(StandardSocketOptions.SO_RCVBUF)) {
                 channel.setOption(StandardSocketOptions.SO_RCVBUF, config.getReceiveBufferSize());
             }
 
