@@ -400,6 +400,11 @@ public interface IoSession {
      * or if SSL is not set for this session, or if SSL is not even an option.
      */
     boolean isSecured();
+    
+    /**
+     * @return <tt>true</tt> if the session was created by an acceptor.
+     */
+    boolean isServer();
 
     /**
      * @return the {@link CloseFuture} of this session.  This method returns
