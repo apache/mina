@@ -913,8 +913,13 @@ public void fireFilterWrite(WriteRequest writeRequest) {
     private static class TailFilter extends IoFilterAdapter {
         @Override
         public void sessionCreated(NextFilter nextFilter, IoSession session) throws Exception {
+            session.getHandler().sessionCreated(session);
+        }
+
+        @Override
+        public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
             try {
-                session.getHandler().sessionCreated(session);
+                session.getHandler().sessionOpened(session);
             } finally {
                 // Notify the related future.
                 ConnectFuture future = (ConnectFuture) session.removeAttribute(SESSION_CREATED_FUTURE);
@@ -923,11 +928,6 @@ public void fireFilterWrite(WriteRequest writeRequest) {
                     future.setSession(session);
                 }
             }
-        }
-
-        @Override
-        public void sessionOpened(NextFilter nextFilter, IoSession session) throws Exception {
-            session.getHandler().sessionOpened(session);
         }
 
         @Override
