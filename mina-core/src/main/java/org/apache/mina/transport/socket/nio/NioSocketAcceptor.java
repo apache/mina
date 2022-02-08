@@ -269,7 +269,7 @@ implements SocketAcceptor {
                 // message
                 String newMessage = "Error while binding on " + localAddress + "\n" + "original message : "
                         + ioe.getMessage();
-                Exception e = new IOException(newMessage);
+                Exception e = new IOException(newMessage, ioe);
                 e.initCause(ioe.getCause());
 
                 // And close the channel
