@@ -22,6 +22,7 @@ package org.apache.mina.filter.ssl;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -513,14 +514,20 @@ public class SslFilter extends IoFilterAdapter {
         }
 
         SslHandler sslHandler = getSslSessionHandler(session);
+        AtomicBoolean canPushMessage = new AtomicBoolean( false );
+        
+        // The SslHandler instance is *guaranteed* to not be null here
 
         synchronized (sslHandler) {
-            if (!isSslStarted(session) && sslHandler.isInboundDone()) {
-                // The SSL session must be established first before we
-                // can push data to the application. Store the incoming
-                // data into a queue for a later processing
-                sslHandler.scheduleMessageReceived(nextFilter, message);
+            if (sslHandler.isOutboundDone() && sslHandler.isInboundDone()) {
+                // We aren't handshaking here. Let's push the message to the next filter
+                
+                // Note: we can push the message to the queue immediately, 
+                // but don't do so in the synchronized block. We use a protected
+                // flag to do so.
+                canPushMessage.set( true );
             } else {
+                canPushMessage.set( false );
                 IoBuffer buf = (IoBuffer) message;
 
                 try {
@@ -565,7 +572,11 @@ public class SslFilter extends IoFilterAdapter {
             }
         }
 
-        sslHandler.flushMessageReceived();
+        if (canPushMessage.get()) {
+            nextFilter.messageReceived(session, message);
+        } else {
+            sslHandler.flushMessageReceived();
+        }
     }
 
     @Override
