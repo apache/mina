@@ -156,11 +156,14 @@ public abstract class AbstractBindTest {
     }
 
     @Test
-    public void testManyTimes() throws IOException {
+    public void testManyTimes() throws IOException, InterruptedException {
         bind(true);
 
         for (int i = 0; i < 1024; i++) {
             acceptor.unbind();
+            
+            Thread.sleep(2);
+                
             acceptor.bind();
         }
     }
