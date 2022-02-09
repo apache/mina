@@ -106,7 +106,7 @@ class IoBufferHexDumper {
         final StringBuilder sb = new StringBuilder();
 
         sb.append("Source ");
-        sb.append(buf);
+        sb.append("0x").append(Integer.toHexString(buf.hashCode()));
         sb.append(" showing index ");
         sb.append(offset);
         sb.append(" through ");
