@@ -52,6 +52,7 @@ public class PriorityThreadPoolExecutorTest {
      *
      * This test asserts that, without a provided comparator, entries are
      * considered equal, when they reference the same session.
+     * @throws Exception an exception
      */
     @Test
     public void fifoEntryTestNoComparatorSameSession() throws Exception {
@@ -74,6 +75,7 @@ public class PriorityThreadPoolExecutorTest {
      *
      * This test asserts that, without a provided comparator, the first entry
      * created is 'less than' an entry that is created later.
+     * @throws Exception an exception
      */
     @Test
     public void fifoEntryTestNoComparatorDifferentSession() throws Exception {
@@ -97,6 +99,7 @@ public class PriorityThreadPoolExecutorTest {
      * This test asserts that, with a provided comparator, entries are
      * considered equal, when they reference the same session (the provided
      * comparator is ignored).
+     * @throws Exception an exception
      */
     @Test
     public void fifoEntryTestWithComparatorSameSession() throws Exception {
@@ -129,6 +132,7 @@ public class PriorityThreadPoolExecutorTest {
      * This test asserts that a provided comparator is used instead of the
      * (fallback) default behavior (when entries are referring different
      * sessions).
+     * @throws Exception an exception
      */
     @Test
     public void fifoEntryTestComparatorDifferentSession() throws Exception {
@@ -166,6 +170,7 @@ public class PriorityThreadPoolExecutorTest {
      * Each session records the timestamp of its last activity. After all work
      * has been processed, the test asserts that the last activity of all
      * sessions was later than the last activity of the preferred session.
+     * @throws Exception an exception
      */
     @Test
     @Ignore("This test faiuls randomly")
@@ -214,18 +219,19 @@ public class PriorityThreadPoolExecutorTest {
     }
 
     /**
-     * Tests the state of {@link PriorityThreadPoolExecutor#idleWorkers} and {@link PriorityThreadPoolExecutor#workers}
-     * after a RuntimeException is thrown when the {@link PriorityThreadPoolExecutor.Worker} is running.
+     * Tests the state of PriorityThreadPoolExecutor workers
+     * after a RuntimeException is thrown when the PriorityThreadPoolExecutor Worker is running.
      *
      * Note that the implementation of this test is <em>not representative</em> of how tasks are normally executed, as
      * tasks would ordinarily be 'wrapped' in a FilterChain. Most FilterChain implementations would catch the
      * RuntimeException that is being used in the implementation of this test. The purpose of this test is to verify
      * Worker's behavior when a RuntimeException is thrown during execution occurs (even if that RuntimeException cannot
      * occur in the way that this test simulates it). A test that implements the execution in a more realistic manner is
-     * provided in {@link org.apache.mina.transport.socket.nio.DIRMINA1156Test}.
+     * provided in {@link org.apache.mina.handler.DIRMINA1156Test}.
      *
-     * @see org.apache.mina.transport.socket.nio.DIRMINA1156Test
+     * @see org.apache.mina.handler.DIRMINA1156Test
      * @see <a href="https://issues.apache.org/jira/browse/DIRMINA-1132">Issue DIRMINA-1156: Inconsistent worker / idleWorker in ThreadPoolExecutors</a>
+     * @throws Exception an exception
      */
     @Test
     public void testRuntimeExceptionInWorkerRun() throws Throwable
@@ -274,10 +280,11 @@ public class PriorityThreadPoolExecutorTest {
      * is being used in the implementation of this test. The purpose of this test is to verify Worker's behavior when an
      * Error is thrown during execution occurs (even if that Error cannot occur in the way that this test simulates it).
      * A test that implements the execution in a more realistic manner is provided in
-     * {@link org.apache.mina.transport.socket.nio.DIRMINA1156Test}.
+     * {@link org.apache.mina.handler.DIRMINA1156Test}.
      *
-     * @see org.apache.mina.transport.socket.nio.DIRMINA1156Test
+     * @see org.apache.mina.handler.DIRMINA1156Test
      * @see <a href="https://issues.apache.org/jira/browse/DIRMINA-1132">Issue DIRMINA-1156: Inconsistent worker / idleWorker in ThreadPoolExecutors</a>
+     * @throws Exception an exception
      */
     @Test
     public void testErrorInWorkerRun() throws Throwable

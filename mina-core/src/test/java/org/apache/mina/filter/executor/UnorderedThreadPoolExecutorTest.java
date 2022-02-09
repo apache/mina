@@ -41,18 +41,19 @@ import org.junit.Test;
 public class UnorderedThreadPoolExecutorTest
 {
     /**
-     * Tests the state of {@link UnorderedThreadPoolExecutor#idleWorkers} and {@link UnorderedThreadPoolExecutor#workers}
-     * after a RuntimeException is thrown when the {@link UnorderedThreadPoolExecutor.Worker} is running.
+     * Tests the state of UnorderedThreadPoolExecutor workers
+     * after a RuntimeException is thrown when the UnorderedThreadPoolExecutor Worker is running.
      *
      * Note that the implementation of this test is <em>not representative</em> of how tasks are normally executed, as
      * tasks would ordinarily be 'wrapped' in a FilterChain. Most FilterChain implementations would catch the
      * RuntimeException that is being used in the implementation of this test. The purpose of this test is to verify
      * Worker's behavior when a RuntimeException is thrown during execution occurs (even if that RuntimeException cannot
      * occur in the way that this test simulates it). A test that implements the execution in a more realistic manner is
-     * provided in {@link org.apache.mina.transport.socket.nio.DIRMINA1156Test}.
+     * provided in {@link org.apache.mina.handler.DIRMINA1156Test}.
      *
-     * @see org.apache.mina.transport.socket.nio.DIRMINA1156Test
+     * @see org.apache.mina.handler.DIRMINA1156Test
      * @see <a href="https://issues.apache.org/jira/browse/DIRMINA-1132">Issue DIRMINA-1156: Inconsistent worker / idleWorker in ThreadPoolExecutors</a>
+     * @throws Exception an exception
      */
     @Test
     public void testRuntimeExceptionInWorkerRun() throws Throwable
@@ -93,18 +94,19 @@ public class UnorderedThreadPoolExecutorTest
     }
 
     /**
-     * Tests the state of {@link UnorderedThreadPoolExecutor#idleWorkers} and {@link UnorderedThreadPoolExecutor#workers}
-     * after an Error is thrown when the {@link UnorderedThreadPoolExecutor.Worker} is running.
+     * Tests the state of UnorderedThreadPoolExecutor workers
+     * after an Error is thrown when the UnorderedThreadPoolExecutor Worker is running.
      *
      * Note that the implementation of this test is <em>not representative</em> of how tasks are normally executed, as
      * tasks would ordinarily be 'wrapped' in a FilterChain. Most FilterChain implementations would catch the Error that
      * is being used in the implementation of this test. The purpose of this test is to verify Worker's behavior when an
      * Error is thrown during execution occurs (even if that Error cannot occur in the way that this test simulates it).
      * A test that implements the execution in a more realistic manner is provided in
-     * {@link org.apache.mina.transport.socket.nio.DIRMINA1156Test}.
+     * {@link org.apache.mina.handler.DIRMINA1156Test}.
      *
-     * @see org.apache.mina.transport.socket.nio.DIRMINA1156Test
+     * @see org.apache.mina.handler.DIRMINA1156Test
      * @see <a href="https://issues.apache.org/jira/browse/DIRMINA-1132">Issue DIRMINA-1156: Inconsistent worker / idleWorker in ThreadPoolExecutors</a>
+     * @throws Exception an exception
      */
     @Test
     public void testErrorInWorkerRun() throws Throwable
