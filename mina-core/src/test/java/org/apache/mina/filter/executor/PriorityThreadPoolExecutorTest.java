@@ -272,8 +272,8 @@ public class PriorityThreadPoolExecutorTest {
     }
 
     /**
-     * Tests the state of {@link PriorityThreadPoolExecutor#idleWorkers} and {@link PriorityThreadPoolExecutor#workers}
-     * after an Error is thrown when the {@link PriorityThreadPoolExecutor.Worker} is running.
+     * Tests the state of PriorityThreadPoolExecutor workers
+     * after an Error is thrown when the PriorityThreadPoolExecutor worker is running.
      *
      * Note that the implementation of this test is <em>not representative</em> of how tasks are normally executed, as
      * tasks would ordinarily be 'wrapped' in a FilterChain. Most FilterChain implementations would catch the Error that
