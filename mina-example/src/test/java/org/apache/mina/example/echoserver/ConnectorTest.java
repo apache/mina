@@ -20,7 +20,6 @@
 package org.apache.mina.example.echoserver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.InetAddress;
@@ -39,7 +38,6 @@ import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +79,6 @@ public class ConnectorTest extends AbstractTest {
     }
 
     @Test
-    @Ignore
     public void testTCPWithSSL() throws Exception {
         useSSL = true;
         // Create a connector
@@ -135,34 +132,7 @@ public class ConnectorTest extends AbstractTest {
 
         // Send closeNotify to test TLS closure if it is TLS connection.
         if (useSSL) {
-            connectorSSLFilter.stopSsl(session).awaitUninterruptibly();
-
-            System.out
-                    .println("-------------------------------------------------------------------------------");
-            // Test again after we finished TLS session.
-            testConnector0(session);
-
-            System.out
-                    .println("-------------------------------------------------------------------------------");
-
-            // Test if we can enter TLS mode again.
-            //// Send StartTLS request.
-            handler.readBuf.clear();
-            IoBuffer buf = IoBuffer.allocate(1);
-            buf.put((byte) '.');
-            buf.flip();
-            session.write(buf).awaitUninterruptibly();
-
-            //// Wait for StartTLS response.
-            waitForResponse(handler, 1);
-
-            handler.readBuf.flip();
-            assertEquals(1, handler.readBuf.remaining());
-            assertEquals((byte) '.', handler.readBuf.get());
-
-            // Now start TLS connection
-            assertTrue(connectorSSLFilter.startSsl(session));
-            testConnector0(session);
+            session.getFilterChain().remove("SSL");
         }
 
         session.closeNow().awaitUninterruptibly();
