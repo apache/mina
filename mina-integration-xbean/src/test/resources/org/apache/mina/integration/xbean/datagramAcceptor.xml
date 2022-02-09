@@ -20,8 +20,8 @@
 -->
 
 <spring:beans xmlns:spring="http://xbean.apache.org/schemas/spring/1.0" 
-			  xmlns:s="http://www.springframework.org/schema/beans"
-			  xmlns="http://mina.apache.org/config/1.0">
+              xmlns:s="http://www.springframework.org/schema/beans"
+              xmlns="http://mina.apache.org/config/1.0">
   
   <nioDatagramAcceptor id="datagramAcceptor0" />
   
