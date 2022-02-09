@@ -53,7 +53,7 @@ public class OrderedThreadPoolExecutorTest
      *
      * @see org.apache.mina.handler.DIRMINA1156Test
      * @see <a href="https://issues.apache.org/jira/browse/DIRMINA-1132">Issue DIRMINA-1156: Inconsistent worker / idleWorker in ThreadPoolExecutors</a>
-     * @throws Excveption an exception
+     * @throws Throwable an exception
      */
     @Test
     public void testRuntimeExceptionInWorkerRun() throws Throwable
@@ -106,7 +106,7 @@ public class OrderedThreadPoolExecutorTest
      *
      * @see org.apache.mina.handler.DIRMINA1156Test
      * @see <a href="https://issues.apache.org/jira/browse/DIRMINA-1132">Issue DIRMINA-1156: Inconsistent worker / idleWorker in ThreadPoolExecutors</a>
-     * @throws Excveption an exception
+     * @throws Throwable an exception
      */
     @Test
     public void testErrorInWorkerRun() throws Throwable
