@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -109,6 +108,7 @@ public class SSLFilterTest {
 
         assert input.readLine().equals("test-1");
 
+        /* Commented, we don't support TLS renegociation anymore
         if (useSSL) {
             // Test renegotiation
             SSLSocket ss = (SSLSocket) socket;
@@ -127,6 +127,7 @@ public class SSLFilterTest {
                 continue;
             }
         }
+        */
 
         socket.close();
         while (acceptor.getManagedSessions().size() != 0) {
@@ -134,9 +135,9 @@ public class SSLFilterTest {
         }
 
         // System.out.println("handler: " + handler.sentMessages);
-        assertEquals("handler should have sent 2 messages:", 2, handler.sentMessages.size());
+        assertEquals("handler should have sent 1 messages:", 1, handler.sentMessages.size());
         assertTrue(handler.sentMessages.contains("test-1"));
-        assertTrue(handler.sentMessages.contains("test-2"));
+        //assertTrue(handler.sentMessages.contains("test-2"));
     }
 
     private int writeMessage(Socket socket, String message) throws Exception {
