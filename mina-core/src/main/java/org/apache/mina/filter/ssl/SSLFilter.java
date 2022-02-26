@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
@@ -71,21 +72,41 @@ public class SSLFilter extends IoFilterAdapter {
     static protected final Executor EXECUTOR = new ThreadPoolExecutor(2, 2, 100, TimeUnit.MILLISECONDS,
             new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec", true));
 
-    protected final SSLContext mContext;
-    protected boolean mNeedClientAuth = false;
-    protected boolean mWantClientAuth = false;
-    protected String[] mEnabledCipherSuites;
-    protected String[] mEnabledProtocols;
+    protected final SSLContext sslContext;
+    
+    /** A flag set if client authentication is required */ 
+    protected boolean needClientAuth = false;
+
+    /** A flag set if client authentication is requested */ 
+    protected boolean wantClientAuth = false;
+    
+    /** The enabled Ciphers. */
+    protected String[] enabledCipherSuites;
+    
+    /** 
+     * The list of enabled SSL/TLS protocols. Must be an array of String, containing:
+     * <ul>
+     *   <li><b>SSLv2Hello</b></li>
+     *   <li><b>SSLv3</b></li>
+     *   <li><b>TLSv1.1</b> or <b>TLSv1</b></li>
+     *   <li><b>TLSv1.2</b></li>
+     *   <li><b>TLSv1.3</b></li>
+     *   <li><b>NONE</li>
+     * </ul> 
+     * 
+     * If null, we will use the default <em>SSLEngine</em> configurtation.
+     **/
+    protected String[] enabledProtocols;
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
      * 
-     * @param context The SSLContext to use
+     * @param sslContext The SSLContext to use
      */
-    public SSLFilter(SSLContext context) {
-        Objects.requireNonNull(context, "ssl must not be null");
+    public SSLFilter(SSLContext sslContext) {
+        Objects.requireNonNull(sslContext, "ssl must not be null");
 
-        this.mContext = context;
+        this.sslContext = sslContext;
     }
 
     /**
@@ -94,17 +115,17 @@ public class SSLFilter extends IoFilterAdapter {
      *         mode.
      */
     public boolean isNeedClientAuth() {
-        return mNeedClientAuth;
+        return needClientAuth;
     }
 
     /**
      * Configures the engine to <em>require</em> client authentication. This option
      * is only useful for engines in the server mode.
      * 
-     * @param needClientAuth A flag set when we need to authenticate the client
+     * @param needClientAuth A flag set when client authentication is required
      */
     public void setNeedClientAuth(boolean needClientAuth) {
-        this.mNeedClientAuth = needClientAuth;
+        this.needClientAuth = needClientAuth;
     }
 
     /**
@@ -113,18 +134,17 @@ public class SSLFilter extends IoFilterAdapter {
      *         mode.
      */
     public boolean isWantClientAuth() {
-        return mWantClientAuth;
+        return wantClientAuth;
     }
 
     /**
      * Configures the engine to <em>request</em> client authentication. This option
      * is only useful for engines in the server mode.
      * 
-     * @param wantClientAuth A flag set when we want to check the client
-     *                       authentication
+     * @param wantClientAuth A flag set when client authentication is requested
      */
     public void setWantClientAuth(boolean wantClientAuth) {
-        this.mWantClientAuth = wantClientAuth;
+        this.wantClientAuth = wantClientAuth;
     }
 
     /**
@@ -132,17 +152,18 @@ public class SSLFilter extends IoFilterAdapter {
      *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledCipherSuites() {
-        return mEnabledCipherSuites;
+        return enabledCipherSuites;
     }
 
     /**
      * Sets the list of cipher suites to be enabled when {@link SSLEngine} is
      * initialized.
      *
-     * @param cipherSuites <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * @param enabledCipherSuites The list of enabled Cipher.
+     *                            <tt>null</tt> means 'use {@link SSLEngine}'s default.'
      */
-    public void setEnabledCipherSuites(String[] cipherSuites) {
-        this.mEnabledCipherSuites = cipherSuites;
+    public void setEnabledCipherSuites(String... enabledCipherSuites) {
+        this.enabledCipherSuites = enabledCipherSuites;
     }
 
     /**
@@ -150,19 +171,23 @@ public class SSLFilter extends IoFilterAdapter {
      *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledProtocols() {
-        return mEnabledProtocols;
+        return enabledProtocols;
     }
 
     /**
      * Sets the list of protocols to be enabled when {@link SSLEngine} is
      * initialized.
      *
-     * @param protocols <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * @param enabledProtocols The list of enabled SSL/TLS protocols.
+     *                  <tt>null</tt> means 'use {@link SSLEngine}'s default.'
      */
-    public void setEnabledProtocols(String[] protocols) {
-        this.mEnabledProtocols = protocols;
+    public void setEnabledProtocols(String... enabledProtocols) {
+        this.enabledProtocols = enabledProtocols;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPreAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
         // Check that we don't have a SSL filter already present in the chain
@@ -181,9 +206,11 @@ public class SSLFilter extends IoFilterAdapter {
     @Override
     public void onPostAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
         IoSession session = parent.getSession();
+        
         if (session.isConnected()) {
-            this.onConnected(next, session);
+            onConnected(next, session);
         }
+        
         super.onPostAdd(parent, name, next);
     }
 
@@ -193,35 +220,44 @@ public class SSLFilter extends IoFilterAdapter {
     @Override
     public void onPreRemove(IoFilterChain parent, String name, NextFilter next) throws Exception {
         IoSession session = parent.getSession();
-        this.onClose(next, session, false);
+        onClose(next, session, false);
     }
 
     /**
      * Internal method for performing post-connect operations; this can be triggered
      * during normal connect event or after the filter is added to the chain.
      * 
-     * @param next
-     * @param session
-     * @throws Exception
+     * @param next The nextFolter to call in the chain
+     * @param session The session instance
+     * @throws SSLException Any exception thrown by the SslHandler closing
      */
-    synchronized protected void onConnected(NextFilter next, IoSession session) throws Exception {
-        SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+    synchronized protected void onConnected(NextFilter next, IoSession session) throws SSLException {
+        SSLHandler sslHandler = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
 
-        if (x == null) {
-            final InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
-            final SSLEngine e = this.createEngine(session, s);
-            x = new SSLHandlerG0(e, EXECUTOR, session);
-            session.setAttribute(SSL_HANDLER, x);
+        if (sslHandler == null) {
+            InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
+            SSLEngine sslEngine = createEngine(session, s);
+            sslHandler = new SSLHandlerG0(sslEngine, EXECUTOR, session);
+            session.setAttribute(SSL_HANDLER, sslHandler);
         }
 
-        x.open(next);
+        sslHandler.open(next);
     }
 
-    synchronized protected void onClose(NextFilter next, IoSession session, boolean linger) throws Exception {
+    /**
+     * Called when the session is going to be closed. We must shutdown the SslHandler instance.
+     * 
+     * @param next The nextFolter to call in the chain
+     * @param session The session instance
+     * @param linger if true, write any queued messages before closing
+     * @throws SSLException Any exception thrown by the SslHandler closing
+     */
+    synchronized protected void onClose(NextFilter next, IoSession session, boolean linger) throws SSLException {
         session.removeAttribute(SSL_SECURED);
-        SSLHandler x = SSLHandler.class.cast(session.removeAttribute(SSL_HANDLER));
-        if (x != null) {
-            x.close(next, linger);
+        SSLHandler sslHandler = SSLHandler.class.cast(session.removeAttribute(SSL_HANDLER));
+        
+        if (sslHandler != null) {
+            sslHandler.close(next, linger);
         }
     }
 
@@ -233,18 +269,22 @@ public class SSLFilter extends IoFilterAdapter {
      * @return an SSLEngine
      */
     protected SSLEngine createEngine(IoSession session, InetSocketAddress addr) {
-        SSLEngine e = (addr != null) ? mContext.createSSLEngine(addr.getHostString(), addr.getPort())
-                : mContext.createSSLEngine();
-        e.setNeedClientAuth(mNeedClientAuth);
-        e.setWantClientAuth(mWantClientAuth);
-        if (this.mEnabledCipherSuites != null) {
-            e.setEnabledCipherSuites(this.mEnabledCipherSuites);
+        SSLEngine sslEngine = (addr != null) ? sslContext.createSSLEngine(addr.getHostString(), addr.getPort())
+                : sslContext.createSSLEngine();
+        sslEngine.setNeedClientAuth(needClientAuth);
+        sslEngine.setWantClientAuth(wantClientAuth);
+        
+        if (enabledCipherSuites != null) {
+            sslEngine.setEnabledCipherSuites(enabledCipherSuites);
         }
-        if (this.mEnabledProtocols != null) {
-            e.setEnabledProtocols(this.mEnabledProtocols);
+        
+        if (enabledProtocols != null) {
+            sslEngine.setEnabledProtocols(enabledProtocols);
         }
-        e.setUseClientMode(!session.isServer());
-        return e;
+        
+        sslEngine.setUseClientMode(!session.isServer());
+        
+        return sslEngine;
     }
 
     /**
@@ -252,10 +292,11 @@ public class SSLFilter extends IoFilterAdapter {
      */
     @Override
     public void sessionOpened(NextFilter next, IoSession session) throws Exception {
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("session {} openend", session);
+        }
 
-        this.onConnected(next, session);
+        onConnected(next, session);
         super.sessionOpened(next, session);
     }
 
@@ -264,9 +305,11 @@ public class SSLFilter extends IoFilterAdapter {
      */
     @Override
     public void sessionClosed(NextFilter next, IoSession session) throws Exception {
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("session {} closed", session);
-        this.onClose(next, session, false);
+        }
+            
+        onClose(next, session, false);
         super.sessionClosed(next, session);
     }
 
@@ -275,10 +318,12 @@ public class SSLFilter extends IoFilterAdapter {
      */
     @Override
     public void messageReceived(NextFilter next, IoSession session, Object message) throws Exception {
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("session {} received {}", session, message);
-        SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
-        x.receive(next, IoBuffer.class.cast(message));
+        }
+        
+        SSLHandler sslHandler = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+        sslHandler.receive(next, IoBuffer.class.cast(message));
     }
 
     /**
@@ -286,15 +331,17 @@ public class SSLFilter extends IoFilterAdapter {
      */
     @Override
     public void messageSent(NextFilter next, IoSession session, WriteRequest request) throws Exception {
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("session {} ack {}", session, request);
+        }
 
         if (request instanceof EncryptedWriteRequest) {
-            EncryptedWriteRequest e = EncryptedWriteRequest.class.cast(request);
-            SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
-            x.ack(next, request);
-            if (e.getOriginalRequest() != e) {
-                next.messageSent(session, e.getOriginalRequest());
+            EncryptedWriteRequest encryptedWriteRequest = EncryptedWriteRequest.class.cast(request);
+            SSLHandler sslHandler = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            sslHandler.ack(next, request);
+            
+            if (encryptedWriteRequest.getOriginalRequest() != encryptedWriteRequest) {
+                next.messageSent(session, encryptedWriteRequest.getOriginalRequest());
             }
         } else {
             super.messageSent(next, session, request);
@@ -306,14 +353,15 @@ public class SSLFilter extends IoFilterAdapter {
      */
     @Override
     public void filterWrite(NextFilter next, IoSession session, WriteRequest request) throws Exception {
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("session {} write {}", session, request);
+        }
 
         if (request instanceof EncryptedWriteRequest || request instanceof DisableEncryptWriteRequest) {
             super.filterWrite(next, session, request);
         } else {
-            SSLHandler x = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
-            x.write(next, request);
+            SSLHandler sslHandler = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            sslHandler.write(next, request);
         }
     }
 }
