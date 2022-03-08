@@ -96,23 +96,23 @@ public abstract class SSLHandler {
     /**
      * Instantiates a new handler
      * 
-     * @param sslEngine The SSLEngine instance
-     * @param executor The executor instance to use to process tasks
-     * @param session The session to handle
+     * @param p engine
+     * @param e executor
+     * @param s session
      */
-    public SSLHandler(SSLEngine sslEngine, Executor executor, IoSession session) {
-        this.mEngine = sslEngine;
-        this.mExecutor = executor;
-        this.mSession = session;
+    public SSLHandler(SSLEngine p, Executor e, IoSession s) {
+        this.mEngine = p;
+        this.mExecutor = e;
+        this.mSession = s;
     }
 
     /**
-     * @return {@code true} if the encryption session is open
+     * {@code true} if the encryption session is open
      */
     abstract public boolean isOpen();
 
     /**
-     * @return {@code true} if the encryption session is connected and secure
+     * {@code true} if the encryption session is connected and secure
      */
     abstract public boolean isConnected();
 
@@ -120,21 +120,23 @@ public abstract class SSLHandler {
      * Opens the encryption session, this may include sending the initial handshake
      * message
      * 
-     * @param next The next filter in the chain
+     * @param session
+     * @param next
      * 
-     * @throws SSLException If we get an SSL exception while processing the opening
+     * @throws SSLException
      */
     abstract public void open(NextFilter next) throws SSLException;
 
     /**
      * Decodes encrypted messages and passes the results to the {@code next} filter.
      * 
-     * @param next The next filter in the chain
-     * @param message The message to process
+     * @param message
+     * @param session
+     * @param next
      * 
-     * @throws SSLException If we get an SSL exception while processing the message
+     * @throws SSLException
      */
-    abstract public void receive(NextFilter next, IoBuffer message) throws SSLException;
+    abstract public void receive(NextFilter next, final IoBuffer message) throws SSLException;
 
     /**
      * Acknowledge that a {@link WriteRequest} has been successfully written to the
@@ -144,12 +146,13 @@ public abstract class SSLHandler {
      * specific number of pending write operations at any moment of time. When one
      * {@code WriteRequest} is acknowledged, another can be encoded and written.
      * 
-     * @param next The next filter in the chain
-     * @param request The written request
+     * @param request
+     * @param session
+     * @param next
      * 
-     * @throws SSLException If we get an SSL exception while processing the ack
+     * @throws SSLException
      */
-    abstract public void ack(NextFilter next, WriteRequest request) throws SSLException;
+    abstract public void ack(NextFilter next, final WriteRequest request) throws SSLException;
 
     /**
      * Encrypts and writes the specified {@link WriteRequest} to the
@@ -158,23 +161,24 @@ public abstract class SSLHandler {
      * The encryption session may be currently handshaking preventing application
      * messages from being written.
      * 
-     * @param next The next filter in the chain
-     * @param request The message to write
+     * @param request
+     * @param session
+     * @param next
      * 
-     * @throws SSLException If we get an SSL exception while writing the message
+     * @throws SSLException
      * @throws WriteRejectedException when the session is closing
      */
-    abstract public void write(NextFilter next, WriteRequest request) throws SSLException, WriteRejectedException;
+    abstract public void write(NextFilter next, final WriteRequest request) throws SSLException, WriteRejectedException;
 
     /**
      * Closes the encryption session and writes any required messages
      * 
-     * @param next The next filter in the chain
+     * @param next
      * @param linger if true, write any queued messages before closing
      * 
-     * @throws SSLException If we get an SSL exception while processing the opening session closure
-     **/
-    abstract public void close(NextFilter next, boolean linger) throws SSLException;
+     * @throws SSLException
+     */
+    abstract public void close(NextFilter next, final boolean linger) throws SSLException;
 
     /**
      * {@inheritDoc}
@@ -187,14 +191,14 @@ public abstract class SSLHandler {
         b.append(Integer.toHexString(this.hashCode()));
         b.append("[mode=");
 
-        if (mEngine.getUseClientMode()) {
+        if (this.mEngine.getUseClientMode()) {
             b.append("client");
         } else {
             b.append("server");
         }
 
         b.append(", connected=");
-        b.append(isConnected());
+        b.append(this.isConnected());
 
         b.append("]");
 
@@ -208,23 +212,20 @@ public abstract class SSLHandler {
      * @return buffer to decode
      */
     protected IoBuffer resume_decode_buffer(IoBuffer source) {
-        if (mDecodeBuffer == null) {
+        if (mDecodeBuffer == null)
             if (source == null) {
                 return ZERO;
             } else {
                 mDecodeBuffer = source;
-                
                 return source;
             }
-        } else {
+        else {
             if (source != null && source != ZERO) {
                 mDecodeBuffer.expand(source.remaining());
                 mDecodeBuffer.put(source);
                 source.free();
             }
-            
             mDecodeBuffer.flip();
-            
             return mDecodeBuffer;
         }
     }
@@ -238,18 +239,17 @@ public abstract class SSLHandler {
     protected void suspend_decode_buffer(IoBuffer source) {
         if (source.hasRemaining()) {
             if (source.isDerived()) {
-                mDecodeBuffer = IoBuffer.allocate(source.remaining());
-                mDecodeBuffer.put(source);
+                this.mDecodeBuffer = IoBuffer.allocate(source.remaining());
+                this.mDecodeBuffer.put(source);
             } else {
                 source.compact();
-                mDecodeBuffer = source;
+                this.mDecodeBuffer = source;
             }
         } else {
             if (source != ZERO) {
                 source.free();
             }
-            
-            mDecodeBuffer = null;
+            this.mDecodeBuffer = null;
         }
     }
 
@@ -260,15 +260,11 @@ public abstract class SSLHandler {
      * @return buffer
      */
     protected IoBuffer allocate_encode_buffer(int estimate) {
-        SSLSession session = mEngine.getHandshakeSession();
-        
-        if (session == null) {
-            session = mEngine.getSession();
-        }
-        
+        SSLSession session = this.mEngine.getHandshakeSession();
+        if (session == null)
+            session = this.mEngine.getSession();
         int packets = Math.max(MIN_ENCODER_BUFFER_PACKETS,
                 Math.min(MAX_ENCODER_BUFFER_PACKETS, 1 + (estimate / session.getApplicationBufferSize())));
-        
         return IoBuffer.allocate(packets * session.getPacketBufferSize());
     }
 
@@ -279,14 +275,10 @@ public abstract class SSLHandler {
      * @return buffer
      */
     protected IoBuffer allocate_app_buffer(int estimate) {
-        SSLSession session = mEngine.getHandshakeSession();
-        
-        if (session == null) { 
-            session = mEngine.getSession();
-        }
-        
+        SSLSession session = this.mEngine.getHandshakeSession();
+        if (session == null)
+            session = this.mEngine.getSession();
         int packets = 1 + (estimate / session.getPacketBufferSize());
-        
         return IoBuffer.allocate(packets * session.getApplicationBufferSize());
     }
 }

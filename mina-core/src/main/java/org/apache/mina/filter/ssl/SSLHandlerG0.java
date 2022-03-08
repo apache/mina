@@ -102,12 +102,12 @@ public class SSLHandlerG0 extends SSLHandler {
     /**
      * Instantiates a new handler
      * 
-     * @param sslEngine The SSLEngine instance
-     * @param executor The executor instance to use to process tasks
-     * @param session The session to handle
+     * @param p engine
+     * @param e executor
+     * @param s session
      */
-    public SSLHandlerG0(SSLEngine sslEngine, Executor executor, IoSession session) {
-        super(sslEngine, executor, session);
+    public SSLHandlerG0(SSLEngine p, Executor e, IoSession s) {
+        super(p, e, s);
     }
 
     /**
@@ -115,7 +115,7 @@ public class SSLHandlerG0 extends SSLHandler {
      */
     @Override
     public boolean isOpen() {
-        return mEngine.isOutboundDone() == false;
+        return this.mEngine.isOutboundDone() == false;
     }
 
     /**
@@ -123,24 +123,21 @@ public class SSLHandlerG0 extends SSLHandler {
      */
     @Override
     public boolean isConnected() {
-        return mHandshakeComplete && isOpen();
+        return this.mHandshakeComplete && isOpen();
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    synchronized public void open(NextFilter next) throws SSLException {
-        if (mHandshakeStarted == false) {
-            mHandshakeStarted = true;
-            
-            if (mEngine.getUseClientMode()) {
+    synchronized public void open(final NextFilter next) throws SSLException {
+        if (this.mHandshakeStarted == false) {
+            this.mHandshakeStarted = true;
+            if (this.mEngine.getUseClientMode()) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} open() - begin handshaking", toString());
                 }
-                
-                mEngine.beginHandshake();
-                write_handshake(next);
+                this.mEngine.beginHandshake();
+                this.write_handshake(next);
             }
         }
     }
@@ -148,65 +145,51 @@ public class SSLHandlerG0 extends SSLHandler {
     /**
      * {@inheritDoc}
      */
-    @Override
-    synchronized public void receive(NextFilter next, IoBuffer message) throws SSLException {
-        if (mDecodeThread == null) {
+    synchronized public void receive(final NextFilter next, final IoBuffer message) throws SSLException {
+        if (this.mDecodeThread == null) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} receive() - message {}", toString(), message);
             }
-            
-            mDecodeThread = Thread.currentThread();
-            IoBuffer source = resume_decode_buffer(message);
-            
+            this.mDecodeThread = Thread.currentThread();
+            final IoBuffer source = resume_decode_buffer(message);
             try {
-                receive_loop(next, source);
+                this.receive_loop(next, source);
             } finally {
                 suspend_decode_buffer(source);
-                mDecodeThread = null;
+                this.mDecodeThread = null;
             }
         } else {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} receive() - recursion", toString());
             }
-            
-            receive_loop(next, mDecodeBuffer);
+            this.receive_loop(next, this.mDecodeBuffer);
         }
 
-        throw_pending_error(next);
+        this.throw_pending_error();
     }
 
     /**
      * Process a received message
      * 
-     * @param next The next filter
-     * @param message The message to process
+     * @param next
+     * @param message
      * 
-     * @throws SSLException If we get some error while processing the message
+     * @throws SSLException
      */
     @SuppressWarnings("incomplete-switch")
-    protected void receive_loop(NextFilter next, IoBuffer message) throws SSLException {
+    protected void receive_loop(final NextFilter next, final IoBuffer message) throws SSLException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} receive_loop() - source {}", toString(), message);
         }
 
         if (mEngine.isInboundDone()) {
-            switch (mEngine.getHandshakeStatus()) {
-                case NEED_WRAP:
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} receive_loop() - handshake needs wrap, invoking write", toString());
-                    }
-                    
-                    write_handshake(next);
-                    break;
-            }
-
             throw new IllegalStateException("closed");
         }
 
-        IoBuffer source = message;
-        IoBuffer dest = allocate_app_buffer(source.remaining());
+        final IoBuffer source = message;
+        final IoBuffer dest = allocate_app_buffer(source.remaining());
 
-        SSLEngineResult result = mEngine.unwrap(source.buf(), dest.buf());
+        final SSLEngineResult result = mEngine.unwrap(source.buf(), dest.buf());
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} receive_loop() - bytes-consumed {}, bytes-produced {}, status {}, handshake {}",
@@ -218,12 +201,10 @@ public class SSLHandlerG0 extends SSLHandler {
             dest.free();
         } else {
             dest.flip();
-            
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} receive_loop() - result {}", toString(), dest);
             }
-            
-            next.messageReceived(mSession, dest);
+            next.messageReceived(this.mSession, dest);
         }
 
         switch (result.getHandshakeStatus()) {
@@ -232,44 +213,34 @@ public class SSLHandlerG0 extends SSLHandler {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("{} receive_loop() - handshake needs unwrap, looping", toString());
                     }
-                    
-                    receive_loop(next, message);
+                    this.receive_loop(next, message);
                 }
-                
                 break;
             case NEED_TASK:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} receive_loop() - handshake needs task, scheduling", toString());
                 }
-                
-                execute_task(next);
-
+                this.schedule_task(next);
                 break;
             case NEED_WRAP:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} receive_loop() - handshake needs wrap, invoking write", toString());
                 }
-                
-                write_handshake(next);
+                this.write_handshake(next);
                 break;
-                
             case FINISHED:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} receive_loop() - handshake finished, flushing queue", toString());
                 }
-                
-                finish_handshake(next);
+                this.finish_handshake(next);
                 break;
-                
             case NOT_HANDSHAKING:
                 if ((result.bytesProduced() != 0 || result.bytesConsumed() != 0) && message.hasRemaining()) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("{} receive_loop() - trying to decode more messages, looping", toString());
                     }
-                    
-                    receive_loop(next, message);
+                    this.receive_loop(next, message);
                 }
-                
                 break;
         }
     }
@@ -277,62 +248,55 @@ public class SSLHandlerG0 extends SSLHandler {
     /**
      * {@inheritDoc}
      */
-    @Override
-    synchronized public void ack(NextFilter next, WriteRequest request) throws SSLException {
-        if (mAckQueue.remove(request)) {
+    synchronized public void ack(final NextFilter next, final WriteRequest request) throws SSLException {
+        if (this.mAckQueue.remove(request)) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} ack() - {}", toString(), request);
             }
-            
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} ack() - checking to see if any messages can be flushed", toString(), request);
             }
-            
-            flush(next);
+            this.flush(next);
         }
 
-        throw_pending_error(next);
+        this.throw_pending_error();
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    synchronized public void write(NextFilter next, WriteRequest request) throws SSLException, WriteRejectedException {
+    synchronized public void write(final NextFilter next, final WriteRequest request)
+            throws SSLException, WriteRejectedException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} write() - source {}", toString(), request);
         }
 
-        if (mOutboundClosing) {
+        if (this.mOutboundClosing) {
             throw new WriteRejectedException(request, "closing");
         }
 
-        if (mEncodeQueue.isEmpty()) {
-            if (write_user_loop(next, request) == false) {
+        if (this.mEncodeQueue.isEmpty()) {
+            if (this.write_user_loop(next, request) == false) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(),
                             request);
                 }
-                
-                if (mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
+                if (this.mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
                     throw new BufferOverflowException();
                 }
-                
-                mEncodeQueue.add(request);
+                this.mEncodeQueue.add(request);
             }
         } else {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
             }
-            
-            if (mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
+            if (this.mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
                 throw new BufferOverflowException();
             }
-            
-            mEncodeQueue.add(request);
+            this.mEncodeQueue.add(request);
         }
 
-        throw_pending_error(next);
+        this.throw_pending_error();
     }
 
     /**
@@ -347,15 +311,16 @@ public class SSLHandlerG0 extends SSLHandler {
      * @throws SSLException
      */
     @SuppressWarnings("incomplete-switch")
-    synchronized protected boolean write_user_loop(NextFilter next, WriteRequest request) throws SSLException {
+    synchronized protected boolean write_user_loop(final NextFilter next, final WriteRequest request)
+            throws SSLException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} write_user_loop() - source {}", toString(), request);
         }
 
-        IoBuffer source = IoBuffer.class.cast(request.getMessage());
-        IoBuffer dest = allocate_encode_buffer(source.remaining());
+        final IoBuffer source = IoBuffer.class.cast(request.getMessage());
+        final IoBuffer dest = allocate_encode_buffer(source.remaining());
 
-        SSLEngineResult result = mEngine.wrap(source.buf(), dest.buf());
+        final SSLEngineResult result = this.mEngine.wrap(source.buf(), dest.buf());
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} write_user_loop() - bytes-consumed {}, bytes-produced {}, status {}, handshake {}",
@@ -369,42 +334,32 @@ public class SSLHandlerG0 extends SSLHandler {
             if (result.bytesConsumed() == 0) {
                 // an handshaking message must have been produced
                 EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
-                
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_user_loop() - result {}", toString(), encrypted);
                 }
-                
-                next.filterWrite(mSession, encrypted);
+                next.filterWrite(this.mSession, encrypted);
                 // do not return because we want to enter the handshake switch
             } else {
                 // then we probably consumed some data
                 dest.flip();
-                
                 if (source.hasRemaining()) {
                     EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
-                    mAckQueue.add(encrypted);
-                    
+                    this.mAckQueue.add(encrypted);
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("{} write_user_loop() - result {}", toString(), encrypted);
                     }
-                    
-                    next.filterWrite(mSession, encrypted);
-                    
-                    if (mAckQueue.size() < MAX_UNACK_MESSAGES) {
+                    next.filterWrite(this.mSession, encrypted);
+                    if (this.mAckQueue.size() < MAX_UNACK_MESSAGES) {
                         return write_user_loop(next, request); // write additional chunks
                     }
-                    
                     return false;
                 } else {
                     EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, request);
-                    mAckQueue.add(encrypted);
-                    
+                    this.mAckQueue.add(encrypted);
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("{} write_user_loop() - result {}", toString(), encrypted);
                     }
-                    
-                    next.filterWrite(mSession, encrypted);
-                    
+                    next.filterWrite(this.mSession, encrypted);
                     return true;
                 }
                 // we return because there is not reason to enter the handshake switch
@@ -416,26 +371,19 @@ public class SSLHandlerG0 extends SSLHandler {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_user_loop() - handshake needs task, scheduling", toString());
                 }
-                
-                //schedule_task(next);
-                execute_task(next);
+                this.schedule_task(next);
                 break;
-                
             case NEED_WRAP:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_user_loop() - handshake needs wrap, looping", toString());
                 }
-                
-                return write_user_loop(next, request);
-                
+                return this.write_user_loop(next, request);
             case FINISHED:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_user_loop() - handshake finished, flushing queue", toString());
                 }
-                
-                finish_handshake(next);
-                
-                return write_user_loop(next, request);
+                this.finish_handshake(next);
+                return this.write_user_loop(next, request);
         }
 
         return false;
@@ -455,9 +403,8 @@ public class SSLHandlerG0 extends SSLHandler {
             LOGGER.debug("{} write_handshake() - internal", toString());
         }
 
-        IoBuffer source = ZERO;
-        IoBuffer dest = allocate_encode_buffer(source.remaining());
-        
+        final IoBuffer source = ZERO;
+        final IoBuffer dest = allocate_encode_buffer(source.remaining());
         return write_handshake_loop(next, source, dest);
     }
 
@@ -477,11 +424,11 @@ public class SSLHandlerG0 extends SSLHandler {
      */
     @SuppressWarnings("incomplete-switch")
     protected boolean write_handshake_loop(NextFilter next, IoBuffer source, IoBuffer dest) throws SSLException {
-        if (mOutboundClosing && mEngine.isOutboundDone()) {
+        if (this.mOutboundClosing && this.mEngine.isOutboundDone()) {
             return false;
         }
 
-        SSLEngineResult result = mEngine.wrap(source.buf(), dest.buf());
+        final SSLEngineResult result = this.mEngine.wrap(source.buf(), dest.buf());
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} write_handshake_loop() - bytes-consumed {}, bytes-produced {}, status {}, handshake {}",
@@ -508,26 +455,23 @@ public class SSLHandlerG0 extends SSLHandler {
                                 LOGGER.debug("{} write_handshake_loop() - handshake needs wrap, fast looping",
                                         toString());
                             }
-                            
                             return write_handshake_loop(next, source, dest);
                     }
                     break;
             }
         }
 
-        boolean success = dest.position() != 0;
+        final boolean success = dest.position() != 0;
 
         if (success == false) {
             dest.free();
         } else {
             dest.flip();
-            
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} write_handshake_loop() - result {}", toString(), dest);
             }
-            
-            EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
-            next.filterWrite(mSession, encrypted);
+            final EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
+            next.filterWrite(this.mSession, encrypted);
         }
 
         switch (result.getHandshakeStatus()) {
@@ -535,33 +479,25 @@ public class SSLHandlerG0 extends SSLHandler {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_handshake_loop() - handshake needs unwrap, invoking receive", toString());
                 }
-                
-                receive(next, ZERO);
+                this.receive(next, ZERO);
                 break;
-                
             case NEED_WRAP:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_handshake_loop() - handshake needs wrap, looping", toString());
                 }
-                
-                write_handshake(next);
+                this.write_handshake(next);
                 break;
-                
             case NEED_TASK:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_handshake_loop() - handshake needs task, scheduling", toString());
                 }
-                
-                //schedule_task(next);
-                execute_task(next);
+                this.schedule_task(next);
                 break;
-                
             case FINISHED:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_handshake_loop() - handshake finished, flushing queue", toString());
                 }
-                
-                finish_handshake(next);
+                this.finish_handshake(next);
                 break;
         }
 
@@ -574,18 +510,17 @@ public class SSLHandlerG0 extends SSLHandler {
      * @param next
      * @throws SSLException
      */
-    synchronized protected void finish_handshake(NextFilter next) throws SSLException {
-        if (mHandshakeComplete == false) {
-            mHandshakeComplete = true;
-            mSession.setAttribute(SSLFilter.SSL_SECURED, mEngine.getSession());
-            next.event(mSession, SSLEvent.SECURED);
+    synchronized protected void finish_handshake(final NextFilter next) throws SSLException {
+        if (this.mHandshakeComplete == false) {
+            this.mHandshakeComplete = true;
+            this.mSession.setAttribute(SSLFilter.SSL_SECURED, this.mEngine.getSession());
+            next.event(this.mSession, SSLEvent.SECURED);
         }
-        
         /**
          * There exists a bug in the JDK which emits FINISHED twice instead of once.
          */
-        receive(next, ZERO);
-        flush(next);
+        this.receive(next, ZERO);
+        this.flush(next);
     }
 
     /**
@@ -595,38 +530,33 @@ public class SSLHandlerG0 extends SSLHandler {
      * 
      * @throws SSLException
      */
-    synchronized public void flush(NextFilter next) throws SSLException {
-        if (mOutboundClosing && mOutboundLinger == false) {
+    synchronized public void flush(final NextFilter next) throws SSLException {
+        if (this.mOutboundClosing && this.mOutboundLinger == false) {
             return;
         }
 
-        if (mEncodeQueue.size() == 0) {
+        if (this.mEncodeQueue.size() == 0) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} flush() - no saved messages", toString());
             }
-            
             return;
         }
 
         WriteRequest current = null;
-        
-        while ((mAckQueue.size() < MAX_UNACK_MESSAGES) && (current = mEncodeQueue.poll()) != null) {
+        while ((this.mAckQueue.size() < MAX_UNACK_MESSAGES) && (current = this.mEncodeQueue.poll()) != null) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} flush() - {}", toString(), current);
             }
-            
-            if (write_user_loop(next, current) == false) {
-                mEncodeQueue.addFirst(current);
-                
+            if (this.write_user_loop(next, current) == false) {
+                this.mEncodeQueue.addFirst(current);
                 break;
             }
         }
 
-        if (mOutboundClosing && mEncodeQueue.size() == 0) {
-            mEngine.closeOutbound();
-            
+        if (this.mOutboundClosing && this.mEncodeQueue.size() == 0) {
+            this.mEngine.closeOutbound();
             if (ENABLE_SOFT_CLOSURE) {
-                write_handshake(next);
+                this.write_handshake(next);
             }
         }
     }
@@ -634,113 +564,77 @@ public class SSLHandlerG0 extends SSLHandler {
     /**
      * {@inheritDoc}
      */
-    @Override
-    synchronized public void close(NextFilter next, boolean linger) throws SSLException {
-        if (mOutboundClosing) {
+    synchronized public void close(final NextFilter next, final boolean linger) throws SSLException {
+        if (this.mOutboundClosing)
             return;
-        }
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} close() - closing session", toString());
         }
 
-        if (mHandshakeComplete) {
-            next.event(mSession, SSLEvent.UNSECURED);
+        if (this.mHandshakeComplete) {
+            next.event(this.mSession, SSLEvent.UNSECURED);
         }
 
-        mOutboundLinger = linger;
-        mOutboundClosing = true;
+        this.mOutboundLinger = linger;
+        this.mOutboundClosing = true;
 
         if (linger == false) {
-            if (mEncodeQueue.size() != 0) {
-                next.exceptionCaught(mSession, new WriteRejectedException(new ArrayList<>(mEncodeQueue), "closing"));
-                mEncodeQueue.clear();
+            if (this.mEncodeQueue.size() != 0) {
+                next.exceptionCaught(this.mSession,
+                        new WriteRejectedException(new ArrayList<>(this.mEncodeQueue), "closing"));
+                this.mEncodeQueue.clear();
             }
-            
-            mEngine.closeOutbound();
-            
+            this.mEngine.closeOutbound();
             if (ENABLE_SOFT_CLOSURE) {
-                write_handshake(next);
+                this.write_handshake(next);
             }
         } else {
-            flush(next);
+            this.flush(next);
         }
     }
 
-    /**
-     * Process the pending error and loop to send the associated alert if we have some.
-     * 
-     * @param next The next filter in the chain
-     * @throws SSLException The rethrown pending error
-     */
-    synchronized protected void throw_pending_error(NextFilter next) throws SSLException {
-        SSLException sslException = mPendingError;
-        
-        if (sslException != null) {
-            mPendingError = null;
-            
-            // Loop to send back the alert messages
-            receive_loop(next, null);
-            
-            // And finally rethrow the exception 
-            throw sslException;
+    synchronized protected void throw_pending_error() throws SSLException {
+        final SSLException e = this.mPendingError;
+        if (e != null) {
+            this.mPendingError = null;
+            throw e;
         }
     }
 
-    /**
-     * Store any error we've got during the handshake or message handling
-     * 
-     * @param sslException The exfeption to store
-     */
-    synchronized protected void store_pending_error(SSLException sslException) {
-        if (mPendingError == null) {
-            mPendingError = sslException;
+    synchronized protected void store_pending_error(SSLException e) {
+        SSLException x = this.mPendingError;
+        if (x == null) {
+            this.mPendingError = e;
         }
     }
 
-    /**
-     * Schedule a SSLEngine task for execution, either using an Executor, or immediately.
-     *  
-     * @param next The next filter to call
-     */
-    protected void schedule_task(NextFilter next) {
-        if (ENABLE_ASYNC_TASKS && (mExecutor != null)) {
-            mExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    SSLHandlerG0.this.execute_task(next);
-                }
-            });
+    protected void schedule_task(final NextFilter next) {
+        if (ENABLE_ASYNC_TASKS) {
+            if (this.mExecutor == null) {
+                this.execute_task(next);
+            } else {
+                this.mExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        SSLHandlerG0.this.execute_task(next);
+                    }
+                });
+            }
         } else {
-            execute_task(next);
+            this.execute_task(next);
         }
     }
 
-    /**
-     * Execute a SSLEngine task. We may have more than one.
-     * 
-     * If we get any exception during the processing, an error is stored and thrown.
-     * 
-     * @param next The next filer in the chain
-     */
-    synchronized protected void execute_task(NextFilter next) {
-        Runnable task = null;
-        int nbTask = 0;
-        
-        while ((task = mEngine.getDelegatedTask()) != null) {
+    synchronized protected void execute_task(final NextFilter next) {
+        Runnable t = null;
+        while ((t = mEngine.getDelegatedTask()) != null) {
             try {
-                System.out.println( "--->>>>> Task number " + nbTask);
-                nbTask++;
-                
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} task() - executing {}", toString(), task);
+                    LOGGER.debug("{} task() - executing {}", toString(), t);
                 }
 
-                if (ENABLE_ASYNC_TASKS && (mExecutor != null)) {
-                    mExecutor.execute(task);
-                } else {
-                    task.run();
-                }
+                t.run();
 
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} task() - writing handshake messages", toString());
@@ -748,14 +642,7 @@ public class SSLHandlerG0 extends SSLHandler {
 
                 write_handshake(next);
             } catch (SSLException e) {
-                store_pending_error(e);
-                
-                try { 
-                    throw_pending_error(next);
-                } catch ( SSLException ssle) {
-                    // ...
-                }
-                
+                this.store_pending_error(e);
                 if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("{} task() - storing error {}", toString(), e);
                 }
