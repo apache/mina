@@ -33,7 +33,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteException;
 import org.apache.mina.example.echoserver.ssl.BogusSSLContextFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
@@ -58,7 +58,7 @@ public class ConnectorTest extends AbstractTest {
     private final int DATA_SIZE = 16;
 
     private EchoConnectorHandler handler;
-    private SSLFilter connectorSSLFilter;
+    private SslFilter connectorSslFilter;
 
     public ConnectorTest() {
         // Do nothing
@@ -68,7 +68,7 @@ public class ConnectorTest extends AbstractTest {
     public void setUp() throws Exception {
         super.setUp();
         handler = new EchoConnectorHandler();
-        connectorSSLFilter = new SSLFilter(BogusSSLContextFactory
+        connectorSslFilter = new SslFilter(BogusSSLContextFactory
                 .getInstance(false));
     }
 
@@ -86,7 +86,7 @@ public class ConnectorTest extends AbstractTest {
         IoConnector connector = new NioSocketConnector();
 
         // Add an SSL filter to connector
-        connector.getFilterChain().addLast("SSL", connectorSSLFilter);
+        connector.getFilterChain().addLast("SSL", connectorSslFilter);
         testConnector(connector);
     }
 
@@ -159,7 +159,7 @@ public class ConnectorTest extends AbstractTest {
             assertEquals((byte) '.', handler.readBuf.get());
 
             // Now start TLS connection
-            session.getFilterChain().addFirst("SSL", connectorSSLFilter);
+            session.getFilterChain().addFirst("SSL", connectorSslFilter);
             testConnector0(session);
         }
 

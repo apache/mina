@@ -41,7 +41,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.junit.After;
@@ -53,7 +53,7 @@ import org.junit.Test;
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SSLFilterTest {
+public class SslFilterTest {
 
     private int port;
     private SocketAcceptor acceptor;
@@ -84,9 +84,9 @@ public class SSLFilterTest {
         // http://java.sun.com/javase/javaseforbusiness/docs/TLSReadme.html
         java.lang.System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
 
-        SSLFilter sslFilter = null;
+        SslFilter sslFilter = null;
         if (useSSL) {
-            sslFilter = new SSLFilter(BogusSSLContextFactory.getInstance(true));
+            sslFilter = new SslFilter(BogusSSLContextFactory.getInstance(true));
             acceptor.getFilterChain().addLast("sslFilter", sslFilter);
         }
         acceptor.getFilterChain().addLast("codec",

@@ -32,7 +32,7 @@ import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.service.TransportMetadata;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.AbstractSocketSessionConfig;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 
@@ -340,6 +340,6 @@ class NioSocketSession extends NioSession {
      */
     @Override
     public final boolean isSecured() {
-        return (this.getAttribute(SSLFilter.SSL_SECURED) != null);
+        return (this.getAttribute(SslFilter.SSL_SECURED) != null);
     }
 }

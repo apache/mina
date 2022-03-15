@@ -49,7 +49,7 @@ import javax.net.ssl.TrustManagerFactory;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SSLContextFactory {
+public class SslContextFactory {
 
     private String provider = null;
 

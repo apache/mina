@@ -26,7 +26,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SSLFilterMain {
+public class SslFilterMain {
 
     public static void main(String[] args) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
             UnrecoverableKeyException, CertificateException, IOException {
@@ -40,8 +40,8 @@ public class SSLFilterMain {
 
         final char[] password = "password".toCharArray();
 
-        ks.load(SSLFilterMain.class.getResourceAsStream("keystore.jks"), password);
-        ts.load(SSLFilterMain.class.getResourceAsStream("truststore.jks"), password);
+        ks.load(SslFilterMain.class.getResourceAsStream("keystore.jks"), password);
+        ts.load(SslFilterMain.class.getResourceAsStream("truststore.jks"), password);
 
         kmf.init(ks, password);
         tmf.init(ts);
@@ -49,7 +49,7 @@ public class SSLFilterMain {
         final SSLContext context = SSLContext.getInstance("TLSv1.3");
         context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
 
-        final SSLFilter filter = new SSLFilter(context);
+        final SslFilter filter = new SslFilter(context);
         filter.setEnabledCipherSuites(new String[] { "TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384" });
         filter.setEnabledProtocols(new String[] { "TLSv1.3" });
 

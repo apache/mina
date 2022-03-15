@@ -40,7 +40,7 @@ import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
@@ -90,7 +90,7 @@ public class SSLTestHandshakeExceptionDIRMINA1077Test {
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
 
         // Inject the SSL filter
-        SSLFilter sslFilter = new SSLFilter(createSSLContext(true));
+        SslFilter sslFilter = new SslFilter(createSSLContext(true));
         filters.addLast("sslFilter", sslFilter);
         sslFilter.setNeedClientAuth(true);
 
@@ -111,7 +111,7 @@ public class SSLTestHandshakeExceptionDIRMINA1077Test {
         DefaultIoFilterChainBuilder filters = nioSocketConnector.getFilterChain();
 
         // Inject the SSL filter
-        SSLFilter sslFilter = new SSLFilter(createSSLContext(false));
+        SslFilter sslFilter = new SslFilter(createSSLContext(false));
         filters.addLast("sslFilter", sslFilter);
 
         address = InetAddress.getByName("localhost");

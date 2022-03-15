@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Jonathan Valliere
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public abstract class SSLHandler {
+public abstract class SslHandler {
 
     /**
      * Minimum size of encoder buffer in packets
@@ -61,7 +61,7 @@ public abstract class SSLHandler {
     /**
      * Static logger
      */
-    static protected final Logger LOGGER = LoggerFactory.getLogger(SSLHandler.class);
+    static protected final Logger LOGGER = LoggerFactory.getLogger(SslHandler.class);
 
     /**
      * Write Requests which are enqueued prior to the completion of the handshaking
@@ -100,7 +100,7 @@ public abstract class SSLHandler {
      * @param e executor
      * @param s session
      */
-    public SSLHandler(SSLEngine p, Executor e, IoSession s) {
+    public SslHandler(SSLEngine p, Executor e, IoSession s) {
         this.mEngine = p;
         this.mExecutor = e;
         this.mSession = s;

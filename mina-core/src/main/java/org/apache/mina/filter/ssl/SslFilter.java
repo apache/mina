@@ -50,21 +50,21 @@ import org.slf4j.LoggerFactory;
  * @author Jonathan Valliere
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SSLFilter extends IoFilterAdapter {
+public class SslFilter extends IoFilterAdapter {
     /**
      * SSLSession object when the session is secured, otherwise null.
      */
-    static public final AttributeKey SSL_SECURED = new AttributeKey(SSLFilter.class, "status");
+    static public final AttributeKey SSL_SECURED = new AttributeKey(SslFilter.class, "status");
 
     /**
      * Returns the SSL2Handler object
      */
-    static protected final AttributeKey SSL_HANDLER = new AttributeKey(SSLFilter.class, "handler");
+    static protected final AttributeKey SSL_HANDLER = new AttributeKey(SslFilter.class, "handler");
 
     /**
      * The logger
      */
-    static protected final Logger LOGGER = LoggerFactory.getLogger(SSLFilter.class);
+    static protected final Logger LOGGER = LoggerFactory.getLogger(SslFilter.class);
 
     /**
      * Task executor for processing handshakes
@@ -103,7 +103,7 @@ public class SSLFilter extends IoFilterAdapter {
      * 
      * @param sslContext The SSLContext to use
      */
-    public SSLFilter(SSLContext sslContext) {
+    public SslFilter(SSLContext sslContext) {
         Objects.requireNonNull(sslContext, "ssl must not be null");
 
         this.sslContext = sslContext;
@@ -191,7 +191,7 @@ public class SSLFilter extends IoFilterAdapter {
     @Override
     public void onPreAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
         // Check that we don't have a SSL filter already present in the chain
-        if (parent.contains(SSLFilter.class)) {
+        if (parent.contains(SslFilter.class)) {
             throw new IllegalStateException("Only one SSL filter is permitted in a chain");
         }
 
@@ -232,7 +232,7 @@ public class SSLFilter extends IoFilterAdapter {
      * @throws SSLException Any exception thrown by the SslHandler closing
      */
     synchronized protected void onConnected(NextFilter next, IoSession session) throws SSLException {
-        SSLHandler sslHandler = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+        SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
 
         if (sslHandler == null) {
             InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
@@ -254,7 +254,7 @@ public class SSLFilter extends IoFilterAdapter {
      */
     synchronized protected void onClose(NextFilter next, IoSession session, boolean linger) throws SSLException {
         session.removeAttribute(SSL_SECURED);
-        SSLHandler sslHandler = SSLHandler.class.cast(session.removeAttribute(SSL_HANDLER));
+        SslHandler sslHandler = SslHandler.class.cast(session.removeAttribute(SSL_HANDLER));
         
         if (sslHandler != null) {
             sslHandler.close(next, linger);
@@ -318,11 +318,19 @@ public class SSLFilter extends IoFilterAdapter {
      */
     @Override
     public void messageReceived(NextFilter next, IoSession session, Object message) throws Exception {
+        //if (session.isServer()) {
+            //System.out.println( ">>> Server messageReceived" );
+        //} else {
+            //System.out.println( ">>> Client messageReceived" );
+        //}
+
+        //System.out.println( message );
+        
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("session {} received {}", session, message);
         }
         
-        SSLHandler sslHandler = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+        SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
         sslHandler.receive(next, IoBuffer.class.cast(message));
     }
 
@@ -337,7 +345,7 @@ public class SSLFilter extends IoFilterAdapter {
 
         if (request instanceof EncryptedWriteRequest) {
             EncryptedWriteRequest encryptedWriteRequest = EncryptedWriteRequest.class.cast(request);
-            SSLHandler sslHandler = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
             sslHandler.ack(next, request);
             
             if (encryptedWriteRequest.getOriginalRequest() != encryptedWriteRequest) {
@@ -360,7 +368,7 @@ public class SSLFilter extends IoFilterAdapter {
         if (request instanceof EncryptedWriteRequest || request instanceof DisableEncryptWriteRequest) {
             super.filterWrite(next, session, request);
         } else {
-            SSLHandler sslHandler = SSLHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
             sslHandler.write(next, request);
         }
     }

@@ -33,7 +33,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.compression.CompressionFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.filter.logging.MdcInjectionFilter;
-import org.apache.mina.filter.ssl.SSLFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 /**
@@ -79,7 +79,7 @@ public class ChatClientSupport {
             if (useSsl) {
                 SSLContext sslContext = BogusSSLContextFactory
                         .getInstance(false);
-                SSLFilter sslFilter = new SSLFilter(sslContext);
+                SslFilter sslFilter = new SslFilter(sslContext);
                 connector.getFilterChain().addFirst("sslFilter", sslFilter);
             }
 
