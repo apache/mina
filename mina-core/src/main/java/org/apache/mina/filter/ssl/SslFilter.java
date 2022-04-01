@@ -271,8 +271,16 @@ public class SslFilter extends IoFilterAdapter {
     protected SSLEngine createEngine(IoSession session, InetSocketAddress addr) {
         SSLEngine sslEngine = (addr != null) ? sslContext.createSSLEngine(addr.getHostString(), addr.getPort())
                 : sslContext.createSSLEngine();
-        sslEngine.setNeedClientAuth(needClientAuth);
-        sslEngine.setWantClientAuth(wantClientAuth);
+        
+        // Always start with WANT, which will be squashed by NEED if NEED is true.
+        // Actually, it makes not a lot of sense to select NEED and WANT. NEED >> WANT...
+        if (wantClientAuth) {
+            sslEngine.setWantClientAuth(true);
+        }
+
+        if (needClientAuth) {
+            sslEngine.setNeedClientAuth(true);
+        }
         
         if (enabledCipherSuites != null) {
             sslEngine.setEnabledCipherSuites(enabledCipherSuites);

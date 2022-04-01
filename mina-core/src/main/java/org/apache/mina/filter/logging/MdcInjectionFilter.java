@@ -20,11 +20,11 @@
 package org.apache.mina.filter.logging;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.mina.core.filterchain.IoFilterEvent;
@@ -136,7 +136,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
      * Create a new MdcInjectionFilter instance
      */
     public MdcInjectionFilter() {
-        this.mdcKeys = EnumSet.allOf(MdcKey.class);
+        mdcKeys = EnumSet.allOf(MdcKey.class);
     }
 
     /**
@@ -166,6 +166,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
                 for (String key : context.keySet()) {
                     MDC.remove(key);
                 }
+                
                 callDepth.remove();
             } else {
                 callDepth.set(currentCallDepth);
@@ -175,9 +176,11 @@ public class MdcInjectionFilter extends CommonEventFilter {
 
     private Map<String, String> getAndFillContext(final IoSession session) {
         Map<String, String> context = getContext(session);
+        
         if (context.isEmpty()) {
             fillContext(session, context);
         }
+        
         return context;
     }
 
@@ -189,6 +192,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
             context = new ConcurrentHashMap<>();
             session.setAttribute(CONTEXT_KEY, context);
         }
+        
         return context;
     }
 

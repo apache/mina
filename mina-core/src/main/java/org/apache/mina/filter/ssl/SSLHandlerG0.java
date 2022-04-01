@@ -427,8 +427,7 @@ public class SSLHandlerG0 extends SslHandler {
                     LOGGER.debug("{} write_user_loop() - handshake needs task, scheduling", toString());
                 }
                 
-                //schedule_task(next);
-                execute_task(next);
+                schedule_task(next);
                 break;
                 
             case NEED_WRAP:
@@ -562,8 +561,7 @@ public class SSLHandlerG0 extends SslHandler {
                     LOGGER.debug("{} write_handshake_loop() - handshake needs task, scheduling", toString());
                 }
                 
-                //schedule_task(next);
-                execute_task(next);
+                schedule_task(next);
                 break;
                 
             case FINISHED:
