@@ -42,7 +42,7 @@ import org.apache.mina.core.write.WriteRequest;
  * @author Jonathan Valliere
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class SSLHandlerG0 extends SslHandler {
+/* package protected */ class SSLHandlerG0 extends SslHandler {
 
     /**
      * Maximum number of queued messages waiting for encoding

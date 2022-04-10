@@ -107,12 +107,12 @@ public abstract class SslHandler {
     }
 
     /**
-     * {@code true} if the encryption session is open
+     * @return {@code true} if the encryption session is open
      */
     abstract public boolean isOpen();
 
     /**
-     * {@code true} if the encryption session is connected and secure
+     * @return {@code true} if the encryption session is connected and secure
      */
     abstract public boolean isConnected();
 
@@ -120,21 +120,19 @@ public abstract class SslHandler {
      * Opens the encryption session, this may include sending the initial handshake
      * message
      * 
-     * @param session
-     * @param next
+     * @param next The next filter
      * 
-     * @throws SSLException
+     * @throws SSLException The thrown exception
      */
     abstract public void open(NextFilter next) throws SSLException;
 
     /**
      * Decodes encrypted messages and passes the results to the {@code next} filter.
      * 
-     * @param message
-     * @param session
-     * @param next
+     * @param next The next filter
+     * @param message the received message 
      * 
-     * @throws SSLException
+     * @throws SSLException The thrown exception
      */
     abstract public void receive(NextFilter next, final IoBuffer message) throws SSLException;
 
@@ -146,11 +144,10 @@ public abstract class SslHandler {
      * specific number of pending write operations at any moment of time. When one
      * {@code WriteRequest} is acknowledged, another can be encoded and written.
      * 
-     * @param request
-     * @param session
-     * @param next
+     * @param next The next filter
+     * @param request The request to ack
      * 
-     * @throws SSLException
+     * @throws SSLException The thrown exception
      */
     abstract public void ack(NextFilter next, final WriteRequest request) throws SSLException;
 
@@ -161,11 +158,10 @@ public abstract class SslHandler {
      * The encryption session may be currently handshaking preventing application
      * messages from being written.
      * 
-     * @param request
-     * @param session
-     * @param next
+     * @param next The next filter
+     * @param request The request to write
      * 
-     * @throws SSLException
+     * @throws SSLException The thrown exception
      * @throws WriteRejectedException when the session is closing
      */
     abstract public void write(NextFilter next, final WriteRequest request) throws SSLException, WriteRejectedException;
@@ -173,10 +169,10 @@ public abstract class SslHandler {
     /**
      * Closes the encryption session and writes any required messages
      * 
-     * @param next
+     * @param next The next filter
      * @param linger if true, write any queued messages before closing
      * 
-     * @throws SSLException
+     * @throws SSLException The thrown exception
      */
     abstract public void close(NextFilter next, final boolean linger) throws SSLException;
 
@@ -256,23 +252,27 @@ public abstract class SslHandler {
     /**
      * Allocates the default encoder buffer for the given source size
      * 
-     * @param source
-     * @return buffer
+     * @param estimate The estimated remaining size
+     * @return buffer The allocated buffer
      */
     protected IoBuffer allocate_encode_buffer(int estimate) {
         SSLSession session = this.mEngine.getHandshakeSession();
-        if (session == null)
+        
+        if (session == null) {
             session = this.mEngine.getSession();
+        }
+        
         int packets = Math.max(MIN_ENCODER_BUFFER_PACKETS,
                 Math.min(MAX_ENCODER_BUFFER_PACKETS, 1 + (estimate / session.getApplicationBufferSize())));
+        
         return IoBuffer.allocate(packets * session.getPacketBufferSize());
     }
 
     /**
      * Allocates the default decoder buffer for the given source size
      * 
-     * @param source
-     * @return buffer
+     * @param estimate The estimated remaining size
+     * @return buffer The allocated buffer
      */
     protected IoBuffer allocate_app_buffer(int estimate) {
         SSLSession session = this.mEngine.getHandshakeSession();

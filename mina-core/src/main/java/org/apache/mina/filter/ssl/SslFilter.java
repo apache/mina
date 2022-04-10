@@ -91,7 +91,7 @@ public class SslFilter extends IoFilterAdapter {
      *   <li><b>TLSv1.1</b> or <b>TLSv1</b></li>
      *   <li><b>TLSv1.2</b></li>
      *   <li><b>TLSv1.3</b></li>
-     *   <li><b>NONE</li>
+     *   <li><b>NONE</b></li>
      * </ul> 
      * 
      * If null, we will use the default <em>SSLEngine</em> configurtation.

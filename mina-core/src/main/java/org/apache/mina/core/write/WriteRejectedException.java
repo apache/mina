@@ -61,6 +61,7 @@ public class WriteRejectedException extends WriteException {
      * Create a new WriteRejectedException instance
      * 
      * @param requests The {@link WriteRequest} which has been rejected
+     * @param message  The error message
      */
     public WriteRejectedException(Collection<WriteRequest> requests, String message) {
         super(requests, message);

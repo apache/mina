@@ -1520,6 +1520,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Returns hexdump of this buffer. The data and pointer are not changed as a
      * result of this method call.
      * 
+     * @param pretty tells if the ourput should be verbose or not
      * @return hexidecimal representation of this buffer
      */
     public String getHexDump(boolean pretty) {
@@ -1542,6 +1543,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * 
      * @param length The maximum number of bytes to dump from the current buffer
      *               position.
+     * @param pretty tells if the ourput should be verbose or not
      * @return hexidecimal representation of this buffer
      */
     public String getHexDump(int length, boolean pretty) {
