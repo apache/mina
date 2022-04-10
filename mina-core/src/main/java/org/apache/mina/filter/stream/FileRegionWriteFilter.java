@@ -37,7 +37,7 @@ import org.apache.mina.core.session.IoSession;
  * {@link org.apache.mina.core.service.IoProcessor} but this is not always possible
  * if a filter is being used that needs to modify the contents of the file
  * before sending over the network (i.e. the
- * {@link org.apache.mina.filter.ssl.SSLFilter} or a data compression filter.)
+ * {@link org.apache.mina.filter.ssl.SslFilter} or a data compression filter.)
  * </p>
  * <p> This filter will ignore written messages which aren't {@link FileRegion}
  * instances. Such messages will be passed to the next filter directly.

@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default interface for SSL exposed to the {@link SSLFilter}
+ * Default interface for SSL exposed to the {@link SslFilter}
  * 
  * @author Jonathan Valliere
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
