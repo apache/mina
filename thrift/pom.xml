@@ -34,7 +34,7 @@
   <properties>
     <symbolicName>${project.groupId}.thrift</symbolicName>
     <exportedPackage>${project.groupId}</exportedPackage>
-    <thrift.version>0.9.0</thrift.version>
+    <thrift.version>0.14.0</thrift.version>
   </properties>
 
   <dependencies>
