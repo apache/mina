@@ -34,7 +34,7 @@
   </organization>
 
   <groupId>org.apache.mina</groupId>
-  <version>2.2.1-SNAPSHOT</version>
+  <version>2.2.0-SNAPSHOT</version>
   <artifactId>mina-parent</artifactId>
   <name>Apache MINA</name>
   <packaging>pom</packaging>
@@ -85,7 +85,7 @@
     <arguments />
 
     <!-- activate Reproducible Builds -->
-    <project.build.outputTimestamp>1649632317</project.build.outputTimestamp>
+    <project.build.outputTimestamp>1658054923</project.build.outputTimestamp>
 
     <!-- Make Java 8 javadoc lint to shut the f*** up... -->
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
