@@ -223,7 +223,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * Say if the list of {@link IoSession} polled by this {@link IoProcessor}
      * is empty
      * 
-     * @return <tt>true</tt> if at least a session is managed by this
+     * @return <code>true</code> if at least a session is managed by this
      *         {@link IoProcessor}
      */
     protected abstract boolean isSelectorEmpty();
@@ -270,7 +270,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * 
      * @param session
      *            the queried session
-     * @return <tt>true</tt> is ready, <tt>false</tt> if not ready
+     * @return <code>true</code> is ready, <code>false</code> if not ready
      */
     protected abstract boolean isWritable(S session);
 
@@ -279,7 +279,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * 
      * @param session
      *            the queried session
-     * @return <tt>true</tt> is ready, <tt>false</tt> if not ready
+     * @return <code>true</code> is ready, <code>false</code> if not ready
      */
     protected abstract boolean isReadable(S session);
 
@@ -289,7 +289,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * @param session
      *            the session for which we want to be interested in write events
      * @param isInterested
-     *            <tt>true</tt> for registering, <tt>false</tt> for removing
+     *            <code>true</code> for registering, <code>false</code> for removing
      * @throws Exception
      *             If there was a problem while registering the session
      */
@@ -301,7 +301,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * @param session
      *            the session for which we want to be interested in read events
      * @param isInterested
-     *            <tt>true</tt> for registering, <tt>false</tt> for removing
+     *            <code>true</code> for registering, <code>false</code> for removing
      * @throws Exception
      *             If there was a problem while registering the session
      */
@@ -312,7 +312,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * 
      * @param session
      *            the queried session
-     * @return <tt>true</tt> is registered for reading
+     * @return <code>true</code> is registered for reading
      */
     protected abstract boolean isInterestedInRead(S session);
 
@@ -321,7 +321,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * 
      * @param session
      *            the queried session
-     * @return <tt>true</tt> is registered for writing
+     * @return <code>true</code> is registered for writing
      */
     protected abstract boolean isInterestedInWrite(S session);
 
@@ -496,7 +496,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * broken connection. In this case, this is a standard case, and we just
      * have to loop.
      * 
-     * @return <tt>true</tt> if a connection has been brutally closed.
+     * @return <code>true</code> if a connection has been brutally closed.
      * @throws IOException
      *             If we got an exception
      */
@@ -818,7 +818,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
          * 
          * @param session
          *            The session to create
-         * @return <tt>true</tt> if the session has been registered
+         * @return <code>true</code> if the session has been registered
          */
         private boolean addNow(S session) {
             boolean registered = false;

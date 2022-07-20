@@ -101,7 +101,7 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory {
      * @return the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, the
      * decoder will throw a {@link BufferDataException}.  The default
-     * value is <tt>1048576</tt> (1MB).
+     * value is <code>1048576</code> (1MB).
      * <p>
      * This method does the same job with {@link ObjectSerializationDecoder#getMaxObjectSize()}.
      */
@@ -113,7 +113,7 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory {
      * Sets the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, the
      * decoder will throw a {@link BufferDataException}.  The default
-     * value is <tt>1048576</tt> (1MB).
+     * value is <code>1048576</code> (1MB).
      * <p>
      * This method does the same job with {@link ObjectSerializationDecoder#setMaxObjectSize(int)}.
      * 

@@ -58,7 +58,7 @@ public interface IoFilterChainBuilder {
     };
 
     /**
-     * Modifies the specified <tt>chain</tt>.
+     * Modifies the specified <code>chain</code>.
      * 
      * @param chain The chain to modify
      * @throws Exception If the chain modification failed

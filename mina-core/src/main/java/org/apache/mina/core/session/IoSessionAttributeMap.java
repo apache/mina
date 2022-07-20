@@ -56,7 +56,7 @@ public interface IoSessionAttributeMap {
      * @param session the session for which we want to set an attribute
      * @param key the key of the attribute
      * @param value the value of the attribute
-     * @return The old value of the attribute.  <tt>null</tt> if it is new.
+     * @return The old value of the attribute.  <code>null</code> if it is new.
      */
     Object setAttribute(IoSession session, Object key, Object value);
 
@@ -82,7 +82,7 @@ public interface IoSessionAttributeMap {
     /**
      * Removes a user-defined attribute with the specified key.
      *
-     * @return The old value of the attribute.  <tt>null</tt> if not found.
+     * @return The old value of the attribute.  <code>null</code> if not found.
      * @param session the session for which we want to remove an attribute
      * @param key The key we are looking for
      */
@@ -105,7 +105,7 @@ public interface IoSessionAttributeMap {
      * @param session the session for which we want to remove a value
      * @param key The key we are looking for
      * @param value The value to remove
-     * @return <tt>true</tt> if the value has been removed, <tt>false</tt> if the key was
+     * @return <code>true</code> if the value has been removed, <code>false</code> if the key was
      * not found of the value not removed
      */
     boolean removeAttribute(IoSession session, Object key, Object value);
@@ -128,16 +128,16 @@ public interface IoSessionAttributeMap {
      * @param key The key we are looking for
      * @param oldValue The old value to replace
      * @param newValue The new value to set
-     * @return <tt>true</tt> if the value has been replaced, <tt>false</tt> if the key was
+     * @return <code>true</code> if the value has been replaced, <code>false</code> if the key was
      * not found of the value not replaced
      */
     boolean replaceAttribute(IoSession session, Object key, Object oldValue, Object newValue);
 
     /**
-     * @return <tt>true</tt> if this session contains the attribute with
-     * the specified <tt>key</tt>.
+     * @return <code>true</code> if this session contains the attribute with
+     * the specified <code>key</code>.
      * 
-     * @param session the session for which wa want to check if an attribute is present
+     * @param session the session for which we want to check if an attribute is present
      * @param key The key we are looking for
      */
     boolean containsAttribute(IoSession session, Object key);

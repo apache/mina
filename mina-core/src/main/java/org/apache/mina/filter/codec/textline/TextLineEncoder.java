@@ -54,7 +54,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
 
     /**
      * Creates a new instance with the current default {@link Charset}
-     * and the specified <tt>delimiter</tt>.
+     * and the specified <code>delimiter</code>.
      * 
      * @param delimiter The line delimiter to use
      */
@@ -64,7 +64,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
 
     /**
      * Creates a new instance with the current default {@link Charset}
-     * and the specified <tt>delimiter</tt>.
+     * and the specified <code>delimiter</code>.
      * 
      * @param delimiter The line delimiter to use
      */
@@ -73,7 +73,7 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     }
 
     /**
-     * Creates a new instance with the specified <tt>charset</tt>
+     * Creates a new instance with the specified <code>charset</code>
      * and {@link LineDelimiter#UNIX} delimiter.
      * 
      * @param charset The {@link Charset} to use
@@ -83,8 +83,8 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     }
 
     /**
-     * Creates a new instance with the specified <tt>charset</tt>
-     * and the specified <tt>delimiter</tt>.
+     * Creates a new instance with the specified <code>charset</code>
+     * and the specified <code>delimiter</code>.
      * 
      * @param charset The {@link Charset} to use
      * @param delimiter The line delimiter to use
@@ -94,8 +94,8 @@ public class TextLineEncoder extends ProtocolEncoderAdapter {
     }
 
     /**
-     * Creates a new instance with the specified <tt>charset</tt>
-     * and the specified <tt>delimiter</tt>.
+     * Creates a new instance with the specified <code>charset</code>
+     * and the specified <code>delimiter</code>.
      * 
      * @param charset The {@link Charset} to use
      * @param delimiter The line delimiter to use

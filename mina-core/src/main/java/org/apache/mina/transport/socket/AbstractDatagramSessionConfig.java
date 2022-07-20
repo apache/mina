@@ -79,10 +79,10 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>broadcast</tt> property
+     * @return <code>true</code> if and only if the <code>broadcast</code> property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns <code>true</code>.  By
+     * default, this method always returns <code>true</code> to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isBroadcastChanged() {
@@ -90,10 +90,10 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>receiveBufferSize</tt> property
+     * @return <code>true</code> if and only if the <code>receiveBufferSize</code> property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns <code>true</code>.  By
+     * default, this method always returns <code>true</code> to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isReceiveBufferSizeChanged() {
@@ -101,10 +101,10 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>reuseAddress</tt> property
+     * @return <code>true</code> if and only if the <code>reuseAddress</code> property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns <code>true</code>.  By
+     * default, this method always returns <code>true</code> to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isReuseAddressChanged() {
@@ -112,10 +112,10 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>sendBufferSize</tt> property
+     * @return <code>true</code> if and only if the <code>sendBufferSize</code> property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns <code>true</code>.  By
+     * default, this method always returns <code>true</code> to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isSendBufferSizeChanged() {
@@ -123,10 +123,10 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>trafficClass</tt> property
+     * @return <code>true</code> if and only if the <code>trafficClass</code> property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns <code>true</code>.  By
+     * default, this method always returns <code>true</code> to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isTrafficClassChanged() {

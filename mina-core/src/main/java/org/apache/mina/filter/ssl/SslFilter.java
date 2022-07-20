@@ -110,7 +110,7 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if the engine will <em>require</em> client
+     * @return <code>true</code> if the engine will <em>require</em> client
      *         authentication. This option is only useful to engines in the server
      *         mode.
      */
@@ -129,7 +129,7 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if the engine will <em>request</em> client
+     * @return <code>true</code> if the engine will <em>request</em> client
      *         authentication. This option is only useful to engines in the server
      *         mode.
      */
@@ -149,7 +149,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * @return the list of cipher suites to be enabled when {@link SSLEngine} is
-     *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     *         initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledCipherSuites() {
         return enabledCipherSuites;
@@ -160,7 +160,7 @@ public class SslFilter extends IoFilterAdapter {
      * initialized.
      *
      * @param enabledCipherSuites The list of enabled Cipher.
-     *                            <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     *                            <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public void setEnabledCipherSuites(String... enabledCipherSuites) {
         this.enabledCipherSuites = enabledCipherSuites;
@@ -168,7 +168,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * @return the list of protocols to be enabled when {@link SSLEngine} is
-     *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     *         initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledProtocols() {
         return enabledProtocols;
@@ -179,7 +179,7 @@ public class SslFilter extends IoFilterAdapter {
      * initialized.
      *
      * @param enabledProtocols The list of enabled SSL/TLS protocols.
-     *                  <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     *                  <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public void setEnabledProtocols(String... enabledProtocols) {
         this.enabledProtocols = enabledProtocols;

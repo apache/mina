@@ -37,7 +37,7 @@ public class SynchronizedProtocolDecoder implements ProtocolDecoder {
     private final ProtocolDecoder decoder;
 
     /**
-     * Creates a new instance which decorates the specified <tt>decoder</tt>.
+     * Creates a new instance which decorates the specified <code>decoder</code>.
      * 
      * @param decoder The decorated decoder
      */

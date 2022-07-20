@@ -32,8 +32,8 @@ public interface IoBufferAllocator {
      * Returns the buffer which is capable of the specified size.
      *
      * @param capacity the capacity of the buffer
-     * @param direct <tt>true</tt> to get a direct buffer,
-     *               <tt>false</tt> to get a heap buffer.
+     * @param direct <code>true</code> to get a direct buffer,
+     *               <code>false</code> to get a heap buffer.
      * @return The allocated {@link IoBuffer}
      */
     IoBuffer allocate(int capacity, boolean direct);
@@ -42,8 +42,8 @@ public interface IoBufferAllocator {
      * Returns the NIO buffer which is capable of the specified size.
      *
      * @param capacity the capacity of the buffer
-     * @param direct <tt>true</tt> to get a direct buffer,
-     *               <tt>false</tt> to get a heap buffer.
+     * @param direct <code>true</code> to get a direct buffer,
+     *               <code>false</code> to get a heap buffer.
      * @return The allocated {@link ByteBuffer}
      */
     ByteBuffer allocateNioBuffer(int capacity, boolean direct);

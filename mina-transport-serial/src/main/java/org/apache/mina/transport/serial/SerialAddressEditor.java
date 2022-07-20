@@ -30,7 +30,7 @@ import org.apache.mina.transport.serial.SerialAddress.StopBits;
 /**
  * A {@link PropertyEditor} which converts a {@link String} into a
  * {@link SerialAddress} and vice versa.  Valid values specify 6 address
- * components separated by colon (e.g. <tt>COM1:9600:7:1:even:rtscts-in</tt>);
+ * components separated by colon (e.g. <code>COM1:9600:7:1:even:rtscts-in</code>);
  * port name, bauds, data bits, stop bits, parity and flow control respectively.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>

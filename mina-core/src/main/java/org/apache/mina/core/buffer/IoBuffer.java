@@ -78,14 +78,14 @@ import org.apache.mina.core.session.IoSession;
  * 
  * <h2>Wrapping existing NIO buffers and arrays</h2>
  * <p>
- * This class provides a few <tt>wrap(...)</tt> methods that wraps any NIO
+ * This class provides a few <code>wrap(...)</code> methods that wraps any NIO
  * buffers and byte arrays.
  * 
  * <h2>AutoExpand</h2>
  * <p>
- * Writing variable-length data using NIO <tt>ByteBuffers</tt> is not really
+ * Writing variable-length data using NIO <code>ByteBuffers</code> is not really
  * easy, and it is because its size is fixed at allocation. {@link IoBuffer}
- * introduces the <tt>autoExpand</tt> property. If <tt>autoExpand</tt> property
+ * introduces the <code>autoExpand</code> property. If <code>autoExpand</code> property
  * is set to true, you never get a {@link BufferOverflowException} or an
  * {@link IndexOutOfBoundsException} (except when index is negative). It
  * automatically expands its capacity. For instance:
@@ -107,8 +107,8 @@ import org.apache.mina.core.session.IoSession;
  * <p>
  * You might also want to decrease the capacity of the buffer when most of the
  * allocated memory area is not being used. {@link IoBuffer} provides
- * <tt>autoShrink</tt> property to take care of this issue. If
- * <tt>autoShrink</tt> is turned on, {@link IoBuffer} halves the capacity of the
+ * <code>autoShrink</code> property to take care of this issue. If
+ * <code>autoShrink</code> is turned on, {@link IoBuffer} halves the capacity of the
  * buffer when {@link #compact()} is invoked and only 1/4 or less of the current
  * capacity is being used.
  * <p>
@@ -130,7 +130,7 @@ import org.apache.mina.core.session.IoSession;
  * multiple {@link IoSession}s. Please note that the buffer derived from and its
  * derived buffers are not auto-expandable nor auto-shrinkable. Trying to call
  * {@link #setAutoExpand(boolean)} or {@link #setAutoShrink(boolean)} with
- * <tt>true</tt> parameter will raise an {@link IllegalStateException}.
+ * <code>true</code> parameter will raise an {@link IllegalStateException}.
  * 
  * <h2>Changing Buffer Allocation Policy</h2>
  * <p>
@@ -187,9 +187,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     }
 
     /**
-     * @return <tt>true</tt> if and only if a direct buffer is allocated by default
+     * @return <code>true</code> if and only if a direct buffer is allocated by default
      *         when the type of the new buffer is not specified. The default value
-     *         is <tt>false</tt>.
+     *         is <code>false</code>.
      */
     public static boolean isUseDirectBuffer() {
         return useDirectBuffer;
@@ -197,7 +197,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * Sets if a direct buffer should be allocated by default when the type of the
-     * new buffer is not specified. The default value is <tt>false</tt>.
+     * new buffer is not specified. The default value is <code>false</code>.
      * 
      * @param useDirectBuffer Tells if direct buffers should be allocated
      */
@@ -223,7 +223,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * bytes.
      * 
      * @param capacity        the capacity of the buffer
-     * @param useDirectBuffer <tt>true</tt> to get a direct buffer, <tt>false</tt>
+     * @param useDirectBuffer <code>true</code> to get a direct buffer, <code>false</code>
      *                        to get a heap buffer.
      * @return a direct or heap IoBuffer which can hold up to capacity bytes
      */
@@ -308,12 +308,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * @see ByteBuffer#isDirect()
      * 
-     * @return <tt>True</tt> if this is a direct buffer
+     * @return <code>True</code> if this is a direct buffer
      */
     public abstract boolean isDirect();
 
     /**
-     * @return <tt>true</tt> if and only if this buffer is derived from another
+     * @return <code>true</code> if and only if this buffer is derived from another
      *         buffer via one of the {@link #duplicate()}, {@link #slice()} or
      *         {@link #asReadOnlyBuffer()} methods.
      */
@@ -322,7 +322,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * @see ByteBuffer#isReadOnly()
      * 
-     * @return <tt>true</tt> if the buffer is readOnly
+     * @return <code>true</code> if the buffer is readOnly
      */
     public abstract boolean isReadOnly();
 
@@ -403,12 +403,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer capacity(int newCapacity);
 
     /**
-     * @return <tt>true</tt> if and only if <tt>autoExpand</tt> is turned on.
+     * @return <code>true</code> if and only if <code>autoExpand</code> is turned on.
      */
     public abstract boolean isAutoExpand();
 
     /**
-     * Turns on or off <tt>autoExpand</tt>.
+     * Turns on or off <code>autoExpand</code>.
      * 
      * @param autoExpand The flag value to set
      * @return The modified IoBuffer instance
@@ -416,12 +416,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer setAutoExpand(boolean autoExpand);
 
     /**
-     * @return <tt>true</tt> if and only if <tt>autoShrink</tt> is turned on.
+     * @return <code>true</code> if and only if <code>autoShrink</code> is turned on.
      */
     public abstract boolean isAutoShrink();
 
     /**
-     * Turns on or off <tt>autoShrink</tt>.
+     * Turns on or off <code>autoShrink</code>.
      * 
      * @param autoShrink The flag value to set
      * @return The modified IoBuffer instance
@@ -430,8 +430,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * Changes the capacity and limit of this buffer so this buffer get the
-     * specified <tt>expectedRemaining</tt> room from the current position. This
-     * method works even if you didn't set <tt>autoExpand</tt> to <tt>true</tt>.
+     * specified <code>expectedRemaining</code> room from the current position. This
+     * method works even if you didn't set <code>autoExpand</code> to <code>true</code>.
      * <br>
      * Assuming a buffer contains N bytes, its position is P and its current
      * capacity is C, here are the resulting buffer if we call the expand method
@@ -499,9 +499,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * Changes the capacity and limit of this buffer so this buffer get the
-     * specified <tt>expectedRemaining</tt> room from the specified
-     * <tt>position</tt>. This method works even if you didn't set
-     * <tt>autoExpand</tt> to <tt>true</tt>. Assuming a buffer contains N bytes, its
+     * specified <code>expectedRemaining</code> room from the specified
+     * <code>position</code>. This method works even if you didn't set
+     * <code>autoExpand</code> to <code>true</code>. Assuming a buffer contains N bytes, its
      * position is P and its current capacity is C, here are the resulting buffer if
      * we call the expand method with a expectedRemaining value V :
      * 
@@ -653,7 +653,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer mark();
 
     /**
-     * @return the position of the current mark. This method returns <tt>-1</tt> if
+     * @return the position of the current mark. This method returns <code>-1</code> if
      *         no mark is set.
      */
     public abstract int markValue();
@@ -675,7 +675,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer clear();
 
     /**
-     * Clears this buffer and fills its content with <tt>NUL</tt>. The position is
+     * Clears this buffer and fills its content with <code>NUL</code>. The position is
      * set to zero, the limit is set to the capacity, and the mark is discarded.
      * 
      * @return the modified IoBuffer
@@ -684,7 +684,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer sweep();
 
     /**
-     * double Clears this buffer and fills its content with <tt>value</tt>. The
+     * double Clears this buffer and fills its content with <code>value</code>. The
      * position is set to zero, the limit is set to the capacity, and the mark is
      * discarded.
      *
@@ -720,7 +720,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * @see java.nio.Buffer#hasRemaining()
      * 
-     * @return <tt>true</tt> if there are some remaining bytes in the buffer
+     * @return <code>true</code> if there are some remaining bytes in the buffer
      */
     public abstract boolean hasRemaining();
 
@@ -751,7 +751,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * @see ByteBuffer#hasArray()
      * 
-     * @return <tt>true</tt> if the {@link #array()} method will return a byte[]
+     * @return <code>true</code> if the {@link #array()} method will return a byte[]
      */
     public abstract boolean hasArray();
 
@@ -855,7 +855,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer getSlice(int length);
 
     /**
-     * Writes the content of the specified <tt>src</tt> into this buffer.
+     * Writes the content of the specified <code>src</code> into this buffer.
      * 
      * @param src The source ByteBuffer
      * @return the modified IoBuffer
@@ -863,7 +863,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer put(ByteBuffer src);
 
     /**
-     * Writes the content of the specified <tt>src</tt> into this buffer.
+     * Writes the content of the specified <code>src</code> into this buffer.
      * 
      * @param src The source IoBuffer
      * @return the modified IoBuffer
@@ -1052,7 +1052,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param index The index from which the medium int will be read
      * @return The medium int value at the given index
      * 
-     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative or not
+     * @throws IndexOutOfBoundsException If <code>index</code> is negative or not
      *                                   smaller than the buffer's limit
      */
     public abstract int getMediumInt(int index);
@@ -1067,7 +1067,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @param index The index from which the unsigned medium int will be read
      * @return The unsigned medium int value at the given index
      * 
-     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative or not
+     * @throws IndexOutOfBoundsException If <code>index</code> is negative or not
      *                                   smaller than the buffer's limit
      */
     public abstract int getUnsignedMediumInt(int index);
@@ -1099,7 +1099,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * 
      * @return the modified IoBuffer
      * 
-     * @throws IndexOutOfBoundsException If <tt>index</tt> is negative or not
+     * @throws IndexOutOfBoundsException If <code>index</code> is negative or not
      *                                   smaller than the buffer's limit, minus
      *                                   three
      */
@@ -1491,7 +1491,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * @return an {@link InputStream} that reads the data from this buffer.
-     *         {@link InputStream#read()} returns <tt>-1</tt> if the buffer position
+     *         {@link InputStream#read()} returns <code>-1</code> if the buffer position
      *         reaches to the limit.
      */
     public abstract InputStream asInputStream();
@@ -1500,7 +1500,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @return an {@link OutputStream} that appends the data into this buffer.
      *         Please note that the {@link OutputStream#write(int)} will throw a
      *         {@link BufferOverflowException} instead of an {@link IOException} in
-     *         case of buffer overflow. Please set <tt>autoExpand</tt> property by
+     *         case of buffer overflow. Please set <code>autoExpand</code> property by
      *         calling {@link #setAutoExpand(boolean)} to prevent the unexpected
      *         runtime exception.
      */
@@ -1558,7 +1558,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Reads a <code>NUL</code>-terminated string from this buffer using the
      * specified <code>decoder</code> and returns it. This method reads until the
-     * limit of this buffer if no <tt>NUL</tt> is found.
+     * limit of this buffer if no <code>NUL</code> is found.
      * 
      * @param decoder The {@link CharsetDecoder} to use
      * @return the read String
@@ -1581,7 +1581,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * Writes the content of <code>in</code> into this buffer using the specified
-     * <code>encoder</code>. This method doesn't terminate string with <tt>NUL</tt>.
+     * <code>encoder</code>. This method doesn't terminate string with <code>NUL</code>.
      * You have to do it by yourself.
      * 
      * @param val     The CharSequence to put in the IoBuffer
@@ -1601,7 +1601,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * a terminator.
      * <p>
      * Please note that this method doesn't terminate with <code>NUL</code> if the
-     * input string is longer than <tt>fieldSize</tt>.
+     * input string is longer than <code>fieldSize</code>.
      * 
      * @param val       The CharSequence to put in the IoBuffer
      * @param fieldSize the maximum number of bytes to write
@@ -1616,7 +1616,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Reads a string which has a 16-bit length field before the actual encoded
      * string, using the specified <code>decoder</code> and returns it. This method
-     * is a shortcut for <tt>getPrefixedString(2, decoder)</tt>.
+     * is a shortcut for <code>getPrefixedString(2, decoder)</code>.
      * 
      * @param decoder The CharsetDecoder to use
      * @return The read String
@@ -1643,7 +1643,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Writes the content of <code>in</code> into this buffer as a string which has
      * a 16-bit length field before the actual encoded string, using the specified
      * <code>encoder</code>. This method is a shortcut for
-     * <tt>putPrefixedString(in, 2, 0, encoder)</tt>.
+     * <code>putPrefixedString(in, 2, 0, encoder)</code>.
      * 
      * @param in      The CharSequence to put in the IoBuffer
      * @param encoder The CharsetEncoder to use
@@ -1658,7 +1658,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Writes the content of <code>in</code> into this buffer as a string which has
      * a 16-bit length field before the actual encoded string, using the specified
      * <code>encoder</code>. This method is a shortcut for
-     * <tt>putPrefixedString(in, prefixLength, 0, encoder)</tt>.
+     * <code>putPrefixedString(in, prefixLength, 0, encoder)</code>.
      * 
      * @param in           The CharSequence to put in the IoBuffer
      * @param prefixLength the length of the length field (1, 2, or 4)
@@ -1675,11 +1675,11 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Writes the content of <code>in</code> into this buffer as a string which has
      * a 16-bit length field before the actual encoded string, using the specified
      * <code>encoder</code>. This method is a shortcut for
-     * <tt>putPrefixedString(in, prefixLength, padding, ( byte ) 0, encoder)</tt>
+     * <code>putPrefixedString(in, prefixLength, padding, ( byte ) 0, encoder)</code>
      * 
      * @param in           The CharSequence to put in the IoBuffer
      * @param prefixLength the length of the length field (1, 2, or 4)
-     * @param padding      the number of padded <tt>NUL</tt>s (1 (or 0), 2, or 4)
+     * @param padding      the number of padded <code>NUL</code>s (1 (or 0), 2, or 4)
      * @param encoder      The CharsetEncoder to use
      * @return The modified IoBuffer
      * 
@@ -1716,7 +1716,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract Object getObject() throws ClassNotFoundException;
 
     /**
-     * Reads a Java object from the buffer using the specified <tt>classLoader</tt>.
+     * Reads a Java object from the buffer using the specified <code>classLoader</code>.
      * 
      * @param classLoader The classLoader to use to read an Object from the IoBuffer
      * @return The read Object
@@ -1735,10 +1735,10 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * 
      * @param prefixLength the length of the prefix field (1, 2, or 4)
-     * @return <tt>true</tt> if this buffer contains a data which has a data length
+     * @return <code>true</code> if this buffer contains a data which has a data length
      *         as a prefix and the buffer has remaining data as enough as specified
      *         in the data length field. This method is identical with
-     *         <tt>prefixedDataAvailable( prefixLength, Integer.MAX_VALUE )</tt>.
+     *         <code>prefixedDataAvailable( prefixLength, Integer.MAX_VALUE )</code>.
      *         Please not that using this method can allow DoS (Denial of Service)
      *         attack in case the remote peer sends too big data length value. It is
      *         recommended to use {@link #prefixedDataAvailable(int, int)} instead.
@@ -1750,12 +1750,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * @param prefixLength  the length of the prefix field (1, 2, or 4)
      * @param maxDataLength the allowed maximum of the read data length
-     * @return <tt>true</tt> if this buffer contains a data which has a data length
+     * @return <code>true</code> if this buffer contains a data which has a data length
      *         as a prefix and the buffer has remaining data as enough as specified
      *         in the data length field.
      * @throws IllegalArgumentException if prefixLength is wrong
      * @throws BufferDataException      if data length is negative or greater then
-     *                                  <tt>maxDataLength</tt>
+     *                                  <code>maxDataLength</code>
      */
     public abstract boolean prefixedDataAvailable(int prefixLength, int maxDataLength);
 
@@ -1768,7 +1768,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * position to the current limit.
      *
      * @param b The byte we are looking for
-     * @return <tt>-1</tt> if the specified byte is not found
+     * @return <code>-1</code> if the specified byte is not found
      */
     public abstract int indexOf(byte b);
 

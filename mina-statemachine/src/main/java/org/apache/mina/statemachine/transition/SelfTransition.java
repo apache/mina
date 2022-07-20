@@ -19,8 +19,8 @@
  */
 package org.apache.mina.statemachine.transition;
 
-import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.State;
+import org.apache.mina.statemachine.context.StateContext;
 
 /**
  * The interface implemented by classes which need to react on entering
@@ -34,7 +34,7 @@ public interface SelfTransition {
      * 
      * @param stateContext The context in which we are executing the transition
      * @param state The current state
-     * @return <tt>true</tt> if the execution succeeded, <tt>false</tt> otherwise.
+     * @return <code>true</code> if the execution succeeded, <code>false</code> otherwise.
      */
     boolean execute(StateContext stateContext, State state);
 }

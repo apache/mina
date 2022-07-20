@@ -83,7 +83,7 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
      * index.
      * 
      * @param other The ByteArray we want to compare with
-     * @return <tt>true</tt> if both ByteArray are equals
+     * @return <code>true</code> if both ByteArray are equals
      */
     @Override
     boolean equals(Object other);

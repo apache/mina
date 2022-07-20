@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core.service;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,14 +61,14 @@ public interface IoService {
     void removeListener(IoServiceListener listener);
 
     /**
-     * @return <tt>true</tt> if and if only {@link #dispose()} method has
-     * been called.  Please note that this method will return <tt>true</tt>
+     * @return <code>true</code> if and if only {@link #dispose()} method has
+     * been called.  Please note that this method will return <code>true</code>
      * even after all the related resources are released.
      */
     boolean isDisposing();
 
     /**
-     * @return <tt>true</tt> if and if only all resources of this processor
+     * @return <code>true</code> if and if only all resources of this processor
      * have been disposed.
      */
     boolean isDisposed();
@@ -133,7 +134,7 @@ public interface IoService {
      * Sets the {@link IoFilterChainBuilder} which will build the
      * {@link IoFilterChain} of all {@link IoSession}s which is created
      * by this service.
-     * If you specify <tt>null</tt> this property will be set to
+     * If you specify <code>null</code> this property will be set to
      * an empty {@link DefaultIoFilterChainBuilder}.
      * 
      * @param builder The filter chain builder to use
@@ -141,7 +142,7 @@ public interface IoService {
     void setFilterChainBuilder(IoFilterChainBuilder builder);
 
     /**
-     * A shortcut for <tt>( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )</tt>.
+     * A shortcut for <code>( ( DefaultIoFilterChainBuilder ) </code>{@link #getFilterChainBuilder()}<code> )</code>.
      * Please note that the returned object is not a <b>real</b> {@link IoFilterChain}
      * but a {@link DefaultIoFilterChainBuilder}.  Modifying the returned builder
      * won't affect the existing {@link IoSession}s at all, because

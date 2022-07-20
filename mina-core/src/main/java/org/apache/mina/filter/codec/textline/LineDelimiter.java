@@ -24,7 +24,7 @@ import java.io.PrintWriter;
 
 /**
  * A delimiter which is appended to the end of a text line, such as
- * <tt>CR/LF</tt>. This class defines default delimiters for various
+ * <code>CR/LF</code>. This class defines default delimiters for various
  * OS :
  * <ul>
  * <li><b>Unix/Linux</b> : LineDelimiter.UNIX ("\n")</li>
@@ -49,34 +49,34 @@ public class LineDelimiter {
     /**
      * A special line delimiter which is used for auto-detection of
      * EOL in {@link TextLineDecoder}.  If this delimiter is used,
-     * {@link TextLineDecoder} will consider both  <tt>'\r'</tt> and
-     * <tt>'\n'</tt> as a delimiter.
+     * {@link TextLineDecoder} will consider both  <code>'\r'</code> and
+     * <code>'\n'</code> as a delimiter.
      */
     public static final LineDelimiter AUTO = new LineDelimiter("");
 
     /**
-     * The CRLF line delimiter constant (<tt>"\r\n"</tt>)
+     * The CRLF line delimiter constant (<code>"\r\n"</code>)
      */
     public static final LineDelimiter CRLF = new LineDelimiter("\r\n");
 
     /**
-     * The line delimiter constant of UNIX (<tt>"\n"</tt>)
+     * The line delimiter constant of UNIX (<code>"\n"</code>)
      */
     public static final LineDelimiter UNIX = new LineDelimiter("\n");
 
     /**
-     * The line delimiter constant of MS Windows/DOS (<tt>"\r\n"</tt>)
+     * The line delimiter constant of MS Windows/DOS (<code>"\r\n"</code>)
      */
     public static final LineDelimiter WINDOWS = CRLF;
 
     /**
-     * The line delimiter constant of Mac OS (<tt>"\r"</tt>)
+     * The line delimiter constant of Mac OS (<code>"\r"</code>)
      */
     public static final LineDelimiter MAC = new LineDelimiter("\r");
 
     /**
      * The line delimiter constant for NUL-terminated text protocols
-     * such as Flash XML socket (<tt>"\0"</tt>)
+     * such as Flash XML socket (<code>"\0"</code>)
      */
     public static final LineDelimiter NUL = new LineDelimiter("\0");
 
@@ -84,7 +84,7 @@ public class LineDelimiter {
     private final String value;
 
     /**
-     * Creates a new line delimiter with the specified <tt>value</tt>.
+     * Creates a new line delimiter with the specified <code>value</code>.
      * 
      * @param value The new Line Delimiter
      */

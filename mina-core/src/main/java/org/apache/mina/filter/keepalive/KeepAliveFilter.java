@@ -39,14 +39,14 @@ import org.apache.mina.core.write.WriteRequest;
  *
  * <h2>Interference with {@link IoSessionConfig#setIdleTime(IdleStatus, int)}</h2>
  *
- * This filter adjusts <tt>idleTime</tt> of the {@link IdleStatus}s that
+ * This filter adjusts <code>idleTime</code> of the {@link IdleStatus}s that
  * this filter is interested in automatically (e.g. {@link IdleStatus#READER_IDLE}
- * and {@link IdleStatus#WRITER_IDLE}.)  Changing the <tt>idleTime</tt>
+ * and {@link IdleStatus#WRITER_IDLE}.)  Changing the <code>idleTime</code>
  * of the {@link IdleStatus}s can lead this filter to a unexpected behavior.
  * Please also note that any {@link IoFilter} and {@link IoHandler} behind
  * {@link KeepAliveFilter} will not get any {@link IoEventType#SESSION_IDLE}
  * event.  To receive the internal {@link IoEventType#SESSION_IDLE} event,
- * you can call {@link #setForwardEvent(boolean)} with <tt>true</tt>.
+ * you can call {@link #setForwardEvent(boolean)} with <code>true</code>.
  *
  * <h2>Implementing {@link KeepAliveMessageFactory}</h2>
  *
@@ -64,14 +64,14 @@ import org.apache.mina.core.write.WriteRequest;
  *     <td>
  *       You want a keep-alive request is sent when the reader is idle.
  *       Once the request is sent, the response for the request should be
- *       received within <tt>keepAliveRequestTimeout</tt> seconds.  Otherwise,
+ *       received within <code>keepAliveRequestTimeout</code> seconds.  Otherwise,
  *       the specified {@link KeepAliveRequestTimeoutHandler} will be invoked.
  *       If a keep-alive request is received, its response also should be sent back.
  *     </td>
  *     <td>
  *       Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
  *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- *       return a non-<tt>null</tt>.
+ *       return a non-<code>null</code>.
  *     </td>
  *   </tr>
  *   <tr valign="top">
@@ -85,7 +85,7 @@ import org.apache.mina.core.write.WriteRequest;
  *     <td>
  *       Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
  *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- *       return a non-<tt>null</tt>, and the <tt>timeoutHandler</tt> property
+ *       return a non-<code>null</code>, and the <code>timeoutHandler</code> property
  *       should be set to {@link KeepAliveRequestTimeoutHandler#NOOP},
  *       {@link KeepAliveRequestTimeoutHandler#LOG} or the custom {@link KeepAliveRequestTimeoutHandler}
  *       implementation that doesn't affect the session state nor throw an exception.
@@ -99,8 +99,8 @@ import org.apache.mina.core.write.WriteRequest;
  *     </td>
  *     <td>
  *       {@link KeepAliveMessageFactory#getRequest(IoSession)} must return
- *       <tt>null</tt> and {@link KeepAliveMessageFactory#getResponse(IoSession, Object)}
- *       must return a non-<tt>null</tt>.
+ *       <code>null</code> and {@link KeepAliveMessageFactory#getResponse(IoSession, Object)}
+ *       must return a non-<code>null</code>.
  *     </td>
  *   </tr>
  *   <tr valign="top">
@@ -111,9 +111,9 @@ import org.apache.mina.core.write.WriteRequest;
  *     </td>
  *     <td>
  *       {@link KeepAliveMessageFactory#getRequest(IoSession)} must return
- *       a non-<tt>null</tt>,
+ *       a non-<code>null</code>,
  *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- *       return <tt>null</tt> and the <tt>timeoutHandler</tt> must be set to
+ *       return <code>null</code> and the <code>timeoutHandler</code> must be set to
  *       {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}.
  *     </td>
  *   </tr>
@@ -126,7 +126,7 @@ import org.apache.mina.core.write.WriteRequest;
  *     <td>
  *       Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
  *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- *       return <tt>null</tt>.
+ *       return <code>null</code>.
  *     </td>
  *   </tr>
  * </table>
@@ -149,7 +149,7 @@ import org.apache.mina.core.write.WriteRequest;
  *
  * {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER} is a special handler which is
  * dedicated for the 'deaf speaker' mode mentioned above.  Setting the
- * <tt>timeoutHandler</tt> property to {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}
+ * <code>timeoutHandler</code> property to {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}
  * stops this filter from waiting for response messages and therefore disables
  * response timeout detection.
  *
@@ -178,10 +178,10 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * Creates a new instance with the default properties.
      * The default property values are:
      * <ul>
-     * <li><tt>interestedIdleStatus</tt> - {@link IdleStatus#READER_IDLE}</li>
-     * <li><tt>policy</tt> = {@link KeepAliveRequestTimeoutHandler#CLOSE}</li>
-     * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
-     * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
+     * <li><code>interestedIdleStatus</code> - {@link IdleStatus#READER_IDLE}</li>
+     * <li><code>policy</code> = {@link KeepAliveRequestTimeoutHandler#CLOSE}</li>
+     * <li><code>keepAliveRequestInterval</code> - 60 (seconds)</li>
+     * <li><code>keepAliveRequestTimeout</code> - 30 (seconds)</li>
      * </ul>
      * 
      * @param messageFactory The message factory to use 
@@ -194,9 +194,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * Creates a new instance with the default properties.
      * The default property values are:
      * <ul>
-     * <li><tt>policy</tt> = {@link KeepAliveRequestTimeoutHandler#CLOSE}</li>
-     * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
-     * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
+     * <li><code>policy</code> = {@link KeepAliveRequestTimeoutHandler#CLOSE}</li>
+     * <li><code>keepAliveRequestInterval</code> - 60 (seconds)</li>
+     * <li><code>keepAliveRequestTimeout</code> - 30 (seconds)</li>
      * </ul>
      * 
      * @param messageFactory The message factory to use 
@@ -210,9 +210,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * Creates a new instance with the default properties.
      * The default property values are:
      * <ul>
-     * <li><tt>interestedIdleStatus</tt> - {@link IdleStatus#READER_IDLE}</li>
-     * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
-     * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
+     * <li><code>interestedIdleStatus</code> - {@link IdleStatus#READER_IDLE}</li>
+     * <li><code>keepAliveRequestInterval</code> - 60 (seconds)</li>
+     * <li><code>keepAliveRequestTimeout</code> - 30 (seconds)</li>
      * </ul>
      * 
      * @param messageFactory The message factory to use 
@@ -226,8 +226,8 @@ public class KeepAliveFilter extends IoFilterAdapter {
      * Creates a new instance with the default properties.
      * The default property values are:
      * <ul>
-     * <li><tt>keepAliveRequestInterval</tt> - 60 (seconds)</li>
-     * <li><tt>keepAliveRequestTimeout</tt> - 30 (seconds)</li>
+     * <li><code>keepAliveRequestInterval</code> - 60 (seconds)</li>
+     * <li><code>keepAliveRequestTimeout</code> - 30 (seconds)</li>
      * </ul>
      * 
      * @param messageFactory The message factory to use 
@@ -346,9 +346,9 @@ public class KeepAliveFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if and only if this filter forwards
+     * @return <code>true</code> if and only if this filter forwards
      * a {@link IoEventType#SESSION_IDLE} event to the next filter.
-     * By default, the value of this property is <tt>false</tt>.
+     * By default, the value of this property is <code>false</code>.
      */
     public boolean isForwardEvent() {
         return forwardEvent;
@@ -357,7 +357,7 @@ public class KeepAliveFilter extends IoFilterAdapter {
     /**
      * Sets if this filter needs to forward a
      * {@link IoEventType#SESSION_IDLE} event to the next filter.
-     * By default, the value of this property is <tt>false</tt>.
+     * By default, the value of this property is <code>false</code>.
      * 
      * @param forwardEvent a flag set to tell if the filter has to forward a {@link IoEventType#SESSION_IDLE} event
      */

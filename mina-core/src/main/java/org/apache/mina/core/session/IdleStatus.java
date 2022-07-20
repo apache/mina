@@ -62,9 +62,9 @@ public class IdleStatus {
     /**
      * @return the string representation of this status.
      * <ul>
-     *   <li>{@link #READER_IDLE} - <tt>"reader idle"</tt></li>
-     *   <li>{@link #WRITER_IDLE} - <tt>"writer idle"</tt></li>
-     *   <li>{@link #BOTH_IDLE} - <tt>"both idle"</tt></li>
+     *   <li>{@link #READER_IDLE} - <code>"reader idle"</code></li>
+     *   <li>{@link #WRITER_IDLE} - <code>"writer idle"</code></li>
+     *   <li>{@link #BOTH_IDLE} - <code>"both idle"</code></li>
      * </ul>
      */
     @Override

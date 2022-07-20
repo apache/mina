@@ -248,7 +248,7 @@ public abstract class AbstractPollingIoConnector<S extends AbstractIoSession, H>
      * 
      * @param handle the client socket handle
      * @param remoteAddress the remote address where to connect
-     * @return <tt>true</tt> if a connection was established, <tt>false</tt> if
+     * @return <code>true</code> if a connection was established, <code>false</code> if
      *         this client socket is in non-blocking mode and the connection
      *         operation is in progress
      * @throws Exception If the connect failed

@@ -78,19 +78,19 @@ public interface IoSessionConfig {
 
     /**
      * @return the interval (seconds) between each throughput calculation.
-     * The default value is <tt>3</tt> seconds.
+     * The default value is <code>3</code> seconds.
      */
     int getThroughputCalculationInterval();
 
     /**
      * @return the interval (milliseconds) between each throughput calculation.
-     * The default value is <tt>3</tt> seconds.
+     * The default value is <code>3</code> seconds.
      */
     long getThroughputCalculationIntervalInMillis();
 
     /**
      * Sets the interval (seconds) between each throughput calculation.  The
-     * default value is <tt>3</tt> seconds.
+     * default value is <code>3</code> seconds.
      * 
      * @param throughputCalculationInterval The interval
      */
@@ -189,7 +189,7 @@ public interface IoSessionConfig {
     void setWriteTimeout(int writeTimeout);
 
     /**
-     * @return <tt>true</tt> if and only if {@link IoSession#read()} operation
+     * @return <code>true</code> if and only if {@link IoSession#read()} operation
      * is enabled.  If enabled, all received messages are stored in an internal
      * {@link BlockingQueue} so you can read received messages in more
      * convenient way for client applications.  Enabling this option is not
@@ -206,13 +206,13 @@ public interface IoSessionConfig {
      * and can cause unintended memory leak, and therefore it's disabled by
      * default.
      * 
-     * @param useReadOperation <tt>true</tt> if the read operation is enabled, <tt>false</tt> otherwise
+     * @param useReadOperation <code>true</code> if the read operation is enabled, <code>false</code> otherwise
      */
     void setUseReadOperation(boolean useReadOperation);
 
     /**
      * Sets all configuration properties retrieved from the specified
-     * <tt>config</tt>.
+     * <code>config</code>.
      * 
      * @param config The configuration to use
      */

@@ -26,7 +26,7 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 /**
  * Encodes a certain type of messages.
  * <p>
- * We didn't provide any <tt>dispose</tt> method for {@link MessageEncoder}
+ * We didn't provide any <code>dispose</code> method for {@link MessageEncoder}
  * because it can give you  performance penalty in case you have a lot of
  * message types to handle.
  * 
