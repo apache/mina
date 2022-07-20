@@ -94,7 +94,7 @@
               org.apache.mina.transport.socket,
               org.apache.mina.transport.socket.nio,
               org.apache.mina.transport.vmpipe,
-              org.apache.mina.util
+              org.apache.mina.util,
               org.apache.mina.util.byteaccess
             </Export-Package>
             <Import-Package>
