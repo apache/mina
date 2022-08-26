@@ -227,7 +227,7 @@ public class SslFilter extends IoFilterAdapter {
      * Internal method for performing post-connect operations; this can be triggered
      * during normal connect event or after the filter is added to the chain.
      * 
-     * @param next The nextFolter to call in the chain
+     * @param next The nextFilter to call in the chain
      * @param session The session instance
      * @throws SSLException Any exception thrown by the SslHandler closing
      */
@@ -247,7 +247,7 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Called when the session is going to be closed. We must shutdown the SslHandler instance.
      * 
-     * @param next The nextFolter to call in the chain
+     * @param next The nextFilter to call in the chain
      * @param session The session instance
      * @param linger if true, write any queued messages before closing
      * @throws SSLException Any exception thrown by the SslHandler closing
