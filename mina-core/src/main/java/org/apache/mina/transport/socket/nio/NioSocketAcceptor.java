@@ -66,7 +66,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
     /**
      * Constructor for {@link NioSocketAcceptor} using default parameters, and
      * given number of {@link NioProcessor} for multithreading I/O operations.
-     * 
+     *
      * @param processorCount the number of processor to create and place in a
      * {@link SimpleIoProcessorPool}
      */
@@ -148,6 +148,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
     /**
      * {@inheritDoc}
      */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return NioSocketSession.METADATA;
     }
@@ -171,6 +172,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         setDefaultLocalAddress((SocketAddress) localAddress);
     }
@@ -194,7 +196,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
         // accept the connection from the client
         try {
             SocketChannel ch = handle.accept();
-    
+
             if (ch == null) {
                 return null;
             }
@@ -260,21 +262,21 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
                 channel.setOption(StandardSocketOptions.SO_RCVBUF, config.getReceiveBufferSize());
             }
 
-      
+
             // and bind.
             try {
                 socket.bind(localAddress, getBacklog());
             } catch (IOException ioe) {
                 // Add some info regarding the address we try to bind to the
                 // message
-                String newMessage = "Error while binding on " + localAddress + "\n" + "original message : "
-                        + ioe.getMessage();
+                String newMessage = "Error while binding on " + localAddress;
                 Exception e = new IOException(newMessage, ioe);
-                e.initCause(ioe.getCause());
-
-                // And close the channel
-                channel.close();
-
+                try {
+                    // And close the channel
+                    channel.close();
+                } catch (IOException nested) {
+                    e.addSuppressed(nested);
+                }
                 throw e;
             }
 
@@ -305,7 +307,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
      * It returns only after at least one channel is selected,
      * this selector's wakeup method is invoked, or the current thread
      * is interrupted, whichever comes first.
-     * 
+     *
      * @return The number of keys having their ready-operation set updated
      * @throws IOException If an I/O error occurs
      */
@@ -355,7 +357,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
         /**
          * Build a SocketChannel iterator which will return a SocketChannel instead of
          * a SelectionKey.
-         * 
+         *
          * @param selectedKeys The selector selected-key set
          */
         private ServerSocketChannelIterator(Collection<SelectionKey> selectedKeys) {
@@ -367,6 +369,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
          * @return <tt>true</tt> if there is at least one more
          * SockectChannel object to read
          */
+        @Override
         public boolean hasNext() {
             return iterator.hasNext();
         }
@@ -374,9 +377,10 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
         /**
          * Get the next SocketChannel in the operator we have built from
          * the selected-key et for this selector.
-         * 
+         *
          * @return The next SocketChannel in the iterator
          */
+        @Override
         public ServerSocketChannel next() {
             SelectionKey key = iterator.next();
 
@@ -390,6 +394,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
         /**
          * Remove the current SocketChannel from the iterator
          */
+        @Override
         public void remove() {
             iterator.remove();
         }
