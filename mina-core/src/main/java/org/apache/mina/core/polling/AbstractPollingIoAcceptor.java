@@ -441,6 +441,42 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     }
 
     /**
+     * Handles new incoming connections by accepting the connections and creating new sessions for them.
+     *
+     * @param  handles   the connection handles to accept and create new sessions for
+     * @throws Exception on errors
+     */
+    @SuppressWarnings("unchecked")
+    protected void processHandles(Iterator<H> handles) throws Exception {
+        while (handles.hasNext()) {
+            H handle = handles.next();
+            handles.remove();
+
+            // Associates a new created connection to a processor,
+            // and get back a session
+            S session = accept(processor, handle);
+
+            if (session == null) {
+                continue;
+            }
+
+            initSession(session, null, null);
+
+            // add the session to the SocketIoProcessor
+            session.getProcessor().add(session);
+        }
+    }
+
+    /**
+     * Tells whether there are pending unbindings.
+     *
+     * @return {@code true} if there are any unbindings pending; {@code false} otherwise
+     */
+    protected boolean hasUnbindings() {
+        return !cancelQueue.isEmpty();
+    }
+
+    /**
      * Processes the futures for executed unbindings, marking all futures as done.
      *
      * @param  unboundFutures describing the unbindings
@@ -549,36 +585,6 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                         disposalFuture.setDone();
                     }
                 }
-            }
-        }
-
-        /**
-         * This method will process new sessions for the Worker class.  All
-         * keys that have had their status updates as per the Selector.selectedKeys()
-         * method will be processed here.  Only keys that are ready to accept
-         * connections are handled here.
-         * <p/>
-         * Session objects are created by making new instances of SocketSessionImpl
-         * and passing the session object to the SocketIoProcessor class.
-         */
-        @SuppressWarnings("unchecked")
-        private void processHandles(Iterator<H> handles) throws Exception {
-            while (handles.hasNext()) {
-                H handle = handles.next();
-                handles.remove();
-
-                // Associates a new created connection to a processor,
-                // and get back a session
-                S session = accept(processor, handle);
-
-                if (session == null) {
-                    continue;
-                }
-
-                initSession(session, null, null);
-
-                // add the session to the SocketIoProcessor
-                session.getProcessor().add(session);
             }
         }
 
