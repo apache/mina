@@ -22,6 +22,8 @@ package org.apache.mina.core.polling;
 import java.net.SocketAddress;
 import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.spi.SelectorProvider;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -336,6 +338,13 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     }
 
     /**
+     * Invoked when a bind request has been registered for processing. The default implementation does nothing.
+     */
+    protected void bindRequestAdded() {
+        // Nothing
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -347,6 +356,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
         // adds the Registration request to the queue for the Workers
         // to handle
         registerQueue.add(request);
+        bindRequestAdded();
 
         // creates the Acceptor instance and has the local
         // executor kick it off.
@@ -431,6 +441,16 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     }
 
     /**
+     * Processes the futures for executed unbindings, marking all futures as done.
+     *
+     * @param  unboundFutures describing the unbindings
+     * @throws Exception      on errors
+     */
+    protected void handleUnbound(Collection<AcceptorOperationFuture> unboundFutures) throws Exception {
+        unboundFutures.forEach(AcceptorOperationFuture::setDone);
+    }
+
+    /**
      * This class is called by the startupAcceptor() method and is
      * placed into a NamePreservingRunnable class.
      * It's a thread accepting incoming connections from clients.
@@ -491,7 +511,9 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                     }
 
                     // check to see if any cancellation request has been made.
-                    nHandles -= unregisterHandles();
+                    Collection<AcceptorOperationFuture> cancellations = new ArrayList<>();
+                    nHandles -= unregisterHandles(cancellations);
+                    handleUnbound(cancellations);
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
                     ExceptionMonitor.getInstance().exceptionCaught(cse);
@@ -628,7 +650,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
          * is CancellationRequest objects and the only place this happens is in
          * the doUnbind() method.
          */
-        private int unregisterHandles() {
+        private int unregisterHandles(Collection<AcceptorOperationFuture> cancelled) {
             int cancelledHandles = 0;
             for (;;) {
                 AcceptorOperationFuture future = cancelQueue.poll();
@@ -654,7 +676,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                     }
                 }
 
-                future.setDone();
+                cancelled.add(future);
             }
 
             return cancelledHandles;
