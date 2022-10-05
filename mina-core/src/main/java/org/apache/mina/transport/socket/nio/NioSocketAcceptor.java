@@ -149,6 +149,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
                 selected = selector.selectNow();
             } finally {
                 super.handleUnbound(unboundFutures); // Marks the futures as done
+                
                 if (hasUnbindings()) {
                     // Depending on when these new unbindings were added, their wakeup() call may just have been
                     // cancelled by the above select. Re-instate it, so that the next select will not block, as
@@ -291,7 +292,6 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
                 channel.setOption(StandardSocketOptions.SO_RCVBUF, config.getReceiveBufferSize());
             }
 
-
             // and bind.
             try {
                 socket.bind(localAddress, getBacklog());
@@ -300,12 +300,14 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
                 // message
                 String newMessage = "Error while binding on " + localAddress;
                 Exception e = new IOException(newMessage, ioe);
+                
                 try {
                     // And close the channel
                     channel.close();
                 } catch (IOException nested) {
                     e.addSuppressed(nested);
                 }
+
                 throw e;
             }
 

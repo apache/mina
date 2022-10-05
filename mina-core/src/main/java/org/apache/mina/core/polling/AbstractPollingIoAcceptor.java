@@ -483,9 +483,11 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      * @throws Exception      on errors
      */
     protected void handleUnbound(Collection<AcceptorOperationFuture> unboundFutures) throws Exception {
-        unboundFutures.forEach(AcceptorOperationFuture::setDone);
+        for (AcceptorOperationFuture unboundFuture:unboundFutures) {
+            unboundFuture.setDone();
+        }
     }
-
+    
     /**
      * This class is called by the startupAcceptor() method and is
      * placed into a NamePreservingRunnable class.
