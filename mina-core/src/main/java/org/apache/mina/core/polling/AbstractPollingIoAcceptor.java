@@ -475,7 +475,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     protected boolean hasUnbindings() {
         return !cancelQueue.isEmpty();
     }
-    
+
     /**
      * Processes the futures for executed unbindings, marking all futures as done.
      *
@@ -551,7 +551,8 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                     // check to see if any cancellation request has been made.
                     Collection<AcceptorOperationFuture> cancellations = new ArrayList<>();
                     nHandles -= unregisterHandles(cancellations);
-                    handleUnbound(cancellations);                } catch (ClosedSelectorException cse) {
+                    handleUnbound(cancellations);
+                } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
                     ExceptionMonitor.getInstance().exceptionCaught(cse);
                     break;
