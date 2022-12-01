@@ -175,6 +175,16 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
+     * Gets the given session's SslHandler.
+     *
+     * @param session An IoSession to query.
+     * @return the given session's SslHandler.
+     */
+    private SslHandler getSslHandler(IoSession session) {
+        return SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+    }
+
+    /**
      * Sets the list of protocols to be enabled when {@link SSLEngine} is
      * initialized.
      *
@@ -232,7 +242,7 @@ public class SslFilter extends IoFilterAdapter {
      * @throws SSLException Any exception thrown by the SslHandler closing
      */
     synchronized protected void onConnected(NextFilter next, IoSession session) throws SSLException {
-        SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+        SslHandler sslHandler = getSslHandler(session);
 
         if (sslHandler == null) {
             InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
@@ -338,7 +348,7 @@ public class SslFilter extends IoFilterAdapter {
             LOGGER.debug("session {} received {}", session, message);
         }
         
-        SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+        SslHandler sslHandler = getSslHandler(session);
         sslHandler.receive(next, IoBuffer.class.cast(message));
     }
 
@@ -353,7 +363,7 @@ public class SslFilter extends IoFilterAdapter {
 
         if (request instanceof EncryptedWriteRequest) {
             EncryptedWriteRequest encryptedWriteRequest = EncryptedWriteRequest.class.cast(request);
-            SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            SslHandler sslHandler = getSslHandler(session);
             sslHandler.ack(next, request);
             
             if (encryptedWriteRequest.getOriginalRequest() != encryptedWriteRequest) {
@@ -376,7 +386,7 @@ public class SslFilter extends IoFilterAdapter {
         if (request instanceof EncryptedWriteRequest || request instanceof DisableEncryptWriteRequest) {
             super.filterWrite(next, session, request);
         } else {
-            SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            SslHandler sslHandler = getSslHandler(session);
             sslHandler.write(next, request);
         }
     }
