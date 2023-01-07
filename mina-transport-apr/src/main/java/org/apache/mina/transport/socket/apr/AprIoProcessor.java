@@ -434,9 +434,9 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
             writtenBytes = Socket.sendb(session.getDescriptor(), buf.buf(), buf.position(), length);
         } else {
             writtenBytes = Socket.send(session.getDescriptor(), buf.array(), buf.position(), length);
-            if (writtenBytes > 0) {
-                buf.skip(writtenBytes);
-            }
+        }
+        if (writtenBytes > 0) {
+            buf.skip(writtenBytes);
         }
 
         if (writtenBytes < 0) {
