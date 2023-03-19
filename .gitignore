@@ -13,3 +13,4 @@ bin/
 META-INF/
 Dockerfile
 Jenkinsfile
+/.idea/
