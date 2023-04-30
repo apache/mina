@@ -27,11 +27,13 @@ import java.util.Map;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultHttpResponse implements HttpResponse {
-
+    /** The HTTP version (one of 1.0 or 1.1) */
     private final HttpVersion version;
 
+    /** The HTTP status */
     private final HttpStatus status;
 
+    /** The HTTP headers */
     private final Map<String, String> headers;
 
     /**
