@@ -66,7 +66,7 @@ public class TextLineDecoder implements ProtocolDecoder {
 
     /**
      * Creates a new instance with the current default {@link Charset}
-     * and the specified <tt>delimiter</tt>.
+     * and the specified <code>delimiter</code>.
      * 
      * @param delimiter The line delimiter to use
      */
@@ -76,7 +76,7 @@ public class TextLineDecoder implements ProtocolDecoder {
 
     /**
      * Creates a new instance with the current default {@link Charset}
-     * and the specified <tt>delimiter</tt>.
+     * and the specified <code>delimiter</code>.
      * 
      * @param delimiter The line delimiter to use
      */
@@ -85,7 +85,7 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     /**
-     * Creates a new instance with the spcified <tt>charset</tt>
+     * Creates a new instance with the spcified <code>charset</code>
      * and {@link LineDelimiter#AUTO} delimiter.
      * 
      * @param charset The {@link Charset} to use
@@ -95,8 +95,8 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     /**
-     * Creates a new instance with the spcified <tt>charset</tt>
-     * and the specified <tt>delimiter</tt>.
+     * Creates a new instance with the spcified <code>charset</code>
+     * and the specified <code>delimiter</code>.
      * 
      * @param charset The {@link Charset} to use
      * @param delimiter The line delimiter to use
@@ -106,8 +106,8 @@ public class TextLineDecoder implements ProtocolDecoder {
     }
 
     /**
-     * Creates a new instance with the specified <tt>charset</tt>
-     * and the specified <tt>delimiter</tt>.
+     * Creates a new instance with the specified <code>charset</code>
+     * and the specified <code>delimiter</code>.
      * 
      * @param charset The {@link Charset} to use
      * @param delimiter The line delimiter to use
@@ -143,7 +143,7 @@ public class TextLineDecoder implements ProtocolDecoder {
      * @return the allowed maximum size of the line to be decoded.
      * If the size of the line to be decoded exceeds this value, the
      * decoder will throw a {@link BufferDataException}.  The default
-     * value is <tt>1024</tt> (1KB).
+     * value is <code>1024</code> (1KB).
      */
     public int getMaxLineLength() {
         return maxLineLength;
@@ -153,7 +153,7 @@ public class TextLineDecoder implements ProtocolDecoder {
      * Sets the allowed maximum size of the line to be decoded.
      * If the size of the line to be decoded exceeds this value, the
      * decoder will throw a {@link BufferDataException}.  The default
-     * value is <tt>1024</tt> (1KB).
+     * value is <code>1024</code> (1KB).
      * 
      * @param maxLineLength The maximum line length
      */

@@ -412,10 +412,10 @@ public class DummySession extends AbstractIoSession {
      * this method returns silently without updating the throughput properties
      * if they were calculated already within last
      * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
-     * If, however, <tt>force</tt> is specified as <tt>true</tt>, this method
+     * If, however, <code>force</code> is specified as <code>true</code>, this method
      * updates the throughput properties immediately.
      * 
-     * @param force the flag that forces the update of properties immediately if <tt>true</tt>
+     * @param force the flag that forces the update of properties immediately if <code>true</code>
      */
     public void updateThroughput(boolean force) {
         super.updateThroughput(System.currentTimeMillis(), force);

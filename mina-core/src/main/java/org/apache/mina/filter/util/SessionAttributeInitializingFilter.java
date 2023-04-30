@@ -32,7 +32,7 @@ import org.apache.mina.core.session.IoSession;
  * {@link IoSession} is created.  By default, the attribute map is empty when
  * an {@link IoSession} is newly created.  Inserting this filter will make
  * the pre-configured attributes available after this filter executes the
- * <tt>sessionCreated</tt> event.
+ * <code>sessionCreated</code> event.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  * @org.apache.xbean.XBean
@@ -64,7 +64,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * Returns the value of user-defined attribute.
      *
      * @param key the key of the attribute
-     * @return <tt>null</tt> if there is no attribute with the specified key
+     * @return <code>null</code> if there is no attribute with the specified key
      */
     public Object getAttribute(String key) {
         return attributes.get(key);
@@ -75,7 +75,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      *
      * @param key the key of the attribute
      * @param value the value of the attribute
-     * @return The old value of the attribute.  <tt>null</tt> if it is new.
+     * @return The old value of the attribute.  <code>null</code> if it is new.
      */
     public Object setAttribute(String key, Object value) {
         if (value == null) {
@@ -91,7 +91,7 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * {@link Boolean#TRUE}.
      *
      * @param key the key of the attribute
-     * @return The old value of the attribute.  <tt>null</tt> if it is new.
+     * @return The old value of the attribute.  <code>null</code> if it is new.
      */
     public Object setAttribute(String key) {
         return attributes.put(key, Boolean.TRUE);
@@ -101,15 +101,15 @@ public class SessionAttributeInitializingFilter extends IoFilterAdapter {
      * Removes a user-defined attribute with the specified key.
      *
      * @param key The attribut's key we want to removee
-     * @return The old value of the attribute.  <tt>null</tt> if not found.
+     * @return The old value of the attribute.  <code>null</code> if not found.
      */
     public Object removeAttribute(String key) {
         return attributes.remove(key);
     }
 
     /**
-     * @return <tt>true</tt> if this session contains the attribute with
-     * the specified <tt>key</tt>.
+     * @return <code>true</code> if this session contains the attribute with
+     * the specified <code>key</code>.
      */
     boolean containsAttribute(String key) {
         return attributes.containsKey(key);

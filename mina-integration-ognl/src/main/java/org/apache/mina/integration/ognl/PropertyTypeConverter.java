@@ -20,15 +20,15 @@ import java.beans.PropertyEditor;
 import java.lang.reflect.Member;
 import java.util.Map;
 
+import org.apache.mina.integration.beans.PropertyEditorFactory;
+
 import ognl.OgnlContext;
 import ognl.TypeConverter;
-
-import org.apache.mina.integration.beans.PropertyEditorFactory;
 
 /**
  * {@link PropertyEditor}-based implementation of OGNL {@link TypeConverter}.
  * This converter uses the {@link PropertyEditor} implementations in
- * <tt>mina-integration-beans</tt> module to perform conversion.  To use this
+ * <code>mina-integration-beans</code> module to perform conversion.  To use this
  * converter:
  * <pre><code>
  * OgnlContext ctx = Ognl.createDefaultContext(root);

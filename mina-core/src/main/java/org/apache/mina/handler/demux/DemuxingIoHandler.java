@@ -101,7 +101,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * @param type The message's type
      * @param handler The message handler
      * @return the old handler if there is already a registered handler for
-     *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
+     *         the specified <code>type</code>.  <code>null</code> otherwise.
      */
     @SuppressWarnings("unchecked")
     public <E> MessageHandler<? super E> addReceivedMessageHandler(Class<E> type, MessageHandler<? super E> handler) {
@@ -116,7 +116,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      *
      * @param <E> The message handler's type
      * @param type The message's type
-     * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
+     * @return the removed handler if successfully removed.  <code>null</code> otherwise.
      */
     @SuppressWarnings("unchecked")
     public <E> MessageHandler<? super E> removeReceivedMessageHandler(Class<E> type) {
@@ -133,7 +133,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * @param type The message's type
      * @param handler The message handler
      * @return the old handler if there is already a registered handler for
-     *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
+     *         the specified <code>type</code>.  <code>null</code> otherwise.
      */
     @SuppressWarnings("unchecked")
     public <E> MessageHandler<? super E> addSentMessageHandler(Class<E> type, MessageHandler<? super E> handler) {
@@ -148,7 +148,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      *
      * @param <E> The message handler's type
      * @param type The message's type
-     * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
+     * @return the removed handler if successfully removed.  <code>null</code> otherwise.
      */
     @SuppressWarnings("unchecked")
     public <E> MessageHandler<? super E> removeSentMessageHandler(Class<E> type) {
@@ -165,7 +165,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      * @param type The message's type
      * @param handler The Exception handler
      * @return the old handler if there is already a registered handler for
-     *         the specified <tt>type</tt>.  <tt>null</tt> otherwise.
+     *         the specified <code>type</code>.  <code>null</code> otherwise.
      */
     @SuppressWarnings("unchecked")
     public <E extends Throwable> ExceptionHandler<? super E> addExceptionHandler(Class<E> type,
@@ -181,7 +181,7 @@ public class DemuxingIoHandler extends IoHandlerAdapter {
      *
      * @param <E> The Exception Handler's type
      * @param type The message's type
-     * @return the removed handler if successfully removed.  <tt>null</tt> otherwise.
+     * @return the removed handler if successfully removed.  <code>null</code> otherwise.
      */
     @SuppressWarnings("unchecked")
     public <E extends Throwable> ExceptionHandler<? super E> removeExceptionHandler(Class<E> type) {

@@ -115,14 +115,14 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     }
 
     /**
-     * Cumulates content of <tt>in</tt> into internal buffer and forwards
+     * Cumulates content of <code>in</code> into internal buffer and forwards
      * decoding request to
      * doDecode(IoSession, IoBuffer, ProtocolDecoderOutput).
-     * <tt>doDecode()</tt> is invoked repeatedly until it returns <tt>false</tt>
+     * <code>doDecode()</code> is invoked repeatedly until it returns <code>false</code>
      * and the cumulative buffer is compacted after decoding ends.
      *
      * @throws IllegalStateException
-     *             if your <tt>doDecode()</tt> returned <tt>true</tt> not
+     *             if your <code>doDecode()</code> returned <code>true</code> not
      *             consuming the cumulative buffer.
      */
     @Override
@@ -215,18 +215,18 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      * @param session The current Session
      * @param in the cumulative buffer
      * @param out The {@link ProtocolDecoderOutput} that will receive the decoded message
-     * @return <tt>true</tt> if and only if there's more to decode in the buffer
-     *         and you want to have <tt>doDecode</tt> method invoked again.
-     *         Return <tt>false</tt> if remaining data is not enough to decode,
+     * @return <code>true</code> if and only if there's more to decode in the buffer
+     *         and you want to have <code>doDecode</code> method invoked again.
+     *         Return <code>false</code> if remaining data is not enough to decode,
      *         then this method will be invoked again when more data is
      *         cumulated.
-     * @throws Exception if cannot decode <tt>in</tt>.
+     * @throws Exception if cannot decode <code>in</code>.
      */
     protected abstract boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception;
 
     /**
-     * Releases the cumulative buffer used by the specified <tt>session</tt>.
-     * Please don't forget to call <tt>super.dispose( session )</tt> when you
+     * Releases the cumulative buffer used by the specified <code>session</code>.
+     * Please don't forget to call <code>super.dispose( session )</code> when you
      * override this method.
      */
     @Override
@@ -251,7 +251,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     }
     
     /**
-     * Let the user change the way we handle fragmentation. If set to <tt>false</tt>, the 
+     * Let the user change the way we handle fragmentation. If set to <code>false</code>, the 
      * decode() method will not check the TransportMetadata fragmentation capability
      *  
      * @param transportMetadataFragmentation The flag to set.

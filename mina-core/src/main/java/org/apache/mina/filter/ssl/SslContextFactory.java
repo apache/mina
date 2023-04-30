@@ -182,7 +182,7 @@ public class SslContextFactory {
 
     /**
      * Sets the provider of the new {@link SSLContext}. The default value is
-     * <tt>null</tt>, which means the default provider will be used.
+     * <code>null</code>, which means the default provider will be used.
      * 
      * @param provider the name of the {@link SSLContext} provider
      */
@@ -205,27 +205,27 @@ public class SslContextFactory {
     }
 
     /**
-     * If this is set to <tt>true</tt> while no {@link KeyManagerFactory} has been
+     * If this is set to <code>true</code> while no {@link KeyManagerFactory} has been
      * set using {@link #setKeyManagerFactory(KeyManagerFactory)} and no algorithm
      * has been set using {@link #setKeyManagerFactoryAlgorithm(String)} the default
      * algorithm return by {@link KeyManagerFactory#getDefaultAlgorithm()} will be
-     * used. The default value of this property is <tt>true</tt>.
+     * used. The default value of this property is <code>true</code>.
      *
-     * @param useDefault <tt>true</tt> or <tt>false</tt>.
+     * @param useDefault <code>true</code> or <code>false</code>.
      */
     public void setKeyManagerFactoryAlgorithmUseDefault(boolean useDefault) {
         this.keyManagerFactoryAlgorithmUseDefault = useDefault;
     }
 
     /**
-     * If this is set to <tt>true</tt> while no {@link TrustManagerFactory} has been
+     * If this is set to <code>true</code> while no {@link TrustManagerFactory} has been
      * set using {@link #setTrustManagerFactory(TrustManagerFactory)} and no
      * algorithm has been set using {@link #setTrustManagerFactoryAlgorithm(String)}
      * the default algorithm return by
      * {@link TrustManagerFactory#getDefaultAlgorithm()} will be used. The default
-     * value of this property is <tt>true</tt>.
+     * value of this property is <code>true</code>.
      *
-     * @param useDefault <tt>true</tt> or <tt>false</tt>.
+     * @param useDefault <code>true</code> or <code>false</code>.
      */
     public void setTrustManagerFactoryAlgorithmUseDefault(boolean useDefault) {
         this.trustManagerFactoryAlgorithmUseDefault = useDefault;
@@ -253,7 +253,7 @@ public class SslContextFactory {
      * If this property isn't set while no {@link KeyManagerFactory} has been set
      * using {@link #setKeyManagerFactory(KeyManagerFactory)} and
      * {@link #setKeyManagerFactoryAlgorithmUseDefault(boolean)} has been set to
-     * <tt>true</tt> the value returned by
+     * <code>true</code> the value returned by
      * {@link KeyManagerFactory#getDefaultAlgorithm()} will be used instead.
      *
      * @param algorithm the algorithm to use.
@@ -328,7 +328,7 @@ public class SslContextFactory {
      * If this property isn't set while no {@link TrustManagerFactory} has been set
      * using {@link #setTrustManagerFactory(TrustManagerFactory)} and
      * {@link #setTrustManagerFactoryAlgorithmUseDefault(boolean)} has been set to
-     * <tt>true</tt> the value returned by
+     * <code>true</code> the value returned by
      * {@link TrustManagerFactory#getDefaultAlgorithm()} will be used instead.
      *
      * @param algorithm the algorithm to use.

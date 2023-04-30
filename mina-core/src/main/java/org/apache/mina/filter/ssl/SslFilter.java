@@ -110,7 +110,7 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if the engine will <em>require</em> client
+     * @return <code>true</code> if the engine will <em>require</em> client
      *         authentication. This option is only useful to engines in the server
      *         mode.
      */
@@ -129,7 +129,7 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if the engine will <em>request</em> client
+     * @return <code>true</code> if the engine will <em>request</em> client
      *         authentication. This option is only useful to engines in the server
      *         mode.
      */
@@ -149,7 +149,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * @return the list of cipher suites to be enabled when {@link SSLEngine} is
-     *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     *         initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledCipherSuites() {
         return enabledCipherSuites;
@@ -160,7 +160,7 @@ public class SslFilter extends IoFilterAdapter {
      * initialized.
      *
      * @param enabledCipherSuites The list of enabled Cipher.
-     *                            <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     *                            <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public void setEnabledCipherSuites(String... enabledCipherSuites) {
         this.enabledCipherSuites = enabledCipherSuites;
@@ -168,10 +168,20 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * @return the list of protocols to be enabled when {@link SSLEngine} is
-     *         initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     *         initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledProtocols() {
         return enabledProtocols;
+    }
+
+    /**
+     * Gets the given session's SslHandler.
+     *
+     * @param session An IoSession to query.
+     * @return the given session's SslHandler.
+     */
+    private SslHandler getSslHandler(IoSession session) {
+        return SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
     }
 
     /**
@@ -179,7 +189,7 @@ public class SslFilter extends IoFilterAdapter {
      * initialized.
      *
      * @param enabledProtocols The list of enabled SSL/TLS protocols.
-     *                  <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     *                  <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public void setEnabledProtocols(String... enabledProtocols) {
         this.enabledProtocols = enabledProtocols;
@@ -227,12 +237,12 @@ public class SslFilter extends IoFilterAdapter {
      * Internal method for performing post-connect operations; this can be triggered
      * during normal connect event or after the filter is added to the chain.
      * 
-     * @param next The nextFolter to call in the chain
+     * @param next The nextFilter to call in the chain
      * @param session The session instance
      * @throws SSLException Any exception thrown by the SslHandler closing
      */
     synchronized protected void onConnected(NextFilter next, IoSession session) throws SSLException {
-        SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+        SslHandler sslHandler = getSslHandler(session);
 
         if (sslHandler == null) {
             InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
@@ -247,7 +257,7 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Called when the session is going to be closed. We must shutdown the SslHandler instance.
      * 
-     * @param next The nextFolter to call in the chain
+     * @param next The nextFilter to call in the chain
      * @param session The session instance
      * @param linger if true, write any queued messages before closing
      * @throws SSLException Any exception thrown by the SslHandler closing
@@ -338,7 +348,7 @@ public class SslFilter extends IoFilterAdapter {
             LOGGER.debug("session {} received {}", session, message);
         }
         
-        SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+        SslHandler sslHandler = getSslHandler(session);
         sslHandler.receive(next, IoBuffer.class.cast(message));
     }
 
@@ -353,7 +363,7 @@ public class SslFilter extends IoFilterAdapter {
 
         if (request instanceof EncryptedWriteRequest) {
             EncryptedWriteRequest encryptedWriteRequest = EncryptedWriteRequest.class.cast(request);
-            SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            SslHandler sslHandler = getSslHandler(session);
             sslHandler.ack(next, request);
             
             if (encryptedWriteRequest.getOriginalRequest() != encryptedWriteRequest) {
@@ -376,7 +386,7 @@ public class SslFilter extends IoFilterAdapter {
         if (request instanceof EncryptedWriteRequest || request instanceof DisableEncryptWriteRequest) {
             super.filterWrite(next, session, request);
         } else {
-            SslHandler sslHandler = SslHandler.class.cast(session.getAttribute(SSL_HANDLER));
+            SslHandler sslHandler = getSslHandler(session);
             sslHandler.write(next, request);
         }
     }

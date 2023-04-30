@@ -105,8 +105,8 @@ public abstract class ConsumeToDynamicTerminatorDecodingState implements Decodin
      * Determines whether the specified <code>byte</code> is a terminator.
      * 
      * @param b the <code>byte</code> to check.
-     * @return <tt>true</tt> if <code>b</code> is a terminator, 
-     *         <tt>false</tt> otherwise.
+     * @return <code>true</code> if <code>b</code> is a terminator, 
+     *         <code>false</code> otherwise.
      */
     protected abstract boolean isTerminator(byte b);
 

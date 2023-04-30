@@ -51,7 +51,7 @@ public interface IoFuture {
      *
      * @param timeout The maximum delay to wait before getting out
      * @param unit the type of unit for the delay (seconds, minutes...)
-     * @return <tt>true</tt> if the operation is completed. 
+     * @return <code>true</code> if the operation is completed. 
      * @exception InterruptedException If the thread is interrupted while waiting
      */
     boolean await(long timeout, TimeUnit unit) throws InterruptedException;
@@ -60,7 +60,7 @@ public interface IoFuture {
      * Wait for the asynchronous operation to complete with the specified timeout.
      *
      * @param timeoutMillis The maximum milliseconds to wait before getting out
-     * @return <tt>true</tt> if the operation is completed.
+     * @return <code>true</code> if the operation is completed.
      * @exception InterruptedException If the thread is interrupted while waiting
      */
     boolean await(long timeoutMillis) throws InterruptedException;
@@ -80,7 +80,7 @@ public interface IoFuture {
      *
      * @param timeout The maximum delay to wait before getting out
      * @param unit the type of unit for the delay (seconds, minutes...)
-     * @return <tt>true</tt> if the operation is completed.
+     * @return <code>true</code> if the operation is completed.
      */
     boolean awaitUninterruptibly(long timeout, TimeUnit unit);
 
@@ -89,7 +89,7 @@ public interface IoFuture {
      * uninterruptibly.
      *
      * @param timeoutMillis The maximum milliseconds to wait before getting out
-     * @return <tt>true</tt> if the operation is finished.
+     * @return <code>true</code> if the operation is finished.
      */
     boolean awaitUninterruptibly(long timeoutMillis);
 
@@ -103,18 +103,18 @@ public interface IoFuture {
      * @deprecated Replaced with {@link #awaitUninterruptibly(long)}.
      * 
      * @param timeoutMillis The time to wait for the join before bailing out
-     * @return <tt>true</tt> if the join was successful
+     * @return <code>true</code> if the join was successful
      */
     @Deprecated
     boolean join(long timeoutMillis);
 
     /**
-     * @return <tt>true</tt> if the operation is completed.
+     * @return <code>true</code> if the operation is completed.
      */
     boolean isDone();
 
     /**
-     * Adds an event <tt>listener</tt> which is notified when
+     * Adds an event <code>listener</code> which is notified when
      * this future is completed. If the listener is added
      * after the completion, the listener is directly notified.
      * 
@@ -124,7 +124,7 @@ public interface IoFuture {
     IoFuture addListener(IoFutureListener<?> listener);
 
     /**
-     * Removes an existing event <tt>listener</tt> so it won't be notified when
+     * Removes an existing event <code>listener</code> so it won't be notified when
      * the future is completed.
      * 
      * @param listener The listener to remove

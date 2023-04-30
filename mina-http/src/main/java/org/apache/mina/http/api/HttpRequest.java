@@ -34,7 +34,7 @@ public interface HttpRequest extends HttpMessage {
      * Determines whether this request contains at least one parameter with the specified name
      * 
      * @param name The parameter name
-     * @return <tt>true</tt> if this request contains at least one parameter with the specified name
+     * @return <code>true</code> if this request contains at least one parameter with the specified name
      */
     boolean containsParameter(String name);
 

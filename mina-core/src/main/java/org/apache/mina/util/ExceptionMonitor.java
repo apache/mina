@@ -25,7 +25,7 @@ package org.apache.mina.util;
  * <p>
  * You can monitor any uncaught exceptions by setting {@link ExceptionMonitor}
  * by calling {@link #setInstance(ExceptionMonitor)}.  The default
- * monitor logs all caught exceptions in <tt>WARN</tt> level using
+ * monitor logs all caught exceptions in <code>WARN</code> level using
  * SLF4J.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -47,7 +47,7 @@ public abstract class ExceptionMonitor {
      * the default monitor will be set.
      *
      * @param monitor A new instance of {@link DefaultExceptionMonitor} is set
-     *                if <tt>null</tt> is specified.
+     *                if <code>null</code> is specified.
      */
     public static void setInstance(ExceptionMonitor monitor) {
         if (monitor == null) {

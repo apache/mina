@@ -99,14 +99,14 @@ abstract class CompositeByteArrayRelativeBase {
     }
 
     /**
-     * @return <TT>TRUE</TT> if there are some more bytes
+     * @return <code>TRUE</code> if there are some more bytes
      */
     public final boolean hasRemaining() {
         return cursor.hasRemaining();
     }
 
     /**
-     * @return The used byte order (little of big indian)
+     * @return The used byte order (little of big endian)
      */
     public ByteOrder order() {
         return cba.order();

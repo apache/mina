@@ -61,12 +61,12 @@ public interface IoAbsoluteReader {
 
     /**
      * @param index The starting position
-     * @return a <tt>byte</tt> from the given index.
+     * @return a <code>byte</code> from the given index.
      */
     byte get(int index);
 
     /**
-     * Gets enough bytes to fill the <tt>IoBuffer</tt> from the given index.
+     * Gets enough bytes to fill the <code>IoBuffer</code> from the given index.
      * 
      * @param index The starting position
      * @param bb The IoBuffer that will be filled with the bytes
@@ -75,37 +75,37 @@ public interface IoAbsoluteReader {
 
     /**
      * @param index The starting position
-     * @return a <tt>short</tt> from the given index.
+     * @return a <code>short</code> from the given index.
      */
     short getShort(int index);
 
     /**
      * @param index The starting position
-     * @return an <tt>int</tt> from the given index.
+     * @return an <code>int</code> from the given index.
      */
     int getInt(int index);
 
     /**
      * @param index The starting position
-     * @return a <tt>long</tt> from the given index.
+     * @return a <code>long</code> from the given index.
      */
     long getLong(int index);
 
     /**
      * @param index The starting position
-     * @return a <tt>float</tt> from the given index.
+     * @return a <code>float</code> from the given index.
      */
     float getFloat(int index);
 
     /**
      * @param index The starting position
-     * @return a <tt>double</tt> from the given index.
+     * @return a <code>double</code> from the given index.
      */
     double getDouble(int index);
 
     /**
      * @param index The starting position
-     * @return a <tt>char</tt> from the given index.
+     * @return a <code>char</code> from the given index.
      */
     char getChar(int index);
 }

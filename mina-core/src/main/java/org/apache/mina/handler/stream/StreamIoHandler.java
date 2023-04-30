@@ -71,7 +71,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
 
     /**
      * @return read timeout in seconds.
-     * The default value is <tt>0</tt> (disabled).
+     * The default value is <code>0</code> (disabled).
      */
     public int getReadTimeout() {
         return readTimeout;
@@ -79,7 +79,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
 
     /**
      * Sets read timeout in seconds.
-     * The default value is <tt>0</tt> (disabled).
+     * The default value is <code>0</code> (disabled).
      * @param readTimeout The Read timeout
      */
     public void setReadTimeout(int readTimeout) {
@@ -88,7 +88,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
 
     /**
      * @return write timeout in seconds.
-     * The default value is <tt>0</tt> (disabled).
+     * The default value is <code>0</code> (disabled).
      */
     public int getWriteTimeout() {
         return writeTimeout;
@@ -96,7 +96,7 @@ public abstract class StreamIoHandler extends IoHandlerAdapter {
 
     /**
      * Sets write timeout in seconds.
-     * The default value is <tt>0</tt> (disabled).
+     * The default value is <code>0</code> (disabled).
      * 
      * @param writeTimeout The Write timeout
      */

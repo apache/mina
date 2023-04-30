@@ -19,12 +19,12 @@ package org.apache.mina.integration.ognl;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.mina.core.session.IoSession;
+
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.OgnlException;
 import ognl.TypeConverter;
-
-import org.apache.mina.core.session.IoSession;
 
 /**
  * Finds {@link IoSession}s that match a boolean OGNL expression.
@@ -41,7 +41,7 @@ public class IoSessionFinder {
 
     /**
      * Creates a new instance with the specified OGNL expression that returns
-     * a boolean value (e.g. <tt>"id == 0x12345678"</tt>).
+     * a boolean value (e.g. <code>"id == 0x12345678"</code>).
      * 
      * @param query The OGNL expression 
      */

@@ -49,22 +49,22 @@ public interface Transition {
      * Executes this {@link Transition}. It is the responsibility of this
      * {@link Transition} to determine whether it actually applies for the
      * specified {@link Event}. If this {@link Transition} doesn't apply
-     * nothing should be executed and <tt>false</tt> must be returned.
+     * nothing should be executed and <code>false</code> must be returned.
      * The method will accept any {@link Event} if it is registered with the 
      * wild card event ID ('*'), and the event ID it is declared for (ie,
      * the event ID that has been passed as a parameter to this transition 
      * constructor.)
      * 
      * @param event the current {@link Event}.
-     * @return <tt>true</tt> if the {@link Transition} was executed, 
-     *         <tt>false</tt> otherwise.
+     * @return <code>true</code> if the {@link Transition} was executed, 
+     *         <code>false</code> otherwise.
      */
     boolean execute(Event event);
 
     /**
      * @return the {@link State} which the {@link StateMachine} should move to 
      * if this {@link Transition} is taken and {@link #execute(Event)} returns
-     * <tt>true</tt>. <code>null</code> if this {@link Transition} is a loopback 
+     * <code>true</code>. <code>null</code> if this {@link Transition} is a loopback 
      * {@link Transition}.
      */
     State getNextState();

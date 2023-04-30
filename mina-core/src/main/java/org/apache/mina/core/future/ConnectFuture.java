@@ -48,7 +48,7 @@ public interface ConnectFuture extends IoFuture {
     /**
      * Returns the cause of the connection failure.
      *
-     * @return <tt>null</tt> if the connect operation is not finished yet,
+     * @return <code>null</code> if the connect operation is not finished yet,
      *         or if the connection attempt is successful, otherwise returns
      *         the cause of the exception
      */
