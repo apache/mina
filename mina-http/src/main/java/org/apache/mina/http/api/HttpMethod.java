@@ -25,9 +25,7 @@ package org.apache.mina.http.api;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum HttpMethod {
-    /** The OPTIONS method */
-    OPTIONS, 
-    
+    // HTTP 1.0 official methods
     /** The GET method */
     GET, 
     
@@ -37,33 +35,55 @@ public enum HttpMethod {
     /** The POST method */
     POST, 
     
-    /** The PUT method */
-    PUT, 
-    
-    /** The PATCH method */
-    PATCH,
-    
-    /** The COPY method */
-    COPY,
-    
-    /** The MOVE method */
-    MOVE,
+    // HTTP 1.1 official methods
+    /** The CONNECT method */
+    CONNECT,
     
     /** The DELETE method */
     DELETE, 
     
+    /** The OPTIONS method */
+    OPTIONS, 
+    
+    /** The PUT method */
+    PUT, 
+    
+    /** The TRACE method */
+    TRACE, 
+    
+    // Additional HTTP 1.0 methods
     /** The LINK method */
     LINK,
     
     /** The UNLINK method */
     UNLINK,
-        
-    /** The TRACE method */
-    TRACE, 
     
-    /** The WRAPPED method */
+    // Additional HTTP 1.1 methods
+    /** The PATCH method, RFC 5789 */
+    PATCH,
+    
+    // Other methods
+    /** The COPY method, RFC 4918*/
+    COPY,
+    
+    /** The MOVE method, RFC 5789 */
+    MOVE,
+    
+    /** The LOCK method, RFC 5789 */
+    LOCK,
+    
+    /** The UNLOCK method, RFC 5789 */
+    UNLOCK,
+    
+    /** The WRAPPED method ??? */
     WRAPPED,
     
-    /** The CONNECT method */
-    CONNECT
+    /** Unknown method */
+    UNKNOWN;
+    
+    String name;
+    
+    public void setName(String name) {
+        this.name = name;
+    }
 }

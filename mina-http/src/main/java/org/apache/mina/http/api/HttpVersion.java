@@ -20,20 +20,37 @@
 package org.apache.mina.http.api;
 
 /**
- * Type safe enumeration representing HTTP protocol version
+ * Type safe enumeration representing HTTP protocol version. Must be
+ * one of :
+ * <ul>
+ *   <li>HTTP 1.0</li>
+ *   <li>HTTP 1.1</li>
+ *   <li>HTTP 1.2</li>
+ *   <li>HTTP 1.3</li>
+ * </ul>
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum HttpVersion {
+    /**
+     * HTTP 1/0
+     */
+    HTTP_1_0("HTTP/1.0"),
+
     /**
      * HTTP 1/1
      */
     HTTP_1_1("HTTP/1.1"),
 
     /**
-     * HTTP 1/0
+     * HTTP 1/2
      */
-    HTTP_1_0("HTTP/1.0");
+    HTTP_1_2("HTTP/1.2"),
+
+    /**
+     * HTTP 1/3
+     */
+    HTTP_1_3("HTTP/1.3");
 
     private final String value;
 
@@ -47,16 +64,27 @@ public enum HttpVersion {
      * @param string The String contaoning the HTTP version
      * @return The version, or <code>null</code> if no version is found
      */
-    public static HttpVersion fromString(String string) {
-        if (HTTP_1_1.toString().equalsIgnoreCase(string)) {
-            return HTTP_1_1;
+    public static HttpVersion fromString(String httpVersion) {
+        if (httpVersion == null) {
+            return null;
         }
-
-        if (HTTP_1_0.toString().equalsIgnoreCase(string)) {
-            return HTTP_1_0;
+        
+        switch (httpVersion.toUpperCase()) {
+            case "HTTP/1.0":
+                return HTTP_1_0;
+                
+            case "HTTP/1.1":
+                return HTTP_1_1;
+                
+            case "HTTP/1.2":
+                return HTTP_1_2;
+                
+            case "HTTP/1.3":
+                return HTTP_1_3;
+                
+            default:
+                return null;
         }
-
-        return null;
     }
 
     /**
@@ -66,5 +94,4 @@ public enum HttpVersion {
     public String toString() {
         return value;
     }
-
 }

@@ -26,6 +26,7 @@ package org.apache.mina.http.api;
  */
 public enum HttpStatus {
 
+    // 1xx - Information
     /**
      * 100 - Continue
      */
@@ -33,7 +34,17 @@ public enum HttpStatus {
     /**
      * 101 - Switching Protocols
      */
-    INFORMATIONAL_SWITCHING_PROTOCOLS(101, "HTTP/1.1 101 Swtiching Protocols"),
+    INFORMATIONAL_SWITCHING_PROTOCOLS(101, "HTTP/1.1 101 Switching Protocols"),
+    /**
+     * 102 - Proxessing, RFC 2518
+     */
+    //PROCESSING(102, "HTTP/1.1 102 Processing"),
+    /**
+     * 103 - Early Hints, RFC 8297
+     */
+    //EARLY_HINTS(103, "HTTP/1.1 103 Early Hints"),
+    
+    // 2xx - Succes
     /**
      * 200 - OK
      */
@@ -63,6 +74,7 @@ public enum HttpStatus {
      */
     SUCCESS_PARTIAL_CONTENT(206, "HTTP/1.1 206 Partial Content"),
 
+    // 3xx - Redirection
     /**
      * 300 - Multiple Choices
      */
@@ -91,7 +103,12 @@ public enum HttpStatus {
      * 307 - Temporary Redirect
      */
     REDIRECTION_TEMPORARILY_REDIRECT(307, "HTTP/1.1 307 Temporary Redirect"),
+    /**
+     * 308 - Permanent Redirect
+     */
+    PERMANENT_REDIRECT(308, "HTTP/1.1 308 Permanent Redirect"),
 
+    // 4xx - Client Error
     /**
      * 400 - Bad Request
      */
@@ -160,7 +177,28 @@ public enum HttpStatus {
      * 417 - Expectation Failed
      */
     CLIENT_ERROR_EXPECTATION_FAILED(417, "HTTP/1.1 417 Expectation Failed"),
+    
+    /**
+     * 418 - Unused (RFC2324 was an April 1 RFC that lampooned the various ways HTTP was abused)
+     */
+    CLIENT_ERROR_UNUSED(418, "HTTP¨/1.1 418 - Unused"),
+    
+    /**
+     * 421 - Misdirected Request
+     */
+    CLIENT_ERROR_MISDIRECTED_REQUEST(421, "HTTP¨/1.1 421 Misdirected Request"),
+    
+    /**
+     * 422 - Unprocessable Content
+     */
+    CLIENT_ERROR_UNPROCESSABLE_CONTENT(422, "HTTP¨/1.1 422 Unprocessable Content"),
+    
+    /**
+     * 426 - Upgrade Required
+     */
+    CLIENT_ERROR_UPGRADE_REQUIRED(426, "HTTP/1.1 426 Upgrade Required"),
 
+    // 5xx - Server Error
     /**
      * 500 - Internal Server Error
      */
