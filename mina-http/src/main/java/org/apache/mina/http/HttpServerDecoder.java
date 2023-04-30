@@ -84,8 +84,8 @@ public class HttpServerDecoder implements ProtocolDecoder {
         DecoderState state = (DecoderState) session.getAttribute(DECODER_STATE_ATT);
         
         if (null == state) {
-            session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
-            state = (DecoderState) session.getAttribute(DECODER_STATE_ATT);
+            state = DecoderState.NEW;
+            session.setAttribute(DECODER_STATE_ATT, state);
         }
         
         switch (state) {
@@ -105,9 +105,11 @@ public class HttpServerDecoder implements ProtocolDecoder {
                     LOGGER.debug("decoding NEW");
                 }
                 
-                HttpRequestImpl rq = parseHttpRequestHead(msg.buf());
+                HttpRequestImpl httpRequest = parseHttpRequestHead(msg.buf());
+                session.removeAttribute(DECODER_STATE_ATT);
+
     
-                if (rq == null) {
+                if (httpRequest == null) {
                     // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
                     ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
                     partial.put(msg.buf());
@@ -117,9 +119,9 @@ public class HttpServerDecoder implements ProtocolDecoder {
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
                     break;
                 } else {
-                    out.write(rq);
+                    out.write(httpRequest);
                     // is it a request with some body content ?
-                    String contentLen = rq.getHeader("content-length");
+                    String contentLen = httpRequest.getHeader("content-length");
     
                     if (contentLen != null) {
                         if (LOGGER.isDebugEnabled()) {
