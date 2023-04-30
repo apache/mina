@@ -157,6 +157,8 @@ public class SslFilter extends IoFilterAdapter {
 
     private boolean wantClientAuth;
 
+    private String identificationAlgorithm;
+
     private String[] enabledCipherSuites;
 
     private String[] enabledProtocols;
@@ -384,6 +386,24 @@ public class SslFilter extends IoFilterAdapter {
      */
     public void setWantClientAuth(boolean wantClientAuth) {
         this.wantClientAuth = wantClientAuth;
+    }
+
+    /**
+     * @return the endpoint identification algorithm to be used when {@link SSLEngine}
+     * is initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public String getEndpointIdentificationAlgorithm() {
+        return identificationAlgorithm;
+    }
+
+    /**
+     * Sets the endpoint identification algorithm to be used when {@link SSLEngine}
+     * is initialized.
+     *
+     * @param identificationAlgorithm <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public void setEndpointIdentificationAlgorithm(String identificationAlgorithm) {
+        this.identificationAlgorithm = identificationAlgorithm;
     }
 
     /**
