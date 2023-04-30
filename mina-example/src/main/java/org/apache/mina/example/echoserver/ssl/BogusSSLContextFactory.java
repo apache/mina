@@ -64,7 +64,7 @@ public class BogusSSLContextFactory {
     //           -keypass boguspw -storepass boguspw -keystore bogus.cert
 
     /**
-     * Bougus keystore password.
+     * Bogus keystore password.
      */
     private static final char[] BOGUS_PW = { 'b', 'o', 'g', 'u', 's', 'p', 'w' };
 
