@@ -33,7 +33,7 @@
   <properties>
     <symbolicName>${project.groupId}.protobuf</symbolicName>
     <exportedPackage>${project.groupId}</exportedPackage>
-    <protobuf.version>2.5.0</protobuf.version>
+    <protobuf.version>3.16.3</protobuf.version>
   </properties>
 
   <dependencies>
