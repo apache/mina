@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLParameters;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
@@ -99,6 +100,11 @@ public class SslFilter extends IoFilterAdapter {
     protected String[] enabledProtocols;
 
     /**
+     * EndPoint identification algorithms
+     */
+    private String identificationAlgorithm;
+
+    /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
      * 
      * @param sslContext The SSLContext to use
@@ -167,6 +173,25 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
+     * @return the endpoint identification algorithm to be used when {@link SSLEngine}
+     * is initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public String getEndpointIdentificationAlgorithm() {
+        return identificationAlgorithm;
+    }
+
+    /**
+     * Sets the endpoint identification algorithm to be used when {@link SSLEngine}
+     * is initialized.
+     *
+     * @param identificationAlgorithm <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     */
+    public void setEndpointIdentificationAlgorithm(String identificationAlgorithm) {
+        this.identificationAlgorithm = identificationAlgorithm;
+    }
+
+
+    /**
      * @return the list of protocols to be enabled when {@link SSLEngine} is
      *         initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
@@ -206,7 +231,11 @@ public class SslFilter extends IoFilterAdapter {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Adding the SSL Filter {} to the chain", name);
+            if (parent.getSession().isServer()) {
+                LOGGER.debug("SERVER: Adding the SSL Filter '{}' to the chain", name);
+            } else {
+                LOGGER.debug("CLIENT: Adding the SSL Filter '{}' to the chain", name);
+            }
         }
     }
 
@@ -279,8 +308,13 @@ public class SslFilter extends IoFilterAdapter {
      * @return an SSLEngine
      */
     protected SSLEngine createEngine(IoSession session, InetSocketAddress addr) {
-        SSLEngine sslEngine = (addr != null) ? sslContext.createSSLEngine(addr.getHostString(), addr.getPort())
-                : sslContext.createSSLEngine();
+        SSLEngine sslEngine;
+        
+        if (addr != null) { 
+            sslEngine = sslContext.createSSLEngine(addr.getHostName(), addr.getPort());
+        } else {
+            sslEngine =  sslContext.createSSLEngine();
+        }
         
         // Always start with WANT, which will be squashed by NEED if NEED is true.
         // Actually, it makes not a lot of sense to select NEED and WANT. NEED >> WANT...
@@ -299,6 +333,13 @@ public class SslFilter extends IoFilterAdapter {
         if (enabledProtocols != null) {
             sslEngine.setEnabledProtocols(enabledProtocols);
         }
+
+        // Set the endpoint identification algorithm
+        if (getEndpointIdentificationAlgorithm() != null) {
+            SSLParameters sslParameters = sslEngine.getSSLParameters();
+            sslParameters.setEndpointIdentificationAlgorithm(getEndpointIdentificationAlgorithm());
+            sslEngine.setSSLParameters(sslParameters);
+        }
         
         sslEngine.setUseClientMode(!session.isServer());
         
@@ -311,7 +352,11 @@ public class SslFilter extends IoFilterAdapter {
     @Override
     public void sessionOpened(NextFilter next, IoSession session) throws Exception {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("session {} openend", session);
+            if (session.isServer()) {
+                LOGGER.debug("SERVER: Session {} openend", session);
+            } else {
+                LOGGER.debug("CLIENT: Session {} openend", session);
+            }
         }
 
         onConnected(next, session);
@@ -324,9 +369,13 @@ public class SslFilter extends IoFilterAdapter {
     @Override
     public void sessionClosed(NextFilter next, IoSession session) throws Exception {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("session {} closed", session);
+            if (session.isServer()) {
+                LOGGER.debug("SERVER: Session {} closed", session);
+            } else {
+                LOGGER.debug("CLIENT: Session {} closed", session);
+            }
         }
-            
+
         onClose(next, session, false);
         super.sessionClosed(next, session);
     }
@@ -345,7 +394,11 @@ public class SslFilter extends IoFilterAdapter {
         //System.out.println( message );
         
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("session {} received {}", session, message);
+            if (session.isServer()) {
+                LOGGER.debug("SERVER: Session {} received {}", session, message);
+            } else {
+                LOGGER.debug("CLIENT: Session {} received {}", session, message);
+            }
         }
         
         SslHandler sslHandler = getSslHandler(session);
@@ -358,7 +411,11 @@ public class SslFilter extends IoFilterAdapter {
     @Override
     public void messageSent(NextFilter next, IoSession session, WriteRequest request) throws Exception {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("session {} ack {}", session, request);
+            if (session.isServer()) {
+                LOGGER.debug("SERVER: Session {} ack {}", session, request);
+            } else {
+                LOGGER.debug("CLIENT: Session {} ack {}", session, request);
+            }
         }
 
         if (request instanceof EncryptedWriteRequest) {
@@ -380,7 +437,11 @@ public class SslFilter extends IoFilterAdapter {
     @Override
     public void filterWrite(NextFilter next, IoSession session, WriteRequest request) throws Exception {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("session {} write {}", session, request);
+            if (session.isServer()) {
+                LOGGER.debug("SERVER: Session {} write {}", session, request);
+            } else {
+                LOGGER.debug("CLIENT: Session {} write {}", session, request);
+            }
         }
 
         if (request instanceof EncryptedWriteRequest || request instanceof DisableEncryptWriteRequest) {
