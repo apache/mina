@@ -148,6 +148,7 @@ implements SocketAcceptor {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return NioSocketSession.METADATA;
     }
@@ -171,6 +172,7 @@ implements SocketAcceptor {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         setDefaultLocalAddress((SocketAddress) localAddress);
     }
@@ -180,7 +182,6 @@ implements SocketAcceptor {
      */
     @Override
     protected NioSession accept(IoProcessor<NioSession> processor, ServerSocketChannel handle) throws Exception {
-
         SelectionKey key = null;
 
         if (handle != null) {
@@ -269,8 +270,12 @@ implements SocketAcceptor {
                 String newMessage = "Error while binding on " + localAddress;
                 Exception e = new IOException(newMessage, ioe);
 
-                // And close the channel
-                channel.close();
+                try {
+                    // And close the channel
+                    channel.close();
+                } catch (IOException nested) {
+                    e.addSuppressed(nested);
+                }
 
                 throw e;
             }
@@ -364,6 +369,7 @@ implements SocketAcceptor {
          * @return <code>true</code> if there is at least one more
          * SockectChannel object to read
          */
+        @Override
         public boolean hasNext() {
             return iterator.hasNext();
         }
@@ -374,6 +380,7 @@ implements SocketAcceptor {
          * 
          * @return The next SocketChannel in the iterator
          */
+        @Override
         public ServerSocketChannel next() {
             SelectionKey key = iterator.next();
 
@@ -387,6 +394,7 @@ implements SocketAcceptor {
         /**
          * Remove the current SocketChannel from the iterator
          */
+        @Override
         public void remove() {
             iterator.remove();
         }
