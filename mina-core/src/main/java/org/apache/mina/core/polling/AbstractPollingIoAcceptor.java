@@ -22,6 +22,8 @@ package org.apache.mina.core.polling;
 import java.net.SocketAddress;
 import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.spi.SelectorProvider;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -336,6 +338,13 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
     }
 
     /**
+     * Invoked when a bind request has been registered for processing. The default implementation does nothing.
+     */
+    protected void bindRequestAdded() {
+        // Nothing
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -347,6 +356,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
         // adds the Registration request to the queue for the Workers
         // to handle
         registerQueue.add(request);
+        bindRequestAdded();
 
         // creates the Acceptor instance and has the local
         // executor kick it off.
@@ -429,6 +439,54 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
             throw future.getException();
         }
     }
+    
+    /**
+     * Handles new incoming connections by accepting the connections and creating new sessions for them.
+     *
+     * @param  handles   the connection handles to accept and create new sessions for
+     * @throws Exception on errors
+     */
+    @SuppressWarnings("unchecked")
+    protected void processHandles(Iterator<H> handles) throws Exception {
+        while (handles.hasNext()) {
+            H handle = handles.next();
+            handles.remove();
+
+            // Associates a new created connection to a processor,
+            // and get back a session
+            S session = accept(processor, handle);
+
+            if (session == null) {
+                continue;
+            }
+
+            initSession(session, null, null);
+
+            // add the session to the SocketIoProcessor
+            session.getProcessor().add(session);
+        }
+    }
+
+    /**
+     * Tells whether there are pending unbindings.
+     *
+     * @return {@code true} if there are any unbindings pending; {@code false} otherwise
+     */
+    protected boolean hasUnbindings() {
+        return !cancelQueue.isEmpty();
+    }
+
+    /**
+     * Processes the futures for executed unbindings, marking all futures as done.
+     *
+     * @param  unboundFutures describing the unbindings
+     * @throws Exception      on errors
+     */
+    protected void handleUnbound(Collection<AcceptorOperationFuture> unboundFutures) throws Exception {
+        for (AcceptorOperationFuture unboundFuture:unboundFutures) {
+            unboundFuture.setDone();
+        }
+    }
 
     /**
      * This class is called by the startupAcceptor() method and is
@@ -489,9 +547,11 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                         // them here.
                         processHandles(selectedHandles());
                     }
-
+                    
                     // check to see if any cancellation request has been made.
-                    nHandles -= unregisterHandles();
+                    Collection<AcceptorOperationFuture> cancellations = new ArrayList<>();
+                    nHandles -= unregisterHandles(cancellations);
+                    handleUnbound(cancellations);
                 } catch (ClosedSelectorException cse) {
                     // If the selector has been closed, we can exit the loop
                     ExceptionMonitor.getInstance().exceptionCaught(cse);
@@ -527,36 +587,6 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                         disposalFuture.setDone();
                     }
                 }
-            }
-        }
-
-        /**
-         * This method will process new sessions for the Worker class.  All
-         * keys that have had their status updates as per the Selector.selectedKeys()
-         * method will be processed here.  Only keys that are ready to accept
-         * connections are handled here.
-         * <p/>
-         * Session objects are created by making new instances of SocketSessionImpl
-         * and passing the session object to the SocketIoProcessor class.
-         */
-        @SuppressWarnings("unchecked")
-        private void processHandles(Iterator<H> handles) throws Exception {
-            while (handles.hasNext()) {
-                H handle = handles.next();
-                handles.remove();
-
-                // Associates a new created connection to a processor,
-                // and get back a session
-                S session = accept(processor, handle);
-
-                if (session == null) {
-                    continue;
-                }
-
-                initSession(session, null, null);
-
-                // add the session to the SocketIoProcessor
-                session.getProcessor().add(session);
             }
         }
 
@@ -628,7 +658,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
          * is CancellationRequest objects and the only place this happens is in
          * the doUnbind() method.
          */
-        private int unregisterHandles() {
+        private int unregisterHandles(Collection<AcceptorOperationFuture> cancelled) {
             int cancelledHandles = 0;
             for (;;) {
                 AcceptorOperationFuture future = cancelQueue.poll();
@@ -654,7 +684,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
                     }
                 }
 
-                future.setDone();
+                cancelled.add(future);
             }
 
             return cancelledHandles;

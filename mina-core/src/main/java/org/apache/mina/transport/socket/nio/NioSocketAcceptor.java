@@ -139,6 +139,35 @@ implements SocketAcceptor {
      * {@inheritDoc}
      */
     @Override
+    protected void handleUnbound(Collection<AcceptorOperationFuture> unboundFutures) throws Exception {
+        // If we're on Java >= 11, unbindings may take effect only on the next select()
+        // TODO: add a check (java.specification.version?) to do this only on a JVM >= 11?
+        if (!unboundFutures.isEmpty()) {
+            int selected = 0;
+            try {
+                // Simply select() would also work since wakeup() *was* called, but let's be explicit.
+                selected = selector.selectNow();
+            } finally {
+                super.handleUnbound(unboundFutures); // Marks the futures as done
+                if (hasUnbindings()) {
+                    // Depending on when these new unbindings were added, their wakeup() call may just have been
+                    // cancelled by the above select. Re-instate it, so that the next select will not block, as
+                    // expected.
+                    wakeup();
+                }
+            }
+            if (selected > 0) {
+                processHandles(selectedHandles());
+            }
+        } else {
+            super.handleUnbound(unboundFutures);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void destroy() throws Exception {
         if (selector != null) {
             selector.close();
@@ -148,6 +177,7 @@ implements SocketAcceptor {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TransportMetadata getTransportMetadata() {
         return NioSocketSession.METADATA;
     }
@@ -171,6 +201,7 @@ implements SocketAcceptor {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDefaultLocalAddress(InetSocketAddress localAddress) {
         setDefaultLocalAddress((SocketAddress) localAddress);
     }
@@ -269,8 +300,12 @@ implements SocketAcceptor {
                 String newMessage = "Error while binding on " + localAddress;
                 Exception e = new IOException(newMessage, ioe);
 
-                // And close the channel
-                channel.close();
+                try {
+                    // And close the channel
+                    channel.close();
+                } catch (IOException nested) {
+                    e.addSuppressed(nested);
+                }
 
                 throw e;
             }
@@ -364,6 +399,7 @@ implements SocketAcceptor {
          * @return <tt>true</tt> if there is at least one more
          * SockectChannel object to read
          */
+        @Override
         public boolean hasNext() {
             return iterator.hasNext();
         }
@@ -374,6 +410,7 @@ implements SocketAcceptor {
          * 
          * @return The next SocketChannel in the iterator
          */
+        @Override
         public ServerSocketChannel next() {
             SelectionKey key = iterator.next();
 
@@ -387,6 +424,7 @@ implements SocketAcceptor {
         /**
          * Remove the current SocketChannel from the iterator
          */
+        @Override
         public void remove() {
             iterator.remove();
         }
