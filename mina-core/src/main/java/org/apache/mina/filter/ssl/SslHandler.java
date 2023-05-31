@@ -571,6 +571,22 @@ class SslHandler {
                     }
                 }
 
+                if (inNetBuffer != null && inNetBuffer.hasRemaining()) {
+                    LOGGER.debug("pos: " + inNetBuffer.position() + ", lim: " + inNetBuffer.limit() + ", cap: " + inNetBuffer.capacity());
+                    inNetBuffer.flip();
+                    SSLEngineResult res = unwrap();
+
+                    // Prepare to be written again
+                    if (inNetBuffer.hasRemaining()) {
+                        inNetBuffer.compact();
+                    } else {
+                        inNetBuffer.free();
+                        inNetBuffer = null;
+                    }
+
+                    renegotiateIfNeeded(nextFilter, res);
+                }
+
                 return;
 
             case NEED_TASK:
