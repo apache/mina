@@ -104,9 +104,14 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     private final Comparator<IoSession> comparator;
 
     /**
-     * Creates a default ThreadPool, with default values : - minimum pool size is 0
-     * - maximum pool size is 16 - keepAlive set to 30 seconds - A default
-     * ThreadFactory - All events are accepted
+     * Creates a default ThreadPool, with default values : 
+     * <ul> 
+     *   <li>minimum pool size is 0</li>
+     *   <li>maximum pool size is 16</li> 
+     *   <li>keepAlive set to 30 seconds</li>
+     *   <li>A default ThreadFactory</li>
+     *   <li>All events are accepted</li>
+     * </ul>
      */
     public PriorityThreadPoolExecutor() {
         this(DEFAULT_INITIAL_THREAD_POOL_SIZE, DEFAULT_MAX_THREAD_POOL, DEFAULT_KEEP_ALIVE, TimeUnit.SECONDS,
@@ -114,9 +119,14 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     /**
-     * Creates a default ThreadPool, with default values : - minimum pool size is 0
-     * - maximum pool size is 16 - keepAlive set to 30 seconds - A default
-     * ThreadFactory - All events are accepted
+     * Creates a default ThreadPool, with default values :
+     * <ul> 
+     *   <li>minimum pool size is 0</li>
+     *   <li>maximum pool size is 16</li> 
+     *   <li>keepAlive set to 30 seconds</li>
+     *   <li>A default ThreadFactory</li>
+     *   <li>All events are accepted</li>
+     * </ul>
      * 
      * @param comparator The comparator used to prioritize the queue
      */
@@ -141,12 +151,16 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     /**
-     * Creates a default ThreadPool, with default values : - minimum pool size is 0
-     * - keepAlive set to 30 seconds - A default ThreadFactory - All events are
-     * accepted
+     * Creates a default ThreadPool, with default values : 
+     * <ul>
+     *   <li>minimum pool size is 0</li>
+     *   <li>keepAlive set to 30 seconds</li>
+     *   <li>A default ThreadFactory</li>
+     *   <li>All events are accepted</li>
+     * </ul>
      *
-     * @param maximumPoolSize
-     *            The maximum pool size
+     * @param maximumPoolSize The maximum pool size
+     * @param comparator The The comparator used to prioritize the queue
      */
     public PriorityThreadPoolExecutor(int maximumPoolSize, Comparator<IoSession> comparator) {
         this(DEFAULT_INITIAL_THREAD_POOL_SIZE, maximumPoolSize, DEFAULT_KEEP_ALIVE, TimeUnit.SECONDS,
@@ -154,13 +168,15 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     /**
-     * Creates a default ThreadPool, with default values : - keepAlive set to 30
-     * seconds - A default ThreadFactory - All events are accepted
+     * Creates a default ThreadPool, with default values :
+     * <ul> 
+     *   <li>keepAlive set to 30 seconds</li>
+     *   <li>A default ThreadFactory</li>
+     *   <li>All events are accepted</li>
+     * </ul>
      *
-     * @param corePoolSize
-     *            The initial pool sizePoolSize
-     * @param maximumPoolSize
-     *            The maximum pool size
+     * @param corePoolSize The initial pool sizePoolSize
+     * @param maximumPoolSize The maximum pool size
      */
     public PriorityThreadPoolExecutor(int corePoolSize, int maximumPoolSize) {
         this(corePoolSize, maximumPoolSize, DEFAULT_KEEP_ALIVE, TimeUnit.SECONDS, Executors.defaultThreadFactory(),
@@ -168,35 +184,32 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     /**
-     * Creates a default ThreadPool, with default values : - A default ThreadFactory
-     * - All events are accepted
+     * Creates a default ThreadPool, with default values : 
+     * <ul> 
+     *   <li>A default ThreadFactory</li>
+     *   <li>All events are accepted</li>
+     * </ul>
      *
-     * @param corePoolSize
-     *            The initial pool sizePoolSize
-     * @param maximumPoolSize
-     *            The maximum pool size
-     * @param keepAliveTime
-     *            Default duration for a thread
-     * @param unit
-     *            Time unit used for the keepAlive value
+     * @param corePoolSize The initial pool sizePoolSize
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
      */
     public PriorityThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory(), null, null);
     }
 
     /**
-     * Creates a default ThreadPool, with default values : - A default ThreadFactory
+     * Creates a default ThreadPool, with default values : 
+     * <ul> 
+     *   <li>A default ThreadFactory</li>
+     * </ul>
      *
-     * @param corePoolSize
-     *            The initial pool sizePoolSize
-     * @param maximumPoolSize
-     *            The maximum pool size
-     * @param keepAliveTime
-     *            Default duration for a thread
-     * @param unit
-     *            Time unit used for the keepAlive value
-     * @param eventQueueHandler
-     *            The queue used to store events
+     * @param corePoolSize The initial pool sizePoolSize
+     * @param maximumPoolSize The maximum pool size
+     * @param keepAliveTime Default duration for a thread
+     * @param unit Time unit used for the keepAlive value
+     * @param eventQueueHandler The queue used to store events
      */
     public PriorityThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             IoEventQueueHandler eventQueueHandler) {
@@ -205,7 +218,10 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     /**
-     * Creates a default ThreadPool, with default values : - A default ThreadFactory
+     * Creates a default ThreadPool, with default values :
+     * <ul> 
+     *   <li>A default ThreadFactory</li>
+     * </ul>
      *
      * @param corePoolSize The initial pool sizePoolSize
      * @param maximumPoolSize The maximum pool size

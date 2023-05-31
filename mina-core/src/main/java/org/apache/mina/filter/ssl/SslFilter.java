@@ -174,7 +174,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * @return the endpoint identification algorithm to be used when {@link SSLEngine}
-     * is initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * is initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public String getEndpointIdentificationAlgorithm() {
         return identificationAlgorithm;
@@ -184,7 +184,7 @@ public class SslFilter extends IoFilterAdapter {
      * Sets the endpoint identification algorithm to be used when {@link SSLEngine}
      * is initialized.
      *
-     * @param identificationAlgorithm <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * @param identificationAlgorithm <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public void setEndpointIdentificationAlgorithm(String identificationAlgorithm) {
         this.identificationAlgorithm = identificationAlgorithm;
