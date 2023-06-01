@@ -30,6 +30,7 @@ import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLParameters;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.buffer.IoBuffer;
@@ -176,6 +177,14 @@ class SslHandler {
         if (sslFilter.getEnabledProtocols() != null) {
             sslEngine.setEnabledProtocols(sslFilter.getEnabledProtocols());
         }
+
+        // Set the endpoint identification algorithm
+        if (sslFilter.getEndpointIdentificationAlgorithm() != null) {
+            SSLParameters sslParameters = sslEngine.getSSLParameters();
+            sslParameters.setEndpointIdentificationAlgorithm(sslFilter.getEndpointIdentificationAlgorithm());
+            sslEngine.setSSLParameters(sslParameters);
+        }
+
 
         // TODO : we may not need to call this method...
         // However, if we don't call it here, the tests are failing. Why?
