@@ -38,7 +38,7 @@ package org.apache.mina.core.future;
  */
 public interface CloseFuture extends IoFuture {
     /**
-     * @return <tt>true</tt> if the close request is finished and the session is closed.
+     * @return {@code true} if the close request is finished and the session is closed.
      */
     boolean isClosed();
 

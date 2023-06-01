@@ -82,10 +82,10 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>keepAlive</tt> property
+     * @return {@code true</tt> if and only if the <tt>keepAlive} property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns {@code true}.  By
+     * default, this method always returns {@code true} to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isKeepAliveChanged() {
@@ -93,10 +93,10 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>oobInline</tt> property
+     * @return {@code true</tt> if and only if the <tt>oobInline} property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns {@code true}.  By
+     * default, this method always returns {@code true} to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isOobInlineChanged() {
@@ -104,10 +104,10 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>receiveBufferSize</tt> property
+     * @return {@code true</tt> if and only if the <tt>receiveBufferSize} property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns {@code true}.  By
+     * default, this method always returns {@code true} to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isReceiveBufferSizeChanged() {
@@ -115,10 +115,10 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>reuseAddress</tt> property
+     * @return {@code true</tt> if and only if the <tt>reuseAddress} property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns {@code true}.  By
+     * default, this method always returns {@code true} to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isReuseAddressChanged() {
@@ -126,10 +126,10 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>sendBufferSize</tt> property
+     * @return {@code true</tt> if and only if the <tt>sendBufferSize} property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns {@code true}.  By
+     * default, this method always returns {@code true} to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isSendBufferSizeChanged() {
@@ -137,10 +137,10 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>soLinger</tt> property
+     * @return {@code true</tt> if and only if the <tt>soLinger} property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns {@code true}.  By
+     * default, this method always returns {@code true} to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isSoLingerChanged() {
@@ -148,10 +148,10 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>tcpNoDelay</tt> property
+     * @return {@code true</tt> if and only if the <tt>tcpNoDelay} property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns {@code true}.  By
+     * default, this method always returns {@code true} to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isTcpNoDelayChanged() {
@@ -159,10 +159,10 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return <tt>true</tt> if and only if the <tt>trafficClass</tt> property
+     * @return {@code true</tt> if and only if the <tt>trafficClass} property
      * has been changed by its setter method.  The system call related with
-     * the property is made only when this method returns <tt>true</tt>.  By
-     * default, this method always returns <tt>true</tt> to simplify implementation
+     * the property is made only when this method returns {@code true}.  By
+     * default, this method always returns {@code true} to simplify implementation
      * of subclasses, but overriding the default behavior is always encouraged.
      */
     protected boolean isTrafficClassChanged() {

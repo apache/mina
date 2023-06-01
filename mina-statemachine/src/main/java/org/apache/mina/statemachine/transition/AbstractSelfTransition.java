@@ -41,7 +41,7 @@ public abstract class AbstractSelfTransition implements SelfTransition {
      * 
      * @param stateContext the context in which the execution should occur
      * @param state the current state
-     * @return <tt>true</tt> if the {@link SelfTransition} has been executed
+     * @return {@code true} if the {@link SelfTransition} has been executed
      *         successfully
      */
     protected abstract boolean doExecute(StateContext stateContext, State state);

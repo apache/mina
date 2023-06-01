@@ -61,9 +61,9 @@ public interface IoEventQueueHandler extends EventListener {
     };
 
     /**
-     * @return <tt>true</tt> if and only if the specified <tt>event</tt> is
-     * allowed to be offered to the event queue.  The <tt>event</tt> is dropped
-     * if <tt>false</tt> is returned.
+     * @return {@code true</tt> if and only if the specified <tt>event} is
+     * allowed to be offered to the event queue.  The {@code event} is dropped
+     * if {@code false} is returned.
      * 
      * @param source The source of event
      * @param event The received event
@@ -71,7 +71,7 @@ public interface IoEventQueueHandler extends EventListener {
     boolean accept(Object source, IoEvent event);
 
     /**
-     * Invoked after the specified <tt>event</tt> has been offered to the
+     * Invoked after the specified {@code event} has been offered to the
      * event queue.
      * 
      * @param source The source of event
@@ -80,7 +80,7 @@ public interface IoEventQueueHandler extends EventListener {
     void offered(Object source, IoEvent event);
 
     /**
-     * Invoked after the specified <tt>event</tt> has been polled from the
+     * Invoked after the specified {@code event} has been polled from the
      * event queue.
      * 
      * @param source The source of event

@@ -32,7 +32,7 @@ public interface SocketSessionConfig extends IoSessionConfig {
     /**
      * @see Socket#getReuseAddress()
      * 
-     * @return <tt>true</tt> if SO_REUSEADDR is enabled.
+     * @return {@code true} if SO_REUSEADDR is enabled.
      */
     boolean isReuseAddress();
 
@@ -81,55 +81,55 @@ public interface SocketSessionConfig extends IoSessionConfig {
     /**
      * @see Socket#setTrafficClass(int)
      * 
-     * @param trafficClass The traffic class to set, one of <tt>IPTOS_LOWCOST</tt> (0x02)
-     * <tt>IPTOS_RELIABILITY</tt> (0x04), <tt>IPTOS_THROUGHPUT</tt> (0x08) or <tt>IPTOS_LOWDELAY</tt> (0x10)
+     * @param trafficClass The traffic class to set, one of {@code IPTOS_LOWCOST} (0x02)
+     * {@code IPTOS_RELIABILITY</tt> (0x04), <tt>IPTOS_THROUGHPUT</tt> (0x08) or <tt>IPTOS_LOWDELAY} (0x10)
      */
     void setTrafficClass(int trafficClass);
 
     /**
      * @see Socket#getKeepAlive()
      * 
-     * @return <tt>true</tt> if <tt>SO_KEEPALIVE</tt> is enabled.
+     * @return {@code true</tt> if <tt>SO_KEEPALIVE} is enabled.
      */
     boolean isKeepAlive();
 
     /**
      * @see Socket#setKeepAlive(boolean)
      * 
-     * @param keepAlive if <tt>SO_KEEPALIVE</tt> is to be enabled
+     * @param keepAlive if {@code SO_KEEPALIVE} is to be enabled
      */
     void setKeepAlive(boolean keepAlive);
 
     /**
      * @see Socket#getOOBInline()
      * 
-     * @return <tt>true</tt> if <tt>SO_OOBINLINE</tt> is enabled.
+     * @return {@code true</tt> if <tt>SO_OOBINLINE} is enabled.
      */
     boolean isOobInline();
 
     /**
      * @see Socket#setOOBInline(boolean)
      * 
-     * @param oobInline if <tt>SO_OOBINLINE</tt> is to be enabled
+     * @param oobInline if {@code SO_OOBINLINE} is to be enabled
      */
     void setOobInline(boolean oobInline);
 
     /**
-     * Please note that enabling <tt>SO_LINGER</tt> in Java NIO can result
+     * Please note that enabling {@code SO_LINGER} in Java NIO can result
      * in platform-dependent behavior and unexpected blocking of I/O thread.
      *
      * @see Socket#getSoLinger()
      * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6179351">Sun Bug Database</a>
      * 
-     * @return The value for <tt>SO_LINGER</tt>
+     * @return The value for {@code SO_LINGER}
      */
     int getSoLinger();
 
     /**
-     * Please note that enabling <tt>SO_LINGER</tt> in Java NIO can result
+     * Please note that enabling {@code SO_LINGER} in Java NIO can result
      * in platform-dependent behavior and unexpected blocking of I/O thread.
      *
-     * @param soLinger Please specify a negative value to disable <tt>SO_LINGER</tt>.
+     * @param soLinger Please specify a negative value to disable {@code SO_LINGER}.
      *
      * @see Socket#setSoLinger(boolean, int)
      * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6179351">Sun Bug Database</a>
@@ -139,14 +139,14 @@ public interface SocketSessionConfig extends IoSessionConfig {
     /**
      * @see Socket#getTcpNoDelay()
      * 
-     * @return <tt>true</tt> if <tt>TCP_NODELAY</tt> is enabled.
+     * @return {@code true</tt> if <tt>TCP_NODELAY} is enabled.
      */
     boolean isTcpNoDelay();
 
     /**
      * @see Socket#setTcpNoDelay(boolean)
      * 
-     * @param tcpNoDelay <tt>true</tt> if <tt>TCP_NODELAY</tt> is to be enabled
+     * @param tcpNoDelay {@code true</tt> if <tt>TCP_NODELAY} is to be enabled
      */
     void setTcpNoDelay(boolean tcpNoDelay);
 }

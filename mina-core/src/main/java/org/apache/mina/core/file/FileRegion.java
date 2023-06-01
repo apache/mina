@@ -29,10 +29,10 @@ import java.nio.channels.FileChannel;
 public interface FileRegion {
 
     /**
-     * The open <tt>FileChannel</tt> from which data will be read to send to
+     * The open {@code FileChannel} from which data will be read to send to
      * remote host.
      *
-     * @return  An open <tt>FileChannel</tt>.
+     * @return  An open {@code FileChannel}.
      */
     FileChannel getFileChannel();
 
@@ -71,7 +71,7 @@ public interface FileRegion {
     /**
      * Provides an absolute filename for the underlying FileChannel.
      * 
-     * @return  the absolute filename, or <tt>null</tt> if the FileRegion
+     * @return  the absolute filename, or {@code null} if the FileRegion
      *   does not know the filename
      */
     String getFilename();

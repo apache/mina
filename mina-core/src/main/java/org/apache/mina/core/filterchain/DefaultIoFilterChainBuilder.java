@@ -190,7 +190,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * @see IoFilterChain#contains(String)
      * 
      * @param name The Filter's name we want to check if it's in the chain
-     * @return <tt>true</tt> if the chain contains the given filter name
+     * @return {@code true} if the chain contains the given filter name
      */
     public boolean contains(String name) {
         return getEntry(name) != null;
@@ -200,7 +200,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * @see IoFilterChain#contains(IoFilter)
      * 
      * @param filter The Filter we want to check if it's in the chain
-     * @return <tt>true</tt> if the chain contains the given filter
+     * @return {@code true} if the chain contains the given filter
      */
     public boolean contains(IoFilter filter) {
         return getEntry(filter) != null;
@@ -210,7 +210,7 @@ public class DefaultIoFilterChainBuilder implements IoFilterChainBuilder {
      * @see IoFilterChain#contains(Class)
      * 
      * @param filterType The FilterType we want to check if it's in the chain
-     * @return <tt>true</tt> if the chain contains the given filterType
+     * @return {@code true} if the chain contains the given filterType
      */
     public boolean contains(Class<? extends IoFilter> filterType) {
         return getEntry(filterType) != null;

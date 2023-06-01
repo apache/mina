@@ -140,7 +140,7 @@ public class IoBufferDecoder {
     private DecodingContext ctx = new DecodingContext();
 
     /**
-     * Creates a new instance that uses specified <tt>delimiter</tt> byte array as a
+     * Creates a new instance that uses specified {@code delimiter} byte array as a
      * message delimiter.
      * 
      * @param delimiter an array of characters which delimits messages
@@ -150,7 +150,7 @@ public class IoBufferDecoder {
     }
 
     /**
-     * Creates a new instance that will read messages of <tt>contentLength</tt> bytes.
+     * Creates a new instance that will read messages of {@code contentLength} bytes.
      * 
      * @param contentLength the exact length to read
      */
@@ -162,7 +162,7 @@ public class IoBufferDecoder {
      * Sets the the length of the content line to be decoded.
      * When set, it overrides the dynamic delimiter setting and content length 
      * method will be used for decoding on the next decodeOnce call.
-     * The default value is <tt>-1</tt>.
+     * The default value is {@code -1}.
      * 
      * @param contentLength the content length to match
      * @param resetMatchCount delimiter matching is reset if true
@@ -181,7 +181,7 @@ public class IoBufferDecoder {
     /**
      * Dynamically sets a new delimiter. Next time 
      * {@link #decodeFully(IoBuffer)} will be called it will use the new 
-     * delimiter. Delimiter matching is reset only if <tt>resetMatchCount</tt> is true but 
+     * delimiter. Delimiter matching is reset only if {@code resetMatchCount} is true but 
      * decoding will continue from current position.
      * 
      * NB : Delimiter {@link LineDelimiter#AUTO} is not allowed.

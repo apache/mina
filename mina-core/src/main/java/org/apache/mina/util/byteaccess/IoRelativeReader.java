@@ -38,7 +38,7 @@ public interface IoRelativeReader {
     /**
      * Checks if there are any remaining bytes that can be read.
      * 
-     * @return <tt>true</tt> if there are some remaining bytes in the buffer
+     * @return {@code true} if there are some remaining bytes in the buffer
      */
     boolean hasRemaining();
 

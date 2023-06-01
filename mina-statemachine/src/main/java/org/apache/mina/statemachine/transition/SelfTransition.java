@@ -34,7 +34,7 @@ public interface SelfTransition {
      * 
      * @param stateContext The context in which we are executing the transition
      * @param state The current state
-     * @return <tt>true</tt> if the execution succeeded, <tt>false</tt> otherwise.
+     * @return {@code true</tt> if the execution succeeded, <tt>false} otherwise.
      */
     boolean execute(StateContext stateContext, State state);
 }

@@ -117,20 +117,20 @@ public interface IoAcceptor extends IoService {
     void setDefaultLocalAddresses(List<? extends SocketAddress> localAddresses);
 
     /**
-     * Returns <tt>true</tt> if and only if all clients are closed when this
+     * Returns {@code true} if and only if all clients are closed when this
      * acceptor unbinds from all the related local address (i.e. when the
      * service is deactivated).
      * 
-     * @return <tt>true</tt> if the service sets the closeOnDeactivation flag
+     * @return {@code true} if the service sets the closeOnDeactivation flag
      */
     boolean isCloseOnDeactivation();
 
     /**
      * Sets whether all client sessions are closed when this acceptor unbinds
      * from all the related local addresses (i.e. when the service is
-     * deactivated).  The default value is <tt>true</tt>.
+     * deactivated).  The default value is {@code true}.
      * 
-     * @param closeOnDeactivation <tt>true</tt> if we should close on deactivation
+     * @param closeOnDeactivation {@code true} if we should close on deactivation
      */
     void setCloseOnDeactivation(boolean closeOnDeactivation);
 
@@ -186,7 +186,7 @@ public interface IoAcceptor extends IoService {
      * Unbinds from all local addresses that this service is bound to and stops
      * to accept incoming connections.  All managed connections will be closed
      * if {@link #setCloseOnDeactivation(boolean) disconnectOnUnbind} property
-     * is <tt>true</tt>.  This method returns silently if no local address is
+     * is {@code true}.  This method returns silently if no local address is
      * bound yet.
      */
     void unbind();
@@ -195,7 +195,7 @@ public interface IoAcceptor extends IoService {
      * Unbinds from the specified local address and stop to accept incoming
      * connections.  All managed connections will be closed if
      * {@link #setCloseOnDeactivation(boolean) disconnectOnUnbind} property is
-     * <tt>true</tt>.  This method returns silently if the default local
+     * {@code true}.  This method returns silently if the default local
      * address is not bound yet.
      * 
      * @param localAddress The local address we will be unbound from
@@ -206,7 +206,7 @@ public interface IoAcceptor extends IoService {
      * Unbinds from the specified local addresses and stop to accept incoming
      * connections.  All managed connections will be closed if
      * {@link #setCloseOnDeactivation(boolean) disconnectOnUnbind} property is
-     * <tt>true</tt>.  This method returns silently if the default local
+     * {@code true}.  This method returns silently if the default local
      * addresses are not bound yet.
      * 
      * @param firstLocalAddress The first local address to be unbound from
@@ -218,7 +218,7 @@ public interface IoAcceptor extends IoService {
      * Unbinds from the specified local addresses and stop to accept incoming
      * connections.  All managed connections will be closed if
      * {@link #setCloseOnDeactivation(boolean) disconnectOnUnbind} property is
-     * <tt>true</tt>.  This method returns silently if the default local
+     * {@code true}.  This method returns silently if the default local
      * addresses are not bound yet.
      * 
      * @param localAddresses The local address we will be unbound from
@@ -227,7 +227,7 @@ public interface IoAcceptor extends IoService {
 
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified
-     * <tt>localAddress</tt> and the specified <tt>remoteAddress</tt> which
+     * {@code localAddress</tt> and the specified <tt>remoteAddress} which
      * reuses the local address that is already bound by this service.
      * <p>
      * This operation is optional.  Please throw {@link UnsupportedOperationException}
@@ -239,7 +239,7 @@ public interface IoAcceptor extends IoService {
      * @throws UnsupportedOperationException if this operation is not supported
      * @throws IllegalStateException if this service is not running.
      * @throws IllegalArgumentException if this service is not bound to the
-     *                                  specified <tt>localAddress</tt>.
+     *                                  specified {@code localAddress}.
      * @return The session bound to the the given localAddress and remote address
      */
     IoSession newSession(SocketAddress remoteAddress, SocketAddress localAddress);

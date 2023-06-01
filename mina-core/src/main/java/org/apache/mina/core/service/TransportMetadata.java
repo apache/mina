@@ -43,7 +43,7 @@ public interface TransportMetadata {
     String getName();
 
     /**
-     * @return <tt>true</tt> if the session of this transport type is
+     * @return {@code true} if the session of this transport type is
      * <a href="http://en.wikipedia.org/wiki/Connectionless">connectionless</a>.
      */
     boolean isConnectionless();

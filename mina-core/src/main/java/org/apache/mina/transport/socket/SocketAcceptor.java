@@ -61,14 +61,14 @@ public interface SocketAcceptor extends IoAcceptor {
     /**
      * @see ServerSocket#getReuseAddress()
      * 
-     * @return <tt>true</tt> if the <tt>SO_REUSEADDR</tt> is enabled
+     * @return {@code true</tt> if the <tt>SO_REUSEADDR} is enabled
      */
     boolean isReuseAddress();
 
     /**
      * @see ServerSocket#setReuseAddress(boolean)
      * 
-     * @param reuseAddress tells if the <tt>SO_REUSEADDR</tt> is to be enabled
+     * @param reuseAddress tells if the {@code SO_REUSEADDR} is to be enabled
      */
     void setReuseAddress(boolean reuseAddress);
 

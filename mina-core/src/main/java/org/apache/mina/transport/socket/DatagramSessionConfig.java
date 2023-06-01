@@ -33,7 +33,7 @@ public interface DatagramSessionConfig extends IoSessionConfig {
     /**
      * @see DatagramSocket#getBroadcast()
      * 
-     * @return <tt>true</tt> if SO_BROADCAST is enabled.
+     * @return {@code true} if SO_BROADCAST is enabled.
      */
     boolean isBroadcast();
 
@@ -47,7 +47,7 @@ public interface DatagramSessionConfig extends IoSessionConfig {
     /**
      * @see DatagramSocket#getReuseAddress()
      * 
-     * @return <tt>true</tt> if SO_REUSEADDR is enabled.
+     * @return {@code true} if SO_REUSEADDR is enabled.
      */
     boolean isReuseAddress();
 
@@ -113,7 +113,7 @@ public interface DatagramSessionConfig extends IoSessionConfig {
      * Sets if the session should be closed if an {@link PortUnreachableException} 
      * occurs.
      * 
-     * @param closeOnPortUnreachable <tt>true</tt> if we should close if the port is unreachable
+     * @param closeOnPortUnreachable {@code true} if we should close if the port is unreachable
      */
     void setCloseOnPortUnreachable(boolean closeOnPortUnreachable);
 }

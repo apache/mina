@@ -56,7 +56,7 @@ public interface WriteRequest {
     /**
      * Returns the destination of this write request.
      *
-     * @return <tt>null</tt> for the default destination
+     * @return {@code null} for the default destination
      */
     SocketAddress getDestination();
 

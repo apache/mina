@@ -99,7 +99,7 @@ public interface IoFilter {
     void destroy() throws Exception;
 
     /**
-     * Invoked before this filter is added to the specified <tt>parent</tt>.
+     * Invoked before this filter is added to the specified {@code parent}.
      * Please note that this method can be invoked more than once if
      * this filter is added to more than one parents.  This method is not
      * invoked before {@link #init()} is invoked.
@@ -113,7 +113,7 @@ public interface IoFilter {
     void onPreAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception;
 
     /**
-     * Invoked after this filter is added to the specified <tt>parent</tt>.
+     * Invoked after this filter is added to the specified {@code parent}.
      * Please note that this method can be invoked more than once if
      * this filter is added to more than one parents.  This method is not
      * invoked before {@link #init()} is invoked.
@@ -127,7 +127,7 @@ public interface IoFilter {
     void onPostAdd(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception;
 
     /**
-     * Invoked before this filter is removed from the specified <tt>parent</tt>.
+     * Invoked before this filter is removed from the specified {@code parent}.
      * Please note that this method can be invoked more than once if
      * this filter is removed from more than one parents.
      * This method is always invoked before {@link #destroy()} is invoked.
@@ -141,7 +141,7 @@ public interface IoFilter {
     void onPreRemove(IoFilterChain parent, String name, NextFilter nextFilter) throws Exception;
 
     /**
-     * Invoked after this filter is removed from the specified <tt>parent</tt>.
+     * Invoked after this filter is removed from the specified {@code parent}.
      * Please note that this method can be invoked more than once if
      * this filter is removed from more than one parents.
      * This method is always invoked before {@link #destroy()} is invoked.
@@ -288,28 +288,28 @@ public interface IoFilter {
      */
     interface NextFilter {
         /**
-         * Forwards <tt>sessionCreated</tt> event to next filter.
+         * Forwards {@code sessionCreated} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          */
         void sessionCreated(IoSession session);
 
         /**
-         * Forwards <tt>sessionOpened</tt> event to next filter.
+         * Forwards {@code sessionOpened} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          */
         void sessionOpened(IoSession session);
 
         /**
-         * Forwards <tt>sessionClosed</tt> event to next filter.
+         * Forwards {@code sessionClosed} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          */
         void sessionClosed(IoSession session);
 
         /**
-         * Forwards <tt>sessionIdle</tt> event to next filter.
+         * Forwards {@code sessionIdle} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          * @param status The {@link IdleStatus} type
@@ -317,7 +317,7 @@ public interface IoFilter {
         void sessionIdle(IoSession session, IdleStatus status);
 
         /**
-         * Forwards <tt>exceptionCaught</tt> event to next filter.
+         * Forwards {@code exceptionCaught} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          * @param cause The exception that cause this event to be received
@@ -331,7 +331,7 @@ public interface IoFilter {
         void inputClosed(IoSession session);
 
         /**
-         * Forwards <tt>messageReceived</tt> event to next filter.
+         * Forwards {@code messageReceived} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          * @param message The received message
@@ -339,7 +339,7 @@ public interface IoFilter {
         void messageReceived(IoSession session, Object message);
 
         /**
-         * Forwards <tt>messageSent</tt> event to next filter.
+         * Forwards {@code messageSent} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          * @param writeRequest The {@link WriteRequest} to process
@@ -347,7 +347,7 @@ public interface IoFilter {
         void messageSent(IoSession session, WriteRequest writeRequest);
 
         /**
-         * Forwards <tt>filterWrite</tt> event to next filter.
+         * Forwards {@code filterWrite} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          * @param writeRequest The {@link WriteRequest} to process
@@ -355,7 +355,7 @@ public interface IoFilter {
         void filterWrite(IoSession session, WriteRequest writeRequest);
 
         /**
-         * Forwards <tt>filterClose</tt> event to next filter.
+         * Forwards {@code filterClose} event to next filter.
          * 
          * @param session The {@link IoSession} which has to process this invocation
          */

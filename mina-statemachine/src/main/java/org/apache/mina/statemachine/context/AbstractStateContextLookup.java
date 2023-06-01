@@ -23,7 +23,7 @@ package org.apache.mina.statemachine.context;
  * Abstract {@link StateContextLookup} implementation. The {@link #lookup(Object[])}
  * method will loop through the event arguments and call the supports(Class)
  * method for each of them. The first argument that this method returns 
- * <tt>true</tt> for will be passed to the abstract lookup(Object)
+ * {@code true} for will be passed to the abstract lookup(Object)
  * method which should try to extract a {@link StateContext} from the argument.
  * If none is found a new {@link StateContext} will be created and stored in the
  * event argument using the store(Object, StateContext) method.
@@ -63,7 +63,7 @@ public abstract class AbstractStateContextLookup implements StateContextLookup {
     /**
      * Extracts a {@link StateContext} from the specified event argument which
      * is an instance of a class {@link #supports(Class)} returns 
-     * <tt>true</tt> for.
+     * {@code true} for.
      * 
      * @param eventArg the event argument.
      * @return the {@link StateContext}.
@@ -73,7 +73,7 @@ public abstract class AbstractStateContextLookup implements StateContextLookup {
     /**
      * Stores a new {@link StateContext} in the specified event argument which
      * is an instance of a class {@link #supports(Class)} returns 
-     * <tt>true</tt> for.
+     * {@code true} for.
      * 
      * @param eventArg the event argument.
      * @param context the {@link StateContext} to be stored.
@@ -81,12 +81,12 @@ public abstract class AbstractStateContextLookup implements StateContextLookup {
     protected abstract void store(Object eventArg, StateContext context);
 
     /**
-     * Must return <tt>true</tt> for any {@link Class} that this
+     * Must return {@code true} for any {@link Class} that this
      * {@link StateContextLookup} can use to store and lookup 
      * {@link StateContext} objects.
      * 
      * @param c the class.
-     * @return <tt>true</tt> or <tt>false</tt>.
+     * @return {@code true</tt> or <tt>false}.
      */
     protected abstract boolean supports(Class<?> c);
 }

@@ -26,7 +26,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 /**
  * Decodes a certain type of messages.
  * <p>
- * We didn't provide any <tt>dispose</tt> method for {@link MessageDecoder}
+ * We didn't provide any {@code dispose} method for {@link MessageDecoder}
  * because it can give you  performance penalty in case you have a lot of
  * message types to handle.
  *
@@ -87,9 +87,9 @@ public interface MessageDecoder {
     MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception;
 
     /**
-     * Invoked when the specified <tt>session</tt> is closed while this decoder was
+     * Invoked when the specified {@code session} is closed while this decoder was
      * parsing the data.  This method is useful when you deal with the protocol which doesn't
-     * specify the length of a message such as HTTP response without <tt>content-length</tt>
+     * specify the length of a message such as HTTP response without {@code content-length}
      * header. Implement this method to process the remaining data that
      * {@link #decode(IoSession, IoBuffer, ProtocolDecoderOutput)} method didn't process
      * completely.

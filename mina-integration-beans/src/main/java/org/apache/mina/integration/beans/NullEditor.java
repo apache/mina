@@ -22,7 +22,7 @@ package org.apache.mina.integration.beans;
 import java.beans.PropertyEditor;
 
 /**
- * A dummy {@link PropertyEditor} for <tt>null</tt>.
+ * A dummy {@link PropertyEditor} for {@code null}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */

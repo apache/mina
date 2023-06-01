@@ -389,7 +389,7 @@ public class IoServiceStatistics {
 
     /**
      * @return the interval (seconds) between each throughput calculation. The
-     *         default value is <tt>3</tt> seconds.
+     *         default value is {@code 3} seconds.
      */
     public final int getThroughputCalculationInterval() {
         return config.getThroughputCalculationInterval();
@@ -397,7 +397,7 @@ public class IoServiceStatistics {
 
     /**
      * @return the interval (milliseconds) between each throughput calculation.
-     * The default value is <tt>3</tt> seconds.
+     * The default value is {@code 3} seconds.
      */
     public final long getThroughputCalculationIntervalInMillis() {
         return config.getThroughputCalculationIntervalInMillis();
@@ -405,7 +405,7 @@ public class IoServiceStatistics {
 
     /**
      * Sets the interval (seconds) between each throughput calculation.  The
-     * default value is <tt>3</tt> seconds.
+     * default value is {@code 3} seconds.
      * 
      * @param throughputCalculationInterval The interval between two calculation
      */
@@ -914,7 +914,7 @@ public class IoServiceStatistics {
 
         /**
          * @return the interval (seconds) between each throughput calculation. The
-         *         default value is <tt>3</tt> seconds.
+         *         default value is {@code 3} seconds.
          */
         public int getThroughputCalculationInterval() {
             return throughputCalculationInterval.get();
@@ -922,7 +922,7 @@ public class IoServiceStatistics {
 
         /**
          * @return the interval (milliseconds) between each throughput calculation.
-         * The default value is <tt>3</tt> seconds.
+         * The default value is {@code 3} seconds.
          */
         public long getThroughputCalculationIntervalInMillis() {
             return throughputCalculationInterval.get() * 1000L;
@@ -930,7 +930,7 @@ public class IoServiceStatistics {
 
         /**
          * Sets the interval (seconds) between each throughput calculation.  The
-         * default value is <tt>3</tt> seconds.
+         * default value is {@code 3} seconds.
          *
          * @param throughputCalculationInterval The interval between two calculation
          */

@@ -92,7 +92,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
     }
 
     /**
-     * @deprecated Take a look at <tt>getConnectTimeoutMillis()</tt>
+     * @deprecated Take a look at {@code getConnectTimeoutMillis()}
      */
     @Deprecated
     @Override
@@ -110,7 +110,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
 
     /**
      * @deprecated
-     *  Take a look at <tt>setConnectTimeoutMillis(long)</tt>
+     *  Take a look at {@code setConnectTimeoutMillis(long)}
      */
     @Deprecated
     @Override
@@ -335,7 +335,7 @@ public abstract class AbstractIoConnector extends AbstractIoService implements I
      * Implement this method to perform the actual connect operation.
      *
      * @param remoteAddress The remote address to connect from
-     * @param localAddress <tt>null</tt> if no local address is specified
+     * @param localAddress {@code null} if no local address is specified
      * @param sessionInitializer The IoSessionInitializer to use when the connection s successful
      * @return The ConnectFuture associated with this asynchronous operation
      * 

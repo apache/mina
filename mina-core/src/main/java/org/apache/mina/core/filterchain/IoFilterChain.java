@@ -42,55 +42,55 @@ public interface IoFilterChain {
     IoSession getSession();
 
     /**
-     * Returns the {@link Entry} with the specified <tt>name</tt> in this chain.
+     * Returns the {@link Entry} with the specified {@code name} in this chain.
      * 
      * @param name The filter's name we are looking for
-     * @return <tt>null</tt> if there's no such name in this chain
+     * @return {@code null} if there's no such name in this chain
      */
     Entry getEntry(String name);
 
     /**
-     * Returns the {@link Entry} with the specified <tt>filter</tt> in this chain.
+     * Returns the {@link Entry} with the specified {@code filter} in this chain.
      * 
      * @param filter  The Filter we are looking for
-     * @return <tt>null</tt> if there's no such filter in this chain
+     * @return {@code null} if there's no such filter in this chain
      */
     Entry getEntry(IoFilter filter);
 
     /**
-     * Returns the {@link Entry} with the specified <tt>filterType</tt>
+     * Returns the {@link Entry} with the specified {@code filterType}
      * in this chain. If there's more than one filter with the specified
      * type, the first match will be chosen.
      * 
      * @param filterType The filter class we are looking for
-     * @return <tt>null</tt> if there's no such name in this chain
+     * @return {@code null} if there's no such name in this chain
      */
     Entry getEntry(Class<? extends IoFilter> filterType);
 
     /**
-     * Returns the {@link IoFilter} with the specified <tt>name</tt> in this chain.
+     * Returns the {@link IoFilter} with the specified {@code name} in this chain.
      * 
      * @param name the filter's name
-     * @return <tt>null</tt> if there's no such name in this chain
+     * @return {@code null} if there's no such name in this chain
      */
     IoFilter get(String name);
 
     /**
-     * Returns the {@link IoFilter} with the specified <tt>filterType</tt>
+     * Returns the {@link IoFilter} with the specified {@code filterType}
      * in this chain. If there's more than one filter with the specified
      * type, the first match will be chosen.
      * 
      * @param filterType The filter class
-     * @return <tt>null</tt> if there's no such name in this chain
+     * @return {@code null} if there's no such name in this chain
      */
     IoFilter get(Class<? extends IoFilter> filterType);
 
     /**
      * Returns the {@link NextFilter} of the {@link IoFilter} with the
-     * specified <tt>name</tt> in this chain.
+     * specified {@code name} in this chain.
      * 
      * @param name The filter's name we want the next filter
-     * @return <tt>null</tt> if there's no such name in this chain
+     * @return {@code null} if there's no such name in this chain
      */
     NextFilter getNextFilter(String name);
 
@@ -99,17 +99,17 @@ public interface IoFilterChain {
      * in this chain.
      * 
      * @param filter The filter for which we want the next filter
-     * @return <tt>null</tt> if there's no such name in this chain
+     * @return {@code null} if there's no such name in this chain
      */
     NextFilter getNextFilter(IoFilter filter);
 
     /**
-     * Returns the {@link NextFilter} of the specified <tt>filterType</tt>
+     * Returns the {@link NextFilter} of the specified {@code filterType}
      * in this chain.  If there's more than one filter with the specified
      * type, the first match will be chosen.
      * 
      * @param filterType The Filter class for which we want the next filter
-     * @return <tt>null</tt> if there's no such name in this chain
+     * @return {@code null} if there's no such name in this chain
      */
     NextFilter getNextFilter(Class<? extends IoFilter> filterType);
 
@@ -126,23 +126,23 @@ public interface IoFilterChain {
     /**
      * @param name The filter's name we are looking for
      * 
-     * @return <tt>true</tt> if this chain contains an {@link IoFilter} with the
-     * specified <tt>name</tt>.
+     * @return {@code true} if this chain contains an {@link IoFilter} with the
+     * specified {@code name}.
      */
     boolean contains(String name);
 
     /**
      * @param filter The filter we are looking for
      * 
-     * @return <tt>true</tt> if this chain contains the specified <tt>filter</tt>.
+     * @return {@code true</tt> if this chain contains the specified <tt>filter}.
      */
     boolean contains(IoFilter filter);
 
     /**
      * @param  filterType The filter's class we are looking for
      * 
-     * @return <tt>true</tt> if this chain contains an {@link IoFilter} of the
-     * specified <tt>filterType</tt>.
+     * @return {@code true} if this chain contains an {@link IoFilter} of the
+     * specified {@code filterType}.
      */
     boolean contains(Class<? extends IoFilter> filterType);
 

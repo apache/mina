@@ -27,7 +27,7 @@ package org.apache.mina.filter.codec;
  * than {@link RecoverableProtocolDecoderException}, it stops calling
  * the {@link ProtocolDecoder#decode(org.apache.mina.core.session.IoSession,
  *        org.apache.mina.core.buffer.IoBuffer, ProtocolDecoderOutput)}
- * immediately and fires an <tt>exceptionCaught</tt> event.
+ * immediately and fires an {@code exceptionCaught} event.
  * <p>
  * On the other hand, if {@link RecoverableProtocolDecoderException} is thrown,
  * it doesn't stop immediately but keeps calling the {@link ProtocolDecoder}

@@ -475,7 +475,7 @@ class SslHandler {
     /**
      * Start SSL shutdown process.
      * 
-     * @return <tt>true</tt> if shutdown process is started. <tt>false</tt> if
+     * @return {@code true</tt> if shutdown process is started. <tt>false} if
      *         shutdown process is already finished.
      * @throws SSLException
      *             on errors
