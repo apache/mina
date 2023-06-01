@@ -24,7 +24,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
  * {@link DecodingState} which skips data until canSkip(byte) returns 
- * <tt>false</tt>.
+ * {@code false}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -70,7 +70,7 @@ public abstract class SkippingState implements DecodingState {
      * Called to determine whether the specified byte can be skipped.
      * 
      * @param b the byte to check.
-     * @return <tt>true</tt> if the byte can be skipped.
+     * @return {@code true} if the byte can be skipped.
      */
     protected abstract boolean canSkip(byte b);
 

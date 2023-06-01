@@ -35,7 +35,7 @@ public class SynchronizedProtocolEncoder implements ProtocolEncoder {
     private final ProtocolEncoder encoder;
 
     /**
-     * Creates a new instance which decorates the specified <tt>encoder</tt>.
+     * Creates a new instance which decorates the specified {@code encoder}.
      * @param encoder The decorated encoder
      */
     public SynchronizedProtocolEncoder(ProtocolEncoder encoder) {

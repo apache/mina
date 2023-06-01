@@ -115,7 +115,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
     }
 
     /**
-     * @return <tt>true</tt> if handshaking is complete and
+     * @return {@code true} if handshaking is complete and
      * data can be sent through the proxy.
      */
     public boolean isHandshakeComplete() {

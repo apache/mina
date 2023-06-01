@@ -397,7 +397,7 @@ public  class NioSocketAcceptor extends AbstractPollingIoAcceptor<NioSession, Se
 
         /**
          * Tells if there are more SockectChannel left in the iterator
-         * @return <tt>true</tt> if there is at least one more
+         * @return {@code true} if there is at least one more
          * SockectChannel object to read
          */
         @Override

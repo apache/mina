@@ -2727,7 +2727,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     /**
      * This method forwards the call to {@link #expand(int)} only when
-     * <tt>autoExpand</tt> property is <tt>true</tt>.
+     * {@code autoExpand</tt> property is <tt>true}.
      */
     private IoBuffer autoExpand(int expectedRemaining) {
         if (isAutoExpand()) {
@@ -2738,7 +2738,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     /**
      * This method forwards the call to {@link #expand(int)} only when
-     * <tt>autoExpand</tt> property is <tt>true</tt>.
+     * {@code autoExpand</tt> property is <tt>true}.
      */
     private IoBuffer autoExpand(int pos, int expectedRemaining) {
         if (isAutoExpand()) {

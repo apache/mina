@@ -132,7 +132,7 @@ public class LazyInitializedCacheMap<K, V> implements Map<K, V> {
      * @param value a lazy initialized value object.
      * 
      * @return the previous value associated with the specified key,
-     *         or <tt>null</tt> if there was no mapping for the key
+     *         or {@code null} if there was no mapping for the key
      */
     public V putIfAbsent(K key, LazyInitializer<V> value) {
         LazyInitializer<V> v = cache.get(key);

@@ -37,14 +37,14 @@ public interface HttpMessage {
     HttpVersion getProtocolVersion();
 
     /**
-     * Gets the <tt>Content-Type</tt> header of the message.
+     * Gets the {@code Content-Type} header of the message.
      * 
      * @return The content type.
      */
     String getContentType();
 
     /**
-     * @return <tt>true</tt> if this message enables keep-alive connection.
+     * @return {@code true} if this message enables keep-alive connection.
      */
     boolean isKeepAlive();
 
@@ -61,7 +61,7 @@ public interface HttpMessage {
      * Tells if the message contains some header
      * 
      * @param name the Header's name we are looking for
-     * @return <tt>true</tt> if the HTTP header with the specified name exists in this request.
+     * @return {@code true} if the HTTP header with the specified name exists in this request.
      */
     boolean containsHeader(String name);
 

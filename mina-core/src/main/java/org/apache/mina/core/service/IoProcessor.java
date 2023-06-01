@@ -35,14 +35,14 @@ import org.apache.mina.core.write.WriteRequest;
 public interface IoProcessor<S extends IoSession> {
 
     /**
-     * @return <tt>true</tt> if and if only {@link #dispose()} method has
-     * been called.  Please note that this method will return <tt>true</tt>
+     * @return {@code true} if and if only {@link #dispose()} method has
+     * been called.  Please note that this method will return {@code true}
      * even after all the related resources are released.
      */
     boolean isDisposing();
 
     /**
-     * @return <tt>true</tt> if and if only all resources of this processor
+     * @return {@code true} if and if only all resources of this processor
      * have been disposed.
      */
     boolean isDisposed();

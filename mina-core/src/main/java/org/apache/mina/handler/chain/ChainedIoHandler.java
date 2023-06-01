@@ -25,7 +25,7 @@ import org.apache.mina.core.session.IoSession;
 
 /**
  * An {@link IoHandler} which executes an {@link IoHandlerChain}
- * on a <tt>messageReceived</tt> event.
+ * on a {@code messageReceived} event.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -41,7 +41,7 @@ public class ChainedIoHandler extends IoHandlerAdapter {
 
     /**
      * Creates a new instance which executes the specified
-     * {@link IoHandlerChain} on a <tt>messageReceived</tt> event.
+     * {@link IoHandlerChain} on a {@code messageReceived} event.
      *
      * @param chain an {@link IoHandlerChain} to execute
      */
@@ -55,14 +55,14 @@ public class ChainedIoHandler extends IoHandlerAdapter {
 
     /**
      * @return the {@link IoHandlerCommand} this handler will use to
-     * handle <tt>messageReceived</tt> events.
+     * handle {@code messageReceived} events.
      */
     public IoHandlerChain getChain() {
         return chain;
     }
 
     /**
-     * Handles the specified <tt>messageReceived</tt> event with the
+     * Handles the specified {@code messageReceived} event with the
      * {@link IoHandlerCommand} or {@link IoHandlerChain} you specified
      * in the constructor.
      */

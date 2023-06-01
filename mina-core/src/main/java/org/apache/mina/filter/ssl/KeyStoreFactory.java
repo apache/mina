@@ -121,7 +121,7 @@ public class KeyStoreFactory {
      * Sets the name of the provider to use when creating the key store. The
      * default is to use the platform default provider.
      *
-     * @param provider the name of the provider, e.g. <tt>"SUN"</tt>.
+     * @param provider the name of the provider, e.g. {@code "SUN"}.
      */
     public void setProvider(String provider) {
         this.provider = provider;

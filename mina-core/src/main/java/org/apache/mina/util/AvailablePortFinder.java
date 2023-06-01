@@ -99,7 +99,7 @@ public class AvailablePortFinder {
      * Checks to see if a specific port is available.
      *
      * @param port the port to check for availability
-     * @return <tt>true</tt> if the port is available
+     * @return {@code true} if the port is available
      */
     public static boolean available(int port) {
         if (port < MIN_PORT_NUMBER || port > MAX_PORT_NUMBER) {

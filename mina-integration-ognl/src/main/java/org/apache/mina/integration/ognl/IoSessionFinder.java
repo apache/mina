@@ -41,7 +41,7 @@ public class IoSessionFinder {
 
     /**
      * Creates a new instance with the specified OGNL expression that returns
-     * a boolean value (e.g. <tt>"id == 0x12345678"</tt>).
+     * a boolean value (e.g. {@code "id == 0x12345678"}).
      * 
      * @param query The OGNL expression 
      */

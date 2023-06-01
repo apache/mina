@@ -38,7 +38,7 @@ import org.apache.mina.util.IdentityHashSet;
  * <h2>Disposing resources acquired by {@link MessageEncoder}</h2>
  * <p>
  * Override {@link #dispose(IoSession)} method. Please don't forget to call
- * <tt>super.dispose()</tt>.
+ * {@code super.dispose()}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  *

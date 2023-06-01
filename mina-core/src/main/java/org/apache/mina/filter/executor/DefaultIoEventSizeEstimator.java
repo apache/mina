@@ -36,7 +36,7 @@ import org.apache.mina.core.write.WriteRequest;
  * <a href="http://martin.nobilitas.com/java/sizeof.html">Martin's Java Notes</a>
  * was used for estimation.  For unknown types, it inspects declaring fields of the
  * class of the specified event and the parameter of the event.  The size of unknown
- * declaring fields are approximated to the specified <tt>averageSizePerField</tt>
+ * declaring fields are approximated to the specified {@code averageSizePerField}
  * (default: 64).
  * <p>
  * All the estimated sizes of classes are cached for performance improvement.

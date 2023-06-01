@@ -87,7 +87,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
     /**
      * Tells if SO_BROADCAST is enabled.
      * 
-     * @return <tt>true</tt> if SO_BROADCAST is enabled
+     * @return {@code true} if SO_BROADCAST is enabled
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */
@@ -140,7 +140,7 @@ class NioDatagramSessionConfig extends AbstractDatagramSessionConfig {
     /**
      * Tells if SO_REUSEADDR is enabled.
      * 
-     * @return <tt>true</tt> if SO_REUSEADDR is enabled
+     * @return {@code true} if SO_REUSEADDR is enabled
      * @throws RuntimeIoException If the socket is closed or if we get an
      * {@link SocketException} 
      */

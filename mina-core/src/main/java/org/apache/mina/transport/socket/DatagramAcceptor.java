@@ -66,7 +66,7 @@ public interface DatagramAcceptor extends IoAcceptor {
     /**
      * Sets the {@link IoSessionRecycler} for this service.
      *
-     * @param sessionRecycler <tt>null</tt> to use the default recycler
+     * @param sessionRecycler {@code null} to use the default recycler
      */
     void setSessionRecycler(IoSessionRecycler sessionRecycler);
 

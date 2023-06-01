@@ -34,7 +34,7 @@ import org.apache.mina.filter.util.WriteRequestFilter;
  * <a href="http://www.jcraft.com/jzlib/">JZlib</a>.
  * Support for the LZW (DLCZ) algorithm is also planned.
  * <p>
- * This filter only supports compression using the <tt>PARTIAL FLUSH</tt> method,
+ * This filter only supports compression using the {@code PARTIAL FLUSH} method,
  * since that is the only method useful when doing stream level compression.
  * <p>
  * This filter supports compression/decompression of the input and output
@@ -109,7 +109,7 @@ public class CompressionFilter extends WriteRequestFilter {
 
     /**
      * Creates a new instance which compresses outboud data and decompresses
-     * inbound data with the specified <tt>compressionLevel</tt>.
+     * inbound data with the specified {@code compressionLevel}.
      *
      * @param compressionLevel the level of compression to be used. Must
      *                         be one of {@link #COMPRESSION_DEFAULT},
@@ -124,8 +124,8 @@ public class CompressionFilter extends WriteRequestFilter {
     /**
      * Creates a new instance.
      *
-     * @param compressInbound <tt>true</tt> if data read is to be decompressed
-     * @param compressOutbound <tt>true</tt> if data written is to be compressed
+     * @param compressInbound {@code true} if data read is to be decompressed
+     * @param compressOutbound {@code true} if data written is to be compressed
      * @param compressionLevel the level of compression to be used. Must
      *                         be one of {@link #COMPRESSION_DEFAULT},
      *                         {@link #COMPRESSION_MAX},
@@ -201,7 +201,7 @@ public class CompressionFilter extends WriteRequestFilter {
     }
 
     /**
-     * @return <tt>true</tt> if incoming data is being compressed.
+     * @return {@code true} if incoming data is being compressed.
      */
     public boolean isCompressInbound() {
         return compressInbound;
@@ -210,14 +210,14 @@ public class CompressionFilter extends WriteRequestFilter {
     /**
      * Sets if incoming data has to be compressed.
      * 
-     * @param compressInbound <tt>true</tt> if the incoming data has to be compressed
+     * @param compressInbound {@code true} if the incoming data has to be compressed
      */
     public void setCompressInbound(boolean compressInbound) {
         this.compressInbound = compressInbound;
     }
 
     /**
-     * @return <tt>true</tt> if the filter is compressing data being written.
+     * @return {@code true} if the filter is compressing data being written.
      */
     public boolean isCompressOutbound() {
         return compressOutbound;
@@ -226,7 +226,7 @@ public class CompressionFilter extends WriteRequestFilter {
     /**
      * Set if outgoing data has to be compressed.
      * 
-     * @param compressOutbound <tt>true</tt> if the outgoing data has to be compressed
+     * @param compressOutbound {@code true} if the outgoing data has to be compressed
      */
     public void setCompressOutbound(boolean compressOutbound) {
         this.compressOutbound = compressOutbound;

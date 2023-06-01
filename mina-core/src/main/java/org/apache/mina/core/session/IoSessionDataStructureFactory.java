@@ -32,7 +32,7 @@ import org.apache.mina.core.write.WriteRequestQueue;
 public interface IoSessionDataStructureFactory {
     /**
      * @return an {@link IoSessionAttributeMap} which is going to be associated
-     * with the specified <tt>session</tt>.  Please note that the returned
+     * with the specified {@code session}.  Please note that the returned
      * implementation must be thread-safe.
      * 
      * @param session The session for which we want the Attribute Map
@@ -42,7 +42,7 @@ public interface IoSessionDataStructureFactory {
 
     /**
      * @return an {@link WriteRequest} which is going to be associated with
-     * the specified <tt>session</tt>.  Please note that the returned
+     * the specified {@code session}.  Please note that the returned
      * implementation must be thread-safe and robust enough to deal
      * with various messages types (even what you didn't expect at all),
      * especially when you are going to implement a priority queue which

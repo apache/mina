@@ -58,7 +58,7 @@ public interface ProtocolEncoderOutput {
      * the returned {@link WriteFuture} if you want to wait for
      * the buffers flushed.
      *
-     * @return <tt>null</tt> if there is nothing to flush at all.
+     * @return {@code null} if there is nothing to flush at all.
      */
     WriteFuture flush();
 }

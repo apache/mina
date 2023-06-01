@@ -165,13 +165,13 @@ class IoBufferHexDumper {
      *
      * @param pos  index position to begin reading
      *
-     * @param len  number of bytes to read; this can be less than the <tt>line</tt>
+     * @param len  number of bytes to read; this can be less than the {@code line}
      *             width
      *
      * @param col  number of bytes in a column
      *
-     * @param line line width in bytes which pads the output if <tt>len</tt> is less
-     *             than <tt>line</tt>
+     * @param line line width in bytes which pads the output if {@code len} is less
+     *             than {@code line}
      *
      * @return string hex dump
      */

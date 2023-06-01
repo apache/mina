@@ -50,18 +50,18 @@ public interface ReadFuture extends IoFuture {
     /**
      * Get the read message.
      * 
-     * @return the received message.  It returns <tt>null</tt> if this
+     * @return the received message.  It returns {@code null} if this
      * future is not ready or the associated {@link IoSession} has been closed. 
      */
     Object getMessage();
 
     /**
-     * @return <tt>true</tt> if a message was received successfully.
+     * @return {@code true} if a message was received successfully.
      */
     boolean isRead();
 
     /**
-     * @return <tt>true</tt> if the {@link IoSession} associated with this
+     * @return {@code true} if the {@link IoSession} associated with this
      * future has been closed.
      */
     boolean isClosed();
@@ -69,7 +69,7 @@ public interface ReadFuture extends IoFuture {
     /**
      * @return the cause of the read failure if and only if the read
      * operation has failed due to an {@link Exception}.  Otherwise,
-     * <tt>null</tt> is returned.
+     * {@code null} is returned.
      */
     Throwable getException();
 

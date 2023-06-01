@@ -78,7 +78,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
      * @return the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, this
      * decoder will throw a {@link BufferDataException}.  The default
-     * value is <tt>1048576</tt> (1MB).
+     * value is {@code 1048576} (1MB).
      */
     public int getMaxObjectSize() {
         return maxObjectSize;
@@ -88,7 +88,7 @@ public class ObjectSerializationInputStream extends InputStream implements Objec
      * Sets the allowed maximum size of the object to be decoded.
      * If the size of the object to be decoded exceeds this value, this
      * decoder will throw a {@link BufferDataException}.  The default
-     * value is <tt>1048576</tt> (1MB).
+     * value is {@code 1048576} (1MB).
      * 
      * @param maxObjectSize The maximum decoded object size
      */

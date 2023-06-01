@@ -106,9 +106,9 @@ public abstract class AbstractTransition implements Transition {
      * already made sure that that is the case.
      * 
      * @param event the current {@link Event}.
-     * @return <tt>true</tt> if the {@link Transition} has been executed 
+     * @return {@code true} if the {@link Transition} has been executed 
      *         successfully and the {@link StateMachine} should move to the 
-     *         next {@link State}. <tt>false</tt> otherwise.
+     *         next {@link State}. {@code false} otherwise.
      */
     protected abstract boolean doExecute(Event event);
     

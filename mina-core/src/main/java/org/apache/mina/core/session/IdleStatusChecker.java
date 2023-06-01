@@ -29,7 +29,7 @@ import org.apache.mina.core.service.IoService;
 import org.apache.mina.util.ConcurrentHashSet;
 
 /**
- * Detects idle sessions and fires <tt>sessionIdle</tt> events to them.
+ * Detects idle sessions and fires {@code sessionIdle} events to them.
  * To be used for service unable to trigger idle events alone, like VmPipe
  * or SerialTransport. Polling base transport are advised to trigger idle 
  * events alone, using the poll/select timeout. 

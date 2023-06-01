@@ -25,9 +25,9 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 /**
  * {@link DecodingState} which decodes a single <code>CRLF</code>.
- * If it is found, the bytes are consumed and <tt>true</tt>
+ * If it is found, the bytes are consumed and {@code true}
  * is provided as the product. Otherwise, read bytes are pushed back
- * to the stream, and <tt>false</tt> is provided as the
+ * to the stream, and {@code false} is provided as the
  * product.
  * Note that if we find a CR but do not find a following LF, we raise
  * an error.
@@ -99,7 +99,7 @@ public abstract class CrLfDecodingState implements DecodingState {
     /**
      * Invoked when this state has found a <code>CRLF</code>.
      * 
-     * @param foundCRLF <tt>true</tt> if <code>CRLF</code> was found.
+     * @param foundCRLF {@code true} if <code>CRLF</code> was found.
      * @param out the current {@link ProtocolDecoderOutput} used to write 
      *        decoded messages.
      * @return the next state if a state transition was triggered (use 
