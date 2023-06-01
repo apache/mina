@@ -155,7 +155,7 @@ public class SslIdentificationAlgorithmTest {
         acceptor.setReuseAddress(true);
 
         SslFilter sslFilter = new SslFilter(sslContext);
-        sslFilter.setEnabledProtocols(new String[] {"TLSv1"});
+        sslFilter.setEnabledProtocols(new String[] {"TLSv1.2"});
 
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
         filters.addLast("ssl", sslFilter);
@@ -197,7 +197,7 @@ public class SslIdentificationAlgorithmTest {
 
         sslFilter.setUseClientMode(true);
         sslFilter.setEndpointIdentificationAlgorithm("HTTPS");
-        sslFilter.setEnabledProtocols(new String[] {"TLSv1"});
+        sslFilter.setEnabledProtocols(new String[] {"TLSv1.2"});
 
         DefaultIoFilterChainBuilder filters = connector.getFilterChain();
         filters.addLast("ssl", sslFilter);
@@ -236,7 +236,7 @@ public class SslIdentificationAlgorithmTest {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(KEY_MANAGER_FACTORY_ALGORITHM);
         tmf.init(trustStore);
 
-        SSLContext ctx = SSLContext.getInstance("TLS");
+        SSLContext ctx = SSLContext.getInstance("TLSv1.2");
         ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
         return ctx;
