@@ -55,7 +55,8 @@ import org.apache.mina.core.write.WriteRequest;
  * message is a keep-alive message or not and creates a new keep-alive
  * message:
  *
- * <table border="1" summary="Message">
+ * <table border="1">
+ *   <caption>Message</caption>
  *   <tr>
  *     <th>Name</th><th>Description</th><th>Implementation</th>
  *   </tr>

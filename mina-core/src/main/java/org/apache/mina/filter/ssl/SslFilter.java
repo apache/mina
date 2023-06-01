@@ -176,7 +176,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
-     * If the <tt>autostart</tt> flag is set to <tt>true</tt>, the
+     * If the <code>autostart</code> flag is set to <code>true</code>, the
      * handshake will start immediately after the filter has been added
      * to the chain.
      * 
@@ -196,19 +196,19 @@ public class SslFilter extends IoFilterAdapter {
      * Returns the underlying {@link SSLSession} for the specified session.
      *
      * @param session The current session 
-     * @return <tt>null</tt> if no {@link SSLSession} is initialized yet.
+     * @return <code>null</code> if no {@link SSLSession} is initialized yet.
      */
     public SSLSession getSslSession(IoSession session) {
         return (SSLSession) session.getAttribute(SSL_SESSION);
     }
 
     /**
-     * (Re)starts SSL session for the specified <tt>session</tt> if not started yet.
+     * (Re)starts SSL session for the specified <code>session</code> if not started yet.
      * Please note that SSL session is automatically started by default, and therefore
      * you don't need to call this method unless you've used TLS closure.
      *
      * @param session The session that will be switched to SSL mode
-     * @return <tt>true</tt> if the SSL session has been started, <tt>false</tt> if already started.
+     * @return <code>true</code> if the SSL session has been started, <code>false</code> if already started.
      * @throws SSLException if failed to start the SSL session
      */
     public boolean startSsl(IoSession session) throws SSLException {
@@ -270,9 +270,9 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if and only if the specified <tt>session</tt> is
+     * @return <code>true</code> if and only if the specified <code>session</code> is
      * encrypted/decrypted over SSL/TLS currently. This method will start
-     * to return <tt>false</tt> after TLS <tt>close_notify</tt> message
+     * to return <code>false</code> after TLS <code>close_notify</code> message
      * is sent and any messages written after then is not going to get encrypted.
      * 
      * @param session the session we want to check
@@ -290,7 +290,7 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if and only if the conditions for
+     * @return <code>true</code> if and only if the conditions for
      * {@link #isSslStarted(IoSession)} are met, and the handhake has
      * completed.
      *
@@ -310,7 +310,7 @@ public class SslFilter extends IoFilterAdapter {
 
 
     /**
-     * Stops the SSL session by sending TLS <tt>close_notify</tt> message to
+     * Stops the SSL session by sending TLS <code>close_notify</code> message to
      * initiate TLS closure.
      *
      * @param session the {@link IoSession} to initiate TLS closure
@@ -336,7 +336,7 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if the engine is set to use client mode
+     * @return <code>true</code> if the engine is set to use client mode
      * when handshaking.
      */
     public boolean isUseClientMode() {
@@ -346,14 +346,14 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Configures the engine to use client (or server) mode when handshaking.
      * 
-     * @param clientMode <tt>true</tt> when we are in client mode, <tt>false</tt> when in server mode
+     * @param clientMode <code>true</code> when we are in client mode, <code>false</code> when in server mode
      */
     public void setUseClientMode(boolean clientMode) {
         this.client = clientMode;
     }
 
     /**
-     * @return <tt>true</tt> if the engine will <em>require</em> client authentication.
+     * @return <code>true</code> if the engine will <em>require</em> client authentication.
      * This option is only useful to engines in the server mode.
      */
     public boolean isNeedClientAuth() {
@@ -371,7 +371,7 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return <tt>true</tt> if the engine will <em>request</em> client authentication.
+     * @return <code>true</code> if the engine will <em>request</em> client authentication.
      * This option is only useful to engines in the server mode.
      */
     public boolean isWantClientAuth() {
@@ -390,7 +390,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * @return the endpoint identification algorithm to be used when {@link SSLEngine}
-     * is initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * is initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public String getEndpointIdentificationAlgorithm() {
         return identificationAlgorithm;
@@ -400,7 +400,7 @@ public class SslFilter extends IoFilterAdapter {
      * Sets the endpoint identification algorithm to be used when {@link SSLEngine}
      * is initialized.
      *
-     * @param identificationAlgorithm <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * @param identificationAlgorithm <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public void setEndpointIdentificationAlgorithm(String identificationAlgorithm) {
         this.identificationAlgorithm = identificationAlgorithm;
@@ -408,7 +408,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * @return the list of cipher suites to be enabled when {@link SSLEngine}
-     * is initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * is initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledCipherSuites() {
         return enabledCipherSuites;
@@ -418,7 +418,7 @@ public class SslFilter extends IoFilterAdapter {
      * Sets the list of cipher suites to be enabled when {@link SSLEngine}
      * is initialized.
      *
-     * @param cipherSuites <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * @param cipherSuites <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public void setEnabledCipherSuites(String[] cipherSuites) {
         this.enabledCipherSuites = cipherSuites;
@@ -426,7 +426,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * @return the list of protocols to be enabled when {@link SSLEngine}
-     * is initialized. <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * is initialized. <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public String[] getEnabledProtocols() {
         return enabledProtocols;
@@ -436,7 +436,7 @@ public class SslFilter extends IoFilterAdapter {
      * Sets the list of protocols to be enabled when {@link SSLEngine}
      * is initialized.
      *
-     * @param protocols <tt>null</tt> means 'use {@link SSLEngine}'s default.'
+     * @param protocols <code>null</code> means 'use {@link SSLEngine}'s default.'
      */
     public void setEnabledProtocols(String[] protocols) {
         this.enabledProtocols = protocols;
