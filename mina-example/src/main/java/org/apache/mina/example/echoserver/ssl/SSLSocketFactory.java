@@ -96,7 +96,7 @@ public class SSLSocketFactory extends SocketFactory {
                 sslFactory = BogusSSLContextFactory.getInstance(false)
                         .getSocketFactory();
             } catch (GeneralSecurityException e) {
-                throw new RuntimeException("could not create SSL socket", e);
+                throw new IllegalStateException("could not create SSL socket", e);
             }
         }
         return sslFactory;

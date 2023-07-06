@@ -252,7 +252,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
             PropertyEditor e = getPropertyEditor(source.getClass(), "p" + i, paramTypes[i]);
             if (e == null) {
-                throwMBeanException(new RuntimeException("Conversion failure: " + params[i]));
+                throwMBeanException(new IllegalArgumentException("Conversion failure: " + params[i]));
             }
 
             e.setValue(params[i]);

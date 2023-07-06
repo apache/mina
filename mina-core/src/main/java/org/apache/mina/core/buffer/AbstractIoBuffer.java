@@ -1815,7 +1815,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         expandedState++;
                         break;
                     default:
-                        throw new RuntimeException(
+                        throw new IllegalArgumentException(
                                 "Expanded by " + (int) Math.ceil(in.remaining() * encoder.maxBytesPerChar())
                                         + " but that wasn't enough for '" + val + "'");
                     }
@@ -2106,7 +2106,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         expandedState++;
                         break;
                     default:
-                        throw new RuntimeException(
+                        throw new IllegalArgumentException(
                                 "Expanded by " + (int) Math.ceil(in.remaining() * encoder.maxBytesPerChar())
                                         + " but that wasn't enough for '" + val + "'");
                     }

@@ -110,7 +110,7 @@ class AprDatagramSession extends AprSession {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_SNDBUF);
             } catch (Exception e) {
-                throw new RuntimeException("APR Exception", e);
+                throw new IllegalStateException("APR Exception", e);
             }
         }
 
@@ -128,7 +128,7 @@ class AprDatagramSession extends AprSession {
             try {
                 return Socket.optGet(getDescriptor(), Socket.APR_SO_RCVBUF);
             } catch (Exception e) {
-                throw new RuntimeException("APR Exception", e);
+                throw new IllegalStateException("APR Exception", e);
             }
         }
 

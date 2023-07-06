@@ -67,7 +67,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
         try {
             rnd = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 

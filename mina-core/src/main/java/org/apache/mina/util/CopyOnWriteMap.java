@@ -215,7 +215,7 @@ public class CopyOnWriteMap<K, V> implements Map<K, V>, Cloneable {
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new InternalError();
+            throw new UnsupportedOperationException(e);
         }
     }
 }
