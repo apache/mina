@@ -60,7 +60,7 @@ public abstract class IntegerDecodingState implements DecodingState {
                     return finishDecode((firstByte << 24) | (secondByte << 16) | (thirdByte << 8) | in.getUnsigned(), out);
                     
                 default:
-                    throw new InternalError();
+                    throw new IllegalStateException();
             }
             
             counter++;

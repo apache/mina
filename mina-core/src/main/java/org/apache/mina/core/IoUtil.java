@@ -205,7 +205,7 @@ public final class IoUtil {
         try {
             return await0(futures, timeoutMillis, false);
         } catch (InterruptedException e) {
-            throw new InternalError();
+            throw new IllegalStateException(e);
         }
     }
 

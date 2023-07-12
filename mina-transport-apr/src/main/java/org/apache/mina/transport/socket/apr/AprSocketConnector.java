@@ -201,7 +201,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         }
 
         throwException(rv);
-        throw new InternalError(); // This sentence will never be executed.
+        throw new IllegalStateException(); // This statement will never be executed.
     }
 
     /**
@@ -234,7 +234,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         if (failedHandles.remove(handle)) {
             int rv = Socket.recvb(handle, dummyBuffer, 0, 1);
             throwException(rv);
-            throw new InternalError("Shouldn't reach here.");
+            throw new IllegalStateException("Shouldn't reach here.");
         }
         return true;
     }

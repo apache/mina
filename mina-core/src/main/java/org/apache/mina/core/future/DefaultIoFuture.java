@@ -161,7 +161,7 @@ public class DefaultIoFuture implements IoFuture {
         try {
             return await0(unit.toMillis(timeout), false);
         } catch (InterruptedException e) {
-            throw new InternalError();
+            throw new IllegalStateException();
         }
     }
 
@@ -173,7 +173,7 @@ public class DefaultIoFuture implements IoFuture {
         try {
             return await0(timeoutMillis, false);
         } catch (InterruptedException e) {
-            throw new InternalError();
+            throw new IllegalStateException();
         }
     }
 

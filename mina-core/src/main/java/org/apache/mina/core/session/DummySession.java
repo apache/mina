@@ -244,7 +244,7 @@ public class DummySession extends AbstractIoSession {
             setAttributeMap(factory.getAttributeMap(this));
             setWriteRequestQueue(factory.getWriteRequestQueue(this));
         } catch (Exception e) {
-            throw new InternalError();
+            throw new IllegalStateException();
         }
     }
 
