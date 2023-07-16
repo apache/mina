@@ -21,6 +21,7 @@ package org.apache.mina.proxy.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -288,7 +289,7 @@ public class StringUtilities {
             return "";
         }
 
-        return new String(str.getBytes("UTF8"), "8859_1");
+        return new String(str.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
     }
 
     /**
