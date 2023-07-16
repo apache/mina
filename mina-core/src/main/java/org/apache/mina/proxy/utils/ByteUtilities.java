@@ -20,6 +20,7 @@
 package org.apache.mina.proxy.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * ByteUtilities.java - Byte manipulation functions.
@@ -192,10 +193,10 @@ public class ByteUtilities {
      * 
      * @param s the string to convert
      * @return the result byte array
-     * @throws UnsupportedEncodingException if the string is not an OEM string
+     * @throws UnsupportedEncodingException Never thrown.
      */
     public static final byte[] getOEMStringAsByteArray(String s) throws UnsupportedEncodingException {
-        return s.getBytes("ASCII");
+        return s.getBytes(StandardCharsets.US_ASCII);
     }
 
     /**
@@ -203,10 +204,10 @@ public class ByteUtilities {
      * 
      * @param s the string to convert
      * @return the result byte array
-     * @throws UnsupportedEncodingException if the string is not an UTF-16LE string
+     * @throws UnsupportedEncodingException Never thrown.
      */
     public static final byte[] getUTFStringAsByteArray(String s) throws UnsupportedEncodingException {
-        return s.getBytes("UTF-16LE");
+        return s.getBytes(StandardCharsets.UTF_16LE);
     }
 
     /**

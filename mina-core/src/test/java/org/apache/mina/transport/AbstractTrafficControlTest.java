@@ -20,6 +20,7 @@
 package org.apache.mina.transport;
 
 import java.net.SocketAddress;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
@@ -167,7 +168,7 @@ public abstract class AbstractTrafficControlTest {
     }
 
     private void write(IoSession session, String s) throws Exception {
-        session.write(IoBuffer.wrap(s.getBytes("ASCII")));
+        session.write(IoBuffer.wrap(s.getBytes(StandardCharsets.US_ASCII)));
     }
 
     private int read(IoSession session) throws Exception {
