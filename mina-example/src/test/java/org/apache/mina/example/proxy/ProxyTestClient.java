@@ -147,7 +147,7 @@ public class ProxyTestClient {
 
         // Tests modifying authentication order preferences. First algorithm in list available on server 
         // will be used for authentication.
-        List<HttpAuthenticationMethods> l = new ArrayList<HttpAuthenticationMethods>();
+        List<HttpAuthenticationMethods> l = new ArrayList<>();
         l.add(HttpAuthenticationMethods.DIGEST);
         l.add(HttpAuthenticationMethods.BASIC);
         proxyIoSession.setPreferedOrder(l);
@@ -196,7 +196,7 @@ public class ProxyTestClient {
      */
     private HttpProxyRequest createHttpProxyRequest(String uri) {
         HttpProxyRequest req = new HttpProxyRequest(uri);
-        HashMap<String, String> props = new HashMap<String, String>();
+        HashMap<String, String> props = new HashMap<>();
         props.put(HttpProxyConstants.USER_PROPERTY, USER);
         props.put(HttpProxyConstants.PWD_PROPERTY, PWD);
         props.put(HttpProxyConstants.DOMAIN_PROPERTY, DOMAIN);

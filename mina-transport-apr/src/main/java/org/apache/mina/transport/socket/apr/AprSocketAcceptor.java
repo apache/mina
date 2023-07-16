@@ -68,7 +68,7 @@ public final class AprSocketAcceptor extends AbstractPollingIoAcceptor<AprSessio
 
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
 
-    private final Queue<Long> polledHandles = new ConcurrentLinkedQueue<Long>();
+    private final Queue<Long> polledHandles = new ConcurrentLinkedQueue<>();
 
     /**
      * Constructor for {@link AprSocketAcceptor} using default parameters (multiple thread model).

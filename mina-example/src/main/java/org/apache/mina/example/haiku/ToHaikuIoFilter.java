@@ -36,7 +36,7 @@ public class ToHaikuIoFilter extends IoFilterAdapter {
         List<String> phrases = (List<String>) session.getAttribute("phrases");
 
         if (null == phrases) {
-            phrases = new ArrayList<String>();
+            phrases = new ArrayList<>();
             session.setAttribute("phrases", phrases);
         }
 

@@ -95,7 +95,7 @@ public final class BufferedWriteFilter extends IoFilterAdapter {
         super();
         this.bufferSize = bufferSize;
         if (buffersMap == null) {
-            this.buffersMap = new LazyInitializedCacheMap<IoSession, IoBuffer>();
+            this.buffersMap = new LazyInitializedCacheMap<>();
         } else {
             this.buffersMap = buffersMap;
         }

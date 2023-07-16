@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BlacklistFilter extends IoFilterAdapter {
     /** The list of blocked addresses */
-    private final List<Subnet> blacklist = new CopyOnWriteArrayList<Subnet>();
+    private final List<Subnet> blacklist = new CopyOnWriteArrayList<>();
 
     /** A logger for this class */ 
     private final static Logger LOGGER = LoggerFactory.getLogger(BlacklistFilter.class);

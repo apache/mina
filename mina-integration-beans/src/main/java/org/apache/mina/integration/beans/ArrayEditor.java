@@ -102,7 +102,7 @@ public class ArrayEditor extends AbstractPropertyEditor {
     @Override
     protected Object toValue(String text) throws IllegalArgumentException {
         PropertyEditor e = getComponentEditor();
-        List<Object> values = new ArrayList<Object>();
+        List<Object> values = new ArrayList<>();
         Matcher m = CollectionEditor.ELEMENT.matcher(text);
         boolean matchedDelimiter = true;
 

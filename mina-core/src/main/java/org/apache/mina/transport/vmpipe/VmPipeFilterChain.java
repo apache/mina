@@ -42,7 +42,7 @@ import org.apache.mina.core.write.WriteToClosedSessionException;
  */
 class VmPipeFilterChain extends DefaultIoFilterChain {
 
-    private final Queue<IoEvent> eventQueue = new ConcurrentLinkedQueue<IoEvent>();
+    private final Queue<IoEvent> eventQueue = new ConcurrentLinkedQueue<>();
 
     private final IoProcessor<VmPipeSession> processor = new VmPipeIoProcessor();
 
@@ -205,7 +205,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
 
                 flushPendingDataQueues(session);
             } else {
-                List<WriteRequest> failedRequests = new ArrayList<WriteRequest>();
+                List<WriteRequest> failedRequests = new ArrayList<>();
                 WriteRequest req;
                 while ((req = queue.poll(session)) != null) {
                     failedRequests.add(req);
@@ -266,7 +266,7 @@ class VmPipeFilterChain extends DefaultIoFilterChain {
 
         public void updateTrafficControl(VmPipeSession session) {
             if (!session.isReadSuspended()) {
-                List<Object> data = new ArrayList<Object>();
+                List<Object> data = new ArrayList<>();
                 session.receivedMessageQueue.drainTo(data);
                 for (Object aData : data) {
                     VmPipeFilterChain.this.fireMessageReceived(aData);

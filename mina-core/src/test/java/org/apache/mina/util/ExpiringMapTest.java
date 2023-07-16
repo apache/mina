@@ -43,7 +43,7 @@ public class ExpiringMapTest {
      */
     @Before
     public void setUp() throws Exception {
-        theMap = new ExpiringMap<String, String>(1, 2);
+        theMap = new ExpiringMap<>(1, 2);
         theMap.put("Apache", "MINA");
         theMap.getExpirer().startExpiringIfNotStarted();
         Thread.sleep(3000);

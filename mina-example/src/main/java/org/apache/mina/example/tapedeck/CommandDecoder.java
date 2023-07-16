@@ -89,7 +89,7 @@ public class CommandDecoder extends TextLineDecoder {
     public void decode(IoSession session, IoBuffer in, final ProtocolDecoderOutput out) 
             throws Exception {
         
-        final LinkedList<String> lines = new LinkedList<String>();
+        final LinkedList<String> lines = new LinkedList<>();
         super.decode(session, in, new ProtocolDecoderOutput() {
             public void write(Object message) {
                 lines.add((String) message);
