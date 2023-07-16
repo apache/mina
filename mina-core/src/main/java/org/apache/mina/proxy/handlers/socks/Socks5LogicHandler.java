@@ -19,10 +19,10 @@
  */
 package org.apache.mina.proxy.handlers.socks;
 
-import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
@@ -113,10 +113,8 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
      * 
      * @param request the socks proxy request data
      * @return the encoded buffer
-     * @throws UnsupportedEncodingException if request's hostname charset 
-     * can't be converted to ASCII. 
      */
-    private IoBuffer encodeProxyRequestPacket(final SocksProxyRequest request) throws UnsupportedEncodingException {
+    private IoBuffer encodeProxyRequestPacket(final SocksProxyRequest request) {
         int len = 6;
         InetSocketAddress adr = request.getEndpointAddress();
         byte addressType = 0;
@@ -131,7 +129,7 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
                 addressType = SocksProxyConstants.IPV4_ADDRESS_TYPE;
             }
         } else {
-            host = request.getHost() != null ? request.getHost().getBytes("ASCII") : null;
+            host = request.getHost() != null ? request.getHost().getBytes(StandardCharsets.US_ASCII) : null;
 
             if (host != null) {
                 len += 1 + host.length;
@@ -167,11 +165,9 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
      * @return the encoded buffer, if null then authentication step is over 
      * and handshake process can jump immediately to the next step without waiting
      * for a server reply.
-     * @throws UnsupportedEncodingException if some string charset convertion fails
      * @throws GSSException when something fails while using GSSAPI
      */
-    private IoBuffer encodeAuthenticationPacket(final SocksProxyRequest request) throws UnsupportedEncodingException,
-            GSSException {
+    private IoBuffer encodeAuthenticationPacket(final SocksProxyRequest request) throws GSSException {
         byte method = ((Byte) getSession().getAttribute(Socks5LogicHandler.SELECTED_AUTH_METHOD)).byteValue();
 
         switch (method) {
@@ -186,8 +182,8 @@ public class Socks5LogicHandler extends AbstractSocksLogicHandler {
 
         case SocksProxyConstants.BASIC_AUTH:
             // The basic auth scheme packet is sent
-            byte[] user = request.getUserName().getBytes("ASCII");
-            byte[] pwd = request.getPassword().getBytes("ASCII");
+            byte[] user = request.getUserName().getBytes(StandardCharsets.US_ASCII);
+            byte[] pwd = request.getPassword().getBytes(StandardCharsets.US_ASCII);
             IoBuffer buf = IoBuffer.allocate(3 + user.length + pwd.length);
 
             buf.put(SocksProxyConstants.BASIC_AUTH_SUBNEGOTIATION_VERSION);

@@ -19,6 +19,7 @@
  */
 package org.apache.mina.proxy.handlers.socks;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -72,8 +73,8 @@ public class Socks4LogicHandler extends AbstractSocksLogicHandler {
     protected void writeRequest(final NextFilter nextFilter, final SocksProxyRequest request) {
         try {
             boolean isV4ARequest = Arrays.equals(request.getIpAddress(), SocksProxyConstants.FAKE_IP);
-            byte[] userID = request.getUserName().getBytes("ASCII");
-            byte[] host = isV4ARequest ? request.getHost().getBytes("ASCII") : null;
+            byte[] userID = request.getUserName().getBytes(StandardCharsets.US_ASCII);
+            byte[] host = isV4ARequest ? request.getHost().getBytes(StandardCharsets.US_ASCII) : null;
 
             int len = 9 + userID.length;
 
