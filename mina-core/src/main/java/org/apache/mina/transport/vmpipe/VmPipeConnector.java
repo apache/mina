@@ -155,7 +155,7 @@ public final class VmPipeConnector extends AbstractIoConnector {
         idleChecker.getNotifyingTask().cancel();
     }
 
-    private static final Set<VmPipeAddress> TAKEN_LOCAL_ADDRESSES = new HashSet<VmPipeAddress>();
+    private static final Set<VmPipeAddress> TAKEN_LOCAL_ADDRESSES = new HashSet<>();
 
     private static int nextLocalPort = -1;
 

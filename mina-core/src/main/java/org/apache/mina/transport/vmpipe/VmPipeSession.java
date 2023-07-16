@@ -73,7 +73,7 @@ class VmPipeSession extends AbstractIoSession {
         this.localAddress = localAddress;
         remoteAddress = serviceAddress = remoteEntry.getAddress();
         filterChain = new VmPipeFilterChain(this);
-        receivedMessageQueue = new LinkedBlockingQueue<Object>();
+        receivedMessageQueue = new LinkedBlockingQueue<>();
 
         remoteSession = new VmPipeSession(this, remoteEntry);
     }
@@ -90,7 +90,7 @@ class VmPipeSession extends AbstractIoSession {
         remoteAddress = remoteSession.localAddress;
         filterChain = new VmPipeFilterChain(this);
         this.remoteSession = remoteSession;
-        receivedMessageQueue = new LinkedBlockingQueue<Object>();
+        receivedMessageQueue = new LinkedBlockingQueue<>();
     }
 
     @Override

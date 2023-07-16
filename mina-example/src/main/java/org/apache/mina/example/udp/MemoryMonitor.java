@@ -68,7 +68,7 @@ public class MemoryMonitor {
         tabbedPane = new JTabbedPane();
         tabbedPane.add("Welcome", createWelcomePanel());
         frame.add(tabbedPane, BorderLayout.CENTER);
-        clients = new ConcurrentHashMap<SocketAddress, ClientPanel>();
+        clients = new ConcurrentHashMap<>();
         frame.pack();
         frame.setLocation(300, 300);
         frame.setVisible(true);

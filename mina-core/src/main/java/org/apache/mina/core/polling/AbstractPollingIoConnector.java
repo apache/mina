@@ -96,7 +96,7 @@ public abstract class AbstractPollingIoConnector<S extends AbstractIoSession, H>
      *            {@link IoSession} type.
      */
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass), true);
+        this(sessionConfig, null, new SimpleIoProcessorPool<>(processorClass), true);
     }
 
     /**
@@ -117,7 +117,7 @@ public abstract class AbstractPollingIoConnector<S extends AbstractIoSession, H>
      */
     protected AbstractPollingIoConnector(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass,
             int processorCount) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass, processorCount), true);
+        this(sessionConfig, null, new SimpleIoProcessorPool<>(processorClass, processorCount), true);
     }
 
     /**

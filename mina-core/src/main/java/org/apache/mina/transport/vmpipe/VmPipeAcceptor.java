@@ -46,7 +46,7 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
     // object used for checking session idle
     private IdleStatusChecker idleChecker;
 
-    static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<VmPipeAddress, VmPipe>();
+    static final Map<VmPipeAddress, VmPipe> boundHandlers = new HashMap<>();
 
     /**
      * Creates a new instance.
@@ -124,7 +124,7 @@ public final class VmPipeAcceptor extends AbstractIoAcceptor {
      */
     @Override
     protected Set<SocketAddress> bindInternal(List<? extends SocketAddress> localAddresses) throws IOException {
-        Set<SocketAddress> newLocalAddresses = new HashSet<SocketAddress>();
+        Set<SocketAddress> newLocalAddresses = new HashSet<>();
 
         synchronized (boundHandlers) {
             for (SocketAddress a : localAddresses) {

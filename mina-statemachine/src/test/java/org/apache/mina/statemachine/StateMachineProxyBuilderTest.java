@@ -207,7 +207,7 @@ public class StateMachineProxyBuilderTest {
         @org.apache.mina.statemachine.annotation.State(PARENT)
         public static final String S5 = "s5";
 
-        private LinkedList<String> messages = new LinkedList<String>();
+        private LinkedList<String> messages = new LinkedList<>();
 
         @OnEntry(S2)
         public void onEntryS2() {

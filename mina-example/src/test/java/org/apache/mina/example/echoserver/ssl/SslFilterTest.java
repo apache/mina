@@ -149,7 +149,7 @@ public class SslFilterTest {
 
     private static class EchoHandler extends IoHandlerAdapter {
 
-        List<String> sentMessages = new ArrayList<String>();
+        List<String> sentMessages = new ArrayList<>();
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause)

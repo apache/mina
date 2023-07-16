@@ -88,8 +88,8 @@ public class SslFilterTest {
     @Test
     public void testFlushRaceCondition() {
         final ExecutorService executor = Executors.newFixedThreadPool(1);
-        final List<Object> message_received_messages = new ArrayList<Object>();
-        final List<WriteRequest> filter_write_requests = new ArrayList<WriteRequest>();
+        final List<Object> message_received_messages = new ArrayList<>();
+        final List<WriteRequest> filter_write_requests = new ArrayList<>();
         
         final AbstractNextFilter write_filter = new AbstractNextFilter()
         {

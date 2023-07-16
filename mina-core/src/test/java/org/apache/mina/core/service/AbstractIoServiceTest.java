@@ -165,7 +165,7 @@ public class AbstractIoServiceTest {
     }
 
     private List<String> getThreadNames() {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         int active = Thread.activeCount();
         Thread[] threads = new Thread[active];
         Thread.enumerate(threads);

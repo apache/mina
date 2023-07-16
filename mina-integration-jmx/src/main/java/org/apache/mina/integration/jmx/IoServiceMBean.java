@@ -70,7 +70,7 @@ public class IoServiceMBean extends ObjectMBean<IoService> {
 
         if (name.equals("findAndRegisterSessions")) {
             IoSessionFinder finder = new IoSessionFinder((String) params[0]);
-            Set<IoSession> registeredSessions = new LinkedHashSet<IoSession>();
+            Set<IoSession> registeredSessions = new LinkedHashSet<>();
             
             for (IoSession s : finder.find(getSource().getManagedSessions().values())) {
                 try {

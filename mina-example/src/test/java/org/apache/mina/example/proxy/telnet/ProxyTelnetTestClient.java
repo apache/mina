@@ -90,7 +90,7 @@ public class ProxyTelnetTestClient {
         */
 
         HttpProxyRequest req = new HttpProxyRequest(serverAddress);
-        HashMap<String, String> props = new HashMap<String, String>();
+        HashMap<String, String> props = new HashMap<>();
         props.put(HttpProxyConstants.USER_PROPERTY, USER);
         props.put(HttpProxyConstants.PWD_PROPERTY, PWD);
         req.setProperties(props);        
