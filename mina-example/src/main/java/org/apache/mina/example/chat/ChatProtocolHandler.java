@@ -39,10 +39,10 @@ public class ChatProtocolHandler extends IoHandlerAdapter {
     private final static Logger LOGGER = LoggerFactory.getLogger(ChatProtocolHandler.class);
 
     private final Set<IoSession> sessions = Collections
-            .synchronizedSet(new HashSet<IoSession>());
+            .synchronizedSet(new HashSet<>());
 
     private final Set<String> users = Collections
-            .synchronizedSet(new HashSet<String>());
+            .synchronizedSet(new HashSet<>());
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {

@@ -73,7 +73,7 @@ public class HttpBasicAuthLogicHandler extends AbstractAuthLogicHandler {
         // Send request
         HttpProxyRequest req = (HttpProxyRequest) request;
         Map<String, List<String>> headers = req.getHeaders() != null ? req.getHeaders()
-                : new HashMap<String, List<String>>();
+                : new HashMap<>();
 
         String username = req.getProperties().get(HttpProxyConstants.USER_PROPERTY);
         String password = req.getProperties().get(HttpProxyConstants.PWD_PROPERTY);

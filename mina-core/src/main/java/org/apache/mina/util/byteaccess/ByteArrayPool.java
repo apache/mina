@@ -62,9 +62,9 @@ public class ByteArrayPool implements ByteArrayFactory {
      */
     public ByteArrayPool(boolean direct, int maxFreeBuffers, int maxFreeMemory) {
         this.direct = direct;
-        freeBuffers = new ArrayList<Stack<DirectBufferByteArray>>();
+        freeBuffers = new ArrayList<>();
         for (int i = 0; i < MAX_BITS; i++) {
-            freeBuffers.add(new Stack<DirectBufferByteArray>());
+            freeBuffers.add(new Stack<>());
         }
         this.maxFreeBuffers = maxFreeBuffers;
         this.maxFreeMemory = maxFreeMemory;

@@ -243,7 +243,7 @@ public class MdcInjectionFilterTest {
         connector.dispose(true);
 
         // make a copy to prevent ConcurrentModificationException
-        List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
+        List<LoggingEvent> events = new ArrayList<>(appender.events);
         // verify that all logging events have correct MDC
         for (LoggingEvent event : events) {
             if (event.getLoggerName().startsWith("org.apache.mina.core.service.AbstractIoService")) {
@@ -281,9 +281,9 @@ public class MdcInjectionFilterTest {
         connector.dispose(true);
 
         // make a copy to prevent ConcurrentModificationException
-        List<LoggingEvent> events = new ArrayList<LoggingEvent>(appender.events);
+        List<LoggingEvent> events = new ArrayList<>(appender.events);
 
-        Set<String> loggersToCheck = new HashSet<String>();
+        Set<String> loggersToCheck = new HashSet<>();
         loggersToCheck.add(MdcInjectionFilterTest.class.getName());
         loggersToCheck.add(ProtocolCodecFilter.class.getName());
         loggersToCheck.add(LoggingFilter.class.getName());
@@ -440,7 +440,7 @@ public class MdcInjectionFilterTest {
     }
 
     private static class MyAppender extends AppenderSkeleton {
-        List<LoggingEvent> events = Collections.synchronizedList(new ArrayList<LoggingEvent>());
+        List<LoggingEvent> events = Collections.synchronizedList(new ArrayList<>());
 
         /**
          * Default constructor
@@ -477,7 +477,7 @@ public class MdcInjectionFilterTest {
     }
 
     private List<String> getThreadNames() {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         int active = Thread.activeCount();
         Thread[] threads = new Thread[active];
         Thread.enumerate(threads);

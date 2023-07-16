@@ -88,7 +88,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
     private final Queue<NioSession> flushingSessions = new ConcurrentLinkedQueue<>();
 
     private final Map<SocketAddress, DatagramChannel> boundHandles = Collections
-            .synchronizedMap(new HashMap<SocketAddress, DatagramChannel>());
+            .synchronizedMap(new HashMap<>());
 
     private IoSessionRecycler sessionRecycler = DEFAULT_RECYCLER;
 

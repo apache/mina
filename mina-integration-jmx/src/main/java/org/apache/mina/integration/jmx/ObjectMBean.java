@@ -104,7 +104,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
-    private static final Map<ObjectName, Object> sources = new ConcurrentHashMap<ObjectName, Object>();
+    private static final Map<ObjectName, Object> sources = new ConcurrentHashMap<>();
 
     /**
      * Get the monitored object
@@ -130,7 +130,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     private final MBeanInfo info;
 
-    private final Map<String, PropertyDescriptor> propertyDescriptors = new HashMap<String, PropertyDescriptor>();
+    private final Map<String, PropertyDescriptor> propertyDescriptors = new HashMap<>();
 
     private final TypeConverter typeConverter = new OgnlTypeConverter();
 
@@ -448,8 +448,8 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         ModelMBeanConstructorInfo[] constructors = new ModelMBeanConstructorInfo[0];
         ModelMBeanNotificationInfo[] notifications = new ModelMBeanNotificationInfo[0];
 
-        List<ModelMBeanAttributeInfo> attributes = new ArrayList<ModelMBeanAttributeInfo>();
-        List<ModelMBeanOperationInfo> operations = new ArrayList<ModelMBeanOperationInfo>();
+        List<ModelMBeanAttributeInfo> attributes = new ArrayList<>();
+        List<ModelMBeanOperationInfo> operations = new ArrayList<>();
 
         addAttributes(attributes, source);
         addExtraAttributes(attributes);
@@ -566,7 +566,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
                 continue;
             }
 
-            List<MBeanParameterInfo> signature = new ArrayList<MBeanParameterInfo>();
+            List<MBeanParameterInfo> signature = new ArrayList<>();
             int i = 1;
             for (Class<?> paramType : m.getParameterTypes()) {
                 String paramName = "p" + (i++);
@@ -720,7 +720,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
 
         if (v instanceof IoFilterChainBuilder) {
-            Map<String, String> filterMapping = new LinkedHashMap<String, String>();
+            Map<String, String> filterMapping = new LinkedHashMap<>();
             if (v instanceof DefaultIoFilterChainBuilder) {
                 for (IoFilterChain.Entry e : ((DefaultIoFilterChainBuilder) v).getAll()) {
                     filterMapping.put(e.getName(), e.getFilter().getClass().getName());
@@ -732,7 +732,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         }
 
         if (v instanceof IoFilterChain) {
-            Map<String, String> filterMapping = new LinkedHashMap<String, String>();
+            Map<String, String> filterMapping = new LinkedHashMap<>();
             for (IoFilterChain.Entry e : ((IoFilterChain) v).getAll()) {
                 filterMapping.put(e.getName(), e.getFilter().getClass().getName());
             }
@@ -742,15 +742,15 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         if (!writable) {
             if ((v instanceof Collection) || (v instanceof Map)) {
                 if (v instanceof List) {
-                    return convertCollection(v, new ArrayList<Object>());
+                    return convertCollection(v, new ArrayList<>());
                 }
                 if (v instanceof Set) {
-                    return convertCollection(v, new LinkedHashSet<Object>());
+                    return convertCollection(v, new LinkedHashSet<>());
                 }
                 if (v instanceof Map) {
-                    return convertCollection(v, new LinkedHashMap<Object, Object>());
+                    return convertCollection(v, new LinkedHashMap<>());
                 }
-                return convertCollection(v, new ArrayList<Object>());
+                return convertCollection(v, new ArrayList<>());
             }
 
             if ((v instanceof Date) || (v instanceof Boolean) || (v instanceof Character) || (v instanceof Number)) {

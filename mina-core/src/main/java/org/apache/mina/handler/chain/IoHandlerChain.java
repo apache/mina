@@ -198,7 +198,7 @@ public class IoHandlerChain implements IoHandlerCommand {
      * @throws Exception If we faced some exception during the cleanup 
      */
     public synchronized void clear() throws Exception {
-        Iterator<String> it = new ArrayList<String>(name2entry.keySet()).iterator();
+        Iterator<String> it = new ArrayList<>(name2entry.keySet()).iterator();
        
         while (it.hasNext()) {
             remove(it.next());

@@ -158,7 +158,7 @@ public class UnorderedThreadPoolExecutor extends ThreadPoolExecutor {
      */
     public UnorderedThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
             ThreadFactory threadFactory, IoEventQueueHandler queueHandler) {
-        super(0, 1, keepAliveTime, unit, new LinkedBlockingQueue<Runnable>(), threadFactory, new AbortPolicy());
+        super(0, 1, keepAliveTime, unit, new LinkedBlockingQueue<>(), threadFactory, new AbortPolicy());
         
         if (corePoolSize < 0) {
             throw new IllegalArgumentException("corePoolSize: " + corePoolSize);

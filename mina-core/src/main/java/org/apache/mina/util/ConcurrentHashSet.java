@@ -39,7 +39,7 @@ public class ConcurrentHashSet<E> extends MapBackedSet<E> {
      * Creates a new instance of ConcurrentHashSet
      */
     public ConcurrentHashSet() {
-        super(new ConcurrentHashMap<E, Boolean>());
+        super(new ConcurrentHashMap<>());
     }
 
     /**
@@ -49,7 +49,7 @@ public class ConcurrentHashSet<E> extends MapBackedSet<E> {
      * @param collection The collection to inject in this set
      */
     public ConcurrentHashSet(Collection<E> collection) {
-        super(new ConcurrentHashMap<E, Boolean>(), collection);
+        super(new ConcurrentHashMap<>(), collection);
     }
 
     /**

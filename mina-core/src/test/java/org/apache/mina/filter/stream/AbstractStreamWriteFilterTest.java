@@ -220,7 +220,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         AbstractStreamWriteFilter<M> filter = createFilter();
         M message = createMessage(new byte[5]);
 
-        Queue<WriteRequest> queue = new LinkedList<WriteRequest>();
+        Queue<WriteRequest> queue = new LinkedList<>();
 
         /*
          * Make up the situation.
@@ -256,7 +256,7 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         WriteRequest wrs[] = new WriteRequest[] { new DefaultWriteRequest(new Object(), new DummyWriteFuture()),
                 new DefaultWriteRequest(new Object(), new DummyWriteFuture()),
                 new DefaultWriteRequest(new Object(), new DummyWriteFuture()) };
-        Queue<WriteRequest> queue = new LinkedList<WriteRequest>();
+        Queue<WriteRequest> queue = new LinkedList<>();
         queue.add(wrs[0]);
         queue.add(wrs[1]);
         queue.add(wrs[2]);
