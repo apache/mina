@@ -19,10 +19,14 @@
  */
 package org.apache.mina.proxy.handlers.http.ntlm;
 
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -179,9 +183,10 @@ public class NTLMResponses {
      *
      * @return The LM Hash of the given password, used in the calculation
      * of the LM Response.
+     * @throws GeneralSecurityException if an encryption problem occurs.
      */
-    private static byte[] lmHash(String password) throws Exception {
-        byte[] oemPassword = password.toUpperCase().getBytes("US-ASCII");
+    private static byte[] lmHash(String password) throws GeneralSecurityException{
+        byte[] oemPassword = password.toUpperCase().getBytes(StandardCharsets.US_ASCII);
         int length = Math.min(oemPassword.length, 14);
         byte[] keyBytes = new byte[14];
         System.arraycopy(oemPassword, 0, keyBytes, 0, length);
