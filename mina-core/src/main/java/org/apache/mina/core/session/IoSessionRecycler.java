@@ -48,7 +48,7 @@ public interface IoSessionRecycler {
          * {@inheritDoc}
          */
         @Override
-        public IoSession recycle(SocketAddress remoteAddress) {
+        public IoSession recycle(SocketAddress remoteAddress, int port) {
             return null;
         }
 
@@ -72,9 +72,10 @@ public interface IoSessionRecycler {
      * Attempts to retrieve a recycled {@link IoSession}.
      *
      * @param remoteAddress the remote socket address of the {@link IoSession} the transport wants to recycle.
+     * @param port The port the Accpetor is listening on
      * @return a recycled {@link IoSession}, or null if one cannot be found.
      */
-    IoSession recycle(SocketAddress remoteAddress);
+    IoSession recycle(SocketAddress remoteAddress, int port);
 
     /**
      * Called when an {@link IoSession} is explicitly closed.

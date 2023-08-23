@@ -19,6 +19,7 @@
  */
 package org.apache.mina.core.session;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.apache.mina.util.ExpirationListener;
@@ -32,10 +33,10 @@ import org.apache.mina.util.ExpiringMap;
  */
 public class ExpiringSessionRecycler implements IoSessionRecycler {
     /** A map used to store the session */
-    private ExpiringMap<SocketAddress, IoSession> sessionMap;
+    private ExpiringMap<String, IoSession> sessionMap;
 
     /** A map used to keep a track of the expiration */ 
-    private ExpiringMap<SocketAddress, IoSession>.Expirer mapExpirer;
+    private ExpiringMap<String, IoSession>.Expirer mapExpirer;
 
     /**
      * Create a new ExpiringSessionRecycler instance
@@ -72,7 +73,9 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
     public void put(IoSession session) {
         mapExpirer.startExpiringIfNotStarted();
 
-        SocketAddress key = session.getRemoteAddress();
+        String key = session.getRemoteAddress() + ":" + ((InetSocketAddress)session.getLocalAddress()).getPort();
+        
+        
 
         if (!sessionMap.containsKey(key)) {
             sessionMap.put(key, session);
@@ -83,8 +86,9 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
      * {@inheritDoc}
      */
     @Override
-    public IoSession recycle(SocketAddress remoteAddress) {
-        return sessionMap.get(remoteAddress);
+    public IoSession recycle(SocketAddress remoteAddress, int port) {
+        String key = remoteAddress + ":" + port;
+        return sessionMap.get(key);
     }
 
     /**
@@ -92,7 +96,7 @@ public class ExpiringSessionRecycler implements IoSessionRecycler {
      */
     @Override
     public void remove(IoSession session) {
-        sessionMap.remove(session.getRemoteAddress());
+        sessionMap.remove(session.getRemoteAddress() + ":" + ((InetSocketAddress)session.getLocalAddress()).getPort());
     }
 
     /**
