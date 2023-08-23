@@ -85,7 +85,7 @@ public class HttpSmartProxyHandler extends AbstractHttpLogicHandler {
             // Compute request headers
             HttpProxyRequest req = (HttpProxyRequest) getProxyIoSession().getRequest();
             Map<String, List<String>> headers = req.getHeaders() != null ? req.getHeaders()
-                    : new HashMap<String, List<String>>();
+                    : new HashMap<>();
 
             AbstractAuthLogicHandler.addKeepAliveHeaders(headers);
             req.setHeaders(headers);

@@ -48,7 +48,7 @@ import org.apache.tomcat.jni.Status;
 public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession> {
     private static final int POLLSET_SIZE = 1024;
 
-    private final Map<Long, AprSession> allSessions = new HashMap<Long, AprSession>(POLLSET_SIZE);
+    private final Map<Long, AprSession> allSessions = new HashMap<>(POLLSET_SIZE);
 
     private final Object wakeupLock = new Object();
 
@@ -64,7 +64,7 @@ public final class AprIoProcessor extends AbstractPollingIoProcessor<AprSession>
 
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
 
-    private final Queue<AprSession> polledSessions = new ConcurrentLinkedQueue<AprSession>();
+    private final Queue<AprSession> polledSessions = new ConcurrentLinkedQueue<>();
 
     /**
      * Create a new instance of {@link AprIoProcessor} with a given Exector for

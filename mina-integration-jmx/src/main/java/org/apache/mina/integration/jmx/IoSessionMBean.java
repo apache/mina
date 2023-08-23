@@ -47,7 +47,7 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
     @Override
     protected Object getAttribute0(String fqan) throws Exception {
         if (fqan.equals("attributes")) {
-            Map<String, String> answer = new LinkedHashMap<String, String>();
+            Map<String, String> answer = new LinkedHashMap<>();
             
             for (Object key : getSource().getAttributeKeys()) {
                 answer.put(String.valueOf(key), String.valueOf(getSource().getAttribute(key)));

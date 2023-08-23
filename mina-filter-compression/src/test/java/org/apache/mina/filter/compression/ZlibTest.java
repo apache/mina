@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.junit.Before;
@@ -52,7 +53,7 @@ public class ZlibTest {
         for (int i = 0; i < 10; i++) {
             strInput += "The quick brown fox jumps over the lazy dog.  ";
         }
-        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
+        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes(StandardCharsets.UTF_8));
 
         // increase the count to have the compression and decompression
         // done using the same instance of Zlib
@@ -68,21 +69,21 @@ public class ZlibTest {
     @Test
     public void testCorruptedData() throws Exception {
         String strInput = "Hello World";
-        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
+        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes(StandardCharsets.UTF_8));
 
         IoBuffer byteCompressed = deflater.deflate(byteInput);
         // change the contents to something else. Since this doesn't check
         // for integrity, it wont throw an exception
         byteCompressed.put(5, (byte) 0xa);
         IoBuffer byteUncompressed = inflater.inflate(byteCompressed);
-        String strOutput = byteUncompressed.getString(Charset.forName("UTF8").newDecoder());
+        String strOutput = byteUncompressed.getString(StandardCharsets.UTF_8.newDecoder());
         assertFalse(strOutput.equals(strInput));
     }
 
     @Test
     public void testCorruptedHeader() throws Exception {
         String strInput = "Hello World";
-        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
+        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes(StandardCharsets.UTF_8));
 
         IoBuffer byteCompressed = deflater.deflate(byteInput);
         // write a bad value into the zlib header. Make sure that
@@ -103,7 +104,7 @@ public class ZlibTest {
         for (int i = 0; i < 10; i++) {
             strInput += "The quick brown fox jumps over the lazy dog.  ";
         }
-        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes("UTF8"));
+        IoBuffer byteInput = IoBuffer.wrap(strInput.getBytes(StandardCharsets.UTF_8));
         IoBuffer byteCompressed = null;
 
         for (int i = 0; i < 5; i++) {

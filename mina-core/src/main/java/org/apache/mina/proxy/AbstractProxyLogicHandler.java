@@ -180,7 +180,7 @@ public abstract class AbstractProxyLogicHandler implements ProxyLogicHandler {
      */
     public synchronized void enqueueWriteRequest(final NextFilter nextFilter, final WriteRequest writeRequest) {
         if (writeRequestQueue == null) {
-            writeRequestQueue = new LinkedList<Event>();
+            writeRequestQueue = new LinkedList<>();
         }
 
         writeRequestQueue.offer(new Event(nextFilter, writeRequest));

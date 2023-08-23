@@ -51,7 +51,7 @@ public abstract class ShortIntegerDecodingState implements DecodingState {
                     return finishDecode((short) ((highByte << 8) | in.getUnsigned()), out);
                     
                 default:
-                    throw new InternalError();
+                    throw new IllegalStateException();
             }
 
             counter++;

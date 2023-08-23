@@ -136,11 +136,11 @@ public class CachedBufferAllocator implements IoBufferAllocator {
         Map<Integer, Queue<CachedBuffer>> poolMap = new HashMap<>();
 
         for (int i = 0; i < 31; i++) {
-            poolMap.put(1 << i, new ConcurrentLinkedQueue<CachedBuffer>());
+            poolMap.put(1 << i, new ConcurrentLinkedQueue<>());
         }
 
-        poolMap.put(0, new ConcurrentLinkedQueue<CachedBuffer>());
-        poolMap.put(Integer.MAX_VALUE, new ConcurrentLinkedQueue<CachedBuffer>());
+        poolMap.put(0, new ConcurrentLinkedQueue<>());
+        poolMap.put(Integer.MAX_VALUE, new ConcurrentLinkedQueue<>());
 
         return poolMap;
     }

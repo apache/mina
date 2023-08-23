@@ -112,7 +112,7 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
      */
     public ConnectionThrottleFilter(long allowedInterval) {
         this.allowedInterval = allowedInterval;
-        clients = new ConcurrentHashMap<String, Long>();
+        clients = new ConcurrentHashMap<>();
 
         // Create the cleanup thread
         ExpiredSessionThread cleanupThread = new ExpiredSessionThread();

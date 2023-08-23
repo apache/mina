@@ -368,7 +368,7 @@ public class IoBufferTest {
     public void testObjectSerialization() throws Exception {
         IoBuffer buf = IoBuffer.allocate(16);
         buf.setAutoExpand(true);
-        List<Object> o = new ArrayList<Object>();
+        List<Object> o = new ArrayList<>();
         o.add(new Date());
         o.add(long.class);
 

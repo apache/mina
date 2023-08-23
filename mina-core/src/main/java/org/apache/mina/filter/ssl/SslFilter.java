@@ -71,7 +71,7 @@ public class SslFilter extends IoFilterAdapter {
      * Task executor for processing handshakes
      */
     static protected final Executor EXECUTOR = new ThreadPoolExecutor(2, 2, 100, TimeUnit.MILLISECONDS,
-            new LinkedBlockingDeque<Runnable>(), new BasicThreadFactory("ssl-exec", true));
+            new LinkedBlockingDeque<>(), new BasicThreadFactory("ssl-exec", true));
 
     protected final SSLContext sslContext;
     

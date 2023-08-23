@@ -80,7 +80,7 @@ public class HttpNTLMAuthLogicHandler extends AbstractAuthLogicHandler {
 
         HttpProxyRequest req = (HttpProxyRequest) request;
         Map<String, List<String>> headers = req.getHeaders() != null ? req.getHeaders()
-                : new HashMap<String, List<String>>();
+                : new HashMap<>();
 
         String domain = req.getProperties().get(HttpProxyConstants.DOMAIN_PROPERTY);
         String workstation = req.getProperties().get(HttpProxyConstants.WORKSTATION_PROPERTY);

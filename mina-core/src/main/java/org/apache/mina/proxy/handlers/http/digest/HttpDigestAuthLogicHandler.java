@@ -67,7 +67,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
         try {
             rnd = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -99,7 +99,7 @@ public class HttpDigestAuthLogicHandler extends AbstractAuthLogicHandler {
 
         HttpProxyRequest req = (HttpProxyRequest) request;
         Map<String, List<String>> headers = req.getHeaders() != null ? req.getHeaders()
-                : new HashMap<String, List<String>>();
+                : new HashMap<>();
 
         if (step > 0) {
             if (LOGGER.isDebugEnabled()) {

@@ -63,7 +63,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
 
     private static final int POLLSET_SIZE = 1024;
 
-    private final Map<Long, ConnectionRequest> requests = new HashMap<Long, ConnectionRequest>(POLLSET_SIZE);
+    private final Map<Long, ConnectionRequest> requests = new HashMap<>(POLLSET_SIZE);
 
     private final Object wakeupLock = new Object();
 
@@ -77,9 +77,9 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
 
     private final long[] polledSockets = new long[POLLSET_SIZE << 1];
 
-    private final Queue<Long> polledHandles = new ConcurrentLinkedQueue<Long>();
+    private final Queue<Long> polledHandles = new ConcurrentLinkedQueue<>();
 
-    private final Set<Long> failedHandles = new HashSet<Long>(POLLSET_SIZE);
+    private final Set<Long> failedHandles = new HashSet<>(POLLSET_SIZE);
 
     private volatile ByteBuffer dummyBuffer;
 
@@ -201,7 +201,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         }
 
         throwException(rv);
-        throw new InternalError(); // This sentence will never be executed.
+        throw new IllegalStateException(); // This statement will never be executed.
     }
 
     /**
@@ -234,7 +234,7 @@ public final class AprSocketConnector extends AbstractPollingIoConnector<AprSess
         if (failedHandles.remove(handle)) {
             int rv = Socket.recvb(handle, dummyBuffer, 0, 1);
             throwException(rv);
-            throw new InternalError("Shouldn't reach here.");
+            throw new IllegalStateException("Shouldn't reach here.");
         }
         return true;
     }

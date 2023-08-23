@@ -70,7 +70,7 @@ public class InetAddressEditor extends AbstractPropertyEditor {
         try {
             return InetAddress.getByName("0.0.0.0");
         } catch (UnknownHostException e) {
-            throw new InternalError();
+            throw new IllegalStateException();
         }
     }
 }

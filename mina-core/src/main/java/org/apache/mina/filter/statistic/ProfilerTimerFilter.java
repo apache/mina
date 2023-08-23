@@ -297,7 +297,7 @@ public class ProfilerTimerFilter extends IoFilterAdapter {
      * @return a Set containing all the profiled {@link IoEventType}
      */
     public Set<IoEventType> getEventsToProfile() {
-        Set<IoEventType> set = new HashSet<IoEventType>();
+        Set<IoEventType> set = new HashSet<>();
 
         if (profileMessageReceived) {
             set.add(IoEventType.MESSAGE_RECEIVED);

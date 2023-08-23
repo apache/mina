@@ -252,7 +252,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
         // handle the exception in a better way. We can't add a try {} catch()
         // {}
         // around the super() call.
-        super(DEFAULT_INITIAL_THREAD_POOL_SIZE, 1, keepAliveTime, unit, new SynchronousQueue<Runnable>(), threadFactory,
+        super(DEFAULT_INITIAL_THREAD_POOL_SIZE, 1, keepAliveTime, unit, new SynchronousQueue<>(), threadFactory,
                 new AbortPolicy());
 
         if (corePoolSize < DEFAULT_INITIAL_THREAD_POOL_SIZE) {

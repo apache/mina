@@ -160,7 +160,7 @@ public class HttpRequestImpl implements HttpRequest {
             String value = param.length == 2 ? param[1] : "";
             
             if (!parameters.containsKey(name)) {
-                parameters.put(name, new ArrayList<String>());
+                parameters.put(name, new ArrayList<>());
             }
             
             parameters.get(name).add(value);

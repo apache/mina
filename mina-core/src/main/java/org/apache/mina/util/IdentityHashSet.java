@@ -37,7 +37,7 @@ public class IdentityHashSet<E> extends MapBackedSet<E> {
      * Creates a new IdentityHashSet instance
      */
     public IdentityHashSet() {
-        super(new IdentityHashMap<E, Boolean>());
+        super(new IdentityHashMap<>());
     }
 
     /**
@@ -46,7 +46,7 @@ public class IdentityHashSet<E> extends MapBackedSet<E> {
      * @param expectedMaxSize The maximum size for the map
      */
     public IdentityHashSet(int expectedMaxSize) {
-        super(new IdentityHashMap<E, Boolean>(expectedMaxSize));
+        super(new IdentityHashMap<>(expectedMaxSize));
     }
 
     /**
@@ -55,6 +55,6 @@ public class IdentityHashSet<E> extends MapBackedSet<E> {
      * @param c The elements to put in the map
      */
     public IdentityHashSet(Collection<E> c) {
-        super(new IdentityHashMap<E, Boolean>(), c);
+        super(new IdentityHashMap<>(), c);
     }
 }

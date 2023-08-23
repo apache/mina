@@ -34,7 +34,7 @@ import org.junit.Test;
 public class AbstractStateContextLookupTest {
     @Test
     public void testLookup() throws Exception {
-        Map<String, StateContext> map = new HashMap<String, StateContext>();
+        Map<String, StateContext> map = new HashMap<>();
         AbstractStateContextLookup lookup = new AbstractStateContextLookup(new DefaultStateContextFactory()) {
             protected boolean supports(Class<?> c) {
                 return Map.class.isAssignableFrom(c);

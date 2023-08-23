@@ -84,7 +84,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
 
     private final Queue<AcceptorOperationFuture> cancelQueue = new ConcurrentLinkedQueue<>();
 
-    private final Map<SocketAddress, H> boundHandles = Collections.synchronizedMap(new HashMap<SocketAddress, H>());
+    private final Map<SocketAddress, H> boundHandles = Collections.synchronizedMap(new HashMap<>());
 
     private final ServiceOperationFuture disposalFuture = new ServiceOperationFuture();
 
@@ -116,7 +116,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      *            type.
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass), true, null);
+        this(sessionConfig, null, new SimpleIoProcessorPool<>(processorClass), true, null);
     }
 
     /**
@@ -135,7 +135,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass,
             int processorCount) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass, processorCount), true, null);
+        this(sessionConfig, null, new SimpleIoProcessorPool<>(processorClass, processorCount), true, null);
     }
 
     /**
@@ -155,7 +155,7 @@ public abstract class AbstractPollingIoAcceptor<S extends AbstractIoSession, H> 
      */
     protected AbstractPollingIoAcceptor(IoSessionConfig sessionConfig, Class<? extends IoProcessor<S>> processorClass,
             int processorCount, SelectorProvider selectorProvider ) {
-        this(sessionConfig, null, new SimpleIoProcessorPool<S>(processorClass, processorCount, selectorProvider), true, selectorProvider);
+        this(sessionConfig, null, new SimpleIoProcessorPool<>(processorClass, processorCount, selectorProvider), true, selectorProvider);
     }
 
     /**
