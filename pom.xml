@@ -87,7 +87,6 @@
   <!-- Define the version for each of the used jar and maven plugins -->
   <properties>
     <arguments />
-
     <!-- Activate reproductible builds -->
     <project.build.outputTimestamp>1685620127</project.build.outputTimestamp>
 
@@ -99,7 +98,7 @@
     <version.api.plugin>3.9.4</version.api.plugin>
     <version.assembly.plugin>3.6.0</version.assembly.plugin>
     <version.build.helper.plugin>3.4.0</version.build.helper.plugin>
-    <version.bundle.plugin>3.5.1</version.bundle.plugin>
+    <version.bundle.plugin>5.1.9</version.bundle.plugin>
     <version.changes.plugin>2.12.1</version.changes.plugin>
     <version.checkstyle.plugin>3.3.0</version.checkstyle.plugin>
     <version.clean.plugin>3.3.1</version.clean.plugin>
