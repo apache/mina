@@ -96,7 +96,7 @@
 
     <!-- Maven Plugins -->
     <version.apache.rat.plugin>0.13</version.apache.rat.plugin>
-    <version.api.plugin>3.5.2</version.api.plugin>
+    <version.api.plugin>3.9.4</version.api.plugin>
     <version.assembly.plugin>3.3.0</version.assembly.plugin>
     <version.build.helper.plugin>3.2.0</version.build.helper.plugin>
     <version.bundle.plugin>4.1.0</version.bundle.plugin>
@@ -120,8 +120,8 @@
     <version.javadoc.plugin>3.2.0</version.javadoc.plugin>
     <version.jdepend.plugin>2.0</version.jdepend.plugin>
     <version.jxr.plugin>3.1.1</version.jxr.plugin>
-    <version.model.plugin>3.6.0</version.model.plugin>
-    <version.plexus.utils>3.1.1</version.plexus.utils>
+    <version.model.plugin>3.9.4</version.model.plugin>
+    <version.plexus.utils>4.0.0</version.plexus.utils>
     <version.plugin.plugin>3.6.1</version.plugin.plugin>
     <version.pmd.plugin>3.14.0</version.pmd.plugin>
     <version.project.plugin>3.0-alpha-2</version.project.plugin>
@@ -133,13 +133,13 @@
     <version.scm.plugin>1.11.2</version.scm.plugin>
     <version.site.plugin>3.9.1</version.site.plugin>
     <version.source.plugin>3.2.1</version.source.plugin>
-    <version.shade.plugin>3.2.1</version.shade.plugin>
+    <version.shade.plugin>3.5.0</version.shade.plugin>
     <version.surefire.plugin>3.0.0-M5</version.surefire.plugin>
     <version.surfire.report.plugin>3.0.0-M5</version.surfire.report.plugin>
     <version.taglist.plugin>2.4</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
     <version.versions.plugin>2.8.1</version.versions.plugin>
-    <version.xbean.plugin>4.20</version.xbean.plugin>
+    <version.xbean.plugin>4.23</version.xbean.plugin>
 
     <!-- Jars -->
     <version.easymock>2.5.2</version.easymock>
@@ -149,15 +149,15 @@
     <version.junit>4.13.2</version.junit>
     <version.jzlib>1.1.3</version.jzlib>
     <version.log4j>1.2.17</version.log4j>
-    <version.ognl>3.3.2</version.ognl>
+    <version.ognl>3.3.4</version.ognl>
     <version.pmd>4.3</version.pmd>
     <version.rmock>2.0.2</version.rmock>
     <version.slf4j.api>1.7.36</version.slf4j.api>
     <version.slf4j.log4j12>1.7.36</version.slf4j.log4j12>
     <version.slf4j.jcl.over.slf4j>1.7.36</version.slf4j.jcl.over.slf4j>
     <version.springframework>2.5.6.SEC03</version.springframework>
-    <version.tomcat.jni>10.0.16</version.tomcat.jni>
-    <version.xbean.spring>4.20</version.xbean.spring>
+    <version.tomcat.jni>10.0.27</version.tomcat.jni>
+    <version.xbean.spring>4.23</version.xbean.spring>
 
     <!-- OSGi minimum versions -->
     <osgi-min-version.slf4j.api>1.7</osgi-min-version.slf4j.api>
@@ -867,14 +867,14 @@
           <dependency>
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-ssh</artifactId>
-            <version>3.5.1</version>
+            <version>3.5.3</version>
           </dependency>
 
           <!-- Add support for 'scpexe' -->
           <dependency>
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-ssh-external</artifactId>
-            <version>3.5.1</version>
+            <version>3.5.3</version>
           </dependency>
         </dependencies>
       </plugin>
