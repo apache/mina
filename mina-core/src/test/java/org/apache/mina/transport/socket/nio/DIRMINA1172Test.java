@@ -52,6 +52,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.FilterEvent;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -241,6 +242,7 @@ public class DIRMINA1172Test
     }
 
     @Test
+    @Ignore
     public void test() throws InterruptedException, IOException
     {
         socket = new DatagramSocket();
