@@ -327,7 +327,7 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
         IoSession session;
 
         synchronized (sessionRecycler) {
-            session = sessionRecycler.recycle(remoteAddress);
+            session = sessionRecycler.recycle(remoteAddress, ((InetSocketAddress)localAddress).getPort());
 
             if (session != null) {
                 return session;

@@ -1542,7 +1542,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * 
      * @param length The maximum number of bytes to dump from the current buffer
      *               position.
-     * @return hexidecimal representation of this buffer
+     * @param pretty If we should do a pretty  dump 
+     * @return hexadecimal representation of this buffer
      */
     public String getHexDump(int length, boolean pretty) {
         return (pretty) ? IoBufferHexDumper.getPrettyHexDumpSlice(this, this.position(), Math.min(this.remaining(), length))

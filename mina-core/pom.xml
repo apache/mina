@@ -94,7 +94,7 @@
               org.apache.mina.transport.socket;version=${project.version};-noimport:=true,
               org.apache.mina.transport.socket.nio;version=${project.version};-noimport:=true,
               org.apache.mina.transport.vmpipe;version=${project.version};-noimport:=true,
-              org.apache.mina.util;version=${project.version};-noimport:=true
+              org.apache.mina.util;version=${project.version};-noimport:=true,
               org.apache.mina.util.byteaccess;version=${project.version};-noimport:=true
             </Export-Package>
             <Import-Package>
