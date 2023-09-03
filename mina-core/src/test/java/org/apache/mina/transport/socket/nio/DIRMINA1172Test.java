@@ -19,7 +19,7 @@ import org.apache.mina.filter.logging.LoggingFilter;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DIRMINA1172
+public class DIRMINA1172Test
 {
     private static DatagramSocket socket;
     private static InetAddress address;
