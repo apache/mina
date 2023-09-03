@@ -200,7 +200,10 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     /**
-     * Creates a default ThreadPool, with default values : - A default ThreadFactory
+     * Creates a default ThreadPool, with default values :
+     * <ul>
+     *   <li>A default ThreadFactory</li>
+     * </ul>
      *
      * @param minimumPoolSize The initial pool size
      * @param maximumPoolSize The maximum pool size
@@ -215,7 +218,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
     }
 
     /**
-     * Creates a default ThreadPool, with default values : - A default ThreadFactory
+     * Creates a default ThreadPool
      *
      * @param minimumPoolSize The initial pool size
      * @param maximumPoolSize The maximum pool size

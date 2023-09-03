@@ -39,7 +39,7 @@ import org.junit.Test;
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class DIRMINA1172
+public class DIRMINA1172Test
 {
     private static DatagramSocket socket;
     private static InetAddress address;
