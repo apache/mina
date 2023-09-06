@@ -61,7 +61,7 @@ public interface SocketAcceptor extends IoAcceptor {
     /**
      * @see ServerSocket#getReuseAddress()
      * 
-     * @return {@code true</tt> if the <tt>SO_REUSEADDR} is enabled
+     * @return {@code true} if the {@code SO_REUSEADDR} is enabled
      */
     boolean isReuseAddress();
 

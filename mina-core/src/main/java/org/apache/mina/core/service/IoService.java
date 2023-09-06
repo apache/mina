@@ -141,7 +141,7 @@ public interface IoService {
     void setFilterChainBuilder(IoFilterChainBuilder builder);
 
     /**
-     * A shortcut for {@code ( ( DefaultIoFilterChainBuilder ) </tt>{@link #getFilterChainBuilder()}<tt> )}.
+     * A shortcut for {@code ( ( DefaultIoFilterChainBuilder )} {@link #getFilterChainBuilder()}.
      * Please note that the returned object is not a <b>real</b> {@link IoFilterChain}
      * but a {@link DefaultIoFilterChainBuilder}.  Modifying the returned builder
      * won't affect the existing {@link IoSession}s at all, because

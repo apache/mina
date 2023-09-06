@@ -133,7 +133,7 @@ public interface IoFilterChain {
     /**
      * @param filter The filter we are looking for
      * 
-     * @return {@code true</tt> if this chain contains the specified <tt>filter}.
+     * @return {@code true} if this chain contains the specified {@code filter}.
      */
     boolean contains(IoFilter filter);
 

@@ -23,7 +23,7 @@ import org.apache.mina.core.session.IoSession;
 
 /**
  * A handler interface that {@link DemuxingIoHandler} forwards
- * {@code messageReceived</tt> or <tt>messageSent} events to.  You have to
+ * {@code messageReceived} or {@code messageSent} events to.  You have to
  * register your handler with the type of the message you want to get notified
  * using {@link DemuxingIoHandler#addReceivedMessageHandler(Class, MessageHandler)}
  * or {@link DemuxingIoHandler#addSentMessageHandler(Class, MessageHandler)}.

@@ -61,7 +61,7 @@ public interface IoEventQueueHandler extends EventListener {
     };
 
     /**
-     * @return {@code true</tt> if and only if the specified <tt>event} is
+     * @return {@code true} if and only if the specified {@code event} is
      * allowed to be offered to the event queue.  The {@code event} is dropped
      * if {@code false} is returned.
      * 

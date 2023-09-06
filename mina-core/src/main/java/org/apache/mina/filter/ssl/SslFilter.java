@@ -190,7 +190,7 @@ public class SslFilter extends IoFilterAdapter {
 
     /**
      * Creates a new SSL filter using the specified {@link SSLContext}.
-     * If the {@code autostart</tt> flag is set to <tt>true}, the
+     * If the {@code autostart} flag is set to {@code true}, the
      * handshake will start immediately after the filter has been added
      * to the chain.
      * 
@@ -222,7 +222,7 @@ public class SslFilter extends IoFilterAdapter {
      * you don't need to call this method unless you've used TLS closure.
      *
      * @param session The session that will be switched to SSL mode
-     * @return {@code true</tt> if the SSL session has been started, <tt>false} if already started.
+     * @return {@code true} if the SSL session has been started, {@code false} if already started.
      * @throws SSLException if failed to start the SSL session
      */
     public boolean startSsl(IoSession session) throws SSLException {
@@ -286,9 +286,9 @@ public class SslFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return {@code true</tt> if and only if the specified <tt>session} is
+     * @return {@code true} if and only if the specified {@code session} is
      * encrypted/decrypted over SSL/TLS currently. This method will start
-     * to return {@code false</tt> after TLS <tt>close_notify} message
+     * to return {@code false} after TLS {@code close_notify} message
      * is sent and any messages written after then is not going to get encrypted.
      * 
      * @param session the session we want to check
@@ -362,7 +362,7 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Configures the engine to use client (or server) mode when handshaking.
      * 
-     * @param clientMode {@code true</tt> when we are in client mode, <tt>false} when in server mode
+     * @param clientMode {@code true} when we are in client mode, {@code false} when in server mode
      */
     public void setUseClientMode(boolean clientMode) {
         this.client = clientMode;

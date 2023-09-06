@@ -79,7 +79,7 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>broadcast} property
+     * @return {@code true} if and only if the {@code broadcast} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -90,7 +90,7 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>receiveBufferSize} property
+     * @return {@code true} if and only if the {@code receiveBufferSize} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -101,7 +101,7 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>reuseAddress} property
+     * @return {@code true} if and only if the {@code reuseAddress} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -112,7 +112,7 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>sendBufferSize} property
+     * @return {@code true} if and only if the {@code sendBufferSize} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -123,7 +123,7 @@ public abstract class AbstractDatagramSessionConfig extends AbstractIoSessionCon
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>trafficClass} property
+     * @return {@code true} if and only if the {@code trafficClass} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation

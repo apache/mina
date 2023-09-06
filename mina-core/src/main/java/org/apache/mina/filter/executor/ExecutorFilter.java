@@ -80,8 +80,8 @@ import org.apache.mina.core.write.WriteRequest;
  * 
  * <h2>Selective Filtering</h2>
  * 
- * By default, all event types but {@code sessionCreated</tt>, <tt>filterWrite},
- * {@code filterClose</tt> and <tt>filterSetTrafficMask} are submitted to the
+ * By default, all event types but {@code sessionCreated}, {@code filterWrite},
+ * {@code filterClose} and {@code filterSetTrafficMask} are submitted to the
  * underlying executor, which is most common setting.
  * <p>
  * If you want to submit only a certain set of event types, you can specify them

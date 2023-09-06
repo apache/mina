@@ -158,7 +158,7 @@ public final class IoUtil {
      * @param futures The {@link IoFuture}s we are waiting on 
      * @param timeout The maximum time we wait for the {@link IoFuture}s to complete
      * @param unit The Time unit to use for the timeout
-     * @return {@code TRUE</TT> if all the {@link IoFuture} have been completed, <tt>FALSE} if
+     * @return {@code TRUE} if all the {@link IoFuture} have been completed, {@code FALSE} if
      * at least one {@link IoFuture} haas been interrupted
      * @throws InterruptedException If one of the {@link IoFuture} is interrupted
      */
@@ -172,7 +172,7 @@ public final class IoUtil {
      *  
      * @param futures The {@link IoFuture}s we are waiting on 
      * @param timeoutMillis The maximum milliseconds we wait for the {@link IoFuture}s to complete
-     * @return {@code TRUE</TT> if all the {@link IoFuture} have been completed, <tt>FALSE} if
+     * @return {@code TRUE} if all the {@link IoFuture} have been completed, {@code FALSE} if
      * at least one {@link IoFuture} has been interrupted
      * @throws InterruptedException If one of the {@link IoFuture} is interrupted
      */
@@ -186,7 +186,7 @@ public final class IoUtil {
      * @param futures The {@link IoFuture}s we are waiting on 
      * @param timeout The maximum time we wait for the {@link IoFuture}s to complete
      * @param unit The Time unit to use for the timeout
-     * @return {@code TRUE</TT> if all the {@link IoFuture} have been completed, <tt>FALSE} if
+     * @return {@code TRUE} if all the {@link IoFuture} have been completed, {@code FALSE} if
      * at least one {@link IoFuture} has been interrupted
      */
     public static boolean awaitUninterruptibly(Iterable<? extends IoFuture> futures, long timeout, TimeUnit unit) {
@@ -198,7 +198,7 @@ public final class IoUtil {
      *  
      * @param futures The {@link IoFuture}s we are waiting on 
      * @param timeoutMillis The maximum milliseconds we wait for the {@link IoFuture}s to complete
-     * @return {@code TRUE</TT> if all the {@link IoFuture} have been completed, <tt>FALSE} if
+     * @return {@code TRUE} if all the {@link IoFuture} have been completed, {@code FALSE} if
      * at least one {@link IoFuture} has been interrupted
      */
     public static boolean awaitUninterruptibly(Iterable<? extends IoFuture> futures, long timeoutMillis) {

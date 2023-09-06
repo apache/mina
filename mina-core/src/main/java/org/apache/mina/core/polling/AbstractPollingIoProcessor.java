@@ -270,7 +270,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * 
      * @param session
      *            the queried session
-     * @return {@code true</tt> is ready, <tt>false} if not ready
+     * @return {@code true} is ready, {@code false} if not ready
      */
     protected abstract boolean isWritable(S session);
 
@@ -279,7 +279,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * 
      * @param session
      *            the queried session
-     * @return {@code true</tt> is ready, <tt>false} if not ready
+     * @return {@code true} is ready, {@code false} if not ready
      */
     protected abstract boolean isReadable(S session);
 
@@ -289,7 +289,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * @param session
      *            the session for which we want to be interested in write events
      * @param isInterested
-     *            {@code true</tt> for registering, <tt>false} for removing
+     *            {@code true} for registering, {@code false} for removing
      * @throws Exception
      *             If there was a problem while registering the session
      */
@@ -301,7 +301,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      * @param session
      *            the session for which we want to be interested in read events
      * @param isInterested
-     *            {@code true</tt> for registering, <tt>false} for removing
+     *            {@code true} for registering, {@code false} for removing
      * @throws Exception
      *             If there was a problem while registering the session
      */

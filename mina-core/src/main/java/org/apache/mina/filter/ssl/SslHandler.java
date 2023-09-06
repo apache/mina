@@ -469,7 +469,7 @@ class SslHandler {
     /**
      * Start SSL shutdown process.
      * 
-     * @return {@code true</tt> if shutdown process is started. <tt>false} if
+     * @return {@code true} if shutdown process is started. {@code false} if
      *         shutdown process is already finished.
      * @throws SSLException
      *             on errors

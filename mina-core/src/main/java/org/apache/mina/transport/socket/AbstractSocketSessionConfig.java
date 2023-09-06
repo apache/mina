@@ -82,7 +82,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>keepAlive} property
+     * @return {@code true} if and only if the {@code keepAlive} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -93,7 +93,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>oobInline} property
+     * @return {@code true} if and only if the {@code oobInline} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -104,7 +104,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>receiveBufferSize} property
+     * @return {@code true} if and only if the {@code receiveBufferSize} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -115,7 +115,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>reuseAddress} property
+     * @return {@code true} if and only if the {@code reuseAddress} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -126,7 +126,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>sendBufferSize} property
+     * @return {@code true} if and only if the {@code sendBufferSize} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -137,7 +137,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>soLinger} property
+     * @return {@code true} if and only if the {@code soLinger} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -148,7 +148,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>tcpNoDelay} property
+     * @return {@code true} if and only if the {@code tcpNoDelay} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation
@@ -159,7 +159,7 @@ public abstract class AbstractSocketSessionConfig extends AbstractIoSessionConfi
     }
 
     /**
-     * @return {@code true</tt> if and only if the <tt>trafficClass} property
+     * @return {@code true} if and only if the {@code trafficClass} property
      * has been changed by its setter method.  The system call related with
      * the property is made only when this method returns {@code true}.  By
      * default, this method always returns {@code true} to simplify implementation

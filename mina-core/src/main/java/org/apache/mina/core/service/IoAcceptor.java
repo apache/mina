@@ -227,7 +227,7 @@ public interface IoAcceptor extends IoService {
 
     /**
      * (Optional) Returns an {@link IoSession} that is bound to the specified
-     * {@code localAddress</tt> and the specified <tt>remoteAddress} which
+     * {@code localAddress} and the specified {@code remoteAddress} which
      * reuses the local address that is already bound by this service.
      * <p>
      * This operation is optional.  Please throw {@link UnsupportedOperationException}

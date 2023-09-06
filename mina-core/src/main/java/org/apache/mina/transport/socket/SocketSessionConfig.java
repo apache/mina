@@ -82,14 +82,14 @@ public interface SocketSessionConfig extends IoSessionConfig {
      * @see Socket#setTrafficClass(int)
      * 
      * @param trafficClass The traffic class to set, one of {@code IPTOS_LOWCOST} (0x02)
-     * {@code IPTOS_RELIABILITY</tt> (0x04), <tt>IPTOS_THROUGHPUT</tt> (0x08) or <tt>IPTOS_LOWDELAY} (0x10)
+     * {@code IPTOS_RELIABILITY} (0x04), {@code IPTOS_THROUGHPUT} (0x08) or {@code IPTOS_LOWDELAY} (0x10)
      */
     void setTrafficClass(int trafficClass);
 
     /**
      * @see Socket#getKeepAlive()
      * 
-     * @return {@code true</tt> if <tt>SO_KEEPALIVE} is enabled.
+     * @return {@code true} if {@code SO_KEEPALIVE} is enabled.
      */
     boolean isKeepAlive();
 
@@ -103,7 +103,7 @@ public interface SocketSessionConfig extends IoSessionConfig {
     /**
      * @see Socket#getOOBInline()
      * 
-     * @return {@code true</tt> if <tt>SO_OOBINLINE} is enabled.
+     * @return {@code true} if {@code SO_OOBINLINE} is enabled.
      */
     boolean isOobInline();
 
@@ -139,14 +139,14 @@ public interface SocketSessionConfig extends IoSessionConfig {
     /**
      * @see Socket#getTcpNoDelay()
      * 
-     * @return {@code true</tt> if <tt>TCP_NODELAY} is enabled.
+     * @return {@code true} if {@code TCP_NODELAY} is enabled.
      */
     boolean isTcpNoDelay();
 
     /**
      * @see Socket#setTcpNoDelay(boolean)
      * 
-     * @param tcpNoDelay {@code true</tt> if <tt>TCP_NODELAY} is to be enabled
+     * @param tcpNoDelay {@code true} if {@code TCP_NODELAY} is to be enabled
      */
     void setTcpNoDelay(boolean tcpNoDelay);
 }
