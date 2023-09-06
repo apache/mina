@@ -51,6 +51,8 @@ public class PriorityThreadPoolExecutorTest {
      *
      * This test asserts that, without a provided comparator, entries are
      * considered equal, when they reference the same session.
+     * 
+     * @exception Exception If the test throw an exception
      */
     @Test
     public void fifoEntryTestNoComparatorSameSession() throws Exception {
@@ -73,6 +75,8 @@ public class PriorityThreadPoolExecutorTest {
      *
      * This test asserts that, without a provided comparator, the first entry
      * created is 'less than' an entry that is created later.
+     * 
+     * @exception Exception If the test throw an exception
      */
     @Test
     public void fifoEntryTestNoComparatorDifferentSession() throws Exception {
@@ -96,6 +100,8 @@ public class PriorityThreadPoolExecutorTest {
      * This test asserts that, with a provided comparator, entries are
      * considered equal, when they reference the same session (the provided
      * comparator is ignored).
+     * 
+     * @exception Exception If the test throw an exception
      */
     @Test
     public void fifoEntryTestWithComparatorSameSession() throws Exception {
@@ -128,6 +134,8 @@ public class PriorityThreadPoolExecutorTest {
      * This test asserts that a provided comparator is used instead of the
      * (fallback) default behavior (when entries are referring different
      * sessions).
+     * 
+     * @exception Exception If the test throw an exception
      */
     @Test
     public void fifoEntryTestComparatorDifferentSession() throws Exception {
@@ -165,6 +173,8 @@ public class PriorityThreadPoolExecutorTest {
      * Each session records the timestamp of its last activity. After all work
      * has been processed, the test asserts that the last activity of all
      * sessions was later than the last activity of the preferred session.
+     * 
+     * @exception Throwable If the test throw an exception
      */
     @Test
     @Ignore("This test faiuls randomly")

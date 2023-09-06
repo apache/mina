@@ -166,6 +166,8 @@ public class SslIdentificationAlgorithmTest {
 
     /**
      * Subject Alternative Name (SAN) scenarios
+     * 
+     * @exception Exception If the test throws an exception
      */
     @Test
     public void shouldAuthenticateWhenServerCertificateAlternativeNameMatchesClientSNIExactly() throws Exception {
