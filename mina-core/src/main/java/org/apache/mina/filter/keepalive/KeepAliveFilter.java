@@ -86,7 +86,7 @@ import org.apache.mina.core.write.WriteRequest;
  *     <td>
  *       Both {@link KeepAliveMessageFactory#getRequest(IoSession)} and
  *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- *       return a non-{@code null</tt>, and the <tt>timeoutHandler} property
+ *       return a non-{@code null}, and the {@code timeoutHandler} property
  *       should be set to {@link KeepAliveRequestTimeoutHandler#NOOP},
  *       {@link KeepAliveRequestTimeoutHandler#LOG} or the custom {@link KeepAliveRequestTimeoutHandler}
  *       implementation that doesn't affect the session state nor throw an exception.
@@ -114,7 +114,7 @@ import org.apache.mina.core.write.WriteRequest;
  *       {@link KeepAliveMessageFactory#getRequest(IoSession)} must return
  *       a non-{@code null},
  *       {@link KeepAliveMessageFactory#getResponse(IoSession, Object)} must
- *       return {@code null</tt> and the <tt>timeoutHandler} must be set to
+ *       return {@code null} and the {@code timeoutHandler} must be set to
  *       {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}.
  *     </td>
  *   </tr>

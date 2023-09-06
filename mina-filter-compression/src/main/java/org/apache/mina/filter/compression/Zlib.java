@@ -29,7 +29,7 @@ import com.jcraft.jzlib.ZStream;
 /**
  * A helper class for interfacing with the JZlib library. This class acts both
  * as a compressor and decompressor, but only as one at a time.  The only
- * flush method supported is {@code Z_SYNC_FLUSH</tt> also known as <tt>Z_PARTIAL_FLUSH}
+ * flush method supported is {@code Z_SYNC_FLUSH} also known as {@code Z_PARTIAL_FLUSH}
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -65,10 +65,10 @@ class Zlib {
      * Creates an instance of the ZLib class.
      * 
      * @param compressionLevel the level of compression that should be used. One of
-     * {@code COMPRESSION_MAX</tt>, <tt>COMPRESSION_MIN},
-     * {@code COMPRESSION_NONE</tt> or <tt>COMPRESSION_DEFAULT}
+     * {@code COMPRESSION_MAX}, {@code COMPRESSION_MIN},
+     * {@code COMPRESSION_NONE} or {@code COMPRESSION_DEFAULT}
      * @param mode the mode in which the instance will operate. Can be either
-     * of {@code MODE_DEFLATER</tt> or <tt>MODE_INFLATER}
+     * of {@code MODE_DEFLATER} or {@code MODE_INFLATER}
      * @throws IllegalArgumentException if the mode is incorrect
      */
     public Zlib(int compressionLevel, int mode) {

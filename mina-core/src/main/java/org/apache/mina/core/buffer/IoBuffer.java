@@ -85,7 +85,7 @@ import org.apache.mina.core.session.IoSession;
  * <p>
  * Writing variable-length data using NIO {@code ByteBuffers} is not really
  * easy, and it is because its size is fixed at allocation. {@link IoBuffer}
- * introduces the {@code autoExpand</tt> property. If <tt>autoExpand} property
+ * introduces the {@code autoExpand} property. If {@code autoExpand} property
  * is set to true, you never get a {@link BufferOverflowException} or an
  * {@link IndexOutOfBoundsException} (except when index is negative). It
  * automatically expands its capacity. For instance:
@@ -223,7 +223,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * bytes.
      * 
      * @param capacity        the capacity of the buffer
-     * @param useDirectBuffer {@code true</tt> to get a direct buffer, <tt>false}
+     * @param useDirectBuffer {@code true} to get a direct buffer, {@code false}
      *                        to get a heap buffer.
      * @return a direct or heap IoBuffer which can hold up to capacity bytes
      */
@@ -403,7 +403,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer capacity(int newCapacity);
 
     /**
-     * @return {@code true</tt> if and only if <tt>autoExpand} is turned on.
+     * @return {@code true} if and only if {@code autoExpand} is turned on.
      */
     public abstract boolean isAutoExpand();
 
@@ -416,7 +416,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     public abstract IoBuffer setAutoExpand(boolean autoExpand);
 
     /**
-     * @return {@code true</tt> if and only if <tt>autoShrink} is turned on.
+     * @return {@code true} if and only if {@code autoShrink} is turned on.
      */
     public abstract boolean isAutoShrink();
 
@@ -431,7 +431,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Changes the capacity and limit of this buffer so this buffer get the
      * specified {@code expectedRemaining} room from the current position. This
-     * method works even if you didn't set {@code autoExpand</tt> to <tt>true}.
+     * method works even if you didn't set {@code autoExpand} to {@code true}.
      * <br>
      * Assuming a buffer contains N bytes, its position is P and its current
      * capacity is C, here are the resulting buffer if we call the expand method
@@ -501,7 +501,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Changes the capacity and limit of this buffer so this buffer get the
      * specified {@code expectedRemaining} room from the specified
      * {@code position}. This method works even if you didn't set
-     * {@code autoExpand</tt> to <tt>true}. Assuming a buffer contains N bytes, its
+     * {@code autoExpand} to {@code true}. Assuming a buffer contains N bytes, its
      * position is P and its current capacity is C, here are the resulting buffer if
      * we call the expand method with a expectedRemaining value V :
      * 
@@ -1510,7 +1510,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Returns hexdump of this buffer. The data and pointer are not changed as a
      * result of this method call.
      * 
-     * @return hexidecimal representation of this buffer
+     * @return hexadecimal representation of this buffer
      */
     public String getHexDump() {
         return this.getHexDump(this.remaining(), false);
@@ -1520,7 +1520,8 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * Returns hexdump of this buffer. The data and pointer are not changed as a
      * result of this method call.
      * 
-     * @return hexidecimal representation of this buffer
+     * @param pretty If we should do a pretty  dump 
+     * @return hexadecimal representation of this buffer
      */
     public String getHexDump(boolean pretty) {
         return getHexDump(this.remaining(), pretty);
@@ -1531,7 +1532,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * 
      * @param length The maximum number of bytes to dump from the current buffer
      *               position.
-     * @return hexidecimal representation of this buffer
+     * @return hexadecimal representation of this buffer
      */
     public String getHexDump(int length) {
         return getHexDump(length, false);

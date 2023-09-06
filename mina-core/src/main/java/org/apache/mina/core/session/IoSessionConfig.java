@@ -206,7 +206,7 @@ public interface IoSessionConfig {
      * and can cause unintended memory leak, and therefore it's disabled by
      * default.
      * 
-     * @param useReadOperation {@code true</tt> if the read operation is enabled, <tt>false} otherwise
+     * @param useReadOperation {@code true} if the read operation is enabled, {@code false} otherwise
      */
     void setUseReadOperation(boolean useReadOperation);
 

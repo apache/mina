@@ -105,7 +105,7 @@ public interface IoSessionAttributeMap {
      * @param session the session for which we want to remove a value
      * @param key The key we are looking for
      * @param value The value to remove
-     * @return {@code true</tt> if the value has been removed, <tt>false} if the key was
+     * @return {@code true} if the value has been removed, {@code false} if the key was
      * not found of the value not removed
      */
     boolean removeAttribute(IoSession session, Object key, Object value);
@@ -128,7 +128,7 @@ public interface IoSessionAttributeMap {
      * @param key The key we are looking for
      * @param oldValue The old value to replace
      * @param newValue The new value to set
-     * @return {@code true</tt> if the value has been replaced, <tt>false} if the key was
+     * @return {@code true} if the value has been replaced, {@code false} if the key was
      * not found of the value not replaced
      */
     boolean replaceAttribute(IoSession session, Object key, Object oldValue, Object newValue);

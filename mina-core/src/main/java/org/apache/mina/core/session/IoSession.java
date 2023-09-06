@@ -146,7 +146,7 @@ public interface IoSession {
     WriteFuture write(Object message);
 
     /**
-     * (Optional) Writes the specified {@code message</tt> to the specified <tt>destination}.
+     * (Optional) Writes the specified {@code message} to the specified {@code destination}.
      * This operation is asynchronous; {@link IoHandler#messageSent(IoSession, Object)}
      * will be invoked when the message is actually sent to remote peer. You can
      * also wait for the returned {@link WriteFuture} if you want to wait for
@@ -476,7 +476,7 @@ public interface IoSession {
      * silently without updating the throughput properties if they were
      * calculated already within last
      * {@link IoSessionConfig#getThroughputCalculationInterval() calculation interval}.
-     * If, however, {@code force</tt> is specified as <tt>true}, this method
+     * If, however, {@code force} is specified as {@code true}, this method
      * updates the throughput properties immediately.
 
      * @param currentTime the current time in milliseconds
@@ -600,9 +600,9 @@ public interface IoSession {
      * for the specified {@link IdleStatus}.
      * <p>
      * If {@code sessionIdle} event is fired first after some time after I/O,
-     * {@code idleCount</tt> becomes <tt>1</tt>.  <tt>idleCount} resets to
+     * {@code idleCount} becomes {@code 1}.  {@code idleCount} resets to
      * {@code 0} if any I/O occurs again, otherwise it increases to
-     * {@code 2</tt> and so on if <tt>sessionIdle} event is fired again without
+     * {@code 2} and so on if {@code sessionIdle} event is fired again without
      * any I/O between two (or more) {@code sessionIdle} events.
      */
     int getIdleCount(IdleStatus status);

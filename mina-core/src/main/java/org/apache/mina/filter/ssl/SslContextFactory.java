@@ -211,7 +211,7 @@ public class SslContextFactory {
      * return by {@link KeyManagerFactory#getDefaultAlgorithm()} will be used.
      * The default value of this property is {@code true}.
      *
-     * @param useDefault {@code true</tt> or <tt>false}.
+     * @param useDefault {@code true} or {@code false}.
      */
     public void setKeyManagerFactoryAlgorithmUseDefault(boolean useDefault) {
         this.keyManagerFactoryAlgorithmUseDefault = useDefault;
@@ -225,7 +225,7 @@ public class SslContextFactory {
      * return by {@link TrustManagerFactory#getDefaultAlgorithm()} will be used.
      * The default value of this property is {@code true}.
      *
-     * @param useDefault {@code true</tt> or <tt>false}.
+     * @param useDefault {@code true} or {@code false}.
      */
     public void setTrustManagerFactoryAlgorithmUseDefault(boolean useDefault) {
         this.trustManagerFactoryAlgorithmUseDefault = useDefault;
