@@ -131,7 +131,7 @@
     <version.resources.plugin>3.3.1</version.resources.plugin>
     <version.scm.plugin>2.0.1</version.scm.plugin>
     <version.site.plugin>3.9.1</version.site.plugin>
-    <version.source.plugin>3.3.0</version.source.plugin>
+    <version.source.plugin>3.2.1</version.source.plugin>
     <version.shade.plugin>3.5.0</version.shade.plugin>
     <version.surefire.plugin>3.1.2</version.surefire.plugin>
     <version.surfire.report.plugin>3.1.2</version.surfire.report.plugin>
