@@ -118,7 +118,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      * Cumulates content of {@code in} into internal buffer and forwards
      * decoding request to
      * doDecode(IoSession, IoBuffer, ProtocolDecoderOutput).
-     * {@code doDecode() is invoked repeatedly until it returns {@code false}
+     * {@code doDecode()} is invoked repeatedly until it returns {@code false}
      * and the cumulative buffer is compacted after decoding ends.
      *
      * @throws IllegalStateException

@@ -84,7 +84,7 @@ import org.apache.mina.core.session.IoSession;
  * <p>
  *   Writing variable-length data using NIO {@code ByteBuffers} is not really
  *   easy, and it is because its size is fixed at allocation. {@link IoBuffer} introduces
- *   the {@code autoExpand} property. If {@codeautoExpand} property is set to true, 
+ *   the {@code autoExpand} property. If {@code autoExpand} property is set to true, 
  *   you never get a {@link BufferOverflowException} or
  *   an {@link IndexOutOfBoundsException} (except when index is negative). It
  *   automatically expands its capacity. For instance:
