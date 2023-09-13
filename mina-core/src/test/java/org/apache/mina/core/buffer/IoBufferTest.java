@@ -34,6 +34,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderMalfunctionError;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1106,7 +1107,10 @@ public class IoBufferTest {
             duplicate.putString("A very very very very looooooong string", Charset.forName("ISO-8859-1").newEncoder());
             fail("ReadOnly buffer's can't be expanded");
         } catch (ReadOnlyBufferException e) {
-            // Expected an Exception, signifies test success
+            // In Java 8 or 11, it expects an Exception, signifies test success
+            assertTrue(true);
+        } catch (CoderMalfunctionError cme) {
+            // In Java 17, it expects an Error, signifies test success
             assertTrue(true);
         }
     }
