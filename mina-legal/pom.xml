@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-parent</artifactId>
-        <version>2.2.4-SNAPSHOT</version>
+        <version>2.1.9-SNAPSHOT</version>
     </parent>
 
     <artifactId>mina-legal</artifactId>
@@ -81,3 +81,4 @@
         </dependency>
     </dependencies>
 </project>
+

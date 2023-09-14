@@ -163,7 +163,6 @@
   </properties>
 
   <modules>
-    <module>mina-legal</module>
     <module>mina-core</module>
     <module>mina-transport-apr</module>
     <module>mina-filter-compression</module>
@@ -247,7 +246,6 @@
       </dependency>
 
       <!-- Integration -->
-
       <dependency>
         <groupId>org.apache.xbean</groupId>
         <artifactId>xbean-spring</artifactId>
@@ -284,13 +282,7 @@
         <groupId>jboss</groupId>
         <artifactId>javassist</artifactId>
         <version>${version.jboss.javassist}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>jdom</groupId>
-        <artifactId>jdom</artifactId>
-        <version>${version.jdom}</version>
-        <optional>true</optional>
+        <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -298,6 +290,7 @@
         <artifactId>jmock</artifactId>
         <version>${version.jmock}</version>
         <optional>true</optional>
+        <scope>test</scope>
       </dependency>
 
       <dependency>
