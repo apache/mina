@@ -173,6 +173,7 @@
     <module>mina-integration-jmx</module>
     <module>mina-example</module>
     <module>mina-http</module>
+    <module>mina-legal</module>
     <!--module>mina-benchmarks</module-->
   </modules>
 
