@@ -244,12 +244,6 @@ public class SslFilter extends IoFilterAdapter {
      */
     @Override
     public void onPostAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
-        IoSession session = parent.getSession();
-        
-        if (session.isConnected()) {
-            onConnected(next, session);
-        }
-        
         super.onPostAdd(parent, name, next);
     }
 
