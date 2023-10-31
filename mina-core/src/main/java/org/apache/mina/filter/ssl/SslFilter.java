@@ -74,7 +74,13 @@ public class SslFilter extends IoFilterAdapter {
             new LinkedBlockingDeque<>(), new BasicThreadFactory("ssl-exec", true));
 
     protected final SSLContext sslContext;
-    
+
+    /** A flag used to tell the filter to start the handshake immediately (in onPostAdd method)
+     *  alternatively handshake will be started after session is connected (in sessionOpened method)
+     *  default value is true
+     * */
+    private final boolean autoStart;
+
     /** A flag set if client authentication is required */ 
     protected boolean needClientAuth = false;
 
@@ -110,9 +116,23 @@ public class SslFilter extends IoFilterAdapter {
      * @param sslContext The SSLContext to use
      */
     public SslFilter(SSLContext sslContext) {
+        this(sslContext, true);
+    }
+
+    /**
+     * Creates a new SSL filter using the specified {@link SSLContext}.
+     * If the <code>autostart</code> flag is set to <code>true</code>, the
+     * handshake will start immediately after the filter has been added
+     * to the chain.
+     *
+     * @param sslContext The SSLContext to use
+     * @param autoStart The flag used to tell the filter to start the handshake immediately
+     */
+    public SslFilter(SSLContext sslContext, boolean autoStart) {
         Objects.requireNonNull(sslContext, "ssl must not be null");
 
         this.sslContext = sslContext;
+        this.autoStart = autoStart;
     }
 
     /**
@@ -244,6 +264,12 @@ public class SslFilter extends IoFilterAdapter {
      */
     @Override
     public void onPostAdd(IoFilterChain parent, String name, NextFilter next) throws Exception {
+        IoSession session = parent.getSession();
+
+        if (session.isConnected() && autoStart) {
+            onConnected(next, session);
+        }
+
         super.onPostAdd(parent, name, next);
     }
 
