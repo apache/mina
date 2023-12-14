@@ -75,7 +75,7 @@
   <licenses>
     <license>
       <name>Apache 2.0 License</name>
-      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -140,7 +140,6 @@
     <!-- Jars -->
     <version.easymock>2.5.2</version.easymock>
     <version.jboss.javassist>3.8.0.GA</version.jboss.javassist>
-    <version.jdom>1.0</version.jdom>
     <version.jmock>1.2.0</version.jmock>
     <version.junit>4.13.2</version.junit>
     <version.jzlib>1.1.3</version.jzlib>
@@ -163,7 +162,6 @@
   </properties>
 
   <modules>
-    <module>mina-legal</module>
     <module>mina-core</module>
     <module>mina-transport-apr</module>
     <module>mina-filter-compression</module>
@@ -174,6 +172,7 @@
     <module>mina-integration-jmx</module>
     <module>mina-example</module>
     <module>mina-http</module>
+    <module>mina-legal</module>
     <!--module>mina-benchmarks</module-->
   </modules>
 
@@ -247,7 +246,6 @@
       </dependency>
 
       <!-- Integration -->
-
       <dependency>
         <groupId>org.apache.xbean</groupId>
         <artifactId>xbean-spring</artifactId>
@@ -284,13 +282,7 @@
         <groupId>jboss</groupId>
         <artifactId>javassist</artifactId>
         <version>${version.jboss.javassist}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>jdom</groupId>
-        <artifactId>jdom</artifactId>
-        <version>${version.jdom}</version>
-        <optional>true</optional>
+        <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -298,6 +290,7 @@
         <artifactId>jmock</artifactId>
         <version>${version.jmock}</version>
         <optional>true</optional>
+        <scope>test</scope>
       </dependency>
 
       <dependency>

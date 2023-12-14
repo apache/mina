@@ -35,12 +35,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
             <version>${version.plexus.utils}</version>
@@ -81,3 +75,4 @@
         </dependency>
     </dependencies>
 </project>
+
