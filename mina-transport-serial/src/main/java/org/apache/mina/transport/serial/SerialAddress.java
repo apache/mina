@@ -82,7 +82,7 @@ public class SerialAddress extends SocketAddress {
         /** Two bits */
         BITS_2,
         
-        /** one and half bits */
+        /** One and half bits */
         BITS_1_5
     }
 

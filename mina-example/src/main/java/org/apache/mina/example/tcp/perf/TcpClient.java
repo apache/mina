@@ -53,7 +53,7 @@ public class TcpClient extends IoHandlerAdapter {
     private long t0;
     private long t1;
 
-    /** the counter used for the sent messages */
+    /** The counter used for the sent messages */
     private CountDownLatch counter;
     
     /**

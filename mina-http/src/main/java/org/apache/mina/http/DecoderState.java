@@ -25,12 +25,12 @@ package org.apache.mina.http;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public enum DecoderState {
-    /** waiting for a new HTTP requests, the session is new of last request was completed */
+    /** Waiting for a new HTTP requests, the session is new of last request was completed */
     NEW,
     
-    /** accumulating the HTTP request head (everything before the body) */
+    /** Accumulating the HTTP request head (everything before the body) */
     HEAD,
     
-    /** receiving HTTP body slices */
+    /** Receiving HTTP body slices */
     BODY
 }

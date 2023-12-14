@@ -97,7 +97,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
         localPort
     }
 
-    /** key used for storing the context map in the IoSession */
+    /** Key used for storing the context map in the IoSession */
     private static final AttributeKey CONTEXT_KEY = new AttributeKey(MdcInjectionFilter.class, "context");
 
     private ThreadLocal<Integer> callDepth = new ThreadLocal<Integer>() {

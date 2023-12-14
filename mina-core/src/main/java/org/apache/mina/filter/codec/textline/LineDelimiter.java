@@ -35,7 +35,7 @@ import java.io.PrintWriter;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class LineDelimiter {
-    /** the line delimiter constant of the current O/S. */
+    /** The line delimiter constant of the current O/S. */
     public static final LineDelimiter DEFAULT;
 
     /** Compute the default delimiter on the current OS */

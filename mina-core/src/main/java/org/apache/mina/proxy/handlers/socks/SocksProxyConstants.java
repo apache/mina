@@ -35,7 +35,7 @@ public class SocksProxyConstants {
     /** Socks V5 */
     public static final byte SOCKS_VERSION_5 = 0x05;
 
-    /** terminator */
+    /** Terminator */
     public static final byte TERMINATOR = 0x00;
 
     /**
