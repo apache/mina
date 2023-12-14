@@ -136,16 +136,15 @@ public class LineDelimiter {
     public String toString() {
         if (value.length() == 0) {
             return "delimiter: auto";
-        } else {
-            StringBuilder buf = new StringBuilder();
-            buf.append("delimiter:");
-
-            for (int i = 0; i < value.length(); i++) {
-                buf.append(" 0x");
-                buf.append(Integer.toHexString(value.charAt(i)));
-            }
-
-            return buf.toString();
         }
+        StringBuilder buf = new StringBuilder();
+        buf.append("delimiter:");
+
+        for (int i = 0; i < value.length(); i++) {
+            buf.append(" 0x");
+            buf.append(Integer.toHexString(value.charAt(i)));
+        }
+
+        return buf.toString();
     }
 }
