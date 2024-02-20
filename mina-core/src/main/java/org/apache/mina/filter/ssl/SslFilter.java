@@ -447,15 +447,14 @@ public class SslFilter extends IoFilterAdapter {
      */
     @Override
     public void messageSent(NextFilter next, IoSession session, WriteRequest request) throws Exception {
-        if (LOGGER.isDebugEnabled()) {
-            if (session.isServer()) {
-                LOGGER.debug("SERVER: Session {} ack {}", session, request);
-            } else {
-                LOGGER.debug("CLIENT: Session {} ack {}", session, request);
-            }
-        }
-
         if (request instanceof EncryptedWriteRequest) {
+            if (LOGGER.isDebugEnabled()) {
+                if (session.isServer()) {
+                    LOGGER.debug("SERVER: Session {} ack {}", session, request);
+                } else {
+                    LOGGER.debug("CLIENT: Session {} ack {}", session, request);
+                }
+            }
             EncryptedWriteRequest encryptedWriteRequest = EncryptedWriteRequest.class.cast(request);
             SslHandler sslHandler = getSslHandler(session);
             sslHandler.ack(next, request);
