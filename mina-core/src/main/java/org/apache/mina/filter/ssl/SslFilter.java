@@ -60,7 +60,7 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Returns the SSL2Handler object
      */
-    static protected final AttributeKey SSL_HANDLER = new AttributeKey(SslFilter.class, "handler");
+    static protected final AttributeKey SSL_HANDLER = new AttributeKey(SslHandler.class, "handler");
 
     /**
      * The logger
@@ -74,12 +74,17 @@ public class SslFilter extends IoFilterAdapter {
             new LinkedBlockingDeque<>(), new BasicThreadFactory("ssl-exec", true));
 
     protected final SSLContext sslContext;
-    
+
     /** A flag used to tell the filter to start the handshake immediately (in onPostAdd method)
      *  alternatively handshake will be started after session is connected (in sessionOpened method)
      *  default value is true
      **/
     private final boolean autoStart;
+
+    /**
+     * Enables the non-blocking IO
+     */
+    private boolean nonBlock = true;
 
     /** A flag set if client authentication is required */ 
     protected boolean needClientAuth = false;
@@ -133,6 +138,10 @@ public class SslFilter extends IoFilterAdapter {
 
         this.sslContext = sslContext;
         this.autoStart = autoStart;
+    }
+
+    public void setNonBlocking(boolean enable) {
+        this.nonBlock = enable;
     }
 
     /**
@@ -299,7 +308,11 @@ public class SslFilter extends IoFilterAdapter {
         if (sslHandler == null) {
             InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
             SSLEngine sslEngine = createEngine(session, s);
-            sslHandler = new SSLHandlerG0(sslEngine, EXECUTOR, session);
+            if(this.nonBlock){
+                sslHandler = new SSLHandlerG1(sslEngine, EXECUTOR, session);
+            }else {
+                sslHandler = new SSLHandlerG0(sslEngine, EXECUTOR, session);
+            }
             session.setAttribute(SSL_HANDLER, sslHandler);
         }
 
