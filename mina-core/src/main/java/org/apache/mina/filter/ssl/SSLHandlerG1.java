@@ -651,7 +651,7 @@ import java.util.concurrent.Executor;
 
         WriteRequest current = null;
         
-        while ((mAckQueue.size() < MAX_UNACK_MESSAGES) && (current = mEncodeQueue.poll()) != null) {
+        while ((mWriteQueue.size() + mAckQueue.size() < MAX_UNACK_MESSAGES) && (current = mEncodeQueue.poll()) != null) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} flush() - {}", toString(), current);
             }
