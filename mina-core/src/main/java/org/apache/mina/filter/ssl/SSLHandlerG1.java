@@ -799,7 +799,7 @@ import java.util.concurrent.Executor;
      * 
      * @param next The next filer in the chain
      */
-    protected void execute_task(NextFilter next) {
+    synchronized protected void execute_task(NextFilter next) {
         Runnable task;
         while ((task = mEngine.getDelegatedTask()) != null) {
             try {
