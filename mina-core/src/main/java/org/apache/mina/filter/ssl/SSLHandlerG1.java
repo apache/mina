@@ -273,7 +273,7 @@ import java.util.concurrent.Executor;
                     LOGGER.debug("{} receive_loop() - handshake needs task, scheduling", toString());
                 }
                 
-                execute_task(next);
+                schedule_task(next);
 
                 break;
             case NEED_WRAP:
@@ -774,8 +774,20 @@ import java.util.concurrent.Executor;
      */
     protected void schedule_task(NextFilter next) {
         if (ENABLE_ASYNC_TASKS && (mExecutor != null)) {
-            mExecutor.execute(() -> SSLHandlerG1.this.execute_task(next));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} schedule_task() - scheduling task", this);
+            }
+            mExecutor.execute(() -> {
+                try {
+                    execute_task(next);
+                } finally {
+                    forward_writes(next);
+                }
+            });
         } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} schedule_task() - scheduling disabled, executing inline", this);
+            }
             execute_task(next);
         }
     }
@@ -787,7 +799,7 @@ import java.util.concurrent.Executor;
      * 
      * @param next The next filer in the chain
      */
-    synchronized protected void execute_task(NextFilter next) {
+    protected void execute_task(NextFilter next) {
         Runnable task;
         while ((task = mEngine.getDelegatedTask()) != null) {
             try {

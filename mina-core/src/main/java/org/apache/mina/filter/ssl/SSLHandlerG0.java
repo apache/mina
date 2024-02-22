@@ -252,7 +252,7 @@ import org.apache.mina.core.write.WriteRequest;
                     LOGGER.debug("{} receive_loop() - handshake needs task, scheduling", toString());
                 }
                 
-                execute_task(next);
+                schedule_task(next);
 
                 break;
             case NEED_WRAP:
