@@ -143,21 +143,23 @@ import java.util.concurrent.Executor;
     @Override
     public void open(NextFilter next) throws SSLException {
         try {
-            synchronized (this) {
-                if (mHandshakeStarted == false) {
-                    mHandshakeStarted = true;
-                    if (mEngine.getUseClientMode()) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("{} open() - begin handshaking", this);
-                        }
-                        mEngine.beginHandshake();
-                        write_handshake(next);
-                    }
-                }
-            }
+            open_start(next);
+            throw_pending_error(next);
         } finally {
             forward_writes(next);
-            throw_pending_error(next);
+        }
+    }
+
+    synchronized protected void open_start(NextFilter next) throws SSLException {
+        if (mHandshakeStarted == false) {
+            mHandshakeStarted = true;
+            if (mEngine.getUseClientMode()) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} open() - begin handshaking", this);
+                }
+                mEngine.beginHandshake();
+                write_handshake(next);
+            }
         }
     }
 
@@ -168,10 +170,10 @@ import java.util.concurrent.Executor;
     public void receive(NextFilter next, IoBuffer message) throws SSLException {
         try {
             receive_start(next, message);
-        } finally {
-            forward_received(next);
-            forward_writes(next);
             throw_pending_error(next);
+        } finally {
+            forward_writes(next);
+            forward_received(next);
         }
     }
 
@@ -311,25 +313,26 @@ import java.util.concurrent.Executor;
     @Override
     public void ack(NextFilter next, WriteRequest request) throws SSLException {
         try {
-            synchronized (this) {
-                if (mAckQueue.remove(request)) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} ack() - accepted {}", toString(), request);
-                    }
-
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} ack() - checking to see if any messages can be flushed", toString(), request);
-                    }
-                    flush_start(next);
-                } else {
-                    if(LOGGER.isWarnEnabled()) {
-                        LOGGER.warn("{} ack() - unknown message {}", toString(), request);
-                    }
-                }
-            }
+            ack_start(next, request);
+            throw_pending_error(next);
         } finally {
             forward_writes(next);
-            throw_pending_error(next);
+        }
+    }
+
+    synchronized protected void ack_start(NextFilter next, WriteRequest request) throws SSLException {
+        if (mAckQueue.remove(request)) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} ack() - accepted {}", toString(), request);
+            }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} ack() - checking to see if any messages can be flushed", toString(), request);
+            }
+            flush_start(next);
+        } else {
+            if(LOGGER.isWarnEnabled()) {
+                LOGGER.warn("{} ack() - unknown message {}", toString(), request);
+            }
         }
     }
 
@@ -339,37 +342,39 @@ import java.util.concurrent.Executor;
     @Override
     public void write(NextFilter next, WriteRequest request) throws SSLException, WriteRejectedException {
         try {
-            synchronized (this) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} write() - source {}", toString(), request);
-                }
-                if (mOutboundClosing) {
-                    throw new WriteRejectedException(request, "closing");
-                }
-                if (mEncodeQueue.isEmpty()) {
-                    if (write_loop(next, request) == false) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(),
-                                    request);
-                        }
-                        if (mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
-                            throw new BufferOverflowException();
-                        }
-                        mEncodeQueue.add(request);
-                    }
-                } else {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
-                    }
-                    if (mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
-                        throw new BufferOverflowException();
-                    }
-                    mEncodeQueue.add(request);
-                }
-            }
+            write_start(next, request);
+            throw_pending_error(next);
         } finally {
             forward_writes(next);
-            throw_pending_error(next);
+        }
+    }
+
+    synchronized protected void write_start(NextFilter next, WriteRequest request) throws SSLException, WriteRejectedException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("{} write() - source {}", toString(), request);
+        }
+        if (mOutboundClosing) {
+            throw new WriteRejectedException(request, "closing");
+        }
+        if (mEncodeQueue.isEmpty()) {
+            if (write_loop(next, request) == false) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(),
+                            request);
+                }
+                if (mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
+                    throw new BufferOverflowException();
+                }
+                mEncodeQueue.add(request);
+            }
+        } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
+            }
+            if (mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
+                throw new BufferOverflowException();
+            }
+            mEncodeQueue.add(request);
         }
     }
 
@@ -623,9 +628,9 @@ import java.util.concurrent.Executor;
     public void flush(NextFilter next) throws SSLException {
         try {
             flush_start(next);
+            throw_pending_error(next);
         } finally {
             forward_writes(next);
-            throw_pending_error(next);
         }
     }
 
@@ -679,9 +684,9 @@ import java.util.concurrent.Executor;
     public void close(NextFilter next, boolean linger) throws SSLException {
         try {
             close_start(next, linger);
+            throw_pending_error(next);
         } finally {
             forward_writes(next);
-            throw_pending_error(next);
         }
     }
 
