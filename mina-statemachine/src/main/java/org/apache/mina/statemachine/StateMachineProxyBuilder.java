@@ -58,7 +58,7 @@ public class StateMachineProxyBuilder {
     private String name = null;
 
     /*
-     * The classloader to use. Iif null we will use the current thread's 
+     * The classloader to use. If null we will use the current thread's 
      * context classloader.
      */
     private ClassLoader defaultCl = null;
