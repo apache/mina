@@ -24,6 +24,7 @@ import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRejectedException;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.FilterEvent;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executor;
+import java.util.logging.Filter;
 
 /**
  * Default implementation of SSLHandler
@@ -106,6 +108,11 @@ import java.util.concurrent.Executor;
     protected final Deque<IoBuffer> mReceiveQueue = new ConcurrentLinkedDeque<>();
 
     /**
+     * Pending filter events for dispatching
+     */
+    protected final Deque<FilterEvent> mEventQueue = new ConcurrentLinkedDeque<>();
+
+    /**
      * Captured error state
      */
     protected SSLException mPendingError = null;
@@ -147,6 +154,7 @@ import java.util.concurrent.Executor;
             throw_pending_error(next);
         } finally {
             forward_writes(next);
+            forward_events(next);
         }
     }
 
@@ -174,6 +182,7 @@ import java.util.concurrent.Executor;
         } finally {
             forward_writes(next);
             forward_received(next);
+            forward_events(next);
         }
     }
 
@@ -317,6 +326,7 @@ import java.util.concurrent.Executor;
             throw_pending_error(next);
         } finally {
             forward_writes(next);
+            forward_events(next);
         }
     }
 
@@ -346,6 +356,7 @@ import java.util.concurrent.Executor;
             throw_pending_error(next);
         } finally {
             forward_writes(next);
+            forward_events(next);
         }
     }
 
@@ -612,7 +623,7 @@ import java.util.concurrent.Executor;
         if (mHandshakeComplete == false) {
             mHandshakeComplete = true;
             mSession.setAttribute(SslFilter.SSL_SECURED, mEngine.getSession());
-            next.event(mSession, SslEvent.SECURED);
+            mEventQueue.add(SslEvent.SECURED);
         }
         
         /**
@@ -631,6 +642,7 @@ import java.util.concurrent.Executor;
             throw_pending_error(next);
         } finally {
             forward_writes(next);
+            forward_events(next);
         }
     }
 
@@ -687,6 +699,7 @@ import java.util.concurrent.Executor;
             throw_pending_error(next);
         } finally {
             forward_writes(next);
+            forward_events(next);
         }
     }
 
@@ -768,6 +781,18 @@ import java.util.concurrent.Executor;
                 }
                 mAckQueue.add(x);
                 next.filterWrite(mSession, x);
+            }
+        }
+    }
+
+    protected void forward_events(NextFilter next) {
+        synchronized (mEventQueue) {
+            FilterEvent x;
+            while((x = mEventQueue.poll()) != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} forward_events() - dispatching event {}", toString(), x);
+                }
+                next.event(mSession, x);
             }
         }
     }
