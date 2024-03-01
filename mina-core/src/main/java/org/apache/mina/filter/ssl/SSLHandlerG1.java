@@ -19,19 +19,22 @@
  */
 package org.apache.mina.filter.ssl;
 
-import java.nio.BufferOverflowException;
-import java.util.ArrayList;
-import java.util.concurrent.Executor;
-
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLEngineResult;
-import javax.net.ssl.SSLException;
-
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRejectedException;
 import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.FilterEvent;
+
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLException;
+import java.nio.BufferOverflowException;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.Executor;
+import java.util.logging.Filter;
 
 /**
  * Default implementation of SSLHandler
@@ -42,7 +45,7 @@ import org.apache.mina.core.write.WriteRequest;
  * @author Jonathan Valliere
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-/* package protected */ class SSLHandlerG0 extends SslHandler {
+/* package protected */ class SSLHandlerG1 extends SslHandler {
 
     /**
      * Maximum number of queued messages waiting for encoding
@@ -90,9 +93,24 @@ import org.apache.mina.core.write.WriteRequest;
     protected boolean mOutboundLinger = false;
 
     /**
-     * Holds the decoder thread reference; used for recursion detection
+     * Holds the decoder thread reference; used for recursion detection introduced by a delegated task
      */
-    protected Thread mDecodeThread = null;
+    protected volatile Thread mReceiveThread = null;
+
+    /**
+     * Encoded buffers ready for processing upstream
+     */
+    protected final Deque<EncryptedWriteRequest> mWriteQueue = new ConcurrentLinkedDeque<>();
+
+    /**
+     * Decoded buffers ready for processing downstream
+     */
+    protected final Deque<IoBuffer> mReceiveQueue = new ConcurrentLinkedDeque<>();
+
+    /**
+     * Pending filter events for dispatching
+     */
+    protected final Deque<FilterEvent> mEventQueue = new ConcurrentLinkedDeque<>();
 
     /**
      * Captured error state
@@ -101,12 +119,12 @@ import org.apache.mina.core.write.WriteRequest;
 
     /**
      * Instantiates a new handler
-     * 
+     *
      * @param sslEngine The SSLEngine instance
      * @param executor The executor instance to use to process tasks
      * @param session The session to handle
      */
-    public SSLHandlerG0(SSLEngine sslEngine, Executor executor, IoSession session) {
+    public SSLHandlerG1(SSLEngine sslEngine, Executor executor, IoSession session) {
         super(sslEngine, executor, session);
     }
 
@@ -130,15 +148,23 @@ import org.apache.mina.core.write.WriteRequest;
      * {@inheritDoc}
      */
     @Override
-    synchronized public void open(NextFilter next) throws SSLException {
+    public void open(NextFilter next) throws SSLException {
+        try {
+            open_start(next);
+            throw_pending_error(next);
+        } finally {
+            forward_writes(next);
+            forward_events(next);
+        }
+    }
+
+    synchronized protected void open_start(NextFilter next) throws SSLException {
         if (mHandshakeStarted == false) {
             mHandshakeStarted = true;
-            
             if (mEngine.getUseClientMode()) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} open() - begin handshaking", this);
                 }
-                
                 mEngine.beginHandshake();
                 write_handshake(next);
             }
@@ -149,30 +175,36 @@ import org.apache.mina.core.write.WriteRequest;
      * {@inheritDoc}
      */
     @Override
-    synchronized public void receive(NextFilter next, IoBuffer message) throws SSLException {
-        if (mDecodeThread == null) {
+    public void receive(NextFilter next, IoBuffer message) throws SSLException {
+        try {
+            receive_start(next, message);
+            throw_pending_error(next);
+        } finally {
+            forward_writes(next);
+            forward_received(next);
+            forward_events(next);
+        }
+    }
+
+    synchronized protected void receive_start(NextFilter next, IoBuffer message) throws SSLException {
+        if(mReceiveThread == Thread.currentThread()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} receive() - recursion", toString());
+            }
+            receive_loop(next, mDecodeBuffer);
+        } else {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} receive() - message {}", toString(), message);
             }
-            
-            mDecodeThread = Thread.currentThread();
+            mReceiveThread = Thread.currentThread();
             IoBuffer source = resume_decode_buffer(message);
-            
             try {
                 receive_loop(next, source);
             } finally {
                 suspend_decode_buffer(source);
-                mDecodeThread = null;
+                mReceiveThread = null;
             }
-        } else {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("{} receive() - recursion", toString());
-            }
-            
-            receive_loop(next, mDecodeBuffer);
         }
-
-        throw_pending_error(next);
     }
 
     /**
@@ -232,8 +264,8 @@ import org.apache.mina.core.write.WriteRequest;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} receive_loop() - result {}", toString(), dest);
             }
-            
-            next.messageReceived(mSession, dest);
+
+            mReceiveQueue.add(dest);
         }
 
         switch (result.getHandshakeStatus()) {
@@ -288,61 +320,73 @@ import org.apache.mina.core.write.WriteRequest;
      * {@inheritDoc}
      */
     @Override
-    synchronized public void ack(NextFilter next, WriteRequest request) throws SSLException {
+    public void ack(NextFilter next, WriteRequest request) throws SSLException {
+        try {
+            ack_start(next, request);
+            throw_pending_error(next);
+        } finally {
+            forward_writes(next);
+            forward_events(next);
+        }
+    }
+
+    synchronized protected void ack_start(NextFilter next, WriteRequest request) throws SSLException {
         if (mAckQueue.remove(request)) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("{} ack() - {}", toString(), request);
+                LOGGER.debug("{} ack() - accepted {}", toString(), request);
             }
-            
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} ack() - checking to see if any messages can be flushed", toString(), request);
             }
-            
-            flush(next);
+            flush_start(next);
+        } else {
+            if(LOGGER.isWarnEnabled()) {
+                LOGGER.warn("{} ack() - unknown message {}", toString(), request);
+            }
         }
-
-        throw_pending_error(next);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    synchronized public void write(NextFilter next, WriteRequest request) throws SSLException, WriteRejectedException {
+    public void write(NextFilter next, WriteRequest request) throws SSLException, WriteRejectedException {
+        try {
+            write_start(next, request);
+            throw_pending_error(next);
+        } finally {
+            forward_writes(next);
+            forward_events(next);
+        }
+    }
+
+    synchronized protected void write_start(NextFilter next, WriteRequest request) throws SSLException, WriteRejectedException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} write() - source {}", toString(), request);
         }
-
         if (mOutboundClosing) {
             throw new WriteRejectedException(request, "closing");
         }
-
         if (mEncodeQueue.isEmpty()) {
-            if (write_user_loop(next, request) == false) {
+            if (write_loop(next, request) == false) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(),
                             request);
                 }
-                
                 if (mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
                     throw new BufferOverflowException();
                 }
-                
                 mEncodeQueue.add(request);
             }
         } else {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} write() - unable to write right now, saving request for later", toString(), request);
             }
-            
             if (mEncodeQueue.size() == MAX_QUEUED_MESSAGES) {
                 throw new BufferOverflowException();
             }
-            
             mEncodeQueue.add(request);
         }
-
-        throw_pending_error(next);
     }
 
     /**
@@ -357,9 +401,9 @@ import org.apache.mina.core.write.WriteRequest;
      * @throws SSLException
      */
     @SuppressWarnings("incomplete-switch")
-    synchronized protected boolean write_user_loop(NextFilter next, WriteRequest request) throws SSLException {
+    synchronized protected boolean write_loop(NextFilter next, WriteRequest request) throws SSLException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} write_user_loop() - source {}", toString(), request);
+            LOGGER.debug("{} write_loop() - source {}", toString(), request);
         }
 
         IoBuffer source = IoBuffer.class.cast(request.getMessage());
@@ -368,7 +412,7 @@ import org.apache.mina.core.write.WriteRequest;
         SSLEngineResult result = mEngine.wrap(source.buf(), dest.buf());
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} write_user_loop() - bytes-consumed {}, bytes-produced {}, status {}, handshake {}",
+            LOGGER.debug("{} write_loop() - bytes-consumed {}, bytes-produced {}, status {}, handshake {}",
                     toString(), result.bytesConsumed(), result.bytesProduced(), result.getStatus(),
                     result.getHandshakeStatus());
         }
@@ -381,10 +425,10 @@ import org.apache.mina.core.write.WriteRequest;
                 EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
                 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} write_user_loop() - result {}", toString(), encrypted);
+                    LOGGER.debug("{} write_loop() - result {}", toString(), encrypted);
                 }
-                
-                next.filterWrite(mSession, encrypted);
+
+                mWriteQueue.add(encrypted);
                 // do not return because we want to enter the handshake switch
             } else {
                 // then we probably consumed some data
@@ -392,28 +436,25 @@ import org.apache.mina.core.write.WriteRequest;
                 
                 if (source.hasRemaining()) {
                     EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
-                    mAckQueue.add(encrypted);
-                    
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} write_user_loop() - result {}", toString(), encrypted);
+                        LOGGER.debug("{} write_loop() - result {}", toString(), encrypted);
                     }
+
+                    mWriteQueue.add(encrypted);
                     
-                    next.filterWrite(mSession, encrypted);
-                    
-                    if (mAckQueue.size() < MAX_UNACK_MESSAGES) {
-                        return write_user_loop(next, request); // write additional chunks
+                    if (mWriteQueue.size() + mAckQueue.size() < MAX_UNACK_MESSAGES) {
+                        return write_loop(next, request); // write additional chunks
                     }
                     
                     return false;
                 } else {
                     EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, request);
-                    mAckQueue.add(encrypted);
-                    
+
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("{} write_user_loop() - result {}", toString(), encrypted);
+                        LOGGER.debug("{} write_loop() - result {}", toString(), encrypted);
                     }
-                    
-                    next.filterWrite(mSession, encrypted);
+
+                    mWriteQueue.add(encrypted);
                     
                     return true;
                 }
@@ -424,7 +465,7 @@ import org.apache.mina.core.write.WriteRequest;
         switch (result.getHandshakeStatus()) {
             case NEED_TASK:
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} write_user_loop() - handshake needs task, scheduling", toString());
+                    LOGGER.debug("{} write_loop() - handshake needs task, scheduling", toString());
                 }
                 
                 schedule_task(next);
@@ -432,19 +473,19 @@ import org.apache.mina.core.write.WriteRequest;
                 
             case NEED_WRAP:
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} write_user_loop() - handshake needs wrap, looping", toString());
+                    LOGGER.debug("{} write_loop() - handshake needs wrap, looping", toString());
                 }
                 
-                return write_user_loop(next, request);
+                return write_loop(next, request);
                 
             case FINISHED:
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} write_user_loop() - handshake finished, flushing queue", toString());
+                    LOGGER.debug("{} write_loop() - handshake finished, flushing queue", toString());
                 }
                 
                 finish_handshake(next);
                 
-                return write_user_loop(next, request);
+                return write_loop(next, request);
         }
 
         return false;
@@ -536,7 +577,7 @@ import org.apache.mina.core.write.WriteRequest;
             }
             
             EncryptedWriteRequest encrypted = new EncryptedWriteRequest(dest, null);
-            next.filterWrite(mSession, encrypted);
+            mWriteQueue.add(encrypted);
         }
 
         switch (result.getHandshakeStatus()) {
@@ -544,15 +585,13 @@ import org.apache.mina.core.write.WriteRequest;
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_handshake_loop() - handshake needs unwrap, invoking receive", toString());
                 }
-                
-                receive(next, ZERO);
+                receive_start(next, ZERO);
                 break;
                 
             case NEED_WRAP:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_handshake_loop() - handshake needs wrap, looping", toString());
                 }
-                
                 write_handshake(next);
                 break;
                 
@@ -560,7 +599,6 @@ import org.apache.mina.core.write.WriteRequest;
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_handshake_loop() - handshake needs task, scheduling", toString());
                 }
-                
                 schedule_task(next);
                 break;
                 
@@ -568,7 +606,6 @@ import org.apache.mina.core.write.WriteRequest;
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} write_handshake_loop() - handshake finished, flushing queue", toString());
                 }
-                
                 finish_handshake(next);
                 break;
         }
@@ -586,14 +623,27 @@ import org.apache.mina.core.write.WriteRequest;
         if (mHandshakeComplete == false) {
             mHandshakeComplete = true;
             mSession.setAttribute(SslFilter.SSL_SECURED, mEngine.getSession());
-            next.event(mSession, SslEvent.SECURED);
+            mEventQueue.add(SslEvent.SECURED);
         }
         
         /**
          * There exists a bug in the JDK which emits FINISHED twice instead of once.
          */
-        receive(next, ZERO);
-        flush(next);
+        receive_start(next, ZERO);
+        flush_start(next);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void flush(NextFilter next) throws SSLException {
+        try {
+            flush_start(next);
+            throw_pending_error(next);
+        } finally {
+            forward_writes(next);
+            forward_events(next);
+        }
     }
 
     /**
@@ -603,7 +653,7 @@ import org.apache.mina.core.write.WriteRequest;
      * 
      * @throws SSLException
      */
-    synchronized public void flush(NextFilter next) throws SSLException {
+    synchronized protected void flush_start(NextFilter next) throws SSLException {
         if (mOutboundClosing && mOutboundLinger == false) {
             return;
         }
@@ -618,12 +668,12 @@ import org.apache.mina.core.write.WriteRequest;
 
         WriteRequest current = null;
         
-        while ((mAckQueue.size() < MAX_UNACK_MESSAGES) && (current = mEncodeQueue.poll()) != null) {
+        while ((mWriteQueue.size() + mAckQueue.size() < MAX_UNACK_MESSAGES) && (current = mEncodeQueue.poll()) != null) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} flush() - {}", toString(), current);
             }
             
-            if (write_user_loop(next, current) == false) {
+            if (write_loop(next, current) == false) {
                 mEncodeQueue.addFirst(current);
                 
                 break;
@@ -643,35 +693,39 @@ import org.apache.mina.core.write.WriteRequest;
      * {@inheritDoc}
      */
     @Override
-    synchronized public void close(NextFilter next, boolean linger) throws SSLException {
+    public void close(NextFilter next, boolean linger) throws SSLException {
+        try {
+            close_start(next, linger);
+            throw_pending_error(next);
+        } finally {
+            forward_writes(next);
+            forward_events(next);
+        }
+    }
+
+    synchronized protected void close_start(NextFilter next, boolean linger) throws SSLException {
         if (mOutboundClosing) {
             return;
         }
-
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} close() - closing session", toString());
         }
-
         if (mHandshakeComplete) {
             next.event(mSession, SslEvent.UNSECURED);
         }
-
         mOutboundLinger = linger;
         mOutboundClosing = true;
-
         if (linger == false) {
             if (mEncodeQueue.size() != 0) {
                 next.exceptionCaught(mSession, new WriteRejectedException(new ArrayList<>(mEncodeQueue), "closing"));
                 mEncodeQueue.clear();
             }
-            
             mEngine.closeOutbound();
-            
             if (ENABLE_SOFT_CLOSURE) {
                 write_handshake(next);
             }
         } else {
-            flush(next);
+            flush_start(next);
         }
     }
 
@@ -683,13 +737,13 @@ import org.apache.mina.core.write.WriteRequest;
      */
     synchronized protected void throw_pending_error(NextFilter next) throws SSLException {
         SSLException sslException = mPendingError;
-        
         if (sslException != null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} throw_pending_error() - throwing pending error");
+            }
             // Loop to send back the alert messages
             receive_loop(next, null);
-            
             mPendingError = null;
-            
             // And finally rethrow the exception 
             throw sslException;
         }
@@ -706,6 +760,43 @@ import org.apache.mina.core.write.WriteRequest;
         }
     }
 
+    protected void forward_received(NextFilter next) {
+        //synchronized (mReceiveQueue) {
+            IoBuffer x;
+            while ((x = mReceiveQueue.poll()) != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} forward_received() - received {}", toString(), x);
+                }
+                next.messageReceived(mSession, x);
+            }
+        //}
+    }
+
+    protected void forward_writes(NextFilter next) {
+        //synchronized (mWriteQueue) {
+            EncryptedWriteRequest x;
+            while ((x = mWriteQueue.poll()) != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} forward_writes() - writing {}", toString(), x);
+                }
+                mAckQueue.add(x);
+                next.filterWrite(mSession, x);
+            }
+        //}
+    }
+
+    protected void forward_events(NextFilter next) {
+        //synchronized (mEventQueue) {
+            FilterEvent x;
+            while((x = mEventQueue.poll()) != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} forward_events() - dispatching event {}", toString(), x);
+                }
+                next.event(mSession, x);
+            }
+        //}
+    }
+
     /**
      * Schedule a SSLEngine task for execution, either using an Executor, or immediately.
      *  
@@ -713,13 +804,20 @@ import org.apache.mina.core.write.WriteRequest;
      */
     protected void schedule_task(NextFilter next) {
         if (ENABLE_ASYNC_TASKS && (mExecutor != null)) {
-            mExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    SSLHandlerG0.this.execute_task(next);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} schedule_task() - scheduling task", this);
+            }
+            mExecutor.execute(() -> {
+                try {
+                    execute_task(next);
+                } finally {
+                    forward_writes(next);
                 }
             });
         } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("{} schedule_task() - scheduling disabled, executing inline", this);
+            }
             execute_task(next);
         }
     }
@@ -732,30 +830,24 @@ import org.apache.mina.core.write.WriteRequest;
      * @param next The next filer in the chain
      */
     synchronized protected void execute_task(NextFilter next) {
-        Runnable task = null;
-        
+        Runnable task;
         while ((task = mEngine.getDelegatedTask()) != null) {
             try {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} task() - executing {}", toString(), task);
                 }
-
                 task.run();
-
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} task() - writing handshake messages", toString());
                 }
-
                 write_handshake(next);
             } catch (SSLException e) {
                 store_pending_error(e);
-                
                 try { 
                     throw_pending_error(next);
                 } catch ( SSLException ssle) {
                     // ...
                 }
-                
                 if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("{} task() - storing error {}", toString(), e);
                 }

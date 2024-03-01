@@ -60,7 +60,7 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Returns the SSL2Handler object
      */
-    static protected final AttributeKey SSL_HANDLER = new AttributeKey(SslFilter.class, "handler");
+    static protected final AttributeKey SSL_HANDLER = new AttributeKey(SslHandler.class, "handler");
 
     /**
      * The logger
@@ -74,12 +74,17 @@ public class SslFilter extends IoFilterAdapter {
             new LinkedBlockingDeque<>(), new BasicThreadFactory("ssl-exec", true));
 
     protected final SSLContext sslContext;
-    
+
     /** A flag used to tell the filter to start the handshake immediately (in onPostAdd method)
      *  alternatively handshake will be started after session is connected (in sessionOpened method)
      *  default value is true
      **/
     private final boolean autoStart;
+
+    /**
+     * Enables the non-blocking pipelines
+     */
+    private boolean nonBlockingPipeline = true;
 
     /** A flag set if client authentication is required */ 
     protected boolean needClientAuth = false;
@@ -133,6 +138,15 @@ public class SslFilter extends IoFilterAdapter {
 
         this.sslContext = sslContext;
         this.autoStart = autoStart;
+    }
+
+    /**
+     * Configures the use of the Non Blocking SSL processor.  This is experimental.
+     *
+     * @param enable
+     */
+    public void setUseNonBlockingPipeline(boolean enable) {
+        this.nonBlockingPipeline = enable;
     }
 
     /**
@@ -299,7 +313,11 @@ public class SslFilter extends IoFilterAdapter {
         if (sslHandler == null) {
             InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
             SSLEngine sslEngine = createEngine(session, s);
-            sslHandler = new SSLHandlerG0(sslEngine, EXECUTOR, session);
+            if(nonBlockingPipeline) {
+                sslHandler = new SSLHandlerG1(sslEngine, EXECUTOR, session);
+            }else {
+                sslHandler = new SSLHandlerG0(sslEngine, EXECUTOR, session);
+            }
             session.setAttribute(SSL_HANDLER, sslHandler);
         }
 
@@ -376,9 +394,9 @@ public class SslFilter extends IoFilterAdapter {
     public void sessionOpened(NextFilter next, IoSession session) throws Exception {
         if (LOGGER.isDebugEnabled()) {
             if (session.isServer()) {
-                LOGGER.debug("SERVER: Session {} openend", session);
+                LOGGER.debug("SERVER: Session {} opened", session);
             } else {
-                LOGGER.debug("CLIENT: Session {} openend", session);
+                LOGGER.debug("CLIENT: Session {} opened", session);
             }
         }
 
@@ -409,14 +427,6 @@ public class SslFilter extends IoFilterAdapter {
      */
     @Override
     public void messageReceived(NextFilter next, IoSession session, Object message) throws Exception {
-        //if (session.isServer()) {
-            //System.out.println( ">>> Server messageReceived" );
-        //} else {
-            //System.out.println( ">>> Client messageReceived" );
-        //}
-
-        //System.out.println( message );
-        
         if (LOGGER.isDebugEnabled()) {
             if (session.isServer()) {
                 LOGGER.debug("SERVER: Session {} received {}", session, message);
@@ -434,15 +444,14 @@ public class SslFilter extends IoFilterAdapter {
      */
     @Override
     public void messageSent(NextFilter next, IoSession session, WriteRequest request) throws Exception {
-        if (LOGGER.isDebugEnabled()) {
-            if (session.isServer()) {
-                LOGGER.debug("SERVER: Session {} ack {}", session, request);
-            } else {
-                LOGGER.debug("CLIENT: Session {} ack {}", session, request);
-            }
-        }
-
         if (request instanceof EncryptedWriteRequest) {
+            if (LOGGER.isDebugEnabled()) {
+                if (session.isServer()) {
+                    LOGGER.debug("SERVER: Session {} ack {}", session, request);
+                } else {
+                    LOGGER.debug("CLIENT: Session {} ack {}", session, request);
+                }
+            }
             EncryptedWriteRequest encryptedWriteRequest = EncryptedWriteRequest.class.cast(request);
             SslHandler sslHandler = getSslHandler(session);
             sslHandler.ack(next, request);
@@ -460,17 +469,16 @@ public class SslFilter extends IoFilterAdapter {
      */
     @Override
     public void filterWrite(NextFilter next, IoSession session, WriteRequest request) throws Exception {
-        if (LOGGER.isDebugEnabled()) {
-            if (session.isServer()) {
-                LOGGER.debug("SERVER: Session {} write {}", session, request);
-            } else {
-                LOGGER.debug("CLIENT: Session {} write {}", session, request);
-            }
-        }
-
         if (request instanceof EncryptedWriteRequest || request instanceof DisableEncryptWriteRequest) {
             super.filterWrite(next, session, request);
         } else {
+            if (LOGGER.isDebugEnabled()) {
+                if (session.isServer()) {
+                    LOGGER.debug("SERVER: Session {} write {}", session, request);
+                } else {
+                    LOGGER.debug("CLIENT: Session {} write {}", session, request);
+                }
+            }
             SslHandler sslHandler = getSslHandler(session);
             sslHandler.write(next, request);
         }
