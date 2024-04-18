@@ -273,6 +273,8 @@ public class ProtocolCodecFilter extends IoFilterAdapter {
                 }
             }
         }
+        
+        in.free();
     }
 
     /**
