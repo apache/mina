@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executor;
-import java.util.logging.Filter;
 
 /**
  * Default implementation of SSLHandler
