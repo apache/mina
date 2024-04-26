@@ -313,11 +313,13 @@ public class SslFilter extends IoFilterAdapter {
         if (sslHandler == null) {
             InetSocketAddress s = InetSocketAddress.class.cast(session.getRemoteAddress());
             SSLEngine sslEngine = createEngine(session, s);
+            
             if(nonBlockingPipeline) {
                 sslHandler = new SSLHandlerG1(sslEngine, EXECUTOR, session);
-            }else {
+            } else {
                 sslHandler = new SSLHandlerG0(sslEngine, EXECUTOR, session);
             }
+            
             session.setAttribute(SSL_HANDLER, sslHandler);
         }
 
