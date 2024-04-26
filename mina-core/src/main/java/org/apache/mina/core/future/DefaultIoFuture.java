@@ -22,6 +22,7 @@ package org.apache.mina.core.future;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.mina.core.polling.AbstractPollingIoProcessor;
 import org.apache.mina.core.service.IoProcessor;
@@ -55,7 +56,7 @@ public class DefaultIoFuture implements IoFuture {
     private Object result;
 
     /** The flag used to determinate if the Future is completed or not */
-    private boolean ready;
+    private AtomicBoolean ready = new AtomicBoolean(false);
 
     /** A counter for the number of threads waiting on this future */
     private int waiters;
@@ -102,7 +103,7 @@ public class DefaultIoFuture implements IoFuture {
     @Override
     public IoFuture await() throws InterruptedException {
         synchronized (lock) {
-            while (!ready) {
+            while (!ready.get()) {
                 waiters++;
                 
                 try {
@@ -113,7 +114,7 @@ public class DefaultIoFuture implements IoFuture {
                 } finally {
                     waiters--;
                     
-                    if (!ready) {
+                    if (!ready.get()) {
                         checkDeadLock();
                     }
                 }
@@ -200,8 +201,8 @@ public class DefaultIoFuture implements IoFuture {
         synchronized (lock) {
             // We can quit if the ready flag is set to true, or if
             // the timeout is set to 0 or below : we don't wait in this case.
-            if (ready||(timeoutMillis <= 0)) {
-                return ready;
+            if (ready.get()||(timeoutMillis <= 0)) {
+                return ready.get();
             }
 
             // The operation is not completed : we have to wait
@@ -222,8 +223,8 @@ public class DefaultIoFuture implements IoFuture {
                         }
                     }
 
-                    if (ready || (endTime < System.currentTimeMillis())) {
-                        return ready;
+                    if (ready.get() || (endTime < System.currentTimeMillis())) {
+                        return ready.get();
                     } else {
                         // Take a chance, detect a potential deadlock
                         checkDeadLock();
@@ -237,7 +238,7 @@ public class DefaultIoFuture implements IoFuture {
                 // In any case, we decrement the number of waiters, and we get out.
                 waiters--;
                 
-                if (!ready) {
+                if (!ready.get()) {
                     checkDeadLock();
                 }
             }
@@ -295,9 +296,7 @@ public class DefaultIoFuture implements IoFuture {
      */
     @Override
     public boolean isDone() {
-        synchronized (lock) {
-            return ready;
-        }
+        return ready.get();
     }
 
     /**
@@ -310,12 +309,12 @@ public class DefaultIoFuture implements IoFuture {
     public boolean setValue(Object newValue) {
         synchronized (lock) {
             // Allowed only once.
-            if (ready) {
+            if (ready.get()) {
                 return false;
             }
 
             result = newValue;
-            ready = true;
+            ready.set(true);
             
             // Now, if we have waiters, notify them that the operation has completed
             if (waiters > 0) {
@@ -348,7 +347,7 @@ public class DefaultIoFuture implements IoFuture {
         }
 
         synchronized (lock) {
-            if (ready) {
+            if (ready.get()) {
                 // Shortcut : if the operation has completed, no need to 
                 // add a new listener, we just have to notify it. The existing
                 // listeners have already been notified anyway, when the 
@@ -380,7 +379,7 @@ public class DefaultIoFuture implements IoFuture {
         }
 
         synchronized (lock) {
-            if (!ready) {
+            if (!ready.get()) {
                 if (listener == firstListener) {
                     if ((otherListeners != null) && !otherListeners.isEmpty()) {
                         firstListener = otherListeners.remove(0);
