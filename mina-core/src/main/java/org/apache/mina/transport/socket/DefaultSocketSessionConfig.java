@@ -37,7 +37,7 @@ public class DefaultSocketSessionConfig extends AbstractSocketSessionConfig {
 
     private static final int DEFAULT_SO_LINGER = -1;
 
-    private static final boolean DEFAULT_TCP_NO_DELAY = false;
+    private static final boolean DEFAULT_TCP_NO_DELAY = true; // Disable Nagle algorithm by default
 
     protected IoService parent;
 
