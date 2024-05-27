@@ -70,8 +70,13 @@
         </dependency>
 
         <dependency>
-            <groupId>pmd</groupId>
-            <artifactId>pmd</artifactId>
+            <groupId>net.sourceforge.pmd</groupId>
+            <artifactId>pmd-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sourceforge.pmd</groupId>
+            <artifactId>pmd-java</artifactId>
         </dependency>
     </dependencies>
 </project>
