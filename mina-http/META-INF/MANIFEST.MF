@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Build-Jdk-Spec: 1.8
+Bundle-Description: Apache MINA is a network application framework which
+  helps users develop high performance and highly scalable network appli
+ cations easily.  It provides an abstract event-driven asynchronous API 
+ over various transports such as TCP/IP and UDP/IP via Java NIO.
+Bundle-DocURL: https://mina.apache.org/
+Bundle-License: https://www.apache.org/licenses/LICENSE-2.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Apache MINA HTTP client and server codec
+Bundle-SymbolicName: org.apache.mina.http
+Bundle-Vendor: Apache MINA Project
+Bundle-Version: 2.2.3
+Created-By: Apache Maven Bundle Plugin 5.1.9
+Export-Package: org.apache.mina.http;version="2.2.3";uses:="org.apache.m
+ ina.core.buffer,org.apache.mina.core.filterchain,org.apache.mina.core.s
+ ession,org.apache.mina.filter.codec,org.apache.mina.http.api",org.apach
+ e.mina.http.api;version="2.2.3"
+Import-Package: org.apache.mina.core.buffer;version="2.2.3",org.apache.m
+ ina.core.filterchain;version="2.2.3",org.apache.mina.core.session;versi
+ on="2.2.3",org.apache.mina.filter.codec;version="2.2.3",org.slf4j;versi
+ on="1.7"
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Tool: Bnd-6.3.1.202206071316

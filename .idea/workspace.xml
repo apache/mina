@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0f73cc1f-9308-4425-8cf5-73f937b6e55f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/examples/src/main/java/org/apache/mina/examples/echoserver/NioEchoServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/examples/src/main/java/org/apache/mina/examples/echoserver/NioEchoServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/thrift/src/main/java/org/apache/mina/codec/delimited/serialization/ThriftMessageEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/thrift/src/main/java/org/apache/mina/codec/delimited/serialization/ThriftMessageEncoder.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="v2.2.3-note" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="v3.0.0-M1-note" />
+                    <option name="lastUsedInstant" value="1720700129" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="trunk" />
+                    <option name="lastUsedInstant" value="1720699945" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="v2.2.3-note" />
+                    <option name="lastUsedInstant" value="1720699590" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="2.2.X" />
+                    <option name="lastUsedInstant" value="1720699524" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="v2.0.19-note" />
+                    <option name="lastUsedInstant" value="1720699206" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="userSettingsFile" value="$USER_HOME$/Desktop/mvn/settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="skipTests" value="true" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2j3MgVNWXOOwNWjvC7LZg2xMseN" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.Main.executor": "Run",
+    "Application.NioEchoClient.executor": "Run",
+    "Application.NioEchoServer.executor": "Run",
+    "JUnit.ConnectorTest.testTCP.executor": "Run",
+    "JUnit.ConnectorTest.testUDP.executor": "Run",
+    "Maven.mina-examples [clean].executor": "Run",
+    "Maven.mina-examples [compile].executor": "Run",
+    "Maven.mina-examples [package].executor": "Run",
+    "Maven.mina-parent [clean].executor": "Run",
+    "Maven.mina-parent [compile].executor": "Run",
+    "Maven.mina-parent [install].executor": "Run",
+    "Maven.mina-parent [package].executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "v3.0.0-M1-note",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/zhoufudun/IdeaProjects/mina",
+    "settings.editor.selected.configurable": "preferences.keymap"
+  }
+}]]></component>
+  <component name="RunManager" selected="Application.NioEchoClient">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.apache.mina.example.echoserver.Main" />
+      <module name="mina-example" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.mina.example.echoserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NioEchoClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.apache.mina.examples.echoclient.NioEchoClient" />
+      <module name="mina-examples" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.mina.examples.echoclient.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NioEchoServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.apache.mina.examples.echoserver.NioEchoServer" />
+      <module name="mina-examples" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.mina.examples.echoserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConnectorTest.testTCP" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="mina-example" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.mina.example.echoserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.apache.mina.example.echoserver" />
+      <option name="MAIN_CLASS_NAME" value="org.apache.mina.example.echoserver.ConnectorTest" />
+      <option name="METHOD_NAME" value="testTCP" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConnectorTest.testUDP" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="mina-example" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.mina.example.echoserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.apache.mina.example.echoserver" />
+      <option name="MAIN_CLASS_NAME" value="org.apache.mina.example.echoserver.ConnectorTest" />
+      <option name="METHOD_NAME" value="testUDP" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="mina-core" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="mina-core" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.NioEchoClient" />
+        <item itemvalue="Application.NioEchoServer" />
+        <item itemvalue="JUnit.ConnectorTest.testTCP" />
+        <item itemvalue="JUnit.ConnectorTest.testUDP" />
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0f73cc1f-9308-4425-8cf5-73f937b6e55f" name="Changes" comment="" />
+      <created>1720609699853</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1720609699853</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/trunk" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/examples/src/main/java/org/apache/mina/examples/echoserver/NioEchoServer.java</url>
+          <line>47</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
