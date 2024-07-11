@@ -59,6 +59,11 @@ public class NioEchoClient {
                 if (message instanceof ByteBuffer) {
                     LOG.info("echoing");
                     session.write(message);
+                    try {
+                        Thread.sleep(1000);
+                    }catch (Exception e){
+
+                    }
                 }
             }
 

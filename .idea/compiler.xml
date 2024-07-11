@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="mina-coap" />
+        <module name="mina-examples" />
+        <module name="mina-thrift" />
+        <module name="mina-core" />
+        <module name="mina-benchmarks" />
+        <module name="mina-protobuf" />
+        <module name="mina-http" />
+        <module name="mina-codec" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="mina-avro" target="1.7" />
+      <module name="mina-benchmarks-common" target="1.7" />
+      <module name="mina-benchmarks-netty3" target="1.7" />
+      <module name="mina-benchmarks-netty4" target="1.7" />
+      <module name="mina-http2" target="1.7" />
+      <module name="mina-monitoring" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
