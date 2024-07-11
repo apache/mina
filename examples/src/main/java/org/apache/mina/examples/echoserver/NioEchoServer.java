@@ -42,7 +42,8 @@ public class NioEchoServer {
     static final private Logger LOG = LoggerFactory.getLogger(NioEchoServer.class);
 
     public static void main(final String[] args) {
-        LOG.info("starting echo server");
+//        LOG.info("starting echo server");
+        System.out.println("starting echo server");
 
         final NioTcpServer acceptor = new NioTcpServer();
 
@@ -54,6 +55,8 @@ public class NioEchoServer {
             public void sessionOpened(final IoSession session) {
                 LOG.info("session opened {}", session);
 
+                System.out.println("session opened="+session);
+
                 final String welcomeStr = "welcome\n";
                 final ByteBuffer bf = ByteBuffer.allocate(welcomeStr.length());
                 bf.put(welcomeStr.getBytes());
@@ -64,7 +67,8 @@ public class NioEchoServer {
             @Override
             public void messageReceived(IoSession session, Object message) {
                 if (message instanceof ByteBuffer) {
-                    LOG.info("echoing");
+//                    LOG.info("echoing");
+                    System.out.println("echoing");
                     session.write(message);
                 }
             }
@@ -72,10 +76,12 @@ public class NioEchoServer {
         try {
             final SocketAddress address = new InetSocketAddress(9999);
             acceptor.bind(address);
-            LOG.debug("Running the server for 25 sec");
-            Thread.sleep(25000);
-            LOG.debug("Unbinding the TCP port");
-            acceptor.unbind();
+//            LOG.debug("Running the server for 25 sec");
+//            Thread.sleep(25000);
+//            LOG.debug("Unbinding the TCP port");
+//            acceptor.unbind();
+
+            Thread.currentThread().join();
         } catch (final InterruptedException e) {
             LOG.error("Interrupted exception", e);
         }
