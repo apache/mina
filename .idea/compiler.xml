@@ -6,14 +6,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="mina-coap" />
-        <module name="mina-examples" />
-        <module name="mina-thrift" />
+        <module name="mina-legal" />
         <module name="mina-core" />
-        <module name="mina-benchmarks" />
-        <module name="mina-protobuf" />
+        <module name="mina-integration-jmx" />
+        <module name="mina-filter-compression" />
+        <module name="mina-integration-xbean" />
+        <module name="mina-statemachine" />
         <module name="mina-http" />
-        <module name="mina-codec" />
+        <module name="mina-example" />
+        <module name="mina-transport-apr" />
+        <module name="mina-integration-ognl" />
+        <module name="mina-integration-beans" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">
@@ -21,17 +24,8 @@
       <module name="mina-benchmarks-common" target="1.7" />
       <module name="mina-benchmarks-netty3" target="1.7" />
       <module name="mina-benchmarks-netty4" target="1.7" />
-      <module name="mina-example" target="1.8" />
-      <module name="mina-filter-compression" target="1.8" />
       <module name="mina-http2" target="1.7" />
-      <module name="mina-integration-beans" target="1.8" />
-      <module name="mina-integration-jmx" target="1.8" />
-      <module name="mina-integration-ognl" target="1.8" />
-      <module name="mina-integration-xbean" target="1.8" />
-      <module name="mina-legal" target="1.8" />
       <module name="mina-monitoring" target="1.7" />
-      <module name="mina-statemachine" target="1.8" />
-      <module name="mina-transport-apr" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

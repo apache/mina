@@ -1,0 +1,191 @@
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n        <option value=\"$PROJECT_DIR$/thrift/pom.xml\" />\n        <option value=\"$PROJECT_DIR$/benchmarks/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_1_8\" default=\"true\" project-jdk-name=\"1.8\" project-jdk-type=\"JavaSDK\" />\n</project>
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	
++++ b/.idea/misc.xml	
+@@ -7,6 +7,7 @@
+         <option value="$PROJECT_DIR$/pom.xml" />
+         <option value="$PROJECT_DIR$/thrift/pom.xml" />
+         <option value="$PROJECT_DIR$/benchmarks/pom.xml" />
++        <option value="$PROJECT_DIR$/mina-integration-jmx/pom.xml" />
+       </list>
+     </option>
+   </component>
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"0f73cc1f-9308-4425-8cf5-73f937b6e55f\" name=\"Changes\" comment=\"\">\n      <change beforePath=\"$PROJECT_DIR$/examples/src/main/java/org/apache/mina/examples/echoserver/NioEchoServer.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/examples/src/main/java/org/apache/mina/examples/echoserver/NioEchoServer.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/thrift/src/main/java/org/apache/mina/codec/delimited/serialization/ThriftMessageEncoder.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/thrift/src/main/java/org/apache/mina/codec/delimited/serialization/ThriftMessageEncoder.java\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"v2.2.3-note\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitToolBoxStore\">\n    <option name=\"recentBranches\">\n      <RecentBranches>\n        <option name=\"branchesForRepo\">\n          <list>\n            <RecentBranchesForRepo>\n              <option name=\"branches\">\n                <list>\n                  <RecentBranch>\n                    <option name=\"branchName\" value=\"v3.0.0-M1-note\" />\n                    <option name=\"lastUsedInstant\" value=\"1720700129\" />\n                  </RecentBranch>\n                  <RecentBranch>\n                    <option name=\"branchName\" value=\"trunk\" />\n                    <option name=\"lastUsedInstant\" value=\"1720699945\" />\n                  </RecentBranch>\n                  <RecentBranch>\n                    <option name=\"branchName\" value=\"v2.2.3-note\" />\n                    <option name=\"lastUsedInstant\" value=\"1720699590\" />\n                  </RecentBranch>\n                  <RecentBranch>\n                    <option name=\"branchName\" value=\"2.2.X\" />\n                    <option name=\"lastUsedInstant\" value=\"1720699524\" />\n                  </RecentBranch>\n                  <RecentBranch>\n                    <option name=\"branchName\" value=\"v2.0.19-note\" />\n                    <option name=\"lastUsedInstant\" value=\"1720699206\" />\n                  </RecentBranch>\n                </list>\n              </option>\n              <option name=\"repositoryRootUrl\" value=\"file://$PROJECT_DIR$\" />\n            </RecentBranchesForRepo>\n          </list>\n        </option>\n      </RecentBranches>\n    </option>\n  </component>\n  <component name=\"MavenImportPreferences\">\n    <option name=\"generalSettings\">\n      <MavenGeneralSettings>\n        <option name=\"userSettingsFile\" value=\"$USER_HOME$/Desktop/mvn/settings.xml\" />\n      </MavenGeneralSettings>\n    </option>\n  </component>\n  <component name=\"MavenRunner\">\n    <option name=\"skipTests\" value=\"true\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 6\n}</component>\n  <component name=\"ProjectId\" id=\"2j3MgVNWXOOwNWjvC7LZg2xMseN\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\">\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\n  </component>\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ASKED_ADD_EXTERNAL_FILES\": \"true\",\n    \"ASKED_SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"Application.Main.executor\": \"Run\",\n    \"Application.NioEchoClient.executor\": \"Run\",\n    \"Application.NioEchoServer.executor\": \"Run\",\n    \"JUnit.ConnectorTest.testTCP.executor\": \"Run\",\n    \"JUnit.ConnectorTest.testUDP.executor\": \"Run\",\n    \"Maven.mina-examples [clean].executor\": \"Run\",\n    \"Maven.mina-examples [compile].executor\": \"Run\",\n    \"Maven.mina-examples [package].executor\": \"Run\",\n    \"Maven.mina-parent [clean].executor\": \"Run\",\n    \"Maven.mina-parent [compile].executor\": \"Run\",\n    \"Maven.mina-parent [install].executor\": \"Run\",\n    \"Maven.mina-parent [package].executor\": \"Run\",\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"git-widget-placeholder\": \"v3.0.0-M1-note\",\n    \"kotlin-language-version-configured\": \"true\",\n    \"last_opened_file_path\": \"/Users/zhoufudun/IdeaProjects/mina\",\n    \"settings.editor.selected.configurable\": \"preferences.keymap\"\n  }\n}]]></component>\n  <component name=\"RunManager\" selected=\"Application.NioEchoClient\">\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.apache.mina.example.echoserver.Main\" />\n      <module name=\"mina-example\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"org.apache.mina.example.echoserver.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration name=\"NioEchoClient\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.apache.mina.examples.echoclient.NioEchoClient\" />\n      <module name=\"mina-examples\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"org.apache.mina.examples.echoclient.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration name=\"NioEchoServer\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.apache.mina.examples.echoserver.NioEchoServer\" />\n      <module name=\"mina-examples\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"org.apache.mina.examples.echoserver.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration name=\"ConnectorTest.testTCP\" type=\"JUnit\" factoryName=\"JUnit\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"mina-example\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"org.apache.mina.example.echoserver.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <option name=\"PACKAGE_NAME\" value=\"org.apache.mina.example.echoserver\" />\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.apache.mina.example.echoserver.ConnectorTest\" />\n      <option name=\"METHOD_NAME\" value=\"testTCP\" />\n      <option name=\"TEST_OBJECT\" value=\"method\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration name=\"ConnectorTest.testUDP\" type=\"JUnit\" factoryName=\"JUnit\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"mina-example\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"org.apache.mina.example.echoserver.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <option name=\"PACKAGE_NAME\" value=\"org.apache.mina.example.echoserver\" />\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.apache.mina.example.echoserver.ConnectorTest\" />\n      <option name=\"METHOD_NAME\" value=\"testUDP\" />\n      <option name=\"TEST_OBJECT\" value=\"method\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"JetRunConfigurationType\">\n      <module name=\"mina-core\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"KotlinStandaloneScriptRunConfigurationType\">\n      <module name=\"mina-core\" />\n      <option name=\"filePath\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Application.NioEchoClient\" />\n        <item itemvalue=\"Application.NioEchoServer\" />\n        <item itemvalue=\"JUnit.ConnectorTest.testTCP\" />\n        <item itemvalue=\"JUnit.ConnectorTest.testUDP\" />\n        <item itemvalue=\"Application.Main\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"0f73cc1f-9308-4425-8cf5-73f937b6e55f\" name=\"Changes\" comment=\"\" />\n      <created>1720609699853</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1720609699853</updated>\n    </task>\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"origin/trunk\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\n  </component>\n  <component name=\"XDebuggerManager\">\n    <breakpoint-manager>\n      <breakpoints>\n        <line-breakpoint enabled=\"true\" type=\"java-line\">\n          <url>file://$PROJECT_DIR$/examples/src/main/java/org/apache/mina/examples/echoserver/NioEchoServer.java</url>\n          <line>47</line>\n          <option name=\"timeStamp\" value=\"1\" />\n        </line-breakpoint>\n      </breakpoints>\n    </breakpoint-manager>\n  </component>\n</project>
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	
++++ b/.idea/workspace.xml	
+@@ -4,9 +4,10 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="0f73cc1f-9308-4425-8cf5-73f937b6e55f" name="Changes" comment="">
+-      <change beforePath="$PROJECT_DIR$/examples/src/main/java/org/apache/mina/examples/echoserver/NioEchoServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/examples/src/main/java/org/apache/mina/examples/echoserver/NioEchoServer.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/thrift/src/main/java/org/apache/mina/codec/delimited/serialization/ThriftMessageEncoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/thrift/src/main/java/org/apache/mina/codec/delimited/serialization/ThriftMessageEncoder.java" afterDir="false" />
++    <list default="true" id="0f73cc1f-9308-4425-8cf5-73f937b6e55f" name="Changes" comment="init">
++      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -16,11 +17,17 @@
+   <component name="Git.Settings">
+     <option name="RECENT_BRANCH_BY_REPOSITORY">
+       <map>
+-        <entry key="$PROJECT_DIR$" value="v2.2.3-note" />
++        <entry key="$PROJECT_DIR$" value="v3.0.0-M1-note" />
+       </map>
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
++  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
++  "lastFilter": {
++    "state": "OPEN",
++    "assignee": "zhoufudun"
++  }
++}]]></component>
+   <component name="GitToolBoxStore">
+     <option name="recentBranches">
+       <RecentBranches>
+@@ -30,6 +37,10 @@
+               <option name="branches">
+                 <list>
+                   <RecentBranch>
++                    <option name="branchName" value="v2.0.19-note" />
++                    <option name="lastUsedInstant" value="1720700726" />
++                  </RecentBranch>
++                  <RecentBranch>
+                     <option name="branchName" value="v3.0.0-M1-note" />
+                     <option name="lastUsedInstant" value="1720700129" />
+                   </RecentBranch>
+@@ -44,10 +55,6 @@
+                   <RecentBranch>
+                     <option name="branchName" value="2.2.X" />
+                     <option name="lastUsedInstant" value="1720699524" />
+-                  </RecentBranch>
+-                  <RecentBranch>
+-                    <option name="branchName" value="v2.0.19-note" />
+-                    <option name="lastUsedInstant" value="1720699206" />
+                   </RecentBranch>
+                 </list>
+               </option>
+@@ -58,6 +65,12 @@
+       </RecentBranches>
+     </option>
+   </component>
++  <component name="GithubPullRequestsUISettings"><![CDATA[{
++  "selectedUrlAndAccountId": {
++    "url": "https://github.com/zhoufudun/mina.git",
++    "accountId": "38533c59-026c-4e84-89e8-3459e111e185"
++  }
++}]]></component>
+   <component name="MavenImportPreferences">
+     <option name="generalSettings">
+       <MavenGeneralSettings>
+@@ -98,7 +111,7 @@
+     "RunOnceActivity.OpenProjectViewOnStart": "true",
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "git-widget-placeholder": "v3.0.0-M1-note",
++    "git-widget-placeholder": "v2.0.19-note",
+     "kotlin-language-version-configured": "true",
+     "last_opened_file_path": "/Users/zhoufudun/IdeaProjects/mina",
+     "settings.editor.selected.configurable": "preferences.keymap"
+@@ -208,6 +221,23 @@
+       <option name="presentableId" value="Default" />
+       <updated>1720609699853</updated>
+     </task>
++    <task id="LOCAL-00001" summary="init">
++      <option name="closed" value="true" />
++      <created>1720700680943</created>
++      <option name="number" value="00001" />
++      <option name="presentableId" value="LOCAL-00001" />
++      <option name="project" value="LOCAL" />
++      <updated>1720700680943</updated>
++    </task>
++    <task id="LOCAL-00002" summary="init">
++      <option name="closed" value="true" />
++      <created>1720700775136</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1720700775136</updated>
++    </task>
++    <option name="localTasksCounter" value="3" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+@@ -235,6 +265,8 @@
+   </component>
+   <component name="VcsManagerConfiguration">
+     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
++    <MESSAGE value="init" />
++    <option name="LAST_COMMIT_MESSAGE" value="init" />
+   </component>
+   <component name="XDebuggerManager">
+     <breakpoint-manager>
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"CompilerConfiguration\">\n    <annotationProcessing>\n      <profile name=\"Maven default annotation processors profile\" enabled=\"true\">\n        <sourceOutputDir name=\"target/generated-sources/annotations\" />\n        <sourceTestOutputDir name=\"target/generated-test-sources/test-annotations\" />\n        <outputRelativeToContentRoot value=\"true\" />\n        <module name=\"mina-coap\" />\n        <module name=\"mina-examples\" />\n        <module name=\"mina-thrift\" />\n        <module name=\"mina-core\" />\n        <module name=\"mina-benchmarks\" />\n        <module name=\"mina-protobuf\" />\n        <module name=\"mina-http\" />\n        <module name=\"mina-codec\" />\n      </profile>\n    </annotationProcessing>\n    <bytecodeTargetLevel target=\"8\">\n      <module name=\"mina-avro\" target=\"1.7\" />\n      <module name=\"mina-benchmarks-common\" target=\"1.7\" />\n      <module name=\"mina-benchmarks-netty3\" target=\"1.7\" />\n      <module name=\"mina-benchmarks-netty4\" target=\"1.7\" />\n      <module name=\"mina-example\" target=\"1.8\" />\n      <module name=\"mina-filter-compression\" target=\"1.8\" />\n      <module name=\"mina-http2\" target=\"1.7\" />\n      <module name=\"mina-integration-beans\" target=\"1.8\" />\n      <module name=\"mina-integration-jmx\" target=\"1.8\" />\n      <module name=\"mina-integration-ognl\" target=\"1.8\" />\n      <module name=\"mina-integration-xbean\" target=\"1.8\" />\n      <module name=\"mina-legal\" target=\"1.8\" />\n      <module name=\"mina-monitoring\" target=\"1.7\" />\n      <module name=\"mina-statemachine\" target=\"1.8\" />\n      <module name=\"mina-transport-apr\" target=\"1.8\" />\n    </bytecodeTargetLevel>\n  </component>\n</project>
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	
++++ b/.idea/compiler.xml	
+@@ -6,32 +6,32 @@
+         <sourceOutputDir name="target/generated-sources/annotations" />
+         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+         <outputRelativeToContentRoot value="true" />
+-        <module name="mina-coap" />
+-        <module name="mina-examples" />
+-        <module name="mina-thrift" />
++        <module name="mina-legal" />
+         <module name="mina-core" />
+-        <module name="mina-benchmarks" />
+-        <module name="mina-protobuf" />
++        <module name="mina-filter-compression" />
++        <module name="mina-example" />
++        <module name="mina-integration-ognl" />
++        <module name="mina-integration-jmx" />
++        <module name="mina-integration-xbean" />
++        <module name="mina-statemachine" />
+         <module name="mina-http" />
+-        <module name="mina-codec" />
++        <module name="mina-transport-apr" />
++        <module name="mina-integration-beans" />
+       </profile>
+     </annotationProcessing>
+     <bytecodeTargetLevel target="8">
+       <module name="mina-avro" target="1.7" />
++      <module name="mina-benchmarks" target="1.5" />
+       <module name="mina-benchmarks-common" target="1.7" />
+       <module name="mina-benchmarks-netty3" target="1.7" />
+       <module name="mina-benchmarks-netty4" target="1.7" />
+-      <module name="mina-example" target="1.8" />
+-      <module name="mina-filter-compression" target="1.8" />
++      <module name="mina-coap" target="1.7" />
++      <module name="mina-codec" target="1.6" />
++      <module name="mina-examples" target="1.7" />
+       <module name="mina-http2" target="1.7" />
+-      <module name="mina-integration-beans" target="1.8" />
+-      <module name="mina-integration-jmx" target="1.8" />
+-      <module name="mina-integration-ognl" target="1.8" />
+-      <module name="mina-integration-xbean" target="1.8" />
+-      <module name="mina-legal" target="1.8" />
+       <module name="mina-monitoring" target="1.7" />
+-      <module name="mina-statemachine" target="1.8" />
+-      <module name="mina-transport-apr" target="1.8" />
++      <module name="mina-protobuf" target="1.7" />
++      <module name="mina-thrift" target="1.7" />
+     </bytecodeTargetLevel>
+   </component>
+ </project>
+\ No newline at end of file

@@ -41,7 +41,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
  */
 public class MinaTimeServer {
     /** We will use a port above 1024 to be able to launch the server with a standard user */
-    private static final int PORT = 9123;
+    public static final int PORT = 9123;
 
     /**
      * The server implementation. It's based on TCP, and uses a logging filter 

@@ -68,9 +68,28 @@
       <scope>test</scope>
     </dependency>
   
+<!--    <dependency>-->
+<!--      <groupId>org.slf4j</groupId>-->
+<!--      <artifactId>jcl-over-slf4j</artifactId>-->
+<!--      <exclusions>-->
+<!--        <exclusion>-->
+<!--          <artifactId>slf4j-api</artifactId>-->
+<!--          <groupId>org.slf4j</groupId>-->
+<!--        </exclusion>-->
+<!--      </exclusions>-->
+<!--    </dependency>-->
+
+
+    <!-- Log4j 2 dependencies -->
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.36</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.36</version>
     </dependency>
 
   </dependencies>

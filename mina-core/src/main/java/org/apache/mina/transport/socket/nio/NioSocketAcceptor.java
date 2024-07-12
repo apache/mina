@@ -220,7 +220,7 @@ implements SocketAcceptor {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc}  服务端初始化
      */
     @Override
     protected ServerSocketChannel open(SocketAddress localAddress) throws Exception {
