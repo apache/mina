@@ -16,8 +16,6 @@
  */
 package org.apache.mina.integration.ognl;
 
-import java.util.Map;
-
 import ognl.ObjectPropertyAccessor;
 import ognl.OgnlContext;
 import ognl.OgnlException;
@@ -67,7 +65,7 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
     }
 
     @Override
-    public final Object getPossibleProperty(Map context, Object target, String name) throws OgnlException {
+    public final Object getPossibleProperty(OgnlContext context, Object target, String name) throws OgnlException {
         Object answer = getProperty0((OgnlContext) context, target, name);
         if (answer == OgnlRuntime.NotFound) {
             answer = super.getPossibleProperty(context, target, name);
@@ -76,7 +74,7 @@ public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
     }
 
     @Override
-    public final Object setPossibleProperty(Map context, Object target, String name, Object value) throws OgnlException {
+    public final Object setPossibleProperty(OgnlContext context, Object target, String name, Object value) throws OgnlException {
         if (context.containsKey(READ_ONLY_MODE)) {
             throw new OgnlException("Expression must be read-only: " + context.get(QUERY));
         }

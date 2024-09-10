@@ -16,7 +16,9 @@
  */
 package org.apache.mina.integration.ognl;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.core.session.IoSession;
@@ -108,12 +110,12 @@ public class IoSessionFinder {
         }
 
         Set<IoSession> answer = new LinkedHashSet<>();
+        Map<Object,Object> values = new HashMap<>();
+        values.put(AbstractPropertyAccessor.READ_ONLY_MODE, true);
+        values.put(AbstractPropertyAccessor.QUERY, query);
         
         for (IoSession s : sessions) {
-            OgnlContext context = (OgnlContext) Ognl.createDefaultContext(s);
-            context.setTypeConverter(typeConverter);
-            context.put(AbstractPropertyAccessor.READ_ONLY_MODE, true);
-            context.put(AbstractPropertyAccessor.QUERY, query);
+            OgnlContext context = (OgnlContext) Ognl.createDefaultContext(s, null, typeConverter).withValues(values);
             Object result = Ognl.getValue(expression, context, s);
             
             if (result instanceof Boolean) {

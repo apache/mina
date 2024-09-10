@@ -18,7 +18,6 @@ package org.apache.mina.integration.ognl;
 
 import java.beans.PropertyEditor;
 import java.lang.reflect.Member;
-import java.util.Map;
 
 import org.apache.mina.integration.beans.PropertyEditorFactory;
 
@@ -46,7 +45,7 @@ public class PropertyTypeConverter implements TypeConverter {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Object convertValue(Map ctx, Object target, Member member, String attrName, Object value, Class toType) {
+    public Object convertValue(OgnlContext ctx, Object target, Member member, String attrName, Object value, Class toType) {
         if (value == null) {
             return null;
         }

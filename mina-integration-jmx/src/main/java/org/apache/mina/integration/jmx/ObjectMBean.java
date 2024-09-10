@@ -212,8 +212,8 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
         try {
             PropertyEditor e = getPropertyEditor(getParent(aname).getClass(), pdesc.getName(), pdesc.getPropertyType());
             e.setAsText((String) avalue);
-            OgnlContext ctx = (OgnlContext) Ognl.createDefaultContext(source);
-            ctx.setTypeConverter(typeConverter);
+            
+            OgnlContext ctx = (OgnlContext) Ognl.createDefaultContext(source, null, typeConverter);
             Ognl.setValue(aname, ctx, source, e.getValue());
         } catch (Exception e) {
             throwMBeanException(e);
@@ -643,8 +643,7 @@ public class ObjectMBean<T> implements ModelMBean, MBeanRegistration {
 
     private Object getAttribute(Object object, String fqan, Class<?> attrType) throws OgnlException {
         Object property;
-        OgnlContext ctx = (OgnlContext) Ognl.createDefaultContext(object);
-        ctx.setTypeConverter(new OgnlTypeConverter());
+        OgnlContext ctx = (OgnlContext) Ognl.createDefaultContext(object, null, new OgnlTypeConverter());
         if (attrType == null) {
             property = Ognl.getValue(fqan, ctx, object);
         } else {
