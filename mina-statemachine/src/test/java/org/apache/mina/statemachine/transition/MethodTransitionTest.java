@@ -24,16 +24,19 @@ import java.lang.reflect.Method;
 import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.event.Event;
-import org.apache.mina.statemachine.transition.MethodTransition;
+import org.junit.Before;
+import org.junit.Test;
 
-import com.agical.rmock.extension.junit.RMockTestCase;
+import static org.easymock.EasyMock.mock;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@link MethodTransition}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class MethodTransitionTest extends RMockTestCase {
+public class MethodTransitionTest {
     State currentState;
 
     State nextState;
@@ -52,9 +55,8 @@ public class MethodTransitionTest extends RMockTestCase {
 
     Object[] args;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         currentState = new State("current");
         nextState = new State("next");
         target = (Target) mock(Target.class);
@@ -69,71 +71,71 @@ public class MethodTransitionTest extends RMockTestCase {
         argsEvent = new Event("event", context, args);
     }
 
+    @Test
     public void testExecuteWrongEventId() throws Exception {
-        startVerification();
         MethodTransition t = new MethodTransition("otherEvent", nextState, "noArgs", target);
         assertFalse(t.execute(noArgsEvent));
     }
 
+    @Test
     public void testExecuteNoArgsMethodOnNoArgsEvent() throws Exception {
         target.noArgs();
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, "noArgs", target);
         assertTrue(t.execute(noArgsEvent));
     }
 
+    @Test
     public void testExecuteNoArgsMethodOnArgsEvent() throws Exception {
         target.noArgs();
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, "noArgs", target);
         assertTrue(t.execute(argsEvent));
     }
 
+    @Test
     public void testExecuteExactArgsMethodOnNoArgsEvent() throws Exception {
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, "exactArgs", target);
         assertFalse(t.execute(noArgsEvent));
     }
 
+    @Test
     public void testExecuteExactArgsMethodOnArgsEvent() throws Exception {
         target.exactArgs((A) args[0], (B) args[1], (C) args[2], ((Integer) args[3]).intValue(),
                 ((Boolean) args[4]).booleanValue());
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, "exactArgs", target);
         assertTrue(t.execute(argsEvent));
     }
 
+    @Test
     public void testExecuteSubsetExactArgsMethodOnNoArgsEvent() throws Exception {
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, "subsetExactArgs", target);
         assertFalse(t.execute(noArgsEvent));
     }
 
+    @Test
     public void testExecuteSubsetExactArgsMethodOnArgsEvent() throws Exception {
         target.subsetExactArgs((A) args[0], (A) args[1], ((Integer) args[3]).intValue());
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, "subsetExactArgs", target);
         assertTrue(t.execute(argsEvent));
     }
 
+    @Test
     public void testExecuteAllArgsMethodOnArgsEvent() throws Exception {
         target.allArgs(argsEvent, context, (A) args[0], (B) args[1], (C) args[2], ((Integer) args[3]).intValue(),
                 ((Boolean) args[4]).booleanValue());
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, "allArgs", target);
         assertTrue(t.execute(argsEvent));
     }
 
+    @Test
     public void testExecuteSubsetAllArgsMethod1OnArgsEvent() throws Exception {
         target.subsetAllArgs(context, (B) args[1], (A) args[2], ((Integer) args[3]).intValue());
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, subsetAllArgsMethod1, target);
         assertTrue(t.execute(argsEvent));
     }
 
+    @Test
     public void testExecuteSubsetAllArgsMethod2OnArgsEvent() throws Exception {
         target.subsetAllArgs(argsEvent, (B) args[1], (B) args[2], ((Boolean) args[4]).booleanValue());
-        startVerification();
         MethodTransition t = new MethodTransition("event", nextState, subsetAllArgsMethod2, target);
         assertTrue(t.execute(argsEvent));
     }

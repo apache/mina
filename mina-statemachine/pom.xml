@@ -41,9 +41,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.agical.rmock</groupId>
-      <artifactId>rmock</artifactId>
-      <version>${version.rmock}</version>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

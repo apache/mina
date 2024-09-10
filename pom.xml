@@ -138,7 +138,7 @@
     <version.xbean.plugin>4.23</version.xbean.plugin>
 
     <!-- Jars -->
-    <version.easymock>2.5.2</version.easymock>
+    <version.easymock>5.4.0</version.easymock>
     <version.jboss.javassist>3.8.0.GA</version.jboss.javassist>
     <version.jmock>1.2.0</version.jmock>
     <version.junit>4.13.2</version.junit>
@@ -146,7 +146,6 @@
     <version.log4j>1.2.17</version.log4j>
     <version.ognl>3.3.4</version.ognl>
     <version.pmd>7.0.0</version.pmd>
-    <version.rmock>2.0.2</version.rmock>
     <version.slf4j.api>1.7.36</version.slf4j.api>
     <version.slf4j.reload4j>1.7.36</version.slf4j.reload4j>
     <version.slf4j.jcl.over.slf4j>1.7.36</version.slf4j.jcl.over.slf4j>
@@ -342,13 +341,6 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <version>${version.easymock}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>com.agical.rmock</groupId>
-        <artifactId>rmock</artifactId>
-        <version>${version.rmock}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>

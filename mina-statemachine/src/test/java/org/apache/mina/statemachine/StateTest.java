@@ -19,29 +19,32 @@
  */
 package org.apache.mina.statemachine;
 
-import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.transition.Transition;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
-
-import com.agical.rmock.extension.junit.RMockTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.easymock.EasyMock.mock;
 
 /**
  * Tests {@link State}.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class StateTest extends RMockTestCase {
-    State state;
+public class StateTest {
+    private State state;
 
-    Transition transition1;
+    private Transition transition1;
 
-    Transition transition2;
+    private Transition transition2;
 
-    Transition transition3;
+    private Transition transition3;
 
-    @BeforeClass
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         state = new State("test");
         transition1 = (Transition) mock(Transition.class);
         transition2 = transition1; //(Transition) mock(Transition.class);
@@ -94,5 +97,4 @@ public class StateTest extends RMockTestCase {
         } catch (IllegalArgumentException npe) {
         }
     }
-
 }
