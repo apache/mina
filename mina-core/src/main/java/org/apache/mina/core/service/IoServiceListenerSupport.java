@@ -252,9 +252,9 @@ public class IoServiceListenerSupport {
 
         // Fire listener events.
         try {
-            for (IoServiceListener l : listeners) {
+            for (IoServiceListener listener : listeners) {
                 try {
-                    l.sessionDestroyed(session);
+                    listener.sessionDestroyed(session);
                 } catch (Exception e) {
                     ExceptionMonitor.getInstance().exceptionCaught(e);
                 }
