@@ -31,7 +31,7 @@ pipeline {
   }
   parameters {
       choice(name: 'nodeLabel', choices: ['ubuntu', 'arm', 'Windows']) 
-      choice(name: 'jdkVersion', choices: ['jdk_8_latest', 'jdk_11_latest', 'jdk_17_latest', 'jdk_21_latest', 'jdk_22_latest', 'jdk_8_latest_windows', 'jdk_11_latest_windows', 'jdk_17_latest_windows', 'jdk_21_latest_windows', 'jdk_22_latest_windows']) 
+      choice(name: 'jdkVersion', choices: ['jdk_1.8_latest', 'jdk_11_latest', 'jdk_17_latest', 'jdk_21_latest', 'jdk_22_latest', 'jdk_1.8_latest_windows', 'jdk_11_latest_windows', 'jdk_17_latest_windows', 'jdk_21_latest_windows', 'jdk_22_latest_windows']) 
       booleanParam(name: 'deployEnabled', defaultValue: false)
       booleanParam(name: 'sonarEnabled', defaultValue: false)
       booleanParam(name: 'testsEnabled', defaultValue: true)
@@ -114,7 +114,7 @@ pipeline {
 
     stage('Build JDK 8') {
       tools {
-        jdk "jdk_8_latest"
+        jdk "jdk_1.8_latest"
       }
       steps {
         echo 'Building JDK 8'
