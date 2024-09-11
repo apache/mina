@@ -173,7 +173,7 @@ pipeline {
 
     stage('Build JDK 8 Windows') {
       tools {
-        jdk "jdk_1.8_latest_windows:"
+        jdk "jdk_1.8_latest_windows"
       }
       steps {
         echo 'Building JDK 8 Windows'
