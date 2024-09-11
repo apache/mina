@@ -90,7 +90,7 @@ pipeline {
 
     stage('Build JDK 17') {
       tools {
-        jdk "jdk_17"
+        jdk "jdk_17_latest"
       }
       steps {
         echo 'Building JDK 17'
@@ -102,7 +102,7 @@ pipeline {
 
     stage('Build JDK 11') {
       tools {
-        jdk "jdk_11"
+        jdk "jdk_11_latest"
       }
       steps {
         echo 'Building JDK 11'
@@ -114,7 +114,7 @@ pipeline {
 
     stage('Build JDK 8') {
       tools {
-        jdk "jdk_8"
+        jdk "jdk_8_latest"
       }
       steps {
         echo 'Building JDK 8'
