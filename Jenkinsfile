@@ -36,7 +36,6 @@ pipeline {
       booleanParam(name: 'sonarEnabled', defaultValue: false)
       booleanParam(name: 'testsEnabled', defaultValue: true)
   }
-
   triggers {
     cron('@weekly')
     pollSCM('@daily')
@@ -64,60 +63,120 @@ pipeline {
       }
     }
     
-    stage('Build JDK 22') {
+    stage('Build JDK 22 Linux') {
       tools {
         jdk "jdk_22_latest"
       }
       steps {
-        echo 'Building JDK 22'
+        echo 'Building JDK 22 Linux'
         sh 'java -version'
         sh 'mvn -version'
         sh 'mvn clean install -Pserial'
       }
     }
 
-    stage('Build JDK 21') {
+    stage('Build JDK 21 Linux') {
       tools {
         jdk "jdk_21_latest"
       }
       steps {
-        echo 'Building JDK 21'
+        echo 'Building JDK 21 Linux'
         sh 'java -version'
         sh 'mvn -version'
         sh 'mvn clean install -Pserial'
       }
     }
 
-    stage('Build JDK 17') {
+    stage('Build JDK 17 Linux') {
       tools {
         jdk "jdk_17_latest"
       }
       steps {
-        echo 'Building JDK 17'
+        echo 'Building JDK 17 Linux'
         sh 'java -version'
         sh 'mvn -version'
         sh 'mvn clean install -Pserial'
       }
     }
 
-    stage('Build JDK 11') {
+    stage('Build JDK 11 Linux') {
       tools {
         jdk "jdk_11_latest"
       }
       steps {
-        echo 'Building JDK 11'
+        echo 'Building JDK 11 Linux'
         sh 'java -version'
         sh 'mvn -version'
         sh 'mvn clean install -Pserial'
       }
     }
 
-    stage('Build JDK 8') {
+    stage('Build JDK 8 Linux') {
       tools {
         jdk "jdk_1.8_latest"
       }
       steps {
-        echo 'Building JDK 8'
+        echo 'Building JDK 8 Linux'
+        sh 'java -version'
+        sh 'mvn -version'
+        sh 'mvn clean install -Pserial'
+      }
+    }
+    
+    stage('Build JDK 22 Windows') {
+      tools {
+        jdk "jdk_22_latest_windows"
+      }
+      steps {
+        echo 'Building JDK 22 Windows'
+        sh 'java -version'
+        sh 'mvn -version'
+        sh 'mvn clean install -Pserial'
+      }
+    }
+
+    stage('Build JDK 21 Windows') {
+      tools {
+        jdk "jdk_21_latest_windows"
+      }
+      steps {
+        echo 'Building JDK 21 Windows'
+        sh 'java -version'
+        sh 'mvn -version'
+        sh 'mvn clean install -Pserial'
+      }
+    }
+
+    stage('Build JDK 17 Windows') {
+      tools {
+        jdk "jdk_17_latest_windows"
+      }
+      steps {
+        echo 'Building JDK 17 Windows'
+        sh 'java -version'
+        sh 'mvn -version'
+        sh 'mvn clean install -Pserial'
+      }
+    }
+
+    stage('Build JDK 11 Windows') {
+      tools {
+        jdk "jdk_11_latest_windows"
+      }
+      steps {
+        echo 'Building JDK 11 Windows'
+        sh 'java -version'
+        sh 'mvn -version'
+        sh 'mvn clean install -Pserial'
+      }
+    }
+
+    stage('Build JDK 8 Windows') {
+      tools {
+        jdk "jdk_1.8_latest_windows:"
+      }
+      steps {
+        echo 'Building JDK 8 Windows'
         sh 'java -version'
         sh 'mvn -version'
         sh 'mvn clean install -Pserial'
