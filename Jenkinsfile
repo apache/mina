@@ -18,10 +18,6 @@
  */
 pipeline {
   agent none
-  options {
-    buildDiscarder(logRotator(numToKeepStr: '10'))
-    timeout(time: 8, unit: 'HOURS')
-  }
   tools {
     maven 'maven_3_latest'
     jdk params.jdkVersion
