@@ -17,7 +17,7 @@
  * under the License.
  */
 pipeline {
-  agent none
+  agent any
   tools {
     maven 'maven_3_latest'
     jdk params.jdkVersion
