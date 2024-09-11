@@ -12,5 +12,4 @@ bin/
 .clover
 META-INF/
 Dockerfile
-Jenkinsfile
 /.idea/
