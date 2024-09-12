@@ -122,7 +122,8 @@ pipeline {
         sh 'mvn clean install -Pserial'
       }
     }
-    
+/*--- Comment out Windows builds for the moment ---*/
+/*    
     stage('Build JDK 22 Windows') {
       tools {
         jdk "jdk_22_latest_windows"
@@ -183,4 +184,5 @@ pipeline {
       }
     }
   }
+*/
 }
