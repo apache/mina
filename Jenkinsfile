@@ -18,10 +18,12 @@
  */
 pipeline {
   agent any
+
   tools {
     maven 'maven_3_latest'
     jdk params.jdkVersion
   }
+
   options {
       // Configure an overall timeout for the build of ten hours.
       timeout(time: 20, unit: 'HOURS')
@@ -29,6 +31,7 @@ pipeline {
       buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
       disableConcurrentBuilds()
   }
+
   parameters {
       choice(name: 'nodeLabel', choices: ['ubuntu', 'arm', 'Windows']) 
       choice(name: 'jdkVersion', choices: ['jdk_1.8_latest', 'jdk_11_latest', 'jdk_17_latest', 'jdk_21_latest', 'jdk_22_latest', 'jdk_1.8_latest_windows', 'jdk_11_latest_windows', 'jdk_17_latest_windows', 'jdk_21_latest_windows', 'jdk_22_latest_windows']) 
@@ -36,10 +39,12 @@ pipeline {
       booleanParam(name: 'sonarEnabled', defaultValue: false)
       booleanParam(name: 'testsEnabled', defaultValue: true)
   }
+
   triggers {
     cron('@weekly')
     pollSCM('@daily')
   }
+
   stages {
     stage('Initialization') {
       steps {
@@ -183,6 +188,6 @@ pipeline {
         sh 'mvn clean install -Pserial'
       }
     }
+---*/
   }
-*/
 }
