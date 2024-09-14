@@ -19,8 +19,6 @@
  */
 package org.apache.mina.util.byteaccess;
 
-import java.nio.ByteOrder;
-
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -29,22 +27,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoAbsoluteWriter {
-
-    /**
-     * @return the index of the first byte that can be accessed.
-     */
-    int first();
-
-    /**
-     * @return the index after the last byte that can be accessed.
-     */
-    int last();
-
-    /**
-     * @return the order of the bytes.
-     */
-    ByteOrder order();
-
     /**
      * Puts a <code>byte</code> at the given index.
      * 

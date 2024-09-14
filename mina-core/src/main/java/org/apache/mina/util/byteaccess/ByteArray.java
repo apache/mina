@@ -30,23 +30,19 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
-
     /**
-     * {@inheritDoc}
+     * @return the index of the first byte that can be accessed.
      */
-    @Override
     int first();
 
     /**
-     * {@inheritDoc}
+     * @return the index after the last byte that can be accessed.
      */
-    @Override
     int last();
-
+    
     /**
-     * {@inheritDoc}
+     * @return the order of the bytes.
      */
-    @Override
     ByteOrder order();
 
     /**
@@ -87,24 +83,6 @@ public interface ByteArray extends IoAbsoluteReader, IoAbsoluteWriter {
      */
     @Override
     boolean equals(Object other);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    byte get(int index);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    void get(int index, IoBuffer bb);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    int getInt(int index);
 
     /**
      * @return a cursor starting at index 0 (which may not be the start of the array).

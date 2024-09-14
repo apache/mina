@@ -144,6 +144,7 @@
     <version.junit>4.13.2</version.junit>
     <version.jzlib>1.1.3</version.jzlib>
     <version.log4j>1.2.17</version.log4j>
+    <version.mockito>5.13.0</version.mockito>
     <version.ognl>3.4.3</version.ognl>
     <version.pmd>7.5.0</version.pmd>
     <version.slf4j.api>1.7.36</version.slf4j.api>
@@ -288,6 +289,14 @@
         <groupId>jmock</groupId>
         <artifactId>jmock</artifactId>
         <version>${version.jmock}</version>
+        <optional>true</optional>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${version.mockito}</version>
         <optional>true</optional>
         <scope>test</scope>
       </dependency>

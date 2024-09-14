@@ -215,7 +215,11 @@ public class IoServiceListenerSupport {
 
         // Fire session events.
         IoFilterChain filterChain = session.getFilterChain();
+        
+        // Should call handler.sessionCreated()
         filterChain.fireSessionCreated();
+        
+        // Should call handler.sessionOpened()
         filterChain.fireSessionOpened();
 
         int managedSessionCount = managedSessions.size();
@@ -227,9 +231,9 @@ public class IoServiceListenerSupport {
         cumulativeManagedSessionCount.incrementAndGet();
 
         // Fire listener events.
-        for (IoServiceListener l : listeners) {
+        for (IoServiceListener listener : listeners) {
             try {
-                l.sessionCreated(session);
+                listener.sessionCreated(session);
             } catch (Exception e) {
                 ExceptionMonitor.getInstance().exceptionCaught(e);
             }

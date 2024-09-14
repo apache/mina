@@ -19,8 +19,6 @@
  */
 package org.apache.mina.util.byteaccess;
 
-import java.nio.ByteOrder;
-
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -29,17 +27,6 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoAbsoluteReader {
-
-    /**
-     * @return the index of the first byte that can be accessed.
-     */
-    int first();
-
-    /**
-     * @return the index after the last byte that can be accessed.
-     */
-    int last();
-
     /**
      * @return the total number of bytes that can be accessed.
      */
@@ -53,11 +40,6 @@ public interface IoAbsoluteReader {
      * @return The ByteArray that is a view on the original array 
      */
     ByteArray slice(int index, int length);
-
-    /**
-     * @return the order of the bytes.
-     */
-    ByteOrder order();
 
     /**
      * @param index The starting position
