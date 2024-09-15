@@ -34,7 +34,7 @@ pipeline {
 
   parameters {
       choice(name: 'nodeLabel', choices: ['ubuntu', 'arm', 'Windows']) 
-      choice(name: 'jdkVersion', choices: ['jdk_1.8_latest', 'jdk_11_latest', 'jdk_17_latest', 'jdk_21_latest', 'jdk_22_latest', 'jdk_1.8_latest_windows', 'jdk_11_latest_windows', 'jdk_17_latest_windows', 'jdk_21_latest_windows', 'jdk_22_latest_windows']) 
+      choice(name: 'jdkVersion', choices: ['jdk_11_latest', 'jdk_17_latest', 'jdk_21_latest', 'jdk_22_latest', 'jdk_11_latest_windows', 'jdk_17_latest_windows', 'jdk_21_latest_windows', 'jdk_22_latest_windows']) 
       booleanParam(name: 'deployEnabled', defaultValue: false)
       booleanParam(name: 'sonarEnabled', defaultValue: false)
       booleanParam(name: 'testsEnabled', defaultValue: true)
@@ -116,19 +116,8 @@ pipeline {
       }
     }
 
-    stage('Build JDK 8 Linux') {
-      tools {
-        jdk "jdk_1.8_latest"
-      }
-      steps {
-        echo 'Building JDK 8 Linux'
-        sh 'java -version'
-        sh 'mvn -version'
-        sh 'mvn clean install -Pserial'
-      }
-    }
-/*--- Comment out Windows builds for the moment ---*/
-/*    
+    /*--- Comment out Windows builds for the moment ---*/
+    /*    
     stage('Build JDK 22 Windows') {
       tools {
         jdk "jdk_22_latest_windows"
@@ -188,6 +177,6 @@ pipeline {
         sh 'mvn clean install -Pserial'
       }
     }
----*/
+    ---*/
   }
 }
