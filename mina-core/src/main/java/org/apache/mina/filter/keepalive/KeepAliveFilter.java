@@ -55,6 +55,7 @@ import org.apache.mina.core.write.WriteRequest;
  * message:
  *
  * <table border="1">
+ *   <caption>Message</caption>
  *   <tr>
  *     <th>Name</th><th>Description</th><th>Implementation</th>
  *   </tr>
