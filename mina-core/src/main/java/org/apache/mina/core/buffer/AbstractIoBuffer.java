@@ -1615,8 +1615,10 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                     continue;
                 }
 
+                i++;
+                
                 if (wasZero) {
-                    end = i - 1;
+                    end = i - 2;
                     break;
                 }
             }
