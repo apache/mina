@@ -31,8 +31,6 @@ public class MacronTest {
     /**
      * Based on mina-core\src\test\java\org\apache\mina\core\buffer\IoBufferTest.testGetString(CharsetDecoder)
      * in branch 2.1.X
-     * 
-     * @throws CharacterCodingException
      */
     @Test
     public void testMacron() throws CharacterCodingException {
