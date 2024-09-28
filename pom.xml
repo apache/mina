@@ -38,7 +38,7 @@
   </organization>
 
   <groupId>org.apache.mina</groupId>
-  <version>2.0.26</version>
+  <version>2.0.27-SNAPSHOT</version>
   <artifactId>mina-parent</artifactId>
   <name>Apache MINA</name>
   <packaging>pom</packaging>
@@ -55,7 +55,7 @@
     <connection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/mina.git</developerConnection>
     <url>https://github.com/apache/mina/tree/${project.scm.tag}</url>
-    <tag>2.0.26</tag>
+    <tag>2.0.X</tag>
   </scm>
 
   <distributionManagement>
@@ -88,7 +88,7 @@
   <properties>
     <arguments />
     <!-- Activate reproductible builds -->
-    <project.build.outputTimestamp>1727544614</project.build.outputTimestamp>
+    <project.build.outputTimestamp>1727544912</project.build.outputTimestamp>
 
     <!-- Make Java 8 javadoc lint to shut the f*** up... -->
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
