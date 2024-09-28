@@ -1602,27 +1602,17 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 newPos = end + 1;
             }
         } else {
-            int i = oldPos;
-            for (;;) {
-                boolean wasZero = get(i) == 0;
-                i++;
+            for (int i = oldPos; i < oldLimit;) {
+                byte b = get(i++);
 
                 if (i >= oldLimit) {
+                    // Odd number of bytes...
                     break;
                 }
 
-                if (get(i) != 0) {
-                    i++;
-                    if (i >= oldLimit) {
-                        break;
-                    }
-
-                    continue;
-                }
-
-                i++;
-
-                if (wasZero) {
+                b |= get(i++);
+                if (b == 0) {
+                    // 0x00 0x00 found.
                     end = i - 2;
                     break;
                 }

@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
-public class MacronTest {
+public class Utf16StringTest {
     /**
      * Based on mina-core\src\test\java\org\apache\mina\core\buffer\IoBufferTest.testGetString(CharsetDecoder)
      * in branch 2.1.X
@@ -75,6 +75,30 @@ public class MacronTest {
         buf.position(0);
         
         assertEquals( "MĀORI",  buf.getString(decoder) );
+
+        buf.clear();
+        buf.fillAndReset(buf.limit());
+
+        // now put "MĀORI" there: \u004d \u0100 \u004f \u0052 \u0049
+        // 01 00 00 00
+
+        buf = IoBuffer.allocate(16);
+        buf.put((byte) 0x01);
+        buf.put((byte) 0x00);
+
+        buf.position(0);
+        
+        assertEquals( "Ā",  buf.getString(decoder) );
+    }
+    
+    @Test
+    public void testNotZeroTerminatedUtf16String() throws CharacterCodingException {
+        IoBuffer buf = IoBuffer.allocate(2);
+        buf.put((byte) 0x01);
+        buf.put((byte) 0x00);
+        buf.position(0);
+        String decoded = buf.getString(StandardCharsets.UTF_16BE.newDecoder());
+        assertEquals("Ā", decoded);
     }
 }
 
