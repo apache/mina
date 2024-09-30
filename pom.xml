@@ -873,7 +873,6 @@
             <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
             <link>http://www.slf4j.org/api/</link>
             <link>http://static.springframework.org/spring/docs/2.0.x/api/</link>
-            <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
           </links>
           <locale>en_US</locale>
         </configuration>
