@@ -121,7 +121,7 @@
     <version.jxr.plugin>3.5.0</version.jxr.plugin>
     <version.model.plugin>3.9.4</version.model.plugin>
     <version.plexus.utils>4.0.0</version.plexus.utils>
-    <version.plugin.plugin>3.12.0</version.plugin.plugin>
+    <version.plugin.plugin>4.0.0-beta-1</version.plugin.plugin>
     <version.pmd.plugin>3.25.0</version.pmd.plugin>
     <version.project.plugin>3.0-alpha-2</version.project.plugin>
     <version.project.info.report.plugin>3.7.0</version.project.info.report.plugin>
