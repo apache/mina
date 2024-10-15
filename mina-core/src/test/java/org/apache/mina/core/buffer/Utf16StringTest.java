@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 
 public class Utf16StringTest {
-    /**
+    /*
      * Based on mina-core\src\test\java\org\apache\mina\core\buffer\IoBufferTest.testGetString(CharsetDecoder)
      * in branch 2.1.X
      */

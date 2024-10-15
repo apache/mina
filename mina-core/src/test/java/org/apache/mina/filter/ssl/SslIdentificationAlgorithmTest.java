@@ -91,10 +91,8 @@ public class SslIdentificationAlgorithmTest {
         assertFalse(handshakeDone.await(10, TimeUnit.SECONDS));
     }
 
-    /**
+    /*
      * Subject Alternative Name (SAN) scenarios
-     * 
-     * @exception 
      */
     @Test
     public void shouldAuthenticateWhenServerCertificateAlternativeNameMatchesClientSNIExactly() throws Exception {
