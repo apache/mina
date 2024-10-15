@@ -61,6 +61,7 @@ public class DIRMINA777Test {
         try {
             IoConnector connector = new NioSocketConnector();
             connector.setHandler(new IoHandlerAdapter());
+            connector.getSessionConfig().setUseReadOperation(true);
             ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost", port));
             connectFuture.awaitUninterruptibly();
             
