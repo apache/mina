@@ -114,18 +114,21 @@ public interface IoSession {
     TransportMetadata getTransportMetadata();
 
     /**
-     * TODO This javadoc is wrong. The return tag should be short.
-     * 
      * @return a {@link ReadFuture} which is notified when a new message is
      * received, the connection is closed or an exception is caught.  This
      * operation is especially useful when you implement a client application.
-     * TODO : Describe here how we enable this feature.
+     * 
      * However, please note that this operation is disabled by default and
      * throw {@link IllegalStateException} because all received events must be
      * queued somewhere to support this operation, possibly leading to memory
      * leak.  This means you have to keep calling {@link #read()} once you
      * enabled this operation.  To enable this operation, please call
      * {@link IoSessionConfig#setUseReadOperation(boolean)} with {@code true}.
+     * 
+     * Side note: the {@link IoSessionConfig#setUseReadOperation(boolean)} call 
+     * MUST be set before the session is opened, otherwise you might have a race 
+     * condition if you write a message in {@link IoHandler#sessionOpened(IoSession)}
+     * event, as this message could be written before the read hook can be set.
      *
      * @throws IllegalStateException if
      * {@link IoSessionConfig#setUseReadOperation(boolean) useReadOperation}
