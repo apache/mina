@@ -69,12 +69,13 @@ public class DIRMINA777Test {
                 throw connectFuture.getException();
             }
             
-            connectFuture.getSession().getConfig().setUseReadOperation(true);
             ReadFuture readFuture = connectFuture.getSession().read();
             readFuture.awaitUninterruptibly();
+            
             if (readFuture.getException() != null) {
                 throw readFuture.getException();
             }
+            
             IoBuffer message = (IoBuffer)readFuture.getMessage();
             assertEquals(1, message.remaining());
             assertEquals(125,message.get());
