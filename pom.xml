@@ -131,14 +131,14 @@
     <version.resources.plugin>3.3.1</version.resources.plugin>
     <version.scm.plugin>2.1.0</version.scm.plugin>
     <version.site.plugin>4.0.0-M16</version.site.plugin>
-    <version.source.plugin>3.2.1</version.source.plugin>
+    <version.source.plugin>3.3.1</version.source.plugin>
     <version.shade.plugin>3.5.0</version.shade.plugin>
     <version.surefire.plugin>3.5.0</version.surefire.plugin>
     <version.surfire.report.plugin>3.5.0</version.surfire.report.plugin>
     <version.taglist.plugin>3.1.0</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
     <version.versions.plugin>2.17.1</version.versions.plugin>
-    <version.xbean.plugin>4.25</version.xbean.plugin>
+    <version.xbean.plugin>4.26</version.xbean.plugin>
 
     <!-- Jars -->
     <version.easymock>2.5.2</version.easymock>
