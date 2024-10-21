@@ -19,31 +19,87 @@
   under the License.
 -->
 
-<spring:beans xmlns:spring="http://xbean.apache.org/schemas/spring/1.0" 
-              xmlns:s="http://www.springframework.org/schema/beans"
-              xmlns="http://mina.apache.org/config/1.0">
-  
-  <nioDatagramAcceptor id="datagramAcceptor0" />
-  
-  <nioDatagramAcceptor id="datagramAcceptor1" defaultLocalAddress="192.168.0.1:110" />
-  
-  <nioDatagramAcceptor id="datagramAcceptor2" executor="#threadPoolExecutor" closeOnDeactivation="false" />
+<spring:beans xmlns:spring="http://xbean.apache.org/schemas/spring/1.0"
+              xmlns:s="http://www.springframework.org/schema/beans">
 
-  <nioDatagramAcceptor id="datagramAcceptor3">
-    <defaultLocalAddresses>
-      <socketAddress>192.168.0.1:10001</socketAddress>
-      <socketAddress>192.168.0.2:10002</socketAddress>
-      <socketAddress>192.168.0.3:10003</socketAddress>
-    </defaultLocalAddresses>
-  </nioDatagramAcceptor>
+  <!-- Initialize datagramAcceptor0 -->
+  <bean class="org.apache.mina.transport.socket.nio.NioDatagramAcceptor" id="datagramAcceptor0"/>
 
-  <nioDatagramAcceptor id="datagramAcceptor4" />
-  
-  <standardThreadPool id="threadPoolExecutor" maxThreads="4"/>
-  
+  <!-- Initialize datagramAcceptor1 -->
+  <bean class="org.apache.mina.transport.socket.nio.NioDatagramAcceptor" id="datagramAcceptor1">
+    <property name="defaultLocalAddress" value="192.168.0.1:110"/>
+  </bean>
+
+  <!-- Initialize datagramAcceptor2 -->
+  <bean class="org.apache.mina.transport.socket.nio.NioDatagramAcceptor" id="datagramAcceptor2">
+    <constructor-arg ref="taskExecutor"/>
+    <property name="closeOnDeactivation" value="false"/>
+  </bean>
+  <!-- Initialize StandardThreadPool use for datagramAcceptor2 -->
+  <bean id="taskExecutor" class="org.apache.mina.integration.xbean.StandardThreadPool">
+    <constructor-arg name="maxThreads" value="4"/>
+  </bean>
+
+  <!-- Initialize datagramAcceptor3 -->
+  <bean class="org.apache.mina.transport.socket.nio.NioDatagramAcceptor" id="datagramAcceptor3">
+    <property name="defaultLocalAddresses">
+      <list>
+        <ref bean="socketAddress0"/>
+        <ref bean="socketAddress1"/>
+        <ref bean="socketAddress2"/>
+      </list>
+    </property>
+  </bean>
+  <!-- Initialize 1st-3rd InetSocketAddress as list in datagramAcceptor3 -->
+  <bean id="socketAddress0" class="java.net.InetSocketAddress">
+    <constructor-arg ref="byAddress0" index="0"/>
+    <constructor-arg value="10001" index="1"/>
+  </bean>
+  <bean id="socketAddress1" class="java.net.InetSocketAddress">
+    <constructor-arg ref="byAddress1" index="0"/>
+    <constructor-arg value="10002" index="1"/>
+  </bean>
+  <bean id="socketAddress2" class="java.net.InetSocketAddress">
+    <constructor-arg ref="byAddress2" index="0"/>
+    <constructor-arg value="10003" index="1"/>
+  </bean>
+  <!-- Initialize 192.168.0.1 as byte[] for input of InetSocketAddress->socketAddress0 -->
+  <bean id="byAddress0" class="java.net.InetAddress" factory-method="getByAddress">
+    <constructor-arg>
+      <array>
+        <value>-64</value>
+        <value>-88</value>
+        <value>0</value>
+        <value>1</value>
+      </array>
+    </constructor-arg>
+  </bean>
+  <!-- Initialize 192.168.0.2 as byte[] for input of InetSocketAddress->socketAddress1 -->
+  <bean id="byAddress1" class="java.net.InetAddress" factory-method="getByAddress">
+    <constructor-arg>
+      <array>
+        <value>-64</value>
+        <value>-88</value>
+        <value>0</value>
+        <value>2</value>
+      </array>
+    </constructor-arg>
+  </bean>
+  <!-- Initialize 192.168.0.3 as byte[] for input of InetSocketAddress->socketAddress2 -->
+  <bean id="byAddress2" class="java.net.InetAddress" factory-method="getByAddress">
+    <constructor-arg>
+      <array>
+        <value>-64</value>
+        <value>-88</value>
+        <value>0</value>
+        <value>3</value>
+      </array>
+    </constructor-arg>
+  </bean>
+
   <!--
-    Sets up the MinaPropertyEditorRegistrar which conveniently installs all the 
-    required MINA PropertyEditor implementations found in the MINA Integration 
+    Sets up the MinaPropertyEditorRegistrar which conveniently installs all the
+    required MINA PropertyEditor implementations found in the MINA Integration
     Beans module.
   -->
   <s:bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
@@ -52,5 +108,5 @@
         <s:bean class="org.apache.mina.integration.xbean.MinaPropertyEditorRegistrar"/>
       </s:list>
     </s:property>
-  </s:bean>     
+  </s:bean>
 </spring:beans>

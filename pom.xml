@@ -150,15 +150,15 @@
     <version.slf4j.api>1.7.36</version.slf4j.api>
     <version.slf4j.reload4j>1.7.36</version.slf4j.reload4j>
     <version.slf4j.jcl.over.slf4j>1.7.36</version.slf4j.jcl.over.slf4j>
-    <version.springframework>2.5.6.SEC03</version.springframework>
+    <version.springframework>6.1.14</version.springframework>
     <version.tomcat.jni>10.0.27</version.tomcat.jni>
-    <version.xbean.spring>4.25</version.xbean.spring>
+    <version.xbean.spring>4.26</version.xbean.spring>
 
     <!-- OSGi minimum versions -->
     <osgi-min-version.slf4j.api>1.7</osgi-min-version.slf4j.api>
-    
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
+
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
   </properties>
 
   <modules>
@@ -254,22 +254,8 @@
 
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>spring</artifactId>
+        <artifactId>spring-context</artifactId>
         <version>${version.springframework}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>
@@ -774,12 +760,12 @@
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.xbean</groupId>
-                      <artifactId>maven-xbean-plugin</artifactId>
-                      <versionRange>[4.12,)</versionRange>
-                      <goals>
-                        <goal>mapping</goal>
-                      </goals>
-                    </pluginExecutionFilter>
+                    <artifactId>maven-xbean-plugin</artifactId>
+                    <versionRange>[4.12,)</versionRange>
+                    <goals>
+                      <goal>mapping</goal>
+                    </goals>
+                  </pluginExecutionFilter>
                   <action>
                     <ignore />
                   </action>
