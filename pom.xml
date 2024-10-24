@@ -154,13 +154,18 @@
     <version.slf4j.api>1.7.36</version.slf4j.api>
     <version.slf4j.reload4j>1.7.36</version.slf4j.reload4j>
     <version.slf4j.jcl.over.slf4j>1.7.36</version.slf4j.jcl.over.slf4j>
-    <version.springframework>2.5.6.SEC03</version.springframework>
+    <version.springframework>5.3.39</version.springframework>
+    <version.springframework.old>2.5.6.SEC03</version.springframework.old>
     <version.tomcat.jni>10.0.27</version.tomcat.jni>
     <version.xbean.spring>4.23</version.xbean.spring>
 
     <!-- OSGi minimum versions -->
     <osgi-min-version.slf4j.api>1.7</osgi-min-version.slf4j.api>
     
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+
+    <!-- Define the Java source and target version -->
     <maven.compiler.source>8</maven.compiler.source>
     <maven.compiler.target>8</maven.compiler.target>
    </properties>
@@ -260,21 +265,19 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring</artifactId>
+        <version>${version.springframework.old}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-beans</artifactId>
         <version>${version.springframework}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${version.springframework}</version>
       </dependency>
 
       <dependency>
@@ -477,9 +480,6 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.compiler.plugin}</version>
           <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
-            <optimize>true</optimize>
             <showDeprecation>true</showDeprecation>
             <encoding>ISO-8859-1</encoding>
           </configuration>
@@ -783,12 +783,12 @@
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.xbean</groupId>
-                      <artifactId>maven-xbean-plugin</artifactId>
-                      <versionRange>[4.12,)</versionRange>
-                      <goals>
-                        <goal>mapping</goal>
-                      </goals>
-                    </pluginExecutionFilter>
+                    <artifactId>maven-xbean-plugin</artifactId>
+                    <versionRange>[4.12,)</versionRange>
+                    <goals>
+                      <goal>mapping</goal>
+                    </goals>
+                  </pluginExecutionFilter>
                   <action>
                     <ignore />
                   </action>
@@ -806,10 +806,7 @@
         <version>${version.compiler.plugin}</version>
         <configuration>
           <encoding>UTF-8</encoding>
-          <source>1.7</source>
-          <target>1.7</target>
           <debug>true</debug>
-          <optimize>true</optimize>
           <showDeprecations>true</showDeprecations>
         </configuration>
       </plugin>
