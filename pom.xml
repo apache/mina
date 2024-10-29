@@ -90,6 +90,9 @@
     <!-- Make Java 8 javadoc lint to shut the f*** up... -->
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
 
+    <!-- SBOM generation versions -->
+    <version.cyclonedx>2.9.0</version.cyclonedx>
+
     <!-- Maven Plugins -->
     <version.apache.rat.plugin>0.16.1</version.apache.rat.plugin>
     <version.api.plugin>3.6.3</version.api.plugin>
@@ -787,6 +790,24 @@
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
+
+        <plugin>
+          <groupId>org.cyclonedx</groupId>
+          <artifactId>cyclonedx-maven-plugin</artifactId>
+          <version>${version.cyclonedx}</version>
+          <executions>
+            <execution>
+              <id>make-bom</id>
+              <phase>package</phase>
+              <goals>
+                <goal>makeAggregateBom</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <outputName>${project.artifactId}-${project.version}-bom</outputName>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -879,6 +900,11 @@
           </dependency>
         </dependencies>
       </plugin>
+                              
+      <plugin>      
+        <groupId>org.cyclonedx</groupId>
+        <artifactId>cyclonedx-maven-plugin</artifactId>
+      </plugin>     
     </plugins>
   </build>
 
