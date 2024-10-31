@@ -165,6 +165,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
                 newBuf.put(buf);
                 newBuf.put(in);
                 newBuf.flip();
+                buf.free();
                 buf = newBuf;
 
                 // Update the session attribute.
@@ -230,11 +231,19 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      */
     @Override
     public void dispose(IoSession session) throws Exception {
-        removeSessionBuffer(session);
+        IoBuffer oldBuf = (IoBuffer) session.removeAttribute(BUFFER);
+        
+        if (oldBuf != null) {
+            oldBuf.free();
+        }
     }
 
     private void removeSessionBuffer(IoSession session) {
-        session.removeAttribute(BUFFER);
+        IoBuffer oldBuf = (IoBuffer) session.getAttribute(BUFFER);
+        
+        if (oldBuf != null) {
+            oldBuf.free();
+        }
     }
 
     private void storeRemainingInSession(IoBuffer buf, IoSession session) {
@@ -243,6 +252,12 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         remainingBuf.order(buf.order());
         remainingBuf.put(buf);
 
+        IoBuffer oldBuf = (IoBuffer) session.removeAttribute(BUFFER);
+        
+        if (oldBuf != null) {
+            oldBuf.free();
+        }
+        
         session.setAttribute(BUFFER, remainingBuf);
     }
     
