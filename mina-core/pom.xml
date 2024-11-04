@@ -32,6 +32,7 @@
   <packaging>bundle</packaging>
 
   <dependencies>
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
@@ -112,4 +113,3 @@
     </plugins>
   </build>
 </project>
-

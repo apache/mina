@@ -90,9 +90,6 @@
     <!-- Make Java 8 javadoc lint to shut the f*** up... -->
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
 
-    <!-- SBOM generation versions -->
-    <version.cyclonedx>2.9.0</version.cyclonedx>
-
     <!-- Maven Plugins -->
     <version.apache.rat.plugin>0.16.1</version.apache.rat.plugin>
     <version.api.plugin>3.6.3</version.api.plugin>
@@ -105,6 +102,7 @@
     <version.clirr.plugin>2.8</version.clirr.plugin>
     <version.cobertura.plugin>2.7</version.cobertura.plugin>
     <version.compiler.plugin>3.13.0</version.compiler.plugin>
+    <version.cyclonedx.plugin>2.9.0</version.cyclonedx.plugin>
     <version.dashboard.plugin>1.0.0-beta-1</version.dashboard.plugin>
     <version.dependency.plugin>3.8.0</version.dependency.plugin>
     <version.deploy.plugin>3.1.3</version.deploy.plugin>
@@ -186,6 +184,13 @@
   <!-- =========================================== -->
   <dependencyManagement>
     <dependencies>
+      <!-- Commons dependencies -->
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons.io.version}</version>
+      </dependency>
+
       <!-- Submodules -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -794,7 +799,7 @@
         <plugin>
           <groupId>org.cyclonedx</groupId>
           <artifactId>cyclonedx-maven-plugin</artifactId>
-          <version>${version.cyclonedx}</version>
+          <version>${version.cyclonedx.plugin}</version>
           <executions>
             <execution>
               <id>make-bom</id>

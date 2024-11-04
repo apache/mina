@@ -43,8 +43,18 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import org.apache.mina.core.buffer.matcher.ClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.FullClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.RegexpClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.WildcardClassNameMatcher;
+
 
 /**
  * A base implementation of {@link IoBuffer}. This implementation assumes that
@@ -79,6 +89,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     /** A mask for an int */
     private static final long INT_MASK = 0xFFFFFFFFL;
+
+    private final List<ClassNameMatcher> acceptMatchers = new ArrayList<>();
+    private final List<ClassNameMatcher> rejectMatchers = new ArrayList<>();
 
     /**
      * We don't have any access to Buffer.markValue(), so we need to track it down,
@@ -2182,6 +2195,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             @Override
             protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
                 Class<?> clazz = desc.forClass();
+                
+                String[] classes = new String[] {"java.util.Date", "long", "java.util.ArrayList"};
 
                 if (clazz == null) {
                     String name = desc.getName();
@@ -2191,10 +2206,25 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         return super.resolveClass(desc);
                     }
                 } else {
-                    return clazz;
+                    boolean found = false;
+                    String className = desc.getName();
+                    
+                    for (ClassNameMatcher matcher : acceptMatchers) {
+                        if (matcher.matches(className)) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        return clazz;
+                    }
+                    
+                    throw new ClassNotFoundException();
                 }
             }
         }) {
+            //((ValidatingObjectInputStream)in).accept(Date.class, long.class, ArrayList.class);
             return in.readObject();
         } catch (IOException e) {
             throw new BufferDataException(e);
@@ -2746,5 +2776,52 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         if (fieldSize < 0) {
             throw new IllegalArgumentException("fieldSize cannot be negative: " + fieldSize);
         }
+    }
+
+    /**
+     * Accept the specified classes for deserialization, unless they
+     * are otherwise rejected.
+     *
+     * @param classes Classes to accept
+     * @return this object
+     */
+    public IoBuffer accept(Class<?>... classes) {
+        for (Class<?> clazz:classes) {
+            acceptMatchers.add(new FullClassNameMatcher(clazz.getName()));
+        }
+
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(ClassNameMatcher m) {
+        acceptMatchers.add(m);
+        
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(Pattern pattern) {
+        acceptMatchers.add(new RegexpClassNameMatcher(pattern));
+        
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(String... patterns) {
+        for (String pattern:patterns) {
+            acceptMatchers.add(new WildcardClassNameMatcher(pattern));
+        }
+        
+        return this;
     }
 }

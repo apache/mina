@@ -372,6 +372,7 @@ public class IoBufferTest {
         List<Object> o = new ArrayList<>();
         o.add(new Date());
         o.add(long.class);
+        buf.accept(ArrayList.class.getName(), Date.class.getName(), long.class.getName());
 
         // Test writing an object.
         buf.putObject(o);
@@ -387,11 +388,12 @@ public class IoBufferTest {
 
     @Test
     public void testNonserializableClass() throws Exception {
-        Class<?> c = NonserializableClass.class;
+        Class<?> c = String.class;
 
         IoBuffer buffer = IoBuffer.allocate(16);
         buffer.setAutoExpand(true);
         buffer.putObject(c);
+        buffer.accept(String.class.getName());
 
         buffer.flip();
         Object o = buffer.getObject();
@@ -407,6 +409,7 @@ public class IoBufferTest {
         IoBuffer buffer = IoBuffer.allocate(16);
         buffer.setAutoExpand(true);
         buffer.putObject(c);
+        buffer.accept(NonserializableInterface.class.getName());
 
         buffer.flip();
         Object o = buffer.getObject();
@@ -947,6 +950,7 @@ public class IoBufferTest {
 
         // Test writing an object.
         buf.putObject(expected);
+        buf.accept(Bar.class.getName());
 
         // Test reading an object.
         buf.clear();
