@@ -19,7 +19,12 @@
  */
 package org.apache.mina.filter.codec.serialization;
 
+import java.util.regex.Pattern;
+
 import org.apache.mina.core.buffer.BufferDataException;
+import org.apache.mina.core.buffer.matcher.ClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.RegexpClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.WildcardClassNameMatcher;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
@@ -121,5 +126,38 @@ public class ObjectSerializationCodecFactory implements ProtocolCodecFactory {
      */
     public void setDecoderMaxObjectSize(int maxObjectSize) {
         decoder.setMaxObjectSize(maxObjectSize);
+    }
+
+    /**
+     * Accept class names where the supplied ClassNameMatcher matches for
+     * deserialization, unless they are otherwise rejected.
+     *
+     * @param classNameMatcher the matcher to use
+     */
+    public void accept(ClassNameMatcher classNameMatcher) {
+        decoder.accept(classNameMatcher);
+    }
+
+    /**
+     * Accept class names that match the supplied pattern for
+     * deserialization, unless they are otherwise rejected.
+     *
+     * @param pattern standard Java regexp
+     */
+    public void accept(Pattern pattern) {
+        decoder.accept(new RegexpClassNameMatcher(pattern));
+    }
+
+    /**
+     * Accept the wildcard specified classes for deserialization,
+     * unless they are otherwise rejected.
+     *
+     * @param patterns Wildcard file name patterns as defined by
+     *                  {@link org.apache.commons.io.FilenameUtils#wildcardMatch(String, String) FilenameUtils.wildcardMatch}
+     */
+    public void accept(String... patterns) {
+        for (String pattern:patterns) {
+            decoder.accept(new WildcardClassNameMatcher(pattern));
+        }
     }
 }

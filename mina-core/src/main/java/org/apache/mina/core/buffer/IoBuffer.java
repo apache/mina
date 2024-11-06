@@ -35,8 +35,11 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
+import org.apache.mina.core.buffer.matcher.ClassNameMatcher;
 import org.apache.mina.core.session.IoSession;
 
 /**
@@ -2108,4 +2111,39 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @return the modified IoBuffer
      */
     public abstract <E extends Enum<E>> IoBuffer putEnumSetLong(int index, Set<E> set);
+    
+    /**
+     * Accept class names where the supplied ClassNameMatcher matches for
+     * deserialization, unless they are otherwise rejected.
+     *
+     * @param m the matcher to use
+     * @return this object
+     */
+    public abstract IoBuffer accept(ClassNameMatcher m);
+
+    /**
+     * Accept class names that match the supplied pattern for
+     * deserialization, unless they are otherwise rejected.
+     *
+     * @param pattern standard Java regexp
+     * @return this object
+     */
+    public abstract IoBuffer accept(Pattern pattern);
+
+    /**
+     * Accept the wildcard specified classes for deserialization,
+     * unless they are otherwise rejected.
+     *
+     * @param patterns Wildcard file name patterns as defined by
+     *                  {@link org.apache.commons.io.FilenameUtils#wildcardMatch(String, String) FilenameUtils.wildcardMatch}
+     * @return this object
+     */
+    public abstract IoBuffer accept(String... patterns);
+    
+    /**
+     * Set the list of class matchers for in incoming buffer
+     * 
+     * @param matchers The list of matchers
+     */
+    public abstract void setMatchers(List<ClassNameMatcher> matchers);
 }

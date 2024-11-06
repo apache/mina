@@ -43,8 +43,17 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.apache.mina.core.buffer.matcher.ClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.FullClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.RegexpClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.WildcardClassNameMatcher;
+
 
 /**
  * A base implementation of {@link IoBuffer}. This implementation assumes that
@@ -79,6 +88,8 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
     /** A mask for an int */
     private static final long INT_MASK = 0xFFFFFFFFL;
+
+    private final List<ClassNameMatcher> acceptMatchers = new ArrayList<>();
 
     /**
      * We don't have any access to Buffer.markValue(), so we need to track it down,
@@ -2154,18 +2165,22 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             @Override
             protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
                 int type = read();
+
                 if (type < 0) {
                     throw new EOFException();
                 }
+
                 switch (type) {
-                case 0: // NON-Serializable class or Primitive types
-                    return super.readClassDescriptor();
-                case 1: // Serializable class
-                    String className = readUTF();
-                    Class<?> clazz = Class.forName(className, true, classLoader);
-                    return ObjectStreamClass.lookup(clazz);
-                default:
-                    throw new StreamCorruptedException("Unexpected class descriptor type: " + type);
+                    case 0: // NON-Serializable class or Primitive types
+                        return super.readClassDescriptor();
+
+                    case 1: // Serializable class
+                        String className = readUTF();
+                        Class<?> clazz = Class.forName(className, true, classLoader);
+                        return ObjectStreamClass.lookup(clazz);
+
+                    default:
+                        throw new StreamCorruptedException("Unexpected class descriptor type: " + type);
                 }
             }
 
@@ -2181,7 +2196,21 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         return super.resolveClass(desc);
                     }
                 } else {
-                    return clazz;
+                    boolean found = false;
+                    String className = desc.getName();
+                    
+                    for (ClassNameMatcher matcher : acceptMatchers) {
+                        if (matcher.matches(className)) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        return clazz;
+                    }
+                    
+                    throw new ClassNotFoundException();
                 }
             }
         }) {
@@ -2735,6 +2764,64 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     private static void checkFieldSize(int fieldSize) {
         if (fieldSize < 0) {
             throw new IllegalArgumentException("fieldSize cannot be negative: " + fieldSize);
+        }
+    }
+
+    /**
+     * Accept the specified classes for deserialization, unless they
+     * are otherwise rejected.
+     *
+     * @param classes Classes to accept
+     * @return this object
+     */
+    public IoBuffer accept(Class<?>... classes) {
+        for (Class<?> clazz:classes) {
+            acceptMatchers.add(new FullClassNameMatcher(clazz.getName()));
+        }
+
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(ClassNameMatcher m) {
+        acceptMatchers.add(m);
+        
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(Pattern pattern) {
+        acceptMatchers.add(new RegexpClassNameMatcher(pattern));
+        
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(String... patterns) {
+        for (String pattern:patterns) {
+            acceptMatchers.add(new WildcardClassNameMatcher(pattern));
+        }
+        
+        return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setMatchers(List<ClassNameMatcher> matchers) {
+        acceptMatchers.clear();
+        
+        for (ClassNameMatcher matcher:matchers) {
+            acceptMatchers.add(matcher);
         }
     }
 }
