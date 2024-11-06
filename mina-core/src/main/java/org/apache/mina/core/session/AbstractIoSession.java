@@ -309,6 +309,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public final CloseFuture close(boolean rightNow) {
         if (rightNow) {
             return closeNow();
@@ -320,6 +321,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public final CloseFuture close() {
         return closeNow();
     }

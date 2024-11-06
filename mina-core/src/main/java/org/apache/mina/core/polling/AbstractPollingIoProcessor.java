@@ -696,16 +696,10 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // Disconnect all sessions immediately if disposal has been
                     // requested so that we exit this loop eventually.
                     if (isDisposing()) {
-                        boolean hasKeys = false;
-
                         for (Iterator<S> i = allSessions(); i.hasNext();) {
                             IoSession session = i.next();
 
                             scheduleRemove((S) session);
-
-                            if (session.isActive()) {
-                                hasKeys = true;
-                            }
                         }
 
                         wakeup();

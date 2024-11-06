@@ -33,7 +33,13 @@ import java.nio.ShortBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.apache.mina.core.buffer.matcher.ClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.RegexpClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.WildcardClassNameMatcher;
 
 /**
  * A {@link IoBuffer} that wraps a buffer and proxies any operations to it.
@@ -1541,5 +1547,36 @@ public class IoBufferWrapper extends IoBuffer {
     public IoBuffer putUnsigned(int index, long value) {
         buf.putUnsigned(index, value);
         return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(ClassNameMatcher m) {
+        return buf.accept(m);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(Pattern pattern) {
+        return buf.accept(pattern);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IoBuffer accept(String... patterns) {
+        return buf.accept(patterns);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setMatchers(List<ClassNameMatcher> matchers) {
+        buf.setMatchers(matchers);
     }
 }

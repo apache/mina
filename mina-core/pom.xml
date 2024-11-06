@@ -52,6 +52,7 @@
             <Export-Package>
               org.apache.mina.core;version=${project.version};-noimport:=true,
               org.apache.mina.core.buffer;version=${project.version};-noimport:=true,
+              org.apache.mina.core.buffer.matcher;version=${project.version};-noimport:=true,
               org.apache.mina.core.file;version=${project.version};-noimport:=true,
               org.apache.mina.core.filterchain;version=${project.version};-noimport:=true,
               org.apache.mina.core.future;version=${project.version};-noimport:=true,
