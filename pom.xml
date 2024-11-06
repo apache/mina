@@ -773,32 +773,6 @@
           <version>${version.versions.plugin}</version>
         </plugin>
 
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <!-- plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.xbean</groupId>
-                      <artifactId>maven-xbean-plugin</artifactId>
-                      <versionRange>[4.12,)</versionRange>
-                      <goals>
-                        <goal>mapping</goal>
-                      </goals>
-                    </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        <plugin-->
-
         <plugin>
           <groupId>org.cyclonedx</groupId>
           <artifactId>cyclonedx-maven-plugin</artifactId>
@@ -939,7 +913,6 @@
           <links>
             <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
             <link>http://www.slf4j.org/api/</link>
-            <!--link>http://static.springframework.org/spring/docs/2.0.x/api/</link-->
           </links>
           <locale>en_US</locale>
         </configuration>
@@ -957,21 +930,6 @@
           <docTitle>Apache MINA ${project.version} Cross Reference</docTitle>
         </configuration>
       </plugin>
-
-      <!--plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rat-maven-plugin</artifactId>
-        <version>${version.rat.maven.plugin}</version>
-        <configuration>
-          <excludes>
-            <exclude>**/target/**/*</exclude>
-            <exclude>**/.*</exclude>
-            <exclude>**/NOTICE.txt</exclude>
-            <exclude>**/LICENSE*.txt</exclude>
-          </excludes>
-          <excludeSubProjects>false</excludeSubProjects>
-        </configuration>
-      </plugin-->
     </plugins>
   </reporting>
 </project>
