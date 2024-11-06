@@ -143,7 +143,7 @@ public class SslFilter extends IoFilterAdapter {
     /**
      * Configures the use of the Non Blocking SSL processor.  This is experimental.
      *
-     * @param enable
+     * @param enable <code>true</code> if the non blocking SSL processor is enabled
      */
     public void setUseNonBlockingPipeline(boolean enable) {
         this.nonBlockingPipeline = enable;
