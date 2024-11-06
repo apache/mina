@@ -309,6 +309,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public final CloseFuture close(boolean rightNow) {
         if (rightNow) {
             return closeNow();
@@ -320,6 +321,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public final CloseFuture close() {
         return closeNow();
     }
@@ -598,6 +600,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public final Object getAttachment() {
         return getAttribute("");
     }
@@ -605,6 +608,7 @@ public abstract class AbstractIoSession implements IoSession {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public final Object setAttachment(Object attachment) {
         return setAttribute("", attachment);
     }
