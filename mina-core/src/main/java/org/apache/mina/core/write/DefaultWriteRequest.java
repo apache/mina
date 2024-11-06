@@ -65,6 +65,7 @@ public class DefaultWriteRequest implements WriteRequest {
         /**
          * {@inheritDoc}
          */
+        @Deprecated
         @Override
         public void join() {
             // Do nothing
@@ -73,6 +74,7 @@ public class DefaultWriteRequest implements WriteRequest {
         /**
          * {@inheritDoc}
          */
+        @Deprecated
         @Override
         public boolean join(long timeoutInMillis) {
             return true;
