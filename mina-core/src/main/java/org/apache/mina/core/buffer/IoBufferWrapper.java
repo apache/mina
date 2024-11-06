@@ -33,6 +33,7 @@ import java.nio.ShortBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -1563,5 +1564,12 @@ public class IoBufferWrapper extends IoBuffer {
     @Override
     public IoBuffer accept(String... patterns) {
         return buf.accept(patterns);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setMatchers(List<ClassNameMatcher> matchers) {
+        buf.setMatchers(matchers);
     }
 }

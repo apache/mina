@@ -59,6 +59,7 @@
             <Export-Package>
               org.apache.mina.core,
               org.apache.mina.core.buffer,
+              org.apache.mina.core.buffer.matcher,
               org.apache.mina.core.file,
               org.apache.mina.core.filterchain,
               org.apache.mina.core.future,

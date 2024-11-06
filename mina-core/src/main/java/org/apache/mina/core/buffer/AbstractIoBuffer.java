@@ -48,7 +48,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.apache.mina.core.buffer.matcher.ClassNameMatcher;
 import org.apache.mina.core.buffer.matcher.FullClassNameMatcher;
@@ -91,7 +90,6 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     private static final long INT_MASK = 0xFFFFFFFFL;
 
     private final List<ClassNameMatcher> acceptMatchers = new ArrayList<>();
-    private final List<ClassNameMatcher> rejectMatchers = new ArrayList<>();
 
     /**
      * We don't have any access to Buffer.markValue(), so we need to track it down,
@@ -2177,18 +2175,23 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             @Override
             protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
                 int type = read();
+                
                 if (type < 0) {
                     throw new EOFException();
                 }
+                
                 switch (type) {
-                case 0: // NON-Serializable class or Primitive types
-                    return super.readClassDescriptor();
-                case 1: // Serializable class
-                    String className = readUTF();
-                    Class<?> clazz = Class.forName(className, true, classLoader);
-                    return ObjectStreamClass.lookup(clazz);
-                default:
-                    throw new StreamCorruptedException("Unexpected class descriptor type: " + type);
+                    case 0: // NON-Serializable class or Primitive types
+                        return super.readClassDescriptor();
+                        
+                    case 1: // Serializable class
+                        String className = readUTF();
+                        Class<?> clazz = Class.forName(className, true, classLoader);
+            
+                        return ObjectStreamClass.lookup(clazz);
+                        
+                    default:
+                        throw new StreamCorruptedException("Unexpected class descriptor type: " + type);
                 }
             }
 
@@ -2196,10 +2199,9 @@ public abstract class AbstractIoBuffer extends IoBuffer {
             protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
                 Class<?> clazz = desc.forClass();
                 
-                String[] classes = new String[] {"java.util.Date", "long", "java.util.ArrayList"};
-
                 if (clazz == null) {
                     String name = desc.getName();
+                    
                     try {
                         return Class.forName(name, false, classLoader);
                     } catch (ClassNotFoundException ex) {
@@ -2224,7 +2226,6 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 }
             }
         }) {
-            //((ValidatingObjectInputStream)in).accept(Date.class, long.class, ArrayList.class);
             return in.readObject();
         } catch (IOException e) {
             throw new BufferDataException(e);
@@ -2823,5 +2824,16 @@ public abstract class AbstractIoBuffer extends IoBuffer {
         }
         
         return this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setMatchers(List<ClassNameMatcher> matchers) {
+        acceptMatchers.clear();
+        
+        for (ClassNameMatcher matcher:matchers) {
+            acceptMatchers.add(matcher);
+        }
     }
 }

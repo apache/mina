@@ -41,6 +41,8 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.apache.mina.core.buffer.matcher.RegexpClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.WildcardClassNameMatcher;
 import org.apache.mina.util.Bar;
 import org.junit.Test;
 
@@ -393,6 +395,8 @@ public class IoBufferTest {
         IoBuffer buffer = IoBuffer.allocate(16);
         buffer.setAutoExpand(true);
         buffer.putObject(c);
+        
+        // Accept the String class
         buffer.accept(String.class.getName());
 
         buffer.flip();
@@ -400,6 +404,59 @@ public class IoBufferTest {
 
         assertEquals(c, o);
         assertSame(c, o);
+    }
+
+    @Test
+    public void testNonserializableClassAcceptWildcard() throws Exception {
+        Class<?> c = String.class;
+
+        IoBuffer buffer = IoBuffer.allocate(16);
+        buffer.setAutoExpand(true);
+        buffer.putObject(c);
+        
+        // Accept all classes which name starts with 'java.lan'
+        // That includes 'java.lang.String'
+        buffer.accept(new WildcardClassNameMatcher("java.lan*"));
+
+        buffer.flip();
+        Object o = buffer.getObject();
+
+        assertEquals(c, o);
+        assertSame(c, o);
+    }
+    
+    @Test
+    public void testNonserializableClassAcceptRegexp() throws Exception {
+        Class<?> c = String.class;
+
+        IoBuffer buffer = IoBuffer.allocate(16);
+        buffer.setAutoExpand(true);
+        buffer.putObject(c);
+        
+        // Accept all class which contains '.lang.' in their name
+        // That includes java.lang.String
+        buffer.accept(new RegexpClassNameMatcher(".*\\.lang\\..*"));
+
+        buffer.flip();
+        Object o = buffer.getObject();
+
+        assertEquals(c, o);
+        assertSame(c, o);
+    }
+
+    @Test(expected=ClassNotFoundException.class)
+    public void testNonserializableClassReject() throws Exception {
+        Class<?> c = String.class;
+
+        IoBuffer buffer = IoBuffer.allocate(16);
+        buffer.setAutoExpand(true);
+        buffer.putObject(c);
+        // Don't accept the java.lang.String class
+
+        buffer.flip();
+        
+        // Should throw an exception
+        buffer.getObject();
     }
 
     @Test

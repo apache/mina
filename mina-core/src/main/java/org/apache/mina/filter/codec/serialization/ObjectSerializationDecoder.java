@@ -20,9 +20,15 @@
 package org.apache.mina.filter.codec.serialization;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.mina.core.buffer.BufferDataException;
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.buffer.matcher.ClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.RegexpClassNameMatcher;
+import org.apache.mina.core.buffer.matcher.WildcardClassNameMatcher;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoder;
@@ -38,6 +44,9 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
     private final ClassLoader classLoader;
 
     private int maxObjectSize = 1048576; // 1MB
+
+    /** The classes we accept when deserializing a binary blob */
+    private final List<ClassNameMatcher> acceptMatchers = new ArrayList<>();
 
     /**
      * Creates a new instance with the {@link ClassLoader} of
@@ -93,8 +102,43 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
         if (!in.prefixedDataAvailable(4, maxObjectSize)) {
             return false;
         }
+        
+        in.setMatchers(acceptMatchers);
 
         out.write(in.getObject(classLoader));
         return true;
+    }
+
+    /**
+     * Accept class names where the supplied ClassNameMatcher matches for
+     * deserialization, unless they are otherwise rejected.
+     *
+     * @param classNameMatcher the matcher to use
+     */
+    public void accept(ClassNameMatcher classNameMatcher) {
+        acceptMatchers.add(classNameMatcher);
+    }
+
+    /**
+     * Accept class names that match the supplied pattern for
+     * deserialization, unless they are otherwise rejected.
+     *
+     * @param pattern standard Java regexp
+     */
+    public void accept(Pattern pattern) {
+        acceptMatchers.add(new RegexpClassNameMatcher(pattern));
+    }
+
+    /**
+     * Accept the wildcard specified classes for deserialization,
+     * unless they are otherwise rejected.
+     *
+     * @param patterns Wildcard file name patterns as defined by
+     *                  {@link org.apache.commons.io.FilenameUtils#wildcardMatch(String, String) FilenameUtils.wildcardMatch}
+     */
+    public void accept(String... patterns) {
+        for (String pattern:patterns) {
+            acceptMatchers.add(new WildcardClassNameMatcher(pattern));
+        }
     }
 }

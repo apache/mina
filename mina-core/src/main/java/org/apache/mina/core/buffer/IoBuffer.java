@@ -35,6 +35,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -2137,4 +2138,11 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * @return this object
      */
     public abstract IoBuffer accept(String... patterns);
+    
+    /**
+     * Set the list of class matchers for in incoming buffer
+     * 
+     * @param matchers The list of matchers
+     */
+    public abstract void setMatchers(List<ClassNameMatcher> matchers);
 }
