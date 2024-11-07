@@ -467,7 +467,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.compiler.plugin}</version>
-          <configuration>$a
+          <configuration>
             <debug>true</debug>
             <showDeprecation>true</showDeprecation>
             <encoding>UTF-8</encoding>
@@ -882,6 +882,11 @@
           </dependency>
         </dependencies>
       </plugin>
+
+      <plugin>  
+        <groupId>org.cyclonedx</groupId>
+        <artifactId>cyclonedx-maven-plugin</artifactId>
+      </plugin>     
     </plugins>
   </build>
 
