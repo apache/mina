@@ -24,6 +24,8 @@ package org.apache.mina.core.buffer.matcher;
  * <p>
  * This object is immutable and thread-safe.
  * </p>
+ * 
+ * This class is extracted from Apache commons-io project
  */
 public final class WildcardClassNameMatcher implements ClassNameMatcher {
 

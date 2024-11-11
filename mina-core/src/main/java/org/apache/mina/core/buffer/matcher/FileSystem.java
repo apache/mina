@@ -29,6 +29,8 @@ import java.util.Objects;
  * </p>
  *
  * @since 2.7
+ * 
+ * This class is extracted from Apache commons-io project
  */
 public enum FileSystem {
 
