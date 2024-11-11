@@ -4,6 +4,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 
+/**
+ * This class is extracted from Apache commons-io project
+ **/
 public class FilenameUtils
 {
     private static final int NOT_FOUND = -1;
