@@ -36,6 +36,7 @@ import java.util.stream.Stream;
  * </p>
  *
  * @since 1.3
+ * This class is extracted from Apache commons-io project
  */
 public enum IOCase {
 

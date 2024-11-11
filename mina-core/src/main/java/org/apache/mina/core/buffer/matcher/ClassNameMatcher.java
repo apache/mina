@@ -20,6 +20,8 @@ package org.apache.mina.core.buffer.matcher;
 
 /**
  * An object that matches a Class name to a condition.
+
+ * This class is extracted from Apache commons-io project
  */
 public interface ClassNameMatcher {
     /**

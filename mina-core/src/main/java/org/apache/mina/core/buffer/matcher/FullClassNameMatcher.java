@@ -28,6 +28,8 @@ import java.util.Set;
  * <p>
  * This object is immutable and thread-safe.
  * </p>
+ *
+ * This class is extracted from Apache commons-io project
  */
 public final class FullClassNameMatcher implements ClassNameMatcher {
     private final Set<String> classesSet;

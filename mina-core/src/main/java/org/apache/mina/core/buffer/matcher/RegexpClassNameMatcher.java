@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
  * <p>
  * This object is immutable and thread-safe.
  * </p>
+ *
+ * This class is extracted from Apache commons-io project
  */
 public final class RegexpClassNameMatcher implements ClassNameMatcher {
     private final Pattern pattern; // Class is thread-safe
