@@ -258,7 +258,7 @@ implements SocketAcceptor {
     protected ServerSocketChannel open(SocketAddress localAddress) throws Exception {
         // Creates the listening ServerSocket
 
-    SocketSessionConfig config = this.getSessionConfig();
+        SocketSessionConfig config = this.getSessionConfig();
     
         ServerSocketChannel channel = null;
 
