@@ -2134,7 +2134,7 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
      * unless they are otherwise rejected.
      *
      * @param patterns Wildcard file name patterns as defined by
-     *                  {@link org.apache.commons.io.FilenameUtils#wildcardMatch(String, String) FilenameUtils.wildcardMatch}
+     *                  org.apache.commons.io.FilenameUtils.wildcardMatch(String, String)
      * @return this object
      */
     public abstract IoBuffer accept(String... patterns);

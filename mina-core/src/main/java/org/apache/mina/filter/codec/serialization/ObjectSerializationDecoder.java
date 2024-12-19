@@ -134,7 +134,7 @@ public class ObjectSerializationDecoder extends CumulativeProtocolDecoder {
      * unless they are otherwise rejected.
      *
      * @param patterns Wildcard file name patterns as defined by
-     *                  {@link org.apache.commons.io.FilenameUtils#wildcardMatch(String, String) FilenameUtils.wildcardMatch}
+     *                  @link org.apache.commons.io.FilenameUtils.wildcardMatch(String, String)
      */
     public void accept(String... patterns) {
         for (String pattern:patterns) {
