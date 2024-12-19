@@ -18,11 +18,9 @@
  */
 package org.apache.mina.core.buffer.matcher;
 
-import org.apache.commons.io.FilenameUtils;
-
 /**
  * A {@link ClassNameMatcher} that uses simplified regular expressions
- *  provided by {@link org.apache.commons.io.FilenameUtils#wildcardMatch(String, String) FilenameUtils.wildcardMatch}
+ *  provided by {@link org.apache.commons.io.FilenameUtils#wildcardMatch(String, String)}
  * <p>
  * This object is immutable and thread-safe.
  * </p>
