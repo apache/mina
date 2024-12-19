@@ -133,7 +133,7 @@ import org.apache.mina.core.session.IoSession;
  * multiple {@link IoSession}s. Please note that the buffer derived from and its
  * derived buffers are not auto-expandable nor auto-shrinkable. Trying to call
  * {@link #setAutoExpand(boolean)} or {@link #setAutoShrink(boolean)} with
- * <code>true</code> parameter will raise an {@link IllegalStateException}.
+ * <code>true</code> parameter will raise an {@link java.lang.IllegalStateException}.
  * 
  * <h2>Changing Buffer Allocation Policy</h2>
  * <p>
