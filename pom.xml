@@ -811,12 +811,8 @@
               <rules>
                 <requireMavenVersion>
                   <level>ERROR</level>
-                  <version>[3.6.3,]</version>
+                  <version>[3.8,]</version>
                 </requireMavenVersion>
-                <requireJavaVersion>
-                  <level>ERROR</level>
-                  <version>11</version>
-                </requireJavaVersion>
               </rules>    
             </configuration>
           </execution>
