@@ -18,7 +18,7 @@
  */
 package org.apache.mina.core.buffer.matcher;
 
-import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * A {@link ClassNameMatcher} that uses simplified regular expressions
