@@ -836,19 +836,6 @@
       </plugin>
 
       <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>${version.source.plugin}</version>
-        <executions>
-          <execution>
-            <id>attach-source</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
           <tagBase>
