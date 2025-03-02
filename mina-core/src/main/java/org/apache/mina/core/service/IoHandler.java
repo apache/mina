@@ -121,5 +121,7 @@ public interface IoHandler {
      * @param event The event to process
      * @throws Exception If we get an exception while processing the event 
      */
-    void event(IoSession session, FilterEvent event) throws Exception;
+    default void event(IoSession session, FilterEvent event) throws Exception {
+        // Nothing
+    }
 }
