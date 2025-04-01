@@ -21,13 +21,17 @@
 package org.apache.mina.filter.ssl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
@@ -74,14 +78,14 @@ abstract class AbstractNextFilter implements NextFilter {
 };
 
 /**
- * A test for DIRMINA-1019
+ * Tests for the {@code SslFilter}
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SslFilterTest {
     SslHandler test_class;
     
     @Before
-    public void init() throws SSLException {
+    public void init() {
         test_class = new SslHandler(null, new DummySession());
     }
     
@@ -138,5 +142,30 @@ public class SslFilterTest {
         
         assertEquals(1, message_received_messages.size());
         assertEquals(1, filter_write_requests.size());
+    }
+
+    @Test
+    public void testIsSslActiveScenarios() throws NoSuchAlgorithmException, SSLException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession dummySession = new DummySession();
+
+        // Scenario 1: No SSL handler attribute
+        assertFalse(filter.isSslActive(dummySession));
+
+        // Scenario 2: SSL handler present but disabled
+        final SslHandler disabledHandler = new SslHandler(filter, dummySession);
+        dummySession.setAttribute(SslFilter.SSL_HANDLER, disabledHandler);
+        disabledHandler.setDisabled(true);
+        assertFalse(filter.isSslActive(dummySession));
+
+        // Scenario 3: SSL handler present, enabled, and initialized
+        final SslHandler enabledHandler = new SslHandler(filter, dummySession);
+        enabledHandler.init();
+        dummySession.setAttribute(SslFilter.SSL_HANDLER, enabledHandler);
+        assertTrue(filter.isSslActive(dummySession));
+
+        // Scenario 4: SSL handler removed
+        dummySession.removeAttribute(SslFilter.SSL_HANDLER);
+        assertFalse(filter.isSslActive(dummySession));
     }
 }

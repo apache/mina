@@ -118,15 +118,31 @@ class SslHandler {
      * for data being produced during the handshake). */
     private boolean writingEncryptedData;
 
+  	/**
+  	 * Whether or not this ssl handler is disabled
+  	 */
+  	private boolean disabled = false;
+
+  	/**
+  	 * The lock used for CCC (clear command channel) negotiation
+  	 */
+  	private final Object cccLock;
+
+  	/**
+  	 * Whether or not CCC is enabled
+  	 */
+  	private boolean cccEnabled = false;
+
     /**
      * Create a new SSL Handler, and initialize it.
      *
-     * @param sslContext
-     * @throws SSLException
+     * @param sslFilter the {@code SslFilter}
+     * @param session the {@code IoSession} implementation
      */
     /* no qualifier */SslHandler(SslFilter sslFilter, IoSession session) {
         this.sslFilter = sslFilter;
         this.session = session;
+        this.cccLock = new Object();
     }
 
     /**
@@ -196,6 +212,8 @@ class SslHandler {
         // set the flags accordingly
         firstSSLNegociation = true;
         handshakeComplete = false;
+     	disabled = false;
+     	cccEnabled = false;
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("{} SSL Handler Initialization done.", sslFilter.getSessionInfo(session));
@@ -510,6 +528,53 @@ class SslHandler {
     }
 
     /**
+     * Sets whether or not this handler has CCC enabled
+     *
+     * @param cccEnabled
+     *            whether or not this handler is has CCC enabled
+     */
+    void setCCCEnabled(boolean cccEnabled) {
+        this.cccEnabled = cccEnabled;
+    }
+
+    /**
+     * Returns whether or not this handler has CCC enabled
+     *
+     * @return whether or not this handler has CCC enabled
+     */
+    boolean isCCCEnabled() {
+        return cccEnabled;
+    }
+
+    /**
+     * Sets whether or not this handler is disabled
+     *
+     * @param disabled
+     *            whether or not this handler is disabled
+     */
+    void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    /**
+     * Returns whether or not this handler is disabled
+     *
+     * @return whether or not this handler is disabled
+     */
+    boolean isDisabled() {
+        return disabled;
+    }
+
+    /**
+     * Returns the CCC lock
+     *
+     * @return the CCC lock object
+     */
+    Object getCccLock() {
+        return cccLock;
+    }
+
+    /**
      * @param res
      * @throws SSLException
      */
@@ -530,28 +595,31 @@ class SslHandler {
                 throw new SSLException("SSLEngine error during decrypt: " + status + " inNetBuffer: " + inNetBuffer
                     + "appBuffer: " + appBuffer);
             case CLOSED:
-                Exception exception =new RuntimeIoException("SSL/TLS close_notify received");
-                
-                // Empty the Ssl queue
-                for (IoFilterEvent event:filterWriteEventQueue) {
-                    EncryptedWriteRequest writeRequest = (EncryptedWriteRequest)event.getParameter();
-                    WriteFuture writeFuture = writeRequest.getParentRequest().getFuture();
-                    writeFuture.setException(exception);
-                    writeFuture.notifyAll();
-                }
-                
-                // Empty the session queue
-                WriteRequestQueue queue = session.getWriteRequestQueue();
-                WriteRequest request = null;
-               
-                while ((request = queue.poll(session)) != null) {
-                    WriteFuture writeFuture = request.getFuture();
-                    writeFuture.setException(exception);
-                    writeFuture.notifyAll();
-                }
-                    
-                // We *must* shutdown session
-                session.closeNow();
+            	// Adding this if check so that we don't close the connection completely if we are using CCC
+            	if (!cccEnabled) {
+                    Exception exception =new RuntimeIoException("SSL/TLS close_notify received");
+
+                    // Empty the Ssl queue
+                    for (IoFilterEvent event:filterWriteEventQueue) {
+                        EncryptedWriteRequest writeRequest = (EncryptedWriteRequest)event.getParameter();
+                        WriteFuture writeFuture = writeRequest.getParentRequest().getFuture();
+                        writeFuture.setException(exception);
+                        writeFuture.notifyAll();
+                    }
+
+                    // Empty the session queue
+                    WriteRequestQueue queue = session.getWriteRequestQueue();
+                    WriteRequest request = null;
+
+                    while ((request = queue.poll(session)) != null) {
+                        WriteFuture writeFuture = request.getFuture();
+                        writeFuture.setException(exception);
+                        writeFuture.notifyAll();
+                    }
+
+                    // We *must* shutdown session
+                    session.closeNow();
+            	}
                 break;
             default: 
                 break;
@@ -588,7 +656,10 @@ class SslHandler {
                 }
 
                 if (inNetBuffer != null && inNetBuffer.hasRemaining()) {
-                    LOGGER.debug("pos: " + inNetBuffer.position() + ", lim: " + inNetBuffer.limit() + ", cap: " + inNetBuffer.capacity());
+					LOGGER.debug("pos: {}, lim: {}, cap: {}",
+							inNetBuffer.position(),
+							inNetBuffer.limit(),
+							inNetBuffer.capacity());
                     inNetBuffer.flip();
                     SSLEngineResult res = unwrap();
 
