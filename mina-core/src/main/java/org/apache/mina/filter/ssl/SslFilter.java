@@ -388,7 +388,7 @@ public class SslFilter extends IoFilterAdapter {
   	}
 
     /**
-     * @return <tt>true</tt> if the engine is set to use client mode
+     * @return <code>true</code> if the engine is set to use client mode
      * when handshaking.
      */
     public boolean isUseClientMode() {
