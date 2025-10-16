@@ -29,9 +29,9 @@ import ognl.PropertyAccessor;
  */
 public abstract class AbstractPropertyAccessor extends ObjectPropertyAccessor {
 
-    static final Object READ_ONLY_MODE = new Object();
+    static final String READ_ONLY_MODE = "READ_ONLY_MODE";
 
-    static final Object QUERY = new Object();
+    static final String QUERY = "QUERY";
 
     @Override
     public final boolean hasGetProperty(OgnlContext context, Object target, Object oname) throws OgnlException {

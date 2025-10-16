@@ -110,7 +110,7 @@ public class IoSessionFinder {
         }
 
         Set<IoSession> answer = new LinkedHashSet<>();
-        Map<Object,Object> values = new HashMap<>();
+        Map<String,Object> values = new HashMap<>();
         values.put(AbstractPropertyAccessor.READ_ONLY_MODE, true);
         values.put(AbstractPropertyAccessor.QUERY, query);
         
