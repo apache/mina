@@ -102,7 +102,8 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     /** The buffer used to store the data in the session */
     private static final AttributeKey BUFFER = new AttributeKey(CumulativeProtocolDecoder.class, "buffer");
     
-    /** A flag set to true if we handle fragmentation accordingly to the TransportMetadata setting. 
+    /** 
+     * A flag set to true if we handle fragmentation accordingly to the TransportMetadata setting. 
      * It can be set to false if needed (UDP with fragments, for instance). the default value is 'true'
      */
     private boolean transportMetadataFragmentation = true;
