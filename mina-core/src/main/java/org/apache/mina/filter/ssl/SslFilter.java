@@ -454,6 +454,7 @@ public class SslFilter extends IoFilterAdapter {
                     LOGGER.debug("CLIENT: Session {} ack {}", session, request);
                 }
             }
+            
             EncryptedWriteRequest encryptedWriteRequest = EncryptedWriteRequest.class.cast(request);
             SslHandler sslHandler = getSslHandler(session);
             sslHandler.ack(next, request);
@@ -481,6 +482,7 @@ public class SslFilter extends IoFilterAdapter {
                     LOGGER.debug("CLIENT: Session {} write {}", session, request);
                 }
             }
+            
             SslHandler sslHandler = getSslHandler(session);
             sslHandler.write(next, request);
         }
