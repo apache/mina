@@ -67,9 +67,9 @@ import java.util.concurrent.Executor;
     static protected final boolean ENABLE_FAST_HANDSHAKE = true;
 
     /**
-     * Enable asynchronous tasks
+     * Enable asynchronous tasks. Default to false.
      */
-    static protected final boolean ENABLE_ASYNC_TASKS = true;
+    static protected final boolean ENABLE_ASYNC_TASKS = false;
 
     /**
      * Indicates whether the first handshake was completed
