@@ -29,7 +29,7 @@ import javax.net.SocketFactory;
 
 /**
  * Simple Socket factory to create sockets with or without SSL enabled.
- * If SSL enabled a "bougus" SSL Context is used (suitable for test purposes)
+ * If SSL enabled a "bogus" SSL Context is used (suitable for test purposes)
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
