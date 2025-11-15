@@ -100,7 +100,7 @@
     <version.api.plugin>3.6.3</version.api.plugin>
     <version.assembly.plugin>3.7.1</version.assembly.plugin>
     <version.build.helper.plugin>3.6.1</version.build.helper.plugin>
-    <version.bundle.plugin>5.1.9</version.bundle.plugin>
+    <version.bundle.plugin>6.0.0</version.bundle.plugin>
     <version.changes.plugin>3.0.0-M3</version.changes.plugin>
     <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
     <version.clean.plugin>3.5.0</version.clean.plugin>
@@ -142,7 +142,7 @@
     <version.taglist.plugin>3.2.1</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
     <version.versions.plugin>2.19.1</version.versions.plugin>
-    <version.xbean.plugin>4.27</version.xbean.plugin>
+    <version.xbean.plugin>4.28</version.xbean.plugin>
 
     <!-- Jars -->
     <version.bcprov>1.82</version.bcprov>
