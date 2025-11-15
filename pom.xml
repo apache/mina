@@ -96,12 +96,12 @@
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
 
     <!-- Maven Plugins -->
-    <version.apache.rat.plugin>0.16.1</version.apache.rat.plugin>
+    <version.apache.rat.plugin>0.17</version.apache.rat.plugin>
     <version.api.plugin>3.6.3</version.api.plugin>
     <version.assembly.plugin>3.7.1</version.assembly.plugin>
     <version.build.helper.plugin>3.6.1</version.build.helper.plugin>
     <version.bundle.plugin>5.1.9</version.bundle.plugin>
-    <version.changes.plugin>2.12.1</version.changes.plugin>
+    <version.changes.plugin>3.0.0-M3</version.changes.plugin>
     <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
     <version.clean.plugin>3.5.0</version.clean.plugin>
     <version.clirr.plugin>2.8</version.clirr.plugin>
@@ -124,12 +124,12 @@
     <version.jxr.plugin>3.6.0</version.jxr.plugin>
     <version.model.plugin>3.9.4</version.model.plugin>
     <version.plexus.utils>4.0.2</version.plexus.utils>
-    <version.plugin.plugin>4.0.0-beta-1</version.plugin.plugin>
+    <version.plugin.plugin>4.0.0-beta-2</version.plugin.plugin>
     <version.pmd.plugin>3.28.0</version.pmd.plugin>
     <version.project.plugin>3.0-alpha-2</version.project.plugin>
     <version.project.info.report.plugin>3.9.0</version.project.info.report.plugin>
     <version.rat.maven.plugin>1.0-alpha-3</version.rat.maven.plugin>
-    <version.release.plugin>3.1.1</version.release.plugin>
+    <version.release.plugin>3.2.0</version.release.plugin>
     <version.remote.resources.plugin>3.3.0</version.remote.resources.plugin>
     <version.replacer.plugin>1.5.3</version.replacer.plugin>
     <version.resources.plugin>3.3.1</version.resources.plugin>
