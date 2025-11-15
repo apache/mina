@@ -163,7 +163,14 @@ public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
     @Override
     protected int allSessionsCount()
     {
-        return selector.keys().size();
+        selectorLock.readLock().lock();
+        
+        try {
+            return selector.keys().size();
+        } finally {
+            selectorLock.readLock().unlock();
+        }
+
     }
 
     @SuppressWarnings("synthetic-access")
@@ -345,7 +352,14 @@ public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
         }
 
         if (oldInterestOps != newInterestOps) {
-            key.interestOps(newInterestOps);
+            // Protect the selector against concurrent accesses
+            selectorLock.readLock().lock();
+            
+            try {
+                key.interestOps(newInterestOps);
+            } finally {
+                selectorLock.readLock().unlock();
+            }
         }
     }
 
@@ -368,7 +382,14 @@ public class NioProcessor extends AbstractPollingIoProcessor<NioSession> {
             newInterestOps &= ~SelectionKey.OP_WRITE;
         }
 
-        key.interestOps(newInterestOps);
+        // Protect the selector against concurrent accesses
+        selectorLock.readLock().lock();
+        
+        try {
+            key.interestOps(newInterestOps);
+        } finally {
+            selectorLock.readLock().unlock();
+        }
     }
 
     @Override
