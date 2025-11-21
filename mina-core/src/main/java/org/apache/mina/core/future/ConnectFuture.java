@@ -24,7 +24,7 @@ import org.apache.mina.core.session.IoSession;
 /**
  * An {@link IoFuture} for asynchronous connect requests.
  *
- * <h3>Example</h3>
+ * <h2>Example</h2>
  * <pre>
  * IoConnector connector = ...;
  * ConnectFuture future = connector.connect(...);

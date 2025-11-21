@@ -22,7 +22,7 @@ package org.apache.mina.core.future;
 /**
  * An {@link IoFuture} for asynchronous close requests.
  *
- * <h3>Example</h3>
+ * <h2>Example</h2>
  * <pre>
  * IoSession session = ...;
  * CloseFuture future = session.close(true);

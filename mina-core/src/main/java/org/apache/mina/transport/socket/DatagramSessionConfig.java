@@ -31,6 +31,8 @@ import org.apache.mina.core.session.IoSessionConfig;
  */
 public interface DatagramSessionConfig extends IoSessionConfig {
     /**
+     * Tell if SO_BROADCAST is enabled
+     * 
      * @see DatagramSocket#getBroadcast()
      * 
      * @return <code>true</code> if SO_BROADCAST is enabled.
@@ -45,6 +47,8 @@ public interface DatagramSessionConfig extends IoSessionConfig {
     void setBroadcast(boolean broadcast);
 
     /**
+     * Tells if SO_REUSEADDR is enabled
+     * 
      * @see DatagramSocket#getReuseAddress()
      * 
      * @return <code>true</code> if SO_REUSEADDR is enabled.
@@ -59,6 +63,8 @@ public interface DatagramSessionConfig extends IoSessionConfig {
     void setReuseAddress(boolean reuseAddress);
 
     /**
+     * Get the size of the receive buffer
+     * 
      * @see DatagramSocket#getReceiveBufferSize()
      * 
      * @return the size of the receive buffer
@@ -73,6 +79,8 @@ public interface DatagramSessionConfig extends IoSessionConfig {
     void setReceiveBufferSize(int receiveBufferSize);
 
     /**
+     * Get the size of the send buffer
+     *
      * @see DatagramSocket#getSendBufferSize()
      * 
      * @return the size of the send buffer
@@ -87,6 +95,8 @@ public interface DatagramSessionConfig extends IoSessionConfig {
     void setSendBufferSize(int sendBufferSize);
 
     /**
+     * Get the traffic class
+     * 
      * @see DatagramSocket#getTrafficClass()
      * 
      * @return the traffic class
@@ -102,6 +112,8 @@ public interface DatagramSessionConfig extends IoSessionConfig {
     void setTrafficClass(int trafficClass);
 
     /**
+     * Tells if we should close if the port is unreachable
+     * 
      * If method returns true, it means session should be closed when a
      * {@link PortUnreachableException} occurs.
      * 

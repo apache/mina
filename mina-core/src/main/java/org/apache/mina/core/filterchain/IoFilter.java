@@ -42,7 +42,7 @@ import org.apache.mina.filter.util.ReferenceCountingFilter;
  * {@link IoSession}s.</strong> Users can cache the reference to the
  * session, which might malfunction if any filters are added or removed later.
  *
- * <h3>The Life Cycle</h3>
+ * <h2>The Life Cycle</h2>
  * {@link IoFilter}s are activated only when they are inside {@link IoFilterChain}.
  * <p>
  * When you add an {@link IoFilter} to an {@link IoFilterChain}:

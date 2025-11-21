@@ -27,8 +27,9 @@ import java.util.concurrent.BlockingQueue;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public interface IoSessionConfig {
-
     /**
+     * Get the read buffer size
+     * 
      * @return the size of the read buffer that I/O processor allocates
      * per each read.  It's unusual to adjust this property because
      * it's often adjusted automatically by the I/O processor.
@@ -45,6 +46,8 @@ public interface IoSessionConfig {
     void setReadBufferSize(int readBufferSize);
 
     /**
+     * Get the minimum size of the read buffer
+     * 
      * @return the minimum size of the read buffer that I/O processor
      * allocates per each read.  I/O processor will not decrease the
      * read buffer size to the smaller value than this property value.
@@ -61,6 +64,8 @@ public interface IoSessionConfig {
     void setMinReadBufferSize(int minReadBufferSize);
 
     /**
+     * Get the maximum size of the read buffer
+     * 
      * @return the maximum size of the read buffer that I/O processor
      * allocates per each read.  I/O processor will not increase the
      * read buffer size to the greater value than this property value.
@@ -77,12 +82,16 @@ public interface IoSessionConfig {
     void setMaxReadBufferSize(int maxReadBufferSize);
 
     /**
+     * Get the throughput interval
+     * 
      * @return the interval (seconds) between each throughput calculation.
      * The default value is <code>3</code> seconds.
      */
     int getThroughputCalculationInterval();
 
     /**
+     * Get the throughput interval in milliseconds
+     * 
      * @return the interval (milliseconds) between each throughput calculation.
      * The default value is <code>3</code> seconds.
      */
@@ -97,6 +106,8 @@ public interface IoSessionConfig {
     void setThroughputCalculationInterval(int throughputCalculationInterval);
 
     /**
+     * Get the idle time
+     * 
      * @return idle time for the specified type of idleness in seconds.
      * 
      * @param status The status for which we want the idle time (One of READER_IDLE,
@@ -105,6 +116,8 @@ public interface IoSessionConfig {
     int getIdleTime(IdleStatus status);
 
     /**
+     * Get the idle time in milliseconds
+     * 
      * @return idle time for the specified type of idleness in milliseconds.
      * 
      * @param status The status for which we want the idle time (One of READER_IDLE,
@@ -121,11 +134,15 @@ public interface IoSessionConfig {
     void setIdleTime(IdleStatus status, int idleTime);
 
     /**
+     * Get the read idle time
+     * 
      * @return idle time for {@link IdleStatus#READER_IDLE} in seconds.
      */
     int getReaderIdleTime();
 
     /**
+     * Get the read idle time in milliseconds
+     * 
      * @return idle time for {@link IdleStatus#READER_IDLE} in milliseconds.
      */
     long getReaderIdleTimeInMillis();
@@ -138,11 +155,15 @@ public interface IoSessionConfig {
     void setReaderIdleTime(int idleTime);
 
     /**
+     * Get the write idle time
+     * 
      * @return idle time for {@link IdleStatus#WRITER_IDLE} in seconds.
      */
     int getWriterIdleTime();
 
     /**
+     * Get the write idle time in milliseconds
+     * 
      * @return idle time for {@link IdleStatus#WRITER_IDLE} in milliseconds.
      */
     long getWriterIdleTimeInMillis();
@@ -155,11 +176,15 @@ public interface IoSessionConfig {
     void setWriterIdleTime(int idleTime);
 
     /**
+     * Get the idle time for reads and writes
+     * 
      * @return idle time for {@link IdleStatus#BOTH_IDLE} in seconds.
      */
     int getBothIdleTime();
 
     /**
+     * Get the idle time in milliseconds
+     * 
      * @return idle time for {@link IdleStatus#BOTH_IDLE} in milliseconds.
      */
     long getBothIdleTimeInMillis();
@@ -172,11 +197,15 @@ public interface IoSessionConfig {
     void setBothIdleTime(int idleTime);
 
     /**
+     * Get the write timeout in seconds.
+     * 
      * @return write timeout in seconds.
      */
     int getWriteTimeout();
 
     /**
+     * Get the write timeout in milliseconds.
+     * 
      * @return write timeout in milliseconds.
      */
     long getWriteTimeoutInMillis();
@@ -189,6 +218,8 @@ public interface IoSessionConfig {
     void setWriteTimeout(int writeTimeout);
 
     /**
+     * Tell if the read operation is enabled
+     * 
      * @return <code>true</code> if and only if {@link IoSession#read()} operation
      * is enabled.  If enabled, all received messages are stored in an internal
      * {@link BlockingQueue} so you can read received messages in more

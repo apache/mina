@@ -46,7 +46,7 @@ import org.apache.mina.core.write.WriteRequest;
  *             new WriteRequestFilter(new IoEventQueueThrottle()));
  * </pre>
  *
- * <h3>Known issues</h3>
+ * <h2>Known issues</h2>
  *
  * You can run into a dead lock if you run this filter with the blocking
  * {@link IoEventQueueHandler} implementation such as {@link IoEventQueueThrottle}

@@ -46,11 +46,11 @@ import org.apache.mina.core.write.WriteRequestQueue;
  *   It often contains objects that represents the state of a higher-level protocol
  *   and becomes a way to exchange data between filters and handlers.
  * </p>
- * <h3>Adjusting Transport Type Specific Properties</h3>
+ * <h2>Adjusting Transport Type Specific Properties</h2>
  * <p>
  *   You can simply downcast the session to an appropriate subclass.
  * </p>
- * <h3>Thread Safety</h3>
+ * <h2>Thread Safety</h2>
  * <p>
  *   {@link IoSession} is thread-safe.  But please note that performing
  *   more than one {@link #write(Object)} calls at the same time will
@@ -58,7 +58,7 @@ import org.apache.mina.core.write.WriteRequestQueue;
  *   to be executed simultaneously, and therefore you have to make sure the
  *   {@link IoFilter} implementations you're using are thread-safe, too.
  * </p>
- * <h3>Equality of Sessions</h3>
+ * <h2>Equality of Sessions</h2>
  * TODO : The getId() method is totally wrong. We can't base
  * a method which is designed to create a unique ID on the hashCode method.
  * {@link Object#equals(Object)} and {@link Object#hashCode()} shall not be overriden

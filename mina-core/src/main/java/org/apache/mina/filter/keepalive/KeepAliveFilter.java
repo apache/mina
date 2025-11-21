@@ -60,7 +60,7 @@ import org.apache.mina.core.write.WriteRequest;
  *   <tr>
  *     <th>Name</th><th>Description</th><th>Implementation</th>
  *   </tr>
- *   <tr valign="top">
+ *   <tr>
  *     <td>Active</td>
  *     <td>
  *       You want a keep-alive request is sent when the reader is idle.
@@ -75,7 +75,7 @@ import org.apache.mina.core.write.WriteRequest;
  *       return a non-<code>null</code>.
  *     </td>
  *   </tr>
- *   <tr valign="top">
+ *   <tr>
  *     <td>Semi-active</td>
  *     <td>
  *       You want a keep-alive request to be sent when the reader is idle.
@@ -92,7 +92,7 @@ import org.apache.mina.core.write.WriteRequest;
  *       implementation that doesn't affect the session state nor throw an exception.
  *     </td>
  *   </tr>
- *   <tr valign="top">
+ *   <tr>
  *     <td>Passive</td>
  *     <td>
  *       You don't want to send a keep-alive request by yourself, but the
@@ -104,7 +104,7 @@ import org.apache.mina.core.write.WriteRequest;
  *       must return a non-<code>null</code>.
  *     </td>
  *   </tr>
- *   <tr valign="top">
+ *   <tr>
  *     <td>Deaf Speaker</td>
  *     <td>
  *       You want a keep-alive request to be sent when the reader is idle, but
@@ -118,7 +118,7 @@ import org.apache.mina.core.write.WriteRequest;
  *       {@link KeepAliveRequestTimeoutHandler#DEAF_SPEAKER}.
  *     </td>
  *   </tr>
- *   <tr valign="top">
+ *   <tr>
  *     <td>Silent Listener</td>
  *     <td>
  *       You don't want to send a keep-alive request by yourself nor send any

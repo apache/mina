@@ -22,7 +22,7 @@ package org.apache.mina.core.future;
 /**
  * An {@link IoFuture} for asynchronous write requests.
  *
- * <h3>Example</h3>
+ * <h2>Example</h2>
  * <pre>
  * IoSession session = ...;
  * WriteFuture future = session.write(...);
