@@ -83,7 +83,7 @@ class NioSocketSession extends NioSession {
      * {@inheritDoc}
      */
     @Override
-    SocketChannel getChannel() {
+    public SocketChannel getChannel() {
         return (SocketChannel) channel;
     }
 
