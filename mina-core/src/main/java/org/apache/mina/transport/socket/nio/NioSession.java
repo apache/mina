@@ -68,7 +68,7 @@ public abstract class NioSession extends AbstractIoSession {
     /**
      * @return The ByteChannel associated with this {@link IoSession} 
      */
-    abstract ByteChannel getChannel();
+    public abstract ByteChannel getChannel();
 
     /**
      * {@inheritDoc}

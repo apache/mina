@@ -75,7 +75,7 @@ class NioDatagramSession extends NioSession {
      * {@inheritDoc}
      */
     @Override
-    DatagramChannel getChannel() {
+    public DatagramChannel getChannel() {
         return (DatagramChannel) channel;
     }
 
