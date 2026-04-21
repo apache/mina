@@ -96,20 +96,20 @@
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
 
     <!-- Maven Plugins -->
-    <version.apache.rat.plugin>0.17</version.apache.rat.plugin>
+    <version.apache.rat.plugin>0.18</version.apache.rat.plugin>
     <version.api.plugin>3.6.3</version.api.plugin>
-    <version.assembly.plugin>3.7.1</version.assembly.plugin>
+    <version.assembly.plugin>3.8.0</version.assembly.plugin>
     <version.build.helper.plugin>3.6.1</version.build.helper.plugin>
-    <version.bundle.plugin>6.0.0</version.bundle.plugin>
+    <version.bundle.plugin>6.0.2</version.bundle.plugin>
     <version.changes.plugin>3.0.0-M3</version.changes.plugin>
     <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
     <version.clean.plugin>3.5.0</version.clean.plugin>
     <version.clirr.plugin>2.8</version.clirr.plugin>
     <version.cobertura.plugin>2.7</version.cobertura.plugin>
-    <version.compiler.plugin>3.14.1</version.compiler.plugin>
+    <version.compiler.plugin>3.15.0</version.compiler.plugin>
     <version.cyclonedx.plugin>2.9.1</version.cyclonedx.plugin>
     <version.dashboard.plugin>1.0.0-beta-1</version.dashboard.plugin>
-    <version.dependency.plugin>3.9.0</version.dependency.plugin>
+    <version.dependency.plugin>3.10.0</version.dependency.plugin>
     <version.deploy.plugin>3.1.4</version.deploy.plugin>
     <version.docck.plugin>1.2</version.docck.plugin>
     <version.eclipse.plugin>2.10</version.eclipse.plugin>
@@ -117,10 +117,10 @@
     <version.findbugs.plugin>3.0.5</version.findbugs.plugin>
     <version.gpg.plugin>3.2.8</version.gpg.plugin>
     <version.install.plugin>3.1.4</version.install.plugin>
-    <version.jar.plugin>3.4.2</version.jar.plugin>
+    <version.jar.plugin>3.5.0</version.jar.plugin>
     <version.javancss.plugin>2.1</version.javancss.plugin>
     <version.javadoc.plugin>3.12.0</version.javadoc.plugin>
-    <version.jdepend.plugin>2.1</version.jdepend.plugin>
+    <version.jdepend.plugin>2.2.0</version.jdepend.plugin>
     <version.jxr.plugin>3.6.0</version.jxr.plugin>
     <version.model.plugin>3.9.15</version.model.plugin>
     <version.plexus.utils>4.0.3</version.plexus.utils>
@@ -129,19 +129,19 @@
     <version.project.plugin>3.0-alpha-2</version.project.plugin>
     <version.project.info.report.plugin>3.9.0</version.project.info.report.plugin>
     <version.rat.maven.plugin>1.0-alpha-3</version.rat.maven.plugin>
-    <version.release.plugin>3.2.0</version.release.plugin>
+    <version.release.plugin>3.3.1</version.release.plugin>
     <version.remote.resources.plugin>3.3.0</version.remote.resources.plugin>
     <version.replacer.plugin>1.5.3</version.replacer.plugin>
-    <version.resources.plugin>3.3.1</version.resources.plugin>
+    <version.resources.plugin>3.5.0</version.resources.plugin>
     <version.scm.plugin>2.2.1</version.scm.plugin>
     <version.site.plugin>4.0.0-M16</version.site.plugin>
-    <version.source.plugin>3.3.1</version.source.plugin>
+    <version.source.plugin>3.4.0</version.source.plugin>
     <version.shade.plugin>3.6.2</version.shade.plugin>
-    <version.surefire.plugin>3.5.4</version.surefire.plugin>
-    <version.surfire.report.plugin>3.5.4</version.surfire.report.plugin>
-    <version.taglist.plugin>3.2.1</version.taglist.plugin>
+    <version.surefire.plugin>3.5.5</version.surefire.plugin>
+    <version.surfire.report.plugin>3.5.5</version.surfire.report.plugin>
+    <version.taglist.plugin>3.2.2</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
-    <version.versions.plugin>2.19.1</version.versions.plugin>
+    <version.versions.plugin>2.21.0</version.versions.plugin>
     <version.xbean.plugin>4.30</version.xbean.plugin>
 
     <!-- Jars -->
