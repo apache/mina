@@ -88,6 +88,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
     /** A mask for an int */
     private static final long INT_MASK = 0xFFFFFFFFL;
 
+    /** A list of acceptable classes for deserialization */
     private final List<ClassNameMatcher> acceptMatchers = new ArrayList<>();
 
     /**
@@ -2182,6 +2183,14 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
                     case 1: // Serializable class
                         String className = readUTF();
+
+                        // Only accept classes that are listed as acceptable
+                        // Apply class filter BEFORE calling Class.forName
+                        if (!acceptMatchers.stream().anyMatch(m -> m.matches(className))) {
+                            throw new ClassNotFoundException("Class not in accept list " + className);
+                        }
+
+                        // Use initialize=false to prevent static block execution during class loading
                         Class<?> clazz = Class.forName(className, true, classLoader);
 
                         return ObjectStreamClass.lookup(clazz);
@@ -2193,32 +2202,24 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
             @Override
             protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                String className = desc.getName();
+                    
+                // apply acceptMatchers filter before any Class.forName() call,
+                // regardless of whether forClass() is null or not
+                if (!acceptMatchers.stream().anyMatch(m -> m.matches(className))) {
+                    throw new ClassNotFoundException("Class not in accept list " + className);
+                }
+    
                 Class<?> clazz = desc.forClass();
-                    
-                if (clazz == null) {
-                    String name = desc.getName();
 
-                    try {
-                        return Class.forName(name, false, classLoader);
-                    } catch (ClassNotFoundException ex) {
-                        return super.resolveClass(desc);
-                    }
-                } else {
-                    boolean found = false;
-                    String className = desc.getName();
-                    
-                    for (ClassNameMatcher matcher : acceptMatchers) {
-                        if (matcher.matches(className)) {
-                            found = true;
-                            break;
-                        }
-                    }
+                if (clazz != null) {
+                    return clazz;
+                }
 
-                    if (found) {
-                        return clazz;
-                    }
-                    
-                    throw new ClassNotFoundException();
+                try {
+                    return Class.forName(className, false, classLoader);
+                } catch (ClassNotFoundException ex) {
+                    return super.resolveClass(desc);
                 }
             }
         }) {

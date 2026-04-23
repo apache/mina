@@ -44,6 +44,7 @@ import java.util.List;
 import org.apache.mina.core.buffer.matcher.RegexpClassNameMatcher;
 import org.apache.mina.core.buffer.matcher.WildcardClassNameMatcher;
 import org.apache.mina.util.Bar;
+import org.apache.mina.util.Foo;
 import org.junit.Test;
 
 /**
@@ -53,10 +54,10 @@ import org.junit.Test;
  */
 public class IoBufferTest {
 
-    private static interface NonserializableInterface {
+    private static interface NonSerializableInterface {
     }
 
-    public static class NonserializableClass {
+    public static class NonSerializableClass {
     }
 
     /**
@@ -388,8 +389,29 @@ public class IoBufferTest {
         assertNotSame(o, o2);
     }
 
+    @Test(expected=ClassNotFoundException.class)
+    public void testObjectSerializationReject() throws Exception {
+        IoBuffer buf = IoBuffer.allocate(16);
+        buf.setAutoExpand(true);
+        List<Object> o = new ArrayList<>();
+        o.add(new Date());
+        o.add(long.class);
+
+        // We don't accept type 0 class (long)
+        buf.accept(ArrayList.class.getName(), Date.class.getName());
+
+        // Test writing an object.
+        buf.putObject(o);
+
+        // Test reading an object.
+        buf.clear();
+
+        // The call should fail as long is not accepted
+        buf.getObject();
+    }
+
     @Test
-    public void testNonserializableClass() throws Exception {
+    public void testSerializableClass() throws Exception {
         Class<?> c = String.class;
 
         IoBuffer buffer = IoBuffer.allocate(16);
@@ -407,7 +429,7 @@ public class IoBufferTest {
     }
 
     @Test
-    public void testNonserializableClassAcceptWildcard() throws Exception {
+    public void testSerializableClassAcceptWildcard() throws Exception {
         Class<?> c = String.class;
 
         IoBuffer buffer = IoBuffer.allocate(16);
@@ -444,8 +466,8 @@ public class IoBufferTest {
         assertSame(c, o);
     }
 
-    @Test(expected=ClassNotFoundException.class)
-    public void testNonserializableClassReject() throws Exception {
+    @Test(expected=BufferDataException.class)
+    public void testSerializableClassReject() throws Exception {
         Class<?> c = String.class;
 
         IoBuffer buffer = IoBuffer.allocate(16);
@@ -460,19 +482,64 @@ public class IoBufferTest {
     }
 
     @Test
-    public void testNonserializableInterface() throws Exception {
-        Class<?> c = NonserializableInterface.class;
+    public void testNonserializableInterfaceAccept() throws Exception {
+        Class<?> c = NonSerializableInterface.class;
 
         IoBuffer buffer = IoBuffer.allocate(16);
         buffer.setAutoExpand(true);
         buffer.putObject(c);
-        buffer.accept(NonserializableInterface.class.getName());
+        buffer.accept(NonSerializableInterface.class.getName());
 
         buffer.flip();
         Object o = buffer.getObject();
 
         assertEquals(c, o);
         assertSame(c, o);
+    }
+
+    @Test(expected=ClassNotFoundException.class)
+    public void testNonserializableInterfaceReject() throws Exception {
+        Class<?> c = NonSerializableInterface.class;
+
+        IoBuffer buffer = IoBuffer.allocate(16);
+        buffer.setAutoExpand(true);
+        buffer.putObject(c);
+
+        buffer.flip();
+
+        // We must get an error
+        buffer.getObject();
+    }
+
+    @Test
+    public void testNonserializableClassAccept() throws Exception {
+        Class<?> c = NonSerializableClass.class;
+
+        IoBuffer buffer = IoBuffer.allocate(16);
+        buffer.setAutoExpand(true);
+        buffer.putObject(c);
+        buffer.accept(NonSerializableClass.class.getName());
+
+        buffer.flip();
+        Object o = buffer.getObject();
+
+        assertEquals(c, o);
+        assertSame(c, o);
+    }
+
+
+    @Test(expected=ClassNotFoundException.class)
+    public void testNonserializableClassReject() throws Exception {
+        Class<?> c = NonSerializableClass.class;
+
+        IoBuffer buffer = IoBuffer.allocate(16);
+        buffer.setAutoExpand(true);
+        buffer.putObject(c);
+
+        buffer.flip();
+
+        // The call must fail
+        buffer.getObject();
     }
 
     @Test
@@ -1007,7 +1074,10 @@ public class IoBufferTest {
 
         // Test writing an object.
         buf.putObject(expected);
+
+        // We must accept all the classes, including the parents.
         buf.accept(Bar.class.getName());
+        buf.accept(Foo.class.getName());
 
         // Test reading an object.
         buf.clear();
