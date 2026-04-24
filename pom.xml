@@ -571,7 +571,7 @@
                 <head />
               </tag>
             </tags>
-            <!-- additionalparam>-Xdoclint:none</additionalparam -->
+            <additionalparam>-Xdoclint:none</additionalparam>
          </configuration>
         </plugin>
 
