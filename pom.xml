@@ -91,7 +91,7 @@
     <project.build.outputTimestamp>1734616380</project.build.outputTimestamp>
 
     <!-- Make Java 8 javadoc lint to shut the f*** up... -->
-    <!-- additionalparam>-Xdoclint:none</additionalparam -->
+    <additionalparam>-Xdoclint:none</additionalparam>
 
     <!-- Maven Plugins -->
     <version.apache.rat.plugin>0.18</version.apache.rat.plugin>
