@@ -92,6 +92,7 @@
 
     <!-- Make Java 8 javadoc lint to shut the f*** up... -->
     <additionalparam>-Xdoclint:none</additionalparam>
+    <doclint>none</doclint>
 
     <!-- Maven Plugins -->
     <version.apache.rat.plugin>0.18</version.apache.rat.plugin>
