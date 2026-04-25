@@ -94,7 +94,7 @@
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
 
     <!-- Maven Plugins -->
-    <version.apache.rat.plugin>0.18</version.apache.rat.plugin>
+    <version.apache.rat.plugin>0.17</version.apache.rat.plugin>
     <version.api.plugin>3.9.4</version.api.plugin>
     <version.assembly.plugin>3.7.1</version.assembly.plugin>
     <version.build.helper.plugin>3.6.0</version.build.helper.plugin>
