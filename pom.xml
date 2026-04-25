@@ -94,7 +94,6 @@
     <!-- additionalparam>-Xdoclint:none</additionalparam -->
 
     <!-- Maven Plugins -->
-    <!-- NOTE: do not use 0.18, which requires java 17 -->
     <version.apache.rat.plugin>0.18</version.apache.rat.plugin>
     <version.api.plugin>3.9.4</version.api.plugin>
     <version.assembly.plugin>3.7.1</version.assembly.plugin>
