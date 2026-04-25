@@ -665,36 +665,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <version>${version.apache.rat.plugin}</version>
-          <inherited>true</inherited>
-          <configuration>
-            <excludeSubProjects>false</excludeSubProjects>
-            <excludes>
-              <!-- project excludes -->
-              <exclude>**/resources/svn_ignore.txt</exclude>
-              <exclude>**/resources/Reveal in Finder.launch</exclude>
-              <exclude>**/target/**</exclude>
-              <exclude>**/.classpath</exclude>
-              <exclude>**/.project</exclude>
-              <exclude>**/.settings/**</exclude>
-              <exclude>**/LICENSE.*</exclude>
-              <exclude>**/NOTICE-bin.txt</exclude>
-              <exclude>**/resources/**</exclude>
-            </excludes>
-          </configuration>
-          <executions>
-            <execution>
-              <phase>verify</phase>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
           <groupId>org.apache.xbean</groupId>
           <artifactId>maven-xbean-plugin</artifactId>
           <version>${version.xbean.plugin}</version>
@@ -858,6 +828,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Automatic-Module-Name>$(maven-symbolicname)</Automatic-Module-Name>
             <Bundle-SymbolicName>${symbolicName}</Bundle-SymbolicName>
             <Export-Package>${exportedPackage}.*;version=${project.version}</Export-Package>
           </instructions>
@@ -888,6 +859,39 @@
         <groupId>org.cyclonedx</groupId>
         <artifactId>cyclonedx-maven-plugin</artifactId>
       </plugin>     
+
+        
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>${version.apache.rat.plugin}</version>
+        <inherited>true</inherited>
+ 
+        <configuration>
+          <excludeSubProjects>false</excludeSubProjects>
+          <inputExcludes>
+            <!-- project excludes -->
+            <inputExclude>**/resources/Reveal in Finder.launch</inputExclude>
+            <inputExclude>**/target/**</inputExclude>
+            <inputExclude>**/.classpath</inputExclude>
+            <inputExclude>**/.project</inputExclude>
+            <inputExclude>**/.settings/**</inputExclude>
+            <inputExclude>**/LICENSE.*</inputExclude>
+            <inputExclude>**/NOTICE-bin.txt</inputExclude>
+            <inputExclude>**/MANIFEST.MF</inputExclude>
+            <inputExclude>**/resources/**</inputExclude>
+          </inputExcludes>
+        </configuration>
+          
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
