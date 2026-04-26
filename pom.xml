@@ -783,6 +783,9 @@
                   <level>ERROR</level>
                   <version>[3.8,]</version>
                 </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>[1.8,1.9)</version>
+                </requireJavaVersion>
               </rules>    
             </configuration>
           </execution>
