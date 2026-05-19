@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
-    <version>37</version>
+    <version>38</version>
     <relativePath />
   </parent>
 
@@ -111,7 +111,7 @@
     <version.deploy.plugin>3.1.4</version.deploy.plugin>
     <version.docck.plugin>1.2</version.docck.plugin>
     <version.eclipse.plugin>2.10</version.eclipse.plugin>
-    <version.enforcer.plugin>3.6.2</version.enforcer.plugin>
+    <version.enforcer.plugin>3.6.3</version.enforcer.plugin>
     <version.findbugs.plugin>3.0.5</version.findbugs.plugin>
     <version.gpg.plugin>3.2.8</version.gpg.plugin>
     <version.install.plugin>3.1.4</version.install.plugin>
@@ -151,7 +151,7 @@
     <version.log4j>1.2.17</version.log4j>
     <!-- DO NOT CHANGE. Breaks the build with more recent versions -->
     <version.ognl>3.3.4</version.ognl>
-    <version.pmd>7.7.0</version.pmd>
+    <version.pmd>7.24.0</version.pmd>
     <version.rmock>2.0.2</version.rmock>
     <version.slf4j.api>1.7.36</version.slf4j.api>
     <version.slf4j.reload4j>1.7.36</version.slf4j.reload4j>
