@@ -126,4 +126,64 @@ public class ZlibTest {
         String strOutput = byteUncompressed.getString(Charset.forName("UTF8").newDecoder());
         assertTrue(strOutput.equals(strInput));
     }
+    
+    
+    /**
+     * Test the inflater with no limit
+     * We create buffers of various sizes:
+     * <ul>
+     *   <li>A 1MB buffer that once compressed should inflate properly
+     *   <li>A 10MB buffer that once compressed should inflate properly
+     *   <li>
+     * </ul> 
+     * @throws Exception
+     */
+    @Test
+    public void testZBombDataNoLimit() throws Exception {
+        // Create an inflater with no size limit
+        Zlib inflaterNoLimit = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
+
+        // Try a 10MB buffer bomb. Should succeed
+        byte[] uncompressed = new byte[1_024*1_024*10];
+        
+        IoBuffer byteInput = IoBuffer.wrap(uncompressed);
+        IoBuffer byteCompressed = deflater.deflate(byteInput);
+        
+        // Should be fine
+        inflaterNoLimit.inflate(byteCompressed);
+    }
+
+    
+    /**
+     * Test the inflater default limit.
+     * We create buffers of various sizes:
+     * <ul>
+     *   <li>A 1MB Buffer that once compressed should inflate properly
+     *   <li>A 1MB+1byte buffer that once compressed should generate an exception when inflated
+     *   <li>
+     * </ul> 
+     * @throws Exception
+     */
+    @Test(expected=IOException.class)
+    public void testZBombData() throws Exception {
+        // Create an inflater with a 1Mb size limit
+        Zlib inflaterWithLimit = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER, 1_024*1_024);
+
+        // Try a 1MB buffer bomb. Should succeed
+        byte[] uncompressed = new byte[1_024*1_024];
+        
+        IoBuffer byteInput = IoBuffer.wrap(uncompressed);
+        IoBuffer byteCompressed = deflater.deflate(byteInput);
+        
+        // Should be fine
+        inflaterWithLimit.inflate(byteCompressed);
+        
+        // Now try with a 1Mb +1 byte buffer
+        uncompressed = new byte[1_024*1_024+1];
+        byteInput = IoBuffer.wrap(uncompressed);
+        byteCompressed = deflater.deflate(byteInput);
+        
+        // Should now fail and throw a IoException
+        inflaterWithLimit.inflate(byteCompressed);  
+    }
 }

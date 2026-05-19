@@ -54,6 +54,12 @@ class Zlib {
 
     /** The requested compression level */
     private int compressionLevel;
+    
+    /** The maximum size of an inflated buffer. Default to 1Mb */
+    /* Package protected */ 
+    static final int MAX_DECOMPRESSED_SIZE = Integer.MAX_VALUE;
+
+    private int maxDecompressedSize = MAX_DECOMPRESSED_SIZE;
 
     /** The inner stream used to inflate or deflate the data */
     private ZStream zStream = null;
@@ -73,31 +79,75 @@ class Zlib {
      */
     public Zlib(int compressionLevel, int mode) {
         switch (compressionLevel) {
-        case COMPRESSION_MAX:
-        case COMPRESSION_MIN:
-        case COMPRESSION_NONE:
-        case COMPRESSION_DEFAULT:
-            this.compressionLevel = compressionLevel;
-            break;
-        default:
-            throw new IllegalArgumentException("invalid compression level specified");
+            case COMPRESSION_MAX:
+            case COMPRESSION_MIN:
+            case COMPRESSION_NONE:
+            case COMPRESSION_DEFAULT:
+                this.compressionLevel = compressionLevel;
+                break;
+            default:
+                throw new IllegalArgumentException("invalid compression level specified");
         }
 
         // create a new instance of ZStream. This will be done only once.
         zStream = new ZStream();
 
         switch (mode) {
-        case MODE_DEFLATER:
-            zStream.deflateInit(this.compressionLevel);
-            break;
-        case MODE_INFLATER:
-            zStream.inflateInit();
-            break;
-        default:
-            throw new IllegalArgumentException("invalid mode specified");
+            case MODE_DEFLATER:
+                zStream.deflateInit(this.compressionLevel);
+                break;
+            case MODE_INFLATER:
+                zStream.inflateInit();
+                break;
+            default:
+                throw new IllegalArgumentException("invalid mode specified");
         }
+
         this.mode = mode;
     }
+    
+
+    /**
+     * Creates an instance of the ZLib class.
+     * 
+     * @param compressionLevel the level of compression that should be used. One of
+     * <code>COMPRESSION_MAX</code>, <code>COMPRESSION_MIN</code>,
+     * <code>COMPRESSION_NONE</code> or <code>COMPRESSION_DEFAULT</code>
+     * @param mode the mode in which the instance will operate. Can be either
+     * of <code>MODE_DEFLATER</code> or <code>MODE_INFLATER</code>
+     * @param maxDecompressedSize The maximum inflation size for a buffer. Default to 1MB
+     * @throws IllegalArgumentException if the mode is incorrect
+     */
+    public Zlib(int compressionLevel, int mode, int maxDecompressedSize) {
+        switch (compressionLevel) {
+            case COMPRESSION_MAX:
+            case COMPRESSION_MIN:
+            case COMPRESSION_NONE:
+            case COMPRESSION_DEFAULT:
+                this.compressionLevel = compressionLevel;
+                break;
+            default:
+                throw new IllegalArgumentException("invalid compression level specified");
+        }
+
+        // create a new instance of ZStream. This will be done only once.
+        zStream = new ZStream();
+
+        switch (mode) {
+            case MODE_DEFLATER:
+                zStream.deflateInit(this.compressionLevel);
+                break;
+            case MODE_INFLATER:
+                this.maxDecompressedSize = maxDecompressedSize;
+                zStream.inflateInit();
+                break;
+            default:
+                throw new IllegalArgumentException("invalid mode specified");
+        }
+
+        this.mode = mode;
+    }
+    
 
     /**
      * Uncompress the given buffer, returning it in a new buffer.
@@ -135,22 +185,28 @@ class Zlib {
             do {
                 retval = zStream.inflate(JZlib.Z_SYNC_FLUSH);
                 switch (retval) {
-                case JZlib.Z_OK:
-                    // completed decompression, lets copy data and get out
-                case JZlib.Z_BUF_ERROR:
-                    // need more space for output. store current output and get more
-                    outBuffer.put(outBytes, 0, zStream.next_out_index);
-                    zStream.next_out_index = 0;
-                    zStream.avail_out = outBytes.length;
-                    break;
-                default:
-                    // unknown error
-                    outBuffer = null;
-                    if (zStream.msg == null) {
-                        throw new IOException("Unknown error. Error code : " + retval);
-                    } else {
-                        throw new IOException("Unknown error. Error code : " + retval + " and message : " + zStream.msg);
-                    }
+                    case JZlib.Z_OK:
+                        // completed decompression, lets copy data and get out
+                    case JZlib.Z_BUF_ERROR:
+                        // Try to avoid exhausting the JVM memory by controling the resulting buffer 
+                        // size after inflation
+                        if (outBuffer.position() + zStream.next_out_index > maxDecompressedSize) {
+                            throw new IOException("decompressed size exceeds max " + maxDecompressedSize);
+                        }
+                        
+                        // need more space for output. store current output and get more
+                        outBuffer.put(outBytes, 0, zStream.next_out_index);
+                        zStream.next_out_index = 0;
+                        zStream.avail_out = outBytes.length;
+                        break;
+                    default:
+                        // unknown error
+                        outBuffer = null;
+                        if (zStream.msg == null) {
+                            throw new IOException("Unknown error. Error code : " + retval);
+                        } else {
+                            throw new IOException("Unknown error. Error code : " + retval + " and message : " + zStream.msg);
+                        }
                 }
             } while (zStream.avail_in > 0);
             

@@ -52,6 +52,11 @@ import org.apache.mina.core.write.WriteRequest;
  * <p>
  * It goes without saying that the other end of this stream should also have a
  * compatible compressor/decompressor using the same algorithm.
+ * <p>
+ * Note: a inflater limit has been added to protect the application from ZBomb
+ * (a compressed buffer that when inflated will create a giant buffer).
+ * It can be set using the CompressionFilter constructor, passing a forth argument
+ * with the expected limit.
  *
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
@@ -91,20 +96,24 @@ public class CompressionFilter extends IoFilterAdapter {
     /**
      * A flag that allows you to disable compression once.
      */
-    public static final AttributeKey DISABLE_COMPRESSION_ONCE = new AttributeKey(CompressionFilter.class, "disableOnce");
+    public static final AttributeKey DISABLE_COMPRESSION_ONCE = 
+            new AttributeKey(CompressionFilter.class, "disableOnce");
 
     private boolean compressInbound = true;
 
     private boolean compressOutbound = true;
 
     private int compressionLevel;
+    
+    /** The maximum decompressed size, to avoid an OOM. Default to 1Mb */
+    private int maxDecompressedSize;
 
     /**
      * Creates a new instance which compresses outboud data and decompresses
      * inbound data with default compression level.
      */
     public CompressionFilter() {
-        this(true, true, COMPRESSION_DEFAULT);
+        this(true, true, COMPRESSION_DEFAULT, Zlib.MAX_DECOMPRESSED_SIZE);
     }
 
     /**
@@ -118,7 +127,7 @@ public class CompressionFilter extends IoFilterAdapter {
      *                         {@link #COMPRESSION_NONE}.
      */
     public CompressionFilter(final int compressionLevel) {
-        this(true, true, compressionLevel);
+        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE);
     }
 
     /**
@@ -132,10 +141,31 @@ public class CompressionFilter extends IoFilterAdapter {
      *                         {@link #COMPRESSION_MIN}, and
      *                         {@link #COMPRESSION_NONE}.
      */
-    public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, final int compressionLevel) {
+    public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, 
+            final int compressionLevel) {
+        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE);
+    }
+
+    /**
+     * Creates a new instance.
+     * <p>
+     * Use thgis constructor if you want to set a limit to the inflated buffer size.
+     *
+     * @param compressInbound <code>true</code> if data read is to be decompressed
+     * @param compressOutbound <code>true</code> if data written is to be compressed
+     * @param compressionLevel the level of compression to be used. Must
+     *                         be one of {@link #COMPRESSION_DEFAULT},
+     *                         {@link #COMPRESSION_MAX},
+     *                         {@link #COMPRESSION_MIN}, and
+     *                         {@link #COMPRESSION_NONE}.
+     * @param maxDecompressedSize The maximum size for a buffer when inflating some data
+     */
+    public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, 
+            final int compressionLevel, final int maxDecompressedSize) {
         this.compressionLevel = compressionLevel;
         this.compressInbound = compressInbound;
         this.compressOutbound = compressOutbound;
+        this.maxDecompressedSize = maxDecompressedSize;
     }
     
     /**
@@ -170,7 +200,10 @@ public class CompressionFilter extends IoFilterAdapter {
     }
     
     /*
-     * @see org.apache.mina.core.IoFilter#filterWrite(org.apache.mina.core.IoFilter.NextFilter, org.apache.mina.core.IoSession, org.apache.mina.core.IoFilter.WriteRequest)
+     * @see org.apache.mina.core.IoFilter#filterWrite(
+     *          org.apache.mina.core.IoFilter.NextFilter, 
+     *          org.apache.mina.core.IoSession, 
+     *          org.apache.mina.core.IoFilter.WriteRequest)
      */
     protected Object doFilterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest)
             throws IOException {
@@ -207,7 +240,7 @@ public class CompressionFilter extends IoFilterAdapter {
         }
 
         Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_DEFLATER);
-        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER);
+        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize);
 
         IoSession session = parent.getSession();
 
