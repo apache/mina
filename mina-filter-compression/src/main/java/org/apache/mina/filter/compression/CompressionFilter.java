@@ -104,16 +104,22 @@ public class CompressionFilter extends IoFilterAdapter {
     private boolean compressOutbound = true;
 
     private int compressionLevel;
-    
+
     /** The maximum decompressed size, to avoid an OOM. Default to 1Mb */
     private int maxDecompressedSize;
+
+    /** Maximum decompression ratio **/
+    private final long maxDecompressRatio;
+
+    /** Grace size before decompression ratio check is enforced **/
+    private final long decompressRatioMinSize;
 
     /**
      * Creates a new instance which compresses outboud data and decompresses
      * inbound data with default compression level.
      */
     public CompressionFilter() {
-        this(true, true, COMPRESSION_DEFAULT, Zlib.MAX_DECOMPRESSED_SIZE);
+        this(true, true, COMPRESSION_DEFAULT, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -127,7 +133,7 @@ public class CompressionFilter extends IoFilterAdapter {
      *                         {@link #COMPRESSION_NONE}.
      */
     public CompressionFilter(final int compressionLevel) {
-        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE);
+        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -143,7 +149,7 @@ public class CompressionFilter extends IoFilterAdapter {
      */
     public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, 
             final int compressionLevel) {
-        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE);
+        this(compressInbound, compressOutbound, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -159,15 +165,43 @@ public class CompressionFilter extends IoFilterAdapter {
      *                         {@link #COMPRESSION_MIN}, and
      *                         {@link #COMPRESSION_NONE}.
      * @param maxDecompressedSize The maximum size for a buffer when inflating some data
+     * @since 2.2.8
      */
-    public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, 
+    public CompressionFilter(final boolean compressInbound, final boolean compressOutbound,
             final int compressionLevel, final int maxDecompressedSize) {
+        this(compressInbound, compressOutbound, compressionLevel, maxDecompressedSize, Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
+    }
+
+    /**
+     * Creates a new instance with explicit zip-bomb protection parameters.
+     *
+     * @param compressInbound <code>true</code> if data read is to be decompressed
+     * @param compressOutbound <code>true</code> if data written is to be compressed
+     * @param compressionLevel the level of compression to be used. Must
+     *                         be one of {@link #COMPRESSION_DEFAULT},
+     *                         {@link #COMPRESSION_MAX},
+     *                         {@link #COMPRESSION_MIN}, and
+     *                         {@link #COMPRESSION_NONE}.
+     * @param maxDecompressedSize the maximum size for a buffer when inflating data
+     * @param maxDecompressRatio the maximum allowed cumulative ratio of
+     *                           decompressed to compressed bytes.
+     *                           A value &lt;= 0 disables the check.
+     * @param decompressRatioMinSize the minimum cumulative decompressed size
+     *                               below which the ratio check is skipped.
+     * @since 2.2.8
+     */
+    public CompressionFilter(final boolean compressInbound, final boolean compressOutbound,
+            final int compressionLevel, final int maxDecompressedSize,
+            final long maxDecompressRatio, final long decompressRatioMinSize) {
         this.compressionLevel = compressionLevel;
         this.compressInbound = compressInbound;
         this.compressOutbound = compressOutbound;
         this.maxDecompressedSize = maxDecompressedSize;
+        this.maxDecompressRatio = maxDecompressRatio;
+        this.decompressRatioMinSize = decompressRatioMinSize;
     }
-    
+
+
     /**
      * {@inheritDoc}
      */
@@ -239,8 +273,8 @@ public class CompressionFilter extends IoFilterAdapter {
             throw new IllegalStateException("Only one " + CompressionFilter.class + " is permitted.");
         }
 
-        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_DEFLATER);
-        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize);
+        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, maxDecompressRatio, decompressRatioMinSize);
+        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, maxDecompressRatio, decompressRatioMinSize);
 
         IoSession session = parent.getSession();
 
