@@ -108,12 +108,23 @@ public class CompressionFilter extends IoFilterAdapter {
     /** The maximum decompressed size, to avoid an OOM. Default to 1Mb */
     private int maxDecompressedSize;
 
+    /** Maximum decompression ratio **/
+    private long maxDecompressRatio;
+
+    public void setMaxDecompressRatio(long maxDecompressRatio) {
+        this.maxDecompressRatio = maxDecompressRatio;
+    }
+
+    /** Grace size before decompression ratio check is enforced **/
+    private long decompressRatioMinSize;
+
     /**
      * Creates a new instance which compresses outboud data and decompresses
      * inbound data with default compression level.
      */
     public CompressionFilter() {
-        this(true, true, COMPRESSION_DEFAULT, Zlib.MAX_DECOMPRESSED_SIZE);
+        this(true, true, COMPRESSION_DEFAULT, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, 
+                Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -127,7 +138,8 @@ public class CompressionFilter extends IoFilterAdapter {
      *                         {@link #COMPRESSION_NONE}.
      */
     public CompressionFilter(final int compressionLevel) {
-        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE);
+        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, 
+                Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -143,7 +155,8 @@ public class CompressionFilter extends IoFilterAdapter {
      */
     public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, 
             final int compressionLevel) {
-        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE);
+        this(compressInbound, compressOutbound, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE, 
+                Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -162,6 +175,31 @@ public class CompressionFilter extends IoFilterAdapter {
      */
     public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, 
             final int compressionLevel, final int maxDecompressedSize) {
+        this(compressInbound, compressOutbound, compressionLevel, maxDecompressedSize, Zlib.MAX_DECOMPRESS_RATIO, 
+                Zlib.DECOMPRESS_RATIO_MIN_SIZE);
+    }
+
+    /**
+     * Creates a new instance with explicit zip-bomb protection parameters.
+     *
+     * @param compressInbound <code>true</code> if data read is to be decompressed
+     * @param compressOutbound <code>true</code> if data written is to be compressed
+     * @param compressionLevel the level of compression to be used. Must
+     *                         be one of {@link #COMPRESSION_DEFAULT},
+     *                         {@link #COMPRESSION_MAX},
+     *                         {@link #COMPRESSION_MIN}, and
+     *                         {@link #COMPRESSION_NONE}.
+     * @param maxDecompressedSize the maximum size for a buffer when inflating data
+     * @param maxDecompressRatio the maximum allowed cumulative ratio of
+     *                           decompressed to compressed bytes.
+     *                           A value &lt;= 0 disables the check.
+     * @param decompressRatioMinSize the minimum cumulative decompressed size
+     *                               below which the ratio check is skipped.
+     * @since 2.2.8
+     */
+    public CompressionFilter(final boolean compressInbound, final boolean compressOutbound,
+            final int compressionLevel, final int maxDecompressedSize,
+            final long maxDecompressRatio, final long decompressRatioMinSize) {
         this.compressionLevel = compressionLevel;
         this.compressInbound = compressInbound;
         this.compressOutbound = compressOutbound;
@@ -239,8 +277,10 @@ public class CompressionFilter extends IoFilterAdapter {
             throw new IllegalStateException("Only one " + CompressionFilter.class + " is permitted.");
         }
 
-        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_DEFLATER);
-        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize);
+        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, 
+                maxDecompressRatio, decompressRatioMinSize);
+        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, 
+                maxDecompressRatio, decompressRatioMinSize);
 
         IoSession session = parent.getSession();
 
@@ -249,7 +289,49 @@ public class CompressionFilter extends IoFilterAdapter {
     }
 
     /**
-     * @return {@code true} if incoming data is being compressed.
+     * Set the compression level. On of:
+     * <ul>
+     *   <li>Zlib.COMPRESSION_DEFAULT (-1)</li>
+     *   <li>Zlib.COMPRESSION_NONE (0)</li>
+     *   <li>Zlib.COMPRESSION_MIN (1)</li>
+     *   <li>Zlib.COMPRESSION_MAX (9)</li>
+     * </ul>
+     * 
+     * @param compressionLevel The compression level to set
+     * @ The CompressionFilter instance
+     */
+    public CompressionFilter setCompressionLevel(int compressionLevel) {
+        this.compressionLevel = compressionLevel;
+        
+        return this;
+    }
+
+    /**
+     * Set The maximum decompressed size, to avoid an OOM. Default to 1Mb
+     *
+     * @param maxDecompressedSize The maximum decompressed size
+     * @return The CompressionFilter instance
+     */
+    public CompressionFilter setMaxDecompressedSize(int maxDecompressedSize) {
+        this.maxDecompressedSize = maxDecompressedSize;
+        
+        return this;
+    }
+
+    /**
+     * Grace size before decompression ratio check is enforced. Default to 1Mb?
+     *
+     * @param decompressRatioMinSize The maximum decompressed size before the ratio is checked
+     * @return The CompressionFilter instance
+     */
+    public CompressionFilter setDecompressRatioMinSize(long decompressRatioMinSize) {
+        this.decompressRatioMinSize = decompressRatioMinSize;
+        
+        return this;
+    }
+
+    /**
+     * @return <code>true</code> if incoming data is being compressed.
      */
     public boolean isCompressInbound() {
         return compressInbound;
