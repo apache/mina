@@ -111,10 +111,6 @@ public class CompressionFilter extends IoFilterAdapter {
     /** Maximum decompression ratio **/
     private long maxDecompressRatio;
 
-    public void setMaxDecompressRatio(long maxDecompressRatio) {
-        this.maxDecompressRatio = maxDecompressRatio;
-    }
-
     /** Grace size before decompression ratio check is enforced **/
     private long decompressRatioMinSize;
 
@@ -323,13 +319,27 @@ public class CompressionFilter extends IoFilterAdapter {
     }
 
     /**
-     * Grace size before decompression ratio check is enforced. Default to 1Mb?
+     * Grace size before decompression ratio check is enforced. Default to 1Mb.
      *
      * @param decompressRatioMinSize The maximum decompressed size before the ratio is checked
      * @return The CompressionFilter instance
      */
     public CompressionFilter setDecompressRatioMinSize(long decompressRatioMinSize) {
         this.decompressRatioMinSize = decompressRatioMinSize;
+        
+        return this;
+    }
+    
+    /**
+     * Set the max alloweed compression ratio. If the inflated buffer exceed this ratio,
+     * an error will be generated. Note that the  <code>decompressRatioMinSize</code> parameter
+     * can be used to avoid bailing out for small inflated files with a high compression ratio.
+     * 
+     * @param maxDecompressRatio The maximum allowed compression ratio. Defaults to 100.
+     * @return
+     */
+    public CompressionFilter setMaxDecompressRatio(long maxDecompressRatio) {
+        this.maxDecompressRatio = maxDecompressRatio;
         
         return this;
     }
