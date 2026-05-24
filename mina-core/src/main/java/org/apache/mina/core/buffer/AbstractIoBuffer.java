@@ -28,6 +28,7 @@ import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
+import java.lang.reflect.Proxy;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -2194,7 +2195,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         }
 
                         // Use initialize=false to prevent static block execution during class loading
-                        Class<?> clazz = Class.forName(className, true, classLoader);
+                        Class<?> clazz = Class.forName(className, false, classLoader);
 
                         return ObjectStreamClass.lookup(clazz);
 
@@ -2224,6 +2225,25 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 } catch (ClassNotFoundException ex) {
                     return super.resolveClass(desc);
                 }
+            }
+            
+            @Override
+            protected Class<?> resolveProxyClass(String[] interfaces) throws IOException, ClassNotFoundException {
+                Class<?>[] classes = new Class<?>[interfaces.length];
+                int i=0;
+
+                for (String interfaceName : interfaces) {
+                    if (!acceptMatchers.stream().anyMatch(m -> m.matches(interfaceName))) {
+                        throw new ClassNotFoundException("Interface not in accept list " + interfaceName);
+                    }
+                    
+                    // Use Class.forName(name, false, loader) — initialize=false — and load via
+                    // the configured classLoader, NOT latestUserDefinedLoader().
+                    classes[i++] = Class.forName(interfaceName, false, classLoader);
+                }
+                
+                
+                return Proxy.getProxyClass(classLoader, classes);
             }
         }) {
             return in.readObject();
