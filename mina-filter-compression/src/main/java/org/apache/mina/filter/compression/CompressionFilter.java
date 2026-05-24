@@ -109,17 +109,18 @@ public class CompressionFilter extends WriteRequestFilter {
     private int maxDecompressedSize;
 
     /** Maximum decompression ratio **/
-    private final long maxDecompressRatio;
+    private long maxDecompressRatio;
 
     /** Grace size before decompression ratio check is enforced **/
-    private final long decompressRatioMinSize;
+    private long decompressRatioMinSize;
 
     /**
      * Creates a new instance which compresses outboud data and decompresses
      * inbound data with default compression level.
      */
     public CompressionFilter() {
-        this(true, true, COMPRESSION_DEFAULT, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
+        this(true, true, COMPRESSION_DEFAULT, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, 
+                Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -133,7 +134,8 @@ public class CompressionFilter extends WriteRequestFilter {
      *                         {@link #COMPRESSION_NONE}.
      */
     public CompressionFilter(final int compressionLevel) {
-        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
+        this(true, true, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, 
+                Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -149,7 +151,8 @@ public class CompressionFilter extends WriteRequestFilter {
      */
     public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, 
             final int compressionLevel) {
-        this(compressInbound, compressOutbound, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE, Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
+        this(compressInbound, compressOutbound, compressionLevel, Zlib.MAX_DECOMPRESSED_SIZE, 
+                Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -169,7 +172,8 @@ public class CompressionFilter extends WriteRequestFilter {
      */
     public CompressionFilter(final boolean compressInbound, final boolean compressOutbound, 
             final int compressionLevel, final int maxDecompressedSize) {
-        this(compressInbound, compressOutbound, compressionLevel, maxDecompressedSize, Zlib.MAX_DECOMPRESS_RATIO, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
+        this(compressInbound, compressOutbound, compressionLevel, maxDecompressedSize, Zlib.MAX_DECOMPRESS_RATIO, 
+                Zlib.DECOMPRESS_RATIO_MIN_SIZE);
     }
 
     /**
@@ -257,8 +261,10 @@ public class CompressionFilter extends WriteRequestFilter {
             throw new IllegalStateException("Only one " + CompressionFilter.class + " is permitted.");
         }
 
-        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, maxDecompressRatio, decompressRatioMinSize);
-        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, maxDecompressRatio, decompressRatioMinSize);
+        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, 
+                maxDecompressRatio, decompressRatioMinSize);
+        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, 
+                maxDecompressRatio, decompressRatioMinSize);
 
         IoSession session = parent.getSession();
 
@@ -267,7 +273,49 @@ public class CompressionFilter extends WriteRequestFilter {
     }
 
     /**
-     * @return {@code true} if incoming data is being compressed.
+     * Set the compression level. On of:
+     * <ul>
+     *   <li>Zlib.COMPRESSION_DEFAULT (-1)</li>
+     *   <li>Zlib.COMPRESSION_NONE (0)</li>
+     *   <li>Zlib.COMPRESSION_MIN (1)</li>
+     *   <li>Zlib.COMPRESSION_MAX (9)</li>
+     * </ul>
+     * 
+     * @param compressionLevel The compression level to set
+     * @ The CompressionFilter instance
+     */
+    public CompressionFilter setCompressionLevel(int compressionLevel) {
+        this.compressionLevel = compressionLevel;
+        
+        return this;
+    }
+
+    /**
+     * Set The maximum decompressed size, to avoid an OOM. Default to 1Mb
+     *
+     * @param maxDecompressedSize The maximum decompressed size
+     * @return The CompressionFilter instance
+     */
+    public CompressionFilter setMaxDecompressedSize(int maxDecompressedSize) {
+        this.maxDecompressedSize = maxDecompressedSize;
+        
+        return this;
+    }
+
+    /**
+     * Grace size before decompression ratio check is enforced. Default to 1Mb.
+     *
+     * @param decompressRatioMinSize The maximum decompressed size before the ratio is checked
+     * @return The CompressionFilter instance
+     */
+    public CompressionFilter setDecompressRatioMinSize(long decompressRatioMinSize) {
+        this.decompressRatioMinSize = decompressRatioMinSize;
+        
+        return this;
+    }
+
+    /**
+     * @return <code>true</code> if incoming data is being compressed.
      */
     public boolean isCompressInbound() {
         return compressInbound;
@@ -280,6 +328,20 @@ public class CompressionFilter extends WriteRequestFilter {
      */
     public void setCompressInbound(boolean compressInbound) {
         this.compressInbound = compressInbound;
+    }
+    
+    /**
+     * Set the max alloweed compression ratio. If the inflated buffer exceed this ratio,
+     * an error will be generated. Note that the  <code>decompressRatioMinSize</code> parameter
+     * can be used to avoid bailing out for small inflated files with a high compression ratio.
+     * 
+     * @param maxDecompressRatio The maximum allowed compression ratio. Defaults to 100.
+     * @return
+     */
+    public CompressionFilter setMaxDecompressRatio(long maxDecompressRatio) {
+        this.maxDecompressRatio = maxDecompressRatio;
+        
+        return this;
     }
 
     /**
