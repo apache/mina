@@ -158,7 +158,7 @@ public class CompressionFilter extends IoFilterAdapter {
     /**
      * Creates a new instance.
      * <p>
-     * Use thgis constructor if you want to set a limit to the inflated buffer size.
+     * Use this constructor if you want to set a limit to the inflated buffer size.
      *
      * @param compressInbound <code>true</code> if data read is to be decompressed
      * @param compressOutbound <code>true</code> if data written is to be compressed
