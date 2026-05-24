@@ -21,10 +21,12 @@ package org.apache.mina.filter.compression;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.junit.Before;
@@ -42,6 +44,26 @@ public class ZlibTest {
     public void setUp() throws Exception {
         deflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER);
         inflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
+    }
+
+    private IoBuffer deflateZeros(int size) throws IOException {
+        try {
+            return new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER)
+                    .deflate(IoBuffer.wrap(new byte[size]));
+        } catch (Exception e) {
+            throw new AssertionError("failed to deflate test fixture", e);
+        }
+    }
+
+    private IoBuffer deflateRandom(int size) throws IOException {
+        try {
+            byte[] data = new byte[size];
+            new Random(0).nextBytes(data);
+            return new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER)
+                    .deflate(IoBuffer.wrap(data));
+        } catch (Exception e) {
+            throw new AssertionError("failed to deflate test fixture", e);
+        }
     }
 
     @Test
@@ -135,25 +157,23 @@ public class ZlibTest {
      *   <li>A 1MB buffer that once compressed should inflate properly
      *   <li>A 10MB buffer that once compressed should inflate properly
      *   <li>
-     * </ul> 
+     * </ul>
      * @throws Exception
      */
     @Test
     public void testZBombDataNoLimit() throws Exception {
-        // Create an inflater with no size limit
-        Zlib inflaterNoLimit = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
+        // Create an inflater with no size limit and the ratio check disabled
+        Zlib inflaterNoLimit = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER,
+                Zlib.MAX_DECOMPRESSED_SIZE, 0L, 0L);
 
         // Try a 10MB buffer bomb. Should succeed
-        byte[] uncompressed = new byte[1_024*1_024*10];
-        
-        IoBuffer byteInput = IoBuffer.wrap(uncompressed);
-        IoBuffer byteCompressed = deflater.deflate(byteInput);
-        
+        IoBuffer byteCompressed = deflateZeros(1_024 * 1_024 * 10);
+
         // Should be fine
         inflaterNoLimit.inflate(byteCompressed);
     }
 
-    
+
     /**
      * Test the inflater default limit.
      * We create buffers of various sizes:
@@ -161,29 +181,118 @@ public class ZlibTest {
      *   <li>A 1MB Buffer that once compressed should inflate properly
      *   <li>A 1MB+1byte buffer that once compressed should generate an exception when inflated
      *   <li>
-     * </ul> 
+     * </ul>
      * @throws Exception
      */
-    @Test(expected=IOException.class)
+    @Test
     public void testZBombData() throws Exception {
-        // Create an inflater with a 1Mb size limit
-        Zlib inflaterWithLimit = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER, 1_024*1_024);
+        // Create an inflater with a 1Mb size limit and the ratio check disabled
+        // so this test stays focused on the size limit.
+        Zlib inflaterWithLimit = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER, 1_024*1_024, 0L, 0L);
 
-        // Try a 1MB buffer bomb. Should succeed
-        byte[] uncompressed = new byte[1_024*1_024];
-        
-        IoBuffer byteInput = IoBuffer.wrap(uncompressed);
-        IoBuffer byteCompressed = deflater.deflate(byteInput);
-        
-        // Should be fine
-        inflaterWithLimit.inflate(byteCompressed);
-        
-        // Now try with a 1Mb +1 byte buffer
-        uncompressed = new byte[1_024*1_024+1];
-        byteInput = IoBuffer.wrap(uncompressed);
-        byteCompressed = deflater.deflate(byteInput);
-        
-        // Should now fail and throw a IoException
-        inflaterWithLimit.inflate(byteCompressed);  
+        // Both inputs are fed to the same inflater as a continuous zlib
+        // stream, so use the shared deflater rather than the fresh-stream
+        // deflateZeros() helper.
+
+        // Right at the size limit: should succeed.
+        inflaterWithLimit.inflate(deflater.deflate(IoBuffer.wrap(new byte[1_024 * 1_024])));
+
+        // One byte over the size limit: should throw.
+        IoBuffer overLimit = deflater.deflate(IoBuffer.wrap(new byte[1_024 * 1_024 + 1]));
+        assertThrows(IOException.class, () -> inflaterWithLimit.inflate(overLimit));
+    }
+
+
+    /**
+     * A highly compressible payload that exceeds both the default ratio (100)
+     * and the default ratio min-size threshold should be rejected by the
+     * inflater.
+     */
+    @Test
+    public void testDecompressRatioExceeded() throws Exception {
+        // 64KiB of zeros compresses to well under 64KiB/100 bytes.
+        int size = 64 * 1_024;
+        IoBuffer byteCompressed = deflateZeros(size);
+        int compressedSize = byteCompressed.remaining();
+        long actualCompressRatio = size / compressedSize;
+
+        // Inflater configured one ratio step below the actual payload's
+        // ratio: the inflate call must throw.
+        Zlib inflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER, Zlib.MAX_DECOMPRESSED_SIZE, actualCompressRatio - 1, 0L);
+        assertThrows(IOException.class, () -> inflater.inflate(byteCompressed));
+    }
+
+
+    /**
+     * The ratio check must not fire while the cumulative decompressed size is
+     * below the configured min-size threshold.
+     */
+    @Test
+    public void testDecompressRatioBelowMinSize() throws Exception {
+        int size = 1_024 * 1_024;
+        IoBuffer byteCompressed = deflateZeros(size);
+
+        // Ratio of 100 would normally trip on this payload; raise the min-size
+        // threshold above the payload so the check is skipped.
+        Zlib inflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER, Zlib.MAX_DECOMPRESSED_SIZE, 1L, size);
+        inflater.inflate(byteCompressed);
+    }
+
+
+    /**
+     * The ratio check is cumulative across multiple inflate() calls on the
+     * same stream, so a bomb cannot bypass it by being split into small
+     * fragments.
+     */
+    @Test
+    public void testDecompressRatioCumulative() throws Exception {
+        Zlib inflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER, Zlib.MAX_DECOMPRESSED_SIZE, 1L, Zlib.DECOMPRESS_RATIO_MIN_SIZE);
+
+        // Below the min-size gate
+        int chunkSize = (int) Zlib.DECOMPRESS_RATIO_MIN_SIZE;
+        inflater.inflate(deflater.deflate(IoBuffer.wrap(new byte[chunkSize])));
+
+        // Exceeds the min-size gate
+        IoBuffer second = deflater.deflate(IoBuffer.wrap(new byte[chunkSize]));
+        assertThrows(IOException.class, () -> inflater.inflate(second));
+    }
+
+
+    /**
+     * An empty input buffer produces no decompressed output, so the ratio
+     * check must not fire even with a pathologically tight max ratio of 1
+     * and the min-size gate wide open.
+     */
+    @Test
+    public void testInflateEmptyBuffer() throws Exception {
+        Zlib inflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER, Zlib.MAX_DECOMPRESSED_SIZE, 1L, 0L);
+        inflater.inflate(IoBuffer.allocate(0));
+    }
+
+
+    /**
+     * The default-constructor inflater must apply the documented defaults
+     * (max ratio = 100, min-size gate = 1 MiB). Three legs:
+     * <ul>
+     *   <li>Small + high ratio: zeros below the gate — must succeed (catches a min-size drop).</li>
+     *   <li>Large + low ratio: pseudo-random bytes above the gate — must succeed (catches an unintended max-ratio bump).</li>
+     *   <li>Large + high ratio: cumulative zeros above the gate — must throw (catches either default being effectively disabled).</li>
+     * </ul>
+     */
+    @Test
+    public void testDefaults() throws Exception {
+        // Leg 1: small + high ratio. Below the 1 MiB gate, check is skipped.
+        Zlib smallHighRatio = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
+        smallHighRatio.inflate(deflateZeros(512 * 1_024));
+
+        // Leg 2: large + low ratio. Above the gate, but ratio ≈ 1 << 100.
+        Zlib largeLowRatio = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
+        largeLowRatio.inflate(deflateRandom(2 * 1_024 * 1_024));
+
+        // Leg 3: large + high ratio. Above the gate, ratio >> 100, throws.
+        Zlib largeHighRatio = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);
+        IoBuffer bomb = deflateZeros(2 * 1_024 * 1_024);
+        assertThrows(IOException.class, () -> largeHighRatio.inflate(bomb));
     }
 }
+

@@ -327,7 +327,7 @@ public class CompressionFilter extends IoFilterAdapter {
     }
     
     /**
-     * Set the max alloweed compression ratio. If the inflated buffer exceed this ratio,
+     * Set the max allowed compression ratio. If the inflated buffer exceed this ratio,
      * an error will be generated. Note that the  <code>decompressRatioMinSize</code> parameter
      * can be used to avoid bailing out for small inflated files with a high compression ratio.
      * 

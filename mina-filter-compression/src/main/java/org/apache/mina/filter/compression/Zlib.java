@@ -59,8 +59,27 @@ class Zlib {
     /* Package protected */ 
     static final int MAX_DECOMPRESSED_SIZE = Integer.MAX_VALUE;
 
+    /**
+     * Default maximum decompression ratio (decompressed / compressed).
+     */
+    /* Package protected */
+    static final long MAX_DECOMPRESS_RATIO = 100L;
+
+    /**
+     * Grace size before decompression ratio check is enforced.
+     *
+     * <p>Below this threshold the check is skipped to avoid false positives on small payloads where framing/header
+     * overhead dominates the ratio.</p>
+     */
+    /* Package protected */
+    static final long DECOMPRESS_RATIO_MIN_SIZE = 1024L * 1024L;
+
     private int maxDecompressedSize = MAX_DECOMPRESSED_SIZE;
 
+    private long maxDecompressRatio = MAX_DECOMPRESS_RATIO;
+
+    private long decompressRatioMinSize = DECOMPRESS_RATIO_MIN_SIZE;
+ 
     /** The inner stream used to inflate or deflate the data */
     private ZStream zStream = null;
 
@@ -78,32 +97,7 @@ class Zlib {
      * @throws IllegalArgumentException if the mode is incorrect
      */
     public Zlib(int compressionLevel, int mode) {
-        switch (compressionLevel) {
-            case COMPRESSION_MAX:
-            case COMPRESSION_MIN:
-            case COMPRESSION_NONE:
-            case COMPRESSION_DEFAULT:
-                this.compressionLevel = compressionLevel;
-                break;
-            default:
-                throw new IllegalArgumentException("invalid compression level specified");
-        }
-
-        // create a new instance of ZStream. This will be done only once.
-        zStream = new ZStream();
-
-        switch (mode) {
-            case MODE_DEFLATER:
-                zStream.deflateInit(this.compressionLevel);
-                break;
-            case MODE_INFLATER:
-                zStream.inflateInit();
-                break;
-            default:
-                throw new IllegalArgumentException("invalid mode specified");
-        }
-
-        this.mode = mode;
+        this(compressionLevel, mode, MAX_DECOMPRESSED_SIZE, MAX_DECOMPRESS_RATIO, DECOMPRESS_RATIO_MIN_SIZE);
     }
     
 
@@ -115,10 +109,16 @@ class Zlib {
      * <code>COMPRESSION_NONE</code> or <code>COMPRESSION_DEFAULT</code>
      * @param mode the mode in which the instance will operate. Can be either
      * of <code>MODE_DEFLATER</code> or <code>MODE_INFLATER</code>
-     * @param maxDecompressedSize The maximum inflation size for a buffer. Default to 1MB
+     * @param maxDecompressedSize the maximum inflation size for a buffer
+     * @param maxDecompressRatio the maximum allowed ratio of decompressed to
+     * compressed bytes, evaluated cumulatively over the lifetime of this
+     * inflater. A value &lt;= 0 disables the check.
+     * @param decompressRatioMinSize the minimum cumulative decompressed size
+     * (in bytes) below which the ratio check is skipped.
      * @throws IllegalArgumentException if the mode is incorrect
      */
-    public Zlib(int compressionLevel, int mode, int maxDecompressedSize) {
+    public Zlib(int compressionLevel, int mode, int maxDecompressedSize,
+            long maxDecompressRatio, long decompressRatioMinSize) {
         switch (compressionLevel) {
             case COMPRESSION_MAX:
             case COMPRESSION_MIN:
@@ -139,6 +139,8 @@ class Zlib {
                 break;
             case MODE_INFLATER:
                 this.maxDecompressedSize = maxDecompressedSize;
+                this.maxDecompressRatio = maxDecompressRatio;
+                this.decompressRatioMinSize = decompressRatioMinSize;
                 zStream.inflateInit();
                 break;
             default:
@@ -193,7 +195,9 @@ class Zlib {
                         if (outBuffer.position() + zStream.next_out_index > maxDecompressedSize) {
                             throw new IOException("decompressed size exceeds max " + maxDecompressedSize);
                         }
-                        
+                       
+                        checkDecompressRatio();
+ 
                         // need more space for output. store current output and get more
                         outBuffer.put(outBytes, 0, zStream.next_out_index);
                         zStream.next_out_index = 0;
@@ -259,6 +263,22 @@ class Zlib {
             cleanUp();
             
             return outBuf;
+        }
+    }
+
+    /**
+     * Checks the cumulative decompression ratio against the configured maximum.
+     *
+     * @throws IOException if the cumulative ratio exceeds {@code maxDecompressRatio}
+     */
+    private void checkDecompressRatio() throws IOException {
+        if (maxDecompressRatio <= 0L) {
+            return;
+        }
+        long totalOut = zStream.getTotalOut();
+        long totalIn = zStream.getTotalIn();
+        if (totalIn > 0L && totalOut > decompressRatioMinSize && totalOut / totalIn > maxDecompressRatio) {
+            throw new IOException("decompression ratio " + (totalOut / totalIn) + " exceeds max " + maxDecompressRatio);
         }
     }
 
