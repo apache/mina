@@ -158,7 +158,7 @@ public class CompressionFilter extends WriteRequestFilter {
     /**
      * Creates a new instance.
      * <p>
-     * Use thgis constructor if you want to set a limit to the inflated buffer size.
+     * Use this constructor if you want to set a limit to the inflated buffer size.
      *
      * @param compressInbound <code>true</code> if data read is to be decompressed
      * @param compressOutbound <code>true</code> if data written is to be compressed
@@ -331,7 +331,7 @@ public class CompressionFilter extends WriteRequestFilter {
     }
     
     /**
-     * Set the max alloweed compression ratio. If the inflated buffer exceed this ratio,
+     * Set the max allowed compression ratio. If the inflated buffer exceed this ratio,
      * an error will be generated. Note that the  <code>decompressRatioMinSize</code> parameter
      * can be used to avoid bailing out for small inflated files with a high compression ratio.
      * 
