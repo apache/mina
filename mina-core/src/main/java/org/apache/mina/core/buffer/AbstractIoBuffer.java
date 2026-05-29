@@ -2237,13 +2237,13 @@ public abstract class AbstractIoBuffer extends IoBuffer {
 
                 if (clazz.isArray() || clazz.isPrimitive() || !Serializable.class.isAssignableFrom(clazz)) {
                     write(0);
-                    super.writeClassDescriptor(desc);
                 } else {
                     // Serializable class
                     write(1);
                     writeUTF(desc.getName());
-                    super.writeClassDescriptor(desc);
                 }
+
+                super.writeClassDescriptor(desc);
             }
         }) {
             out.writeObject(o);
