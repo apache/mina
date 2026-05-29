@@ -298,7 +298,7 @@ public class CompressionFilter extends IoFilterAdapter {
      * </ul>
      * 
      * @param compressionLevel The compression level to set
-     * @ The CompressionFilter instance
+     * @return The CompressionFilter instance
      */
     public CompressionFilter setCompressionLevel(int compressionLevel) {
         this.compressionLevel = compressionLevel;
@@ -336,7 +336,7 @@ public class CompressionFilter extends IoFilterAdapter {
      * can be used to avoid bailing out for small inflated files with a high compression ratio.
      * 
      * @param maxDecompressRatio The maximum allowed compression ratio. Defaults to 100.
-     * @return
+     * @return The CompressionFilter instance
      */
     public CompressionFilter setMaxDecompressRatio(long maxDecompressRatio) {
         this.maxDecompressRatio = maxDecompressRatio;
@@ -361,6 +361,8 @@ public class CompressionFilter extends IoFilterAdapter {
     }
 
     /**
+     * Tell if if the filter compress the data
+     *
      * @return <code>true</code> if the filter is compressing data being written.
      */
     public boolean isCompressOutbound() {
