@@ -2191,9 +2191,7 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                         }
 
                         // Use initialize=false to prevent static block execution during class loading
-                        Class<?> clazz = Class.forName(className, true, classLoader);
-
-                        return ObjectStreamClass.lookup(clazz);
+                        return super.readClassDescriptor();
 
                     default:
                         throw new StreamCorruptedException("Unexpected class descriptor type: " + type);
@@ -2246,12 +2244,14 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                     
                     if (clazz.isArray() || clazz.isPrimitive() || !Serializable.class.isAssignableFrom(clazz)) {
                         write(0);
-                        super.writeClassDescriptor(desc); 
                     } else {
                         // Serializable class
                         write(1);
-                        writeUTF(desc.getName());                            
+                        writeUTF(desc.getName());
                     }
+                    
+                    super.writeClassDescriptor(desc);
+
                 }
             }) {
             out.writeObject(o);
