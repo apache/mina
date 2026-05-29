@@ -142,20 +142,15 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         // If we have a session buffer, append data to that; otherwise
         // use the buffer read from the network directly.
         if (buf != null) {
-            boolean appended = false;
             // Make sure that the buffer is auto-expanded.
             if (buf.isAutoExpand()) {
                 try {
                     buf.put(in);
-                    appended = true;
+                    buf.flip();
                 } catch (IllegalStateException | IndexOutOfBoundsException e) {
                     // A user called derivation method (e.g. slice()),
                     // which disables auto-expansion of the parent buffer.
                 }
-            }
-
-            if (appended) {
-                buf.flip();
             } else {
                 // Reallocate the buffer if append operation failed due to
                 // derivation or disabled auto-expansion.
@@ -231,18 +226,14 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      */
     @Override
     public void dispose(IoSession session) throws Exception {
-        IoBuffer oldBuf = (IoBuffer) session.removeAttribute(BUFFER);
-        
-        if (oldBuf != null) {
-            oldBuf.free();
-        }
+        removeSessionBuffer(session);
     }
 
     private void removeSessionBuffer(IoSession session) {
-        IoBuffer oldBuf = (IoBuffer) session.getAttribute(BUFFER);
+        IoBuffer buf = (IoBuffer) session.removeAttribute(BUFFER);
         
-        if (oldBuf != null) {
-            oldBuf.free();
+        if (buf != null) {
+            buf.free();
         }
     }
 
@@ -252,11 +243,7 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         remainingBuf.order(buf.order());
         remainingBuf.put(buf);
 
-        IoBuffer oldBuf = (IoBuffer) session.removeAttribute(BUFFER);
-        
-        if (oldBuf != null) {
-            oldBuf.free();
-        }
+        removeSessionBuffer(session);
         
         session.setAttribute(BUFFER, remainingBuf);
     }

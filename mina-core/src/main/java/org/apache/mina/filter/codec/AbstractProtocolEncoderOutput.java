@@ -88,13 +88,14 @@ public abstract class AbstractProtocolEncoderOutput implements ProtocolEncoderOu
         for (Object b : messageQueue) {
             sum += ((IoBuffer) b).remaining();
         }
-
+        
         // Allocate a new BB that will contain all fragments
         IoBuffer newBuf = IoBuffer.allocate(sum);
 
         // and merge all.
         for (;;) {
             IoBuffer buf = (IoBuffer) messageQueue.poll();
+            
             if (buf == null) {
                 break;
             }
