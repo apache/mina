@@ -64,33 +64,35 @@ public class ConnectionThrottleFilter extends IoFilterAdapter {
     private class ExpiredSessionThread extends Thread {
         public void run() {
 
-            try {
-                // Wait for the delay to be expired
-                Thread.sleep(allowedInterval);
-            } catch (InterruptedException e) {
-                // We have been interrupted, get out of the loop.
-                return;
-            }
-
-            // now, remove all the sessions that have been created
-            // before the delay
-            long currentTime = System.currentTimeMillis();
-
-            lock.lock();
-
-            try {
-                Iterator<String> sessions = clients.keySet().iterator();
-
-                while (sessions.hasNext()) {
-                    String session = sessions.next();
-                    long creationTime = clients.get(session);
-
-                    if (creationTime + allowedInterval < currentTime) {
-                        clients.remove(session);
-                    }
+            while(true) {
+                try {
+                    // Wait for the delay to be expired
+                    Thread.sleep(allowedInterval);
+                } catch (InterruptedException e) {
+                    // We have been interrupted, get out of the loop.
+                    return;
                 }
-            } finally {
-                lock.unlock();
+    
+                // now, remove all the sessions that have been created
+                // before the delay
+                long currentTime = System.currentTimeMillis();
+    
+                lock.lock();
+    
+                try {
+                    Iterator<String> sessions = clients.keySet().iterator();
+    
+                    while (sessions.hasNext()) {
+                        String session = sessions.next();
+                        long creationTime = clients.get(session);
+    
+                        if (creationTime + allowedInterval < currentTime) {
+                            clients.remove(session);
+                        }
+                    }
+                } finally {
+                    lock.unlock();
+                }
             }
         }
     }
