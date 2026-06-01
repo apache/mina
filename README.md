@@ -64,6 +64,6 @@ You are done...
 
 ## Code convention
 
-Like it or not, we follow the ancient Sun's standard Java convention. Not tabs, 4 spaces instead. Please respect this convezntion, it saves the committers a lot of time when merging PRs.
+Like it or not, we follow the ancient Sun's standard Java convention. Not tabs, 4 spaces instead. Please respect this convention, it saves the committers a lot of time when merging PRs.
 
 
