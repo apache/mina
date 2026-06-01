@@ -1,4 +1,4 @@
-# Apache MINAa developer guide
+# Apache MINAdeveloper guide
 
 This document gathers the minimal information about how to build the project.
 
@@ -13,6 +13,8 @@ We have 3 branches:
 * 2.2.X, The latest version
 * 2.1.X 
 * 2.0.X
+
+NOTE: The trunk is a dead branch!
 
 The following example shows how to get the current stable branch (2.2.X).
 
