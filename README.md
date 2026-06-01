@@ -20,8 +20,7 @@
 
 This document gathers the minimal information about how to build the project.
 
-All the detailed information can be found in the (MINA Developer Guide page)[https://mina.apache.org/mina-project/developer-g
-uide.html]
+All the detailed information can be found in the (MINA Developer Guide page)[https://mina.apache.org/mina-project/developer-guide.html]
 
 ## Building MINA
 
@@ -59,13 +58,12 @@ It's as simple as typing:
 $ mvn clean install [-Pserial]
 ```
 
-(The '-Pserial' flag is optional. It's onlt use if you want to generate the code using the LGPL rxtx library).
+(The '-Pserial' flag is optional. It's only useful if you want to generate the code using the LGPL rxtx library).
 
 You are done...
 
 ## Code convention
 
-Like it or not, we follow the ancient Sun's standard Java convention. Not tabs, 4 spaces instead. Please respect this convezn
-tion, it saves the committers a lot of time when merging PRs.
+Like it or not, we follow the ancient Sun's standard Java convention. Not tabs, 4 spaces instead. Please respect this convention, it saves the committers a lot of time when merging PRs.
 
 
