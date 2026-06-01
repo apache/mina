@@ -35,15 +35,14 @@ import org.junit.Test;
  */
 public class SubnetIPv6Test {
 
-    // Test Data
-    private static final String TEST_V6ADDRESS = "1080:0:0:0:8:800:200C:417A";
-
     @Test
     public void testIPv6() throws UnknownHostException {
-        InetAddress a = InetAddress.getByName(TEST_V6ADDRESS);
-
-        assertTrue(a instanceof Inet6Address);
-
-        new Subnet(a, 24);
+        
+        Subnet subnet = new Subnet(InetAddress.getByName("2001:db8::"), 32);
+        assertTrue(!subnet.inSubnet(InetAddress.getByName("2001:db7:ffff:ffff:ffff:ffff:ffff:ffff")));
+        assertTrue(!subnet.inSubnet(InetAddress.getByName("2001:db9::")));
+        assertTrue(subnet.inSubnet(InetAddress.getByName("2001:db8::1")));
+        assertTrue(subnet.inSubnet(InetAddress.getByName("2001:db8:ffff:ffff:ffff:ffff:ffff:ffff")));
+        
     }
 }
