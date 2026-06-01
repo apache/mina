@@ -58,7 +58,7 @@ It's as simple as typing:
 $ mvn clean install [-Pserial]
 ```
 
-(The '-Pserial' flag is optional. It's onlt use if you want to generate the code using the LGPL rxtx library).
+(The '-Pserial' flag is optional. It's only useful if you want to generate the code using the LGPL rxtx library).
 
 You are done...
 
