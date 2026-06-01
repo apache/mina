@@ -18,8 +18,10 @@ NOTE: The trunk is a dead branch!
 
 The following example shows how to get the current stable branch (2.2.X).
 
+```
 $ git clone -b 2.2.X https://gitbox.apache.org/repos/asf/mina.git mina-2.2.X
 $ cd mina-2.2.X
+```
 
 ## Prerequisites
 
