@@ -1,4 +1,4 @@
-# Apache MINAdeveloper guide
+# Apache MINA developer guide
 
 This document gathers the minimal information about how to build the project.
 
