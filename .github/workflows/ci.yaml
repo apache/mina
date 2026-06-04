@@ -34,9 +34,6 @@ jobs:
           - os: macos-latest
             java-version: 8
             distribution: zulu
-          - os: macos-latest
-            java-version: 11
-            distribution: temurin
       fail-fast: false
     name: Test JDK ${{ matrix.java-version }}, ${{ matrix.os }}
 
