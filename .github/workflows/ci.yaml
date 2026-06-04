@@ -67,6 +67,7 @@ jobs:
         shell: bash
         run: |
           mvn verify \
+          -Pserial \
           --show-version --batch-mode --errors --no-transfer-progress
 
       # Upload the test results, even when the build failed.
