@@ -1,26 +1,71 @@
----
+# SPDX-License-Identifier: Apache-2.0
 name: Java CI
 
-on: [push]
+on:
+  # Build only the production branches on push, so internal feature branches do not trigger a build twice (once on push, once on the pull request).
+  push:
+    # Restricts push builds to these branches, even if the workflow is copied to another branch.
+    branches:
+      - 2.0.X
+      - 2.1.X
+      - 2.2.X
+  # Build every pull request targeting the branch this workflow lives on.
+  pull_request:
+
+# Permissions are granted per job.
+permissions: { }
+
+# Check all pushes to production branches, but interrupt a PR job if a new commit is pushed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, macOS-latest, windows-2016]
-        java: [7, 8, 11, 17, 20]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java-version: [17, 21, 25]
+        distribution: [temurin]
       fail-fast: false
-      max-parallel: 4
-    name: Test JDK ${{ matrix.java }}, ${{ matrix.os }}
+    name: Test JDK ${{ matrix.java-version }}, ${{ matrix.os }}
 
+    # Actions from the `actions` and `github` organizations are pinned to a major version tag rather than a commit SHA.
+    # This is a deliberate decision:
+    #
+    # - Those organizations have strong expertise in securing GitHub Actions.
+    # - A compromise of either organization would likely also compromise the GitHub Actions service itself, so pinning would not help.
+    # - These actions release frequently.
+    #
+    # The residual risk is deemed acceptable in exchange for less Dependabot churn across the maintained branches.
     steps:
-      - uses: actions/checkout@v1
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java }}
-      - name: Test with Maven
-        run: mvn test -B --file pom.xml
 
-...
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          # Don't persist the GitHub token used to check out the repository.
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: ${{ matrix.distribution }}
+          cache: maven
+
+      - name: Test with Maven
+        run: |
+          mvn verify \
+          --show-version --batch-mode --errors --no-transfer-progress
+
+      # Upload the test results, even when the build failed.
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: "test-report-${{matrix.os}}-${{matrix.distribution}}-${{matrix.java-version}}-${{github.run_number}}-${{github.run_attempt}}"
+          # Don't warn or fail when no tests ran (e.g. a compilation failure).
+          if-no-files-found: ignore
+          path: |
+            **/target/surefire-reports
