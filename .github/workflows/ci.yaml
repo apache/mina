@@ -26,7 +26,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        java-version: [8, 11]
+        # Enforce Java 8 only, branches 2.0.X and 2.1.X won't build with any other versions
+        java-version: [8]
         distribution: [temurin]
         include:
           # There is no Temurin JDK 8 release for macOS ARM.
