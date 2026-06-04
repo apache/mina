@@ -55,6 +55,7 @@ jobs:
           cache: maven
 
       - name: Test with Maven
+        shell: bash
         run: |
           mvn verify \
           --show-version --batch-mode --errors --no-transfer-progress
