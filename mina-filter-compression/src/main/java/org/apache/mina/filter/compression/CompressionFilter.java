@@ -273,9 +273,9 @@ public class CompressionFilter extends IoFilterAdapter {
             throw new IllegalStateException("Only one " + CompressionFilter.class + " is permitted.");
         }
 
-        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, 
+        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_DEFLATER, maxDecompressedSize,
                 maxDecompressRatio, decompressRatioMinSize);
-        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, 
+        Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize,
                 maxDecompressRatio, decompressRatioMinSize);
 
         IoSession session = parent.getSession();
