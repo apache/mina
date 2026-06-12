@@ -23,6 +23,8 @@ concurrency:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    # Prevent runaway builds from running until the 6-hour GitHub default.
+    timeout-minutes: 30
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
