@@ -345,6 +345,8 @@ public class CompressionFilter extends IoFilterAdapter {
     }
 
     /**
+     * Tells if the incoming data is being compressed or not
+     * 
      * @return <code>true</code> if incoming data is being compressed.
      */
     public boolean isCompressInbound() {
