@@ -149,6 +149,7 @@
     <!-- Jars -->
     <!-- This version of easymock can't be upgraded -->
     <version.easymock>2.5.2</version.easymock>
+    <version.mockito>4.11.0</version.mockito>
     <version.jboss.javassist>3.8.0.GA</version.jboss.javassist>
     <version.jdom>1.0</version.jdom>
     <version.jmock>1.2.0</version.jmock>
@@ -313,6 +314,14 @@
         <groupId>jmock</groupId>
         <artifactId>jmock</artifactId>
         <version>${version.jmock}</version>
+        <optional>true</optional>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${version.mockito}</version>
         <optional>true</optional>
         <scope>test</scope>
       </dependency>

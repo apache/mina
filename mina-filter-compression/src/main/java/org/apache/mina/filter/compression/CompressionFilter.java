@@ -261,8 +261,7 @@ public class CompressionFilter extends WriteRequestFilter {
             throw new IllegalStateException("Only one " + CompressionFilter.class + " is permitted.");
         }
 
-        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, 
-                maxDecompressRatio, decompressRatioMinSize);
+        Zlib deflater = new Zlib(compressionLevel, Zlib.MODE_DEFLATER);
         Zlib inflater = new Zlib(compressionLevel, Zlib.MODE_INFLATER, maxDecompressedSize, 
                 maxDecompressRatio, decompressRatioMinSize);
 
