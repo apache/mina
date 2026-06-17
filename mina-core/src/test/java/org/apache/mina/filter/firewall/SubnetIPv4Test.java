@@ -30,7 +30,6 @@ import java.net.UnknownHostException;
 import org.junit.Test;
 
 /**
- * TODO Add documentation
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
