@@ -28,6 +28,7 @@ import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
+import java.lang.reflect.Proxy;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -2212,6 +2213,29 @@ public abstract class AbstractIoBuffer extends IoBuffer {
                 } catch (ClassNotFoundException ex) {
                     return super.resolveClass(desc);
                 }
+            }
+            
+            @Override
+            protected Class<?> resolveProxyClass(String[] interfaces) throws IOException, ClassNotFoundException {
+                Class<?>[] classes = new Class<?>[interfaces.length];
+                int i = 0;
+
+                for (String interfaceName : interfaces) {
+                    // Apply the acceptMatchers filter to EVERY proxy interface name before
+                    // any Class.forName() call. The JDK default resolveProxyClass() bypasses
+                    // resolveClass()/readClassDescriptor() entirely, so without this override
+                    // an attacker can deserialize a java.lang.reflect.Proxy implementing
+                    // arbitrary interfaces regardless of the configured allow-list.
+                    if (!acceptMatchers.stream().anyMatch(m -> m.matches(interfaceName))) {
+                        throw new ClassNotFoundException("Interface not in accept list " + interfaceName);
+                    }
+
+                    // Use Class.forName(name, false, loader) - initialize=false - and load via
+                    // the configured classLoader, NOT latestUserDefinedLoader().
+                    classes[i++] = Class.forName(interfaceName, false, classLoader);
+                }
+
+                return Proxy.getProxyClass(classLoader, classes);
             }
         }) {
             return in.readObject();
