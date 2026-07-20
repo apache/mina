@@ -137,7 +137,7 @@ public class SslFilter extends IoFilterAdapter {
     /** An attribute containing the next filter */
     private static final AttributeKey NEXT_FILTER = new AttributeKey(SslFilter.class, "nextFilter");
 
-    private static final AttributeKey SSL_HANDLER = new AttributeKey(SslFilter.class, "handler");
+    static final AttributeKey SSL_HANDLER = new AttributeKey(SslFilter.class, "handler");
 
     /** The SslContext used */
     /* No qualifier */final SSLContext sslContext;
@@ -335,6 +335,58 @@ public class SslFilter extends IoFilterAdapter {
         return future;
     }
 
+   	/**
+   	 * Marks the handler as CCC being enabled
+   	 *
+   	 * @param session
+   	 *            the {@link IoSession} to initiate TLS closure
+     *
+     * @throws IllegalArgumentException
+     *             if this filter is not managing the specified session
+   	 */
+   	public void enableCCC(IoSession session) {
+   		SslHandler handler = getSslSessionHandler(session);
+   		handler.setCCCEnabled(true);
+   	}
+
+    /**
+  	 * Stops the SSL filter handling of messages, but does not send a
+  	 * CLOSE_NOTIFY to the client. This basically disables the filter and
+  	 * proceeds with passing through the messages assumed to be plain text. This
+  	 * is added to support clients that do not wish to honor the close_notify
+  	 * negotiation.
+  	 *
+  	 * @param session
+  	 *            the {@link IoSession} to initiate TLS closure
+  	 * @throws IllegalArgumentException
+  	 *             if this filter is not managing the specified session
+  	 */
+  	public void stopSslWithoutCloseNotify(IoSession session) {
+  		SslHandler handler = getSslSessionHandler(session);
+  		handler.setDisabled(true);
+  	}
+
+  	/**
+  	 * Similar to the isSslStarted() method, however this will additionally
+  	 * check to see if the handler is disabled, which can happen when ssl is
+  	 * disabled without sending a CLOSE_NOTIFY
+  	 *
+  	 * @param session
+  	 *            the SSL session to check
+  	 * @return whether or not ssl is currently active
+  	 */
+  	public boolean isSslActive(IoSession session) {
+  		SslHandler handler = (SslHandler) session.getAttribute(SSL_HANDLER);
+
+  		if (handler == null) {
+  			return false;
+  		}
+
+  		synchronized (handler) {
+  			return !handler.isOutboundDone() && !handler.isDisabled();
+  		}
+  	}
+
     /**
      * @return <code>true</code> if the engine is set to use client mode
      * when handshaking.
@@ -520,62 +572,63 @@ public class SslFilter extends IoFilterAdapter {
         SslHandler sslHandler = getSslSessionHandler(session);
         AtomicBoolean canPushMessage = new AtomicBoolean( false );
         
-        // The SslHandler instance is *guaranteed* to nit be null here
+        // The SslHandler instance is *guaranteed* to not be null here
+        synchronized (sslHandler.getCccLock()) {
+            synchronized (sslHandler) {
+                if ((sslHandler.isOutboundDone() && sslHandler.isInboundDone()) || sslHandler.isDisabled()) {
+                    // We aren't handshaking here. Let's push the message to the next filter
 
-        synchronized (sslHandler) {
-            if (sslHandler.isOutboundDone() && sslHandler.isInboundDone()) {
-                // We aren't handshaking here. Let's push the message to the next filter
-                
-                // Note: we can push the message to the queue immediately, 
-                // but don't do so in the synchronized block. We use a protected
-                // flag to do so.
-                canPushMessage.set( true );
-            } else {
-                canPushMessage.set( false );
-                IoBuffer buf = (IoBuffer) message;
-                
-                try {
-                    if (sslHandler.isOutboundDone()) {
-                        sslHandler.destroy();
-                        throw new SSLException("Outbound done");
-                    }
-                
-                    // forward read encrypted data to SSL handler
-                    sslHandler.messageReceived(nextFilter, buf.buf());
-                    
-                    // Handle data to be forwarded to application or written to net
-                    handleSslData(nextFilter, sslHandler);
-                    
-                    if (sslHandler.isInboundDone()) {
-                        if (sslHandler.isOutboundDone()) {
+                    // Note: we can push the message to the queue immediately,
+                    // but don't do so in the synchronized block. We use a protected
+                    // flag to do so.
+                    canPushMessage.set( true );
+                } else {
+                    canPushMessage.set( false );
+                    IoBuffer buf = (IoBuffer) message;
+
+                    try {
+                        if (sslHandler.isOutboundDone() && !sslHandler.isCCCEnabled()) {
                             sslHandler.destroy();
+                            throw new SSLException("Outbound done");
+                        }
+
+                        // forward read encrypted data to SSL handler
+                        sslHandler.messageReceived(nextFilter, buf.buf());
+
+                        // Handle data to be forwarded to application or written to net
+                        handleSslData(nextFilter, sslHandler);
+
+                        if (sslHandler.isInboundDone()) {
+                            if (sslHandler.isOutboundDone()) {
+                                sslHandler.destroy();
+                            } else {
+                                initiateClosure(nextFilter, session);
+                            }
+
+                            if (buf.hasRemaining()) {
+                                // Forward the data received after closure.
+                                sslHandler.scheduleMessageReceived(nextFilter, buf);
+                            }
+                        }
+                    } catch (SSLException ssle) {
+                        if (!sslHandler.isHandshakeComplete()) {
+                            SSLException newSsle = new SSLHandshakeException("SSL handshake failed.");
+                            newSsle.initCause(ssle);
+                            ssle = newSsle;
+
+                            // Close the session immediately, the handshake has failed
+                            session.closeNow();
                         } else {
-                            initiateClosure(nextFilter, session);
+                            // Free the SSL Handler buffers
+                            sslHandler.release();
                         }
-                    
-                        if (buf.hasRemaining()) {
-                            // Forward the data received after closure.
-                            sslHandler.scheduleMessageReceived(nextFilter, buf);
-                        }
+
+                        throw ssle;
                     }
-                } catch (SSLException ssle) {
-                    if (!sslHandler.isHandshakeComplete()) {
-                        SSLException newSsle = new SSLHandshakeException("SSL handshake failed.");
-                        newSsle.initCause(ssle);
-                        ssle = newSsle;
-            
-                        // Close the session immediately, the handshake has failed
-                        session.closeNow();
-                    } else {
-                        // Free the SSL Handler buffers
-                        sslHandler.release();
-                    }
-                
-                    throw ssle;
                 }
             }
         }
-    
+
         if (canPushMessage.get()) {
             nextFilter.messageReceived(session, message);
         } else {
@@ -672,6 +725,9 @@ public class SslFilter extends IoFilterAdapter {
                     // Remove the marker attribute because it is temporary.
                     session.removeAttribute(DISABLE_ENCRYPTION_ONCE);
                     sslHandler.scheduleFilterWrite(nextFilter, writeRequest);
+            	}
+            	else if(sslHandler.isDisabled()) {
+            		sslHandler.scheduleFilterWrite(nextFilter,writeRequest);
                 } else {
                     // Otherwise, encrypt the buffer.
                     IoBuffer buf = (IoBuffer) writeRequest.getMessage();
@@ -722,12 +778,7 @@ public class SslFilter extends IoFilterAdapter {
             synchronized (sslHandler) {
                 if (isSslStarted(session)) {
                     future = initiateClosure(nextFilter, session);
-                    future.addListener(new IoFutureListener<IoFuture>() {
-                        @Override
-                        public void operationComplete(IoFuture future) {
-                            nextFilter.filterClose(session);
-                        }
-                    });
+                    future.addListener(future1 -> nextFilter.filterClose(session));
                 }
                 sslHandler.flushFilterWrite();
             }
@@ -890,7 +941,7 @@ public class SslFilter extends IoFilterAdapter {
         private final IoBuffer encryptedMessage;
         
         // The original message
-        private WriteRequest parentRequest;
+        private final WriteRequest parentRequest;
 
         /**
          * Create a new instance of an EncryptedWriteRequest
@@ -926,4 +977,17 @@ public class SslFilter extends IoFilterAdapter {
             return parentRequest.getFuture();
         }
     }
+
+  	/**
+  	 * Returns the ccc lock from the underlying ssl handler for synchronizing
+  	 * ccc logic when proper ssl termination is bypassed
+  	 *
+  	 * @param session
+  	 *            the iosession
+  	 * @return the object to lock on
+  	 */
+  	public Object getCccLock(IoSession session) {
+  		SslHandler handler = getSslSessionHandler(session);
+  		return handler.getCccLock();
+  	}
 }
