@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package org.apache.mina.filter.ssl;
+package org.apache.mina.example.chat;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
