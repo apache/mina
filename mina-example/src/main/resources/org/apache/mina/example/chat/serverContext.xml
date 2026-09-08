@@ -46,7 +46,7 @@
 
   <bean id="keyStore" factory-bean="keystoreFactory" factory-method="newInstance"/>
 
-  <bean id="bogusTrustManagerFactory" class="org.apache.mina.filter.ssl.BogusTrustManagerFactory"/>
+  <bean id="bogusTrustManagerFactory" class="org.apache.mina.example.chat.BogusTrustManagerFactory"/>
   
   <!-- SSLContext to be used -->
   <bean id="sslContextFactory"  class="org.apache.mina.filter.ssl.SslContextFactory">
