@@ -354,7 +354,7 @@ public class SslFilter extends IoFilterAdapter {
         SSLEngine sslEngine;
         
         if (addr != null) { 
-            sslEngine = sslContext.createSSLEngine(addr.getHostName(), addr.getPort());
+            sslEngine = sslContext.createSSLEngine(addr.getHostString(), addr.getPort());
         } else {
             sslEngine =  sslContext.createSSLEngine();
         }
