@@ -51,6 +51,9 @@ public class HttpServerDecoder implements ProtocolDecoder {
 
     /** Key for the number of bytes remaining to read for completing the body */
     private static final String BODY_REMAINING_BYTES = "http.brb";
+    
+    /** Regex to parse raw headers and body */
+    public static final byte[] RAW_VALUE_BYTES = { 0x0d, 0x0a, 0x0d, 0x0a };
 
     /** Regex to parse HttpRequest Request Line */
     public static final Pattern REQUEST_LINE_PATTERN = Pattern.compile(" ");
@@ -196,16 +199,16 @@ public class HttpServerDecoder implements ProtocolDecoder {
     }
 
     private HttpRequestImpl parseHttpRequestHead(ByteBuffer buffer) {
-        String raw = new String(buffer.array(), buffer.position(), buffer.remaining());
-        String[] headersAndBody = RAW_VALUE_PATTERN.split(raw, -1);
-
-        if (headersAndBody.length <= 1) {
+        int foundEndHeaders = ArrayIndexOf(buffer.array(), RAW_VALUE_BYTES, buffer.position(), buffer.limit());
+    
+        if (foundEndHeaders < 0) {
             // we didn't receive the full HTTP head
             return null;
         }
 
-        String[] headerFields = HEADERS_BODY_PATTERN.split(headersAndBody[0]);
-        headerFields = ArrayUtil.dropFromEndWhile(headerFields, "");
+        String headers = new String(buffer.array(), buffer.position(), foundEndHeaders);
+        
+        String[] headerFields = HEADERS_BODY_PATTERN.split(headers);
 
         String requestLine = headerFields[0];
         Map<String, String> generalHeaders = new HashMap<>();
@@ -228,8 +231,34 @@ public class HttpServerDecoder implements ProtocolDecoder {
         String queryString = pathFrags.length == 2 ? pathFrags[1] : "";
 
         // we put the buffer position where we found the beginning of the HTTP body
-        buffer.position(headersAndBody[0].length() + 4);
+        buffer.position(foundEndHeaders + 4);
 
         return new HttpRequestImpl(version, method, requestedPath, queryString, generalHeaders);
+    }
+
+    /**
+     * Find the index of a byte sequence instead a larger byte sequence
+     */
+    private static int ArrayIndexOf(byte[] haystack, byte[] needle, int startIndex, int limit) {
+        if (needle.length == 0) {
+            return 0;
+        }
+
+        for (int i = startIndex; i <= limit - needle.length; i++) {
+            boolean match = true;
+
+            for (int j = 0; j < needle.length; j++) {
+                if (haystack[i + j] != needle[j]) {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

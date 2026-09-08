@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Queue;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -35,6 +36,8 @@ import org.apache.mina.filter.codec.AbstractProtocolDecoderOutput;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpRequest;
+import org.apache.mina.proxy.utils.StringUtilities;
+import org.junit.After;
 import org.junit.Test;
 
 public class HttpServerDecoderTest {
@@ -102,6 +105,14 @@ public class HttpServerDecoderTest {
         }
 
         return out;
+    }
+    
+    /**
+     * Be sure to clean the session to get back in NEW state
+     */
+    @After
+    public void shutdown() {
+        session.removeAttribute(DECODER_STATE_ATT);
     }
 
     @Test
@@ -325,6 +336,23 @@ public class HttpServerDecoderTest {
         HttpRequest request = (HttpRequest) out.getQueue().poll();
         assertEquals("localhost", request.getHeader("host"));
         assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
-        session.removeAttribute(DECODER_STATE_ATT); // This test leaves session in HEAD state, crashing following test
+        //session.removeAttribute(DECODER_STATE_ATT); // This test leaves session in HEAD state, crashing following test
+    }
+
+    @Test
+    public void multtiByteContentDoesNotBreakFraming() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.0\r\nMyHeader: éééééééé\r\nHost: localhost\r\n\r\n", 
+                Charset.forName("UTF-8").newEncoder());
+        buffer.rewind();
+        while (buffer.hasRemaining()) {
+            decoder.decode(session, buffer, out);
+        }
+        assertEquals(2, out.getQueue().size());
+        HttpRequest request = (HttpRequest) out.getQueue().poll();
+        assertEquals("localhost", request.getHeader("host"));
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+        //session.removeAttribute(DECODER_STATE_ATT); // This test leaves session in HEAD state, crashing following test
     }
 }
