@@ -172,20 +172,37 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
             usingSessionBuffer = false;
         }
 
-        for (;;) {
-            int oldPos = buf.position();
-            boolean decoded = doDecode(session, buf, out);
-            if (decoded) {
-                if (buf.position() == oldPos) {
-                    throw new IllegalStateException("doDecode() can't return true when buffer is not consumed.");
-                }
-
-                if (!buf.hasRemaining()) {
+        try { 
+            for (;;) {
+                int oldPos = buf.position();
+                boolean decoded = doDecode(session, buf, out);
+                if (decoded) {
+                    if (buf.position() == oldPos) {
+                        throw new IllegalStateException("doDecode() can't return true when buffer is not consumed.");
+                    }
+    
+                    if (!buf.hasRemaining()) {
+                        break;
+                    }
+                } else {
                     break;
                 }
-            } else {
-                break;
             }
+        } catch (Exception | Error e) {
+            // doDecode() threw: the cumulative buffer is still flipped in
+            // read mode, with the messages decoded (and delivered) by the
+            // earlier iterations before its position. If we left it stored
+            // in the session, the next decode() call would append new data
+            // at the current position and flip the buffer again, re-reading
+            // - and re-delivering to the handler - those already-consumed
+            // messages. A decoding error may cost the accumulated remainder,
+            // but it must never replay consumed input, so discard the buffer
+            // before propagating the exception.
+            if (usingSessionBuffer) {
+                removeSessionBuffer(session);
+            }
+
+            throw e;
         }
 
         // if there is any data left that cannot be decoded, we store

@@ -143,6 +143,49 @@ public class CumulativeProtocolDecoderTest {
         }
     }
 
+    @Test
+    public void testDecoderExceptionDiscardsSessionBuffer() throws Exception {
+        FaultyIntegerDecoder faultyDecoder = new FaultyIntegerDecoder();
+
+        // First chunk: an incomplete integer, stored in the session buffer.
+        buf.putShort((short) 0);
+        buf.flip();
+        faultyDecoder.decode(session, buf, session.getDecoderOutput());
+        assertEquals(0, session.getDecoderOutputQueue().size());
+
+        // Second chunk: completes integer 1 (decoded and delivered), then
+        // the poisoned integer 0xBAD that makes doDecode() throw after the
+        // first message was already delivered.
+        buf.clear();
+        buf.putShort((short) 1);
+        buf.putInt(0xBAD);
+        buf.flip();
+
+        try {
+            faultyDecoder.decode(session, buf, session.getDecoderOutput());
+            fail("The poisoned integer should have made the decoder throw");
+        } catch (ProtocolDecoderException e) {
+            // OK
+        }
+
+        assertEquals(1, session.getDecoderOutputQueue().size());
+        assertEquals(1, session.getDecoderOutputQueue().poll());
+
+        // Further data must NOT re-deliver integer 1: the cumulative buffer
+        // was left flipped by the exception and must have been discarded,
+        // not replayed on the next decode.
+        buf.clear();
+        buf.putInt(7);
+        buf.flip();
+        faultyDecoder.decode(session, buf, session.getDecoderOutput());
+
+        assertEquals(1, session.getDecoderOutputQueue().size());
+        assertEquals(7, session.getDecoderOutputQueue().poll());
+
+        faultyDecoder.dispose(session);
+    }
+
+
     private static class IntegerDecoder extends CumulativeProtocolDecoder {
         /**
          * Default constructor
@@ -160,6 +203,31 @@ public class CumulativeProtocolDecoderTest {
             }
 
             out.write(new Integer(in.getInt()));
+            return true;
+        }
+    }
+
+    private static class FaultyIntegerDecoder extends CumulativeProtocolDecoder {
+        /**
+         * Default constructor
+         */
+        public FaultyIntegerDecoder() {
+            super();
+        }
+
+        @Override
+        protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+            if (in.remaining() < 4) {
+                return false;
+            }
+
+            int value = in.getInt();
+
+            if (value == 0xBAD) {
+                throw new ProtocolDecoderException("poisoned integer");
+            }
+
+            out.write(value);
             return true;
         }
     }
