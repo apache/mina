@@ -23,6 +23,9 @@ concurrency:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    # Tests normally finish in 2-4 minutes; cap the job so a hung/deadlocked test fails fast
+    # instead of running until the 6-hour GitHub default.
+    timeout-minutes: 15
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
