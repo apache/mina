@@ -95,6 +95,8 @@ public class SslFilterScheduledWriteMessagesTest {
                 assertEquals(0, connectorSession.getWrittenMessages());
                 assertEquals(0, acceptorSession.getScheduledWriteMessages());
                 assertEquals(0, connectorSession.getScheduledWriteMessages());
+                assertEquals(0, acceptorSession.getScheduledWriteBytes());
+                assertEquals(0, connectorSession.getScheduledWriteBytes());
                 assertEquals(0, acceptorIoHandler.sentMessageCount);
                 assertEquals(0, connectionIoHandler.sentMessageCount);
 
@@ -107,6 +109,8 @@ public class SslFilterScheduledWriteMessagesTest {
                 assertEquals(1, connectorSession.getWrittenMessages());
                 assertEquals(0, acceptorSession.getScheduledWriteMessages());
                 assertEquals(0, connectorSession.getScheduledWriteMessages());
+                assertEquals(0, acceptorSession.getScheduledWriteBytes());
+                assertEquals(0, connectorSession.getScheduledWriteBytes());
                 assertEquals(0, acceptorIoHandler.sentMessageCount);
                 assertEquals(1, connectionIoHandler.sentMessageCount);
 
@@ -119,6 +123,8 @@ public class SslFilterScheduledWriteMessagesTest {
                 assertEquals(1, connectorSession.getWrittenMessages());
                 assertEquals(0, acceptorSession.getScheduledWriteMessages());
                 assertEquals(0, connectorSession.getScheduledWriteMessages());
+                assertEquals(0, acceptorSession.getScheduledWriteBytes());
+                assertEquals(0, connectorSession.getScheduledWriteBytes());
                 assertEquals(1, acceptorIoHandler.sentMessageCount);
                 assertEquals(1, connectionIoHandler.sentMessageCount);
             } finally {
@@ -152,6 +158,8 @@ public class SslFilterScheduledWriteMessagesTest {
                 assertEquals(0, connectorSession.getWrittenMessages());
                 assertEquals(0, acceptorSession.getScheduledWriteMessages());
                 assertEquals(0, connectorSession.getScheduledWriteMessages());
+                assertEquals(0, acceptorSession.getScheduledWriteBytes());
+                assertEquals(0, connectorSession.getScheduledWriteBytes());
                 assertEquals(0, acceptorIoHandler.sentMessageCount);
                 assertEquals(0, connectionIoHandler.sentMessageCount);
 
@@ -164,6 +172,8 @@ public class SslFilterScheduledWriteMessagesTest {
                 assertEquals(1, connectorSession.getWrittenMessages());
                 assertEquals(0, acceptorSession.getScheduledWriteMessages());
                 assertEquals(0, connectorSession.getScheduledWriteMessages());
+                assertEquals(0, acceptorSession.getScheduledWriteBytes());
+                assertEquals(0, connectorSession.getScheduledWriteBytes());
                 assertEquals(0, acceptorIoHandler.sentMessageCount);
                 assertEquals(1, connectionIoHandler.sentMessageCount);
 
@@ -176,6 +186,8 @@ public class SslFilterScheduledWriteMessagesTest {
                 assertEquals(1, connectorSession.getWrittenMessages());
                 assertEquals(0, acceptorSession.getScheduledWriteMessages());
                 assertEquals(0, connectorSession.getScheduledWriteMessages());
+                assertEquals(0, acceptorSession.getScheduledWriteBytes());
+                assertEquals(0, connectorSession.getScheduledWriteBytes());
                 assertEquals(1, acceptorIoHandler.sentMessageCount);
                 assertEquals(1, connectionIoHandler.sentMessageCount);
             } finally {
