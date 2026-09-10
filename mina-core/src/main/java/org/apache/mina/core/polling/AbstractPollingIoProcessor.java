@@ -414,7 +414,6 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
     @Override
     public final void remove(S session) {
         LOG.debug( "Session {} has to be removed", session );
-        new Throwable().printStackTrace();
         scheduleRemove(session);
         startupProcessor();
     }
