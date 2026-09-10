@@ -455,12 +455,11 @@ public class SslFilter extends IoFilterAdapter {
                 }
             }
             
-            EncryptedWriteRequest encryptedWriteRequest = EncryptedWriteRequest.class.cast(request);
             SslHandler sslHandler = getSslHandler(session);
             sslHandler.ack(next, request);
             
-            if (encryptedWriteRequest.getOriginalRequest() != encryptedWriteRequest) {
-                next.messageSent(session, encryptedWriteRequest.getOriginalRequest());
+            if (request.getOriginalRequest() != request) {
+                next.messageSent(session, request.getOriginalRequest());
             }
         } else {
             super.messageSent(next, session, request);

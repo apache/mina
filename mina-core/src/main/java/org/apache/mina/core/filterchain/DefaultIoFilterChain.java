@@ -36,6 +36,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestQueue;
 import org.apache.mina.filter.FilterEvent;
+import org.apache.mina.filter.ssl.EncryptedWriteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -904,8 +905,11 @@ public class DefaultIoFilterChain implements IoFilterChain {
                 }
             }
 
-            s.increaseScheduledWriteMessages();
-
+            if (!(writeRequest instanceof EncryptedWriteRequest) || writeRequest.getOriginalRequest() != writeRequest) {
+                // do not increase the counter for encrypted SSL-related messages
+                s.increaseScheduledWriteMessages();
+            }
+            
             WriteRequestQueue writeRequestQueue = s.getWriteRequestQueue();
 
             if (!s.isWriteSuspended()) {

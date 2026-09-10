@@ -413,13 +413,13 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      */
     @Override
     public final void remove(S session) {
-        LOG.debug( "Session {} has to be removed", session );
+        //LOG.debug( "Session {} has to be removed", session );
         scheduleRemove(session);
         startupProcessor();
     }
 
     private void scheduleRemove(S session) {
-        LOG.debug( "Session {} scheduled to be removed", session );
+        //LOG.debug( "Session {} scheduled to be removed", session );
         if (!removingSessions.contains(session)) {
             removingSessions.add(session);
         }
@@ -1137,7 +1137,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
         }
 
         private boolean removeNow(S session) {
-            LOG.debug( "RemoveNow requested for session {}", session );
+            //LOG.debug( "RemoveNow requested for session {}", session );
             clearWriteRequestQueue(session);
 
             try {

@@ -130,14 +130,14 @@ public class SslFilterTest {
         */
 
         socket.close();
+
         while (acceptor.getManagedSessions().size() != 0) {
             Thread.sleep(100);
         }
 
-        // System.out.println("handler: " + handler.sentMessages);
         assertEquals("handler should have sent 1 messages:", 1, handler.sentMessages.size());
+        assertEquals("All scheduled write messages should be cleared", 0, acceptor.getScheduledWriteMessages());
         assertTrue(handler.sentMessages.contains("test-1"));
-        //assertTrue(handler.sentMessages.contains("test-2"));
     }
 
     private int writeMessage(Socket socket, String message) throws Exception {
@@ -148,7 +148,7 @@ public class SslFilterTest {
 
     private Socket getClientSocket(boolean ssl) throws Exception {
         if (ssl) {
-            SSLContext ctx = SSLContext.getInstance("TLS");
+            SSLContext ctx = SSLContext.getInstance("TLSv1.3");
             ctx.init(null, trustManagers, null);
             return ctx.getSocketFactory().createSocket("localhost", port);
         }
@@ -172,10 +172,6 @@ public class SslFilterTest {
         @Override
         public void messageSent(IoSession session, Object message) throws Exception {
             sentMessages.add(message.toString());
-
-            if (sentMessages.size() >= 2) {
-                session.closeNow();
-            }
         }
     }
 
