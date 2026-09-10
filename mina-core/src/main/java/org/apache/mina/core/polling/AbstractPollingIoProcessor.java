@@ -413,11 +413,14 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
      */
     @Override
     public final void remove(S session) {
+        LOG.debug( "Session {} has to be removed", session );
+        new Throwable().printStackTrace();
         scheduleRemove(session);
         startupProcessor();
     }
 
     private void scheduleRemove(S session) {
+        LOG.debug( "Session {} scheduled to be removed", session );
         if (!removingSessions.contains(session)) {
             removingSessions.add(session);
         }
@@ -560,6 +563,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 (!(e instanceof PortUnreachableException)
                         || !AbstractDatagramSessionConfig.class.isAssignableFrom(config.getClass())
                         || ((AbstractDatagramSessionConfig) config).isCloseOnPortUnreachable())) {
+                LOG.error("Exception occured while trying to read, closing session: {}", e.getMessage());
                 scheduleRemove(session);
             }
 
@@ -696,6 +700,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                     // Disconnect all sessions immediately if disposal has been
                     // requested so that we exit this loop eventually.
                     if (isDisposing()) {
+                        LOG.debug( "Disposing sessions");
                         boolean hasKeys = false;
 
                         for (Iterator<S> i = allSessions(); i.hasNext();) {
@@ -927,6 +932,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                             scheduleFlush(session);
                         }
                     } catch (Exception e) {
+                        LOG.error("Exception '{}' occured while trying to flush, closing session {}", e.getMessage(), session);
                         scheduleRemove(session);
                         session.closeNow();
                         IoFilterChain filterChain = session.getFilterChain();
@@ -1110,6 +1116,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
                 } catch (IOException ioe) {
                     // We have had an issue while trying to send data to the
                     // peer : let's close the session.
+                    LOG.error( "Error '{}' while trying to write on session {}", ioe.getMessage(), session);
                     buf.free();
                     session.closeNow();
                     this.removeNow(session);
@@ -1131,6 +1138,7 @@ public abstract class AbstractPollingIoProcessor<S extends AbstractIoSession> im
         }
 
         private boolean removeNow(S session) {
+            LOG.debug( "RemoveNow requested for session {}", session );
             clearWriteRequestQueue(session);
 
             try {
