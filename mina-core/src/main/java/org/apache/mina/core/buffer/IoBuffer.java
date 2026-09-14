@@ -1711,6 +1711,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
     /**
      * Reads a Java object from the buffer using the context {@link ClassLoader} of
      * the current thread.
+     * <p>
+     * See {@link #putObject(Object)} for how the serialized form differs
+     * across MINA versions.
      * 
      * @return The read Object
      * @throws ClassNotFoundException thrown when we can't find the Class to use
@@ -1719,6 +1722,9 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * Reads a Java object from the buffer using the specified <code>classLoader</code>.
+     * <p>
+     * See {@link #putObject(Object)} for how the serialized form differs
+     * across MINA versions.
      * 
      * @param classLoader The classLoader to use to read an Object from the IoBuffer
      * @return The read Object
@@ -1728,6 +1734,12 @@ public abstract class IoBuffer implements Comparable<IoBuffer> {
 
     /**
      * Writes the specified Java object to the buffer.
+     * <p>
+     * The serialized form of Serializable objects changed in MINA 2.2.8, as
+     * part of the CVE-2026-47065 fix: a stream produced by MINA 2.2.7 or
+     * earlier cannot be read by MINA 2.2.8 or later, and a stream produced by
+     * MINA 2.2.8 or later cannot be read by MINA 2.2.7 or earlier. Arrays and
+     * primitives are not affected.
      * 
      * @param o The Object to write in the IoBuffer
      * @return The modified IoBuffer
