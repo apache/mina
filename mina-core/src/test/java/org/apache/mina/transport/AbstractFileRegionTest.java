@@ -69,6 +69,7 @@ public abstract class AbstractFileRegionTest {
         try {
             acceptor.setHandler(new IoHandlerAdapter() {
                 private int index = 0;
+                private ByteBuffer localBuffer = ByteBuffer.allocate(0);
 
                 @Override
                 public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
@@ -79,8 +80,14 @@ public abstract class AbstractFileRegionTest {
                 @Override
                 public void messageReceived(IoSession session, Object message) throws Exception {
                     IoBuffer buffer = (IoBuffer) message;
-                    while (buffer.hasRemaining()) {
-                        int x = buffer.getInt();
+
+                    // copy message to the local buffer (expand if necessary)
+                    localBuffer.compact();
+                    localBuffer = copy(buffer.buf(), localBuffer);
+                    localBuffer.flip();
+
+                    while (localBuffer.remaining() >= 4) {
+                        int x = localBuffer.getInt();
                         if (x != index) {
                             throw new Exception(String.format("Integer at %d was %d but should have been %d", index, x,
                                     index));
@@ -136,6 +143,34 @@ public abstract class AbstractFileRegionTest {
                 acceptor.dispose();
             }
         }
+    }
+
+    /**
+     * Copies the remaining bytes of {@code src} into {@code dst}, growing the destination buffer first if it doesn't
+     * have enough remaining capacity to hold them.
+     * <p>
+     * The {@code src} buffer's position, limit, and mark are not modified. The {@code dst} buffer's position is
+     * advanced by the number of bytes copied; if the buffer was grown, a new {@link ByteBuffer} instance is returned
+     * (the original {@code dst} reference becomes stale and must not be used further).
+     */
+    public static ByteBuffer copy(ByteBuffer src, ByteBuffer dst) {
+        if (dst.remaining() < src.remaining()) {
+            int newCapacity = dst.position() + src.remaining();
+            ByteBuffer newDst = dst.isDirect() ? ByteBuffer.allocateDirect(newCapacity) : ByteBuffer.allocate(newCapacity);
+            newDst.order(dst.order());
+
+            for (int i = 0; i < dst.position(); i++) {
+                newDst.put(dst.get(i));
+            }
+
+            dst = newDst;
+        }
+
+        for (int i = src.position(); i < src.limit(); i++) {
+            dst.put(src.get(i));
+        }
+
+        return dst;
     }
 
     private File createLargeFile() throws IOException {
