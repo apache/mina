@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -40,6 +41,7 @@ import javax.net.ssl.TrustManagerFactory;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
 import java.security.Security;
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -74,21 +76,24 @@ public class SslIdentificationAlgorithmTest {
     private int port;
     private CountDownLatch handshakeDone;
     
-    private class CustomSslFilter extends SslFilter {
+    private static class CustomSslFilter extends SslFilter {
         public CustomSslFilter(SSLContext sslContext) {
             super(sslContext);
         }
         
         protected SSLEngine createEngine(IoSession session, InetSocketAddress addr) {
             //Add your SNI host name and port in the IOSession
-            String sniHostNames = (String)session.getAttribute( "SNIHostNames" );
+            String sniHostName = (String)session.getAttribute( "SNIHostNames" );
             int portNumber = (int)session.getAttribute( "PortNumber");
-            InetSocketAddress peer = new InetSocketAddress( sniHostNames, portNumber);
-            
+
             SSLEngine sslEngine;
-            
-            if (addr != null) {
+
+            if (addr != null && sniHostName != null) {
+                // Use createUnresolved to avoid blocking DNS lookup on the I/O thread
+                InetSocketAddress peer = InetSocketAddress.createUnresolved(sniHostName, portNumber);
                 sslEngine = sslContext.createSSLEngine(peer.getHostName(), peer.getPort());
+            } else if (addr != null) {
+                sslEngine = sslContext.createSSLEngine(addr.getHostString(), addr.getPort());
             } else {
                 sslEngine = sslContext.createSSLEngine();
             }
@@ -120,6 +125,13 @@ public class SslIdentificationAlgorithmTest {
            }
 
            sslEngine.setUseClientMode(!session.isServer());
+
+            // Explicitly set the SNI extension so the server receives the correct hostname
+            if (sniHostName != null && !session.isServer()) {
+                SSLParameters sslParameters = sslEngine.getSSLParameters();
+                sslParameters.setServerNames(Collections.singletonList(new SNIHostName(sniHostName)));
+                sslEngine.setSSLParameters(sslParameters);
+            }
            
            return sslEngine;
        }
@@ -229,7 +241,7 @@ public class SslIdentificationAlgorithmTest {
         acceptor.setReuseAddress(true);
 
         SslFilter sslFilter = new SslFilter(sslContext);
-        sslFilter.setEnabledProtocols(new String[] {"TLSv1.2"});
+        sslFilter.setEnabledProtocols("TLSv1.2");
 
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
         filters.addLast("ssl", sslFilter);
@@ -271,7 +283,7 @@ public class SslIdentificationAlgorithmTest {
         };
 
         sslFilter.setEndpointIdentificationAlgorithm("HTTPS");
-        sslFilter.setEnabledProtocols(new String[] {"TLSv1.2"});
+        sslFilter.setEnabledProtocols("TLSv1.2");
 
         DefaultIoFilterChainBuilder filters = connector.getFilterChain();
         filters.addLast("ssl", sslFilter);
