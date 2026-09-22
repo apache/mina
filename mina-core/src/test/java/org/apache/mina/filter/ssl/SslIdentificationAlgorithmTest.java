@@ -31,6 +31,8 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SNIHostName;
@@ -41,7 +43,9 @@ import javax.net.ssl.TrustManagerFactory;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
 import java.security.Security;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -59,6 +63,7 @@ import static org.junit.Assert.assertTrue;
  * client-san-ext.truststore    - keystore with trusted certificate
  * </pre>
  */
+@RunWith(Parameterized.class)
 public class SslIdentificationAlgorithmTest {
 
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
@@ -73,9 +78,19 @@ public class SslIdentificationAlgorithmTest {
         KEY_MANAGER_FACTORY_ALGORITHM = algorithm;
     }
 
+    @Parameterized.Parameters(name = "{0}")
+    public static List<Object[]> getParameters() {
+        return Arrays.asList(new Object[][]{{"TLSv1.2"}, {"TLSv1.3"}});
+    }
+
+    private final String enabledProtocol;
     private int port;
     private CountDownLatch handshakeDone;
-    
+
+    public SslIdentificationAlgorithmTest(String enabledProtocol) {
+        this.enabledProtocol = enabledProtocol;
+    }
+
     private static class CustomSslFilter extends SslFilter {
         public CustomSslFilter(SSLContext sslContext) {
             super(sslContext);
@@ -241,7 +256,7 @@ public class SslIdentificationAlgorithmTest {
         acceptor.setReuseAddress(true);
 
         SslFilter sslFilter = new SslFilter(sslContext);
-        sslFilter.setEnabledProtocols("TLSv1.2");
+        sslFilter.setEnabledProtocols(enabledProtocol);
 
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
         filters.addLast("ssl", sslFilter);
@@ -283,7 +298,7 @@ public class SslIdentificationAlgorithmTest {
         };
 
         sslFilter.setEndpointIdentificationAlgorithm("HTTPS");
-        sslFilter.setEnabledProtocols("TLSv1.2");
+        sslFilter.setEnabledProtocols(enabledProtocol);
 
         DefaultIoFilterChainBuilder filters = connector.getFilterChain();
         filters.addLast("ssl", sslFilter);
@@ -322,7 +337,7 @@ public class SslIdentificationAlgorithmTest {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(KEY_MANAGER_FACTORY_ALGORITHM);
         tmf.init(trustStore);
 
-        SSLContext ctx = SSLContext.getInstance("TLSv1.2");
+        SSLContext ctx = SSLContext.getInstance(enabledProtocol);
         ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
         return ctx;
