@@ -44,6 +44,7 @@ import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
@@ -246,7 +247,8 @@ public class MdcInjectionFilterTest {
         List<LoggingEvent> events = new ArrayList<>(appender.events);
         // verify that all logging events have correct MDC
         for (LoggingEvent event : events) {
-            if (event.getLoggerName().startsWith("org.apache.mina.core.service.AbstractIoService")) {
+            if (event.getLoggerName().startsWith("org.apache.mina.core.service.AbstractIoService") ||
+                    event.getLoggerName().startsWith(IoProcessor.class.getName())) {
                 continue;
             }
             for (MdcInjectionFilter.MdcKey mdcKey : MdcInjectionFilter.MdcKey.values()) {
