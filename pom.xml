@@ -25,7 +25,7 @@
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
     <version>9</version>
-  </parent>
+  </parent>   
 
   <organization>
     <name>Apache MINA Project</name>
