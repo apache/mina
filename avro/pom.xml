@@ -33,7 +33,7 @@
   <properties>
     <symbolicName>${project.groupId}.avro</symbolicName>
     <exportedPackage>${project.groupId}</exportedPackage>
-    <avro.version>1.7.4</avro.version>
+    <avro.version>1.11.4</avro.version>
   </properties>
 
   <dependencies>
