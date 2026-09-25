@@ -22,6 +22,7 @@ package org.apache.mina.filter.ssl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.security.NoSuchAlgorithmException;
@@ -34,6 +35,7 @@ import java.util.concurrent.Future;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 
+import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IdleStatus;
@@ -83,18 +85,20 @@ abstract class AbstractNextFilter implements NextFilter {
  */
 public class SslFilterTest {
     SslHandler test_class;
-    
+
     @Before
     public void init() {
         test_class = new SslHandler(null, new DummySession());
+        test_class.setCCCEnabled(true);
+        test_class.setDisabled(false);
     }
-    
+
     @Test
     public void testFlushRaceCondition() {
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         final List<Object> message_received_messages = new ArrayList<>();
         final List<WriteRequest> filter_write_requests = new ArrayList<>();
-        
+
         final AbstractNextFilter write_filter = new AbstractNextFilter()
         {
             @Override
@@ -167,5 +171,259 @@ public class SslFilterTest {
         // Scenario 4: SSL handler removed
         dummySession.removeAttribute(SslFilter.SSL_HANDLER);
         assertFalse(filter.isSslActive(dummySession));
+    }
+
+    // ------------------------------------------------------------------------
+    // Tests for the SslFilter CCC / close-notify public API
+    // ------------------------------------------------------------------------
+
+    /**
+     * {@link SslFilter#enableCCC(IoSession)} must mark the underlying handler
+     * as CCC enabled.
+     */
+    @Test
+    public void testEnableCCC() throws NoSuchAlgorithmException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+        final SslHandler handler = new SslHandler(filter, session);
+        session.setAttribute(SslFilter.SSL_HANDLER, handler);
+
+        assertFalse(handler.isCCCEnabled());
+
+        filter.enableCCC(session);
+
+        assertTrue(handler.isCCCEnabled());
+    }
+
+    /**
+     * {@link SslFilter#stopSslWithoutCloseNotify(IoSession)} must disable the
+     * underlying handler, which in turn makes SSL inactive.
+     */
+    @Test
+    public void testStopSslWithoutCloseNotify() throws NoSuchAlgorithmException, SSLException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+        final SslHandler handler = new SslHandler(filter, session);
+        handler.init();
+        session.setAttribute(SslFilter.SSL_HANDLER, handler);
+
+        assertTrue("SSL should be active before it is stopped", filter.isSslActive(session));
+
+        filter.stopSslWithoutCloseNotify(session);
+
+        assertTrue("The handler must be disabled", handler.isDisabled());
+        assertFalse("SSL must no longer be active once disabled", filter.isSslActive(session));
+    }
+
+    /**
+     * {@link SslFilter#getCccLock(IoSession)} must return the exact same lock
+     * object owned by the session's handler.
+     */
+    @Test
+    public void testGetCccLockReturnsHandlerLock() throws NoSuchAlgorithmException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+        final SslHandler handler = new SslHandler(filter, session);
+        session.setAttribute(SslFilter.SSL_HANDLER, handler);
+
+        assertSame(handler.getCccLock(), filter.getCccLock(session));
+    }
+
+    /**
+     * The CCC / close-notify API methods rely on
+     * {@code getSslSessionHandler(IoSession)}, which must throw an
+     * {@link IllegalStateException} when there is no handler attached to the
+     * session.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testEnableCCCWithoutHandlerThrows() throws NoSuchAlgorithmException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+
+        filter.enableCCC(new DummySession());
+    }
+
+    /**
+     * When the session's handler belongs to a different filter, the CCC API
+     * must reject the call with an {@link IllegalArgumentException}.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetCccLockWithForeignHandlerThrows() throws NoSuchAlgorithmException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final SslFilter otherFilter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+
+        // The handler is managed by 'otherFilter', not 'filter'
+        final SslHandler foreignHandler = new SslHandler(otherFilter, session);
+        session.setAttribute(SslFilter.SSL_HANDLER, foreignHandler);
+
+        filter.getCccLock(session);
+    }
+
+    /**
+     * The {@code checkStatus} handling of a {@code close_notify} must not close
+     * the session while CCC is enabled. We assert the behavioral contract via
+     * the handler flags exposed by the commit.
+     */
+    @Test
+    public void testCccEnabledKeepsHandlerActive() throws NoSuchAlgorithmException, SSLException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+        final SslHandler handler = new SslHandler(filter, session);
+        handler.init();
+        session.setAttribute(SslFilter.SSL_HANDLER, handler);
+
+        filter.enableCCC(session);
+
+        assertTrue("CCC enabled handler is still considered active", filter.isSslActive(session));
+        assertTrue(handler.isCCCEnabled());
+        assertFalse(handler.isDisabled());
+    }
+
+    // ------------------------------------------------------------------------
+    // Regression tests: messageReceived / filterWrite behaviour must be
+    // unchanged when CCC is NOT enabled (and the handler is not disabled).
+    // ------------------------------------------------------------------------
+
+    /**
+     * Builds a {@link NextFilter} that records every {@code filterWrite} request
+     * and every {@code messageReceived} message it is handed.
+     */
+    private static NextFilter recordingNextFilter(final List<Object> received, final List<WriteRequest> written) {
+        return new AbstractNextFilter() {
+            @Override
+            public void messageReceived(IoSession session, Object message) {
+                received.add(message);
+            }
+
+            @Override
+            public void filterWrite(IoSession session, WriteRequest writeRequest) {
+                written.add(writeRequest);
+            }
+        };
+    }
+
+    /**
+     * When SSL has not been started yet (no {@code SSLEngine} created) and CCC
+     * is not enabled, {@link SslFilter#filterWrite} must forward the plaintext
+     * write request straight to the next filter, exactly as before the commit.
+     */
+    @Test
+    public void testFilterWriteForwardsWhenSslNotStarted() throws NoSuchAlgorithmException, SSLException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+        // Not initialized => SSL not started, not disabled, CCC not enabled
+        final SslHandler handler = new SslHandler(filter, session);
+        session.setAttribute(SslFilter.SSL_HANDLER, handler);
+
+        assertFalse(handler.isCCCEnabled());
+        assertFalse(handler.isDisabled());
+        assertFalse(filter.isSslStarted(session));
+
+        final List<Object> received = new ArrayList<>();
+        final List<WriteRequest> written = new ArrayList<>();
+        final NextFilter next = recordingNextFilter(received, written);
+
+        final WriteRequest request = new DefaultWriteRequest(IoBuffer.wrap(new byte[] { 1, 2, 3 }));
+
+        filter.filterWrite(next, session, request);
+
+        // Unchanged behaviour: the write is passed through untouched.
+        assertEquals(1, written.size());
+        assertSame(request, written.get(0));
+    }
+
+    /**
+     * When {@link SslFilter#DISABLE_ENCRYPTION_ONCE} is set and CCC is not
+     * enabled, {@link SslFilter#filterWrite} must forward the request without
+     * encrypting it and clear the temporary marker attribute afterwards. This
+     * is the StartTLS bypass path that must remain unchanged.
+     */
+    @Test
+    public void testFilterWriteBypassesWithDisableEncryptionOnce() throws NoSuchAlgorithmException, SSLException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+        final SslHandler handler = new SslHandler(filter, session);
+        handler.init(); // SSL started
+        session.setAttribute(SslFilter.SSL_HANDLER, handler);
+        session.setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE, Boolean.TRUE);
+
+        assertFalse(handler.isCCCEnabled());
+        assertFalse(handler.isDisabled());
+
+        final List<Object> received = new ArrayList<>();
+        final List<WriteRequest> written = new ArrayList<>();
+        final NextFilter next = recordingNextFilter(received, written);
+
+        final WriteRequest request = new DefaultWriteRequest(IoBuffer.wrap(new byte[] { 1, 2, 3 }));
+
+        filter.filterWrite(next, session, request);
+
+        // Unchanged behaviour: forwarded unencrypted and the marker is removed.
+        assertEquals(1, written.size());
+        assertSame(request, written.get(0));
+        assertFalse(session.containsAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE));
+    }
+
+    /**
+     * While the handshake is still in progress and CCC is not enabled,
+     * {@link SslFilter#filterWrite} must queue the write as a pre-handshake
+     * request instead of forwarding it to the next filter. This deferral must
+     * remain unchanged by the CCC changes.
+     */
+    @Test
+    public void testFilterWriteDefersDuringHandshake() throws NoSuchAlgorithmException, SSLException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+        final SslHandler handler = new SslHandler(filter, session);
+        handler.init(); // SSL started, handshake not complete
+
+        session.setAttribute(SslFilter.SSL_HANDLER, handler);
+
+        assertFalse(handler.isHandshakeComplete());
+        assertFalse(handler.isCCCEnabled());
+        assertFalse(handler.isDisabled());
+
+        final List<Object> received = new ArrayList<>();
+        final List<WriteRequest> written = new ArrayList<>();
+        final NextFilter next = recordingNextFilter(received, written);
+
+        final WriteRequest request = new DefaultWriteRequest(IoBuffer.wrap(new byte[] { 1, 2, 3 }));
+
+        filter.filterWrite(next, session, request);
+
+        // Unchanged behaviour: nothing is forwarded until the handshake completes.
+        assertTrue(written.isEmpty());
+    }
+
+    /**
+     * Once the engine is fully closed (inbound and outbound done) and CCC is not
+     * enabled, {@link SslFilter#messageReceived} must push the raw message to
+     * the next filter as-is, without attempting to decrypt it. This pass-through
+     * path must remain unchanged by the CCC changes.
+     */
+    @Test
+    public void testMessageReceivedForwardsWhenSessionClosed() throws NoSuchAlgorithmException, SSLException {
+        final SslFilter filter = new SslFilter(SSLContext.getDefault());
+        final IoSession session = new DummySession();
+        // Not initialized => sslEngine null => both inbound and outbound "done"
+        final SslHandler handler = new SslHandler(filter, session);
+        session.setAttribute(SslFilter.SSL_HANDLER, handler);
+
+        assertTrue(handler.isInboundDone());
+        assertTrue(handler.isOutboundDone());
+        assertFalse(handler.isCCCEnabled());
+        assertFalse(handler.isDisabled());
+
+        final List<Object> received = new ArrayList<>();
+        final List<WriteRequest> written = new ArrayList<>();
+        final NextFilter next = recordingNextFilter(received, written);
+
+        final IoBuffer message = IoBuffer.wrap(new byte[] { 1, 2, 3 });
+
+        filter.messageReceived(next, session, message);
+
+        // Unchanged behaviour: the raw message is forwarded untouched.
+        assertEquals(1, received.size());
+        assertSame(message, received.get(0));
     }
 }

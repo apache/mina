@@ -34,6 +34,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.log4j.Level;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
@@ -176,6 +177,8 @@ public class SslTest {
 
     @Test
     public void testSSL() throws Exception {
+        // It's easier when we see the logs
+        org.apache.log4j.Logger.getRootLogger().setLevel(Level.DEBUG);
         try {
             startServer();
     
@@ -202,6 +205,7 @@ public class SslTest {
     
     @Test
     public void unsecureClientTryToConnectoToSecureServer() throws Exception {
+        org.apache.log4j.Logger.getRootLogger().setLevel(Level.DEBUG);
         try {
             startServer(); // Start Server with SSLFilter
     
