@@ -74,28 +74,36 @@ public abstract class AbstractBindTest {
 
         setReuseAddress(reuseAddress);
 
-        // Find an available test port and bind to it.
         boolean socketBound = false;
+        int retryCount = 5;
 
-        // Let's start from port #1 to detect possible resource leak
-        // because test will fail in port 1-1023 if user run this test
-        // as a normal user.
-        port = AvailablePortFinder.getNextAvailable();
-        socketBound = false;
-        try {
-            acceptor.setDefaultLocalAddress(createSocketAddress(port));
-            acceptor.bind();
-            socketBound = true;
-        } catch (IOException e) {
-            //System.out.println(e.getMessage());
+        // there is a gap between org.apache.mina.util.AvailablePortFinder.getNextAvailable() and
+        // org.apache.mina.transport.AbstractBindTest.createSocketAddress which can lead to port being occupied again
+        // and not available anymore, which requires retrying
+        while (retryCount > 0) {
+            // Let's start from port #1 to detect possible resource leak
+            // because test will fail in port 1-1023 if user runs this test
+            // as a normal user.
+            port = AvailablePortFinder.getNextAvailable();
+
+            try {
+                acceptor.setDefaultLocalAddress(createSocketAddress(port));
+                acceptor.bind();
+                socketBound = true;
+            } catch (IOException e) {
+            }
+
+            if (socketBound) {
+                break;
+            }
+
+            retryCount--;
         }
 
         // If there is no port available, test fails.
         if (!socketBound) {
             throw new IOException("Cannot bind any test port.");
         }
-
-        //System.out.println( "Using port " + port + " for testing." );
     }
 
     private void setReuseAddress(boolean reuseAddress) {
