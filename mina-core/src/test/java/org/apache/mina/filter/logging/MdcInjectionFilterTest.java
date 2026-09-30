@@ -42,6 +42,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
+import org.apache.mina.core.filterchain.IoFilterEvent;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.service.IoProcessor;
@@ -243,21 +244,24 @@ public class MdcInjectionFilterTest {
         simpleIoHandler.sessionClosedLatch.await();
         connector.dispose(true);
 
+        Set<String> allowedLoggerNames = new HashSet<>();
+        allowedLoggerNames.add(MdcInjectionFilterTest.class.getName());
+        allowedLoggerNames.add(ProtocolCodecFilter.class.getName());
+        allowedLoggerNames.add(IoFilterEvent.class.getName());
+
         // make a copy to prevent ConcurrentModificationException
         List<LoggingEvent> events = new ArrayList<>(appender.events);
         // verify that all logging events have correct MDC
         for (LoggingEvent event : events) {
-            if (event.getLoggerName().startsWith("org.apache.mina.core.service.AbstractIoService") ||
-                    event.getLoggerName().startsWith(IoProcessor.class.getName())) {
-                continue;
-            }
-            for (MdcInjectionFilter.MdcKey mdcKey : MdcInjectionFilter.MdcKey.values()) {
-                String key = mdcKey.name();
-                Object value = event.getMDC(key);
-                if (mdcKey == MdcInjectionFilter.MdcKey.remoteAddress) {
-                    assertNotNull("MDC[remoteAddress] not set for [" + event.getMessage() + "]", value);
-                } else {
-                    assertNull("MDC[" + key + "] set for [" + event.getMessage() + "]", value);
+            if (allowedLoggerNames.contains(event.getLoggerName())) {
+                for (MdcInjectionFilter.MdcKey mdcKey : MdcInjectionFilter.MdcKey.values()) {
+                    String key = mdcKey.name();
+                    Object value = event.getMDC(key);
+                    if (mdcKey == MdcInjectionFilter.MdcKey.remoteAddress) {
+                        assertNotNull("MDC[remoteAddress] not set for [" + event.getMessage() + "]", value);
+                    } else {
+                        assertNull("MDC[" + key + "] set for [" + event.getMessage() + "]", value);
+                    }
                 }
             }
         }
