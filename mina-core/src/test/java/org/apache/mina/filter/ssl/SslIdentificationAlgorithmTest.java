@@ -28,7 +28,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -154,7 +154,6 @@ public class SslIdentificationAlgorithmTest {
 
     @Before
     public void setUp() {
-        port = AvailablePortFinder.getNextAvailable(5555);
         handshakeDone = new CountDownLatch(2);
     }
 
@@ -277,7 +276,7 @@ public class SslIdentificationAlgorithmTest {
             }
         });
 
-        acceptor.bind(new InetSocketAddress(port));
+        port = AcceptorBindUtil.tryBind(acceptor);
     }
 
     private void startConnector(SSLContext sslContext, String sni) {

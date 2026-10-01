@@ -38,7 +38,7 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.SessionState;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -172,10 +172,8 @@ public class PollingIoProcessorTest {
         IoAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setHandler(new IoHandlerAdapter());
 
-        InetSocketAddress addr = new InetSocketAddress("localhost", AvailablePortFinder.getNextAvailable(20000));
-
-        acceptor.bind(addr);
-        ConnectFuture future = connector.connect(addr);
+        int port = AcceptorBindUtil.tryBind( acceptor );
+        ConnectFuture future = connector.connect(new InetSocketAddress("localhost", port));
         future.awaitUninterruptibly();
         IoSession session = future.getSession();
         WriteFuture wf = session.write(IoBuffer.allocate(1)).awaitUninterruptibly();

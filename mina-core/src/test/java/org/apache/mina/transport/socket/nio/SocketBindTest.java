@@ -19,11 +19,14 @@
  */
 package org.apache.mina.transport.socket.nio;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.transport.AbstractBindTest;
+import org.apache.mina.transport.socket.SocketAcceptor;
+import org.apache.mina.util.AvailablePortFinder;
 
 /**
  * Tests {@link NioSocketAcceptor} resource leakage.
@@ -31,9 +34,8 @@ import org.apache.mina.transport.AbstractBindTest;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SocketBindTest extends AbstractBindTest {
-
     public SocketBindTest() {
-        super(new NioSocketAcceptor());
+        super(new NioSocketAcceptor() );
     }
 
     @Override
@@ -49,5 +51,35 @@ public class SocketBindTest extends AbstractBindTest {
     @Override
     protected IoConnector newConnector() {
         return new NioSocketConnector();
+    }
+    
+    @Override
+    protected void setReuseAddress(boolean reuseAddress) {
+        ((SocketAcceptor) acceptor).setReuseAddress(reuseAddress);
+    }
+
+    @Override
+    protected void bind(boolean reuseAddress) throws IOException {
+        acceptor.setHandler(new EchoProtocolHandler());
+
+        setReuseAddress(reuseAddress);
+
+        // Find an available test port and bind to it.
+        int nbTry = 10;
+        
+        while (true) {
+            try {
+                port = AvailablePortFinder.getNextAvailable();
+                acceptor.setDefaultLocalAddress(createSocketAddress(port));
+                acceptor.bind();
+                break;
+            } catch (RuntimeException re ) {
+                nbTry--;
+                
+                if (nbTry == 0) {
+                    throw new IOException("Cannot bind any test port.");
+                }
+            }
+        }
     }
 }

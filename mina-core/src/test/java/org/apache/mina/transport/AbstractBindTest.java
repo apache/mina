@@ -37,11 +37,8 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.transport.socket.DatagramAcceptor;
-import org.apache.mina.transport.socket.DatagramSessionConfig;
-import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketSessionConfig;
-import org.apache.mina.util.AvailablePortFinder;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -69,42 +66,9 @@ public abstract class AbstractBindTest {
 
     protected abstract IoConnector newConnector();
 
-    protected void bind(boolean reuseAddress) throws IOException {
-        acceptor.setHandler(new EchoProtocolHandler());
-
-        setReuseAddress(reuseAddress);
-
-        // Find an available test port and bind to it.
-        boolean socketBound = false;
-
-        // Let's start from port #1 to detect possible resource leak
-        // because test will fail in port 1-1023 if user run this test
-        // as a normal user.
-        port = AvailablePortFinder.getNextAvailable();
-        socketBound = false;
-        try {
-            acceptor.setDefaultLocalAddress(createSocketAddress(port));
-            acceptor.bind();
-            socketBound = true;
-        } catch (IOException e) {
-            //System.out.println(e.getMessage());
-        }
-
-        // If there is no port available, test fails.
-        if (!socketBound) {
-            throw new IOException("Cannot bind any test port.");
-        }
-
-        //System.out.println( "Using port " + port + " for testing." );
-    }
-
-    private void setReuseAddress(boolean reuseAddress) {
-        if (acceptor instanceof DatagramAcceptor) {
-            ((DatagramSessionConfig) acceptor.getSessionConfig()).setReuseAddress(reuseAddress);
-        } else if (acceptor instanceof SocketAcceptor) {
-            ((SocketAcceptor) acceptor).setReuseAddress(reuseAddress);
-        }
-    }
+    protected abstract void bind(boolean reuseAddress) throws IOException;
+    
+    protected abstract void setReuseAddress(boolean reuseAddress) throws IOException;
 
     @After
     public void tearDown() {
@@ -160,12 +124,17 @@ public abstract class AbstractBindTest {
     public void testManyTimes() throws IOException, InterruptedException {
         bind(true);
 
+        //long t0 = System.nanoTime();
         for (int i = 0; i < 1024; i++) {
             Assert.assertTrue("Bound addresses is empty", acceptor.getLocalAddresses().size() > 0);
             acceptor.unbind();
-            Thread.sleep(5);
+            //Thread.sleep(2);
             Assert.assertTrue("Bound addresses is not empty", acceptor.getLocalAddresses().size() == 0);
             acceptor.bind();
+            //long t1 = System.nanoTime();
+
+            //System.out.println("Iteration #" + i + " in " + (t1 - t0) + "ns");
+            //t0 = t1;
         }
 
         acceptor.unbind();
@@ -264,7 +233,7 @@ public abstract class AbstractBindTest {
         bind(false);
     }
 
-    private static class EchoProtocolHandler extends IoHandlerAdapter {
+    protected static class EchoProtocolHandler extends IoHandlerAdapter {
         private static final Logger LOG = LoggerFactory.getLogger(EchoProtocolHandler.class);
 
         /**

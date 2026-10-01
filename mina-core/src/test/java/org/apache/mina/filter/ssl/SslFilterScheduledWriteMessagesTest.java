@@ -30,7 +30,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,7 +71,6 @@ public class SslFilterScheduledWriteMessagesTest {
     public void setUp() {
         handshakeDone = new CountDownLatch(2);
         sessionsOpened = new CountDownLatch(2);
-        port = AvailablePortFinder.getNextAvailable(5555);
     }
 
     @Test
@@ -206,7 +205,8 @@ public class SslFilterScheduledWriteMessagesTest {
         filters.addLast("text", new ProtocolCodecFilter(new TextLineCodecFactory()));
 
         acceptor.setHandler(handler);
-        acceptor.bind(new InetSocketAddress(port));
+        
+        port = AcceptorBindUtil.tryBind(acceptor);
 
         return acceptor;
     }
@@ -223,7 +223,7 @@ public class SslFilterScheduledWriteMessagesTest {
         filters.addLast("text", new ProtocolCodecFilter(new TextLineCodecFactory()));
 
         acceptor.setHandler(handler);
-        acceptor.bind(new InetSocketAddress(port));
+        port = AcceptorBindUtil.tryBind(acceptor);
 
         return acceptor;
     }

@@ -32,7 +32,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.ExpiringSessionRecycler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +65,6 @@ public class DatagramRecyclerTest {
 
     @Test
     public void testDatagramRecycler() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(1024);
         ExpiringSessionRecycler recycler = new ExpiringSessionRecycler(1, 1);
 
         MockHandler acceptorHandler = new MockHandler();
@@ -73,7 +72,7 @@ public class DatagramRecyclerTest {
 
         acceptor.setHandler(acceptorHandler);
         acceptor.setSessionRecycler(recycler);
-        acceptor.bind(new InetSocketAddress(port));
+        int port = AcceptorBindUtil.tryBind( acceptor );
 
         try {
             connector.setHandler(connectorHandler);
@@ -110,7 +109,6 @@ public class DatagramRecyclerTest {
 
     @Test
     public void testCloseRequest() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(1024);
         ExpiringSessionRecycler recycler = new ExpiringSessionRecycler(10, 1);
 
         MockHandler acceptorHandler = new MockHandler();
@@ -119,7 +117,8 @@ public class DatagramRecyclerTest {
         acceptor.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, 1);
         acceptor.setHandler(acceptorHandler);
         acceptor.setSessionRecycler(recycler);
-        acceptor.bind(new InetSocketAddress(port));
+        
+        int port = AcceptorBindUtil.tryBind( acceptor );
 
         try {
             connector.setHandler(connectorHandler);

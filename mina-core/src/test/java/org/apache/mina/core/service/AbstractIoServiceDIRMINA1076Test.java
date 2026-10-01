@@ -30,13 +30,11 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 
@@ -69,12 +67,7 @@ public class AbstractIoServiceDIRMINA1076Test {
 
                     acceptor.getSessionConfig().setReadBufferSize( 2048 );
                     acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
-                    int nextAvailable = AvailablePortFinder.getNextAvailable();
-                    try {
-                        acceptor.bind( new InetSocketAddress( nextAvailable ) );
-                    } catch ( IOException e1 ) {
-                        throw new RuntimeException( e1 );
-                    }
+                    int nextAvailable = AcceptorBindUtil.tryBind( acceptor );
 
                     final NioSocketConnector connector = new NioSocketConnector();
 

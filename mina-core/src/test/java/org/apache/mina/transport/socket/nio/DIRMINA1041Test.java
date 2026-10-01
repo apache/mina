@@ -19,7 +19,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.WriteFuture;
@@ -29,7 +28,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketConnector;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +43,7 @@ public class DIRMINA1041Test {
 
     private static final Logger LOG = LoggerFactory.getLogger(DIRMINA1041Test.class);
     private static final String HOST = "localhost";
-    private static final int PORT = AvailablePortFinder.getNextAvailable(); 
+    private int port; 
     private static final long TIMEOUT = 10000L;
     private static int counter = 0;
     private SocketAcceptor acceptor;
@@ -55,7 +54,7 @@ public class DIRMINA1041Test {
         acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
         acceptor.setHandler(new SomeAcceptHandler());
-        acceptor.bind(new InetSocketAddress(HOST, PORT));
+        port = AcceptorBindUtil.tryBind( acceptor );
 
         connector = new NioSocketConnector();
         connector.getSessionConfig().setReuseAddress(true);
@@ -65,7 +64,7 @@ public class DIRMINA1041Test {
 
     @Test
     public void testWrite() throws InterruptedException {
-        SocketAddress address = new InetSocketAddress(HOST, PORT);
+        SocketAddress address = new InetSocketAddress(HOST, port);
         
         try {
             for (int i = 0; i < 10000; i++) {
@@ -112,7 +111,7 @@ public class DIRMINA1041Test {
     }
 
     private IoSession getSession() {
-        ConnectFuture future = connector.connect(new InetSocketAddress(HOST, PORT));
+        ConnectFuture future = connector.connect(new InetSocketAddress(HOST, port));
         if (!future.awaitUninterruptibly(TIMEOUT)) {
             
             Assert.fail("ConnectFuture did not complete.");

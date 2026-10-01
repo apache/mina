@@ -24,11 +24,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.Test;
 
 /**
@@ -76,11 +77,12 @@ public class DatagramSessionIdleTest {
         acceptor.getSessionConfig().setBothIdleTime(BOTH_IDLE_TIME);
         acceptor.getSessionConfig().setReaderIdleTime(READER_IDLE_TIME);
         acceptor.getSessionConfig().setWriterIdleTime(WRITER_IDLE_TIME);
-        InetSocketAddress bindAddress = new InetSocketAddress(AvailablePortFinder.getNextAvailable());
         acceptor.setHandler(new TestHandler());
-        acceptor.bind(bindAddress);
+        int port = AcceptorBindUtil.tryBind(acceptor);
+        SocketAddress bindAddress = new InetSocketAddress(port);
+
         IoSession session = acceptor.newSession(
-                new InetSocketAddress(InetAddress.getByName(null), AvailablePortFinder.getNextAvailable()), bindAddress);
+                new InetSocketAddress(InetAddress.getByName(null), port), bindAddress);
 
         //check properties to be copied from acceptor to session
         assertEquals(BOTH_IDLE_TIME, session.getConfig().getBothIdleTime());

@@ -35,7 +35,7 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,13 +71,13 @@ public class DatagramConfigTest {
 
     @Test
     public void testAcceptorFilterChain() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(1024 + 1000);
         IoFilter mockFilter = new MockFilter();
         IoHandler mockHandler = new MockHandler();
 
         acceptor.getFilterChain().addLast("mock", mockFilter);
         acceptor.setHandler(mockHandler);
-        acceptor.bind(new InetSocketAddress(port));
+        
+        int port = AcceptorBindUtil.tryBind( acceptor );
 
         try {
             connector.setHandler(new IoHandlerAdapter());

@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.Test;
 
 public class SocketAcceptorTest {
@@ -58,9 +58,8 @@ public class SocketAcceptorTest {
         acceptor.setReuseAddress(true);
         acceptor.setHandler(new IoHandlerAdapter());
         try {
-            int port = AvailablePortFinder.getNextAvailable(1025);
+            int port = AcceptorBindUtil.tryBind(acceptor);
             InetSocketAddress address = new InetSocketAddress("127.0.0.1", port);
-            acceptor.bind(address);
             acceptor.unbind(address);
             acceptor.bind(address);
             acceptor.unbind(address);

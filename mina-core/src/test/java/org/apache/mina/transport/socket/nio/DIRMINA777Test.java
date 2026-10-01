@@ -30,7 +30,7 @@ import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.Test;
 
 /**
@@ -42,7 +42,6 @@ public class DIRMINA777Test {
 
     @Test
     public void checkReadFuture() throws Throwable {
-        int port = AvailablePortFinder.getNextAvailable();
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
         acceptor.setHandler(new IoHandlerAdapter() {
@@ -57,7 +56,7 @@ public class DIRMINA777Test {
 
         });
 
-        acceptor.bind(new InetSocketAddress(port));
+        int port = AcceptorBindUtil.tryBind( acceptor );
 
         try {
             IoConnector connector = new NioSocketConnector();

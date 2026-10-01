@@ -38,6 +38,7 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionInitializer;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.apache.mina.util.AvailablePortFinder;
 import org.junit.Test;
 
@@ -54,10 +55,10 @@ public abstract class AbstractConnectorTest {
 
     @Test
     public void testConnectFutureSuccessTiming() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(1025);
         IoAcceptor acceptor = createAcceptor();
         acceptor.setHandler(new IoHandlerAdapter());
-        acceptor.bind(new InetSocketAddress(port));
+        
+        int port = AcceptorBindUtil.tryBind( acceptor );
 
         try {
             final StringBuffer buf = new StringBuffer();

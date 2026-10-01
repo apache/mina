@@ -45,7 +45,7 @@ import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.easymock.IArgumentMatcher;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -325,27 +325,27 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
 
     @Test
     public void testWriteUsingSocketTransport() throws Exception {
-        NioSocketAcceptor acceptor = new NioSocketAcceptor();
-        acceptor.setReuseAddress(true);
-        SocketAddress address = new InetSocketAddress("localhost", AvailablePortFinder.getNextAvailable());
-
-        NioSocketConnector connector = new NioSocketConnector();
-
         // Generate 4MB of random data
         byte[] data = new byte[4 * 1024 * 1024];
         new Random().nextBytes(data);
 
         byte[] expectedMd5 = MessageDigest.getInstance("MD5").digest(data);
-
         M message = createMessage(data);
 
+        // Create the acceptor
+        NioSocketAcceptor acceptor = new NioSocketAcceptor();
         SenderHandler sender = new SenderHandler(message);
         ReceiverHandler receiver = new ReceiverHandler(data.length);
 
         acceptor.setHandler(sender);
+        acceptor.setReuseAddress(true);
+
+        int nextAvailable = AcceptorBindUtil.tryBind( acceptor );
+        SocketAddress address = new InetSocketAddress("localhost", nextAvailable);
+
+        NioSocketConnector connector = new NioSocketConnector();
         connector.setHandler(receiver);
 
-        acceptor.bind(address);
         connector.connect(address);
         sender.latch.await();
         receiver.latch.await();

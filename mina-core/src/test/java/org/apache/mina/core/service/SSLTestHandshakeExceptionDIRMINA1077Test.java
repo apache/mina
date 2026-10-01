@@ -43,7 +43,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.apache.mina.util.AvailablePortFinder;
+import org.apache.mina.util.AcceptorBindUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -54,7 +54,7 @@ import org.junit.Test;
  * @author chrjohn
  */
 public class SSLTestHandshakeExceptionDIRMINA1077Test {
-    private int port = AvailablePortFinder.getNextAvailable();
+    private int port;
     private static InetAddress address;
     private static NioSocketAcceptor acceptor;
 
@@ -83,7 +83,7 @@ public class SSLTestHandshakeExceptionDIRMINA1077Test {
      * Starts a Server with the SSL Filter and a simple text line 
      * protocol codec filter
      */
-    private void startServer(int port) throws Exception {
+    private int startServer(int port) throws Exception {
         acceptor = new NioSocketAcceptor();
 
         acceptor.setReuseAddress(true);
@@ -98,7 +98,8 @@ public class SSLTestHandshakeExceptionDIRMINA1077Test {
         filters.addLast("text", new ProtocolCodecFilter(new TextLineCodecFactory()));
 
         acceptor.setHandler(new TestHandler());
-        acceptor.bind(new InetSocketAddress(port));
+        
+        return AcceptorBindUtil.tryBind( acceptor );
     }
     
     private static void stopServer() {
@@ -157,9 +158,8 @@ public class SSLTestHandshakeExceptionDIRMINA1077Test {
         // without DIRMINA-1076/1077 fixed, the test will hang after short time
         while (System.currentTimeMillis() < startTime + 10000) {
             try {
-                port = AvailablePortFinder.getNextAvailable();
                 final CountDownLatch disposalLatch = new CountDownLatch( 1 );
-                startServer(port);
+                port = startServer(port);
                 
                 Thread t = new Thread() {
                     public void run() {
