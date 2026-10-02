@@ -30,7 +30,7 @@ import org.junit.Test;
 public class SocketAcceptorTest {
 
     @Test
-    public void testBindTwice() throws Exception {
+    public void testBindTwice() {
         NioSocketAcceptor acceptor = new NioSocketAcceptor() {
 
             private int nRequests;
@@ -61,7 +61,8 @@ public class SocketAcceptorTest {
             int port = AcceptorBindUtil.tryBind(acceptor);
             InetSocketAddress address = new InetSocketAddress("127.0.0.1", port);
             acceptor.unbind(address);
-            acceptor.bind(address);
+            port = AcceptorBindUtil.tryBind(acceptor, port);
+            address = new InetSocketAddress("127.0.0.1", port);
             acceptor.unbind(address);
         } finally {
             acceptor.dispose();
