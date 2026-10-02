@@ -58,8 +58,8 @@ public class SocketAcceptorTest {
         acceptor.setReuseAddress(true);
         acceptor.setHandler(new IoHandlerAdapter());
         try {
-            int port = AcceptorBindUtil.tryBind(acceptor);
-            InetSocketAddress address = new InetSocketAddress("127.0.0.1", port);
+            AcceptorBindUtil.tryBind(acceptor);
+            InetSocketAddress address = acceptor.getLocalAddress() ;
             acceptor.unbind(address);
             acceptor.bind(address);
             acceptor.unbind(address);
