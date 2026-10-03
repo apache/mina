@@ -172,7 +172,16 @@ public final class NioDatagramAcceptor extends AbstractIoAcceptor implements Dat
                                 acceptor = null;
                                 break;
                             }
-                        } finally {
+                        } catch (InterruptedException e) {
+                            // when org.apache.mina.core.service.IoService.dispose() is called, the executor running
+                            // this acceptor will shut down, which usually interrupts its threads
+                            // in this case we don't want to propagate this interrupted exception which will bubble up
+                            // in org.apache.mina.util.NamePreservingRunnable and at the end in UncaughtExceptionHandler
+                            if (!isDisposing()) {
+                                throw e;
+                            }
+                        }
+                        finally {
                             lock.release();
                         }
                     }

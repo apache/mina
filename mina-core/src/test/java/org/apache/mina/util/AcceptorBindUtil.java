@@ -17,7 +17,6 @@
  *  under the License.
  *
  */
-
 package org.apache.mina.util;
 
 import java.io.IOException;
@@ -26,44 +25,17 @@ import java.net.InetSocketAddress;
 import org.apache.mina.core.service.IoAcceptor;
 
 /**
- * An unitily class containing a method to bind an acceptor with
+ * A utility class containing a method to bind acceptor with
  * a retry mechanism, in case the port has already been taken when the 
  * bind occurs.
- * 
+ * <p>
  * May be useful to avoid random test failures...
- * 
  */
-public class AcceptorBindUtil {
+public final class AcceptorBindUtil {
     /** The default number of tries */
     private static final int NB_TRIES = 10;
-    
-    /**
-     * Try to bind an IoAcceptor, using a random port, but retrying
-     * if the port get used between the moment it's picked and the moment 
-     * the bind occurs. If it fails, we get a untimeException
-     * 
-     * @param acceptor The IoAccceptor we try to bind
-     * @return The port to which the IoAcceptor is bound to
-     */
-    public static final int tryBind(IoAcceptor acceptor) {
-        int nbTry = NB_TRIES;
-        
-        while (true) {
-            int nextAvailable = AvailablePortFinder.getNextAvailable();
-            try {
-                acceptor.bind(new InetSocketAddress(nextAvailable));
-                
-                System.out.println( "-------------> " + nextAvailable );
-                
-                return nextAvailable;
-            } catch ( IOException e ) {
-                nbTry--;
-                
-                if (nbTry == 0) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+
+    private AcceptorBindUtil() {
     }
 
     /**
@@ -71,11 +43,23 @@ public class AcceptorBindUtil {
      * if the port get used between the moment it's picked and the moment 
      * the bind occurs. If it fails, we get a untimeException
      * 
-     * @param acceptor The IoAccceptor we try to bind
+     * @param acceptor The IoAcceptor we try to bind
+     * @return The port to which the IoAcceptor is bound to
+     */
+    public static  int tryBind(IoAcceptor acceptor) {
+        return tryBind(acceptor, NB_TRIES);
+    }
+
+    /**
+     * Try to bind an IoAcceptor, using a random port, but retrying
+     * if the port get used between the moment it's picked and the moment 
+     * the bind occurs. If it fails, we get a untimeException
+     * 
+     * @param acceptor The IoAcceptor we try to bind
      * @param host The host to use
      * @return The port to which the IoAcceptor is bound to
      */
-    public static final int tryBind(IoAcceptor acceptor, String host) {
+    public static int tryBind(IoAcceptor acceptor, String host) {
         int nbTry = NB_TRIES;
         
         while (true) {
@@ -99,20 +83,20 @@ public class AcceptorBindUtil {
      * if the port get used between the moment it's picked and the moment 
      * the bind occurs. If it fails, we get a untimeException
      * 
-     * @param acceptor The IoAccceptor we try to bind
+     * @param acceptor The IoAcceptor we try to bind
      * @param nbTries The number of times it tries
      * @return The port to which the IoAcceptor is bound to
      */
-    public static final int tryBind(IoAcceptor acceptor, int nbTries) {
+    public static int tryBind(IoAcceptor acceptor, int nbTries) {
         while (true) {
             int nextAvailable = AvailablePortFinder.getNextAvailable();
             try {
                 acceptor.bind(new InetSocketAddress(nextAvailable));
-                
+
                 return nextAvailable;
-            } catch ( IOException e ) {
+            } catch (IOException e) {
                 nbTries--;
-                
+
                 if (nbTries == 0) {
                     throw new RuntimeException(e);
                 }
@@ -130,7 +114,7 @@ public class AcceptorBindUtil {
      * @param nbTries The number of times it tries
      * @return The port to which the IoAcceptor is bound to
      */
-    public static final int tryBind(IoAcceptor acceptor, String host, int nbTries) {
+    public static int tryBind(IoAcceptor acceptor, String host, int nbTries) {
         while (true) {
             int nextAvailable = AvailablePortFinder.getNextAvailable();
             try {
