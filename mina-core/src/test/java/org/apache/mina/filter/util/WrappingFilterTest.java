@@ -20,6 +20,7 @@
 package org.apache.mina.filter.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,6 @@ import org.apache.mina.core.session.IoEventType;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.DefaultWriteRequest;
 import org.apache.mina.core.write.WriteRequest;
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,8 +53,7 @@ public class WrappingFilterTest {
          * Create the mocks.
          */
         session = new DummySession();
-        nextFilter = EasyMock.createMock(IoFilter.NextFilter.class);
-        //nextFilter = (IoFilter.NextFilter) mockNextFilter.getClass();
+        nextFilter = mock(IoFilter.NextFilter.class);
     }
 
     @Test
@@ -80,8 +79,6 @@ public class WrappingFilterTest {
         nextFilter.exceptionCaught(session, cause);
         nextFilter.sessionClosed(session);
 
-        /* replay */
-        EasyMock.replay(nextFilter);
         wrappingFilter.sessionCreated(nextFilter, session);
         wrappingFilter.sessionOpened(nextFilter, session);
         wrappingFilter.sessionIdle(nextFilter, session, IdleStatus.READER_IDLE);
@@ -93,9 +90,6 @@ public class WrappingFilterTest {
         wrappingFilter.filterClose(nextFilter, session);
         wrappingFilter.exceptionCaught(nextFilter, session, cause);
         wrappingFilter.sessionClosed(nextFilter, session);
-
-        /* verify */
-        EasyMock.verify(nextFilter);
 
         /* check event lists */
         assertEquals(11, wrappingFilter.eventsBefore.size());

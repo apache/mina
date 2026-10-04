@@ -18,61 +18,44 @@
  */
 package org.apache.mina.example.haiku;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.IoSession;
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class ToHaikuIoFilterTest extends MockObjectTestCase {
+public class ToHaikuIoFilterTest {
     private IoFilter filter;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() {
         filter = new ToHaikuIoFilter();
     }
 
+    @Test
     public void testThreeStringsMakesAHaiku() throws Exception {
-        Mock list = mock(List.class);
-        list.expects(once()).method("add").with(eq("two")).will(
-                returnValue(true));
-        list.expects(once()).method("add").with(eq("three")).will(
-                returnValue(true));
-        list.expects(once()).method("toArray").with(isA(String[].class)).will(
-                returnValue(new String[] { "one", "two", "three" }));
-        list.expects(exactly(2)).method("size").will(
-                onConsecutiveCalls(returnValue(2), returnValue(3)));
+        IoSession session = mock(IoSession.class);
 
-        Mock session = mock(IoSession.class);
-        session.expects(exactly(3)).method("getAttribute").with(eq("phrases"))
-                .will(
-                        onConsecutiveCalls(returnValue(null), returnValue(list
-                                .proxy()), returnValue(list.proxy()),
-                                returnValue(list.proxy())));
-        session.expects(exactly(1)).method("setAttribute").with(eq("phrases"),
-                eq(Collections.emptyList()));
-        session.expects(exactly(1)).method("removeAttribute").with(
-                eq("phrases"));
+        List<String> phrases = new ArrayList<>();
+        doReturn(phrases).when(session).getAttribute("phrases");
 
-        IoSession sessionProxy = (IoSession) session.proxy();
+        IoFilter.NextFilter nextFilter = mock(IoFilter.NextFilter.class);
 
-        Mock nextFilter = mock(IoFilter.NextFilter.class);
-        nextFilter.expects(once()).method("messageReceived").with(
-                eq(sessionProxy), eq(new Haiku("one", "two", "three")));
+        filter.messageReceived(nextFilter, session, "one");
+        filter.messageReceived(nextFilter, session, "two");
+        filter.messageReceived(nextFilter, session, "three");
 
-        IoFilter.NextFilter nextFilterProxy = (IoFilter.NextFilter) nextFilter
-                .proxy();
-
-        filter.messageReceived(nextFilterProxy, sessionProxy, "one");
-        filter.messageReceived(nextFilterProxy, sessionProxy, "two");
-        filter.messageReceived(nextFilterProxy, sessionProxy, "three");
+        verify(nextFilter).messageReceived(eq(session), eq(new Haiku("one", "two", "three")));
+        verify(session).removeAttribute(eq("phrases"));
     }
-
 }

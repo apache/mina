@@ -22,18 +22,20 @@ package org.apache.mina.filter.codec;
 import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 import org.apache.mina.filter.codec.demux.MessageDecoderAdapter;
 import org.apache.mina.filter.codec.demux.DemuxingProtocolDecoder;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.file.FileRegion;
 import org.apache.mina.transport.socket.SocketSessionConfig;
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 /**
  * Simple Unit Test showing that the DemuxingProtocolDecoder has
@@ -44,13 +46,7 @@ import java.nio.charset.Charset;
 public class DemuxingProtocolDecoderBugTest {
 
     private static void doTest(IoSession session) throws Exception {
-        ProtocolDecoderOutput mock = EasyMock.createMock(ProtocolDecoderOutput.class);
-        mock.write(Character.valueOf('A'));
-        mock.write(Character.valueOf('B'));
-        mock.write(Integer.valueOf(1));
-        mock.write(Integer.valueOf(2));
-        mock.write(Character.valueOf('C'));
-        EasyMock.replay(mock);
+        ProtocolDecoderOutput output = mock(ProtocolDecoderOutput.class);
 
         IoBuffer buffer = IoBuffer.allocate(1000);
         buffer.putString("AB12C", Charset.defaultCharset().newEncoder());
@@ -60,9 +56,15 @@ public class DemuxingProtocolDecoderBugTest {
         decoder.addMessageDecoder(CharacterMessageDecoder.class);
         decoder.addMessageDecoder(IntegerMessageDecoder.class);
 
-        decoder.decode(session, buffer, mock);
+        decoder.decode(session, buffer, output);
 
-        EasyMock.verify(mock);
+        verify(output).write(Character.valueOf('A'));
+        verify(output).write(Character.valueOf('B'));
+        verify(output).write(Integer.valueOf(1));
+        verify(output).write(Integer.valueOf(2));
+        verify(output).write(Character.valueOf('C'));
+
+        verifyNoMoreInteractions(output);
     }
 
     public static class CharacterMessageDecoder extends MessageDecoderAdapter {
@@ -70,7 +72,7 @@ public class DemuxingProtocolDecoderBugTest {
             return Character.isDigit((char) in.get()) ? MessageDecoderResult.NOT_OK : MessageDecoderResult.OK;
         }
 
-        public MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+        public MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) {
             out.write(Character.valueOf((char) in.get()));
             return MessageDecoderResult.OK;
         }
@@ -81,7 +83,7 @@ public class DemuxingProtocolDecoderBugTest {
             return Character.isDigit((char) in.get()) ? MessageDecoderResult.OK : MessageDecoderResult.NOT_OK;
         }
 
-        public MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+        public MessageDecoderResult decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) {
             out.write(Integer.parseInt("" + (char) in.get()));
             return MessageDecoderResult.OK;
         }

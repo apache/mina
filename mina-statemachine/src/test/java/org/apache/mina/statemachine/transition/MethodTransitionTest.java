@@ -27,9 +27,9 @@ import org.apache.mina.statemachine.event.Event;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.mock;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests {@link MethodTransition}.
@@ -59,14 +59,14 @@ public class MethodTransitionTest {
     public void setUp() throws Exception {
         currentState = new State("current");
         nextState = new State("next");
-        target = (Target) mock(Target.class);
+        target = mock(Target.class);
         subsetAllArgsMethod1 = Target.class.getMethod("subsetAllArgs", new Class[] { TestStateContext.class, B.class,
                 A.class, Integer.TYPE });
         subsetAllArgsMethod2 = Target.class.getMethod("subsetAllArgs", new Class[] { Event.class, B.class, B.class,
                 Boolean.TYPE });
 
         args = new Object[] { new A(), new B(), new C(), new Integer(627438), Boolean.TRUE };
-        context = (TestStateContext) mock(TestStateContext.class);
+        context = mock(TestStateContext.class);
         noArgsEvent = new Event("event", context, new Object[0]);
         argsEvent = new Event("event", context, args);
     }

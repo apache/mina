@@ -22,12 +22,13 @@ package org.apache.mina.statemachine;
 import org.apache.mina.statemachine.transition.Transition;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.easymock.EasyMock.mock;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests {@link State}.
@@ -44,15 +45,15 @@ public class StateTest {
     private Transition transition3;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         state = new State("test");
-        transition1 = (Transition) mock(Transition.class);
+        transition1 = mock(Transition.class);
         transition2 = transition1; //(Transition) mock(Transition.class);
         transition3 = transition1; //(Transition) mock(Transition.class);
     }
 
     @Test
-    public void testAddFirstTransition() throws Exception {
+    public void testAddFirstTransition() {
         assertTrue(state.getTransitions().isEmpty());
         state.addTransition(transition1);
         assertFalse(state.getTransitions().isEmpty());
@@ -61,7 +62,7 @@ public class StateTest {
     }
 
     @Test
-    public void testUnweightedTransitions() throws Exception {
+    public void testUnweightedTransitions() {
         assertTrue(state.getTransitions().isEmpty());
         state.addTransition(transition1);
         state.addTransition(transition2);
@@ -73,7 +74,7 @@ public class StateTest {
     }
 
     @Test
-    public void testWeightedTransitions() throws Exception {
+    public void testWeightedTransitions() {
         assertTrue(state.getTransitions().isEmpty());
         state.addTransition(transition1, 10);
         state.addTransition(transition2, 5);
@@ -85,16 +86,16 @@ public class StateTest {
     }
 
     @Test
-    public void testAddTransitionReturnsSelf() throws Exception {
+    public void testAddTransitionReturnsSelf() {
         assertSame(state, state.addTransition(transition1));
     }
 
     @Test
-    public void testAddNullTransitionThrowsException() throws Exception {
+    public void testAddNullTransitionThrowsException() {
         try {
             state.addTransition(null);
             fail("null transition added. IllegalArgumentException expected.");
-        } catch (IllegalArgumentException npe) {
+        } catch (IllegalArgumentException ignore) {
         }
     }
 }

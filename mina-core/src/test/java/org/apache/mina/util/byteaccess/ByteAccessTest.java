@@ -19,7 +19,6 @@
  */
 package org.apache.mina.util.byteaccess;
 
-//import static org.easymock.EasyMock.createStrictControl;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.ByteOrder;
@@ -32,13 +31,9 @@ import org.apache.mina.util.byteaccess.CompositeByteArray.CursorListener;
 import org.apache.mina.util.byteaccess.CompositeByteArrayRelativeWriter.ChunkedExpander;
 import org.apache.mina.util.byteaccess.CompositeByteArrayRelativeWriter.Flusher;
 import org.junit.Ignore;
-//import org.easymock.IMocksControl;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests classes in the <code>byteaccess</code> package.

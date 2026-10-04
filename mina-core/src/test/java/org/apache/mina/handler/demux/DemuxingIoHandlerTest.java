@@ -20,9 +20,12 @@
 package org.apache.mina.handler.demux;
 
 import org.apache.mina.core.session.IoSession;
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 /**
  * Tests {@link org.apache.mina.handler.demux.DemuxingIoHandler}.
@@ -60,35 +63,15 @@ public class DemuxingIoHandlerTest {
         /*
          * Create mocks.
          */
-        handler1 = EasyMock.createMock(MessageHandler.class);
-        handler2 = EasyMock.createMock(MessageHandler.class);
-        handler3 = EasyMock.createMock(MessageHandler.class);
+        handler1 = mock(MessageHandler.class);
+        handler2 = mock(MessageHandler.class);
+        handler3 = mock(MessageHandler.class);
 
-        session = EasyMock.createMock(IoSession.class);
+        session = mock(IoSession.class);
     }
 
     @Test
     public void testFindHandlerByClass() throws Exception {
-        /*
-         * Record expectations.
-         */
-        handler1.handleMessage(session, msg[0]);
-        handler1.handleMessage(session, msg[1]);
-        handler1.handleMessage(session, msg[2]);
-        handler1.handleMessage(session, msg[3]);
-        handler2.handleMessage(session, msg[4]);
-        handler2.handleMessage(session, msg[5]);
-        handler1.handleMessage(session, msg[6]);
-        handler2.handleMessage(session, msg[7]);
-        handler3.handleMessage(session, msg[8]);
-
-        /*
-         * Replay.
-         */
-        EasyMock.replay(handler1);
-        EasyMock.replay(handler2);
-        EasyMock.replay(handler3);
-
         DemuxingIoHandler ioHandler = new DemuxingIoHandler();
 
         /*
@@ -120,33 +103,24 @@ public class DemuxingIoHandlerTest {
         /*
          * Verify.
          */
-        EasyMock.verify(handler1);
-        EasyMock.verify(handler2);
-        EasyMock.verify(handler3);
+
+        verify(handler1).handleMessage(session, msg[0]);
+        verify(handler1).handleMessage(session, msg[1]);
+        verify(handler1).handleMessage(session, msg[2]);
+        verify(handler1).handleMessage(session, msg[3]);
+        verify(handler2).handleMessage(session, msg[4]);
+        verify(handler2).handleMessage(session, msg[5]);
+        verify(handler1).handleMessage(session, msg[6]);
+        verify(handler2).handleMessage(session, msg[7]);
+        verify(handler3).handleMessage(session, msg[8]);
+
+        verifyNoMoreInteractions(handler1);
+        verifyNoMoreInteractions(handler2);
+        verifyNoMoreInteractions(handler3);
     }
 
     @Test
     public void testFindHandlerByInterface() throws Exception {
-        /*
-         * Record expectations.
-         */
-        handler1.handleMessage(session, msg[0]);
-        handler1.handleMessage(session, msg[1]);
-        handler1.handleMessage(session, msg[2]);
-        handler1.handleMessage(session, msg[3]);
-        handler2.handleMessage(session, msg[4]);
-        handler1.handleMessage(session, msg[5]);
-        handler3.handleMessage(session, msg[6]);
-        handler2.handleMessage(session, msg[7]);
-        handler3.handleMessage(session, msg[8]);
-
-        /*
-         * Replay.
-         */
-        EasyMock.replay(handler1);
-        EasyMock.replay(handler2);
-        EasyMock.replay(handler3);
-
         DemuxingIoHandler ioHandler = new DemuxingIoHandler();
 
         /*
@@ -178,9 +152,20 @@ public class DemuxingIoHandlerTest {
         /*
          * Verify.
          */
-        EasyMock.verify(handler1);
-        EasyMock.verify(handler2);
-        EasyMock.verify(handler3);
+
+        verify(handler1).handleMessage(session, msg[0]);
+        verify(handler1).handleMessage(session, msg[1]);
+        verify(handler1).handleMessage(session, msg[2]);
+        verify(handler1).handleMessage(session, msg[3]);
+        verify(handler2).handleMessage(session, msg[4]);
+        verify(handler1).handleMessage(session, msg[5]);
+        verify(handler3).handleMessage(session, msg[6]);
+        verify(handler2).handleMessage(session, msg[7]);
+        verify(handler3).handleMessage(session, msg[8]);
+
+        verifyNoMoreInteractions(handler1);
+        verifyNoMoreInteractions(handler2);
+        verifyNoMoreInteractions(handler3);
     }
 
     /*
