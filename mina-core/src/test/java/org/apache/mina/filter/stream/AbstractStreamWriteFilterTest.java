@@ -23,6 +23,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -46,9 +51,8 @@ import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.easymock.IArgumentMatcher;
-import org.easymock.EasyMock;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,23 +78,11 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
 
         WriteRequest writeRequest = new DefaultWriteRequest(message, new DummyWriteFuture());
 
-        NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
-        /*
-          * Record expectations
-          */
-        nextFilter.messageSent(session, writeRequest);
-
-        /*
-         * Replay.
-         */
-        EasyMock.replay(nextFilter);
-
+        NextFilter nextFilter = mock(NextFilter.class);
         filter.filterWrite(nextFilter, session, writeRequest);
 
-        /*
-         * Verify.
-         */
-        EasyMock.verify(nextFilter);
+        verify(nextFilter).messageSent(session, writeRequest);
+        verifyNoMoreInteractions(nextFilter);
 
         assertTrue(writeRequest.getFuture().isWritten());
     }
@@ -108,25 +100,13 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         Object message = new Object();
         WriteRequest writeRequest = new DefaultWriteRequest(message, new DummyWriteFuture());
 
-        NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
-        /*
-         * Record expectations
-         */
-        nextFilter.filterWrite(session, writeRequest);
-        nextFilter.messageSent(session, writeRequest);
-
-        /*
-         * Replay.
-         */
-        EasyMock.replay(nextFilter);
-
+        NextFilter nextFilter = mock(NextFilter.class);
         filter.filterWrite(nextFilter, session, writeRequest);
         filter.messageSent(nextFilter, session, writeRequest);
 
-        /*
-         * Verify.
-         */
-        EasyMock.verify(nextFilter);
+        verify(nextFilter).filterWrite(session, writeRequest);
+        verify(nextFilter).messageSent(session, writeRequest);
+        verifyNoMoreInteractions(nextFilter);
     }
 
     /**
@@ -143,25 +123,14 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
 
         WriteRequest writeRequest = new DefaultWriteRequest(message, new DummyWriteFuture());
 
-        NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
-        /*
-         * Record expectations
-         */
-        nextFilter.filterWrite(EasyMock.eq(session), eqWriteRequest(new DefaultWriteRequest(IoBuffer.wrap(data))));
-        nextFilter.messageSent(session, writeRequest);
-
-        /*
-         * Replay.
-         */
-        EasyMock.replay(nextFilter);
+        NextFilter nextFilter = mock(NextFilter.class);
 
         filter.filterWrite(nextFilter, session, writeRequest);
         filter.messageSent(nextFilter, session, writeRequest);
 
-        /*
-         * Verify.
-         */
-        EasyMock.verify(nextFilter);
+        verify(nextFilter).filterWrite(eq(session), eqWriteRequest(new DefaultWriteRequest(IoBuffer.wrap(data))));
+        verify(nextFilter).messageSent(eq(session), eq(writeRequest));
+        verifyNoMoreInteractions(nextFilter);
 
         assertTrue(writeRequest.getFuture().isWritten());
     }
@@ -188,29 +157,18 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         WriteRequest chunk2Request = new DefaultWriteRequest(IoBuffer.wrap(chunk2));
         WriteRequest chunk3Request = new DefaultWriteRequest(IoBuffer.wrap(chunk3));
 
-        NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
-        /*
-         * Record expectations
-         */
-        nextFilter.filterWrite(EasyMock.eq(session), eqWriteRequest(chunk1Request));
-        nextFilter.filterWrite(EasyMock.eq(session), eqWriteRequest(chunk2Request));
-        nextFilter.filterWrite(EasyMock.eq(session), eqWriteRequest(chunk3Request));
-        nextFilter.messageSent(EasyMock.eq(session), eqWriteRequest(writeRequest));
-
-        /*
-         * Replay.
-         */
-        EasyMock.replay(nextFilter);
+        NextFilter nextFilter = mock(NextFilter.class);
 
         filter.filterWrite(nextFilter, session, writeRequest);
         filter.messageSent(nextFilter, session, chunk1Request);
         filter.messageSent(nextFilter, session, chunk2Request);
         filter.messageSent(nextFilter, session, chunk3Request);
 
-        /*
-         * Verify.
-         */
-        EasyMock.verify(nextFilter);
+        verify(nextFilter).filterWrite(eq(session), eqWriteRequest(chunk1Request));
+        verify(nextFilter).filterWrite(eq(session), eqWriteRequest(chunk2Request));
+        verify(nextFilter).filterWrite(eq(session), eqWriteRequest(chunk3Request));
+        verify(nextFilter).messageSent(eq(session), eqWriteRequest(writeRequest));
+        verifyNoMoreInteractions(nextFilter);
 
         assertTrue(writeRequest.getFuture().isWritten());
     }
@@ -228,21 +186,14 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         session.setAttribute(filter.CURRENT_STREAM, message);
         session.setAttribute(filter.WRITE_REQUEST_QUEUE, queue);
 
-        NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
-        /*
-         * Replay.  (We recorded *nothing* because nothing should occur.)
-         */
-        EasyMock.replay(nextFilter);
+        NextFilter nextFilter = mock(NextFilter.class);
 
         WriteRequest wr = new DefaultWriteRequest(new Object(), new DummyWriteFuture());
         filter.filterWrite(nextFilter, session, wr);
         assertEquals(1, queue.size());
         assertSame(wr, queue.poll());
 
-        /*
-         * Verify.
-         */
-        EasyMock.verify(nextFilter);
+        verifyNoMoreInteractions(nextFilter);
 
         session.removeAttribute(filter.CURRENT_STREAM);
         session.removeAttribute(filter.WRITE_REQUEST_QUEUE);
@@ -268,27 +219,16 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
         session.setAttribute(filter.CURRENT_WRITE_REQUEST, new DefaultWriteRequest(message));
         session.setAttribute(filter.WRITE_REQUEST_QUEUE, queue);
 
-        /*
-         * Record expectations
-         */
-        NextFilter nextFilter = EasyMock.createMock(NextFilter.class);
-        nextFilter.filterWrite(session, wrs[0]);
-        nextFilter.filterWrite(session, wrs[1]);
-        nextFilter.filterWrite(session, wrs[2]);
-        nextFilter.messageSent(EasyMock.eq(session), eqWriteRequest(new DefaultWriteRequest(message)));
-
-        /*
-         * Replay.
-         */
-        EasyMock.replay(nextFilter);
+        NextFilter nextFilter = mock(NextFilter.class);
 
         filter.messageSent(nextFilter, session, new DefaultWriteRequest(new Object()));
         assertEquals(0, queue.size());
 
-        /*
-         * Verify.
-         */
-        EasyMock.verify(nextFilter);
+        verify(nextFilter).filterWrite(session, wrs[0]);
+        verify(nextFilter).filterWrite(session, wrs[1]);
+        verify(nextFilter).filterWrite(session, wrs[2]);
+        verify(nextFilter).messageSent(eq(session), eqWriteRequest(new DefaultWriteRequest(message)));
+        verifyNoMoreInteractions(nextFilter);
     }
 
     /**
@@ -465,29 +405,26 @@ public abstract class AbstractStreamWriteFilterTest<M, U extends AbstractStreamW
     }
 
     public static WriteRequest eqWriteRequest(WriteRequest expected) {
-        EasyMock.reportMatcher(new WriteRequestMatcher(expected));
-        return null;
+         return argThat(new WriteRequestMatcher(expected));
     }
 
-    private static class WriteRequestMatcher implements IArgumentMatcher {
+    private static class WriteRequestMatcher implements ArgumentMatcher<WriteRequest> {
         private final WriteRequest expected;
 
         public WriteRequestMatcher(WriteRequest expected) {
             this.expected = expected;
         }
 
-        public boolean matches(Object actual) {
+        @Override
+        public boolean matches(WriteRequest actual) {
             if (actual instanceof WriteRequest) {
-                WriteRequest w2 = (WriteRequest) actual;
+                WriteRequest w2 = actual;
 
                 return expected.getMessage().equals(w2.getMessage())
                         && expected.getFuture().isWritten() == w2.getFuture().isWritten();
             }
-            return false;
-        }
 
-        public void appendTo(StringBuffer buffer) {
-            buffer.append("Expected a WriteRequest with the message '").append(expected.getMessage()).append("'");
+            return false;
         }
     }
 

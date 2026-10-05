@@ -20,39 +20,41 @@ package org.apache.mina.example.haiku;
 
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IoSession;
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
-public class HaikuValidatorIoHandlerTest extends MockObjectTestCase {
+public class HaikuValidatorIoHandlerTest  {
     private IoHandler handler;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() {
         handler = new HaikuValidatorIoHandler();
     }
 
+    @Test
     public void testValidHaiku() throws Exception {
-        Mock session = mock(IoSession.class);
-        session.expects(once()).method("write").with(eq("HAIKU!"));
-        IoSession sessionProxy = (IoSession) session.proxy();
+        IoSession session = mock(IoSession.class);
 
-        handler.messageReceived(sessionProxy, new Haiku(
+        handler.messageReceived(session, new Haiku(
                 "Oh, I drank too much.", "Why, oh why did I sign up",
                 "For an eight thirty?"));
+
+        verify(session).write("HAIKU!");
     }
 
+    @Test
     public void testInvalidHaiku() throws Exception {
-        Mock session = mock(IoSession.class);
-        session.expects(once()).method("write").with(
-                eq("NOT A HAIKU: phrase 1, 'foo' had 1 syllables, not 5"));
-        IoSession sessionProxy = (IoSession) session.proxy();
+        IoSession session = mock(IoSession.class);
 
-        handler.messageReceived(sessionProxy,
+        handler.messageReceived(session,
                 new Haiku("foo", "a haiku", "poo"));
+
+        verify(session).write("NOT A HAIKU: phrase 1, 'foo' had 1 syllables, not 5");
     }
 }
