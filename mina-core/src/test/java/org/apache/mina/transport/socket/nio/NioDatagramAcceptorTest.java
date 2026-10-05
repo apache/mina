@@ -41,7 +41,9 @@ public class NioDatagramAcceptorTest {
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
-                exception.set(cause);
+                if (isFromNioDatagramAcceptor(cause)) {
+                    exception.set(cause);
+                }
             }
         });
 
@@ -72,7 +74,9 @@ public class NioDatagramAcceptorTest {
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
-                exception.set(cause);
+                if (isFromNioDatagramAcceptor(cause)) {
+                    exception.set(cause);
+                }
             }
         });
 
@@ -105,5 +109,15 @@ public class NioDatagramAcceptorTest {
         } finally {
             ExceptionMonitor.setInstance(null);
         }
+    }
+
+    private static boolean isFromNioDatagramAcceptor(Throwable cause) {
+        for (StackTraceElement stackTraceElement : cause.getStackTrace()) {
+            String className = stackTraceElement.getClassName();
+            if (className.equals(NioDatagramAcceptor.class.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
