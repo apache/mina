@@ -760,7 +760,7 @@ import java.util.concurrent.Executor;
     }
 
     protected void forward_received(NextFilter next) {
-        //synchronized (mReceiveQueue) {
+        synchronized (mReceiveQueue) {
             IoBuffer x;
             while ((x = mReceiveQueue.poll()) != null) {
                 if (LOGGER.isDebugEnabled()) {
@@ -768,11 +768,11 @@ import java.util.concurrent.Executor;
                 }
                 next.messageReceived(mSession, x);
             }
-        //}
+        }
     }
 
     protected void forward_writes(NextFilter next) {
-        //synchronized (mWriteQueue) {
+         synchronized (mWriteQueue) {
             EncryptedWriteRequest x;
             while ((x = mWriteQueue.poll()) != null) {
                 if (LOGGER.isDebugEnabled()) {
@@ -781,19 +781,19 @@ import java.util.concurrent.Executor;
                 mAckQueue.add(x);
                 next.filterWrite(mSession, x);
             }
-        //}
+         }
     }
 
     protected void forward_events(NextFilter next) {
-        //synchronized (mEventQueue) {
+        synchronized(mEventQueue) {
             FilterEvent x;
-            while((x = mEventQueue.poll()) != null) {
+            while ((x = mEventQueue.poll()) != null) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("{} forward_events() - dispatching event {}", toString(), x);
                 }
                 next.event(mSession, x);
             }
-        //}
+        }
     }
 
     /**
