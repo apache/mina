@@ -49,8 +49,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
 public class SslEnd2EndTest {
@@ -90,7 +93,7 @@ public class SslEnd2EndTest {
     }
 
     @Test
-    public void shouldSendLargeMessages() throws Exception {
+    public void shouldSendLargeMessages() throws Throwable {
         ByteBuffer acceptorReceiveBuffer = ByteBuffer.allocate(MAX_LENGTH);
         AcceptorHandler acceptorHandler = new AcceptorHandler(acceptorReceiveBuffer);
         IoAcceptor acceptor = createAcceptor(acceptorHandler);
@@ -104,11 +107,7 @@ public class SslEnd2EndTest {
 
             try {
                 ConnectFuture connectFuture = connector.connect(acceptor.getLocalAddress());
-                boolean connected = connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS);
-
-                if (!connected) {
-                    throw new RuntimeException("Failed to connect");
-                }
+                assertTrue("Failed to connect", connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
 
                 IoBuffer connectorSendBuffer = IoBuffer.wrap(ByteBuffer.allocate(MAX_LENGTH));
 
@@ -136,16 +135,13 @@ public class SslEnd2EndTest {
                     connectorHandler.reset(connectorMessageReceivedLatch, messageLength);
 
                     WriteFuture writeFuture = session.write(connectorSendBuffer);
-                    boolean written = writeFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS);
-
-                    if (!written) {
-                        throw new RuntimeException("Failed to write data");
-                    }
+                    assertTrue("Connector write failed", writeFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
 
                     boolean messageReceived = acceptorMessageReceivedLatch.await(4L, TimeUnit.SECONDS);
 
                     if (!messageReceived) {
-                        throw new RuntimeException("Failed to receive from connector");
+                        assertNoException(acceptorHandler.getFailure());
+                        fail("Failed to receive from connector");
                     }
 
                     acceptorReceiveBuffer.flip();
@@ -157,7 +153,8 @@ public class SslEnd2EndTest {
                     boolean connectorMessageReceived = connectorMessageReceivedLatch.await(4L, TimeUnit.SECONDS);
 
                     if (!connectorMessageReceived) {
-                        throw new RuntimeException("Failed to receive from acceptor");
+                        assertNoException(connectorHandler.getFailure());
+                        fail("Failed to receive from acceptor");
                     }
 
                     connectorReceiveBuffer.flip();
@@ -174,6 +171,12 @@ public class SslEnd2EndTest {
         } finally {
             acceptor.unbind();
             acceptor.dispose();
+        }
+    }
+
+    private void assertNoException(Throwable exception) throws Throwable {
+        if (exception != null) {
+            throw exception;
         }
     }
 
@@ -258,11 +261,13 @@ public class SslEnd2EndTest {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(AcceptorHandler.class);
         private final ByteBuffer receiveBuffer;
+        private final AtomicReference<Throwable> exception;
         private CountDownLatch messageReceivedLatch;
         private int expectedLength;
 
         private AcceptorHandler(ByteBuffer receiveBuffer) {
             this.receiveBuffer = receiveBuffer;
+            this.exception = new AtomicReference<>();
         }
 
         public void reset(CountDownLatch messageReceivedLatch, int expectedLength) {
@@ -277,9 +282,17 @@ public class SslEnd2EndTest {
             this.expectedLength = expectedLength;
         }
 
+        public Throwable getFailure() {
+            return exception.get();
+        }
+
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
-            LOGGER.error("Exception caught", cause);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Exception caught: {}", session, cause);
+            }
+
+            exception.set(cause);
         }
 
         @Override
@@ -304,11 +317,17 @@ public class SslEnd2EndTest {
         private static final Logger LOGGER = LoggerFactory.getLogger(ConnectorIoHandler.class);
 
         private final ByteBuffer receiveBuffer;
+        private final AtomicReference<Throwable> exception;
         private CountDownLatch messageReceivedLatch;
         private int expectedLength;
 
         private ConnectorIoHandler(ByteBuffer receiveBuffer) {
             this.receiveBuffer = receiveBuffer;
+            this.exception = new AtomicReference<>();
+        }
+
+        public Throwable getFailure() {
+            return exception.get();
         }
 
         public void reset(CountDownLatch messageReceivedLatch, int expectedLength) {
@@ -325,7 +344,11 @@ public class SslEnd2EndTest {
 
         @Override
         public void exceptionCaught(IoSession session, Throwable cause) {
-            LOGGER.error("Exception caught", cause);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Exception caught: {}", session, cause);
+            }
+            
+            exception.set(cause);
         }
 
         @Override
