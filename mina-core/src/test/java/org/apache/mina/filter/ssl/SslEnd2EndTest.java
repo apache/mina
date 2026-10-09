@@ -93,7 +93,7 @@ public class SslEnd2EndTest {
     }
 
     @Test
-    public void shouldSendLargeMessages() throws Throwable {
+    public void shouldSendLargeMessages() throws Exception {
         ByteBuffer acceptorReceiveBuffer = ByteBuffer.allocate(MAX_LENGTH);
         AcceptorHandler acceptorHandler = new AcceptorHandler(acceptorReceiveBuffer);
         IoAcceptor acceptor = createAcceptor(acceptorHandler);
@@ -174,9 +174,9 @@ public class SslEnd2EndTest {
         }
     }
 
-    private void assertNoException(Throwable exception) throws Throwable {
+    private void assertNoException(Throwable exception) {
         if (exception != null) {
-            throw exception;
+            throw new AssertionError(exception);
         }
     }
 
@@ -292,7 +292,7 @@ public class SslEnd2EndTest {
                 LOGGER.debug("Exception caught: {}", session, cause);
             }
 
-            exception.set(cause);
+            exception.compareAndSet(null, cause);
         }
 
         @Override
@@ -347,8 +347,8 @@ public class SslEnd2EndTest {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Exception caught: {}", session, cause);
             }
-            
-            exception.set(cause);
+
+            exception.compareAndSet(null, cause);
         }
 
         @Override
