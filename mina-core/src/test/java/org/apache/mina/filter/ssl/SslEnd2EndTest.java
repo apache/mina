@@ -188,6 +188,7 @@ public class SslEnd2EndTest {
         SSLContext sslContext = createAcceptorSSLContext();
 
         SslFilter sslFilter = new SslFilter(sslContext);
+        sslFilter.setUseNonBlockingPipeline(true);
         sslFilter.setEnabledCipherSuites(cipherSuites);
         sslFilter.setEnabledProtocols(protocol);
 
@@ -205,6 +206,7 @@ public class SslEnd2EndTest {
         SSLContext sslContext = createConnectorSslContext();
 
         SslFilter sslFilter = new SslFilter(sslContext);
+        sslFilter.setUseNonBlockingPipeline(true);
         sslFilter.setEnabledCipherSuites(cipherSuites);
         sslFilter.setEnabledProtocols(protocol);
 
