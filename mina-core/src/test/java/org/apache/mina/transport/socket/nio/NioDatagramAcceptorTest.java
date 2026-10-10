@@ -24,6 +24,8 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.util.AcceptorBindUtil;
 import org.apache.mina.util.ExceptionMonitor;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,13 +36,18 @@ import static org.junit.Assert.assertTrue;
 
 public class NioDatagramAcceptorTest {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NioDatagramAcceptorTest.class);
+
     @Test
     public void shouldDisposeAcceptorSilentlyWhenExecutorIsShutdown() {
         AtomicReference<Throwable> exception = new AtomicReference<>();
 
+        ExceptionMonitor previous = ExceptionMonitor.getInstance();
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
+                LOGGER.error("Exception caught", cause);
+
                 if (isFromNioDatagramAcceptor(cause)) {
                     exception.set(cause);
                 }
@@ -63,7 +70,7 @@ public class NioDatagramAcceptorTest {
                 assertNull("Exception must not be thrown when disposing executor service", exception.get());
             }
         } finally {
-            ExceptionMonitor.setInstance(null);
+            ExceptionMonitor.setInstance(previous);
         }
     }
 
@@ -71,9 +78,12 @@ public class NioDatagramAcceptorTest {
     public void shouldThrowExceptionWhenThreadIsInterruptedAndServiceIsNotDisposing() {
         AtomicReference<Throwable> exception = new AtomicReference<>();
 
+        ExceptionMonitor previous = ExceptionMonitor.getInstance();
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
+                LOGGER.error("Exception caught", cause);
+
                 if (isFromNioDatagramAcceptor(cause)) {
                     exception.set(cause);
                 }
@@ -107,7 +117,7 @@ public class NioDatagramAcceptorTest {
                 }
             }
         } finally {
-            ExceptionMonitor.setInstance(null);
+            ExceptionMonitor.setInstance(previous);
         }
     }
 
