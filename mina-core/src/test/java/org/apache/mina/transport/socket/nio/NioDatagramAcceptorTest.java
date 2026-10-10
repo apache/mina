@@ -23,7 +23,9 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.util.AcceptorBindUtil;
 import org.apache.mina.util.ExceptionMonitor;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,9 @@ public class NioDatagramAcceptorTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NioDatagramAcceptorTest.class);
 
+    @Rule
+    public TestName testName = new TestName();
+
     @Test
     public void shouldDisposeAcceptorSilentlyWhenExecutorIsShutdown() {
         AtomicReference<Throwable> exception = new AtomicReference<>();
@@ -46,7 +51,7 @@ public class NioDatagramAcceptorTest {
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
-                LOGGER.error("Exception caught", cause);
+                LOGGER.error("Exception caught in test {}", testName.getMethodName(), cause);
 
                 if (isFromNioDatagramAcceptor(cause)) {
                     exception.set(cause);
@@ -82,7 +87,7 @@ public class NioDatagramAcceptorTest {
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
-                LOGGER.error("Exception caught", cause);
+                LOGGER.error("Exception caught in test {}", testName.getMethodName(), cause);
 
                 if (isFromNioDatagramAcceptor(cause)) {
                     exception.set(cause);
