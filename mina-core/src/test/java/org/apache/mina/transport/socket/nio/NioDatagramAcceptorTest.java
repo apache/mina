@@ -23,7 +23,11 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.util.AcceptorBindUtil;
 import org.apache.mina.util.ExceptionMonitor;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,14 +38,24 @@ import static org.junit.Assert.assertTrue;
 
 public class NioDatagramAcceptorTest {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NioDatagramAcceptorTest.class);
+
+    @Rule
+    public TestName testName = new TestName();
+
     @Test
     public void shouldDisposeAcceptorSilentlyWhenExecutorIsShutdown() {
         AtomicReference<Throwable> exception = new AtomicReference<>();
 
+        ExceptionMonitor previous = ExceptionMonitor.getInstance();
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
-                exception.set(cause);
+                LOGGER.error("Exception caught in test {}", testName.getMethodName(), cause);
+
+                if (isFromNioDatagramAcceptor(cause)) {
+                    exception.set(cause);
+                }
             }
         });
 
@@ -61,7 +75,7 @@ public class NioDatagramAcceptorTest {
                 assertNull("Exception must not be thrown when disposing executor service", exception.get());
             }
         } finally {
-            ExceptionMonitor.setInstance(null);
+            ExceptionMonitor.setInstance(previous);
         }
     }
 
@@ -69,10 +83,15 @@ public class NioDatagramAcceptorTest {
     public void shouldThrowExceptionWhenThreadIsInterruptedAndServiceIsNotDisposing() {
         AtomicReference<Throwable> exception = new AtomicReference<>();
 
+        ExceptionMonitor previous = ExceptionMonitor.getInstance();
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
-                exception.set(cause);
+                LOGGER.error("Exception caught in test {}", testName.getMethodName(), cause);
+
+                if (isFromNioDatagramAcceptor(cause)) {
+                    exception.set(cause);
+                }
             }
         });
 
@@ -103,7 +122,17 @@ public class NioDatagramAcceptorTest {
                 }
             }
         } finally {
-            ExceptionMonitor.setInstance(null);
+            ExceptionMonitor.setInstance(previous);
         }
+    }
+
+    private static boolean isFromNioDatagramAcceptor(Throwable cause) {
+        for (StackTraceElement stackTraceElement : cause.getStackTrace()) {
+            String className = stackTraceElement.getClassName();
+            if (className.equals(NioDatagramAcceptor.class.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
