@@ -26,6 +26,7 @@ import java.util.concurrent.Executor;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
@@ -92,6 +93,11 @@ public abstract class SslHandler {
      * Progressive decoder buffer
      */
     protected IoBuffer mDecodeBuffer;
+
+    /**
+     * Captured error state
+     */
+    protected SSLException mPendingError = null;
 
     /**
      * Instantiates a new handler
@@ -175,6 +181,22 @@ public abstract class SslHandler {
      * @throws SSLException The thrown exception
      */
     abstract public void close(NextFilter next, final boolean linger) throws SSLException;
+
+    /**
+     * Attempts to generate a handshake message and write the data to the IoSession.
+     * <p>
+     * If FAST_HANDSHAKE is enabled, this method will recursively loop in order to
+     * combine multiple messages into one buffer.
+     * 
+     * @param next
+     * @param source
+     * @param dest
+     * 
+     * @return {@code true} if a message was generated and written
+     * 
+     * @throws SSLException
+     */
+    protected abstract boolean write_handshake_loop(NextFilter next, IoBuffer source, IoBuffer dest) throws SSLException;
 
     /**
      * {@inheritDoc}
@@ -280,5 +302,49 @@ public abstract class SslHandler {
             session = this.mEngine.getSession();
         int packets = 1 + (estimate / session.getPacketBufferSize());
         return IoBuffer.allocate(packets * session.getApplicationBufferSize());
+    }
+    
+
+    /**
+     * Process the pending error and loop to send the associated alert if we have some.
+     * 
+     * @param next The next filter in the chain
+     * @throws SSLException The rethrown pending error
+     */
+    synchronized protected void throw_pending_error(NextFilter next) throws SSLException {
+        SSLException sslException = mPendingError;
+        
+        if (sslException != null) {
+            // Errors are fatal: the pending error stays set and is rethrown on every subsequent call.
+            if (mEngine.isInboundDone() && mEngine.getHandshakeStatus() == HandshakeStatus.NEED_WRAP) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{} throw_pending_error() - handshake needs wrap, invoking write", toString());
+                }
+                
+                write_handshake(next);
+            }
+
+            throw sslException;
+        }
+    }
+
+    /**
+     * Attempts to generate a handshake message and write the data to the IoSession
+     * 
+     * @param next
+     * 
+     * @return {@code true} if a message was generated and written
+     * 
+     * @throws SSLException
+     */
+    synchronized protected boolean write_handshake(NextFilter next) throws SSLException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("{} write_handshake() - internal", toString());
+        }
+
+        IoBuffer source = ZERO;
+        IoBuffer dest = allocate_encode_buffer(source.remaining());
+        
+        return write_handshake_loop(next, source, dest);
     }
 }

@@ -29,6 +29,7 @@ import org.apache.mina.filter.FilterEvent;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
+
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -110,11 +111,11 @@ import java.util.concurrent.Executor;
      * Pending filter events for dispatching
      */
     protected final Deque<FilterEvent> mEventQueue = new ConcurrentLinkedDeque<>();
-
-    /**
-     * Captured error state
-     */
-    protected SSLException mPendingError = null;
+//
+//    /**
+//     * Captured error state
+//     */
+//    protected SSLException mPendingError = null;
 
     /**
      * Instantiates a new handler
@@ -237,10 +238,19 @@ import java.util.concurrent.Executor;
                 throw new IllegalStateException("closed");
             }
         }
+        
+        // The message is null when we have had an exception
+        if (message==null) {
+            if ( mPendingError != null ) {
+                throw mPendingError;
+            } else {
+                throw new IllegalStateException("closed");
+            }
+        }
 
         IoBuffer source = message;
         
-        // No need to fo for another loop if the message is empty
+        // No need to go for another loop if the message is empty
         if (source.remaining() == 0) {
             return;
         }
@@ -499,16 +509,16 @@ import java.util.concurrent.Executor;
      * 
      * @throws SSLException
      */
-    synchronized protected boolean write_handshake(NextFilter next) throws SSLException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} write_handshake() - internal", toString());
-        }
-
-        IoBuffer source = ZERO;
-        IoBuffer dest = allocate_encode_buffer(source.remaining());
-        
-        return write_handshake_loop(next, source, dest);
-    }
+//    synchronized protected boolean write_handshake(NextFilter next) throws SSLException {
+//        if (LOGGER.isDebugEnabled()) {
+//            LOGGER.debug("{} write_handshake() - internal", toString());
+//        }
+//
+//        IoBuffer source = ZERO;
+//        IoBuffer dest = allocate_encode_buffer(source.remaining());
+//        
+//        return write_handshake_loop(next, source, dest);
+//    }
 
     /**
      * Attempts to generate a handshake message and write the data to the IoSession.
@@ -524,6 +534,7 @@ import java.util.concurrent.Executor;
      * 
      * @throws SSLException
      */
+    @Override
     @SuppressWarnings("incomplete-switch")
     protected boolean write_handshake_loop(NextFilter next, IoBuffer source, IoBuffer dest) throws SSLException {
         if (mOutboundClosing && mEngine.isOutboundDone()) {
@@ -734,19 +745,22 @@ import java.util.concurrent.Executor;
      * @param next The next filter in the chain
      * @throws SSLException The rethrown pending error
      */
-    synchronized protected void throw_pending_error(NextFilter next) throws SSLException {
-        SSLException sslException = mPendingError;
-        if (sslException != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("{} throw_pending_error() - throwing pending error");
-            }
-            // Loop to send back the alert messages
-            receive_loop(next, null);
-            mPendingError = null;
-            // And finally rethrow the exception 
-            throw sslException;
-        }
-    }
+//    synchronized protected void throw_pending_error(NextFilter next) throws SSLException {
+//        SSLException sslException = mPendingError;
+//        
+//        if (sslException != null) {
+//            // Errors are fatal: the pending error stays set and is rethrown on every subsequent call.
+//            if (mEngine.isInboundDone() && mEngine.getHandshakeStatus() == HandshakeStatus.NEED_WRAP) {
+//                if (LOGGER.isDebugEnabled()) {
+//                    LOGGER.debug("{} throw_pending_error() - handshake needs wrap, invoking write", toString());
+//                }
+//                
+//                write_handshake(next);
+//            }
+//
+//            throw sslException;
+//        }
+//    }
 
     /**
      * Store any error we've got during the handshake or message handling
