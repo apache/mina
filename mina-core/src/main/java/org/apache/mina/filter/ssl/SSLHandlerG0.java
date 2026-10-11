@@ -95,11 +95,6 @@ import org.apache.mina.core.write.WriteRequest;
     protected Thread mDecodeThread = null;
 
     /**
-     * Captured error state
-     */
-    //protected SSLException mPendingError = null;
-
-    /**
      * Instantiates a new handler
      * 
      * @param sslEngine The SSLEngine instance
@@ -460,26 +455,6 @@ import org.apache.mina.core.write.WriteRequest;
     }
 
     /**
-     * Attempts to generate a handshake message and write the data to the IoSession
-     * 
-     * @param next
-     * 
-     * @return {@code true} if a message was generated and written
-     * 
-     * @throws SSLException
-     */
-//    synchronized protected boolean write_handshake(NextFilter next) throws SSLException {
-//        if (LOGGER.isDebugEnabled()) {
-//            LOGGER.debug("{} write_handshake() - internal", toString());
-//        }
-//
-//        IoBuffer source = ZERO;
-//        IoBuffer dest = allocate_encode_buffer(source.remaining());
-//        
-//        return write_handshake_loop(next, source, dest);
-//    }
-
-    /**
      * Attempts to generate a handshake message and write the data to the IoSession.
      * <p>
      * If FAST_HANDSHAKE is enabled, this method will recursively loop in order to
@@ -684,29 +659,6 @@ import org.apache.mina.core.write.WriteRequest;
             flush(next);
         }
     }
-
-    /**
-     * Process the pending error and loop to send the associated alert if we have some.
-     * 
-     * @param next The next filter in the chain
-     * @throws SSLException The rethrown pending error
-     */
-//    synchronized protected void throw_pending_error(NextFilter next) throws SSLException {
-//        SSLException sslException = mPendingError;
-//        
-//        if (sslException != null) {
-//            // Errors are fatal: the pending error stays set and is rethrown on every subsequent call.
-//            if (mEngine.isInboundDone() && mEngine.getHandshakeStatus() == HandshakeStatus.NEED_WRAP) {
-//                if (LOGGER.isDebugEnabled()) {
-//                    LOGGER.debug("{} throw_pending_error() - handshake needs wrap, invoking write", toString());
-//                }
-//                
-//                write_handshake(next);
-//            }
-//
-//            throw sslException;
-//        }
-//    }
 
     /**
      * Store any error we've got during the handshake or message handling
