@@ -95,11 +95,6 @@ import org.apache.mina.core.write.WriteRequest;
     protected Thread mDecodeThread = null;
 
     /**
-     * Captured error state
-     */
-    protected SSLException mPendingError = null;
-
-    /**
      * Instantiates a new handler
      * 
      * @param sslEngine The SSLEngine instance
@@ -200,6 +195,15 @@ import org.apache.mina.core.write.WriteRequest;
                     break;
             }
 
+            if ( mPendingError != null ) {
+                throw mPendingError;
+            } else {
+                throw new IllegalStateException("closed");
+            }
+        }
+
+        // The message is null when we have had an exception
+        if (message==null) {
             if ( mPendingError != null ) {
                 throw mPendingError;
             } else {
@@ -451,26 +455,6 @@ import org.apache.mina.core.write.WriteRequest;
     }
 
     /**
-     * Attempts to generate a handshake message and write the data to the IoSession
-     * 
-     * @param next
-     * 
-     * @return {@code true} if a message was generated and written
-     * 
-     * @throws SSLException
-     */
-    synchronized protected boolean write_handshake(NextFilter next) throws SSLException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} write_handshake() - internal", toString());
-        }
-
-        IoBuffer source = ZERO;
-        IoBuffer dest = allocate_encode_buffer(source.remaining());
-        
-        return write_handshake_loop(next, source, dest);
-    }
-
-    /**
      * Attempts to generate a handshake message and write the data to the IoSession.
      * <p>
      * If FAST_HANDSHAKE is enabled, this method will recursively loop in order to
@@ -484,6 +468,7 @@ import org.apache.mina.core.write.WriteRequest;
      * 
      * @throws SSLException
      */
+    @Override
     @SuppressWarnings("incomplete-switch")
     protected boolean write_handshake_loop(NextFilter next, IoBuffer source, IoBuffer dest) throws SSLException {
         if (mOutboundClosing && mEngine.isOutboundDone()) {
@@ -672,26 +657,6 @@ import org.apache.mina.core.write.WriteRequest;
             }
         } else {
             flush(next);
-        }
-    }
-
-    /**
-     * Process the pending error and loop to send the associated alert if we have some.
-     * 
-     * @param next The next filter in the chain
-     * @throws SSLException The rethrown pending error
-     */
-    synchronized protected void throw_pending_error(NextFilter next) throws SSLException {
-        SSLException sslException = mPendingError;
-        
-        if (sslException != null) {
-            // Loop to send back the alert messages
-            receive_loop(next, null);
-            
-            mPendingError = null;
-            
-            // And finally rethrow the exception 
-            throw sslException;
         }
     }
 

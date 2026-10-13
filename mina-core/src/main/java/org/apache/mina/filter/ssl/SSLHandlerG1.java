@@ -29,6 +29,7 @@ import org.apache.mina.filter.FilterEvent;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
+
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -69,7 +70,7 @@ import java.util.concurrent.Executor;
     /**
      * Enable asynchronous tasks. Default to false.
      */
-    static protected final boolean ENABLE_ASYNC_TASKS = false;
+    static protected final boolean ENABLE_ASYNC_TASKS = true;
 
     /**
      * Indicates whether the first handshake was completed
@@ -110,11 +111,6 @@ import java.util.concurrent.Executor;
      * Pending filter events for dispatching
      */
     protected final Deque<FilterEvent> mEventQueue = new ConcurrentLinkedDeque<>();
-
-    /**
-     * Captured error state
-     */
-    protected SSLException mPendingError = null;
 
     /**
      * Instantiates a new handler
@@ -237,10 +233,19 @@ import java.util.concurrent.Executor;
                 throw new IllegalStateException("closed");
             }
         }
+        
+        // The message is null when we have had an exception
+        if (message==null) {
+            if ( mPendingError != null ) {
+                throw mPendingError;
+            } else {
+                throw new IllegalStateException("closed");
+            }
+        }
 
         IoBuffer source = message;
         
-        // No need to fo for another loop if the message is empty
+        // No need to go for another loop if the message is empty
         if (source.remaining() == 0) {
             return;
         }
@@ -491,26 +496,6 @@ import java.util.concurrent.Executor;
     }
 
     /**
-     * Attempts to generate a handshake message and write the data to the IoSession
-     * 
-     * @param next
-     * 
-     * @return {@code true} if a message was generated and written
-     * 
-     * @throws SSLException
-     */
-    synchronized protected boolean write_handshake(NextFilter next) throws SSLException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{} write_handshake() - internal", toString());
-        }
-
-        IoBuffer source = ZERO;
-        IoBuffer dest = allocate_encode_buffer(source.remaining());
-        
-        return write_handshake_loop(next, source, dest);
-    }
-
-    /**
      * Attempts to generate a handshake message and write the data to the IoSession.
      * <p>
      * If FAST_HANDSHAKE is enabled, this method will recursively loop in order to
@@ -524,6 +509,7 @@ import java.util.concurrent.Executor;
      * 
      * @throws SSLException
      */
+    @Override
     @SuppressWarnings("incomplete-switch")
     protected boolean write_handshake_loop(NextFilter next, IoBuffer source, IoBuffer dest) throws SSLException {
         if (mOutboundClosing && mEngine.isOutboundDone()) {
@@ -725,26 +711,6 @@ import java.util.concurrent.Executor;
             }
         } else {
             flush_start(next);
-        }
-    }
-
-    /**
-     * Process the pending error and loop to send the associated alert if we have some.
-     * 
-     * @param next The next filter in the chain
-     * @throws SSLException The rethrown pending error
-     */
-    synchronized protected void throw_pending_error(NextFilter next) throws SSLException {
-        SSLException sslException = mPendingError;
-        if (sslException != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("{} throw_pending_error() - throwing pending error");
-            }
-            // Loop to send back the alert messages
-            receive_loop(next, null);
-            mPendingError = null;
-            // And finally rethrow the exception 
-            throw sslException;
         }
     }
 
