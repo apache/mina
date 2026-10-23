@@ -70,7 +70,7 @@ public class DatagramBindTest extends AbstractBindTest {
                 acceptor.setDefaultLocalAddress(createSocketAddress(port));
                 acceptor.bind();
                 break;
-            } catch (RuntimeException re ) {
+            } catch (IOException e) {
                 nbTry--;
                 
                 System.out.println( "Retrying #" + ( 10 - nbTry) );
