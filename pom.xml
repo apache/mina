@@ -152,7 +152,7 @@
     <version.log4j>1.2.17</version.log4j>
     <version.mockito>5.24.0</version.mockito>
     <version.ognl>3.4.17</version.ognl>
-    <version.pmd>7.24.0</version.pmd>
+    <version.pmd>7.28.0</version.pmd>
     <version.slf4j.api>1.7.36</version.slf4j.api>
     <version.slf4j.reload4j>1.7.36</version.slf4j.reload4j>
     <version.slf4j.jcl.over.slf4j>1.7.36</version.slf4j.jcl.over.slf4j>
