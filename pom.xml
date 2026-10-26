@@ -159,7 +159,7 @@
     <version.springframework>7.0.10</version.springframework>
     <version.springframework.old>2.5.6.SEC03</version.springframework.old>
     <version.tomcat.jni>10.0.27</version.tomcat.jni>
-    <version.xbean.spring>4.30</version.xbean.spring>
+    <version.xbean.spring>4.31</version.xbean.spring>
 
     <!-- OSGi minimum versions -->
     <osgi-min-version.slf4j.api>1.7</osgi-min-version.slf4j.api>
