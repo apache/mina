@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
+import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -109,35 +110,8 @@ public class ExecutorFilterRegressionTest {
         }
     }
 
-    private static class EventOrderChecker implements NextFilter {
+    private static class EventOrderChecker extends IoFilterAdapter.NextFilterAdapter {
         Throwable throwable;
-
-        /**
-         * Default constructor
-         */
-        public EventOrderChecker() {
-            super();
-        }
-
-        public void sessionOpened(IoSession session) {
-            // Do nothing
-        }
-
-        public void sessionClosed(IoSession session) {
-            // Do nothing
-        }
-
-        public void sessionIdle(IoSession session, IdleStatus status) {
-            // Do nothing
-        }
-
-        public void exceptionCaught(IoSession session, Throwable cause) {
-            // Do nothing
-        }
-
-        public void inputClosed(IoSession session) {
-            // Do nothing
-        }
 
         public void messageReceived(IoSession session, Object message) {
             try {
@@ -147,26 +121,6 @@ public class ExecutorFilterRegressionTest {
                     this.throwable = e;
                 }
             }
-        }
-
-        public void messageSent(IoSession session, WriteRequest writeRequest) {
-            // Do nothing
-        }
-
-        public void filterWrite(IoSession session, WriteRequest writeRequest) {
-            // Do nothing
-        }
-
-        public void filterClose(IoSession session) {
-            // Do nothing
-        }
-
-        public void sessionCreated(IoSession session) {
-            // Do nothing
-        }
-        
-        public void event(IoSession session, FilterEvent event) {
-            // Do nothing
         }
     }
 }

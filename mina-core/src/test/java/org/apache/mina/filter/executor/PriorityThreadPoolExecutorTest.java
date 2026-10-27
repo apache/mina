@@ -19,20 +19,22 @@
  */
 package org.apache.mina.filter.executor;
 
-import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.DummySession;
-import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.core.write.WriteRequest;
-import org.apache.mina.filter.FilterEvent;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,6 +46,9 @@ import static org.junit.Assert.assertTrue;
  * @author Guus der Kinderen, guus.der.kinderen@gmail.com
  */
 public class PriorityThreadPoolExecutorTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PriorityThreadPoolExecutorTest.class);
+
     /**
      * Tests that verify the functionality provided by the implementation of
      * {@link org.apache.mina.filter.executor.PriorityThreadPoolExecutor.SessionEntry}
@@ -109,12 +114,7 @@ public class PriorityThreadPoolExecutorTest {
         IoSession session = new DummySession();
         final int predeterminedResult = 3853;
         
-        Comparator<IoSession> comparator = new Comparator<IoSession>() {
-            @Override
-            public int compare(IoSession o1, IoSession o2) {
-                return predeterminedResult;
-            }
-        };
+        Comparator<IoSession> comparator = (o1, o2) -> predeterminedResult;
         
         PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(session, comparator);
         PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(session, comparator);
@@ -143,12 +143,7 @@ public class PriorityThreadPoolExecutorTest {
         // relevant here!)
         final int predeterminedResult = 3853;
         
-        Comparator<IoSession> comparator = new Comparator<IoSession>() {
-            @Override
-            public int compare(IoSession o1, IoSession o2) {
-                return predeterminedResult;
-            }
-        };
+        Comparator<IoSession> comparator = (o1, o2) -> predeterminedResult;
         
         PriorityThreadPoolExecutor.SessionEntry first = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), comparator);
         PriorityThreadPoolExecutor.SessionEntry last = new PriorityThreadPoolExecutor.SessionEntry(new DummySession(), comparator);
@@ -177,11 +172,18 @@ public class PriorityThreadPoolExecutorTest {
      * @exception Throwable If the test throw an exception
      */
     @Test
-    @Ignore("This test faiuls randomly")
     public void testPrioritisation() throws Throwable {
-        // Set up fixture.
-        MockWorkFilter nextFilter = new MockWorkFilter();
+        IoSession blockerSession = new DummySession();
+        CountDownLatch blockerQueued = new CountDownLatch(1);
+        CountDownLatch sessionQueued = new CountDownLatch(1);
+
+        MockWorkFilter nextFilter = new MockWorkFilter(blockerSession, blockerQueued, sessionQueued);
         List<LastActivityTracker> sessions = new ArrayList<>();
+
+        int maximumPoolSize = 1; // keep this low, to force resource contention.
+        int sessionCount = 10;
+        int taskCount = 400;
+        int tasksPerSessionCount = taskCount / sessionCount;
         
         for (int i = 0; i < 10; i++) {
             sessions.add(new LastActivityTracker());
@@ -190,34 +192,57 @@ public class PriorityThreadPoolExecutorTest {
         LastActivityTracker preferredSession = sessions.get(4); // prefer an arbitrary session
                                                                 // (but not the first or last
                                                                 // session, for good measure).
+
         Comparator<IoSession> comparator = new UnfairComparator(preferredSession);
-        int maximumPoolSize = 1; // keep this low, to force resource contention.
-        int amountOfTasks = 400;
+
         
         ExecutorService executor = new PriorityThreadPoolExecutor(maximumPoolSize, comparator);
         ExecutorFilter filter = new ExecutorFilter(executor);
+
+        filter.messageReceived(nextFilter, blockerSession, null);
+        assertTrue("Worker did not start", blockerQueued.await(4L, TimeUnit.SECONDS));
         
         // Execute system under test.
-        for (int i = 0; i < amountOfTasks; i++) {
+        for (int i = 0; i < taskCount; i++) {
             int sessionIndex = i % sessions.size();
             
             LastActivityTracker currentSession = sessions.get(sessionIndex);
             filter.messageReceived(nextFilter, currentSession, null);
-        
-            if (nextFilter.throwable != null) {
-                throw nextFilter.throwable;
+
+            Throwable throwable = nextFilter.throwable.get();
+
+            if (throwable != null) {
+                throw throwable;
             }
         }
-        
+
+        sessionQueued.countDown();
+
+        // we have to wait before shutdown as shutdown events as prioritized
+        Thread.sleep(4L);
+
         executor.shutdown();
-        
-        // Verify results.
-        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-        
+        assertTrue(executor.awaitTermination(16L, TimeUnit.SECONDS));
+
         for (LastActivityTracker session : sessions) {
+            LOGGER.error("Session {} data [lastActivity={},messageCount={}]", session, session.lastActivity.get(),
+                    session.messageCount.get());
+        }
+
+        for (LastActivityTracker session : sessions) {
+            assertEquals(tasksPerSessionCount, session.messageCount.get());
+
             if (session != preferredSession) {
-                assertTrue("All other sessions should have finished later than the preferred session (but at least one did not).", 
-                    session.lastActivity > preferredSession.lastActivity);
+                long lastActivity = session.lastActivity.get();
+                long preferredActivity = preferredSession.lastActivity.get();
+
+                if (lastActivity <= preferredActivity) {
+                    LOGGER.error("Session {} finished at {}, before preferred session {} finished at {}", session,
+                            lastActivity, preferredSession, preferredActivity);
+                }
+
+                assertTrue("All other sessions should have finished later than the preferred session (but at least one did not).",
+                    lastActivity > preferredActivity);
             }
         }
     }
@@ -226,93 +251,73 @@ public class PriorityThreadPoolExecutorTest {
      * A comparator that prefers a particular session.
      */
     private static class UnfairComparator implements Comparator<IoSession> {
-        private IoSession preferred;
-        
+
+        private final IoSession preferred;
+
         public UnfairComparator(IoSession preferred) {
             this.preferred = preferred;
         }
-        
+
         @Override
         public int compare(IoSession o1, IoSession o2) {
             if (o1 == preferred) {
                 return -1;
             }
-        
+
             if (o2 == preferred) {
                 return 1;
             }
-        
+
             return 0;
         }
     }
 
     /**
-     * A session that tracks the timestamp of last activity.
+     * A session that tracks the timestamp of the last activity.
      */
     private static class LastActivityTracker extends DummySession {
-        long lastActivity = System.currentTimeMillis();
 
-        public synchronized void setLastActivity() {
-            lastActivity = System.currentTimeMillis();
+        private final AtomicLong lastActivity = new AtomicLong();
+        private final AtomicInteger messageCount = new AtomicInteger();
+
+        public void markMessageReceived() {
+            lastActivity.set(System.nanoTime());
+            messageCount.incrementAndGet();
         }
     }
 
     /**
      * A filter that simulates a non-negligible amount of work.
      */
-    private static class MockWorkFilter implements IoFilter.NextFilter {
-        Throwable throwable;
-        
-        public void sessionOpened(IoSession session) {
-            // Do nothing
+    private static class MockWorkFilter extends IoFilterAdapter.NextFilterAdapter {
+
+        private final IoSession blockerSession;
+        private final CountDownLatch blockerQueued;
+        private final CountDownLatch sessionsQueued;
+        private final AtomicReference<Throwable> throwable = new AtomicReference<>();
+
+        public MockWorkFilter(IoSession blockerSession, CountDownLatch blockerQueued, CountDownLatch sessionsQueued) {
+            this.blockerSession = blockerSession;
+            this.blockerQueued = blockerQueued;
+            this.sessionsQueued = sessionsQueued;
         }
-        
-        public void sessionClosed(IoSession session) {
-            // Do nothing
-        }
-        
-        public void sessionIdle(IoSession session, IdleStatus status) {
-            // Do nothing
-        }
-        
+
         public void exceptionCaught(IoSession session, Throwable cause) {
-            // Do nothing
+            throwable.compareAndSet(null, cause);
         }
-        
-        public void inputClosed(IoSession session) {
-            // Do nothing
-        }
-        
+
         public void messageReceived(IoSession session, Object message) {
             try {
-                Thread.sleep(20); // mimic work.
-                ((LastActivityTracker) session).setLastActivity();
-            } catch (Exception e) {
-                if (this.throwable == null) {
-                    this.throwable = e;
+                if (session == blockerSession) {
+                    // notify that the blocker session has been queued and await for other sessions to queue
+                    blockerQueued.countDown();
+                    sessionsQueued.await();
+                } else {
+                    ((LastActivityTracker) session).markMessageReceived();
                 }
+            } catch (InterruptedException e) {
+                throwable.compareAndSet(null, e);
             }
-        }
-        
-        public void messageSent(IoSession session, WriteRequest writeRequest) {
-            // Do nothing
-        }
-        
-        public void filterWrite(IoSession session, WriteRequest writeRequest) {
-            // Do nothing
-        }
-        
-        public void filterClose(IoSession session) {
-            // Do nothing
-        }
-        
-        public void sessionCreated(IoSession session) {
-            // Do nothing
-        }
-        
-        @Override
-        public void event(IoSession session, FilterEvent event) {
-            // TODO Auto-generated method stub
         }
     }
 }
