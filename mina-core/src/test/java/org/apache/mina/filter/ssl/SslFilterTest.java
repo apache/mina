@@ -104,7 +104,10 @@ public class SslFilterTest {
                 LOG.error("client packet size " + sslClient.getSession().getPacketBufferSize());
                 LOG.error("client app buffer size " + sslClient.getSession().getApplicationBufferSize());
                 for (int msgSize = 61000; msgSize < 80000; msgSize++) {
-                    LOG.error("Trying " + msgSize);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Trying " + msgSize);
+                    }
+
                     CountDownLatch received = new CountDownLatch(1);
                     filter.init(received, msgSize);
                     IoBuffer data = createMosaicRequest(msgSize);
