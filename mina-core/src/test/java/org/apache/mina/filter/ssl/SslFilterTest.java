@@ -186,11 +186,17 @@ public class SslFilterTest {
                 b.get(data);
                 acc.put(data);
             } else {
-                LOG.error("Remote: got " + received + " bytes");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Remote: got " + received + " bytes");
+                }
                 acc.put(b);
             }
             needBytes -= received;
-            LOG.error("Remote: still need " + needBytes + " bytes");
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Remote: still need " + needBytes + " bytes");
+            }
+
             if (needBytes <= 0) {
                 int i = 0;
                 int j = 0;
