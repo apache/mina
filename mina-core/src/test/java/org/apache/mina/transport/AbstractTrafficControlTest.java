@@ -172,19 +172,19 @@ public abstract class AbstractTrafficControlTest {
     }
 
     private int read(IoSession session) throws Exception {
-        int pos = ((Integer) session.getAttribute("pos")).intValue();
+        int pos = (Integer) session.getAttribute("pos");
         for (int i = 0; i < 10 && pos == getReceived(session).length(); i++) {
             Object lock = session.getAttribute("lock");
             lock.wait(200);
         }
-        session.setAttribute("pos", new Integer(pos + 1));
+        session.setAttribute("pos", pos + 1);
         String received = getReceived(session);
         assertTrue(received.length() > pos);
         return getReceived(session).charAt(pos);
     }
 
     private boolean canRead(IoSession session) throws Exception {
-        int pos = ((Integer) session.getAttribute("pos")).intValue();
+        int pos = (Integer) session.getAttribute("pos");
         Object lock = session.getAttribute("lock");
         lock.wait(250);
         String received = getReceived(session);
@@ -210,7 +210,7 @@ public abstract class AbstractTrafficControlTest {
         @Override
         public void sessionCreated(IoSession session) throws Exception {
             super.sessionCreated(session);
-            session.setAttribute("pos", new Integer(0));
+            session.setAttribute("pos", 0);
             session.setAttribute("received", new StringBuffer());
             session.setAttribute("sent", new StringBuffer());
             session.setAttribute("lock", new Object());

@@ -59,7 +59,7 @@ public class CircularQueueTest {
             // make expansion happen
             int oldCapacity = q.capacity();
             for (int j = q.capacity(); j >= 0; j--) {
-                q.offer(new Integer(++pushCount));
+                q.offer(++pushCount);
             }
 
             assertTrue(q.capacity() > oldCapacity);
@@ -69,7 +69,7 @@ public class CircularQueueTest {
 
     private void testRotation0(CircularQueue<Integer> q) {
         for (int i = 0; i < q.capacity() * 7 / 4; i++) {
-            q.offer(new Integer(++pushCount));
+            q.offer(++pushCount);
             assertEquals(++popCount, q.poll().intValue());
         }
     }
@@ -79,23 +79,23 @@ public class CircularQueueTest {
         CircularQueue<Integer> q = new CircularQueue<>();
         // Create a queue with 5 elements and capacity 8;
         for (int i = 0; i < 5; i++) {
-            q.offer(new Integer(i));
+            q.offer(i);
         }
 
-        q.add(0, new Integer(100));
-        q.add(3, new Integer(200));
-        q.add(7, new Integer(300));
+        q.add(0, 100);
+        q.add(3, 200);
+        q.add(7, 300);
 
         Iterator<Integer> i = q.iterator();
         assertEquals(8, q.size());
-        assertEquals(new Integer(100), i.next());
-        assertEquals(new Integer(0), i.next());
-        assertEquals(new Integer(1), i.next());
-        assertEquals(new Integer(200), i.next());
-        assertEquals(new Integer(2), i.next());
-        assertEquals(new Integer(3), i.next());
-        assertEquals(new Integer(4), i.next());
-        assertEquals(new Integer(300), i.next());
+        assertEquals(100, i.next().intValue());
+        assertEquals(0, i.next().intValue());
+        assertEquals(1, i.next().intValue());
+        assertEquals(200, i.next().intValue());
+        assertEquals(2, i.next().intValue());
+        assertEquals(3, i.next().intValue());
+        assertEquals(4, i.next().intValue());
+        assertEquals(Integer.valueOf(300), i.next());
 
         try {
             i.next();
@@ -110,27 +110,27 @@ public class CircularQueueTest {
     public void testRandomAddOnRotatedQueue() {
         CircularQueue<Integer> q = getRotatedQueue();
 
-        q.add(0, new Integer(100)); // addFirst
-        q.add(2, new Integer(200));
-        q.add(4, new Integer(300));
-        q.add(10, new Integer(400));
-        q.add(12, new Integer(500)); // addLast
+        q.add(0, 100); // addFirst
+        q.add(2, 200);
+        q.add(4, 300);
+        q.add(10, 400);
+        q.add(12, 500); // addLast
 
         Iterator<Integer> i = q.iterator();
         assertEquals(13, q.size());
-        assertEquals(new Integer(100), i.next());
-        assertEquals(new Integer(0), i.next());
-        assertEquals(new Integer(200), i.next());
-        assertEquals(new Integer(1), i.next());
-        assertEquals(new Integer(300), i.next());
-        assertEquals(new Integer(2), i.next());
-        assertEquals(new Integer(3), i.next());
-        assertEquals(new Integer(4), i.next());
-        assertEquals(new Integer(5), i.next());
-        assertEquals(new Integer(6), i.next());
-        assertEquals(new Integer(400), i.next());
-        assertEquals(new Integer(7), i.next());
-        assertEquals(new Integer(500), i.next());
+        assertEquals(100, i.next().intValue());
+        assertEquals(0, i.next().intValue());
+        assertEquals(200, i.next().intValue());
+        assertEquals(1, i.next().intValue());
+        assertEquals(Integer.valueOf(300), i.next());
+        assertEquals(Integer.valueOf(2), i.next());
+        assertEquals(Integer.valueOf(3), i.next());
+        assertEquals(Integer.valueOf(4), i.next());
+        assertEquals(Integer.valueOf(5), i.next());
+        assertEquals(Integer.valueOf(6), i.next());
+        assertEquals(Integer.valueOf(400), i.next());
+        assertEquals(Integer.valueOf(7), i.next());
+        assertEquals(Integer.valueOf(500), i.next());
 
         try {
             i.next();
@@ -147,7 +147,7 @@ public class CircularQueueTest {
 
         // Create a queue with 5 elements and capacity 8;
         for (int i = 0; i < 5; i++) {
-            q.offer(new Integer(i));
+            q.offer(i);
         }
 
         q.remove(0);
@@ -156,8 +156,8 @@ public class CircularQueueTest {
 
         Iterator<Integer> i = q.iterator();
         assertEquals(2, q.size());
-        assertEquals(new Integer(1), i.next());
-        assertEquals(new Integer(2), i.next());
+        assertEquals(Integer.valueOf(1), i.next());
+        assertEquals(Integer.valueOf(2), i.next());
 
         try {
             i.next();
@@ -179,10 +179,10 @@ public class CircularQueueTest {
 
         Iterator<Integer> i = q.iterator();
         assertEquals(4, q.size());
-        assertEquals(new Integer(1), i.next());
-        assertEquals(new Integer(2), i.next());
-        assertEquals(new Integer(5), i.next());
-        assertEquals(new Integer(6), i.next());
+        assertEquals(Integer.valueOf(1), i.next());
+        assertEquals(Integer.valueOf(2), i.next());
+        assertEquals(Integer.valueOf(5), i.next());
+        assertEquals(Integer.valueOf(6), i.next());
 
         try {
             i.next();
@@ -221,19 +221,19 @@ public class CircularQueueTest {
 
         // Ensure capacity: 16
         for (int i = 0; i < 16; i++) {
-            q.offer(new Integer(-1));
+            q.offer(-1);
         }
         q.clear();
 
         // Rotate it
         for (int i = 0; i < 12; i++) {
-            q.offer(new Integer(-1));
+            q.offer(-1);
             q.poll();
         }
 
         // Now push items
         for (int i = 0; i < 8; i++) {
-            q.offer(new Integer(i));
+            q.offer(i);
         }
 
         return q;
