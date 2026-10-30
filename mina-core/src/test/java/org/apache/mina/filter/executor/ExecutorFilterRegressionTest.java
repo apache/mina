@@ -71,7 +71,7 @@ public class ExecutorFilterRegressionTest {
         //executor.setKeepAliveTime(3, TimeUnit.SECONDS);
 
         for (int i = 0; i < loop; i++) {
-            Integer objI = new Integer(i);
+            Integer objI = i;
 
             for (int j = end; j >= 0; j--) {
                 filter.messageReceived(nextFilter, sessions[j], objI);
@@ -102,7 +102,7 @@ public class ExecutorFilterRegressionTest {
 
         public synchronized void setLastCount(Integer newCount) {
             if (lastCount != null) {
-                assertEquals(lastCount.intValue() + 1, newCount.intValue());
+                assertEquals(lastCount + 1, newCount.intValue());
             }
 
             lastCount = newCount;
