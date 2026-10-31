@@ -169,4 +169,95 @@ public class IoFilterAdapter implements IoFilter {
     public String toString() {
         return this.getClass().getSimpleName();
     }
+
+    public static class NextFilterAdapter implements NextFilter {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void sessionCreated(IoSession session) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void sessionOpened(IoSession session) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void sessionClosed(IoSession session) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void sessionIdle(IoSession session, IdleStatus status) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void exceptionCaught(IoSession session, Throwable cause) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void inputClosed(IoSession session) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void messageReceived(IoSession session, Object message) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void messageSent(IoSession session, WriteRequest writeRequest) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void filterWrite(IoSession session, WriteRequest writeRequest) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void filterClose(IoSession session) {
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void event(IoSession session, FilterEvent event) {
+
+        }
+    }
 }

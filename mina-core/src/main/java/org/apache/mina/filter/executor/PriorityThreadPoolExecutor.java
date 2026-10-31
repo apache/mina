@@ -751,7 +751,8 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
 
             try {
                 for (;;) {
-                    IoSession session = fetchSession();
+                    SessionEntry entry = fetchSessionEntry();
+                    IoSession session = entry == null ? null : entry.getSession();
 
                     idleWorkers.decrementAndGet();
 
@@ -763,7 +764,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
                         }
                     }
 
-                    if (session == EXIT_SIGNAL) {
+                    if (entry == EXIT_SIGNAL) {
                         break;
                     }
 
@@ -782,7 +783,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
 
-        private IoSession fetchSession() {
+        private SessionEntry fetchSessionEntry() {
             SessionEntry entry = null;
             long currentTime = System.currentTimeMillis();
             long deadline = currentTime + getKeepAliveTime(TimeUnit.MILLISECONDS);
@@ -809,10 +810,7 @@ public class PriorityThreadPoolExecutor extends ThreadPoolExecutor {
                 }
             }
 
-            if (entry != null) {
-                return entry.getSession();
-            }
-            return null;
+            return entry;
         }
 
         private void runTasks(SessionQueue sessionTasksQueue) {
