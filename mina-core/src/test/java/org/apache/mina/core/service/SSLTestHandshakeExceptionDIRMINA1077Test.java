@@ -58,7 +58,7 @@ public class SSLTestHandshakeExceptionDIRMINA1077Test {
     private static InetAddress address;
     private static NioSocketAcceptor acceptor;
 
-    /** A JVM independant KEY_MANAGER_FACTORY algorithm */
+    /** A JVM independent KEY_MANAGER_FACTORY algorithm */
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
 
     static {
