@@ -181,6 +181,8 @@ public class SslEnd2EndTest {
     private IoAcceptor createAcceptor(IoHandler handler) throws Exception {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
+        // Disable Nagle's algorithm: combined with delayed ACKs, it adds ~40 ms per round trip on Linux.
+        acceptor.getSessionConfig().setTcpNoDelay(true);
         acceptor.setHandler(handler);
 
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
@@ -199,6 +201,8 @@ public class SslEnd2EndTest {
 
     private IoConnector createConnector(IoHandler ioHandler) throws GeneralSecurityException, IOException {
         NioSocketConnector connector = new NioSocketConnector();
+        // See createAcceptor().
+        connector.getSessionConfig().setTcpNoDelay(true);
         connector.setHandler(ioHandler);
 
         DefaultIoFilterChainBuilder filters = connector.getFilterChain();
