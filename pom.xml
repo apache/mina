@@ -99,7 +99,7 @@
     <version.apache.rat.plugin>0.18</version.apache.rat.plugin>
     <version.api.plugin>4.0.0-rc-5</version.api.plugin>
     <version.assembly.plugin>3.8.0</version.assembly.plugin>
-    <version.build.helper.plugin>3.6.2</version.build.helper.plugin>
+    <version.build.helper.plugin>3.8.0</version.build.helper.plugin>
     <version.bundle.plugin>6.2.0</version.bundle.plugin>
     <version.changes.plugin>3.0.0-M3</version.changes.plugin>
     <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
@@ -113,7 +113,7 @@
     <version.deploy.plugin>3.2.0</version.deploy.plugin>
     <version.docck.plugin>1.2</version.docck.plugin>
     <version.eclipse.plugin>2.10</version.eclipse.plugin>
-    <version.enforcer.plugin>3.6.3</version.enforcer.plugin>
+    <version.enforcer.plugin>3.7.0</version.enforcer.plugin>
     <version.findbugs.plugin>3.0.5</version.findbugs.plugin>
     <version.gpg.plugin>3.2.8</version.gpg.plugin>
     <version.install.plugin>3.2.0</version.install.plugin>
@@ -138,10 +138,10 @@
     <version.source.plugin>3.4.0</version.source.plugin>
     <version.shade.plugin>3.6.2</version.shade.plugin>
     <version.surefire.plugin>3.6.1</version.surefire.plugin>
-    <version.surfire.report.plugin>3.5.5</version.surfire.report.plugin>
-    <version.taglist.plugin>3.2.3</version.taglist.plugin>
+    <version.surfire.report.plugin>3.6.1</version.surfire.report.plugin>
+    <version.taglist.plugin>3.3.0</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
-    <version.versions.plugin>2.23.0</version.versions.plugin>
+    <version.versions.plugin>2.25.1</version.versions.plugin>
     <version.xbean.plugin>4.31</version.xbean.plugin>
 
     <!-- Jars -->
