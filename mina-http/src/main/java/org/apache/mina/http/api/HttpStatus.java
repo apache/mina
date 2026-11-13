@@ -198,6 +198,11 @@ public enum HttpStatus {
      */
     CLIENT_ERROR_UPGRADE_REQUIRED(426, "HTTP/1.1 426 Upgrade Required"),
 
+    /**
+     * 431 - Request Header Fields Too Large
+     */
+    CLIENT_ERROR_REQUEST_HEADER_FIELDS_TOO_LARGE(431, "HTTP/1.1 431 Request Header Fields Too Large"),
+
     // 5xx - Server Error
     /**
      * 500 - Internal Server Error

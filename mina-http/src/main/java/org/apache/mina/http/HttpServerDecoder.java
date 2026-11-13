@@ -43,6 +43,24 @@ import org.slf4j.LoggerFactory;
 public class HttpServerDecoder implements ProtocolDecoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerCodec.class);
 
+    /**
+     * The default maximum size in bytes of an accumulated HTTP request head
+     * (request line plus headers). A peer that keeps sending header bytes
+     * without ever terminating the head (CRLFCRLF) would otherwise make the
+     * decoder accumulate and re-parse an ever-growing buffer, exhausting the
+     * heap with a single unauthenticated connection. The 16 KB default is in
+     * line with mainstream HTTP servers; it can be changed globally with the
+     * <tt>org.apache.mina.http.maxRequestHeadSize</tt> system property, or
+     * per decoder with the {@link #HttpServerDecoder(int)} constructor.
+     * A value of <tt>0</tt> or less disables the limit (previous, unbounded
+     * behavior).
+     */
+    public static final int DEFAULT_MAX_REQUEST_HEAD_SIZE = Integer.getInteger(
+            "org.apache.mina.http.maxRequestHeadSize", 16 * 1024);
+
+    /** The maximum size in bytes of an accumulated HTTP request head */
+    private final int maxRequestHeadSize;
+    
     /** Key for decoder current state */
     private static final String DECODER_STATE_ATT = "http.ds";
 
@@ -80,6 +98,26 @@ public class HttpServerDecoder implements ProtocolDecoder {
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
 
     /**
+     * Creates a new HttpServerDecoder instance, limiting the accumulated HTTP
+     * request head to {@link #DEFAULT_MAX_REQUEST_HEAD_SIZE} bytes.
+     */
+    public HttpServerDecoder() {
+        this(DEFAULT_MAX_REQUEST_HEAD_SIZE);
+    }
+
+    /**
+     * Creates a new HttpServerDecoder instance
+     *
+     * @param maxRequestHeadSize the maximum size in bytes of an accumulated
+     * HTTP request head (request line plus headers); requests whose head
+     * exceeds this size fail with an {@link HttpException} (431). A value of
+     * <tt>0</tt> or less disables the limit.
+     */
+    public HttpServerDecoder(int maxRequestHeadSize) {
+        this.maxRequestHeadSize = maxRequestHeadSize;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -111,8 +149,19 @@ public class HttpServerDecoder implements ProtocolDecoder {
                 HttpRequestImpl httpRequest = parseHttpRequestHead(msg.buf());
                 session.removeAttribute(DECODER_STATE_ATT);
 
-    
                 if (httpRequest == null) {
+                    // Refuse to accumulate more than maxRequestHeadSize bytes for a
+                    // single request head: a peer withholding the CRLFCRLF terminator
+                    // must not be able to grow the partial-head buffer (and the
+                    // re-parse work on every read) without bound.
+                    if ((maxRequestHeadSize > 0) && (msg.remaining() > maxRequestHeadSize)) {
+                        session.removeAttribute(PARTIAL_HEAD_ATT);
+                        session.removeAttribute(DECODER_STATE_ATT);
+                        
+                        throw new HttpException(HttpStatus.CLIENT_ERROR_REQUEST_HEADER_FIELDS_TOO_LARGE,
+                                "HTTP request head exceeds " + maxRequestHeadSize + " bytes");
+                    }
+        
                     // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
                     ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
                     partial.put(msg.buf());

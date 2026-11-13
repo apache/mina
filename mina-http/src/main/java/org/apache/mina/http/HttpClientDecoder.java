@@ -43,6 +43,23 @@ import org.slf4j.LoggerFactory;
 public class HttpClientDecoder implements ProtocolDecoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientCodec.class);
 
+    /**
+     * The default maximum size in bytes of an accumulated HTTP response head
+     * (status line plus headers). A hostile or broken server that keeps
+     * sending header bytes without ever terminating the head (CRLFCRLF)
+     * would otherwise make the decoder accumulate an ever-growing buffer,
+     * exhausting the heap. It can be changed globally with the
+     * <tt>org.apache.mina.http.maxResponseHeadSize</tt> system property, or
+     * per decoder with the {@link #HttpClientDecoder(int)} constructor.
+     * A value of <tt>0</tt> or less disables the limit (previous, unbounded
+     * behavior).
+     */
+    public static final int DEFAULT_MAX_RESPONSE_HEAD_SIZE = Integer.getInteger(
+            "org.apache.mina.http.maxResponseHeadSize", 16 * 1024);
+
+    /** The maximum size in bytes of an accumulated HTTP response head */
+    private final int maxResponseHeadSize;
+
     /** Key for decoder current state */
     private static final String DECODER_STATE_ATT = "http.ds";
 
@@ -83,6 +100,26 @@ public class HttpClientDecoder implements ProtocolDecoder {
     public static final Pattern COOKIE_SEPARATOR_PATTERN = Pattern.compile(";");
 
     /**
+     * Creates a new HttpClientDecoder instance, limiting the accumulated HTTP
+     * response head to {@link #DEFAULT_MAX_RESPONSE_HEAD_SIZE} bytes.
+     */
+    public HttpClientDecoder() {
+        this(DEFAULT_MAX_RESPONSE_HEAD_SIZE);
+    }
+
+    /**
+     * Creates a new HttpClientDecoder instance
+     *
+     * @param maxResponseHeadSize the maximum size in bytes of an accumulated
+     * HTTP response head (status line plus headers); responses whose head
+     * exceeds this size fail with an {@link HttpException}. A value of
+     * <tt>0</tt> or less disables the limit.
+     */
+    public HttpClientDecoder(int maxResponseHeadSize) {
+        this.maxResponseHeadSize = maxResponseHeadSize;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -114,6 +151,17 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 DefaultHttpResponse rp = parseHttpReponseHead(msg.buf());
     
                 if (rp == null) {
+                    // Refuse to accumulate more than maxResponseHeadSize bytes for a
+                    // single response head: a server withholding the CRLFCRLF
+                    // terminator must not be able to grow the partial-head buffer
+                    // without bound.
+                    if ((maxResponseHeadSize > 0) && (msg.remaining() > maxResponseHeadSize)) {
+                        session.removeAttribute(PARTIAL_HEAD_ATT);
+                        session.removeAttribute(DECODER_STATE_ATT);
+                        throw new HttpException(HttpStatus.CLIENT_ERROR_REQUEST_ENTITY_TOO_LARGE,
+                                "HTTP response head exceeds " + maxResponseHeadSize + " bytes");
+                    }
+
                     // we copy the incoming BB because it's going to be recycled by the inner IoProcessor for next reads
                     ByteBuffer partial = ByteBuffer.allocate(msg.remaining());
                     partial.put(msg.buf());

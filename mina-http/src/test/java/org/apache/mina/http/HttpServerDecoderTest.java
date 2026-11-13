@@ -22,6 +22,7 @@ package org.apache.mina.http;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -316,6 +317,39 @@ public class HttpServerDecoderTest {
         HttpRequest request = (HttpRequest) out.getQueue().poll();
         assertEquals("localhost", request.getHeader("host"));
         assertTrue(out.getQueue().poll() instanceof HttpEndOfContent);
+    }
+    
+    @Test
+    public void unterminatedRequestHeadIsRejectedOnceTooLarge() throws Exception {
+        ProtocolDecoderQueue out = new ProtocolDecoderQueue();
+        IoSession localSession = new DummySession();
+        ProtocolDecoder localDecoder = new HttpServerDecoder(128);
+
+        // A request head that never contains the CRLFCRLF terminator: the
+        // decoder must refuse to accumulate it beyond the configured limit
+        // instead of growing (and re-parsing) it forever.
+        IoBuffer buffer = IoBuffer.allocate(0).setAutoExpand(true);
+        buffer.putString("GET / HTTP/1.1\r\nHost: dummy\r\nX-Filler: ", encoder);
+
+        for (int i = 0; i < 8; i++) {
+            buffer.putString("aaaaaaaaaaaaaaaa", encoder);
+        }
+
+        buffer.rewind();
+
+        try {
+            while (buffer.hasRemaining()) {
+                localDecoder.decode(localSession, buffer, out);
+            }
+            
+            fail("The over-sized request head should have been rejected");
+        } catch (HttpException e) {
+            assertEquals(431, e.getStatusCode());
+        }
+
+        // The partial-head accumulation state must have been cleaned up
+        assertEquals(null, localSession.getAttribute(DECODER_STATE_ATT));
+        assertEquals(null, localSession.getAttribute("http.ph"));
     }
 
     @Test
