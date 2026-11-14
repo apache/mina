@@ -184,7 +184,41 @@ public class CumulativeProtocolDecoderTest {
 
         faultyDecoder.dispose(session);
     }
+    
+    @Test
+    public void testCumulationIsBounded() throws Exception {
+        NeverDecodingDecoder boundedDecoder = new NeverDecodingDecoder();
+        boundedDecoder.setMaxCumulativeSize(8);
 
+        // First two chunks fit within the limit and are cumulated.
+        for (int i = 0; i < 2; i++) {
+            buf.clear();
+            buf.putInt(i);
+            buf.flip();
+            boundedDecoder.decode(session, buf, session.getDecoderOutput());
+        }
+
+        // The third chunk would grow the cumulative buffer beyond the limit.
+        buf.clear();
+        buf.putInt(2);
+        buf.flip();
+
+        try {
+            boundedDecoder.decode(session, buf, session.getDecoderOutput());
+            fail("The cumulative buffer should have been bounded");
+        } catch (ProtocolDecoderException e) {
+            // OK
+        }
+
+        // The over-sized cumulative buffer must have been discarded:
+        // new data starts cumulating from scratch instead of failing again.
+        buf.clear();
+        buf.putInt(3);
+        buf.flip();
+        boundedDecoder.decode(session, buf, session.getDecoderOutput());
+
+        boundedDecoder.dispose(session);
+    }
 
     private static class IntegerDecoder extends CumulativeProtocolDecoder {
         /**
@@ -243,6 +277,22 @@ public class CumulativeProtocolDecoderTest {
         @Override
         protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
             return true;
+        }
+    }
+    
+    private static class NeverDecodingDecoder extends CumulativeProtocolDecoder {
+        /**
+         * Default constructor
+         */
+        public NeverDecodingDecoder() {
+            super();
+        }
+
+        @Override
+        protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+            // Simulates a decoder waiting for a frame terminator that the
+            // peer never sends: everything is cumulated, nothing is decoded.
+            return false;
         }
     }
 

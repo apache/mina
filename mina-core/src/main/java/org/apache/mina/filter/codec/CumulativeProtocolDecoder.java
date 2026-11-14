@@ -101,7 +101,24 @@ import org.apache.mina.core.session.IoSession;
 public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
     /** The buffer used to store the data in the session */
     private static final AttributeKey BUFFER = new AttributeKey(CumulativeProtocolDecoder.class, "buffer");
-    
+
+    /**
+     * The default maximum size in bytes of the cumulative session buffer. A
+     * peer sending data that the subclass never manages to decode (doDecode()
+     * keeps returning <code>false</code>) would otherwise make the buffer -
+     * and the heap - grow without limit on a single connection. The 16 MB
+     * default is far above any of the shipped decoders' message sizes; it can
+     * be changed globally with the
+     * <tt>org.apache.mina.codec.maxCumulativeSize</tt> system property, or per
+     * decoder with {@link #setMaxCumulativeSize(int)}. A value of <tt>0</tt>
+     * or less disables the limit (previous, unbounded behavior).
+     */
+    public static final int DEFAULT_MAX_CUMULATIVE_SIZE = Integer.getInteger(
+            "org.apache.mina.codec.maxCumulativeSize", 16 * 1024 * 1024);
+
+    /** The maximum size in bytes of the cumulative session buffer */
+    private int maxCumulativeSize = DEFAULT_MAX_CUMULATIVE_SIZE;
+
     /** 
      * A flag set to true if we handle fragmentation accordingly to the TransportMetadata setting. 
      * It can be set to false if needed (UDP with fragments, for instance). the default value is 'true'
@@ -143,6 +160,21 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
         // If we have a session buffer, append data to that; otherwise
         // use the buffer read from the network directly.
         if (buf != null) {
+            // Refuse to cumulate more than maxCumulativeSize bytes: a peer
+            // sending data the subclass never manages to decode must fail the
+            // session instead of growing the heap without limit.
+            if (maxCumulativeSize > 0) {
+                long cumulated = buf.position() + (long) in.remaining();
+
+                if (cumulated > maxCumulativeSize) {
+                    removeSessionBuffer(session);
+                    
+                    throw new ProtocolDecoderException("The cumulative session buffer grew to " + cumulated
+                            + " bytes, exceeding the " + maxCumulativeSize
+                            + " bytes limit (see CumulativeProtocolDecoder.setMaxCumulativeSize())");
+                }
+            }
+
             // Make sure that the buffer is auto-expanded.
             if (buf.isAutoExpand()) {
                 try {
@@ -274,5 +306,29 @@ public abstract class CumulativeProtocolDecoder extends ProtocolDecoderAdapter {
      */
     public void setTransportMetadataFragmentation(boolean transportMetadataFragmentation) {
         this.transportMetadataFragmentation = transportMetadataFragmentation;
+    }
+
+    /**
+     * @return the maximum size in bytes the cumulative session buffer may
+     * grow to before the decoder fails the session with a
+     * {@link ProtocolDecoderException}. A value of <tt>0</tt> or less means
+     * no limit.
+     */
+    public int getMaxCumulativeSize() {
+        return maxCumulativeSize;
+    }
+
+    /**
+     * Sets the maximum size in bytes the cumulative session buffer may grow
+     * to before the decoder fails the session with a
+     * {@link ProtocolDecoderException}, protecting the heap against a peer
+     * that sends data the subclass never manages to decode. Defaults to
+     * {@link #DEFAULT_MAX_CUMULATIVE_SIZE}.
+     *
+     * @param maxCumulativeSize the limit; a value of <tt>0</tt> or less
+     * disables it (unbounded cumulation)
+     */
+    public void setMaxCumulativeSize(int maxCumulativeSize) {
+        this.maxCumulativeSize = maxCumulativeSize;
     }
 }
