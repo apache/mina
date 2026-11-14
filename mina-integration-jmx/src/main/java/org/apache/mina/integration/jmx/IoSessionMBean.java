@@ -36,6 +36,23 @@ import org.apache.mina.core.session.IoSession;
  */
 public class IoSessionMBean extends ObjectMBean<IoSession> {
     /**
+     * Name of the system property that re-enables exposing session attribute <b>values</b>
+     * through the <code>attributes</code> MBean attribute. Session attributes are where
+     * applications keep per-peer security state (authentication results, tokens,
+     * principals), and the JMX attribute-read permission is granted to the weakest
+     * monitoring role. By default only the attribute keys are exposed and every value is
+     * redacted, consistent with {@link ObjectMBean} refusing to expose the
+     * <code>attachment</code> and <code>attributeKeys</code> properties. Set
+     * <code>-Dorg.apache.mina.integration.jmx.exposeSessionAttributeValues=true</code> to
+     * restore the previous behavior, and only after scoping JMX read access accordingly.
+     */
+    public static final String EXPOSE_ATTRIBUTE_VALUES_PROPERTY =
+            "org.apache.mina.integration.jmx.exposeSessionAttributeValues";
+
+    /** The placeholder returned instead of a session attribute value by default */
+    static final String REDACTED_VALUE = "<hidden>";
+
+    /**
      * Creates a new IoSessionMBean instance
      * 
      * @param source The IoSession to monitor
@@ -47,10 +64,12 @@ public class IoSessionMBean extends ObjectMBean<IoSession> {
     @Override
     protected Object getAttribute0(String fqan) throws Exception {
         if (fqan.equals("attributes")) {
+            boolean exposeValues = Boolean.getBoolean(EXPOSE_ATTRIBUTE_VALUES_PROPERTY);
+            
             Map<String, String> answer = new LinkedHashMap<>();
             
             for (Object key : getSource().getAttributeKeys()) {
-                answer.put(String.valueOf(key), String.valueOf(getSource().getAttribute(key)));
+                answer.put(String.valueOf(key), exposeValues ? String.valueOf(getSource().getAttribute(key)):REDACTED_VALUE);
             }
             
             return answer;
