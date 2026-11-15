@@ -53,6 +53,20 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
 
     private static final byte[] CRLF_DELIMITER = new byte[] { '\r', '\n' };
 
+    /**
+     * Maximum entity body length (in bytes) accepted from the proxy during the
+     * handshake. The Content-Length and chunk-size values are proxy-supplied
+     * and drive buffer allocation before any body byte arrives, so they must
+     * be bounded: a hostile or compromised proxy answering with
+     * "Content-Length: 2000000000" would otherwise trigger a ~2 GB allocation
+     * for free. Proxy handshake bodies (auth challenges, error pages) are
+     * small; 64 KiB is generous. The bound can be adjusted with the
+     * "org.apache.mina.proxy.http.maxEntityBodyLength" system property.
+     */
+    private static final int MAX_ENTITY_BODY_LENGTH = Integer
+            .getInteger("org.apache.mina.proxy.http.maxEntityBodyLength", 64 * 1024);
+
+
     // Parsing vars
 
     /**
@@ -160,6 +174,11 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
                     contentLength = 0;
                 } else {
                     contentLength = Integer.parseInt(contentLengthHeader.trim());
+
+                    if (contentLength < 0 || contentLength > MAX_ENTITY_BODY_LENGTH) {
+                        throw new ProxyAuthException("Invalid proxy response Content-Length: " + contentLength);
+                    }
+
                     decoder.setContentLength(contentLength, true);
                 }
             }
@@ -205,6 +224,11 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
                             chunkSize = chunkSize.substring(0, chunkSize.length() - 2);
                         }
                         contentLength = Integer.decode("0x" + chunkSize);
+
+                        if (contentLength < 0 || contentLength > MAX_ENTITY_BODY_LENGTH) {
+                            throw new ProxyAuthException("Invalid proxy response chunk size: " + contentLength);
+                        }
+
                         if (contentLength > 0) {
                             contentLength += 2; // also read chunk's trailing CRLF
                             decoder.setContentLength(contentLength, true);
@@ -225,6 +249,11 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
                     contentLength = 0;
                     responseData.put(tmp);
                     buf.position(buf.position());
+
+                    if (responseData.position() - entityBodyStartPosition > MAX_ENTITY_BODY_LENGTH) {
+                        throw new ProxyAuthException("Proxy response entity body larger than "
+                                + MAX_ENTITY_BODY_LENGTH + " bytes");
+                    }
                 }
 
                 // Read footers

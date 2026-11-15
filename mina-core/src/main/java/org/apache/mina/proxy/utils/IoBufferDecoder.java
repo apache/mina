@@ -32,6 +32,13 @@ import org.apache.mina.filter.codec.textline.LineDelimiter;
  * @since MINA 2.0.0-M3
  */
 public class IoBufferDecoder {
+    /**
+     * Maximum number of bytes allocated up front in content-length mode. The
+     * content length is peer-supplied, so the buffer starts small and
+     * auto-expands as data actually arrives instead of eagerly allocating
+     * whatever the peer declared.
+     */
+    private static final int INITIAL_CONTENT_BUFFER_SIZE = 4096;
 
     /**
      * The class holding the decoding context.
@@ -224,7 +231,10 @@ public class IoBufferDecoder {
         // Retrieve fixed length content
         if (contentLength > -1) {
             if (decodedBuffer == null) {
-                decodedBuffer = IoBuffer.allocate(contentLength).setAutoExpand(true);
+                // Do not trust the peer-declared length for the upfront
+                // allocation: the buffer auto-expands as bytes arrive, so a
+                // huge declared length costs nothing until it is actually sent.
+                decodedBuffer = IoBuffer.allocate(Math.min(contentLength, INITIAL_CONTENT_BUFFER_SIZE)).setAutoExpand(true);
             }
 
             // If not enough data to complete the decoding
