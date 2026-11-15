@@ -33,12 +33,12 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
     /**
      * Carriage return character
      */
-    private static final byte CR = 13;
+    private static final byte CR = '\r';
 
     /**
      * Line feed character
      */
-    private static final byte LF = 10;
+    private static final byte LF = '\n';
 
     private boolean lastIsCR;
 
@@ -95,6 +95,14 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
                 if (buffer == null) {
                     product = IoBuffer.allocate(0);
                 } else {
+                    int bufferPos = buffer.position();
+
+                    if ((terminatorPos == beginPos) && (bufferPos > 0) && (buffer.get(bufferPos - 1) == CR)) {
+                        // The terminating CR arrived in a previous chunk and was accumulated; exclude it from 
+                        // the product now that it has been paired with an LF.
+                        buffer.position(bufferPos - 1);
+                    }
+
                     product = buffer.flip();
                     buffer = null;
                 }
@@ -110,11 +118,12 @@ public abstract class ConsumeToCrLfDecodingState implements DecodingState {
             buffer.setAutoExpand(true);
         }
 
+        // Keep any trailing CR in the accumulation buffer: it is only part of
+        // the terminator if the *next* chunk starts with an LF, which is
+        // handled above when the terminator is found. Rewinding over it here
+        // used to drop bare CRs at chunk boundaries, making the decoded
+        // product depend on how the input was fragmented.
         buffer.put(in);
-
-        if (lastIsCR) {
-            buffer.position(buffer.position() - 1);
-        }
 
         return this;
     }
