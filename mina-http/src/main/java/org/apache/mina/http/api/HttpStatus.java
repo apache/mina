@@ -19,6 +19,9 @@
  */
 package org.apache.mina.http.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * An <code>Enumeration</code> of all known HTTP status codes.
  * 
@@ -236,6 +239,14 @@ public enum HttpStatus {
      * The line associated with this status, "HTTP/1.1 501 Not Implemented".
      */
     private String line;
+    
+    private static final Map<Integer, HttpStatus> BY_CODE = new HashMap<>();
+    
+    static {
+        for (HttpStatus e: values()) {
+            BY_CODE.put(e.code, e);
+        }
+    }
 
     /**
      * Create an instance of this type.
@@ -264,5 +275,23 @@ public enum HttpStatus {
      */
     public String line() {
         return line + "\r\n";
+    }
+    
+    /**
+     * Tells if an HttpStatus exists for the given code
+     * @param code The HttpStatus code to retrieve
+     * @return <code>true</code> if the HttpStatus is valid
+     */
+    public static boolean hasStatus(int code) {
+        return BY_CODE.containsKey(code);
+    }
+    
+    /**
+     * Gets an HttpStatus by its code
+     * @param code The HttpStatus code to retrieve
+     * @return The associated HttpStatus
+     */
+    public static HttpStatus getStatus(int code) {
+        return BY_CODE.get(code);
     }
 }

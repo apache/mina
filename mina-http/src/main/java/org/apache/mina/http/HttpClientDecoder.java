@@ -72,6 +72,18 @@ public class HttpClientDecoder implements ProtocolDecoder {
     /** Key for indicating chunked data */
     private static final String BODY_CHUNKED = "http.ckd";
     
+    /** Key for the number of bytes remaining in the current chunk */
+    private static final String CHUNK_REMAINING_BYTES = "http.crb";
+
+    /** Key for a partially received chunk-size or trailer line */
+    private static final String PARTIAL_CHUNK_LINE = "http.pcl";
+
+    /** Key indicating that the last (zero-sized) chunk was seen and trailers are being consumed */
+    private static final String CHUNK_TRAILER = "http.ctr";
+
+    /** Maximum length of a chunk-size or trailer line, to bound accumulation */
+    private static final int MAX_CHUNK_LINE_LENGTH = 4096;
+
     /** Regex to parse HttpRequest Request Line */
     public static final Pattern REQUEST_LINE_PATTERN = Pattern.compile(" ");
 
@@ -127,8 +139,8 @@ public class HttpClientDecoder implements ProtocolDecoder {
         DecoderState state = (DecoderState)session.getAttribute(DECODER_STATE_ATT);
         
         if (null == state) {
-            session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
-            state = (DecoderState)session.getAttribute(DECODER_STATE_ATT);
+            state = DecoderState.NEW;
+            session.setAttribute(DECODER_STATE_ATT, state);
         }
         
         switch (state) {
@@ -140,7 +152,7 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 // grab the stored a partial HEAD request
                 ByteBuffer oldBuffer = (ByteBuffer)session.getAttribute(PARTIAL_HEAD_ATT);
                 // concat the old buffer and the new incoming one
-                IoBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg).flip();
+                msg = IoBuffer.allocate(oldBuffer.remaining() + msg.remaining()).put(oldBuffer).put(msg).flip();
                 // now let's decode like it was a new message
     
             case NEW:
@@ -169,43 +181,52 @@ public class HttpClientDecoder implements ProtocolDecoder {
                     // no request decoded, we accumulate
                     session.setAttribute(PARTIAL_HEAD_ATT, partial);
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.HEAD);
-                } else {
-                    out.write(rp);
-                    // is it a response with some body content ?
+                    break;
+                }
+
+                out.write(rp);
+                
+                // is it a response with some body content ?
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("response with content");
+                }
+
+                session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
+
+                String contentLen = rp.getHeader("content-length");
+
+                if (contentLen != null) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("response with content");
                     }
-                    
-                    session.setAttribute(DECODER_STATE_ATT, DecoderState.BODY);
-    
-                    String contentLen = rp.getHeader("content-length");
-    
-                    if (contentLen != null) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("found content len : {}", contentLen);
-                        }
-                        
-                        session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(contentLen));
-                    } else if ("chunked".equalsIgnoreCase(rp.getHeader("transfer-encoding"))) {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("no content len but chunked");
-                        }
-                        
-                        session.setAttribute(BODY_CHUNKED, Boolean.TRUE);
-                    } else if ("close".equalsIgnoreCase(rp.getHeader("connection"))) {
-                        session.closeNow();
-                    } else {
-                        throw new HttpException(HttpStatus.CLIENT_ERROR_LENGTH_REQUIRED, "no content length !");
+
+                    session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(contentLen));
+                } else if ("chunked".equalsIgnoreCase(rp.getHeader("transfer-encoding"))) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("no content len but chunked");
                     }
+
+                    session.setAttribute(BODY_CHUNKED, Boolean.TRUE);
+                } else if ("close".equalsIgnoreCase(rp.getHeader("connection"))) {
+                    session.closeNow();
+                    break;
+                } else {
+                    throw new HttpException(HttpStatus.CLIENT_ERROR_LENGTH_REQUIRED, "no content length !");
                 }
-    
-                break;
-    
+
+                // fallthrough, process the body bytes received along with the head
+
             case BODY:
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("decoding BODY: {} bytes", msg.remaining());
                 }
-                
+
+                // a chunked body is framed by the server : decode the framing
+                if( session.getAttribute(BODY_CHUNKED) != null ) {
+                    decodeChunkedBody(session, msg, out);
+                    break;
+                }
+
                 int chunkSize = msg.remaining();
                 
                 // send the chunk of body
@@ -218,17 +239,9 @@ public class HttpClientDecoder implements ProtocolDecoder {
                 
                 msg.position(msg.limit());
                 
-                // do we have reach end of body ?
-                int remaining;
-                
-                // if chunked, remaining is the msg.remaining()
-                if( session.getAttribute(BODY_CHUNKED) != null ) {
-                    remaining = chunkSize;
-                } else {
-                    // otherwise, manage with content-length
-                    remaining = (Integer) session.getAttribute(BODY_REMAINING_BYTES);
-                    remaining -= chunkSize;
-                }
+                // do we have reach end of body ? manage with content-length
+                int remaining = (Integer) session.getAttribute(BODY_REMAINING_BYTES);
+                remaining -= chunkSize;
     
                 if (remaining <= 0 ) {
                     if (LOGGER.isDebugEnabled()) {
@@ -238,21 +251,128 @@ public class HttpClientDecoder implements ProtocolDecoder {
                     session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
                     session.removeAttribute(BODY_REMAINING_BYTES);
                     
-                    if( session.getAttribute(BODY_CHUNKED) != null ) {
-                        session.removeAttribute(BODY_CHUNKED);
-                    }
-                    
                     out.write(new HttpEndOfContent());
                 } else {
-                    if( session.getAttribute(BODY_CHUNKED) == null ) {
-                        session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(remaining));
-                    }
+                    session.setAttribute(BODY_REMAINING_BYTES, Integer.valueOf(remaining));
                 }
     
                 break;
     
             default:
                 throw new HttpException(HttpStatus.SERVER_ERROR_INTERNAL_SERVER_ERROR, "Unknonwn decoder state : " + state);
+        }
+    }
+
+    /**
+     * Decodes a body sent with "Transfer-Encoding: chunked". Only the chunk payloads
+     * are delivered to the next filter : the chunk-size lines, the CRLF terminating
+     * each chunk and the optional trailers are consumed by the decoder. A
+     * {@link HttpEndOfContent} is emitted once the last (zero-sized) chunk and its
+     * trailers have been received. The method consumes at least one byte on each
+     * invocation when data remains, so the codec filter can safely call it again
+     * while input remains.
+     */
+    private void decodeChunkedBody(IoSession session, IoBuffer msg, ProtocolDecoderOutput out) {
+        Integer chunkRemaining = (Integer) session.getAttribute(CHUNK_REMAINING_BYTES);
+
+        if ((chunkRemaining != null) && (chunkRemaining.intValue() > 0)) {
+            // deliver as much of the current chunk payload as we have received
+            int toRead = Math.min(chunkRemaining.intValue(), msg.remaining());
+
+            if (toRead == 0) {
+                // wait for more data
+                return;
+            }
+
+            IoBuffer wb = IoBuffer.allocate(toRead);
+            int oldLimit = msg.limit();
+            msg.limit(msg.position() + toRead);
+            wb.put(msg);
+            msg.limit(oldLimit);
+            wb.flip();
+            out.write(wb);
+
+            int left = chunkRemaining.intValue() - toRead;
+
+            if (left == 0) {
+                session.removeAttribute(CHUNK_REMAINING_BYTES);
+            } else {
+                session.setAttribute(CHUNK_REMAINING_BYTES, Integer.valueOf(left));
+            }
+
+            return;
+        }
+
+        // we are between chunks : accumulate a full line, which is either a
+        // chunk-size line, the CRLF terminating the previous chunk or a trailer line
+        String partial = (String) session.getAttribute(PARTIAL_CHUNK_LINE);
+        StringBuilder line = (partial == null) ? new StringBuilder() : new StringBuilder(partial);
+        boolean complete = false;
+
+        while (msg.hasRemaining()) {
+            char c = (char) (msg.get() & 0xFF);
+
+            if (c == '\n') {
+                complete = true;
+                break;
+            }
+
+            if (c != '\r') {
+                line.append(c);
+            }
+
+            if (line.length() > MAX_CHUNK_LINE_LENGTH) {
+                throw new HttpException(HttpStatus.CLIENT_ERROR_BAD_REQUEST, "Chunk size line too long");
+            }
+        }
+
+        if (!complete) {
+            // wait for more data
+            session.setAttribute(PARTIAL_CHUNK_LINE, line.toString());
+            return;
+        }
+
+        session.removeAttribute(PARTIAL_CHUNK_LINE);
+        String chunkLine = line.toString();
+
+        if (session.getAttribute(CHUNK_TRAILER) != null) {
+            // consuming the trailers following the last chunk
+            if (chunkLine.length() == 0) {
+                // end of the trailers : end of the response
+                session.setAttribute(DECODER_STATE_ATT, DecoderState.NEW);
+                session.removeAttribute(BODY_CHUNKED);
+                session.removeAttribute(CHUNK_TRAILER);
+                out.write(new HttpEndOfContent());
+            }
+
+            return;
+        }
+
+        if (chunkLine.length() == 0) {
+            // the CRLF terminating the previous chunk payload
+            return;
+        }
+
+        // a chunk-size line : an hex size, optionally followed by ';' and extensions
+        int semicolon = chunkLine.indexOf(';');
+        String sizeString = (semicolon >= 0 ? chunkLine.substring(0, semicolon) : chunkLine).trim();
+        int size;
+
+        try {
+            size = Integer.parseInt(sizeString, 16);
+        } catch (NumberFormatException e) {
+            throw new HttpException(HttpStatus.CLIENT_ERROR_BAD_REQUEST, "Invalid chunk size : " + sizeString);
+        }
+
+        if (size < 0) {
+            throw new HttpException(HttpStatus.CLIENT_ERROR_BAD_REQUEST, "Invalid chunk size : " + sizeString);
+        }
+
+        if (size == 0) {
+            // last chunk : consume the trailers
+            session.setAttribute(CHUNK_TRAILER, Boolean.TRUE);
+        } else {
+            session.setAttribute(CHUNK_REMAINING_BYTES, Integer.valueOf(size));
         }
     }
 
@@ -271,7 +391,7 @@ public class HttpClientDecoder implements ProtocolDecoder {
     }
 
     private DefaultHttpResponse parseHttpReponseHead(ByteBuffer buffer) {
-        String raw = new String(buffer.array(), 0, buffer.limit());
+        String raw = new String(buffer.array(), buffer.position(), buffer.remaining());
         String[] headersAndBody = RAW_VALUE_PATTERN.split(raw, -1);
         
         if (headersAndBody.length <= 1) {
@@ -285,27 +405,29 @@ public class HttpClientDecoder implements ProtocolDecoder {
         String requestLine = headerFields[0];
         Map<String, String> generalHeaders = new HashMap<>();
 
-        for (String headerField:headerFields) {
-            String[] header = HEADER_VALUE_PATTERN.split(headerField);
-            generalHeaders.put(header[0].toLowerCase(), header[1]);
+        // the status line is not a header : start at 1
+        for (int i = 1; i < headerFields.length; i++) {
+            String headerField = headerFields[i];
+            int firstColon = headerField.indexOf(':');
+
+            if (firstColon > 0) {
+                generalHeaders.put(headerField.substring(0, firstColon).toLowerCase(),
+                        headerField.substring(firstColon + 1).trim());
+            } else {
+                generalHeaders.put(headerField.trim(), "");
+            }
         }
 
         String[] elements = RESPONSE_LINE_PATTERN.split(requestLine);
-        HttpStatus status = null;
         int statusCode = Integer.parseInt(elements[1]);
         
-        for (HttpStatus httpStatus:HttpStatus.values()) {
-            if (statusCode == httpStatus.code()) {
-                
-                break;
-            }
-        }
+        HttpStatus status = HttpStatus.getStatus(statusCode);
         
         HttpVersion version = HttpVersion.fromString(elements[0]);
 
         // we put the buffer position where we found the beginning of the HTTP body
-        buffer.position(headersAndBody[0].length() + 4);
-
+        buffer.position(buffer.position() + headersAndBody[0].length() + 4);
+        
         return new DefaultHttpResponse(version, status, generalHeaders);
     }
 }
