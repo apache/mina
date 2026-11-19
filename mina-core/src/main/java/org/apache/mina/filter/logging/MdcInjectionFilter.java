@@ -176,11 +176,14 @@ public class MdcInjectionFilter extends CommonEventFilter {
 
     private Map<String, String> getAndFillContext(final IoSession session) {
         Map<String, String> context = getContext(session);
-        
-        if (context.isEmpty()) {
-            fillContext(session, context);
+
+        // make sure that context returned is fully filled and doesn't return partial context
+        synchronized (context) {
+            if (context.isEmpty()) {
+                fillContext(session, context);
+            }
         }
-        
+
         return context;
     }
 
@@ -190,7 +193,7 @@ public class MdcInjectionFilter extends CommonEventFilter {
         
         if (context == null) {
             context = new ConcurrentHashMap<>();
-            session.setAttribute(CONTEXT_KEY, context);
+            session.setAttributeIfAbsent(CONTEXT_KEY, context);
         }
         
         return context;
