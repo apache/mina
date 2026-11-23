@@ -107,7 +107,7 @@ public class UseReadOperationTest {
             connector.setHandler(new IoHandlerAdapter() {
                 @Override
                 public void messageReceived(IoSession session, Object message) {
-                    receivedMessage.setOpaque((IoBuffer) message);
+                    receivedMessage.set((IoBuffer) message);
                     receiveViaHandler.countDown();
                 }
             });
@@ -128,7 +128,7 @@ public class UseReadOperationTest {
                 } else {
                     // message received via IO handler (useReadOperation flag was not picked up before message delivery)
                     assertTrue("Message handler receive failed", receiveViaHandler.await(4L, TimeUnit.SECONDS));
-                    message = receivedMessage.getOpaque();
+                    message = receivedMessage.get();
                 }
 
                 assertEquals(1, message.remaining());
@@ -155,7 +155,7 @@ public class UseReadOperationTest {
 
                 while (true) {
 
-                    if (readOperationSet.getOpaque()) {
+                    if (readOperationSet.get()) {
                         break;
                     }
 
@@ -184,7 +184,7 @@ public class UseReadOperationTest {
                 assertTrue("Connect failed", connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
 
                 connectFuture.getSession().getConfig().setUseReadOperation(true);
-                readOperationSet.setOpaque(true);
+                readOperationSet.set(true);
 
                 ReadFuture readFuture = connectFuture.getSession().read();
                 assertTrue("Message receive failed", readFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
