@@ -8,7 +8,7 @@ on:
     branches:
       - 2.0.X
       - 2.1.X
-      - 2.2.X
+      - mina-2.2.X
   # Build every pull request targeting the branch this workflow lives on.
   pull_request:
 
