@@ -173,16 +173,14 @@ public class ProxyFilter extends IoFilterAdapter {
                 }
 
                 forward = buf.hasRemaining();
-
-                if (forward) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(" Passing remaining data to next filter");
-                    }
-                }
             }
         }
 
         if (forward) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(" Passing remaining data to next filter");
+            }
+
             nextFilter.messageReceived(session, buf);
         }
     }
@@ -230,7 +228,6 @@ public class ProxyFilter extends IoFilterAdapter {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug(" Write request on closed session. Request ignored.");
                     }
-                    forward = false;
                 } else {
                     // Queue the data to be sent as soon as the handshake completes
                     if (LOGGER.isDebugEnabled()) {
@@ -238,8 +235,10 @@ public class ProxyFilter extends IoFilterAdapter {
                     }
                     
                     handler.enqueueWriteRequest(nextFilter, writeRequest);
-                    forward = false;
+
                 }
+
+                forward = false;
             }
         }
 
