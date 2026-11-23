@@ -19,11 +19,6 @@
  */
 package org.apache.mina.filter.logging;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -45,7 +40,6 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterEvent;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
-import org.apache.mina.core.service.IoProcessor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
@@ -60,11 +54,16 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.statistic.ProfilerTimerFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests {@link MdcInjectionFilter} in various scenarios.
@@ -89,7 +88,7 @@ public class MdcInjectionFilterTest {
 
     private ExecutorFilter executorFilter2;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         // comment out next line if you want to see normal logging
         org.apache.log4j.Logger.getRootLogger().removeAllAppenders();
@@ -99,7 +98,7 @@ public class MdcInjectionFilterTest {
         acceptor = new NioSocketAcceptor();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         acceptor.dispose(true);
         org.apache.log4j.Logger.getRootLogger().setLevel(previousLevelRootLogger);
@@ -258,9 +257,9 @@ public class MdcInjectionFilterTest {
                     String key = mdcKey.name();
                     Object value = event.getMDC(key);
                     if (mdcKey == MdcInjectionFilter.MdcKey.remoteAddress) {
-                        assertNotNull("MDC[remoteAddress] not set for [" + event.getMessage() + "]", value);
+                        assertNotNull(value, "MDC[remoteAddress] not set for [" + event.getMessage() + "]");
                     } else {
-                        assertNull("MDC[" + key + "] set for [" + event.getMessage() + "]", value);
+                        assertNull(value, "MDC[" + key + "] set for [" + event.getMessage() + "]");
                     }
                 }
             }
@@ -299,10 +298,9 @@ public class MdcInjectionFilterTest {
 
             if (loggersToCheck.contains(event.getLoggerName())) {
                 Object remoteAddress = event.getMDC("remoteAddress");
-                assertNotNull("MDC[remoteAddress] not set for [" + event.getMessage() + "]", remoteAddress);
-                assertNotNull("MDC[remotePort] not set for [" + event.getMessage() + "]", event.getMDC("remotePort"));
-                assertEquals("every event should have MDC[handlerClass]", SimpleIoHandler.class.getName(),
-                        event.getMDC("handlerClass"));
+                assertNotNull(remoteAddress, "MDC[remoteAddress] not set for [" + event.getMessage() + "]");
+                assertNotNull(event.getMDC("remotePort"), "MDC[remotePort] not set for [" + event.getMessage() + "]");
+                assertEquals(SimpleIoHandler.class.getName(), event.getMDC("handlerClass"), "every event should have MDC[handlerClass]");
             }
         }
         // assert we have received all expected logging events for each client

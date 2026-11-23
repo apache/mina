@@ -19,15 +19,15 @@
  */
 package org.apache.mina.filter.codec.statemachine;
 
-import static org.junit.Assert.assertEquals;
-
 import java.nio.charset.StandardCharsets;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.filterchain.IoFilter.NextFilter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests {@link ConsumeToCrLfDecodingState}, in particular that the decoded
@@ -118,8 +118,9 @@ public class ConsumeToCrLfDecodingStateTest {
         String input = "abc\rdef\r\n";
 
         for (int split = 1; split < input.length(); split++) {
-            assertEquals("split at " + split, "abc\rdef",
-                    decode(input.substring(0, split), input.substring(split)));
+            assertEquals("abc\rdef",
+                    decode(input.substring(0, split), input.substring(split)),
+                    "split at " + split);
         }
     }
 }

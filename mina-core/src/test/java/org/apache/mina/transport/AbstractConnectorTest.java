@@ -19,12 +19,6 @@
  */
 package org.apache.mina.transport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
@@ -40,7 +34,13 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionInitializer;
 import org.apache.mina.util.AcceptorBindUtil;
 import org.apache.mina.util.AvailablePortFinder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests a generic {@link IoConnector}.
@@ -173,13 +173,14 @@ public abstract class AbstractConnectorTest {
                         }
                     });
 
-            assertTrue("Timed out waiting for callback and IoHandler.sessionCreated to be invoked",
-                    latch.await(5, TimeUnit.SECONDS));
-            assertTrue("Callback was not invoked", assertions[callbackInvoked]);
-            assertTrue("IoHandler.sessionCreated was not invoked", assertions[sessionCreatedInvoked]);
-            assertFalse("IoHandler.sessionCreated was invoked before session callback",
-                    assertions[sessionCreatedInvokedBeforeCallback]);
-            assertSame("Callback future should have been same future as returned by connect", future, callbackFuture[0]);
+            assertTrue(latch.await(5, TimeUnit.SECONDS),
+                    "Timed out waiting for callback and IoHandler.sessionCreated to be invoked");
+            assertTrue(assertions[callbackInvoked], "Callback was not invoked");
+            assertTrue(assertions[sessionCreatedInvoked], "IoHandler.sessionCreated was not invoked");
+            assertFalse(assertions[sessionCreatedInvokedBeforeCallback],
+                    "IoHandler.sessionCreated was invoked before session callback");
+            assertSame(future, callbackFuture[0],
+                    "Callback future should have been same future as returned by connect");
         } finally {
             try {
                 connector.dispose();

@@ -19,8 +19,6 @@
  */
 package org.apache.mina.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -34,7 +32,10 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpResponse;
 import org.apache.mina.http.api.HttpStatus;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HttpClientDecoderTest {
     private static final Charset ASCII = Charset.forName("US-ASCII");
@@ -73,7 +74,7 @@ public class HttpClientDecoderTest {
         ProtocolDecoderQueue out = new ProtocolDecoderQueue();
 
         decode(decoder, session, "HTTP/1.1 200 OK\r\nContent-Le", out);
-        assertTrue("no message expected before the full head is received", out.getQueue().isEmpty());
+        assertTrue(out.getQueue().isEmpty(), "no message expected before the full head is received");
 
         decode(decoder, session, "ngth: 2\r\n\r\nAB", out);
 
@@ -116,8 +117,8 @@ public class HttpClientDecoderTest {
         assertEquals(HttpStatus.SUCCESS_OK, response.getStatus());
         assertEquals("abc", asString(out.getQueue().poll()));
         assertEquals("de", asString(out.getQueue().poll()));
-        assertTrue("end of content must be signaled after the zero chunk",
-                out.getQueue().poll() instanceof HttpEndOfContent);
+        assertTrue(out.getQueue().poll() instanceof HttpEndOfContent,
+                "end of content must be signaled after the zero chunk");
     }
 
     @Test

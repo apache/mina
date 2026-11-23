@@ -23,9 +23,9 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.util.AcceptorBindUtil;
 import org.apache.mina.util.ExceptionMonitor;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,15 +33,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NioDatagramAcceptorTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NioDatagramAcceptorTest.class);
 
-    @Rule
-    public TestName testName = new TestName();
+    private TestInfo testInfo;
+
+    @BeforeEach
+    void setUp(TestInfo testInfo) {
+        this.testInfo = testInfo;
+    }
 
     @Test
     public void shouldDisposeAcceptorSilentlyWhenExecutorIsShutdown() {
@@ -51,7 +55,7 @@ public class NioDatagramAcceptorTest {
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
-                LOGGER.error("Exception caught in test {}", testName.getMethodName(), cause);
+                LOGGER.error("Exception caught in test {}", testInfo.getDisplayName(), cause);
 
                 if (isFromNioDatagramAcceptor(cause)) {
                     exception.set(cause);
@@ -72,7 +76,7 @@ public class NioDatagramAcceptorTest {
                 AcceptorBindUtil.tryBind(acceptor);
                 acceptor.dispose(true);
 
-                assertNull("Exception must not be thrown when disposing executor service", exception.get());
+                assertNull(exception.get(), "Exception must not be thrown when disposing executor service");
             }
         } finally {
             ExceptionMonitor.setInstance(previous);
@@ -87,7 +91,7 @@ public class NioDatagramAcceptorTest {
         ExceptionMonitor.setInstance(new ExceptionMonitor() {
             @Override
             public void exceptionCaught(Throwable cause) {
-                LOGGER.error("Exception caught in test {}", testName.getMethodName(), cause);
+                LOGGER.error("Exception caught in test {}", testInfo.getDisplayName(), cause);
 
                 if (isFromNioDatagramAcceptor(cause)) {
                     exception.set(cause);

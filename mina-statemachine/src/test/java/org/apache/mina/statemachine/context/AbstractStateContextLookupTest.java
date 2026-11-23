@@ -19,12 +19,13 @@
  */
 package org.apache.mina.statemachine.context;
 
-import static org.junit.Assert.assertSame;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Tests {@link AbstractStateContextLookup}.
@@ -32,6 +33,7 @@ import org.junit.Test;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class AbstractStateContextLookupTest {
+
     @Test
     public void testLookup() throws Exception {
         Map<String, StateContext> map = new HashMap<>();

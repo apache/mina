@@ -22,7 +22,10 @@ package org.apache.mina.filter.executor;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IoSession;
-import org.junit.Test;
+import org.apache.mina.core.write.WriteRequest;
+import org.apache.mina.filter.FilterEvent;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +39,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests that verify the functionality provided by the implementation of
@@ -70,7 +73,7 @@ public class PriorityThreadPoolExecutorTest {
         int result = first.compareTo(last);
     
         // Verify results.
-        assertEquals("Without a comparator, entries of the same session are expected to be equal.", 0, result);
+        assertEquals(0, result, "Without a comparator, entries of the same session are expected to be equal.");
     }
 
     /**
@@ -94,7 +97,7 @@ public class PriorityThreadPoolExecutorTest {
         int result = first.compareTo(last);
         
         // Verify results.
-        assertTrue("Without a comparator, the first entry created should be the first entry out. Expected a negative result, instead, got: " + result, result < 0);
+        assertTrue(result < 0, "Without a comparator, the first entry created should be the first entry out. Expected a negative result, instead, got: " + result);
     }
 
     /**
@@ -123,7 +126,7 @@ public class PriorityThreadPoolExecutorTest {
         int result = first.compareTo(last);
         
         // Verify results.
-        assertEquals("With a comparator, entries of the same session are expected to be equal.", 0, result);
+        assertEquals(0, result, "With a comparator, entries of the same session are expected to be equal.");
     }
 
     /**
@@ -152,7 +155,7 @@ public class PriorityThreadPoolExecutorTest {
         int result = first.compareTo(last);
         
         // Verify results.
-        assertEquals("With a comparator, comparing entries of different sessions is expected to yield the comparator result.", predeterminedResult, result);
+        assertEquals(predeterminedResult, result, "With a comparator, comparing entries of different sessions is expected to yield the comparator result.");
     }
 
     /**
@@ -184,7 +187,7 @@ public class PriorityThreadPoolExecutorTest {
         int sessionCount = 10;
         int taskCount = 400;
         int tasksPerSessionCount = taskCount / sessionCount;
-        
+
         for (int i = 0; i < 10; i++) {
             sessions.add(new LastActivityTracker());
         }
@@ -200,8 +203,8 @@ public class PriorityThreadPoolExecutorTest {
         ExecutorFilter filter = new ExecutorFilter(executor);
 
         filter.messageReceived(nextFilter, blockerSession, null);
-        assertTrue("Worker did not start", blockerQueued.await(4L, TimeUnit.SECONDS));
-        
+        assertTrue(blockerQueued.await(4L, TimeUnit.SECONDS), "Worker did not start");
+
         // Execute system under test.
         for (int i = 0; i < taskCount; i++) {
             int sessionIndex = i % sessions.size();
@@ -241,8 +244,8 @@ public class PriorityThreadPoolExecutorTest {
                             lastActivity, preferredSession, preferredActivity);
                 }
 
-                assertTrue("All other sessions should have finished later than the preferred session (but at least one did not).",
-                    lastActivity > preferredActivity);
+                assertTrue(lastActivity > preferredActivity,
+                        "All other sessions should have finished later than the preferred session (but at least one did not).");
             }
         }
     }

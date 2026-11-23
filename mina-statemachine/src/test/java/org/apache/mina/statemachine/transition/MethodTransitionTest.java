@@ -24,11 +24,11 @@ import java.lang.reflect.Method;
 import org.apache.mina.statemachine.State;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.event.Event;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -55,7 +55,7 @@ public class MethodTransitionTest {
 
     Object[] args;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         currentState = new State("current");
         nextState = new State("next");

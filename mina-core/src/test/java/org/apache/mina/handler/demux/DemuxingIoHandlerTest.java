@@ -20,8 +20,8 @@
 package org.apache.mina.handler.demux;
 
 import org.apache.mina.core.session.IoSession;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -44,7 +44,7 @@ public class DemuxingIoHandlerTest {
 
     Object[] msg;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         /*
          * Create the messages.

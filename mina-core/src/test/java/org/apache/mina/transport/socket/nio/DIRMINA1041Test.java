@@ -29,15 +29,16 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class DIRMINA1041Test {
 
@@ -49,7 +50,7 @@ public class DIRMINA1041Test {
     private SocketAcceptor acceptor;
     private SocketConnector connector;
     
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
@@ -71,8 +72,7 @@ public class DIRMINA1041Test {
                 ConnectFuture future = connector.connect( address);
     
                 if (!future.awaitUninterruptibly(TIMEOUT)) {
-                    
-                    Assert.fail("ConnectFuture did not complete.");
+                    fail("ConnectFuture did not complete.");
                 }
                 
                 IoSession session = future.getSession();
@@ -86,13 +86,13 @@ public class DIRMINA1041Test {
                 //LOG.info("Waiting for WriteFuture to complete. Session: " + session);
                 if (!writeFuture.await(TIMEOUT)) {
                     LOG.info("WriteFuture did not complete. Session: " + session);
-                    Assert.fail("WriteFuture did not complete. Session: " + session);
+                    fail("WriteFuture did not complete. Session: " + session);
                 }
                 
                 CloseFuture closeFuture = session.closeOnFlush();
                 
                 if (!closeFuture.awaitUninterruptibly(TIMEOUT)) {
-                    Assert.fail("CloseFuture did not complete.");
+                    fail("CloseFuture did not complete.");
                 }
                 
                 //Thread.sleep( 2 );
@@ -104,7 +104,7 @@ public class DIRMINA1041Test {
         System.out.println("Done " + 100000  + " loops, counter = " + counter);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         try { connector.dispose(true); } catch (Throwable e) { e.printStackTrace(); }
         try { acceptor.unbind(); acceptor.dispose(true); } catch (Throwable e) { e.printStackTrace(); }
@@ -113,8 +113,7 @@ public class DIRMINA1041Test {
     private IoSession getSession() {
         ConnectFuture future = connector.connect(new InetSocketAddress(HOST, port));
         if (!future.awaitUninterruptibly(TIMEOUT)) {
-            
-            Assert.fail("ConnectFuture did not complete.");
+            fail("ConnectFuture did not complete.");
         }
         return future.getSession();
     }
@@ -122,7 +121,7 @@ public class DIRMINA1041Test {
     private void closeSession(IoSession session) {
         CloseFuture closeFuture = session.closeNow();
         if (!closeFuture.awaitUninterruptibly(TIMEOUT)) {
-            Assert.fail("CloseFuture did not complete.");
+            fail("CloseFuture did not complete.");
         }
     }
 

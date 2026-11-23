@@ -20,8 +20,8 @@ package org.apache.mina.example.haiku;
 
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IoSession;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.verify;
 public class HaikuValidatorIoHandlerTest  {
     private IoHandler handler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handler = new HaikuValidatorIoHandler();
     }

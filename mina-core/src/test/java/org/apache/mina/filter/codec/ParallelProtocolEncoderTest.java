@@ -19,8 +19,6 @@
  */
 package org.apache.mina.filter.codec;
 
-import static org.junit.Assert.assertTrue;
-
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,10 +34,11 @@ import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParallelProtocolEncoderTest {
     private NioSocketConnector connector = null;

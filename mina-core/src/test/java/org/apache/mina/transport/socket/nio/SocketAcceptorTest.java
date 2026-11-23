@@ -25,7 +25,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SocketAcceptorTest {
 

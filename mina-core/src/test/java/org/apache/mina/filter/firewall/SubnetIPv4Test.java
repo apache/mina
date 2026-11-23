@@ -20,20 +20,21 @@
 
 package org.apache.mina.filter.firewall;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class SubnetIPv4Test {
+
     @Test
     public void test24() throws UnknownHostException {
         InetAddress a = InetAddress.getByName("127.2.3.0");

@@ -29,10 +29,9 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SNIHostName;
@@ -43,14 +42,12 @@ import javax.net.ssl.TrustManagerFactory;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
 import java.security.Security;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test SNI matching scenarios. (tests for DIRMINA-1122)
@@ -63,7 +60,6 @@ import static org.junit.Assert.assertTrue;
  * client-san-ext.truststore    - keystore with trusted certificate
  * </pre>
  */
-@RunWith(Parameterized.class)
 public class SslIdentificationAlgorithmTest {
 
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
@@ -78,18 +74,8 @@ public class SslIdentificationAlgorithmTest {
         KEY_MANAGER_FACTORY_ALGORITHM = algorithm;
     }
 
-    @Parameterized.Parameters(name = "{0}")
-    public static List<Object[]> getParameters() {
-        return Arrays.asList(new Object[][]{{"TLSv1.2"}, {"TLSv1.3"}});
-    }
-
-    private final String enabledProtocol;
     private int port;
     private CountDownLatch handshakeDone;
-
-    public SslIdentificationAlgorithmTest(String enabledProtocol) {
-        this.enabledProtocol = enabledProtocol;
-    }
 
     private static class CustomSslFilter extends SslFilter {
         public CustomSslFilter(SSLContext sslContext) {
@@ -152,40 +138,43 @@ public class SslIdentificationAlgorithmTest {
        }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handshakeDone = new CountDownLatch(2);
     }
 
-    @Test
-    public void shouldAuthenticateWhenServerCertificateCommonNameMatchesClientSNI() throws Exception {
-        SSLContext acceptorContext = createSSLContext("server-cn.keystore", "emptykeystore.sslTest");
-        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-cn.truststore");
+    @ParameterizedTest
+    @ValueSource(strings = {"TLSv1.2", "TLSv1.3"})
+    public void shouldAuthenticateWhenServerCertificateCommonNameMatchesClientSNI(String enabledProtocols) throws Exception {
+        SSLContext acceptorContext = createSSLContext("server-cn.keystore", "emptykeystore.sslTest", enabledProtocols);
+        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-cn.truststore", enabledProtocols);
 
-        startAcceptor(acceptorContext);
-        startConnector(connectorContext, "mina");
+        startAcceptor(acceptorContext, enabledProtocols);
+        startConnector(connectorContext, "mina", enabledProtocols);
 
         assertTrue(handshakeDone.await(10, TimeUnit.SECONDS));
     }
 
-    @Test
-    public void shouldFailAuthenticationWhenServerCertificateCommonNameDoesNotMatchClientSNI() throws Exception {
-        SSLContext acceptorContext = createSSLContext("server-cn.keystore", "emptykeystore.sslTest");
-        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-cn.truststore");
+    @ParameterizedTest
+    @ValueSource(strings = {"TLSv1.2", "TLSv1.3"})
+    public void shouldFailAuthenticationWhenServerCertificateCommonNameDoesNotMatchClientSNI(String enabledProtocols) throws Exception {
+        SSLContext acceptorContext = createSSLContext("server-cn.keystore", "emptykeystore.sslTest", enabledProtocols);
+        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-cn.truststore", enabledProtocols);
 
-        startAcceptor(acceptorContext);
-        startConnector(connectorContext, "example.com");
+        startAcceptor(acceptorContext, enabledProtocols);
+        startConnector(connectorContext, "example.com", enabledProtocols);
 
         assertFalse(handshakeDone.await(10, TimeUnit.SECONDS));
     }
 
-    @Test
-    public void shouldFailAuthenticationWhenClientMissingSNIAndIdentificationAlgorithmProvided() throws Exception {
-        SSLContext acceptorContext = createSSLContext("server-cn.keystore", "emptykeystore.sslTest");
-        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-cn.truststore");
+    @ParameterizedTest
+    @ValueSource(strings = {"TLSv1.2", "TLSv1.3"})
+    public void shouldFailAuthenticationWhenClientMissingSNIAndIdentificationAlgorithmProvided(String enabledProtocols) throws Exception {
+        SSLContext acceptorContext = createSSLContext("server-cn.keystore", "emptykeystore.sslTest", enabledProtocols);
+        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-cn.truststore", enabledProtocols);
 
-        startAcceptor(acceptorContext);
-        startConnector(connectorContext, null);
+        startAcceptor(acceptorContext, enabledProtocols);
+        startConnector(connectorContext, null, enabledProtocols);
 
         assertFalse(handshakeDone.await(10, TimeUnit.SECONDS));
     }
@@ -195,67 +184,72 @@ public class SslIdentificationAlgorithmTest {
      * 
      * @exception Exception If the test throws an exception
      */
-    @Test
-    public void shouldAuthenticateWhenServerCertificateAlternativeNameMatchesClientSNIExactly() throws Exception {
-        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest");
-        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore");
+    @ParameterizedTest
+    @ValueSource(strings = {"TLSv1.2", "TLSv1.3"})
+    public void shouldAuthenticateWhenServerCertificateAlternativeNameMatchesClientSNIExactly(String enabledProtocols) throws Exception {
+        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest", enabledProtocols);
+        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore", enabledProtocols);
 
-        startAcceptor(acceptorContext);
-        startConnector(connectorContext, "xxx.yyy");
-
-        assertTrue(handshakeDone.await(10, TimeUnit.SECONDS));
-    }
-
-    @Test
-    public void shouldAuthenticateWhenServerCertificateAlternativeNameMatchesClientSNIViaWildcard() throws Exception {
-        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest");
-        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore");
-
-        startAcceptor(acceptorContext);
-        startConnector(connectorContext, "aaa.bbb.ccc");
+        startAcceptor(acceptorContext, enabledProtocols);
+        startConnector(connectorContext, "xxx.yyy", enabledProtocols);
 
         assertTrue(handshakeDone.await(10, TimeUnit.SECONDS));
     }
 
-    @Test
-    public void shouldFailAuthenticationWhenServerCommonNameMatchesSNIAndSNINotInAlternativeName() throws Exception {
-        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest");
-        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore");
+    @ParameterizedTest
+    @ValueSource(strings = {"TLSv1.2", "TLSv1.3"})
+    public void shouldAuthenticateWhenServerCertificateAlternativeNameMatchesClientSNIViaWildcard(String enabledProtocols) throws Exception {
+        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest", enabledProtocols);
+        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore", enabledProtocols);
 
-        startAcceptor(acceptorContext);
-        startConnector(connectorContext, "mina");
+        startAcceptor(acceptorContext, enabledProtocols);
+        startConnector(connectorContext, "aaa.bbb.ccc", enabledProtocols);
+
+        assertTrue(handshakeDone.await(10, TimeUnit.SECONDS));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"TLSv1.2", "TLSv1.3"})
+    public void shouldFailAuthenticationWhenServerCommonNameMatchesSNIAndSNINotInAlternativeName(String enabledProtocols) throws Exception {
+        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest", enabledProtocols);
+        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore", enabledProtocols);
+
+        startAcceptor(acceptorContext, enabledProtocols);
+        startConnector(connectorContext, "mina", enabledProtocols);
 
         assertFalse(handshakeDone.await(10, TimeUnit.SECONDS));
     }
 
-    @Test
-    public void shouldFailAuthenticationWhenMatchingAlternativeNameWildcardExactly() throws Exception {
-        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest");
-        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore");
+    @ParameterizedTest
+    @ValueSource(strings = {"TLSv1.2", "TLSv1.3"})
+    public void shouldFailAuthenticationWhenMatchingAlternativeNameWildcardExactly(String enabledProtocols) throws Exception {
+        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest", enabledProtocols);
+        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore", enabledProtocols);
 
-        startAcceptor(acceptorContext);
-        startConnector(connectorContext, "*.bbb.ccc");
-
-        assertFalse(handshakeDone.await(10, TimeUnit.SECONDS));
-    }
-
-    @Test
-    public void shouldFailAuthenticationWhenMatchingAlternativeNameWithTooManyLabels() throws Exception {
-        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest");
-        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore");
-
-        startAcceptor(acceptorContext);
-        startConnector(connectorContext, "mmm.nnn.bbb.ccc");
+        startAcceptor(acceptorContext, enabledProtocols);
+        startConnector(connectorContext, "*.bbb.ccc", enabledProtocols);
 
         assertFalse(handshakeDone.await(10, TimeUnit.SECONDS));
     }
 
-    private void startAcceptor(SSLContext sslContext) throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"TLSv1.2", "TLSv1.3"})
+    public void shouldFailAuthenticationWhenMatchingAlternativeNameWithTooManyLabels(String enabledProtocols) throws Exception {
+        SSLContext acceptorContext = createSSLContext("server-san-ext.keystore", "emptykeystore.sslTest", enabledProtocols);
+        SSLContext connectorContext = createSSLContext("emptykeystore.sslTest", "client-san-ext.truststore", enabledProtocols);
+
+        startAcceptor(acceptorContext, enabledProtocols);
+        startConnector(connectorContext, "mmm.nnn.bbb.ccc", enabledProtocols);
+
+        assertFalse(handshakeDone.await(10, TimeUnit.SECONDS));
+    }
+
+    private void startAcceptor(SSLContext sslContext, String enabledProtocols) {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
 
         SslFilter sslFilter = new SslFilter(sslContext);
-        sslFilter.setEnabledProtocols(enabledProtocol);
+        sslFilter.setEnabledProtocols(enabledProtocols);
 
         DefaultIoFilterChainBuilder filters = acceptor.getFilterChain();
         filters.addLast("ssl", sslFilter);
@@ -279,7 +273,7 @@ public class SslIdentificationAlgorithmTest {
         port = AcceptorBindUtil.tryBind(acceptor);
     }
 
-    private void startConnector(SSLContext sslContext, String sni) {
+    private void startConnector(SSLContext sslContext, String sni, String enabledProtocols) {
         NioSocketConnector connector = new NioSocketConnector();
 
         SslFilter sslFilter = new CustomSslFilter(sslContext) {
@@ -297,7 +291,7 @@ public class SslIdentificationAlgorithmTest {
         };
 
         sslFilter.setEndpointIdentificationAlgorithm("HTTPS");
-        sslFilter.setEnabledProtocols(enabledProtocol);
+        sslFilter.setEnabledProtocols(enabledProtocols);
 
         DefaultIoFilterChainBuilder filters = connector.getFilterChain();
         filters.addLast("ssl", sslFilter);
@@ -321,7 +315,7 @@ public class SslIdentificationAlgorithmTest {
         connector.connect(new InetSocketAddress("localhost", port));
     }
 
-    private SSLContext createSSLContext(String keyStorePath, String trustStorePath) throws Exception {
+    private SSLContext createSSLContext(String keyStorePath, String trustStorePath, String enabledProtocols) throws Exception {
         char[] password = "password".toCharArray();
 
         KeyStore keyStore = KeyStore.getInstance("JKS");
@@ -336,7 +330,7 @@ public class SslIdentificationAlgorithmTest {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(KEY_MANAGER_FACTORY_ALGORITHM);
         tmf.init(trustStore);
 
-        SSLContext ctx = SSLContext.getInstance(enabledProtocol);
+        SSLContext ctx = SSLContext.getInstance(enabledProtocols);
         ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
         return ctx;

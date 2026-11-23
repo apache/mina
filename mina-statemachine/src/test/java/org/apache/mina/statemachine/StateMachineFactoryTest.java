@@ -19,19 +19,19 @@
  */
 package org.apache.mina.statemachine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
-
 import java.lang.reflect.Method;
 import java.util.List;
 
 import org.apache.mina.statemachine.annotation.Transition;
 import org.apache.mina.statemachine.annotation.Transitions;
 import org.apache.mina.statemachine.transition.MethodTransition;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests {@link StateMachineFactory}.
@@ -51,7 +51,7 @@ public class StateMachineFactoryTest {
 
     Method fooOrBarInCOrFooInD;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         barInA = States.class.getDeclaredMethod("barInA", new Class[0]);
         error = States.class.getDeclaredMethod("error", new Class[0]);

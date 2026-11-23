@@ -19,13 +19,6 @@
  */
 package org.apache.mina.transport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Collection;
@@ -39,12 +32,18 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests {@link IoAcceptor} resource leakage by repeating bind and unbind.
@@ -70,7 +69,7 @@ public abstract class AbstractBindTest {
     
     protected abstract void setReuseAddress(boolean reuseAddress) throws IOException;
 
-    @After
+    @AfterEach
     public void tearDown() {
         try {
             acceptor.dispose();
@@ -126,10 +125,10 @@ public abstract class AbstractBindTest {
 
         //long t0 = System.nanoTime();
         for (int i = 0; i < 1024; i++) {
-            Assert.assertTrue("Bound addresses is empty", acceptor.getLocalAddresses().size() > 0);
+            assertTrue(acceptor.getLocalAddresses().size() > 0, "Bound addresses is empty");
             acceptor.unbind();
             //Thread.sleep(2);
-            Assert.assertTrue("Bound addresses is not empty", acceptor.getLocalAddresses().size() == 0);
+            assertTrue(acceptor.getLocalAddresses().size() == 0, "Bound addresses is not empty");
             acceptor.bind();
             //long t1 = System.nanoTime();
 
@@ -218,7 +217,7 @@ public abstract class AbstractBindTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testRegressively() throws IOException {
         setReuseAddress(true);
 

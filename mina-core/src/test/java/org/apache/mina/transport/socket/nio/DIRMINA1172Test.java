@@ -19,8 +19,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -34,9 +32,9 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.FilterEvent;
 import org.apache.mina.filter.logging.LoggingFilter;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class DIRMINA1172Test
 {
@@ -44,7 +42,7 @@ public class DIRMINA1172Test
     private static InetAddress address;
     private static byte[] buf;
 
-    @Before
+    @BeforeEach
     public void init()
     {
         AbstractIoService inputSource1 = new NioDatagramAcceptor();
@@ -220,7 +218,7 @@ public class DIRMINA1172Test
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void test() throws InterruptedException, IOException
     {
         socket = new DatagramSocket();

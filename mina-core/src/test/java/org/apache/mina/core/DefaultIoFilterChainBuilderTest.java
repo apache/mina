@@ -24,12 +24,12 @@ import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.filterchain.IoFilterChain.Entry;
 import org.apache.mina.filter.util.NoopFilter;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Tests {@link DefaultIoFilterChainBuilder}.
@@ -37,17 +37,18 @@ import static org.junit.Assert.assertSame;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class DefaultIoFilterChainBuilderTest {
-    @Before
+
+    @BeforeEach
     public void setUp() throws Exception {
         // Do nothing
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         // Do nothing
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testAdd() throws Exception {
         DefaultIoFilterChainBuilder builder = new DefaultIoFilterChainBuilder();
 

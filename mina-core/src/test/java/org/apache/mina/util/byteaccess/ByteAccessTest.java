@@ -19,8 +19,6 @@
  */
 package org.apache.mina.util.byteaccess;
 
-import static org.junit.Assert.assertEquals;
-
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +28,10 @@ import org.apache.mina.util.byteaccess.ByteArray.Cursor;
 import org.apache.mina.util.byteaccess.CompositeByteArray.CursorListener;
 import org.apache.mina.util.byteaccess.CompositeByteArrayRelativeWriter.ChunkedExpander;
 import org.apache.mina.util.byteaccess.CompositeByteArrayRelativeWriter.Flusher;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -49,7 +49,7 @@ public class ByteAccessTest {
     }
 
     private void assertOperationCountEquals(int expectedCount) {
-        assertEquals("Operations: " + operations, expectedCount, operations.size());
+        assertEquals(expectedCount, operations.size(), "Operations: " + operations);
     }
 
     private void addOperation(String description) {
@@ -138,8 +138,8 @@ public class ByteAccessTest {
     }
 
     @Test
-    @Ignore("Not sure what this test is doing...")
-    public void testCompositeCursor() throws Exception {
+    @Disabled("Not sure what this test is doing...")
+    public void testCompositeCursor() {
         //IMocksControl mc = createStrictControl();
         CursorListener cursorListener = mock(CursorListener.class);
 

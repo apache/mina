@@ -20,8 +20,6 @@
 
 package org.apache.mina.core.service;
 
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -44,8 +42,11 @@ import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test a SSL session and provoke HandshakeException.
@@ -151,8 +152,9 @@ public class SSLTestHandshakeExceptionDIRMINA1077Test {
         return ctx;
     }
 
-    @Test(timeout=15000)
-    @Ignore
+    @Test
+    @Timeout(15)
+    @Disabled
     public void testSSL() throws Exception {
         long startTime = System.currentTimeMillis();
         // without DIRMINA-1076/1077 fixed, the test will hang after short time

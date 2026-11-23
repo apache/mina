@@ -31,8 +31,8 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -43,8 +43,8 @@ import java.security.Security;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SslFilterScheduledWriteMessagesTest {
 
@@ -67,7 +67,7 @@ public class SslFilterScheduledWriteMessagesTest {
     private CountDownLatch sessionsOpened;
     private int port;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         handshakeDone = new CountDownLatch(2);
         sessionsOpened = new CountDownLatch(2);

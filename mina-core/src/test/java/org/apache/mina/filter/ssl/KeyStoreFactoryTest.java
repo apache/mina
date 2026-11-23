@@ -19,13 +19,13 @@
  */
 package org.apache.mina.filter.ssl;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
-
-import org.junit.Test;
 
 /**
  * Tests {@link KeyStoreFactory}.

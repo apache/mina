@@ -18,19 +18,20 @@
  */
 package org.apache.mina.integration.xbean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.xbean.spring.context.FileSystemXmlApplicationContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.URL;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * TODO : Add documentation
@@ -54,23 +55,21 @@ public class SpringXBeanTest {
 
         // test default without any properties
         NioDatagramAcceptor acceptor0 = (NioDatagramAcceptor) factory.getBean("datagramAcceptor0");
-        assertNotNull("acceptor0 should not be null", acceptor0);
+        assertNotNull(acceptor0, "acceptor0 should not be null");
         assertTrue(
-                "Default constructor for NioDatagramAcceptor should have true value for closeOnDeactivation property",
-                acceptor0.isCloseOnDeactivation());
+                acceptor0.isCloseOnDeactivation(),
+                "Default constructor for NioDatagramAcceptor should have true value for closeOnDeactivation property");
 
         // test setting the port and IP for the acceptor
         NioDatagramAcceptor acceptor1 = (NioDatagramAcceptor) factory.getBean("datagramAcceptor1");
-        assertNotNull("acceptor1 should not be null", acceptor1);
+        assertNotNull(acceptor1, "acceptor1 should not be null");
         assertEquals("192.168.0.1", acceptor1.getDefaultLocalAddress().getAddress().getHostAddress());
         assertEquals(110, acceptor1.getDefaultLocalAddress().getPort());
 
         // test creating with executor and some primitive properties
         NioDatagramAcceptor acceptor2 = (NioDatagramAcceptor) factory.getBean("datagramAcceptor2");
-        assertNotNull(acceptor2);
-        assertFalse(acceptor2.isCloseOnDeactivation());
-        assertFalse("NioDatagramAcceptor should have false value for closeOnDeactivation property",
-                acceptor2.isCloseOnDeactivation());
+        assertNotNull(acceptor2, "acceptor2 should not be null");
+        assertFalse(acceptor2.isCloseOnDeactivation(), "NioDatagramAcceptor should have false value for closeOnDeactivation property");
 
         // test creating with multiple addresses
         NioDatagramAcceptor acceptor3 = (NioDatagramAcceptor) factory.getBean("datagramAcceptor3");

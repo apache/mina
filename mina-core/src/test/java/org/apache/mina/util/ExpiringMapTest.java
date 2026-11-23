@@ -20,10 +20,10 @@
 
 package org.apache.mina.util;
 
-import static org.junit.Assert.assertNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Simple test that checks to see if the {@link ExpiringMap} can
@@ -41,7 +41,7 @@ public class ExpiringMapTest {
      *
      * @throws Exception If the setup failed
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         theMap = new ExpiringMap<>(1, 2);
         theMap.put("Apache", "MINA");

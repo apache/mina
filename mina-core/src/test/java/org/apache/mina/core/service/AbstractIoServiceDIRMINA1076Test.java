@@ -20,8 +20,6 @@
 
 package org.apache.mina.core.service;
 
-import static org.junit.Assert.fail;
-
 import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IdleStatus;
@@ -31,12 +29,15 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test disposal of AbstractIoService. This test should not hang or timeout when DIRMINA-1076 is fixed.
@@ -45,8 +46,9 @@ import java.util.concurrent.CountDownLatch;
  */
 public class AbstractIoServiceDIRMINA1076Test {
 
-    @Test( timeout = 15000 )
-    @Ignore
+    @Test
+    @Timeout(15)
+    @Disabled
     public void testDispose()
         throws Exception {
 
@@ -122,7 +124,6 @@ public class AbstractIoServiceDIRMINA1076Test {
                 fail( "Thread should have died by now, supposed hang in AbstractIoService.dispose()" );
             }
         }
-        ;
     }
 
     public static class ClientHandler

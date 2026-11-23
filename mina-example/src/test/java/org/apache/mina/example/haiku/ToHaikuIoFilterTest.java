@@ -20,8 +20,8 @@ package org.apache.mina.example.haiku;
 
 import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.session.IoSession;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 public class ToHaikuIoFilterTest {
     private IoFilter filter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         filter = new ToHaikuIoFilter();
     }

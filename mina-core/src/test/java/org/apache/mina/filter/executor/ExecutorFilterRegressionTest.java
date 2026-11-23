@@ -19,8 +19,6 @@
  */
 package org.apache.mina.filter.executor;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -31,9 +29,11 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.filter.FilterEvent;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * TODO Add documentation
@@ -47,12 +47,12 @@ public class ExecutorFilterRegressionTest {
         // Do nothing
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         filter = new ExecutorFilter(8);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ((ExecutorService) filter.getExecutor()).shutdown();
         filter = null;
