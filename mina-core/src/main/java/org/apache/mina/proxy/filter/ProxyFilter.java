@@ -210,17 +210,15 @@ public class ProxyFilter extends IoFilterAdapter {
     public void writeData(final NextFilter nextFilter, final IoSession session, final WriteRequest writeRequest,
             final boolean isHandshakeData) {
         ProxyLogicHandler handler = getProxyHandler(session);
-        boolean forward;
+        boolean forward = true;
 
         synchronized (handler) {
             if (handler.isHandshakeComplete()) {
                 // Handshake is done - write data as normal
-                forward = true;
             } else if (isHandshakeData) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("   handshake data: {}", writeRequest.getMessage());
                 }
-                forward = true;
             } else {
                 // Writing non-handshake data before the handshake finished
                 if (!session.isConnected()) {
@@ -228,7 +226,6 @@ public class ProxyFilter extends IoFilterAdapter {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug(" Write request on closed session. Request ignored.");
                     }
-                    forward = false;
                 } else {
                     // Queue the data to be sent as soon as the handshake completes
                     if (LOGGER.isDebugEnabled()) {
@@ -236,7 +233,6 @@ public class ProxyFilter extends IoFilterAdapter {
                     }
                     
                     handler.enqueueWriteRequest(nextFilter, writeRequest);
-                    forward = false;
                 }
 
                 forward = false;
