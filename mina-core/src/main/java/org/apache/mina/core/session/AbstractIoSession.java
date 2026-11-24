@@ -78,6 +78,28 @@ public abstract class AbstractIoSession implements IoSession {
     private static final AttributeKey WAITING_READ_FUTURES_KEY = new AttributeKey(AbstractIoSession.class,
             "waitingReadFutures");
 
+    /**
+     * The default maximum number of received messages queued as ready
+     * {@link ReadFuture}s when {@link IoSessionConfig#isUseReadOperation()}
+     * is enabled. Without a bound, a peer sending faster than the
+     * application calls {@link #read()} would make the queue - and the
+     * peer-supplied messages it retains - grow without limit until the heap
+     * is exhausted. When the limit is reached, the session's read interest
+     * is suspended until the application drains the queue below half of the
+     * limit. It can be changed globally with the
+     * <tt>org.apache.mina.session.maxQueuedReadFutures</tt> system property,
+     * or per session with {@link #setMaxQueuedReadFutures(int)}. A value of
+     * <tt>0</tt> or less disables the limit (previous, unbounded behavior).
+     */
+    public static final int DEFAULT_MAX_QUEUED_READ_FUTURES = Integer.getInteger(
+            "org.apache.mina.session.maxQueuedReadFutures", 512);
+
+    /** The maximum number of ready ReadFutures queued for this session */
+    private volatile int maxQueuedReadFutures = DEFAULT_MAX_QUEUED_READ_FUTURES;
+
+    /** Set to true when reads were suspended because the ready ReadFutures queue hit its limit */
+    private volatile boolean readSuspendedByReadFutureLimit;
+
     private static final IoFutureListener<CloseFuture> SCHEDULED_COUNTER_RESETTER = new IoFutureListener<CloseFuture>() {
         public void operationComplete(CloseFuture future) {
             AbstractIoSession session = (AbstractIoSession) future.getSession();
@@ -422,7 +444,44 @@ public abstract class AbstractIoSession implements IoSession {
             }
         }
 
+        // The application is draining the queue: resume reading once it went
+        // below half of the configured limit.
+        if (readSuspendedByReadFutureLimit) {
+            int max = maxQueuedReadFutures;
+
+            if ((max <= 0) || (readyReadFutures.size() <= max / 2)) {
+                readSuspendedByReadFutureLimit = false;
+                resumeRead();
+            }
+        }
+
+
         return future;
+    }
+    
+    /**
+     * @return the maximum number of received messages queued as ready
+     * {@link ReadFuture}s when {@link IoSessionConfig#isUseReadOperation()}
+     * is enabled, before the session's read interest is suspended.
+     * A value of <tt>0</tt> or less means no limit.
+     */
+    public final int getMaxQueuedReadFutures() {
+        return maxQueuedReadFutures;
+    }
+
+    /**
+     * Sets the maximum number of received messages queued as ready
+     * {@link ReadFuture}s when {@link IoSessionConfig#isUseReadOperation()}
+     * is enabled. When the limit is reached, the session's read interest is
+     * suspended until {@link #read()} drains the queue below half of the
+     * limit, so a peer sending faster than the application reads cannot
+     * exhaust the heap. Defaults to {@link #DEFAULT_MAX_QUEUED_READ_FUTURES}.
+     *
+     * @param maxQueuedReadFutures the limit; a value of <tt>0</tt> or less
+     * disables it (unbounded queue)
+     */
+    public final void setMaxQueuedReadFutures(int maxQueuedReadFutures) {
+        this.maxQueuedReadFutures = maxQueuedReadFutures;
     }
 
     /**
@@ -462,16 +521,28 @@ public abstract class AbstractIoSession implements IoSession {
         Queue<ReadFuture> readyReadFutures = getReadyReadFutures();
         Queue<ReadFuture> waitingReadFutures = getWaitingReadFutures();
         ReadFuture future;
-        
+
+        boolean limitReached = false;
+
         synchronized (readyReadFutures) {
             future = waitingReadFutures.poll();
             
             if (future == null) {
                 future = new DefaultReadFuture(this);
                 readyReadFutures.offer(future);
+                int max = maxQueuedReadFutures;
+                limitReached = (max > 0) && (readyReadFutures.size() >= max);
             }
         }
-        
+
+        // Stop reading from the peer until the application drains the queued
+        // ReadFutures: they retain every received message, so letting the
+        // queue grow unchecked hands the peer an unbounded heap allocation.
+        if (limitReached && !readSuspendedByReadFutureLimit) {
+            readSuspendedByReadFutureLimit = true;
+            suspendRead();
+        }
+
         return future;
     }
 

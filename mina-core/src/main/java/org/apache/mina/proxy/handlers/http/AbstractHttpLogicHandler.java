@@ -160,9 +160,16 @@ public abstract class AbstractHttpLogicHandler extends AbstractProxyLogicHandler
                 parsedResponse = decodeResponse(responseHeader);
 
                 // Is handshake complete ?
-                if (parsedResponse.getStatusCode() == 200
-                        || (parsedResponse.getStatusCode() >= 300 && parsedResponse.getStatusCode() <= 307)) {
-                    buf.position(0);
+                // Only a successful response establishes the tunnel. A 3xx
+                // answer to a CONNECT request is a redirect/failure (RFC 9110):
+                // the proxy did NOT switch to tunnel mode, so it must be
+                // handled as an error below, never as an established tunnel.
+                if (parsedResponse.getStatusCode() == 200) {
+                    // Leave the buffer positioned right after the consumed
+                    // handshake bytes so that only genuine post-tunnel data is
+                    // forwarded to the next filter; rewinding to 0 would replay
+                    // the already-consumed proxy response into the
+                    // application's decoder chain.
                     setHandshakeComplete();
                     return;
                 }
