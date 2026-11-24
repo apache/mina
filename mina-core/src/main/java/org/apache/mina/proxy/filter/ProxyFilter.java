@@ -144,14 +144,13 @@ public class ProxyFilter extends IoFilterAdapter {
     public void messageReceived(final NextFilter nextFilter, final IoSession session, final Object message)
             throws ProxyAuthException {
         ProxyLogicHandler handler = getProxyHandler(session);
+        IoBuffer buf = (IoBuffer) message;
+        boolean forward;
 
         synchronized (handler) {
-            IoBuffer buf = (IoBuffer) message;
-
             if (handler.isHandshakeComplete()) {
                 // Handshake done - pass data on as-is
-                nextFilter.messageReceived(session, buf);
-
+                forward = true;
             } else {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(" Data Read: {} ({})", handler, buf);
@@ -173,15 +172,16 @@ public class ProxyFilter extends IoFilterAdapter {
                     }
                 }
 
-                // Pass on any remaining data to the next filter
-                if (buf.hasRemaining()) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(" Passing remaining data to next filter");
-                    }
-
-                    nextFilter.messageReceived(session, buf);
-                }
+                forward = buf.hasRemaining();
             }
+        }
+
+        if (forward) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(" Passing remaining data to next filter");
+            }
+
+            nextFilter.messageReceived(session, buf);
         }
     }
 
@@ -210,18 +210,15 @@ public class ProxyFilter extends IoFilterAdapter {
     public void writeData(final NextFilter nextFilter, final IoSession session, final WriteRequest writeRequest,
             final boolean isHandshakeData) {
         ProxyLogicHandler handler = getProxyHandler(session);
+        boolean forward = true;
 
         synchronized (handler) {
             if (handler.isHandshakeComplete()) {
                 // Handshake is done - write data as normal
-                nextFilter.filterWrite(session, writeRequest);
             } else if (isHandshakeData) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("   handshake data: {}", writeRequest.getMessage());
                 }
-
-                // Writing handshake data
-                nextFilter.filterWrite(session, writeRequest);
             } else {
                 // Writing non-handshake data before the handshake finished
                 if (!session.isConnected()) {
@@ -237,7 +234,13 @@ public class ProxyFilter extends IoFilterAdapter {
                     
                     handler.enqueueWriteRequest(nextFilter, writeRequest);
                 }
+
+                forward = false;
             }
+        }
+
+        if (forward) {
+            nextFilter.filterWrite(session, writeRequest);
         }
     }
 
