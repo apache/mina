@@ -19,11 +19,6 @@
  */
 package org.apache.mina.proxy.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -34,7 +29,12 @@ import org.apache.mina.proxy.handlers.http.AbstractHttpLogicHandler;
 import org.apache.mina.proxy.handlers.http.HttpProxyRequest;
 import org.apache.mina.proxy.handlers.http.HttpProxyResponse;
 import org.apache.mina.proxy.session.ProxyIoSession;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Regression tests for the HTTP CONNECT handshake status handling:
@@ -90,8 +90,8 @@ public class HttpConnectHandshakeStatusTest {
         IoBuffer buf = wrap("HTTP/1.0 302 Found\r\nLocation: http://portal.example/\r\n\r\n");
         handler.messageReceived(null, buf);
 
-        assertFalse("a 3xx CONNECT response must not complete the handshake", handler.isHandshakeComplete());
-        assertNotNull("the 3xx response must be routed to handleResponse()", handler.lastResponse);
+        assertFalse(handler.isHandshakeComplete(), "a 3xx CONNECT response must not complete the handshake");
+        assertNotNull(handler.lastResponse, "the 3xx response must be routed to handleResponse()");
         assertEquals(302, handler.lastResponse.getStatusCode());
     }
 
@@ -110,10 +110,8 @@ public class HttpConnectHandshakeStatusTest {
             // positioned; only the buffer state matters here.
         }
 
-        assertTrue(handler.isHandshakeComplete());
-        assertEquals("the buffer must be positioned after the consumed handshake bytes", response.length(),
-                buf.position());
-        assertEquals("only genuine post-tunnel data may remain", "TUNNELED",
-                buf.getString(java.nio.charset.StandardCharsets.ISO_8859_1.newDecoder()));
+        assertTrue(handler.isHandshakeComplete(), "a 2xx CONNECT response must complete the handshake");
+        assertEquals(response.length(), buf.position(), "the buffer must be positioned after the consumed handshake bytes");
+        assertEquals("TUNNELED", buf.getString(java.nio.charset.StandardCharsets.ISO_8859_1.newDecoder()), "only genuine post-tunnel data may remain");
     }
 }
