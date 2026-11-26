@@ -44,7 +44,7 @@ jobs:
     steps:
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Don't persist the GitHub token used to check out the repository.
           persist-credentials: false
