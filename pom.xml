@@ -97,7 +97,7 @@
 
     <!-- Maven Plugins -->
     <version.apache.rat.plugin>0.18</version.apache.rat.plugin>
-    <version.api.plugin>4.0.0-rc-5</version.api.plugin>
+    <version.api.plugin>4.0.0-rc-7</version.api.plugin>
     <version.assembly.plugin>3.8.0</version.assembly.plugin>
     <version.build.helper.plugin>3.8.0</version.build.helper.plugin>
     <version.bundle.plugin>6.2.0</version.bundle.plugin>
