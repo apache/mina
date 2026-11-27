@@ -123,7 +123,7 @@
     <version.jdepend.plugin>2.2.1</version.jdepend.plugin>
     <version.jxr.plugin>3.6.0</version.jxr.plugin>
     <version.model.plugin>4.0.0-rc-5</version.model.plugin>
-    <version.plexus.utils>4.0.3</version.plexus.utils>
+    <version.plexus.utils>4.2.0</version.plexus.utils>
     <version.plugin.plugin>4.0.0-beta-2</version.plugin.plugin>
     <version.pmd.plugin>3.29.0</version.pmd.plugin>
     <version.project.plugin>3.0-alpha-2</version.project.plugin>
