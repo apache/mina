@@ -141,7 +141,7 @@
     <version.surfire.report.plugin>3.6.1</version.surfire.report.plugin>
     <version.taglist.plugin>3.3.0</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
-    <version.versions.plugin>2.25.1</version.versions.plugin>
+    <version.versions.plugin>2.25.3</version.versions.plugin>
     <version.xbean.plugin>4.31</version.xbean.plugin>
 
     <!-- Jars -->
