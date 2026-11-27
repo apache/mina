@@ -22,81 +22,86 @@ package org.apache.mina.core;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.nio.NioIoHandler;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NettyBenchmarkClient implements BenchmarkClient {
 
-    private ChannelFactory factory;
+    private EventLoopGroup group;
 
     /**
-     * 
+     * {@inheritDoc}
      */
-    public NettyBenchmarkClient() {
-    }
-
-    /**
-     * {@inheritedDoc}
-     */
+    @Override
     public void start(final int port, final CountDownLatch counter, final byte[] data) throws IOException {
-        factory = new NioClientSocketChannelFactory();
-        ClientBootstrap bootstrap = new ClientBootstrap(factory);
-        bootstrap.setOption("sendBufferSize", 64 * 1024);
-        bootstrap.setOption("tcpNoDelay", true);
-        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-            public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(new SimpleChannelUpstreamHandler() {
-                    private void sendMessage(ChannelHandlerContext ctx, byte[] data) {
-                        ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(data);
-                        ctx.getChannel().write(buffer);
-                    }
-
+        group = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+        try {
+            ChannelFuture connected = new Bootstrap()
+                .group(group)
+                .channel(NioSocketChannel.class)
+                .option(ChannelOption.SO_SNDBUF, 64 * 1024)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-                        if (e.getMessage() instanceof ChannelBuffer) {
-                            ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
-                            for (int i = 0; i < buffer.readableBytes(); ++i) {
-                                counter.countDown();
-                                if (counter.getCount() > 0) {
-                                    sendMessage(ctx, data);
-                                } else {
-                                    ctx.getChannel().close();
+                    protected void initChannel(SocketChannel channel) {
+                        channel.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() {
+                            @Override
+                            public void channelActive(ChannelHandlerContext ctx) {
+                                sendMessage(ctx);
+                            }
+
+                            @Override
+                            protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buffer) {
+                                for (int i = 0; i < buffer.readableBytes(); ++i) {
+                                    counter.countDown();
+                                    if (counter.getCount() == 0) {
+                                        ctx.close();
+                                        return;
+                                    }
+                                    sendMessage(ctx);
                                 }
                             }
-                        } else {
-                            throw new IllegalArgumentException(e.getMessage().getClass().getName());
-                        }
-                    }
 
-                    @Override
-                    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-                        sendMessage(ctx, data);
+                            private void sendMessage(ChannelHandlerContext ctx) {
+                                ctx.writeAndFlush(Unpooled.wrappedBuffer(data));
+                            }
+                        });
                     }
-
-                });
+                })
+                .connect(new InetSocketAddress(port)).awaitUninterruptibly();
+            if (!connected.isSuccess()) {
+                throw new IOException("Could not connect Netty benchmark client to port " + port, connected.cause());
             }
-        });
-        bootstrap.connect(new InetSocketAddress(port));
+        } catch (IOException | RuntimeException | Error e) {
+            stop();
+            throw e;
+        }
     }
 
     /**
-     * {@inheritedDoc}
+     * {@inheritDoc}
      */
-    public void stop() throws IOException {
-        factory.releaseExternalResources();
+    @Override
+    public void stop() {
+        if (group != null) {
+            group.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS).awaitUninterruptibly();
+            group = null;
+        }
     }
 }

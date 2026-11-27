@@ -24,17 +24,17 @@
   <parent>
     <groupId>org.apache.mina</groupId>
     <artifactId>mina-parent</artifactId>
-    <version>2.0.8-SNAPSHOT</version>
+    <version>2.2.11-SNAPSHOT</version>
   </parent>
 
   <artifactId>mina-benchmarks</artifactId>
   <groupId>org.apache.mina</groupId>
-  <version>2.0.12-SNAPSHOT</version>
+  <version>2.2.11-SNAPSHOT</version>
   <name>Apache MINA Benchmarks tests</name>
   <properties>
      <!-- defined in order to run against a different MINA version -->
      <mina.version>${project.version}</mina.version>
-     <netty.version>3.5.9.Final</netty.version>
+     <netty.version>4.2.21.Final</netty.version>
   </properties>
 
   <dependencies>
@@ -47,7 +47,7 @@
     </dependency>
     <dependency>
       <groupId>io.netty</groupId>
-      <artifactId>netty</artifactId>
+      <artifactId>netty-transport</artifactId>
       <version>${netty.version}</version>
       <scope>test</scope>
     </dependency>
