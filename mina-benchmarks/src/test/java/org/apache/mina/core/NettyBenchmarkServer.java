@@ -21,157 +21,124 @@ package org.apache.mina.core;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.ChildChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.nio.NioIoHandler;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class NettyBenchmarkServer implements BenchmarkServer {
 
-    private static enum State {
+    private enum State {
         WAIT_FOR_FIRST_BYTE_LENGTH, WAIT_FOR_SECOND_BYTE_LENGTH, WAIT_FOR_THIRD_BYTE_LENGTH, WAIT_FOR_FOURTH_BYTE_LENGTH, READING
     }
 
-    private static final ChannelBuffer ACK = ChannelBuffers.buffer(1);
+    private static final ByteBuf ACK = Unpooled.unreleasableBuffer(Unpooled.wrappedBuffer(new byte[] { 0 }));
 
-    static {
-        ACK.writeByte(0);
-    }
+    private EventLoopGroup acceptorGroup;
+    private EventLoopGroup workerGroup;
 
-    private static final String STATE_ATTRIBUTE = NettyBenchmarkServer.class.getName() + ".state";
-
-    private static final String LENGTH_ATTRIBUTE = NettyBenchmarkServer.class.getName() + ".length";
-
-    private ChannelFactory factory;
-    
-    /**
-     * Allocate a map as attachment for storing attributes.
-     * 
-     * @param ctx the channel context
-     * @return the map from the attachment
-     */
-    protected static Map<String, Object> getAttributesMap(ChannelHandlerContext ctx) {
-        Map<String, Object> map = (Map<String, Object>) ctx.getAttachment();
-        if (map == null) {
-            map = new HashMap<String, Object>();
-            ctx.setAttachment(map);
-        }
-        return map;
-    }
-
-    private static void setAttribute(ChannelHandlerContext ctx, String name, Object value) {
-        getAttributesMap(ctx).put(name, value);
-    }
-
-    
-    private static Object getAttribute(ChannelHandlerContext ctx, String name) {
-        return getAttributesMap(ctx).get(name);
-    }
-    
     /**
      * {@inheritDoc}
      */
+    @Override
     public void start(int port) throws IOException {
-        factory = new NioServerSocketChannelFactory();
-        ServerBootstrap bootstrap = new ServerBootstrap(factory);
-        bootstrap.setOption("receiveBufferSize", 128 * 1024);
-        bootstrap.setOption("tcpNoDelay", true);
-        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-            public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(new SimpleChannelUpstreamHandler() {
+        acceptorGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
+        try {
+            workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+            ChannelFuture bound = new ServerBootstrap()
+                .group(acceptorGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_RCVBUF, 128 * 1024)
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    public void childChannelOpen(ChannelHandlerContext ctx, ChildChannelStateEvent e) throws Exception {
-                        System.out.println("childChannelOpen");
-                        setAttribute(ctx, STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
+                    protected void initChannel(SocketChannel channel) {
+                        channel.pipeline().addLast(new BenchmarkServerHandler());
                     }
-
-                    @Override
-                    public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-                        System.out.println("channelOpen");
-                        setAttribute(ctx, STATE_ATTRIBUTE, State.WAIT_FOR_FIRST_BYTE_LENGTH);
-                    }
-                    
-                    @Override
-                    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-                        if (e.getMessage() instanceof ChannelBuffer) {
-                            ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
-                            
-                            State state = (State) getAttribute(ctx, STATE_ATTRIBUTE);
-                            int length = 0;
-                            if (getAttributesMap(ctx).containsKey(LENGTH_ATTRIBUTE)) {
-                                length = (Integer) getAttribute(ctx, LENGTH_ATTRIBUTE);
-                            }
-                            while (buffer.readableBytes() > 0) {
-                                switch (state) {
-                                case WAIT_FOR_FIRST_BYTE_LENGTH:
-                                    length = (buffer.readByte() & 255) << 24;
-                                    state = State.WAIT_FOR_SECOND_BYTE_LENGTH;
-                                    break;
-                                case WAIT_FOR_SECOND_BYTE_LENGTH:
-                                    length += (buffer.readByte() & 255) << 16;
-                                    state = State.WAIT_FOR_THIRD_BYTE_LENGTH;
-                                    break;
-                                case WAIT_FOR_THIRD_BYTE_LENGTH:
-                                    length += (buffer.readByte() & 255) << 8;
-                                    state = State.WAIT_FOR_FOURTH_BYTE_LENGTH;
-                                    break;
-                                case WAIT_FOR_FOURTH_BYTE_LENGTH:
-                                    length += (buffer.readByte() & 255);
-                                    state = State.READING;
-                                    if ((length == 0) && (buffer.readableBytes() == 0)) {
-                                        ctx.getChannel().write(ACK.slice());
-                                        state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
-                                    }
-                                    break;
-                                case READING:
-                                    int remaining = buffer.readableBytes();
-                                    if (length > remaining) {
-                                        length -= remaining;
-                                        buffer.skipBytes(remaining);
-                                    } else {
-                                        buffer.skipBytes(length);
-                                        ctx.getChannel().write(ACK.slice());
-                                        state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
-                                        length = 0;
-                                    }
-                                }
-                            }
-                            setAttribute(ctx, STATE_ATTRIBUTE, state);
-                            setAttribute(ctx, LENGTH_ATTRIBUTE, length);
-                        }
-                    }
-
-                    @Override
-                    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-                        e.getCause().printStackTrace();
-                    }
-                });
+                })
+                .bind(new InetSocketAddress(port)).awaitUninterruptibly();
+            if (!bound.isSuccess()) {
+                throw new IOException("Could not bind Netty benchmark server to port " + port, bound.cause());
             }
-        });
-        bootstrap.bind(new InetSocketAddress(port));
+        } catch (IOException | RuntimeException | Error e) {
+            stop();
+            throw e;
+        }
     }
 
     /**
-     * {@inheritedDoc}
+     * {@inheritDoc}
      */
-    public void stop() throws IOException {
-        factory.releaseExternalResources();
+    @Override
+    public void stop() {
+        if (acceptorGroup != null) {
+            acceptorGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS).awaitUninterruptibly();
+            acceptorGroup = null;
+        }
+        if (workerGroup != null) {
+            workerGroup.shutdownGracefully(0, 0, TimeUnit.MILLISECONDS).awaitUninterruptibly();
+            workerGroup = null;
+        }
+    }
+
+    private static final class BenchmarkServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
+
+        private State state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
+
+        private int length;
+
+        @Override
+        protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buffer) {
+            while (buffer.isReadable()) {
+                switch (state) {
+                case WAIT_FOR_FIRST_BYTE_LENGTH:
+                    length = buffer.readUnsignedByte() << 24;
+                    state = State.WAIT_FOR_SECOND_BYTE_LENGTH;
+                    break;
+                case WAIT_FOR_SECOND_BYTE_LENGTH:
+                    length += buffer.readUnsignedByte() << 16;
+                    state = State.WAIT_FOR_THIRD_BYTE_LENGTH;
+                    break;
+                case WAIT_FOR_THIRD_BYTE_LENGTH:
+                    length += buffer.readUnsignedByte() << 8;
+                    state = State.WAIT_FOR_FOURTH_BYTE_LENGTH;
+                    break;
+                case WAIT_FOR_FOURTH_BYTE_LENGTH:
+                    length += buffer.readUnsignedByte();
+                    if (length == 0) {
+                        ctx.writeAndFlush(ACK.duplicate());
+                        state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
+                    } else {
+                        state = State.READING;
+                    }
+                    break;
+                case READING:
+                    int remaining = buffer.readableBytes();
+                    if (length > remaining) {
+                        length -= remaining;
+                        buffer.skipBytes(remaining);
+                    } else {
+                        buffer.skipBytes(length);
+                        ctx.writeAndFlush(ACK.duplicate());
+                        state = State.WAIT_FOR_FIRST_BYTE_LENGTH;
+                    }
+                    break;
+                }
+            }
+        }
     }
 }
