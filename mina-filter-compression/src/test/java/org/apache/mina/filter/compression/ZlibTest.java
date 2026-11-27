@@ -19,18 +19,18 @@
  */
 package org.apache.mina.filter.compression;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThrows;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -40,7 +40,7 @@ public class ZlibTest {
 
     private Zlib inflater = null;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         deflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_DEFLATER);
         inflater = new Zlib(Zlib.COMPRESSION_MAX, Zlib.MODE_INFLATER);

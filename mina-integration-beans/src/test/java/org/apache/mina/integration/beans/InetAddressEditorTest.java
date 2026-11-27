@@ -19,13 +19,14 @@
  */
 package org.apache.mina.integration.beans;
 
-import static org.junit.Assert.assertEquals;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests {@link InetAddressEditor}.
@@ -35,7 +36,7 @@ import org.junit.Test;
 public class InetAddressEditorTest {
     InetAddressEditor editor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         editor = new InetAddressEditor();
     }

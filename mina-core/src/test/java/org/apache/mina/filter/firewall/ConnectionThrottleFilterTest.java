@@ -20,15 +20,15 @@
 
 package org.apache.mina.filter.firewall;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.session.DummySession;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * TODO Add documentation
@@ -42,7 +42,7 @@ public class ConnectionThrottleFilterTest {
 
     private DummySession sessionTwo;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         filter = new ConnectionThrottleFilter();
 
@@ -52,7 +52,7 @@ public class ConnectionThrottleFilterTest {
         sessionTwo.setRemoteAddress(new InetSocketAddress(1235));
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         filter = null;
     }

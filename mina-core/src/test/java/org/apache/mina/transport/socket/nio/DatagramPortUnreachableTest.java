@@ -19,8 +19,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import static org.junit.Assert.assertEquals;
-
 import java.net.InetSocketAddress;
 import java.net.PortUnreachableException;
 
@@ -31,7 +29,9 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.util.AvailablePortFinder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests {@link DatagramSessionConfig#setCloseOnPortUnreachable(boolean)}.

@@ -18,7 +18,6 @@
  *
  */
 package org.apache.mina.example.echoserver;
-import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -35,10 +34,12 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.util.AvailablePortFinder;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests echo server example.
@@ -83,7 +84,7 @@ public abstract class AbstractTest {
         return buf.getHexDump();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         // Disable SSL by default
         useSSL = false;
@@ -188,7 +189,7 @@ public abstract class AbstractTest {
         LOGGER.info("Using port " + port + " for testing.");
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         if (boundAddress != null) {
             socketAcceptor.dispose();

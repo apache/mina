@@ -19,20 +19,20 @@
  */
 package org.apache.mina.filter.codec;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.net.SocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.DefaultTransportMetadata;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.IoSessionConfig;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests {@link CumulativeProtocolDecoder}.
@@ -46,7 +46,7 @@ public class CumulativeProtocolDecoderTest {
 
     private IntegerDecoder decoder;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         buf = IoBuffer.allocate(16);
         decoder = new IntegerDecoder();
@@ -54,7 +54,7 @@ public class CumulativeProtocolDecoderTest {
                 IoSessionConfig.class, IoBuffer.class));
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         decoder.dispose(session);
     }

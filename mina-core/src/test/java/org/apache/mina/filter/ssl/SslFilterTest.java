@@ -38,11 +38,11 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SslFilterTest {
 
@@ -113,7 +113,7 @@ public class SslFilterTest {
                     IoBuffer data = createMosaicRequest(msgSize);
                     clientSocket.write(data).await();
                     data.free();
-                    assertTrue(received.await(5, TimeUnit.SECONDS));
+                    assertTrue(received.await(5, TimeUnit.SECONDS), "Message receive failed");
                     assertNoException(filter.getFailure());
                 }
             } finally {

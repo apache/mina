@@ -20,7 +20,7 @@
 package org.apache.mina.proxy;
 
 import static org.apache.mina.proxy.utils.ByteUtilities.asHex;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -30,7 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMResponses;
 import org.apache.mina.proxy.handlers.http.ntlm.NTLMUtilities;
 import org.apache.mina.proxy.utils.ByteUtilities;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

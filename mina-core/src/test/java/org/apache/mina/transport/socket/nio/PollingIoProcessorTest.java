@@ -19,8 +19,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
@@ -39,8 +37,10 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.session.SessionState;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests non regression on issue DIRMINA-632.
@@ -48,7 +48,7 @@ import org.junit.Test;
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
  */
 public class PollingIoProcessorTest {
-    @Ignore
+    @Disabled
     @Test
     public void testExceptionOnWrite() throws Exception {
         final Executor ex = Executors.newFixedThreadPool(1);

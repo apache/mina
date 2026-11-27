@@ -19,15 +19,16 @@
  */
 package org.apache.mina.statemachine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 import org.apache.mina.statemachine.context.DefaultStateContext;
 import org.apache.mina.statemachine.context.StateContext;
 import org.apache.mina.statemachine.event.Event;
 import org.apache.mina.statemachine.transition.AbstractSelfTransition;
 import org.apache.mina.statemachine.transition.AbstractTransition;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Tests {@link StateMachine}.

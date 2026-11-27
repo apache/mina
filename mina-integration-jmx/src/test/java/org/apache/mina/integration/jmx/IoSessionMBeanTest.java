@@ -16,15 +16,16 @@
  */
 package org.apache.mina.integration.jmx;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.core.session.IoSession;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests that the {@link IoSessionMBean} <code>attributes</code> MBean attribute does not
@@ -32,6 +33,7 @@ import org.junit.Test;
  * unless the embedder explicitly opts in.
  */
 public class IoSessionMBeanTest {
+
     @Test
     public void testAttributeValuesAreRedactedByDefault() throws Exception {
         IoSession session = new DummySession();

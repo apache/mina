@@ -19,11 +19,6 @@
  */
 package org.apache.mina.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -36,8 +31,13 @@ import org.apache.mina.filter.codec.AbstractProtocolDecoderOutput;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.http.api.HttpEndOfContent;
 import org.apache.mina.http.api.HttpRequest;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class HttpServerDecoderTest {
     private static final String DECODER_STATE_ATT = "http.ds";
@@ -109,7 +109,7 @@ public class HttpServerDecoderTest {
     /**
      * Be sure to clean the session to get back in NEW state
      */
-    @After
+    @AfterEach
     public void shutdown() {
         session.removeAttribute(DECODER_STATE_ATT);
     }
@@ -361,7 +361,7 @@ public class HttpServerDecoderTest {
         int prevBufferPosition = buffer.position();
         while (buffer.hasRemaining()) {
             decoder.decode(session, buffer, out);
-            assertNotEquals("Buffer at new position", prevBufferPosition, buffer.position());
+            assertNotEquals(prevBufferPosition, buffer.position(), "Buffer at new position");
             prevBufferPosition = buffer.position();
         }
         assertEquals(2, out.getQueue().size());

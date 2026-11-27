@@ -20,14 +20,14 @@
 package org.apache.mina.statemachine;
 
 import org.apache.mina.statemachine.transition.Transition;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -44,7 +44,7 @@ public class StateTest {
 
     private Transition transition3;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         state = new State("test");
         transition1 = mock(Transition.class);

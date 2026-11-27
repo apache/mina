@@ -19,13 +19,6 @@
  */
 package org.apache.mina.core.buffer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -45,7 +38,16 @@ import org.apache.mina.core.buffer.matcher.RegexpClassNameMatcher;
 import org.apache.mina.core.buffer.matcher.WildcardClassNameMatcher;
 import org.apache.mina.util.Bar;
 import org.apache.mina.util.Foo;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests the {@link IoBuffer} class.
@@ -312,11 +314,11 @@ public class IoBufferTest {
         IoBuffer buffer = IoBuffer.allocate(8, false);
         buffer.setAutoExpand(true);
 
-        assertTrue("Should AutoExpand", buffer.isAutoExpand());
+        assertTrue(buffer.isAutoExpand(), "Should AutoExpand");
 
         IoBuffer slice = buffer.slice();
-        assertFalse("Should *NOT* AutoExpand", buffer.isAutoExpand());
-        assertFalse("Should *NOT* AutoExpand", slice.isAutoExpand());
+        assertFalse(buffer.isAutoExpand(), "Should *NOT* AutoExpand");
+        assertFalse(slice.isAutoExpand(), "Should *NOT* AutoExpand");
     }
 
     /**
@@ -391,7 +393,7 @@ public class IoBufferTest {
         assertNotSame(o, o2);
     }
 
-    @Test(expected=ClassNotFoundException.class)
+    @Test
     public void testObjectSerializationReject() throws Exception {
         IoBuffer buf = IoBuffer.allocate(16);
         buf.setAutoExpand(true);
@@ -409,7 +411,9 @@ public class IoBufferTest {
         buf.clear();
 
         // The call should fail as long is not accepted
-        buf.getObject();
+        Assertions.assertThrows(ClassNotFoundException.class, () -> {
+            buf.getObject();
+        });
     }
 
     @Test
@@ -468,8 +472,8 @@ public class IoBufferTest {
         assertSame(c, o);
     }
 
-    @Test(expected=BufferDataException.class)
-    public void testNonSerializableBaseClassReject() throws Exception {
+    @Test
+    public void testNonSerializableBaseClassReject() {
         Class<?> c = String.class;
 
         IoBuffer buffer = IoBuffer.allocate(16);
@@ -478,9 +482,10 @@ public class IoBufferTest {
         // Don't accept the java.lang.String class
 
         buffer.flip();
-        
-        // Should throw an exception
-        buffer.getObject();
+
+        assertThrows(BufferDataException.class, () -> {
+            buffer.getObject();
+        });
     }
 
     @Test
@@ -500,7 +505,7 @@ public class IoBufferTest {
     }
 
 
-    @Test(expected=ClassNotFoundException.class)
+    @Test
     public void testNonserializableInterfaceReject() throws Exception {
         Class<?> c = NonSerializableInterface.class;
 
@@ -510,8 +515,9 @@ public class IoBufferTest {
 
         buffer.flip();
 
-        // We must get an error
-        buffer.getObject();
+        assertThrows(ClassNotFoundException.class, () -> {
+            buffer.getObject();
+        });
     }
 
     @Test
@@ -530,7 +536,7 @@ public class IoBufferTest {
         assertSame(c, o);
     }
 
-    @Test(expected=ClassNotFoundException.class)
+    @Test
     public void testNonSerializableClassReject() throws Exception {
         Class<?> c = NonSerializableClass.class;
 
@@ -541,7 +547,9 @@ public class IoBufferTest {
         buffer.flip();
 
         // The call must fail
-        buffer.getObject();
+        assertThrows(ClassNotFoundException.class, () -> {
+            buffer.getObject();
+        });
     }
 
     @Test
@@ -558,15 +566,16 @@ public class IoBufferTest {
 
     /**
      * Test that we can't allocate a buffer with a negative value
-     * @throws Exception If allocation failed
      */
-    @Test(expected=IllegalArgumentException.class)
-    public void testAllocateNegative() throws Exception {
-        IoBuffer.allocate(-1);
+    @Test
+    public void testAllocateNegative() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            IoBuffer.allocate(-1);
+        });
     }
 
     @Test
-    public void testAutoExpand() throws Exception {
+    public void testAutoExpand() {
         IoBuffer buf = IoBuffer.allocate(1);
 
         buf.put((byte) 0);

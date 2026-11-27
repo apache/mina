@@ -19,8 +19,6 @@
  */
 package org.apache.mina.example.echoserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -37,11 +35,14 @@ import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AvailablePortFinder;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests echo server example.
@@ -64,7 +65,7 @@ public class ConnectorTest extends AbstractTest {
         // Do nothing
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         handler = new EchoConnectorHandler();
@@ -79,7 +80,7 @@ public class ConnectorTest extends AbstractTest {
     }
 
     @Test 
-    @Ignore
+    @Disabled
     public void testTCPWithSSL() throws Exception {
         useSSL = true;
         // Create a connector

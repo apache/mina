@@ -19,11 +19,6 @@
  */
 package org.apache.mina.proxy;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.net.InetSocketAddress;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -34,7 +29,12 @@ import org.apache.mina.proxy.handlers.http.HttpProxyRequest;
 import org.apache.mina.proxy.handlers.http.HttpProxyResponse;
 import org.apache.mina.proxy.session.ProxyIoSession;
 import org.apache.mina.proxy.utils.IoBufferDecoder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Regression tests: sizes declared by the proxy during the HTTP handshake
@@ -86,7 +86,7 @@ public class HttpProxyResponseBodyLimitTest {
                     + "Proxy-Authenticate: Basic realm=\"test\"\r\n" + "Content-Length: 2000000000\r\n" + "\r\n"));
             fail("expected ProxyAuthException for a 2 GB declared Content-Length");
         } catch (ProxyAuthException expected) {
-            assertTrue(expected.getMessage(), expected.getMessage().contains("Content-Length"));
+            assertTrue(expected.getMessage().contains("Content-Length"), expected.getMessage());
         }
     }
 
@@ -100,7 +100,7 @@ public class HttpProxyResponseBodyLimitTest {
                     + "7ffffff0\r\n"));
             fail("expected ProxyAuthException for a ~2 GB declared chunk size");
         } catch (ProxyAuthException expected) {
-            assertTrue(expected.getMessage(), expected.getMessage().contains("chunk size"));
+            assertTrue(expected.getMessage().contains("chunk size"), expected.getMessage());
         }
     }
 
@@ -111,7 +111,7 @@ public class HttpProxyResponseBodyLimitTest {
         handler.messageReceived(null, response("HTTP/1.0 407 Proxy Authentication Required\r\n"
                 + "Proxy-Authenticate: Basic realm=\"test\"\r\n" + "Content-Length: 5\r\n" + "\r\n" + "hello"));
 
-        assertTrue("small entity bodies must still be decoded and handled", handler.responseHandled);
+        assertTrue(handler.responseHandled, "small entity bodies must still be decoded and handled");
     }
 
     @Test
@@ -120,8 +120,7 @@ public class HttpProxyResponseBodyLimitTest {
         // content must still be reassembled correctly.
         IoBufferDecoder decoder = new IoBufferDecoder(10);
 
-        assertNull("partial content must not complete decoding",
-                decoder.decodeFully(IoBuffer.wrap("hello".getBytes())));
+        assertNull(decoder.decodeFully(IoBuffer.wrap("hello".getBytes())), "partial content must not complete decoding");
 
         IoBuffer decoded = decoder.decodeFully(IoBuffer.wrap("world".getBytes()));
         assertNotNull(decoded);
@@ -129,7 +128,7 @@ public class HttpProxyResponseBodyLimitTest {
 
         byte[] content = new byte[decoded.remaining()];
         decoded.get(content);
-        assertTrue("reassembled content must match", new String(content).equals("helloworld"));
+        assertTrue(new String(content).equals("helloworld"), "reassembled content must match");
     }
 
     @Test

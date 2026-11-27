@@ -19,13 +19,14 @@
  */
 package org.apache.mina.example.chat;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.mina.core.service.IoService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * TODO Add documentation
@@ -36,7 +37,7 @@ public class SpringMainTest {
 
     private ConfigurableApplicationContext appContext;
 
-    @Before
+    @BeforeEach
     public void tearDown() throws Exception {
         if (appContext != null) {
             appContext.close();

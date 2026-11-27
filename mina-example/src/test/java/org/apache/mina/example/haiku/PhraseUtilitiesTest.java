@@ -18,9 +18,9 @@
  */
 package org.apache.mina.example.haiku;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author <a href="http://mina.apache.org">Apache MINA Project</a>
@@ -65,7 +65,6 @@ public class PhraseUtilitiesTest {
     }
 
     private static void assertSyllableCount(int count, String word) {
-        assertEquals("syllables in " + word, count, PhraseUtilities
-                .countSyllablesInWord(word.toLowerCase()));
+        assertEquals(count, PhraseUtilities.countSyllablesInWord(word.toLowerCase()), "syllables in " + word);
     }
 }

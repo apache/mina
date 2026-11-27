@@ -19,15 +19,6 @@
  */
 package org.apache.mina.transport.socket.nio;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.net.InetSocketAddress;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.ReadFuture;
@@ -35,7 +26,16 @@ import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UseReadOperationTest {
 
@@ -64,12 +64,12 @@ public class UseReadOperationTest {
 
             try {
                 ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost", port));
-                assertTrue("Connect failed", connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
+                assertTrue(connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS), "Connect failed");
 
                 IoSession session = connectFuture.getSession();
 
                 ReadFuture readFuture = session.read();
-                assertTrue("Read failed", readFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
+                assertTrue(readFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS), "Read failed");
 
                 IoBuffer message = (IoBuffer) readFuture.getMessage();
                 assertEquals(1, message.remaining());
@@ -114,7 +114,7 @@ public class UseReadOperationTest {
 
             try {
                 ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost", port));
-                assertTrue("Connect failed", connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
+                assertTrue(connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS), "Connect failed");
 
                 connectFuture.getSession().getConfig().setUseReadOperation(true);
 
@@ -127,7 +127,7 @@ public class UseReadOperationTest {
                     message = (IoBuffer) readFuture.getMessage();
                 } else {
                     // message received via IO handler (useReadOperation flag was not picked up before message delivery)
-                    assertTrue("Message handler receive failed", receiveViaHandler.await(4L, TimeUnit.SECONDS));
+                    assertTrue(receiveViaHandler.await(4L, TimeUnit.SECONDS), "Message handler receive failed");
                     message = receivedMessage.get();
                 }
 
@@ -181,13 +181,13 @@ public class UseReadOperationTest {
 
             try {
                 ConnectFuture connectFuture = connector.connect(new InetSocketAddress("localhost", port));
-                assertTrue("Connect failed", connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
+                assertTrue(connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS), "Connect failed");
 
                 connectFuture.getSession().getConfig().setUseReadOperation(true);
                 readOperationSet.set(true);
 
                 ReadFuture readFuture = connectFuture.getSession().read();
-                assertTrue("Message receive failed", readFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
+                assertTrue(readFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS), "Message receive failed");
 
                 IoBuffer message = (IoBuffer) readFuture.getMessage();
                 assertEquals(1, message.remaining());

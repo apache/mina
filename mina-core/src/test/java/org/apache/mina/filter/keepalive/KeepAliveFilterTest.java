@@ -20,8 +20,8 @@
 package org.apache.mina.filter.keepalive;
 
 import static org.apache.mina.filter.keepalive.KeepAliveRequestTimeoutHandler.EXCEPTION;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -34,9 +34,9 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link KeepAliveFilter} used by the connector with different
@@ -58,7 +58,7 @@ public class KeepAliveFilterTest {
 
     private NioSocketAcceptor acceptor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         acceptor = new NioSocketAcceptor();
         KeepAliveMessageFactory factory = new ServerFactory();
@@ -70,7 +70,7 @@ public class KeepAliveFilterTest {
         port = acceptor.getLocalAddress().getPort();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         acceptor.unbind();
         acceptor.dispose();
@@ -123,7 +123,7 @@ public class KeepAliveFilterTest {
 
         Thread.sleep((INTERVAL + TIMEOUT + 1) * 1000);
 
-        assertFalse("got an exception on the client", gotException.get());
+        assertFalse(gotException.get(), "got an exception on the client");
 
         session.closeNow();
         connector.dispose();

@@ -19,18 +19,15 @@
  */
 package org.apache.mina.core.buffer;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 
-
-import org.junit.Test;
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClinitDescriptorTest {
     static final class ClinitFlags {
@@ -82,8 +79,8 @@ public class ClinitDescriptorTest {
         // expected: aborts after the class name
         }
         
-        assertFalse("ZDRES-233: <clinit> of an allow-listed class must not run during "
-                + "descriptor resolution of an aborted stream", ClinitFlags.truncatedProbeInitialized);
+        assertFalse(ClinitFlags.truncatedProbeInitialized, "ZDRES-233: <clinit> of an allow-listed class must not run during "
+                + "descriptor resolution of an aborted stream");
         }
 
     

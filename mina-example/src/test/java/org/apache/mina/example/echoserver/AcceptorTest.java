@@ -19,10 +19,6 @@
  */
 package org.apache.mina.example.echoserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -33,7 +29,11 @@ import java.util.Arrays;
 
 import org.apache.mina.example.echoserver.ssl.SSLServerSocketFactory;
 import org.apache.mina.example.echoserver.ssl.SSLSocketFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests echo server example.

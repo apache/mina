@@ -19,9 +19,6 @@
  */
 package org.apache.mina.transport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,7 +35,10 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.util.AcceptorBindUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * TODO Add documentation
@@ -56,7 +56,7 @@ public abstract class AbstractFileRegionTest {
     @Test
     public void testSendLargeFile() throws Throwable {
         File file = createLargeFile();
-        assertEquals("Test file not as big as specified", FILE_SIZE, file.length());
+        assertEquals(FILE_SIZE, file.length(), "Test file not as big as specified");
 
         final CountDownLatch latch = new CountDownLatch(1);
         final boolean[] success = { false };
@@ -132,10 +132,9 @@ public abstract class AbstractFileRegionTest {
             if (exception[0] != null) {
                 throw exception[0];
             }
-            assertTrue("Did not complete file transfer successfully", success[0]);
-
-            assertEquals("Written messages should be 1 (we wrote one file)", 1, session.getWrittenMessages());
-            assertEquals("Written bytes should match file size", FILE_SIZE, session.getWrittenBytes());
+            assertTrue(success[0], "Did not complete file transfer successfully");
+            assertEquals(1, session.getWrittenMessages(), "Written messages should be 1 (we wrote one file)");
+            assertEquals(FILE_SIZE, session.getWrittenBytes(), "Written bytes should match file size");
         } finally {
             try {
                 connector.dispose();

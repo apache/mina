@@ -36,9 +36,9 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.apache.mina.util.AcceptorBindUtil;
 import org.apache.mina.util.DaemonThreadFactory;
 import org.apache.mina.util.ThreadUtil;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,14 +68,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@RunWith(Parameterized.class)
 public class SocksProxyTest {
 
     private static final String KEY_MANAGER_FACTORY_ALGORITHM;
@@ -94,50 +94,32 @@ public class SocksProxyTest {
     }
 
     // @formatter:off
-    @Parameterized.Parameters(name = "{index}: {0} / {1} / {2} / nonBlockingPipelineEnabled={3} / sslEnabled={4}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                // SSL + SOCKS_4
-                {"TLSv1.2", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", SocksProxyConstants.SOCKS_VERSION_4, true, true},
-                {"TLSv1.3", "TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384", SocksProxyConstants.SOCKS_VERSION_4, true, true},
-                {"TLSv1.2", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", SocksProxyConstants.SOCKS_VERSION_4, false, true},
-                {"TLSv1.3", "TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384", SocksProxyConstants.SOCKS_VERSION_4, false, true},
-                // SSL + SOCKS_5
-                {"TLSv1.2", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", SocksProxyConstants.SOCKS_VERSION_5, true, true},
-                {"TLSv1.3", "TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384", SocksProxyConstants.SOCKS_VERSION_5, true, true},
-                {"TLSv1.2", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", SocksProxyConstants.SOCKS_VERSION_5, false, true},
-                {"TLSv1.3", "TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384", SocksProxyConstants.SOCKS_VERSION_5, false, true},
-                // SOCKS_4
-                {"", "", SocksProxyConstants.SOCKS_VERSION_4, true, false},
-                {"", "", SocksProxyConstants.SOCKS_VERSION_4, false, false},
-                {"", "", SocksProxyConstants.SOCKS_VERSION_4, true, false},
-                {"", "", SocksProxyConstants.SOCKS_VERSION_4, false, false},
-                // SOCKS_5
-                {"", "", SocksProxyConstants.SOCKS_VERSION_5, true, false},
-                {"", "", SocksProxyConstants.SOCKS_VERSION_5, false, false},
-                {"", "", SocksProxyConstants.SOCKS_VERSION_5, true, false},
-                {"", "", SocksProxyConstants.SOCKS_VERSION_5, false, false},
-        });
+    public static Stream<Arguments>  data() {
+        return Stream.of(
+            // SSL + SOCKS_4
+            Arguments.of("TLSv1.2", new String[] {"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"}, SocksProxyConstants.SOCKS_VERSION_4, true, true),
+            Arguments.of("TLSv1.3", new String[] {"TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384"}, SocksProxyConstants.SOCKS_VERSION_4, true, true),
+            Arguments.of("TLSv1.2", new String[] {"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"}, SocksProxyConstants.SOCKS_VERSION_4, false, true),
+            Arguments.of("TLSv1.3", new String[] {"TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384"}, SocksProxyConstants.SOCKS_VERSION_4, false, true),
+            // SSL + SOCKS_5
+            Arguments.of("TLSv1.2", new String[] {"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"}, SocksProxyConstants.SOCKS_VERSION_5, true, true),
+            Arguments.of("TLSv1.3", new String[] {"TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384"}, SocksProxyConstants.SOCKS_VERSION_5, true, true),
+            Arguments.of("TLSv1.2", new String[] {"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"}, SocksProxyConstants.SOCKS_VERSION_5, false, true),
+            Arguments.of("TLSv1.3", new String[] {"TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384"}, SocksProxyConstants.SOCKS_VERSION_5, false, true),
+            // SOCKS_4
+            Arguments.of("", new String[] {""}, SocksProxyConstants.SOCKS_VERSION_4, true, false),
+            Arguments.of("", new String[] {""}, SocksProxyConstants.SOCKS_VERSION_4, false, false),
+            // SOCKS_5
+            Arguments.of("", new String[] {""}, SocksProxyConstants.SOCKS_VERSION_5, true, false),
+            Arguments.of("", new String[] {""}, SocksProxyConstants.SOCKS_VERSION_5, false, false)
+        );
     }
     // @formatter:on
 
-    private final String protocol;
-    private final String[] cipherSuites;
-    private final byte socksVersion;
-    private final boolean nonBlockingPipelineEnabled;
-    private final boolean sslEnabled;
-
-    public SocksProxyTest(String protocol, String cipherSuites, byte socksVersion,
-            boolean nonBlockingPipelineEnabled, boolean sslEnabled) {
-        this.protocol = protocol;
-        this.cipherSuites = cipherSuites.split(",");
-        this.socksVersion = socksVersion;
-        this.nonBlockingPipelineEnabled = nonBlockingPipelineEnabled;
-        this.sslEnabled = sslEnabled;
-    }
-
-    @Test
-    public void shouldNotDeadlockUnderConcurrentReadsAndWrites() throws Exception {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void shouldNotDeadlockUnderConcurrentReadsAndWrites(String protocol, String[] cipherSuites,
+            byte socksVersion, boolean nonBlockingPipelineEnabled, boolean sslEnabled) throws Exception {
         byte[] payload = createPayload(MESSAGE_LENGTH);
         long expectedCount = MESSAGE_COUNT * MESSAGE_LENGTH * WRITER_COUNT;
         long expectedSum = 0L;
@@ -156,18 +138,20 @@ public class SocksProxyTest {
             InetSocketAddress proxyAddress = proxyServer.getLocalAddress();
 
             AcceptorHandler acceptorHandler = new AcceptorHandler();
-            NioSocketAcceptor acceptor = createAcceptor(acceptorHandler);
+            NioSocketAcceptor acceptor = createAcceptor(acceptorHandler, protocol, cipherSuites, socksVersion,
+                    nonBlockingPipelineEnabled, sslEnabled);
 
             try {
                 AcceptorBindUtil.tryBind(acceptor);
                 InetSocketAddress endpoint = new InetSocketAddress("127.0.0.1", acceptor.getLocalAddress().getPort());
 
                 ConnectorIoHandler connectorHandler = new ConnectorIoHandler();
-                ProxyConnector connector = createrSocksProxyConnector(connectorHandler, proxyAddress, endpoint);
+                ProxyConnector connector = createrSocksProxyConnector(connectorHandler, proxyAddress, endpoint,
+                        protocol, cipherSuites, socksVersion, nonBlockingPipelineEnabled, sslEnabled);
 
                 try {
                     ConnectFuture connectFuture = connector.connect(proxyAddress);
-                    assertTrue("Failed to connect", connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS));
+                    assertTrue(connectFuture.awaitUninterruptibly(4L, TimeUnit.SECONDS), "Failed to connect");
 
                     IoSession session = connectFuture.getSession();
                     ExecutorService executorService = Executors.newFixedThreadPool(WRITER_COUNT,
@@ -215,13 +199,13 @@ public class SocksProxyTest {
 
                         ThreadUtil.assertNoDeadlock();
 
-                        assertNull("Acceptor failure", acceptorHandler.getFailure());
-                        assertEquals("Acceptor byte count", expectedCount, acceptorHandler.receivedCount.get());
-                        assertEquals("Acceptor data sum", expectedSum, acceptorHandler.receivedSum.get());
+                        assertNull(acceptorHandler.getFailure(), "Acceptor failure");
+                        assertEquals(expectedCount, acceptorHandler.receivedCount.get(), "Acceptor byte count");
+                        assertEquals(expectedSum, acceptorHandler.receivedSum.get(), "Acceptor data sum");
 
-                        assertNull("Connector failure", connectorHandler.getFailure());
-                        assertEquals("Connector byte count", expectedCount, connectorHandler.receivedCount.get());
-                        assertEquals("Connector data sum", expectedSum, connectorHandler.receivedSum.get());
+                        assertNull(connectorHandler.getFailure(), "Connector failure");
+                        assertEquals(expectedCount, connectorHandler.receivedCount.get(), "Connector byte count");
+                        assertEquals(expectedSum, connectorHandler.receivedSum.get(), "Connector data sum");
                     } finally {
                         executorService.shutdown();
                     }
@@ -247,13 +231,14 @@ public class SocksProxyTest {
         }
     }
 
-    private NioSocketAcceptor createAcceptor(IoHandler handler) throws Exception {
+    private NioSocketAcceptor createAcceptor(IoHandler handler, String protocol, String[] cipherSuites,
+            byte socksVersion, boolean nonBlockingPipelineEnabled, boolean sslEnabled) throws Exception {
         NioSocketAcceptor acceptor = new NioSocketAcceptor();
         acceptor.setReuseAddress(true);
         acceptor.setHandler(handler);
 
         if (sslEnabled) {
-            SSLContext sslContext = createAcceptorSSLContext();
+            SSLContext sslContext = createAcceptorSSLContext(protocol);
 
             SslFilter sslFilter = new SslFilter(sslContext);
             sslFilter.setUseNonBlockingPipeline(nonBlockingPipelineEnabled);
@@ -267,12 +252,13 @@ public class SocksProxyTest {
     }
 
     private ProxyConnector createrSocksProxyConnector(IoHandler handler, InetSocketAddress proxyAddress,
-            InetSocketAddress endpointAddress) throws Exception {
+            InetSocketAddress endpointAddress, String protocol, String[] cipherSuites,
+            byte socksVersion, boolean nonBlockingPipelineEnabled, boolean sslEnabled) throws Exception {
         NioSocketConnector connector = new NioSocketConnector();
         connector.setHandler(handler);
 
         if (sslEnabled) {
-            SSLContext sslContext = createConnectorSslContext();
+            SSLContext sslContext = createConnectorSslContext(protocol);
 
             SslFilter sslFilter = new SslFilter(sslContext, false);
             sslFilter.setUseNonBlockingPipeline(nonBlockingPipelineEnabled);
@@ -293,7 +279,7 @@ public class SocksProxyTest {
         return proxyConnector;
     }
 
-    private SSLContext createAcceptorSSLContext() throws IOException, GeneralSecurityException {
+    private SSLContext createAcceptorSSLContext(String protocol) throws IOException, GeneralSecurityException {
         char[] passphrase = "password".toCharArray();
 
         SSLContext ctx = SSLContext.getInstance(protocol);
@@ -314,7 +300,7 @@ public class SocksProxyTest {
         return ctx;
     }
 
-    private SSLContext createConnectorSslContext() throws IOException, GeneralSecurityException {
+    private SSLContext createConnectorSslContext(String protocol) throws IOException, GeneralSecurityException {
         char[] passphrase = "password".toCharArray();
 
         SSLContext ctx = SSLContext.getInstance(protocol);

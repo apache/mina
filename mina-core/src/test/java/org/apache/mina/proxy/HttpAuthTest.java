@@ -19,14 +19,14 @@
  */
 package org.apache.mina.proxy;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashMap;
 
 import org.apache.mina.core.session.DummySession;
 import org.apache.mina.proxy.handlers.http.basic.HttpBasicAuthLogicHandler;
 import org.apache.mina.proxy.handlers.http.digest.DigestUtilities;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * HttpAuthTest.java - JUNIT tests of the HTTP Basic &amp; Digest authentication mechanisms.
