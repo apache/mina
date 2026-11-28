@@ -142,7 +142,7 @@
     <version.taglist.plugin>3.3.0</version.taglist.plugin>
     <version.tools.maven.plugin>1.4</version.tools.maven.plugin>
     <version.versions.plugin>2.25.3</version.versions.plugin>
-    <version.xbean.plugin>4.31</version.xbean.plugin>
+    <version.xbean.plugin>5.0.0</version.xbean.plugin>
 
     <!-- Jars -->
     <version.bcprov>1.87</version.bcprov>
